@@ -3,16 +3,24 @@ import h5py
 import math
 
 class Sequence():
+	"""
+	The Sequence object represents the common storage object for the 
+	nwb file. It can represent time series, signal events, image stacks
+	and experimental events.
+	"""
 	def __init__(self):
 		self.data = None
-		self.description = ""
-		self.sampling_rate = 0
-		self.num_samples = 0
-		self.resolution = None
-		self.filter_desc = ""
-		self.t = None
+		self.image_data = None
 		self.max_val = 0
 		self.min_val = 0
+		self.num_samples = 0
+		self.resolution = 1e-20
+		#
+		self.description = ""
+		self.filter_desc = ""
+		#
+		self.t = None
+		self.sampling_rate = 0
 		self.t_interval = 1
 		self.discontinuity_t = []
 		self.discontinuity_idx = []
@@ -21,8 +29,6 @@ class Sequence():
 		print "Description:   '%s'" % self.description
 		print "Sampling rate: %d" % self.sampling_rate
 		print "Num samples:   %d" % self.num_samples
-		if self.resolution == None:
-			self.resolution = 1e-20
 		print "Resolution:    %g" % self.resolution
 		print "Filter:        '%s'" % self.filter_desc
 		print "Max value:     %g" % self.max_val
@@ -40,15 +46,25 @@ class Sequence():
 			print "%8d\t%g" % (self.discontinuity_idx[i], self.discontinuity_t[i])
 		
 	def set_data(self, data, t, interval, dt, dt_err):
-		# t is array of all times
-		# interval is space between successive timestamps
-		# dt is expected interval between samples
-		# dt_err is max error before flagging discontinuity
-		# 
-		# sets t, t_interval, discontinuity_t, discontinuity_idx
-		#
+		"""
+		data is array of all data elements
+		t is array of all times
+		interval is space between successive timestamps
+		dt is expected interval between samples
+		dt_err is max error before flagging discontinuity
+		
+		sets object values, except description fields and data resolution
+		"""
+		# sanity check
 		assert len(data) == len(t)
+		#############################
+		# store data
 		self.data = data
+		self.max_val = max(data)
+		self.min_val = min(data)
+		self.num_samples = len(t)
+		#############################
+		# store temporal info
 		# create timestamp array
 		self.t = np.zeros(math.ceil(len(t)/interval))
 		for i in range(len(self.t)):
@@ -60,15 +76,11 @@ class Sequence():
 			if t[i] - t[i-1] > dt_err:
 				self.discontinuity_t.append(t[i])
 				self.discontinuity_idx.append(i)
-		# store number of samples
-		self.num_samples = len(t)
-		# calculate peaks
-		self.max_val = max(data)
-		self.min_val = min(data)
 
 
-	#def write_data(parent, seq_name):
 	def write_data(self, parent, seq_name):
+		""" create new dataset for sequence and write data 
+		"""
 		assert seq_name not in parent
 		seq = parent.create_group(seq_name)
 		meta = seq.create_group("meta")
@@ -88,8 +100,6 @@ class Sequence():
 		seq.create_dataset("sampling_rate", data=self.sampling_rate)
 		return seq, meta
 
-	def read(parent, name):
-		None
 		
 
 class ElectronicSequence(Sequence):
