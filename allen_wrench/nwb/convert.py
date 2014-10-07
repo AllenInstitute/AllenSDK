@@ -25,6 +25,82 @@ def timestamp_string(sec):
 	d += dd.timedelta(seconds=int(sec))
 	return d.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
+# calculate an amplitude-independent fingerprint
+# use length of monotonic increase/decreases/flatline
+def calc_stream_fingerprint(stream):
+	import arc4hash
+	run = 0
+	arc4 = arc4hash.Arc4Hash()	# hashing object
+	last = stream[0]			# previous stream value
+	last_delta = 0				# previous delta
+	peak = abs(last)		# peak value in stream
+	changes = 0			# number of changes in stream
+	polarity = 0		# polarity of previous change
+	swaps = 0			# number of polarity changes
+	first = -1			# index of stimulus start
+	final = 0			# index of stimulus end
+	for i in range(1, len(stream)):
+		val = stream[i]
+		if abs(val) > peak:
+			peak = abs(val)
+		delta = val - last
+		if delta>0 and polarity<=0:
+			polarity = 1
+			swaps += 1
+			run_len = run
+			run = 0
+		elif delta<0 and polarity>=0:
+			polarity = -1
+			swaps += 1
+			run_len = run
+			run = 0
+		else:
+			run += 1
+		if last != val:
+			changes += 1
+		if run_len > 0:
+			# hash requires value on (0, 255)
+			# use 0-82 to represent flatline duration
+			# use 83-165 to represent duration of decreasing vals
+			# use 166-248 to represent duration of increasing vals
+			run_len %= 83
+			if last_delta>0:
+				run_len += 166
+			elif last_delta<0:
+				run_len += 83
+			arc4.append(run_len)
+			run_len = 0
+		# log stimulus start and stop
+		if first < 0:
+			if swaps == 3:
+				first = i
+		elif val<>0:
+			final = i
+			# remember previous delta change, to detect next
+		last_delta = delta
+		last = val
+	arc4.append((final-first) % 251)
+	# ident stimulus
+	if swaps == 4:
+		if changes == 8:
+			stim = "step"
+		elif changes > 8:
+			stim = "ramp"
+		else:
+			stim = "null"
+	elif swaps > 8:
+		stim = "noise"
+	else:
+		stim = "test"
+	for i in range(first-1, final+5):
+		print "%d\t%f" % (i, stream[i])
+#	if stim == "noise":
+#		print "swaps: %d" % swaps
+#		for i in range(first-5, first+155, 5):
+#			print "\t%f" % stream[i]
+	return arc4.finalize(), stim, peak, (final-first)
+
+
 ########################################################################
 ########################################################################
 
@@ -113,6 +189,7 @@ ofile.create_dataset("file_create_date", data=time.ctime())
 # create acquisition sequences
 acquisition = ofile.create_group("acquisition")
 for i in range(len(sweep_num_list)):
+	break
 	swp = "Sweep_%d" % sweep_num_list[i]
 	seq = sequence.PatchClampSequence()
 	# set patch-clamp sequence values
@@ -138,11 +215,11 @@ for i in range(len(sweep_num_list)):
 	seq.max_val = max(data)
 	# TODO set seq.resolution
 	t0 = summary[sweep]["time"] - exp_start_time
-	t1 = t0 + len(trace) * sampling_rate / 1000000.0
+	t1 = t0 + len(data) * sampling_rate / 1000000.0
 	seq.t = []
 	seq.t.append(t0)
 	seq.t.append(t1)
-	seq.num_samples = len(trace)
+	seq.num_samples = len(data)
 	seq.t_interval = seq.num_samples - 1
 	seq.write_data(acquisition, swp)
 	if i > 5:
@@ -150,6 +227,62 @@ for i in range(len(sweep_num_list)):
 
 ########################################################################
 # process and store stimuli
+# create template stimuli first
+#trace = datafolder["Sweep_55"].attrs["IGORWaveNote"]
+#fields = trace.split('\r')
+#for i in range(len(fields)):
+#	print fields[i]
+
+# TODO first search lab notebook. if stimulus data not there, then 
+#   try to pull it from wave notes
+stimulus = ofile.create_group("stimulus")
+stimulus_temps = stimulus.create_group("templates")
+stim = ""
+scale_factor = ""
+stim_templates = {}
+stim_instances = []
+for i in range(len(sweep_num_list)):
+	swp = "Sweep_%d" % sweep_num_list[i]
+	trace = datafolder[swp].value
+	attrs = datafolder[swp].attrs["IGORWaveNote"].split('\r')
+	for j in range(len(attrs)):
+		if attrs[j].startswith("StimWaveName"):
+			stim = attrs[j].split(": ")[1]
+		if attrs[j].startswith("StimScaleFactor"):
+			scale_factor = float(attrs[j].split(": ")[1])
+	label = "%s: %f" % (stim, scale_factor)
+	if label in stim_templates:
+		seq = stim_templates[label]
+		seq.sweeps.append(swp)
+		stim_instances.append(seq)
+		continue
+	seq = sequence.Sequence()
+	seq.sweeps = []
+	seq.sweeps.append(swp)
+	data = np.zeros(len(trace))
+	for k in range(len(trace)):
+		data[k] = trace[k][0]
+	seq.data = data
+	seq.max_val = max(data)
+	seq.min_val = min(data)
+	seq.num_samples = len(data)
+	config = datafolder["Config_Sweep_%d" % sweep_num_list[i]].value
+	seq.sampling_rate = config[1][2]
+	t0 = 0
+	t1 = len(data) * seq.sampling_rate / 1000000.0
+	seq.t = []
+	seq.t.append(t0)
+	seq.t.append(t1)
+	seq.t_interval = len(data)-1
+
+
+	stim_templates[label] = seq
+	seq.write_data(stimulus_temps, label)
+	
+	#ident, stim, peak, dur = calc_stream_fingerprint(data)
+	#print "%d\t%s\t%s\t%f (%f)" % (i, stim, ident, peak, dur/200000.0)
+#	if i > 30:
+#		break	# TODO REMOVE DEBUG
 
 sys.exit(0)
 
