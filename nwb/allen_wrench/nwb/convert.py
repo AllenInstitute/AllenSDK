@@ -9,6 +9,7 @@ import sequence
 import math
 
 TESTING = True
+TEST_N = 5
 
 if len(sys.argv) != 3:
 	if TESTING:
@@ -128,8 +129,9 @@ ofile.create_dataset("file_create_date", data=time.ctime())
 ########################################################################
 # create acquisition sequences
 h_acquisition = ofile.create_group("acquisition")
+h_acq_sequences = h_acquisition.create_group("sequences")
 for i in range(len(sweep_num_list)):
-	if TESTING and i > 10:
+	if TESTING and i > TEST_N:
 		break	# TODO REMOVE DEBUG
 	sweep = sweep_num_list[i]
 	swp = "Sweep_%d" % sweep
@@ -165,7 +167,7 @@ for i in range(len(sweep_num_list)):
 	seq.t.append(t1)
 	seq.num_samples = len(data)
 	seq.t_interval = seq.num_samples - 1
-	seq.write_h5(h_acquisition, swp)
+	seq.write_h5(h_acq_sequences, swp)
 
 ########################################################################
 # process and store stimuli
@@ -183,7 +185,7 @@ stim_templates = {}
 # list of stimulus instances, one for each sweep
 stim_instance_template = []
 for i in range(len(sweep_num_list)):
-	if TESTING and i > 10:
+	if TESTING and i > TEST_N:
 		break	# TODO REMOVE DEBUG
 	scale_factor = None
 	stim = None
@@ -229,15 +231,12 @@ for k in stim_templates.keys():
 	epochs = []
 	for i in range(len(seq.nwb_sweeps)):
 		epochs.append(np.string_(seq.nwb_sweeps[i]))
-	#print epochs
-	#print k
 	stim_templates[k].nwb_h5_obj.attrs.create("epochs", data=epochs)
-	#print stim_templates[k].nwb_sweeps
 
 
 # create instance stimuli
 for i in range(len(sweep_num_list)):
-	if TESTING and i > 10:
+	if TESTING and i > TEST_N:
 		break	# TODO REMOVE DEBUG
 	sweep = sweep_num_list[i]
 	swp = "Sweep_%d" % sweep
@@ -260,31 +259,20 @@ for i in range(len(sweep_num_list)):
 	seq_inst.subclass = copy.deepcopy(seq_temp.subclass)
 	seq_inst.write_h5_link_data(h_stimulus_present, swp, seq_temp_h5)
 	
-sys.exit(0)
-
 ########################################################################
 # create epochs and store voltage trace
-#acquisition = ofile.create_group("acquisition")
-# allocate storage for voltage data
-cnt = 0
-for i in range(len(sweep_num_list)):
-	cnt += datafolder["Sweep_%d" % sweep_num_list[i]].len()
-seq = sequence.Sequence()
-seq.data = np.zeros(cnt)
-print cnt
-# fetch voltage data
-pos = 0
 # get the sampling rate
 sampling_rate = -1
-# time
-t = 0.0
 # sometimes sweep times aren't reported accurately. to detect this, we
 #   need to measure the reported time interval between sweeps
 last_start = 0.0
 last_end = 0.0
 epochs = ofile.create_group("epochs")
 for i in range(len(sweep_num_list)):
+	if TESTING and i > TEST_N:
+		break	# TODO REMOVE DEBUG
 	sweep = sweep_num_list[i]
+	swp = "Sweep_%d" % sweep
 	config = datafolder["Config_Sweep_%d" % sweep].value
 	if sampling_rate < 0:
 		sampling_rate = config[1][2]
@@ -293,38 +281,21 @@ for i in range(len(sweep_num_list)):
 	# if these are at different, modify the code to support this and 
 	#   use the new data file to make sure nothing breaks
 	assert sampling_rate == config[0][2]
-	# copy sweep's trace into voltage array
-	swp = "Sweep_%d" % sweep
-	trace = datafolder[swp].value
-	for k in range(len(trace)):
-		seq.data[pos+k] = trace[k][1]
-	if i > 0:
-		seq.discontinuity_idx.append(pos)
-		seq.discontinuity_t.append(t)
 	# create epoch and store start time
 	epo = epochs.create_group(swp)
-	t0 = summary[sweep][5] - exp_start_time
-	if t0 <= last_start:
-		t0 = last_end + 1.0
-	epo.create_dataset("start_time", data=t)
+	acq = h_acq_sequences[swp]
+	t = acq["timestamps"].value
+	samples = len(acq["data"])
+	epo.create_dataset("start_time", data=t[0])
 	# add acquisition data to epoch
-	acq = epo.create_group("acq_voltage")
-	acq.create_dataset("t_start", data=t)
-	acq.create_dataset("idx_start", data=pos)
-	# update counters
-	pos += len(trace)
-	t += 1.0 * len(trace) * sampling_rate / 1000000.0
-	print t
-	# store epoch stop time
-	epo.create_dataset("stop_time", data=t)
-	acq.create_dataset("t_stop", data=t)
-	acq.create_dataset("idx_stop", data=pos)
+	acq_volts = epo.create_group("acq_voltage")
+	acq_volts.create_dataset("t_start", data=t[0])
+	acq_volts.create_dataset("idx_start", data=int(0))
+	acq_volts.create_dataset("t_stop", data=t[1])
+	acq_volts.create_dataset("idx_stop", data=samples-1)
 	# advance clock for next sweep
 	# TODO FIXME need actual sweep times from notebook
-	t = 1.0 + math.ceil(t)
-	if i > 5:
-		break	# TODO REMOVE DEBUG
-print seq.data
+	#t = 1.0 + math.ceil(t)
 
 # finish off epochs
 #for i in range(len(sweep_num_list)):
@@ -332,23 +303,6 @@ print seq.data
 #	# TODO for description, use stimulus name plus set number
 #	# TODO link to acquisition sequence
 #	# TODO add stimulus
-
-########################################################################
-# identify and categorize stimuli
-# build 2-level tree for stimuli, 1st level for type, 2nd for amplitude
-
-# to categorize, measure polarity changes and duration of time at 
-#   stimulus level. store values in list then CRC the list. this 
-#   should allow amplitude-independent comparison of stimuli
-# for increasing interval N, add (N) to list
-# for decreasing interval N, add (-N) to list
-# for flat interval N, add(N + 0.1) to list
-#for i in range(len(sweep_num_list)):
-#	changelist = []
-#	stim = datafolder["Sweep_%d" % i].value
-#stim = datafolder["Sweep_10"][0]
-#stim = datafolder["Sweep_10"]
-#print stim.len()
 
 ########################################################################
 # add remaining top-level groups to output file

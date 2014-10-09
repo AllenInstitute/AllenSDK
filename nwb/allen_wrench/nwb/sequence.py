@@ -93,7 +93,8 @@ class Sequence(object):
 		strlen = len(self.description)
 		seq.create_dataset("description", data=self.description)
 		seq.create_dataset("resolution", data=self.resolution)
-		seq.create_dataset("t", data=self.t, dtype='f8')
+		seq.create_dataset("timestamps", data=self.t, dtype='f8')
+		seq.create_dataset("t_interval", data=self.t_interval, dtype='f8')
 		dis_t = self.discontinuity_t
 		seq.create_dataset("discontinuity_t", data=dis_t, dtype='f8')
 		dis_i = self.discontinuity_idx
