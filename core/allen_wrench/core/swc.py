@@ -113,7 +113,7 @@ class Morphology( object ):
         sorted_compartments = sorted(self.compartment_list, key=lambda x: int(x['id']))
 
         with open(file_name, 'wb') as f:
-            writer = csv.DictWriter(f, delimiter=' ', fieldnames=columns)
+            writer = csv.DictWriter(f, delimiter=' ', fieldnames=columns, extrasaction='ignore')
             writer.writeheader()
             writer.writerows(sorted_compartments)
 
