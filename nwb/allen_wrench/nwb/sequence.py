@@ -2,7 +2,7 @@ import numpy as np
 import h5py
 import math
 
-class Sequence():
+class Sequence(object):
 	"""
 	The Sequence object represents the common storage object for the 
 	nwb file. It can represent time series, signal events, image stacks
@@ -24,6 +24,7 @@ class Sequence():
 		self.t_interval = 1
 		self.discontinuity_t = []
 		self.discontinuity_idx = []
+		self.subclass = {}
 
 	def print_report(self):
 		print "Description:   '%s'" % self.description
@@ -77,17 +78,21 @@ class Sequence():
 				self.discontinuity_t.append(t[i])
 				self.discontinuity_idx.append(i)
 
-
-	def write_data(self, parent, seq_name):
-		""" create new dataset for sequence and write data 
+	def write_h5_link_data(self, parent, seq_name, sibling):
+		""" create a new dataset, but link its data entry to
+		the data field in its sibling
 		"""
 		assert seq_name not in parent
+		seq = self.write_h5_no_data(parent, seq_name)
+		seq["data"] = sibling["data"]
+		return seq
+
+	def write_h5_no_data(self, parent, seq_name):
 		seq = parent.create_group(seq_name)
-		meta = seq.create_group("meta")
+		subclass = seq.create_group("subclass")
 		strlen = len(self.description)
 		seq.create_dataset("description", data=self.description)
 		seq.create_dataset("resolution", data=self.resolution)
-		seq.create_dataset("data", data=self.data, dtype='f4')
 		seq.create_dataset("t", data=self.t, dtype='f8')
 		dis_t = self.discontinuity_t
 		seq.create_dataset("discontinuity_t", data=dis_t, dtype='f8')
@@ -98,29 +103,49 @@ class Sequence():
 		seq.create_dataset("max_value", data=(max(self.data)))
 		seq.create_dataset("min_value", data=(min(self.data)))
 		seq.create_dataset("sampling_rate", data=self.sampling_rate)
-		return seq, meta
+		for k in self.subclass.keys():
+			seq.create_dataset("subclass/" + k, data=self.subclass[k])
+		return seq
+
+	def write_h5(self, parent, seq_name):
+		""" create new dataset for sequence and write data 
+		"""
+		assert seq_name not in parent
+		seq = self.write_h5_no_data(parent, seq_name)
+		seq.create_dataset("data", data=self.data, dtype='f4')
+		return seq
 
 		
 
 class ElectronicSequence(Sequence):
-	def __init__():
-		super.__init__()
-		self.electrode_map = None
+	def __init__(self):
+		super(ElectronicSequence, self).__init__()
+		electrode_map = []
+		electrode_map.append(0)
+		self.subclass["electrode_map"] = electrode_map
 
-	def write_data(parent, seq_name):
-		seq, meta = super.write_data(parent, seq_name)
-		meta.create_dataset("electrode_map", self.electrode_map)
-		return seq, meta
+#	def write_h5(self, parent, seq_name):
+#		sup = super(ElectronicSequence,self)
+#		seq, subclass = sup.write_h5(parent, seq_name)
+#		subclass.create_dataset("electrode_map", self.electrode_map)
+#		return seq, subclass
 
 class PatchClampSequence(ElectronicSequence):
-	def __init__():
-		super.__init__()
-		self.bridge_balance = 0
-		self.bias_current = 0
+	def __init__(self):
+		super(PatchClampSequence, self).__init__()
+		self.subclass["bridge_balance"] = 0
+		self.subclass["access_resistance"] = 0
 
-	def write_data(parent, seq_name):
-		seq, meta = super.write_data(parent, seq_name)
-		meta.create_dataset("bridge_balance", self.bridge_balance)
-		meta.create_dataset("bias_current", self.bias_current)
-		return seq, meta
+	def set_bridge_balance(self, val):
+		self.subclass["bridge_balance"] = val
+
+	def set_access_resistance(self, val):
+		self.subclass["access_resistance"] = val
+
+#	def write_h5(self, parent, seq_name):
+#		sup = super(PatchClampSequence, self)
+#		seq, subclass = sup.write_h5(parent, seq_name)
+#		subclass.create_dataset("bridge_balance", data=self.bridge_balance)
+#		subclass.create_dataset("bias_current", data=self.bias_current)
+#		return seq, subclass
 

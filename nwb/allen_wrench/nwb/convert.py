@@ -1,19 +1,29 @@
 #!/usr/bin/python
 import h5py
 import datetime
+import copy
 import time
-import sys	# TODO remove debug
+import sys
 import numpy as np
 import sequence
 import math
 
-infile = "154747.h5"
-outfile = "foo.h5"
+TESTING = True
+
+if len(sys.argv) != 3:
+	if TESTING:
+		infile = "154747.h5"
+		outfile = "foo.h5"
+	else:
+		print "Usage: %s <input h5> <output nwb>" % sys.argv[0]
+		sys.exit(1)
+else:
+	infile = sys.argv[1]
+	outfile = sys.argv[2]
 
 FILE_VERSION_STR = "0.0.1"
 
 IDENT_PREFIX = "Allen Institute, NDB-dev: "
-
 
 ########################################################################
 ########################################################################
@@ -24,81 +34,6 @@ def timestamp_string(sec):
 	d = dd.datetime.strptime("01-01-1904", "%d-%m-%Y")
 	d += dd.timedelta(seconds=int(sec))
 	return d.strftime("%a, %d %b %Y %H:%M:%S GMT")
-
-# calculate an amplitude-independent fingerprint
-# use length of monotonic increase/decreases/flatline
-def calc_stream_fingerprint(stream):
-	import arc4hash
-	run = 0
-	arc4 = arc4hash.Arc4Hash()	# hashing object
-	last = stream[0]			# previous stream value
-	last_delta = 0				# previous delta
-	peak = abs(last)		# peak value in stream
-	changes = 0			# number of changes in stream
-	polarity = 0		# polarity of previous change
-	swaps = 0			# number of polarity changes
-	first = -1			# index of stimulus start
-	final = 0			# index of stimulus end
-	for i in range(1, len(stream)):
-		val = stream[i]
-		if abs(val) > peak:
-			peak = abs(val)
-		delta = val - last
-		if delta>0 and polarity<=0:
-			polarity = 1
-			swaps += 1
-			run_len = run
-			run = 0
-		elif delta<0 and polarity>=0:
-			polarity = -1
-			swaps += 1
-			run_len = run
-			run = 0
-		else:
-			run += 1
-		if last != val:
-			changes += 1
-		if run_len > 0:
-			# hash requires value on (0, 255)
-			# use 0-82 to represent flatline duration
-			# use 83-165 to represent duration of decreasing vals
-			# use 166-248 to represent duration of increasing vals
-			run_len %= 83
-			if last_delta>0:
-				run_len += 166
-			elif last_delta<0:
-				run_len += 83
-			arc4.append(run_len)
-			run_len = 0
-		# log stimulus start and stop
-		if first < 0:
-			if swaps == 3:
-				first = i
-		elif val<>0:
-			final = i
-			# remember previous delta change, to detect next
-		last_delta = delta
-		last = val
-	arc4.append((final-first) % 251)
-	# ident stimulus
-	if swaps == 4:
-		if changes == 8:
-			stim = "step"
-		elif changes > 8:
-			stim = "ramp"
-		else:
-			stim = "null"
-	elif swaps > 8:
-		stim = "noise"
-	else:
-		stim = "test"
-	for i in range(first-1, final+5):
-		print "%d\t%f" % (i, stream[i])
-#	if stim == "noise":
-#		print "swaps: %d" % swaps
-#		for i in range(first-5, first+155, 5):
-#			print "\t%f" % stream[i]
-	return arc4.finalize(), stim, peak, (final-first)
 
 
 ########################################################################
@@ -121,6 +56,11 @@ dname = toks[0]
 notebook = ifile["MIES"]["LabNoteBook"][dname]["Device%s" % toks[2]]
 devicefolder = acq_devices[dname]["Device%s" % toks[2]]
 datafolder = devicefolder["Data"]
+
+########################################################################
+# build list of sweeps to process
+h_general = ofile.create_group("general")
+# TODO put metadata in general
 
 ########################################################################
 # build list of sweeps to process
@@ -166,14 +106,14 @@ assert sweepnum_idx >= 0
 #   previous entries
 for i in range(len(notebook_vals)-1, 0, -1):
 	swp = int(notebook_vals[i][sweepnum_idx][0])
-	if swp == 0 and len(summary[0]) > 0:
-		break	# everything read -- break out
 	while len(summary) <= swp:
 		summary.append({})
 	vals = summary[swp]
 	vals["bridge"] = notebook_vals[i][bridge_bal_idx][0]
 	vals["bias"] = notebook_vals[i][bias_current_idx][0]
 	vals["time"] = notebook_vals[i][timestamp_idx][0]
+	if swp == 0:
+		break
 
 ########################################################################
 # store high-level metadata in output file
@@ -187,11 +127,15 @@ ofile.create_dataset("file_create_date", data=time.ctime())
 
 ########################################################################
 # create acquisition sequences
-acquisition = ofile.create_group("acquisition")
+h_acquisition = ofile.create_group("acquisition")
 for i in range(len(sweep_num_list)):
-	break
-	swp = "Sweep_%d" % sweep_num_list[i]
+	if TESTING and i > 10:
+		break	# TODO REMOVE DEBUG
+	sweep = sweep_num_list[i]
+	swp = "Sweep_%d" % sweep
 	seq = sequence.PatchClampSequence()
+	seq.set_bridge_balance(1e6 * summary[sweep]["bridge"])
+	seq.set_access_resistance(1e-12 * summary[sweep]["bias"])
 	# set patch-clamp sequence values
 	seq.bridge_balance = summary[i]["bridge"]
 	seq.bias_current = summary[i]["bias"]
@@ -209,7 +153,7 @@ for i in range(len(sweep_num_list)):
 	trace = datafolder[swp].value
 	data = np.zeros(len(trace))
 	for k in range(len(trace)):
-		data[k] = trace[k][1]
+		data[k] = 1e-3 * trace[k][1]
 	seq.data = data
 	seq.min_val = min(data)
 	seq.max_val = max(data)
@@ -221,27 +165,28 @@ for i in range(len(sweep_num_list)):
 	seq.t.append(t1)
 	seq.num_samples = len(data)
 	seq.t_interval = seq.num_samples - 1
-	seq.write_data(acquisition, swp)
-	if i > 5:
-		break	# TODO REMOVE DEBUG
+	seq.write_h5(h_acquisition, swp)
 
 ########################################################################
 # process and store stimuli
-# create template stimuli first
-#trace = datafolder["Sweep_55"].attrs["IGORWaveNote"]
-#fields = trace.split('\r')
-#for i in range(len(fields)):
-#	print fields[i]
 
+# create template stimuli first
 # TODO first search lab notebook. if stimulus data not there, then 
 #   try to pull it from wave notes
-stimulus = ofile.create_group("stimulus")
-stimulus_temps = stimulus.create_group("templates")
+h_stimulus = ofile.create_group("stimulus")
+h_stimulus_temps = h_stimulus.create_group("templates")
+h_stimulus_present = h_stimulus.create_group("presentation")
 stim = ""
 scale_factor = ""
+# store stimulus templates
 stim_templates = {}
-stim_instances = []
+# list of stimulus instances, one for each sweep
+stim_instance_template = []
 for i in range(len(sweep_num_list)):
+	if TESTING and i > 10:
+		break	# TODO REMOVE DEBUG
+	scale_factor = None
+	stim = None
 	swp = "Sweep_%d" % sweep_num_list[i]
 	trace = datafolder[swp].value
 	attrs = datafolder[swp].attrs["IGORWaveNote"].split('\r')
@@ -250,18 +195,18 @@ for i in range(len(sweep_num_list)):
 			stim = attrs[j].split(": ")[1]
 		if attrs[j].startswith("StimScaleFactor"):
 			scale_factor = float(attrs[j].split(": ")[1])
-	label = "%s: %f" % (stim, scale_factor)
+	label = "%s:%f" % (stim, scale_factor)
 	if label in stim_templates:
 		seq = stim_templates[label]
-		seq.sweeps.append(swp)
-		stim_instances.append(seq)
+		seq.nwb_sweeps.append(swp)
+		stim_instance_template.append(seq)
 		continue
 	seq = sequence.Sequence()
-	seq.sweeps = []
-	seq.sweeps.append(swp)
+	seq.nwb_sweeps = []
+	seq.nwb_sweeps.append(swp)
 	data = np.zeros(len(trace))
 	for k in range(len(trace)):
-		data[k] = trace[k][0]
+		data[k] = 1e-12 * trace[k][0]
 	seq.data = data
 	seq.max_val = max(data)
 	seq.min_val = min(data)
@@ -274,16 +219,47 @@ for i in range(len(sweep_num_list)):
 	seq.t.append(t0)
 	seq.t.append(t1)
 	seq.t_interval = len(data)-1
-
-
+	stim_instance_template.append(seq)
 	stim_templates[label] = seq
-	seq.write_data(stimulus_temps, label)
-	
-	#ident, stim, peak, dur = calc_stream_fingerprint(data)
-	#print "%d\t%s\t%s\t%f (%f)" % (i, stim, ident, peak, dur/200000.0)
-#	if i > 30:
-#		break	# TODO REMOVE DEBUG
+	h5seq = seq.write_h5(h_stimulus_temps, label)
+	seq.nwb_h5_obj = h5seq
 
+for k in stim_templates.keys():
+	seq = stim_templates[k]
+	epochs = []
+	for i in range(len(seq.nwb_sweeps)):
+		epochs.append(np.string_(seq.nwb_sweeps[i]))
+	#print epochs
+	#print k
+	stim_templates[k].nwb_h5_obj.attrs.create("epochs", data=epochs)
+	#print stim_templates[k].nwb_sweeps
+
+
+# create instance stimuli
+for i in range(len(sweep_num_list)):
+	if TESTING and i > 10:
+		break	# TODO REMOVE DEBUG
+	sweep = sweep_num_list[i]
+	swp = "Sweep_%d" % sweep
+	seq_temp = stim_instance_template[i]
+	seq_temp_h5 = seq_temp.nwb_h5_obj
+	t0 = summary[sweep]["time"] - exp_start_time
+	t1 = t0 + len(data) * seq_temp.sampling_rate / 1000000.0
+	# create stimulus sequence using link to template's data
+
+	seq_inst = sequence.Sequence()
+	seq_inst.max_val = seq_temp.max_val
+	seq_inst.min_val = seq_temp.min_val
+	seq_inst.num_samples = seq_temp.num_samples
+	seq_inst.sampling_rate = seq_temp.sampling_rate
+	assert len(seq_temp.t) == 2
+	dt = seq_temp.t[1] - seq_temp.t[0]
+	seq_inst.data = seq_temp.data
+	seq_inst.t = [ t0, t1 ]
+	seq_inst.t_interval = seq_temp.t_interval
+	seq_inst.subclass = copy.deepcopy(seq_temp.subclass)
+	seq_inst.write_h5_link_data(h_stimulus_present, swp, seq_temp_h5)
+	
 sys.exit(0)
 
 ########################################################################
@@ -350,8 +326,6 @@ for i in range(len(sweep_num_list)):
 		break	# TODO REMOVE DEBUG
 print seq.data
 
-acquisition = ofile.create_group("acquisition")
-
 # finish off epochs
 #for i in range(len(sweep_num_list)):
 #	swp = "Sweep_%d" % sweep_num_list[i]
@@ -376,6 +350,10 @@ acquisition = ofile.create_group("acquisition")
 #stim = datafolder["Sweep_10"]
 #print stim.len()
 
+########################################################################
+# add remaining top-level groups to output file
+ofile.create_group("processing")
+ofile.create_group("analysis")
 
 ########################################################################
 # close up shop
