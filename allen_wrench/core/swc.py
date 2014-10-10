@@ -114,7 +114,6 @@ class Morphology( object ):
 
         with open(file_name, 'wb') as f:
             writer = csv.DictWriter(f, delimiter=' ', fieldnames=columns, extrasaction='ignore')
-            writer.writeheader()
             writer.writerows(sorted_compartments)
 
 
