@@ -40,6 +40,8 @@ def read(file_name, columns=None, numeric_columns=None):
 
 
 class Morphology( object ):
+    SOMA = 1
+    
     """ Keep track of the list of compartments in a morphology and provide 
     a few helper methods (index by id, sparsify, root, etc).  During initialization
     the compartments are assigned a 'children' property that is a list of
@@ -100,6 +102,9 @@ class Morphology( object ):
                 return c
         return None
 
+    def compartment_index_by_type(self, compartment_type):
+        return { c['id']: c for c in self._compartment_list if c['type'] == compartment_type }
+
     def write(self, file_name, columns=None):
         """ Write this morphology out to an SWC file 
         
@@ -144,7 +149,7 @@ class Morphology( object ):
             parent['children'].append(compartment['id'])
 
 
-    def sparsify(self, modulo):
+    def sparsify(self, modulo, compress_ids=False):
         """ Return a new Morphology object that has a given number of non-leaf,
         non-root segments removed.  IDs are reassigned so as to be continuous.
 
@@ -161,9 +166,10 @@ class Morphology( object ):
         for i, c in compartments.iteritems():
             pid = c['parent']
             cid = c['id']
+            ctype = c['type']
 
-            # keep the root, junctions, and the first child of the root (for visualization)
-            if pid == "-1" or len(c['children']) != 1 or pid == root['id']:
+            # keep the root, soma, junctions, and the first child of the root (for visualization)
+            if pid == "-1" or len(c['children']) != 1 or pid == root['id'] or ctype == Morphology.SOMA:
                 keep[cid] = True
             else:
                 keep[cid] = (ct % modulo) == 0
@@ -184,21 +190,22 @@ class Morphology( object ):
 
         # filter out the orphans
         sparsified_compartments = { k:v for k,v in compartments.iteritems() if keep[k] }
-    
-        # compress the ids
-        ids = sorted(sparsified_compartments.keys(), key=lambda x: int(x))
-        id_hash = { fid:str(i+1) for i,fid in enumerate(ids) }
-        id_hash["-1"] = "-1"
 
-        # build the final compartment index
-        out_compartments = {}
-        for cid, compartment in sparsified_compartments.iteritems():
-            compartment['id'] = id_hash[cid]
-            compartment['parent'] = id_hash[compartment['parent']]
-            
-            out_compartments[compartment['id']] = compartment
+        if compress_ids:
+            ids = sorted(sparsified_compartments.keys(), key=lambda x: int(x))
+            id_hash = { fid:str(i+1) for i,fid in enumerate(ids) }
+            id_hash["-1"] = "-1"
 
-        return Morphology(compartment_index=out_compartments)
+            # build the final compartment index
+            out_compartments = {}
+            for cid, compartment in sparsified_compartments.iteritems():
+                compartment['id'] = id_hash[cid]
+                compartment['parent'] = id_hash[compartment['parent']]
+                out_compartments[compartment['id']] = compartment
+
+            return Morphology(compartment_index=out_compartments)
+        else:
+            return Morphology(compartment_index=sparsified_compartments)
 
 def str_to_num(s):
     """ Try to convert a string s into a number """
