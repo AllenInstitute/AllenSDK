@@ -28,7 +28,7 @@ class Sequence(object):
 
 	def print_report(self):
 		print "Description:   '%s'" % self.description
-		print "Sampling rate: %d" % self.sampling_rate
+		print "Sampling rate: %f" % self.sampling_rate
 		print "Num samples:   %d" % self.num_samples
 		print "Resolution:    %g" % self.resolution
 		print "Filter:        '%s'" % self.filter_desc
@@ -89,8 +89,7 @@ class Sequence(object):
 
 	def write_h5_no_data(self, parent, seq_name):
 		seq = parent.create_group(seq_name)
-		subclass = seq.create_group("subclass")
-		strlen = len(self.description)
+		empty = np.chararray((128))
 		seq.create_dataset("description", data=self.description)
 		seq.create_dataset("resolution", data=self.resolution)
 		seq.create_dataset("timestamps", data=self.t, dtype='f8')
@@ -105,7 +104,7 @@ class Sequence(object):
 		seq.create_dataset("min_value", data=(min(self.data)))
 		seq.create_dataset("sampling_rate", data=self.sampling_rate)
 		for k in self.subclass.keys():
-			seq.create_dataset("subclass/" + k, data=self.subclass[k])
+			seq.create_dataset(k, data=self.subclass[k])
 		return seq
 
 	def write_h5(self, parent, seq_name):
