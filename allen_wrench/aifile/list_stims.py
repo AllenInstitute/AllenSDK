@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import h5py
 import sys
+from aif_common import list_templates
 
 TESTING = True
 
@@ -14,12 +15,7 @@ else:
 	infile = sys.argv[1]
 
 f = h5py.File(infile, "r")
-stims = f["stimulus"]["templates"]
-
-lst = []
-for k in stims.keys():
-	lst.append(k)
-lst.sort()
+stims, lst = list_templates(f)
 
 print "%s\t%28s\t%s\t%s" % ("Number", "Stimulus", "pA", "Sweeps")
 for i in range(len(lst)):

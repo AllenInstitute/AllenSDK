@@ -37,60 +37,73 @@ lst.sort()
 
 sweeps = {}
 
+def get_first_epoch(idx0, stim):
+	t0 = idx0
+	t1 = t0 + int(0.25 / 5e-6)
+	return t0, t1
+
+def get_last_epoch(idx1, stim):
+	return idx1-int(0.25/5e-6), idx1
+
+def measure_vm(seg):
+	vals = np.copy(seg)
+	mean = np.mean(vals)
+	vals -= mean
+	rms = np.sqrt(np.mean(np.square(vals)))
+	return mean, rms
+
+
+
 # pull out Vm from beginning and end of recording
 for i in range(len(lst)):
 	results = {}
 	labels = ""
 	sweeps["Sweep_%d" % lst[i]] = results
+	current = epochs["Stim_%d" % lst[i]]["stim_current"]["sequence"]["data"]
 	volts = epochs["Stim_%d" % lst[i]]["acq_voltage"]
 	data = volts["sequence"]["data"].value
 	print "Stim_%d" % lst[i]
-	idx0a = volts["idx_start"].value
-	idx0b = idx0a + int(0.025 / 5e-6)
-	ival = 1000.0 * data[idx0a:idx0b]
-	mean0 = np.mean(ival)
-	ival -= mean0
-	rms0 = np.sqrt(np.mean(np.square(ival)))
-	peak0 = max(ival)
-	peak0b = min(ival)
-	if peak0 < -peak0b:
-		peak0 = -peak0b
+	# measure Vm and noise right before stimulus
+	id0, id1 = get_first_epoch(volts["idx_start"].value, current)
+	mean0, rms0 = measure_vm(1000 * data[id0:id1])
 	results["vm_0"] = mean0
-	results["noise_0"] = rms0
-	print "\t%g\t%g\t%g" % (mean0, rms0, peak0)
-	idx1b = volts["idx_stop"].value
-	idx1a = idx1b - int(0.025 / 5e-6)
-	ival = 1000.0 * data[idx1a:idx1b]
-	mean1 = np.mean(ival)
-	ival -= mean1
-	rms1 = np.sqrt(np.mean(np.square(ival)))
-	peak1 = max(ival)
-	peak1b = min(ival)
-	if peak1 < -peak1b:
-		peak1 = -peak1b
+	results["rms_0"] = rms0
+	# measure Vm and noise from end of recording
+	id0, id1 = get_last_epoch(volts["idx_stop"].value, current)
+	mean1, rms1 = measure_vm(1000 * data[id0:id1])
 	results["vm_1"] = mean1
-	results["noise_1"] = rms1
-	print "\t%g\t%g\t%g" % (mean1, rms1, peak1)
-	if rms0 > 0.2:
+	results["rms_1"] = rms1
+	# measure blowout voltage
+	# take mean of V in S20_Blowout_DA_0
+	templ = ai_file["stimulus"]["templates"]
+	if "S20_Blowout_DA_0" not in templ:
+		results["blowout"] = float('nan')
+	else:
+		swpname = templ["S20_Blowout_DA_0"].attrs["epochs"][0]
+		curr = epochs[swpname]["stim_current"]["sequence"]["data"].value
+		results["blowout"] = np.mean(curr)
+
+	for k in results.keys():
+		print "\t%s\t%g" % (k, results[k])
+
+	if results["rms_0"] > 0.2:
 		labels += "rms0 "
-	if peak0 > 0.2:
-		labels += "noise0 "
-	if rms1 > 0.2:
+	if results["rms_1"] > 0.2:
 		labels += "rms1 "
-	if peak1 > 0.2:
-		labels += "noise1 "
-	if abs(mean1 - mean0) > 0.5:
+	if abs(results["vm_0"] - results["vm_1"]) > 0.5:
 		labels += "Vm "
 	bridge = volts["sequence"]["bridge_balance"].value
 	if bridge < 1e6:
 		labels += "bridge-low "
 	if bridge >20e6:
 		labels += "bridge-high "
-	print "\t%g" % bridge
-	access = volts["sequence"]["access_resistance"].value
-	print "\t%g" % access
+	if results["blowout"] > 3.0:
+		labels += "blowout "
+#	print "\t%g" % bridge
+#	access = volts["sequence"]["access_resistance"].value
+#	print "\t%g" % access
 	if len(labels) > 0:
-		print "Sweep %d FAIL: %s" % (i, labels)
+		print "**\tSweep %d FAIL: %s\n" % (i, labels)
 
 #h_acquisition = h_file["acquisition"]
 #for k in h_acquisition.keys():

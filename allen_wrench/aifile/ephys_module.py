@@ -3,6 +3,7 @@ import sys
 import os
 import h5py
 import aif_common
+import h5d_convert
 
 TESTING = True
 
@@ -51,10 +52,15 @@ try:
 	ai_file = h5py.File(ai_name, "r")
 except OSError:
 	assert False	# bug in code -- prevent overwrite
-	aif_convert.convert_h5d_aif(h5file, ai_name)
+	h5d_convert.convert_h5d_aif(h5file, ai_name)
 	ai_file = h5py.File(aifile, "r")
 
 assert ai_file is not None, "Unable to open '%s'" % ai_name
+
+err = ephys_qc.run_qc(ai_file, injson, outjson)
+
+if err != None:
+	log_error(err)
 
 module_exit()
 
