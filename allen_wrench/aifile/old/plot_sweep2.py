@@ -4,7 +4,8 @@ import sys
 import numpy as np
 from matplotlib import pyplot as plt
 
-infile = "157436.03.01.ai"
+infile = "/local2/ephys/157615.04.02.ai"
+#infile = "157436.03.01.ai"
 if len(sys.argv) < 2:
 	print "usage: %s <sweep num>" % sys.argv[0]
 	sys.exit(1)

@@ -18,6 +18,7 @@ class Sequence(object):
 		#
 		self.description = ""
 		self.filter_desc = ""
+		self.units = ""
 		#
 		self.t = None
 		self.sampling_rate = 0
@@ -25,6 +26,9 @@ class Sequence(object):
 		self.discontinuity_t = []
 		self.discontinuity_idx = []
 		self.subclass = {}
+		#
+		self.ancestry = []
+		self.ancestry.append("Sequence")
 
 	def print_report(self):
 		print "Description:   '%s'" % self.description
@@ -32,6 +36,7 @@ class Sequence(object):
 		print "Num samples:   %d" % self.num_samples
 		print "Resolution:    %g" % self.resolution
 		print "Filter:        '%s'" % self.filter_desc
+		print "Units:         '%s'" % self.units
 		print "Max value:     %g" % self.max_val
 		print "Min value:     %g" % self.min_val
 		print "Interval:      %d" % self.t_interval
@@ -99,6 +104,8 @@ class Sequence(object):
 		dis_i = self.discontinuity_idx
 		seq.create_dataset("discontinuity_idx", data=dis_i)
 		seq.create_dataset("filter", data=self.filter_desc)
+		seq.create_dataset("units", data=self.units)
+		seq.create_dataset("ancestry", data=self.ancestry)
 		seq.create_dataset("num_samples", data=(len(self.data)))
 		seq.create_dataset("max_value", data=(max(self.data)))
 		seq.create_dataset("min_value", data=(min(self.data)))
@@ -115,7 +122,12 @@ class Sequence(object):
 		seq.create_dataset("data", data=self.data, dtype='f4')
 		return seq
 
-		
+	def has_ancestor(self, name):
+		for i in range(len(self.ancestry)):
+			if self.ancestry[i] == name:
+				return True
+		return False
+
 
 class ElectronicSequence(Sequence):
 	def __init__(self):
@@ -123,16 +135,29 @@ class ElectronicSequence(Sequence):
 		electrode_map = []
 		electrode_map.append(0)
 		self.subclass["electrode_map"] = electrode_map
+		self.ancestry.append("ElectronicSequence")
 
-#	def write_h5(self, parent, seq_name):
-#		sup = super(ElectronicSequence,self)
-#		seq, subclass = sup.write_h5(parent, seq_name)
-#		subclass.create_dataset("electrode_map", self.electrode_map)
-#		return seq, subclass
 
+class CurrentStimulusSequence(ElectronicSequence):
+	def __init__(self):
+		super(CurrentStimulusSequence, self).__init__()
+		self.units = "Amps"
+		self.ancestry.append("CurrentStimulusSequence")
+
+
+class VoltageStimulusSequence(ElectronicSequence):
+	def __init__(self):
+		super(CurrentStimulusSequence, self).__init__()
+		self.units = "Volts"
+		self.ancestry.append("VoltageStimulusSequence")
+
+
+	
 class PatchClampSequence(ElectronicSequence):
 	def __init__(self):
 		super(PatchClampSequence, self).__init__()
+		self.ancestry.append("PatchClampSequence")
+
 		self.subclass["bridge_balance"] = 0
 		self.subclass["access_resistance"] = 0
 
@@ -142,10 +167,19 @@ class PatchClampSequence(ElectronicSequence):
 	def set_access_resistance(self, val):
 		self.subclass["access_resistance"] = val
 
-#	def write_h5(self, parent, seq_name):
-#		sup = super(PatchClampSequence, self)
-#		seq, subclass = sup.write_h5(parent, seq_name)
-#		subclass.create_dataset("bridge_balance", data=self.bridge_balance)
-#		subclass.create_dataset("bias_current", data=self.bias_current)
-#		return seq, subclass
+
+class VoltageClampSequence(PatchClampSequence):
+	def __init__(self):
+		super(VoltageClampSequence, self).__init__()
+		self.units = "Amps"
+		self.ancestry.append("VoltageClampSequence")
+
+
+class CurrentClampSequence(PatchClampSequence):
+	def __init__(self):
+		super(CurrentClampSequence, self).__init__()
+		self.units = "Volts"
+		self.ancestry.append("CurrentClampSequence")
+
+
 

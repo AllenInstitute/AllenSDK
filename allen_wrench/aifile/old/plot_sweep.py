@@ -4,7 +4,7 @@ import sys
 import numpy as np
 from matplotlib import pyplot as plt
 
-infile = "157436.03.01.ai"
+infile = "/local2/ephys/157615.04.02.ai"
 if len(sys.argv) < 2:
 	print "usage: %s <sweep num>" % sys.argv[0]
 	sys.exit(1)
@@ -18,43 +18,43 @@ f = h5py.File(infile, "r")
 
 # each sweep is stored in its own epoch
 # fetch epoch for test pulse
-pulse_name = "Pulse_%d" % sweep_num
+pulse_name = "TestPulse_%d" % sweep_num
 if pulse_name not in f["epochs"]:
 	# some sweeps don't have a test pulse -- bail out in such cases
 	print "Specified sweep not available"
 	sys.exit(1)
 pulse_epoch = f["epochs"][pulse_name]
 # get voltage stream 
-idx_0 = pulse_epoch["acq_voltage"]["idx_start"].value
-idx_1 = pulse_epoch["acq_voltage"]["idx_stop"].value
-pulse_v = pulse_epoch["acq_voltage"]["sequence"]["data"][idx_0:idx_1]
+idx_0 = pulse_epoch["acquired"]["idx_start"].value
+idx_1 = pulse_epoch["acquired"]["idx_stop"].value
+pulse_v = pulse_epoch["acquired"]["sequence"]["data"][idx_0:idx_1]
 pulse_v *= 1000.0
 # get current stream 
-idx_0 = pulse_epoch["stim_current"]["idx_start"].value
-idx_1 = pulse_epoch["stim_current"]["idx_stop"].value
-pulse_curr = pulse_epoch["stim_current"]["sequence"]["data"][idx_0:idx_1]
+idx_0 = pulse_epoch["stimulus"]["idx_start"].value
+idx_1 = pulse_epoch["stimulus"]["idx_stop"].value
+pulse_curr = pulse_epoch["stimulus"]["sequence"]["data"][idx_0:idx_1]
 pulse_curr *= 1.0e12
 # get epoch's description
 pulse_name = pulse_epoch["description"].value
 
 # generate time array, based on sampling rate
-srate = pulse_epoch["stim_current"]["sequence"]["sampling_rate"].value
+srate = pulse_epoch["stimulus"]["sequence"]["sampling_rate"].value
 pulse_t = np.zeros(len(pulse_v))
 for i in range(len(pulse_t)):
 	pulse_t[i] = srate * i
 
 # fetch epoch for experiment data
-stim_name = "Stim_%d" % sweep_num
+stim_name = "Experiment_%d" % sweep_num
 stim_epoch = f["epochs"][stim_name]
 # get voltage stream 
-idx_0 = stim_epoch["acq_voltage"]["idx_start"].value
-idx_1 = stim_epoch["acq_voltage"]["idx_stop"].value
-stim_v = stim_epoch["acq_voltage"]["sequence"]["data"][idx_0:idx_1]
+idx_0 = stim_epoch["acquired"]["idx_start"].value
+idx_1 = stim_epoch["acquired"]["idx_stop"].value
+stim_v = stim_epoch["acquired"]["sequence"]["data"][idx_0:idx_1]
 stim_v *= 1000.0
 # get current stream 
-idx_0 = stim_epoch["stim_current"]["idx_start"].value
-idx_1 = stim_epoch["stim_current"]["idx_stop"].value
-stim_curr = stim_epoch["stim_current"]["sequence"]["data"][idx_0:idx_1]
+idx_0 = stim_epoch["stimulus"]["idx_start"].value
+idx_1 = stim_epoch["stimulus"]["idx_stop"].value
+stim_curr = stim_epoch["stimulus"]["sequence"]["data"][idx_0:idx_1]
 stim_curr *= 1e12
 # get epoch's description
 stim_name = stim_epoch["description"].value

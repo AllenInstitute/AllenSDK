@@ -9,6 +9,12 @@ TESTING = True
 
 aifile = "157436.03.01.ai"
 
+if len(sys.argv) != 2:
+	print "Usage: %s <input ai>" % sys.argv[0]
+	sys.exit(1)
+else:
+	aifile = sys.argv[1]
+
 #if len(sys.argv) != 4:
 #	if TESTING:
 #		aifile = "157436.03.01.ai"
@@ -24,6 +30,8 @@ if not os.path.isfile(aifile):
 
 ai_file = h5py.File(aifile, "r")
 #h5_file = h5py.File(infile, "r")
+
+log_file = open(aifile + ".txt", "w")
 
 # pull out stimulus/response epochs
 epochs = ai_file["epochs"]
@@ -53,8 +61,8 @@ def measure_vm(seg):
 	return mean, rms
 
 
-
 # pull out Vm from beginning and end of recording
+cnt = 0
 for i in range(len(lst)):
 	results = {}
 	labels = ""
@@ -62,7 +70,8 @@ for i in range(len(lst)):
 	current = epochs["Stim_%d" % lst[i]]["stim_current"]["sequence"]["data"]
 	volts = epochs["Stim_%d" % lst[i]]["acq_voltage"]
 	data = volts["sequence"]["data"].value
-	print "Stim_%d" % lst[i]
+	#print "Stim_%d" % lst[i]
+	log_file.write("---------- Sweep %d\n" % lst[i])
 	# measure Vm and noise right before stimulus
 	id0, id1 = get_first_epoch(volts["idx_start"].value, current)
 	mean0, rms0 = measure_vm(1000 * data[id0:id1])
@@ -76,15 +85,16 @@ for i in range(len(lst)):
 	# measure blowout voltage
 	# take mean of V in S20_Blowout_DA_0
 	templ = ai_file["stimulus"]["templates"]
-	if "S20_Blowout_DA_0" not in templ:
+	if "S20_Blowout_DA_0:  0" not in templ:
 		results["blowout"] = float('nan')
 	else:
-		swpname = templ["S20_Blowout_DA_0"].attrs["epochs"][0]
-		curr = epochs[swpname]["stim_current"]["sequence"]["data"].value
+		swpname = templ["S20_Blowout_DA_0:  0"].attrs["epochs"][0]
+		curr = epochs[swpname]["acq_voltage"]["sequence"]["data"].value
 		results["blowout"] = np.mean(curr)
 
 	for k in results.keys():
-		print "\t%s\t%g" % (k, results[k])
+		#print "\t%s\t%g" % (k, results[k])
+		log_file.write("\t%s\t%g\n" % (k, results[k]))
 
 	if results["rms_0"] > 0.2:
 		labels += "rms0 "
@@ -103,7 +113,13 @@ for i in range(len(lst)):
 #	access = volts["sequence"]["access_resistance"].value
 #	print "\t%g" % access
 	if len(labels) > 0:
-		print "**\tSweep %d FAIL: %s\n" % (i, labels)
+		#print "**\tSweep %d FAIL: %s\n" % (i, labels)
+		log_file.write("**\tFAIL: %s\n" % labels)
+		cnt += 1
+
+print "%s: %d of %d sweeps passed" % (aifile, len(lst)-cnt, len(lst))
+log_file.write("%d of %d sweeps passed\n" % (len(lst)-cnt, len(lst)))
+
 
 #h_acquisition = h_file["acquisition"]
 #for k in h_acquisition.keys():
@@ -112,4 +128,5 @@ for i in range(len(lst)):
 #	bridge_balance = h_sweep["subclass"]["bridge_balance"]
 
 ai_file.close()
+log_file.close()
 

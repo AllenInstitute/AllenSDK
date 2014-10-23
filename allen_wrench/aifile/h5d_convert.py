@@ -17,19 +17,40 @@ TEST_N = 199
 
 VERS_MAJOR = 0
 VERS_MINOR = 9
-VERS_PATCH = 0
+VERS_PATCH = 2
 
 FILE_VERSION_STR = "AIFile.%d.%d.%d" % (VERS_MAJOR, VERS_MINOR, VERS_PATCH)
 
 IDENT_PREFIX = "Allen Institute " + FILE_VERSION_STR + ": "
 
-PULSE_LEN = 0.5
+PULSE_LEN = 0.3
 
-def convert_h5d_aif(infilei, outfile):
+########################################################################
+########################################################################
+# helper functions
+
+def version():
+	return FILE_VERSION_STR
+
+def is_voltage_clamp(stim_name):
+	""" uses stimulus template name to infer whether stimulus was
+	run in voltage-clamp or current-clamp mode
+	"""
+	# stim name starts with S<N>_. for N<=5 sweep is v-clamp
+	n = int(stim_name.split('_')[0][1:])
+	if n <= 5:
+		return True
+	return False
+
+
+########################################################################
+########################################################################
+
+def convert_h5d_aif(infile, outfile):
 	print "Generating " + outfile
 
-	########################################################################
-	########################################################################
+	#####################################################################
+	#####################################################################
 	# analysis prep
 
 	# make list of image files to add to acquisition
@@ -43,8 +64,8 @@ def convert_h5d_aif(infilei, outfile):
 			imagefiles[os.path.basename(lst[i])] = lst[i]
 
 
-	########################################################################
-	########################################################################
+	#####################################################################
+	#####################################################################
 	# create input and output files
 	ifile = h5py.File(infile, "r")
 	ofile = h5py.File(outfile, "w")
@@ -73,12 +94,12 @@ def convert_h5d_aif(infilei, outfile):
 	datafolder = devicefolder["Data"]
 
 
-	########################################################################
+	#####################################################################
 	# TODO create and populate general folder
 	h_general = ofile["general"]
 
 
-	########################################################################
+	#####################################################################
 	# build list of sweeps to process
 	sweep_num_list = []
 	for k in datafolder.keys():
@@ -96,7 +117,7 @@ def convert_h5d_aif(infilei, outfile):
 	print "Processing %d sweeps" % n
 
 
-	########################################################################
+	#####################################################################
 	# load lab notebook and summarize it
 	notebook_cols = notebook["KeyWave"]["keyWave"].value
 	notebook_vals = notebook["settingsHistory"]["settingsHistory"].value
@@ -199,7 +220,7 @@ def convert_h5d_aif(infilei, outfile):
 		sweep_stimuli[swp_num]["scalefactor"] = scale
 
 
-	########################################################################
+	#####################################################################
 	# store high-level metadata in output file
 	exp_start_time = summary[0]["time"]
 	tstr = timestamp_string(exp_start_time)
@@ -209,7 +230,7 @@ def convert_h5d_aif(infilei, outfile):
 	ofile.create_dataset("identifier", data=hstr)
 	ofile.create_dataset("file_create_date", data=time.ctime())
 
-	########################################################################
+	#####################################################################
 	# create acquisition sequences
 	h_acquisition = ofile["acquisition"]
 
@@ -228,10 +249,13 @@ def convert_h5d_aif(infilei, outfile):
 			break	# TODO REMOVE DEBUG
 		swp_num = sweep_num_list[i]
 		swp_name = "Sweep_%d" % swp_num
-		seq = sequence.PatchClampSequence()
 		stim_name = sweep_stimuli[swp_num]["stim"]
 		stim_mag = sweep_stimuli[swp_num]["scalefactor"]
-		###############################
+		if is_voltage_clamp(stim_name):
+			seq = sequence.VoltageClampSequence()
+		else:
+			seq = sequence.CurrentClampSequence()
+		############################
 		# TODO Remove the following code when notebook's stim scale factor works
 		# meansure peak stimulus
 		# find stimulus start. start looking 0.30 seconds into stim
@@ -241,8 +265,8 @@ def convert_h5d_aif(infilei, outfile):
 			val = trace[j][0]
 			if abs(val) > abs(stim_mag):
 				stim_mag = val
-		sweep_stimuli[swp_num]["scalefactor"] = "%3g" % stim_mag
-		###############################
+		sweep_stimuli[swp_num]["scalefactor"] = "%g" % stim_mag
+		############################
 		# use stimulus name and scale factor in sequence description
 		seq.description = "trace for %s:%s" % (stim_name, stim_mag)
 		seq.set_bridge_balance(1e6 * summary[swp_num]["bridge"])
@@ -279,7 +303,7 @@ def convert_h5d_aif(infilei, outfile):
 		seq.t_interval = seq.num_samples - 1
 		seq.write_h5(h_acq_sequences, swp_name)
 
-	########################################################################
+	#####################################################################
 	# process and store stimuli
 
 	# create template stimuli first
@@ -306,6 +330,11 @@ def convert_h5d_aif(infilei, outfile):
 			seq.nwb_sweeps.append(np.string_(swp_name))
 			stim_instance_template.append(seq)
 			continue
+		# determine if voltage or current clamp
+		if is_voltage_clamp(stim_name):
+			seq = sequence.VoltageStimulusSequence()
+		else:
+			seq = sequence.CurrentStimulusSequence()
 		seq = sequence.Sequence()
 		seq.description = np.string_(label)
 		# use custom data field in sequence, for admin purposes
@@ -368,7 +397,7 @@ def convert_h5d_aif(infilei, outfile):
 		seq_inst.subclass = copy.deepcopy(seq_temp.subclass)
 		seq_inst.write_h5_link_data(h_stimulus_present, swp_name, seq_temp_h5)
 		
-	########################################################################
+	#####################################################################
 	# create epochs and store voltage trace
 
 	# helper function -- inserts sequence reference to epoch
@@ -420,12 +449,12 @@ def convert_h5d_aif(infilei, outfile):
 		# add acquisition data to epoch
 		seq = h_acq_sequences[swp_name]
 		desc = "%s test-pulse voltage" % swp_name
-		name = "acq_voltage"
+		name = "acquired"
 		epoch_insert_sequence(epo, name, t0, t1, idx0, idx1, desc, seq)
 		# add stim sequence
 		seq = h_stimulus["presentation"][swp_name]
 		desc = "%s test-pulse current" % swp_name
-		name = "stim_current"
+		name = "stimulus"
 		epoch_insert_sequence(epo, name, t0, t1, idx0, idx1, desc, seq)
 
 
@@ -435,23 +464,19 @@ def convert_h5d_aif(infilei, outfile):
 			break	# TODO REMOVE DEBUG
 		swp_num = sweep_num_list[i]
 		swp_name = "Sweep_%d" % swp_num
-		stim_name = "Stim_%d" % swp_num
+		stim_name = "Experiment_%d" % swp_num
 		config = datafolder["Config_Sweep_%d" % swp_num].value
-		orig_v = epochs[swp_name]["acq_voltage"]
-		orig_i = epochs[swp_name]["stim_current"]
+		orig_v = epochs[swp_name]["acquired"]
+		orig_i = epochs[swp_name]["stimulus"]
 		sampling_rate = orig_v["sequence"]["sampling_rate"].value
 		epo = epochs[swp_name]
-		# don't write sub-epochs for smoke tests, or stims that are too
-		#   short 
-		idx0 = int(1.0 / sampling_rate)
-		idx1 = len(h_acq_sequences[swp_name]["data"])
-		if int(1.0 / sampling_rate) > len(h_acq_sequences[swp_name]["data"]):
+		# don't write sub-epochs for voltage clamp epochs
+		if orig_v["sequence"]["units"].value == "Amps":
 			continue
 		##############################
 		# pulse epoch
 		#
-		# pulse duration is 100ms
-		pulse_name = "Pulse_%d" % swp_num
+		pulse_name = "TestPulse_%d" % swp_num
 		t0 = orig_v["t_start"].value
 		t1 = t0 + PULSE_LEN 
 		idx0 = 0
@@ -468,18 +493,17 @@ def convert_h5d_aif(infilei, outfile):
 		# add acq sequence
 		seq = h_acq_sequences[swp_name]
 		desc = "%s test-pulse voltage" % swp_name
-		name = "acq_voltage"
+		name = "acquired"
 		epoch_insert_sequence(epo_pulse, name, t0, t1, idx0, idx1, desc, seq)
 		# add stim sequence
 		seq = h_stimulus["presentation"][swp_name]
 		desc = "%s test-pulse current" % swp_name
-		name = "stim_current"
+		name = "stimulus"
 		epoch_insert_sequence(epo_pulse, name, t0, t1, idx0, idx1, desc, seq)
 		##############################
 		# stim epoch
 		#
-		# pulse duration is 100ms
-		pulse_name = "Stim_%d" % swp_num
+		pulse_name = "Experiment_%d" % swp_num
 		t0 = orig_v["t_start"].value + 1.0
 		t1 = orig_v["t_stop"].value
 		idx0 = int(1.0 / sampling_rate)
@@ -496,16 +520,16 @@ def convert_h5d_aif(infilei, outfile):
 		# add acq sequence
 		seq = h_acq_sequences[swp_name]
 		desc = "%s test-pulse voltage" % swp_name
-		name = "acq_voltage"
+		name = "acquired"
 		epoch_insert_sequence(epo_pulse, name, t0, t1, idx0, idx1, desc, seq)
 		# add stim sequence
 		seq = h_stimulus["presentation"][swp_name]
 		desc = "%s test-pulse current" % swp_name
-		name = "stim_current"
+		name = "stimulus"
 		epoch_insert_sequence(epo_pulse, name, t0, t1, idx0, idx1, desc, seq)
 
 
-	########################################################################
+	#####################################################################
 	# close up shop
 	ofile.close()
 	ifile.close()
@@ -529,7 +553,7 @@ if __name__ == "__main__":
 		outfile = infile
 	if outfile.endswith(".h5"):
 		outfile = outfile[:-3]
-	outfile = outfile + ".ai"
+	outfile = outfile + ".aibs"
 
 	convert_h5d_aif(infile, outfile)
 
