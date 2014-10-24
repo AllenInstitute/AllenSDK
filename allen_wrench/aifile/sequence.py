@@ -147,7 +147,7 @@ class CurrentStimulusSequence(ElectronicSequence):
 
 class VoltageStimulusSequence(ElectronicSequence):
 	def __init__(self):
-		super(CurrentStimulusSequence, self).__init__()
+		super(VoltageStimulusSequence, self).__init__()
 		self.units = "Volts"
 		self.ancestry.append("VoltageStimulusSequence")
 

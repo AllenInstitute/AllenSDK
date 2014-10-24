@@ -5,7 +5,7 @@ import h5d_convert
 import h5py
 import sys
 
-h5files = glob.glob('/local2/ephys/*/*h5')
+h5files = glob.glob('/local2/e2/*/*h5')
 
 for i in range(len(h5files)):
 	infile = h5files[i]
@@ -17,7 +17,7 @@ for i in range(len(h5files)):
 		outfile = infile
 	if outfile.endswith(".h5"):
 		outfile = outfile[:-3]
-	outfile = "/local2/ephys/" + outfile + ".aibs"
+	outfile = "/local2/e2/" + outfile + ".aibs"
 
 	if os.path.isfile(outfile):
 		# TODO add version checking here and regenerate file if new version
