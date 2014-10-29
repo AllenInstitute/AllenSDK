@@ -8,7 +8,7 @@ DEFAULT_COLUMNS = [ 'id', 'type', 'x', 'y', 'z', 'radius', 'parent' ]
 # Default columns to convert to numeric types automatically 
 DEFAULT_NUMERIC_COLUMNS = [ 'type', 'x', 'y', 'z', 'radius' ]
 
-def read(file_name, columns=None, numeric_columns=None):
+def read_compartments(file_name, columns=None, numeric_columns=None):
     """  Read in an SWC file and return a Morphology object.
 
     file_name: file to be read
@@ -35,9 +35,11 @@ def read(file_name, columns=None, numeric_columns=None):
                 compartment[nh] = str_to_num(compartment[nh])
                 
             compartment_list.append(compartment)
-            
-    return Morphology(compartment_list=compartment_list)
+    return compartment_list
 
+def read(file_name, columns=None, numeric_columns=None):
+    compartment_list = read_compartments(file_name, columns, numeric_columns)
+    return Morphology(compartment_list=compartment_list)
 
 class Morphology( object ):
     SOMA = 1
