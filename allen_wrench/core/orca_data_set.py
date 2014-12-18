@@ -12,7 +12,7 @@ class OrcaDataSet( EphysDataSet ):
                 'stimulus': stimulus,
                 'response': response,
                 'index_range': (0, len(stimulus)-1),
-                'dt': sec['stimulus']['sequence']['sampling_rate'].value
+                'sampling_rate': sec['stimulus']['sequence']['sampling_rate'].value
             }
 
     def get_experiment(self, sweep_number):
@@ -25,7 +25,7 @@ class OrcaDataSet( EphysDataSet ):
                 'stimulus': stimulus,
                 'response': response,
                 'index_range': (0, len(stimulus)-1),
-                'dt': sec['stimulus']['sequence']['sampling_rate'].value
+                'sampling_rate': sec['stimulus']['sequence']['sampling_rate'].value
             }
 
     def get_full_sweep(self, sweep_number):
@@ -40,5 +40,5 @@ class OrcaDataSet( EphysDataSet ):
                 'stimulus': stimulus,
                 'response': response,
                 'index_range': ( exp['stimulus']['idx_start'].value, exp['stimulus']['idx_stop'].value ),
-                'dt': swp['stimulus']['sequence']['sampling_rate'].value
+                'sampling_rate': swp['stimulus']['sequence']['sampling_rate'].value
             }
