@@ -24,7 +24,7 @@ class OrcaDataSet( EphysDataSet ):
             return {
                 'stimulus': stimulus,
                 'response': response,
-                'index_range': (0, len(stimulus)-1),
+                'index_range': ( exp['stimulus']['idx_start'].value, exp['stimulus']['idx_stop'].value ),
                 'sampling_rate': sec['stimulus']['sequence']['sampling_rate'].value
             }
 
