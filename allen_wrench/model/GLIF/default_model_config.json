@@ -1,0 +1,99 @@
+{
+  "neuron": {
+    "tau": [
+      0.01, 
+      0.04
+    ],      
+    "threshold_reset_method": { 
+      "name": "V_plus_const"
+    }, 
+    "th_inf": 0.027, 
+    "coeff_a": 1.0, 
+    "coeff_b": 1.0, 
+    "voltage_reset_method": {
+      "name": "Vbefore"
+    }, 
+    "threshold_dynamics_method": {
+      "name": "adapt_standard",
+      "params" : {"a": 1,
+                  "b": 10
+                   }
+    }, 
+    "AScurrent_dynamics_method": {
+      "name": "expViaBlip"
+  	}, 
+    "AScurrent_reset_method": {
+      "params": {
+        "r": [
+          1, 
+          1
+        ]
+      }, 
+      "name": "sum"
+    }, 
+    "coeff_C": 1.0, 
+    "coeff_G": 1.0, 
+    "a_vector": [
+      1e-12, 
+      1e-12
+    ], 
+    "type": "GLIF", 
+    "voltage_dynamics_method": {
+      "name": "linear"
+    }, 
+    "Cap": 1.4358e-10, 
+    "Rinput": 159000000.0, 
+    "dt": 5e-05, 
+    "El": 0, 
+    "ER1": 0.07, 
+    "ER2": -0.02, 
+    "Vr": 0.004, 
+    "coeff_a_vector": [
+      1, 
+      -1
+    ]
+  }, 
+  "optimizer": {
+    "internal_iterations": 1, 
+    "save_file_name": "default_optimizer_file_name.json", 
+    "param_upper_bounds": [
+      1, 
+      1, 
+      1, 
+      1, 
+      1
+    ], 
+    "init_threshold": 0.02, 
+    "inner_loop": 1, 
+    "error_function": "VSD", 
+    "test_hold_out": true, 
+    "eps": 0.01, 
+    "neuron_number": 1, 
+    "param_lower_bounds": [
+      0, 
+      0, 
+      0, 
+      0, 
+      0
+    ], 
+    "init_AScurrents": [
+      0, 
+      0
+    ], 
+    "init_voltage": 0.0, 
+    "outer_loop": 1, 
+    "param_fit_names": [
+      "coeff_G",
+      "coeff_b",
+      "coeff_a", 
+      "coeff_a_vector"
+    ], 
+    "single_hold_out_repeat": false, 
+    "internal_func": 100000, 
+    "xtol": 1e-07, 
+     "ftol": 1e-07
+  },
+    "preprocessing": {
+        "subsample": { "time_step": 0.00005 }
+    }
+}
