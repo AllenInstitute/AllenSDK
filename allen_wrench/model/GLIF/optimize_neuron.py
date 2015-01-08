@@ -1,14 +1,15 @@
+import logging, time
 import sys, argparse, json, os
 import allen_wrench.model.GLIF.configuration_setup as configuration_setup
+
+logger = logging.getLogger()
 
 DEFAULT_STIMULUS = 'noise1_run1'
 DEFAULT_MODEL_CONFIG = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'default_model_config.json')
 
-def iteration_finished_callback(optimizer, outer, inner):
-    print 'finished outer iteration: ', outer, 'inner iteration: ', inner
-    print optimizer.iteration_info[-1]
-
 def parse_arguments():
+    ''' Use argparse to get required arguments from the command line '''
+
     parser = argparse.ArgumentParser(description='fit a neuron')
 
     parser.add_argument('--data_config_file', help='data configuration file name (sweeps properties, etc)', required=True)
@@ -20,10 +21,17 @@ def parse_arguments():
 
     return parser.parse_args()
 
-def main():
-    args = parse_arguments()
 
-    config = configuration_setup.read(args.data_config_file, args.model_config_file)
+def iteration_finished_callback(optimizer, outer, inner):
+    ''' Print some debug information when the optimizer finishes an iteration '''
+    logging.info('finished outer iteration: %d, inner iteration: %d' % (outer, inner))
+    logging.info(repr(optimizer.iteration_info[-1]))
+
+
+def setup_optimizer(data_config_file, model_config_file):
+    ''' Initialize the GLIF optimizer from data and model configuration files '''
+
+    config = configuration_setup.read(data_config_file, model_config_file)
 
     with open(args.method_config_file, 'rb') as f:
         method_config = json.loads(f.read())
@@ -35,15 +43,32 @@ def main():
     config.neuron_config['voltage_reset_method'] =      { 'name': method_config['voltage_reset_method'],      'params': None }
     config.neuron_config['threshold_reset_method'] =    { 'name': method_config['threshold_reset_method'],    'params': None }
 
-    optimizer = config.setup_optimizer(args.stimulus)
+    return config.setup_optimizer(args.stimulus)
 
-    best_params, begin_params = optimizer.run_many(config.optimizer_config['outer_loop'], iteration_finished_callback) 
+
+def optimize_neuron(optimizer, iterations):
+    ''' Run a GLIF optimizer for a given number of iterations '''
+
+    start_time = time.time()
+
+    best_params, begin_params = optimizer.run_many(iterations, iteration_finished_callback) 
+
+    logging.debug("optimize time %f" % (time.time() - start_time))
+
+    logging.info('finished optimizing')
+    logging.info('initial params ' + str(begin_params))
+    logging.info('best params' +  str(best_params))
+
+
+def main():
+    args = parse_arguments()
     
-    print 'finished optimizing'
-    print 'initial params', begin_params
-    print 'best params', best_params
+    optimizer = setup_optimizer(args.data_config_file, args.model_config_file)
+
+    optimize_neuron(optimizer, config.optimizer_config['outer_loop'])
 
     config.write(args.output_config_file)
+
 
 if __name__ == "__main__": main()
 
