@@ -128,6 +128,9 @@ class GLIFPreprocessor(object):
         
         (R_via_ave20to40percent_ramp, deltaV)=calc_input_R_and_extrapolatedV_via_ramp(ramp_data['voltage'][0], ramp_data['current'][0], 
                                                                                        ramp_data['start_idx'][0], dt, self.El_reference)
+        deltaV=0
+        #TODO:  need some checks for this mapping
+        
         print "Resistance averaging the resitance over 20 to 40 percent of ramp:", R_via_ave20to40percent_ramp
 
         #calculate resistance via average subthreshold noise
@@ -135,11 +138,16 @@ class GLIFPreprocessor(object):
         subthresh_noise_voltage=noise_data['voltage'][0][0:int(6./dt)]
         subthresh_noise_current=noise_data['current'][0][0:int(6./dt)]
         noise_El=self.sweep_properties[all_noise_sweeps[0]]['resting_potential']
+        
         R_via_noise=calculate_input_R_via_subthresh_noise(subthresh_noise_voltage, 
                                                           subthresh_noise_current, noise_El*1e-3, noise_data['start_idx'][0], dt)
         print 'resistance via noise average', R_via_noise
 
-        self.neuron_config['Rinput']=R_via_noise
+        #compute R, C, and El via least squares
+        (R_lssq, C_lssq, El_lssq)=R_via_subthresh_linRgress(subthresh_noise_voltage, subthresh_noise_current, dt)
+        print "difference in resting potential calculations", self.El_reference-El_lssq
+
+        self.neuron_config['Rinput']=R_lssq
 
 #        plt.figure()
 #        plt.subplot(2,1,1)
@@ -163,9 +171,12 @@ class GLIFPreprocessor(object):
 #        self.neuron_config['Cap'] = calculate_capacitance_via_subthreshold_blip(self.subthreshold_blip_data['voltage'][0][self.subthreshold_blip_data['start_idx'][0]:] - self.El_reference, 
 #                                                                                self.subthreshold_blip_data['current'][0][self.subthreshold_blip_data['start_idx'][0]:], self.neuron_config['dt'])
 
-        (self.neuron_config['Cap'], total_charge_dump)=calc_cap_via_fit_charge_dump(self.subthreshold_blip_data['voltage'][0][self.subthreshold_blip_data['start_idx'][0]:], 
+        (cap_via_charge_dump, total_charge_dump)=calc_cap_via_fit_charge_dump(self.subthreshold_blip_data['voltage'][0][self.subthreshold_blip_data['start_idx'][0]:], 
                                      self.subthreshold_blip_data['current'][0][self.subthreshold_blip_data['start_idx'][0]:], 
                                      self.neuron_config['Rinput'], dt, self.sweep_properties[subthreshold_blip_sweeps[0]]['resting_potential']*1e-3)
+        print "capacitance via charge dump", cap_via_charge_dump
+
+        self.neuron_config['Cap']=C_lssq
                     
         # calculate adaptive threshold from ramp
         #TODO: this is now repetitive and why the different load statements
@@ -232,7 +243,26 @@ class GLIFPreprocessor(object):
 
                 if compute_spike_cut_length:
                     self.neuron_config['spike_cut_length'] = index_of_min-int(sec_before_thresh_to_look_at_spikes/dt)
-                
+            elif method_config['name'] == 'LIF':
+                #NOTE I AM ONLY DOING THIS HERE TO GET A VALUE FOR SPIKE CUTTING
+                endPointMethod = 'timeAfterThresh'
+                noise_data = self.load_stimulus(self.stimulus_file_name, all_noise_sweeps)
+
+                (noise_v_spike_shape_list, noise_i_spike_shape_list, noise_zeroCrossInd, noise_thresholdInd, waveIndOfFirstSpikes, spikeFromWhichSweep) \
+                    = align_and_cut_spikes(noise_data['voltage'], noise_data['current'], dt=dt, method=spike_determination_method, sec_look_before_spike=sec_before_thresh_to_look_at_spikes)
+                ave_V_trace=np.mean(noise_v_spike_shape_list, axis=0)
+                #TODO: CorinneT: all this hard coded index stuff is not good it will be dependent on the hard coded stuff in align_and_cut_spikes
+                #TODO: CorinneT: a better algorithm might be the first deflection of the derivative (just incase the voltage goes up then down again
+                min_v=np.min(ave_V_trace[.004/dt:.010/dt]) 
+                if min_v==ave_V_trace[.010/dt-1]: #if the minimum is equal to the end of the spike then choose a time 4 ms after the spike threshold as min
+                    min_v=ave_V_trace[.0065/dt] #this is ~4 ms after thereshold. TODO: Note this will be dependent on how spikes are cut: fix this  
+                index_of_min=np.where(ave_V_trace==min_v)[0][0]
+                method_config['params'] = {
+                    'value': 0.0
+                } 
+                if compute_spike_cut_length:
+                    warnings.warn('you are cutting spikes via minimum average spike trace')
+                    self.neuron_config['spike_cut_length'] = index_of_min-int(sec_before_thresh_to_look_at_spikes/dt)   
             elif method_config['name'] == 'Vbefore':
                 # --load all noise
                 endPointMethod = 'timeAfterThresh'
@@ -402,6 +432,8 @@ class GLIFPreprocessor(object):
                 #TODO at some point this value my be fit
                 method_config['params'] = {'value': .003}
                 warnings.warn('v_plus_constant is currently a guess')
+            elif method_config['name'] == 'LIF':
+                method_config['params'] = {'value': self.neuron_config['th_inf']}
             else:  
                 method_config['params'] = {}
 
@@ -443,6 +475,8 @@ class GLIFPreprocessor(object):
                     'value': self.neuron_config['th_adapt']
                 }
                 # TODO: perhaps this should be renames to adapted threshold since it is fixed at a particular place
+            elif method_config['name'] == 'LIF':
+                method_config['params'] = {'value': self.neuron_config['th_inf']}
             else:
                 method_config['params'] = {}
 
@@ -1251,3 +1285,21 @@ def calculate_input_R_via_subthresh_noise(voltage, current, El, start_idx, dt):
     
     resistance=-aveV/aveI
     return resistance
+
+def R_via_subthresh_linRgress(voltage, current, dt):
+    v_nplus1=voltage[1:]
+    voltage=voltage[0:-1]
+    current=current[0:-1]
+    matrix=np.ones((len(voltage), 3))
+    matrix[:,0]=voltage
+    matrix[:,1]=current
+    out=np.linalg.lstsq(matrix, v_nplus1)[0] 
+    
+    capacitance=dt/out[1]
+    resistance=dt/(capacitance*(1-out[0]))
+    El=(capacitance*resistance*out[2])/dt
+    print "R via least squares", resistance*1e-6, "Mohms"
+    print "C via least squares", capacitance*1e12, "pF"
+    print "El via least squares", El*1e3, "mV" 
+    print "tau", resistance*capacitance*1e3, "ms"
+    return resistance, capacitance, El

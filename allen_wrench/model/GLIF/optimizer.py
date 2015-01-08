@@ -16,19 +16,22 @@ import random
 
 
 class GLIFOptimizer(object): #not sure why object is in here
-    def __init__(self, experiment=None, dt=None, upper_bounds=None, lower_bounds=None,
-                 inner_loop=None, start_time=None, eps=None, param_fit_names=None, stim=None, 
-                 error_function_name=None, neuron_num=None, xtol=None, ftol=None, save_file_name=None,
-                 internal_iterations=None, internal_func=None):
+    def __init__(self, experiment, dt, 
+                 inner_loop, start_time, 
+                 sigma_outer, sigma_inner,
+                 init_params, param_fit_names, stim, 
+                 error_function_name, neuron_num, 
+                 xtol, ftol, save_file_name,
+                 internal_iterations, internal_func):
 
         self.experiment = experiment
         self.dt = dt
-        self.upper_bounds = upper_bounds
-        self.lower_bounds = lower_bounds
         self.inner_loop = inner_loop
         self.start_time = start_time
         self.save_file_name = save_file_name
-        self.eps = eps
+        self.init_params = init_params
+        self.sigma_outer = sigma_outer
+        self.sigma_inner = sigma_inner
         self.param_fit_names = param_fit_names
         self.stim = stim
         self.error_function = error_functions.get_error_function_by_name(error_function_name)
@@ -43,11 +46,11 @@ class GLIFOptimizer(object): #not sure why object is in here
     def to_dict(self):
         return {
             'dt': self.dt,
-            'upper_bounds': self.upper_bounds,
-            'lower_bounds': self.lower_bounds,
             'inner_loop': self.inner_loop,
             'start_time': self.start_time,
-            'eps': self.eps,
+            'init_params': self.init_params,
+            'sigma_outer': self.sigma_outer,
+            'sigma_inner': self.sigma_inner,
             'param_fit_names': self.param_fit_names,
             'neuron_num': self.neuron_num,
             'xtol': self.xtol,
@@ -59,39 +62,36 @@ class GLIFOptimizer(object): #not sure why object is in here
             'init_AScurrents': self.experiment.init_AScurrents
         }
             
-    def generateInitParamGuess(self):
-        return self.lower_bounds+(self.upper_bounds-self.lower_bounds)*np.random.random(len(self.upper_bounds)) #specify random initial condition  #THIS WILL HAVE TO BE ADAPTED FOR VARIOUS PARAMETERS!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+    def randomize_parameter_values(self, values, sigma):
+        values = np.random.normal(values, sigma)
+        values[values<0] = 0
+        return values
+        
     def run_many(self, outloop, iteration_finished_callback=None):
-        initial_params = None
-
+        params = self.init_params
+        
         for o in range(0,outloop):  #outerloop 
-            params = self.generateInitParamGuess()
-
-            if initial_params is None:
-                initial_params = params
-
             for s in range(0,self.inner_loop):  #innerloop
-                #I think this is the bug is here this should be indicies not times and this should be the target not ref ISI
-                # bestFitParam.append(fmin(TRDMinRoutine, param0[s], args=(var_in, peakInd, ISI, stim), xtol=.0001, ftol=.0001, maxiter=2000, full_output=1 ))  #THIS IS THE OLD WAY
-                # bestFitParam.append(fmin(self.optimizer.thresh_routine, param0[s], args=(self.fit_names, self.var_in, self.peakInd, self.ISI, self.stim), xtol=.0001, ftol=.0001, maxiter=2, full_output=1 ))
-
                 start_time = time()
+
+                # run the optimizer once.  first time is always the passed initial conditions.
                 opt = self.run_once(params)
-                xtol, ftol = opt[0], opt[1]
+                xopt, fopt = opt[0], opt[1]
+
                 print 'fmin took', time()-self.start_time, "seconds",  (time()- self.start_time)/60, 'mins', (time()-self.start_time)/60/60, 'hours'
 
                 self.iteration_info.append({
                     'in_params': params.tolist(),
-                    'out_params': xtol.tolist(),
-                    'error': float(ftol)
+                    'out_params': xopt.tolist(),
+                    'error': float(fopt)
                 })
-
-                # randomize the best fit parameters
-                params = xtol*(1-self.eps/2+self.eps*np.random.random(len(params),))
 
                 if iteration_finished_callback is not None:
                     iteration_finished_callback(self, o, s)
+
+                # randomize the best fit parameters
+                params = self.randomize_parameter_values(xopt, self.sigma_inner)
+                #params = xtol*(1-self.eps/2+self.eps*np.random.random(len(params),))
 
                 #cant figure out how to run the model so I might have to just save the results and then run them else where
                 #(voltage, gridtime)=self.model.neuron.runModel(self, self.neuron.init_voltage, self.neuron.init_threshold, self.neuron.init_AScurrents, self.stim)
@@ -129,6 +129,10 @@ class GLIFOptimizer(object): #not sure why object is in here
 
                 #timeFor1Iter=time()-tempTimeIterStart  
 
+            # outer loop uses the outer standard deviation to randomize the initial values
+            params = self.randomize_parameter_values(self.init_params, self.sigma_outer)
+
+
         # get the best one!
         min_error = float("inf")
         min_i = -1
@@ -138,7 +142,7 @@ class GLIFOptimizer(object): #not sure why object is in here
                 min_i = i
 
         print 'done optimizing'
-        return self.iteration_info[min_i]['out_params'], initial_params
+        return self.iteration_info[min_i]['out_params'], self.init_params
 
     def run_once_bound(self, low_bound, high_bound):
         '''

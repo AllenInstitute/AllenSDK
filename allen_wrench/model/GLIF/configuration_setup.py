@@ -135,7 +135,6 @@ class ConfigurationSetup( object ):
         else: 
             raise Exception("not implemented")        
 
-        return self.neuron
     
     def setup_optimizer(self, optimize_stimulus_name, optimize_sweep_ids=None,
                         superthresh_blip_name='minimum_superthreshold_short_square', 
@@ -173,18 +172,6 @@ class ConfigurationSetup( object ):
             warnings.warn('ConfigurationSetup thinks the init_AScurrents have incorrect length.  Setting to zeros.')
             self.optimizer_config['init_AScurrents'] = np.zeros(len(self.neuron.a_vector))
 
-        # make sure that the optimizer parameter bounds have the correct size
-        lower_bounds = self.optimizer_config.get('param_lower_bounds', [])
-        upper_bounds = self.optimizer_config.get('param_upper_bounds', [])
-        correct_num_bounds = len(self.optimizer_config['param_fit_names']) + len(self.neuron.a_vector) - 1
-        
-        if len(lower_bounds) != correct_num_bounds:
-            warnings.warn('ConfigurationSetup thinks the param_lower_bounds has incorrect length.  Setting to zeros.')
-            self.optimizer_config['param_lower_bounds'] = np.zeros(correct_num_bounds)
-
-        if len(upper_bounds) != correct_num_bounds:
-            warnings.warn('ConfigurationSetup thinks the param_upper_bounds has incorrect length.  Setting to ones.')
-            self.optimizer_config['param_upper_bounds'] = np.ones(correct_num_bounds)
 
         # initialize the experiment
         self.experiment = GLIFExperiment(neuron = self.neuron, 
@@ -199,17 +186,19 @@ class ConfigurationSetup( object ):
                                          target_spike_mask = prep.target_spike_mask,
                                          fit_names_list = self.optimizer_config['param_fit_names'])  
 
+        init_params = np.ones(len(self.optimizer_config['param_fit_names']) + len(self.neuron.a_vector) - 1)
+
         # initialize the optimizer
         self.optimizer = GLIFOptimizer(experiment = self.experiment, 
                                        dt = self.experiment.dt,              
                                        inner_loop = self.optimizer_config['inner_loop'],
                                        start_time = time(),
                                        save_file_name = self.optimizer_config['save_file_name'],
-                                       stim = prep.optimize_data['current'],
-                                       lower_bounds = np.array(self.optimizer_config['param_lower_bounds']), 
-                                       upper_bounds = np.array(self.optimizer_config['param_upper_bounds']), #!!!!!!!!!THIS WI4LL HAVE TO BE ADAPTED FOR VARIOUS PARAMETERS!!!!!!!!!!!
-                                       eps = self.optimizer_config['eps'],
+                                       init_params = init_params,
+                                       sigma_inner = self.optimizer_config['sigma_inner'],
+                                       sigma_outer = self.optimizer_config['sigma_outer'],
                                        param_fit_names = self.optimizer_config['param_fit_names'],
+                                       stim = prep.optimize_data['current'],
                                        error_function_name = self.optimizer_config['error_function'],
                                        neuron_num = self.optimizer_config['neuron_number'],
                                        xtol = self.optimizer_config['xtol'],
@@ -232,10 +221,9 @@ class ConfigurationSetup( object ):
         'internal_iterations': 1,
         'internal_func': 1000000,
         'param_fit_names': ['coeff_a', 'coeff_a_vector'],
-        'param_upper_bounds': [1,1,1,1,1],
-        'param_lower_bounds': [0,0,0,0,0],
         'save_file_name': 'default_optimizer_file_name.json',
-        'eps': 0.01,
+        'sigma_inner': 0.01,
+        'sigma_outer': 0.3,
         'init_voltage': 0.0,
         'init_threshold': 0.02,
         'init_AScurrents': [0,0,0,0]  #this intentially set to a list--probably because that would be how it comes in in a potential configuration file?

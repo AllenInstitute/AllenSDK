@@ -45,10 +45,10 @@ class OrcaDataSet( EphysDataSet ):
             try:
                 # if the sweep has an experiment, the index range will point to the range of values containing the experimental data.
                 exp = f['epochs']['Experiment_%d' % sweep_number]
-                out['index_range'] = ( exp['stimulus']['idx_start'].value, exp['stimulus']['idx_stop'].value ),
+                out['index_range'] = ( exp['stimulus']['idx_start'].value, exp['stimulus']['idx_stop'].value )
             except KeyError, e:
                 # this sweep has no experiment.  return the index range of the entire sweep.
-                out['index_range'] = ( swp['stimulus']['idx_start'].value, swp['stimulus']['idx_stop'].value ),
+                out['index_range'] = ( swp['stimulus']['idx_start'].value, swp['stimulus']['idx_stop'].value )
                 
             return out
 

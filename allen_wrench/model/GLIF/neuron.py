@@ -24,10 +24,12 @@ class GLIFNeuron( object ):
         
         # Values that can be fit: They scale the input values.  
         # These are allowed to have default values because they are going to get optimized.
+        self.coeff_th = kwargs.get('coeff_th', 1)
         self.coeff_C = kwargs.get('coeff_C', 1)
         self.coeff_G = kwargs.get('coeff_G', 1)
         self.coeff_b = kwargs.get('coeff_b', 1)
         self.coeff_a = kwargs.get('coeff_a', 1)
+        
         self.coeff_a_vector = np.array(kwargs.get('coeff_a_vector', np.ones(len(self.a_vector))))
         
         # debug print
@@ -54,6 +56,7 @@ class GLIFNeuron( object ):
             'a_vector': self.a_vector,
             'spike_cut_length': self.spike_cut_length,
             'th_inf': self.th_inf,
+            'coeff_th': self.coeff_th,
             'coeff_C': self.coeff_C,
             'coeff_G': self.coeff_G,
             'coeff_b': self.coeff_b,
@@ -102,7 +105,7 @@ class GLIFNeuron( object ):
 
         AScurrents_t1 = self.AScurrent_dynamics_method(self, AScurrents_t0, time_step, spike_time_steps)
         voltage_t1 = self.voltage_dynamics_method(self, voltage_t0, AScurrents_t0, inj)
-        threshold_t1 = self.threshold_dynamics_method(self, threshold_t0, voltage_t0)
+        threshold_t1 = self.threshold_dynamics_method(self, threshold_t0, voltage_t0)*self.coeff_th
         
         return voltage_t1, threshold_t1, AScurrents_t1
     
@@ -128,6 +131,9 @@ class GLIFNeuron( object ):
                 pass
 
         return total
+    
+    def dynamics_AScurrent_LIF(self, AScurrents_t0, time_step, spike_time_steps):
+        return np.zeros(len(AScurrents_t0))
    
     #-----voltage equations all return voltage_t1
     def dynamics_voltage_linear(self, voltage_t0, AScurrents_t0, inj):
@@ -146,6 +152,9 @@ class GLIFNeuron( object ):
         return threshold_t0+(a*self.coeff_a*(voltage_t0-self.El)-b*self.coeff_b*(threshold_t0-self.th_inf))*self.dt 
         
     def dynamics_threshold_fixed(self, threshold_t0, voltage_t0, value=None):
+        return value
+
+    def dynamics_threshold_LIF(self, threshold_t0, voltage_t0, value=None):
         return value
         
     #-------------------------------------------------------------------
@@ -167,7 +176,7 @@ class GLIFNeuron( object ):
         
         AScurrents_t1 = self.AScurrent_reset_method(self, AScurrents_t0, t)  #TODO: David I think you want to feed in r here
         voltage_t1 = self.voltage_reset_method(self, voltage_t0)
-        threshold_t1 = self.threshold_reset_method(self, threshold_t0)
+        threshold_t1 = self.threshold_reset_method(self, threshold_t0)*self.coeff_th
         return voltage_t1, threshold_t1, AScurrents_t1
     
     #-----AS current reset rules all return AScurrents_t1------------------------
@@ -178,6 +187,10 @@ class GLIFNeuron( object ):
         #TODO: David use r again when it is implemented as a vector
         #return self.a_vector * self.coeff_a_vector + AScurrents_t0 * r * np.exp(self.k * self.dt)
 
+    def reset_AScurrent_LIF(self, AScurrents_t0, t):
+        if np.sum(AScurrents_t0)!=0:
+            raise Exception('You are running a LIF but the AScurrents are not zero!')
+        return 0
 
     #---------voltage reset rules---------------------------------------------------------------------            
     def reset_voltage_Vbefore(self, voltage_t0, a=1.0516, b=.0051):
@@ -188,6 +201,9 @@ class GLIFNeuron( object ):
     
     def reset_voltage_fixed(self, voltage_t0, value=0.003):
         return value
+
+    def reset_voltage_LIF(self, voltage_t0, value=0.0):
+        return value    
     
     #--------threshold reset rules-----------------------------------------------------------------------
     def reset_threshold_from_paper(self, threshold_t0, th_reset=0.010):
@@ -200,6 +216,9 @@ class GLIFNeuron( object ):
         '''it is highly probable that at some point we will need to fit const'''
         '''threshold_t0 and value should be in mV'''
         return threshold_t0 + value
+
+    def reset_threshold_LIF(self, threshold_t0, value=0.010):
+        return value
         
     #-----------------------------------------------------------------------------------
     #------------run functions----------------------------------------------------------
@@ -613,7 +632,8 @@ class GLIFNeuron( object ):
             'exp': dynamics_AScurrent_exp,
             'expViaBlip': dynamics_AScurrent_exp,
             'expViaGLM': dynamics_AScurrent_exp,
-            'vector': dynamics_AScurrent_vector
+            'vector': dynamics_AScurrent_vector,
+            'LIF': dynamics_AScurrent_LIF
         },
         'voltage_dynamics_method': { 
             'linear': dynamics_voltage_linear,
@@ -621,20 +641,24 @@ class GLIFNeuron( object ):
         },
         'threshold_dynamics_method': {
             'fixed': dynamics_threshold_fixed,
-            'adapt_standard': dynamics_threshold_adapt_standard
+            'adapt_standard': dynamics_threshold_adapt_standard,
+            'LIF': dynamics_threshold_LIF
         },
         'AScurrent_reset_method': {
-            'sum': reset_AScurrent_sum
+            'sum': reset_AScurrent_sum,
+            'LIF': reset_AScurrent_LIF,
         }, 
         'voltage_reset_method': {
             'Vbefore': reset_voltage_Vbefore,
             'IandVbefore': reset_voltage_IandVbefore,
-            'fixed': reset_voltage_fixed
+            'fixed': reset_voltage_fixed,
+            'LIF': reset_voltage_LIF
         }, 
         'threshold_reset_method': {
             'from_paper': reset_threshold_from_paper,
             'fixed': reset_threshold_fixed,
-            'V_plus_const': reset_threshold_V_plus_const
+            'V_plus_const': reset_threshold_V_plus_const,
+            'LIF': reset_threshold_LIF
         }
     }
 

@@ -6,7 +6,7 @@ import json
 import copy
 
 class GLIFExperiment( object ):
-    FIT_PARAMETERS = ["coeff_C", "coeff_G", "coeff_a", "coeff_b", "coeff_a_vector"]
+    FIT_PARAMETERS = ["coeff_th", "coeff_C", "coeff_G", "coeff_a", "coeff_b", "coeff_a_vector"]
 
     #If I need to get stuff from the top level script into the run functions add 
     #a thing here and remember to set it in the initialization

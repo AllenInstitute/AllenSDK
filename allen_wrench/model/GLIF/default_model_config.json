@@ -5,22 +5,19 @@
       0.04
     ],      
     "threshold_reset_method": { 
-      "name": "V_plus_const"
+      "name": "LIF"
     }, 
     "th_inf": 0.027, 
     "coeff_a": 1.0, 
     "coeff_b": 1.0, 
     "voltage_reset_method": {
-      "name": "Vbefore"
+      "name": "LIF"
     }, 
     "threshold_dynamics_method": {
-      "name": "adapt_standard",
-      "params" : {"a": 1,
-                  "b": 10
-                   }
+      "name": "LIF"
     }, 
     "AScurrent_dynamics_method": {
-      "name": "expViaBlip"
+      "name": "LIF"
   	}, 
     "AScurrent_reset_method": {
       "params": {
@@ -67,7 +64,8 @@
     "inner_loop": 1, 
     "error_function": "VSD", 
     "test_hold_out": true, 
-    "eps": 0.01, 
+    "sigma_inner": 0.01, 
+    "sigma_outer": 0.3, 
     "neuron_number": 1, 
     "param_lower_bounds": [
       0, 
