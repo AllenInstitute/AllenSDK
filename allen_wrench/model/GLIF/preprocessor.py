@@ -109,7 +109,9 @@ class GLIFPreprocessor(object):
         # reference resting potential comes from the ramp
         sec_before_thresh_to_look_at_spikes=.002 #used in spike cutting
         self.El_reference = self.sweep_properties[ramp_sweeps[0]]['resting_potential']  * 1e-3
-        print 'WHAT UNITS IS THIS IN', self.El_reference
+        if self.El_reference>-.03 or self.El_reference<-.1:
+            print "the resting potential is :", self.El_reference
+            raise Exception("Resting potential is not in the correct range")
         self.neuron_config['El'] = 0  # AT THE MOMENT EVERYTHING IS BEING CALCULATED SHIFTING EL TO ZERO
 
         # --load the sweeps that will be run in the model optimizer
