@@ -1,3 +1,5 @@
+import logging
+
 from scipy import *
 import numpy as np
 import copy
@@ -22,7 +24,7 @@ class GLIFOptimizer(object): #not sure why object is in here
                  init_params, param_fit_names, stim, 
                  error_function_name, neuron_num, 
                  xtol, ftol, save_file_name,
-                 internal_iterations, internal_func):
+                 internal_iterations):
 
         self.experiment = experiment
         self.dt = dt
@@ -39,7 +41,6 @@ class GLIFOptimizer(object): #not sure why object is in here
         self.xtol = xtol
         self.ftol = ftol
         self.internal_iterations = internal_iterations
-        self.internal_func = internal_func
 
         self.iteration_info = [];
 
@@ -63,7 +64,11 @@ class GLIFOptimizer(object): #not sure why object is in here
         }
             
     def randomize_parameter_values(self, values, sigma):
-        values = np.random.normal(values, sigma)
+        values = np.array(np.random.normal(values, sigma))
+
+        # values might not have a shape if it's a single element long, depending on your numpy version
+        if not values.shape:
+            values = np.array([values])
         values[values<0] = 0
         return values
         
@@ -78,7 +83,7 @@ class GLIFOptimizer(object): #not sure why object is in here
                 opt = self.run_once(params)
                 xopt, fopt = opt[0], opt[1]
 
-                print 'fmin took', time()-self.start_time, "seconds",  (time()- self.start_time)/60, 'mins', (time()-self.start_time)/60/60, 'hours'
+                logging.debug('fmin took %f secs, %f mins, %f hours' %  (time()-self.start_time, (time()- self.start_time)/60, (time()-self.start_time)/60/60))
 
                 self.iteration_info.append({
                     'in_params': params.tolist(),
@@ -141,8 +146,12 @@ class GLIFOptimizer(object): #not sure why object is in here
                 min_error = info['error']
                 min_i = i
 
-        print 'done optimizing'
-        return self.iteration_info[min_i]['out_params'], self.init_params
+        best_params = self.iteration_info[min_i]['out_params']
+
+        self.experiment.set_neuron_parameters(best_params)
+
+        logging.debug('done optimizing')
+        return best_params, self.init_params
 
     def run_once_bound(self, low_bound, high_bound):
         '''
@@ -159,10 +168,9 @@ class GLIFOptimizer(object): #not sure why object is in here
         @param param0: a list of the initial guesses for the optimizer
         @return: tuple including parameters that optimize function and value - see fmin docs
         '''       
-        print 'why isn''t this thing printing the iteration values!?' 
 #        fmin(func, x0, args=(), xtol=1e-4, ftol=1e-4, maxiter=None, maxfun=None, full_output=0, disp=1, retall=0, callback=None):
 
-        return fmin(self.error_function, param0, args=(self.experiment,self.save_file_name),xtol=self.xtol, ftol=self.ftol,  maxiter=self.internal_iterations, maxfun=self.internal_func, retall=1,full_output=1, disp=1)
+        return fmin(self.error_function, param0, args=(self.experiment,self.save_file_name),xtol=self.xtol, ftol=self.ftol,  maxiter=self.internal_iterations, maxfun=self.internal_iterations, retall=1,full_output=1, disp=1)
 
 #        #Note is defined in the top level script
 #        def mycallback_ncg(xk):

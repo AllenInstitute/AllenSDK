@@ -1,11 +1,9 @@
+
 import logging, time
 import sys, argparse, json, os
 
 import allen_wrench.model.GLIF.configuration_setup as configuration_setup
 from allen_wrench.core.orca_data_set import OrcaDataSet as EphysDataSet
-
-logger = logging.getLogger()
-
 
 def parse_arguments():
     ''' Use argparse to get required arguments from the command line '''
@@ -15,6 +13,7 @@ def parse_arguments():
     parser.add_argument('--model_config_file', help='configuration file output by optimizer', required=True)
     parser.add_argument('--output_file', help='output file name', required=True)
     parser.add_argument('--stimulus', help='stimulus type name', default=None)
+    parser.add_argument('--log_level', help='log_level', default=logging.INFO)
 
     return parser.parse_args()
 
@@ -24,7 +23,7 @@ def simulate_sweep(neuron, stimulus, init_voltage, init_threshold, init_AScurren
 
     start_time = time.time()
 
-    logger.debug("simulating")
+    logging.debug("simulating")
 
     (voltage, threshold, AScurrent_matrix, grid_spike_time, 
      interpolated_spike_time, grid_spike_index, interpolated_spike_voltage, 
@@ -33,56 +32,58 @@ def simulate_sweep(neuron, stimulus, init_voltage, init_threshold, init_AScurren
                                                 init_AScurrents,
                                                 stimulus)    
     
-    logger.debug("simulation time %f" % (time.time() - start_time))
+    logging.debug("simulation time %f" % (time.time() - start_time))
     
     return voltage
 
 
-def load_sweep_stimulus(file_name, sweep_number):
+def load_sweep(file_name, sweep_number):
     ''' Load the stimulus for a sweep from file. '''
-    logger.debug("loading sweep %d" % sweep_number)
+    logging.debug("loading sweep %d" % sweep_number)
     
     load_start_time = time.time()
     data = EphysDataSet(file_name).get_full_sweep(sweep_number)
 
-    logger.debug("load time %f" + (time.time() - load_start_time))
+    logging.debug("load time %f" % (time.time() - load_start_time))
 
-    return data['stimulus']
+    return data
 
 
 def write_sweep_response(file_name, sweep_number, response):
     ''' Overwrite the response in a file. '''
 
-    logger.debug("writing sweep")
+    logging.debug("writing sweep")
 
     write_start_time = time.time()
-    out_data = EphysDataSet(args.output_file).set_full_sweep(sweep_number, stimulus=None, response=voltage)
+    out_data = EphysDataSet(file_name).set_full_sweep(sweep_number, stimulus=None, response=response)
     
-    logger.debug("write time %f" % (time.time() - write_start_time))
+    logging.debug("write time %f" % (time.time() - write_start_time))
 
     
-def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_name, neuron, init_voltage, init_threshold, init_AScurrents):
+def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_name, init_voltage, init_threshold, init_AScurrents):
     ''' Load a sweep stimulus, simulate the response, and write it out. '''
     
     sweep_start_time = time.time()
     
     try:
-        stimulus = load_sweep_stimulus(input_file_name, sweep_number)
+        data = load_sweep(input_file_name, sweep_number)
     except Exception,e:
-        logger.warning("Failed to load sweep, skipping. " + str(e))
-        return
+        logging.warning("Failed to load sweep, skipping. (%s)" % str(e))
+        raise
         
         # tell the neuron what dt should be for this sweep
     neuron.dt = 1.0 / data['sampling_rate']
     
-    response = simulate_sweep(neuron, stimulus, init_voltage, init_threshold, init_AScurrents)
+    response = simulate_sweep(neuron, data['stimulus'], init_voltage, init_threshold, init_AScurrents)
     
     write_sweep_response(output_file_name, sweep_number, response)
     
-    logger.debug("total sweep time %f", ( time.time() - sweep_start_time)
+    logging.debug("total sweep time %f" % ( time.time() - sweep_start_time ))
                  
 def main():
     args = parse_arguments()
+
+    logging.getLogger().setLevel(args.log_level)
                  
     config = configuration_setup.read(args.data_config_file, args.model_config_file)
     neuron = config.setup_neuron(config.neuron_config)
@@ -104,6 +105,6 @@ def main():
                                  config.optimizer_config['init_AScurrents'])
                  
 
-    logger.debug("total elapsed time %f" % (time.time() - start_time))
+    logging.debug("total elapsed time %f" % (time.time() - start_time))
 
 if __name__ == "__main__": main()

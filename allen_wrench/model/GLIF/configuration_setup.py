@@ -59,23 +59,9 @@ class ConfigurationSetup( object ):
         if self.optimizer_config is None:
             self.optimizer_config = dict(ConfigurationSetup.DEFAULT_OPTIMIZER_CONFIG)
 
-#         self.spike_cutting_method = spike_cutting_method
-#         if spike_cutting_method is None:
-#             self.spike_cutting_method = {'specifiedTime': .004}
-#        self.spikeCuttingMethod_dict={'None':[]}
-#        self.spikeCuttingMethod_dict={'specifiedTime': .0074}  #note that this value has to be smaller than the smallest ISI.  There is a built in error function that will check thi
-    
         self.preprocessing_config = preprocessing_config
         if self.preprocessing_config is None:
             self.preprocessing_config = dict(ConfigurationSetup.DEFAULT_PREPROCESSING_CONFIG)
-#         self.preprocessing_methods = preprocessing_methods
-#         if self.preprocessing_methods is None:
-#             self.preprocessing_methods = {'None':[]}
-#        self.dictOfPreprocessMethods = kwargs.get('preprocessing_methods', )
-#        self.dictOfPreprocessMethods={'subSample':{'present_time_step': self.neuron.dt, 'desired_time_step': 0.01},
-#                                      'cut_extra_current':[20000:40000]}
-#        self.dictOfPreprocessMethods={'cut_extra_current':[], 'zeroOutElViaInjCurrent':{'blip_index':[2], 'blip_ind':[], 'input_resistance':[] }}  #NEED TO MAKE SURE THIS IS CORRECT FOR THE DATA YOU ARE PROCESSING
-#        self.dictOfPreprocessMethods={'cut_extra_current':[]}
 
         self.save_fig = save_fig
 
@@ -120,6 +106,7 @@ class ConfigurationSetup( object ):
                                      spike_cut_length=neuron_config['spike_cut_length'],
                                      th_inf=neuron_config['th_inf'],
                                      
+                                     coeff_th=neuron_config['coeff_th'],
                                      coeff_C=neuron_config['coeff_C'],
                                      coeff_G=neuron_config['coeff_G'],
                                      coeff_b=neuron_config['coeff_b'],
@@ -135,12 +122,15 @@ class ConfigurationSetup( object ):
         else: 
             raise Exception("not implemented")        
 
+        return self.neuron
+
     
     def setup_optimizer(self, optimize_stimulus_name, optimize_sweep_ids=None,
                         superthresh_blip_name='minimum_superthreshold_short_square', 
                         subthresh_blip_name='maximum_subthreshold_short_square', 
                         ramp_name='superthreshold_ramp',
-                        all_noise_name='all_noise'):
+                        all_noise_name='all_noise',
+                        multi_square_name='multi_short_square'):
 
         # extract the sweeps to be used for optimization by name.  
         # If a subset of the sweeps are to be used, filter accordingly.
@@ -161,6 +151,7 @@ class ConfigurationSetup( object ):
                                  subthreshold_blip_sweeps=self.data_config.get(subthresh_blip_name, None),
                                  ramp_sweeps=self.data_config.get(ramp_name, None),
                                  all_noise_sweeps=self.data_config.get(all_noise_name, None),
+                                 multi_blip_sweeps=self.data_config.get(multi_square_name, None),
                                  spike_determination_method=self.spike_determination_method)
 
         # set up the neuron based on the preprocessed neuron config
@@ -186,7 +177,11 @@ class ConfigurationSetup( object ):
                                          target_spike_mask = prep.target_spike_mask,
                                          fit_names_list = self.optimizer_config['param_fit_names'])  
 
-        init_params = np.ones(len(self.optimizer_config['param_fit_names']) + len(self.neuron.a_vector) - 1)
+        num_optimizer_params = len(self.optimizer_config['param_fit_names'])
+        if 'coeff_a_vector' in self.optimizer_config['param_fit_names']:
+            num_optimizer_params += len(self.neuron.a_vector) - 1
+
+        init_params = np.ones(num_optimizer_params)
 
         # initialize the optimizer
         self.optimizer = GLIFOptimizer(experiment = self.experiment, 
@@ -203,8 +198,7 @@ class ConfigurationSetup( object ):
                                        neuron_num = self.optimizer_config['neuron_number'],
                                        xtol = self.optimizer_config['xtol'],
                                        ftol = self.optimizer_config['ftol'],
-                                       internal_iterations = self.optimizer_config['internal_iterations'],
-                                       internal_func = self.optimizer_config['internal_func'])
+                                       internal_iterations = self.optimizer_config['internal_iterations'])
 
         return self.optimizer
 
@@ -218,8 +212,7 @@ class ConfigurationSetup( object ):
         'error_function': 'VSD',
         'xtol': 0.0000001,
         'ftol': 0.0000001,
-        'internal_iterations': 1,
-        'internal_func': 1000000,
+        'internal_iterations': 1000000,
         'param_fit_names': ['coeff_a', 'coeff_a_vector'],
         'save_file_name': 'default_optimizer_file_name.json',
         'sigma_inner': 0.01,
@@ -237,6 +230,7 @@ class ConfigurationSetup( object ):
         'Cap': 143.58e-12,
         'ER1': 0.07, #not used
         'ER2': -0.02, #not used
+        'coeff_th': 1.0,
         'coeff_C': 1.0,
         'coeff_G': 1.0,
         'coeff_a': 1.0,

@@ -5,20 +5,20 @@
       0.04
     ],      
     "threshold_reset_method": { 
-      "name": "LIF"
+      "name": "from_paper"
     }, 
-    "th_inf": 0.027, 
-    "coeff_a": 1.0, 
-    "coeff_b": 1.0, 
     "voltage_reset_method": {
-      "name": "LIF"
-    }, 
+      "name": "Vbefore"
+    },
     "threshold_dynamics_method": {
-      "name": "LIF"
+      "name": "adapt_standard"
     }, 
     "AScurrent_dynamics_method": {
       "name": "LIF"
   	}, 
+  	"voltage_dynamics_method": {
+      "name": "linear"
+    },
     "AScurrent_reset_method": {
       "params": {
         "r": [
@@ -27,17 +27,18 @@
         ]
       }, 
       "name": "sum"
-    }, 
+    },
+    "th_inf": 0.027, 
+    "coeff_th": 1.0,
+    "coeff_a": 1.0, 
+    "coeff_b": 1.0,   
     "coeff_C": 1.0, 
     "coeff_G": 1.0, 
     "a_vector": [
       1e-12, 
       1e-12
     ], 
-    "type": "GLIF", 
-    "voltage_dynamics_method": {
-      "name": "linear"
-    }, 
+    "type": "GLIF",  
     "Cap": 1.4358e-10, 
     "Rinput": 159000000.0, 
     "dt": 5e-05, 
@@ -51,7 +52,14 @@
     ]
   }, 
   "optimizer": {
-    "internal_iterations": 1, 
+    "internal_iterations": 1,
+    "param_fit_names": [
+    	"coeff_th",
+    	"coeff_a",
+    	"coeff_b",
+		"coeff_C",
+		"coeff_a_vector"
+    ], 
     "save_file_name": "default_optimizer_file_name.json", 
     "param_upper_bounds": [
       1, 
@@ -65,7 +73,7 @@
     "error_function": "VSD", 
     "test_hold_out": true, 
     "sigma_inner": 0.01, 
-    "sigma_outer": 0.3, 
+    "sigma_outer": 0.3,
     "neuron_number": 1, 
     "param_lower_bounds": [
       0, 
@@ -79,17 +87,10 @@
       0
     ], 
     "init_voltage": 0.0, 
-    "outer_loop": 1, 
-    "param_fit_names": [
-      "coeff_G",
-      "coeff_b",
-      "coeff_a", 
-      "coeff_a_vector"
-    ], 
+    "outer_loop": 1,  
     "single_hold_out_repeat": false, 
-    "internal_func": 100000, 
     "xtol": 1e-07, 
-     "ftol": 1e-07
+    "ftol": 1e-07
   },
     "preprocessing": {
         "subsample": { "time_step": 0.00005 }

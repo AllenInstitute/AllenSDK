@@ -8,6 +8,7 @@ from scipy import stats
 from scipy.io import savemat
 from scipy.optimize import curve_fit
 import sys
+import statsmodels.api as sm
 
 import logging
 logger = logging.getLogger()
@@ -102,7 +103,7 @@ class GLIFPreprocessor(object):
         return sweep_data
 
         
-    def preprocess_stimulus(self, optimize_sweeps, superthreshold_blip_sweeps, subthreshold_blip_sweeps, ramp_sweeps, all_noise_sweeps, spike_determination_method='threshold'):
+    def preprocess_stimulus(self, optimize_sweeps, superthreshold_blip_sweeps, subthreshold_blip_sweeps, ramp_sweeps, all_noise_sweeps, multi_blip_sweeps, spike_determination_method='threshold'):
         
         #TODO:  instead of just taking zeroth sweep there should be should way to take the first passed sweep
         
@@ -126,44 +127,38 @@ class GLIFPreprocessor(object):
                                                                            ramp_data['current'][0][ramp_data['start_idx'][0]:], self.neuron_config['dt'])                    
         print 'Resistance via beigining of ramp: ', R_via_begining_of_ramp
         
-        (R_via_ave20to40percent_ramp, deltaV)=calc_input_R_and_extrapolatedV_via_ramp(ramp_data['voltage'][0], ramp_data['current'][0], 
-                                                                                       ramp_data['start_idx'][0], dt, self.El_reference)
-        deltaV=0
-        #TODO:  need some checks for this mapping
-        
-        print "Resistance averaging the resitance over 20 to 40 percent of ramp:", R_via_ave20to40percent_ramp
-
         #calculate resistance via average subthreshold noise
         noise_data=self.load_stimulus(self.stimulus_file_name,all_noise_sweeps)
         subthresh_noise_voltage=noise_data['voltage'][0][0:int(6./dt)]
         subthresh_noise_current=noise_data['current'][0][0:int(6./dt)]
-        noise_El=self.sweep_properties[all_noise_sweeps[0]]['resting_potential']
+        noise_El=self.sweep_properties[all_noise_sweeps[0]]['resting_potential']*1e-3
         
         R_via_noise=calculate_input_R_via_subthresh_noise(subthresh_noise_voltage, 
-                                                          subthresh_noise_current, noise_El*1e-3, noise_data['start_idx'][0], dt)
+                                                          subthresh_noise_current, noise_El, noise_data['start_idx'][0], dt)
         print 'resistance via noise average', R_via_noise
+        
+        #TODO put delta somewhere else
+        (R_via_ave20to40percent_ramp, deltaV_via_ave20to40percent_ramp)=calc_input_R_and_extrapolatedV_via_ramp(ramp_data['voltage'][0], ramp_data['current'][0], 
+                                                                                       ramp_data['start_idx'][0], dt, self.El_reference)
+
+        print "Resistance averaging the resitance over 20 to 40 percent of ramp:", R_via_ave20to40percent_ramp
+        print 'difference between threshold on ramp and threshold via extrapolated V', deltaV_via_ave20to40percent_ramp
+        
+        (R_glm, C_glm)=RC_via_subthresh_GLM(subthresh_noise_voltage, subthresh_noise_current, dt)
+        print "R via GLM", R_glm*1e-6, "Mohms"
+        print "C via GLM", C_glm*1e12, "pF"
 
         #compute R, C, and El via least squares
         (R_lssq, C_lssq, El_lssq)=R_via_subthresh_linRgress(subthresh_noise_voltage, subthresh_noise_current, dt)
         print "difference in resting potential calculations", self.El_reference-El_lssq
 
         self.neuron_config['Rinput']=R_lssq
-
-#        plt.figure()
-#        plt.subplot(2,1,1)
-#        plt.plot(np.arange(0, len(subthresh_noise_current))*dt, subthresh_noise_current)
-#        plt.subplot(2,1,2)        
-#        plt.plot(np.arange(0, len(subthresh_noise_voltage))*dt, subthresh_noise_voltage)
-    
+  
 #        #---these are for saving for Ram
 #        out={'I_stim':subthresh_noise_current, 'voltage':subthresh_noise_voltage, 'dt':dt}
 #        savemat('/data/mat/RamIyer/IVSCC/subthresh_noise5', out)
 #        sys.exit()
 
-        # extract instantaneous threshold from superthreshold blip
-        self.superthreshold_blip_data = self.load_stimulus(self.stimulus_file_name, superthreshold_blip_sweeps) 
-        thresh_inf_via_Vmeasure = find_first_spike_voltage(self.superthreshold_blip_data['voltage'][0], dt) - self.El_reference-deltaV      
-            
         # calculate capacitance from subthreshold blip data
         self.subthreshold_blip_data = self.load_stimulus(self.stimulus_file_name, subthreshold_blip_sweeps) 
 
@@ -174,9 +169,26 @@ class GLIFPreprocessor(object):
         (cap_via_charge_dump, total_charge_dump)=calc_cap_via_fit_charge_dump(self.subthreshold_blip_data['voltage'][0][self.subthreshold_blip_data['start_idx'][0]:], 
                                      self.subthreshold_blip_data['current'][0][self.subthreshold_blip_data['start_idx'][0]:], 
                                      self.neuron_config['Rinput'], dt, self.sweep_properties[subthreshold_blip_sweeps[0]]['resting_potential']*1e-3)
-        print "capacitance via charge dump", cap_via_charge_dump
+        print "capacitance via charge dump fit extrapolation", cap_via_charge_dump
 
         self.neuron_config['Cap']=C_lssq
+        
+        #calculate b constant and potential threshold reset
+        muliti_SS = self.load_stimulus(self.stimulus_file_name, multi_blip_sweeps)
+    
+        (thresh_reset,b_value)=calc_a_b_from_muliblip(muliti_SS, dt)
+        #TODO: 
+        print "value added to previous threshold if method is V_plus_const", thresh_reset
+        
+        deltaV_ramp_and_used_R=calc_deltaV_via_specified_R_and_ramp(self.neuron_config['Rinput'], ramp_data['voltage'][0], ramp_data['current'][0], 
+                                                                                       ramp_data['start_idx'][0], dt, self.El_reference)
+        deltaV=deltaV_ramp_and_used_R
+        
+        # extract instantaneous threshold from superthreshold blip
+        self.superthreshold_blip_data = self.load_stimulus(self.stimulus_file_name, superthreshold_blip_sweeps) 
+        thresh_inf_via_Vmeasure = find_first_spike_voltage(self.superthreshold_blip_data['voltage'][0], dt) - self.El_reference     
+        print "threshold infinity measured from blip", thresh_inf_via_Vmeasure
+        print "threshold infinity measured from blip minus V difference of ramp thesh verusus extrapolated threhsold", thresh_inf_via_Vmeasure-deltaV
                     
         # calculate adaptive threshold from ramp
         #TODO: this is now repetitive and why the different load statements
@@ -184,16 +196,19 @@ class GLIFPreprocessor(object):
         self.neuron_config['th_adapt'] = find_first_spike_voltage(ramp_data['voltage'][0], dt) - self.El_reference-deltaV
 
         #calculate threshold inf via R and c and charge dump
-        thresh_inf_via_R_and_C=total_charge_dump/self.neuron_config['Cap']
-        self.neuron_config['th_inf']=thresh_inf_via_R_and_C
+        thresh_inf_via_Q_and_C=total_charge_dump/self.neuron_config['Cap']
+        self.neuron_config['th_inf']=thresh_inf_via_Q_and_C
+        print "threshold infinity calculated with charge dump and calculated C", thresh_inf_via_Q_and_C
+
+        a_value=b_value*(self.neuron_config['th_adapt']-self.neuron_config['th_inf'])/(self.neuron_config['th_adapt']-self.neuron_config['El'])
+        print 'a', a_value
+        print 'b', b_value                                                                                                                                                    
         
-        
-        print 'Adapted threshold', self.neuron_config['th_adapt']
-        print 'Instantaneous threshold via V measurement', thresh_inf_via_Vmeasure
-        print 'Instantaneous threshold calculated via R and C', thresh_inf_via_R_and_C
+        print 'delta V to adjust thresholds', deltaV
+        print 'Adapted threshold used', self.neuron_config['th_adapt']
         print 'Instantaneous threshold used', self.neuron_config['th_inf']
-        print 'capacitance', self.neuron_config['Cap']
-        print 'resistance', self.neuron_config['Rinput']
+        print 'capacitance used', self.neuron_config['Cap']
+        print 'resistance used', self.neuron_config['Rinput']
       
         compute_spike_cut_length = 'spike_cut_length' not in self.neuron_config
         
@@ -276,7 +291,7 @@ class GLIFPreprocessor(object):
                     = align_and_cut_spikes(all_voltage_list, all_current_list, dt=dt, method=spike_determination_method, sec_look_before_spike=sec_before_thresh_to_look_at_spikes)
                 
                 #change frame of reference of voltage
-                all_v_spike_shape_list=[shape-self.El_reference for shape in all_v_spike_shape_list]
+                all_v_spike_shape_list=[shape-self.El_reference-deltaV for shape in all_v_spike_shape_list]
                                 
                 if DEBUG_MODE:
                     plt.title(self.stimulus_file_name + ' Spike cutting', fontsize=22)    
@@ -405,7 +420,7 @@ class GLIFPreprocessor(object):
             
                 method_config['params'] = {
                         'a': slope_at_min_expVar_list,
-                        'b': intercept_at_min_expVar_list+deltaV
+                        'b': intercept_at_min_expVar_list
                     }
                 if compute_spike_cut_length:
                     self.neuron_config['spike_cut_length'] = (list_of_endPointArrays[vectorIndex_of_max_explained_var][0])-int(sec_before_thresh_to_look_at_spikes/dt) #note this is dangerous if they arent' all at the same ind
@@ -425,13 +440,15 @@ class GLIFPreprocessor(object):
 
         method_config = self.neuron_config['threshold_reset_method']        
         if method_config.get('params', None) is None:
+            #TODO: rename from_paper to max or something
+            if method_config['name'] == 'from_paper':
+                method_config['params'] = {}
             if method_config['name'] == 'fixed':
                 #TODO:this could probably also be renamed to something more descriptive like fixed_at_th_adapted
-                method_config['params'] = {'value': self.neuron_config['th_adapt']-deltaV}
+                method_config['params'] = { 'value': self.neuron_config['th_adapt'] - deltaV }
             elif method_config['name'] == 'V_plus_const':
                 #TODO at some point this value my be fit
-                method_config['params'] = {'value': .003}
-                warnings.warn('v_plus_constant is currently a guess')
+                method_config['params'] = {'value': thresh_reset}
             elif method_config['name'] == 'LIF':
                 method_config['params'] = {'value': self.neuron_config['th_inf']}
             else:  
@@ -477,6 +494,11 @@ class GLIFPreprocessor(object):
                 # TODO: perhaps this should be renames to adapted threshold since it is fixed at a particular place
             elif method_config['name'] == 'LIF':
                 method_config['params'] = {'value': self.neuron_config['th_inf']}
+            elif method_config['name'] == 'adapt_standard':
+                method_config['params'] = {
+                    'a': a_value,
+                    'b': b_value 
+                }
             else:
                 method_config['params'] = {}
 
@@ -562,21 +584,26 @@ class GLIFPreprocessor(object):
                 p0_2=[5.e-12,-3e-12, -50, 1]
                 p0_3=[1.3e-11, -3.99e-12, -8.69e-12,  -6.7e+01, -1.031,  -1.3e+01]
                 p0_4=[1.23e-11, -6.17e-13, -7.22e-11, 6.53e-11, -7.01e+01,  -2.0, -9.090,  -8.46]
+
                 
-#                guessI_2=exp_curve_2(cut_time, p0_2[0], p0_2[1], p0_2[2], p0_2[3], p0_2[4])    
-#                guessI_3=exp_curve_3(cut_time, p0_3[0], p0_3[1], p0_3[2], p0_3[3], p0_3[4], p0_3[5], p0_3[6])    
-#                guessI_4=exp_curve_4(cut_time, p0_4[0], p0_4[1], p0_4[2], p0_4[3], p0_4[4], p0_4[5], p0_4[6], p0_4[7], p0_4[8]) 
+                # guessI_2=exp_curve_2(cut_time, p0_2[0], p0_2[1], p0_2[2], p0_2[3], p0_2[4])    
+                # guessI_3=exp_curve_3(cut_time, p0_3[0], p0_3[1], p0_3[2], p0_3[3], p0_3[4], p0_3[5], p0_3[6])    
+                # guessI_4=exp_curve_4(cut_time, p0_4[0], p0_4[1], p0_4[2], p0_4[3], p0_4[4], p0_4[5], p0_4[6], p0_4[7], p0_4[8]) 
                 
+                print "fitting 2 params"
                 (popt_2, pcov_2)= curve_fit(exp_curve_2, (cut_time, AScurrent_end_current), AScurrent, p0=p0_2, maxfev=1000000)
-                (popt_3, pcov_3)= curve_fit(exp_curve_3, (cut_time, AScurrent_end_current), AScurrent, p0=p0_3, maxfev=1000000)
-                (popt_4, pcov_4)= curve_fit(exp_curve_4, (cut_time, AScurrent_end_current), AScurrent, p0=p0_4, maxfev=1000000)
-                print '2 parameters', popt_2
-                print '3 parameters', popt_3
-                print '4 parameters', popt_4
-                
                 fitV_2=exp_curve_2((cut_time, AScurrent_end_current), popt_2[0], popt_2[1], popt_2[2], popt_2[3])
-                fitV_3=exp_curve_3((cut_time, AScurrent_end_current), popt_3[0], popt_3[1], popt_3[2], popt_3[3], popt_3[4], popt_3[5])    
+                print '2 parameters', popt_2
+                
+                print "fitting 3 params"
+                (popt_3, pcov_3)= curve_fit(exp_curve_3, (cut_time, AScurrent_end_current), AScurrent, p0=p0_3, maxfev=1000000)
+                fitV_3=exp_curve_3((cut_time, AScurrent_end_current), popt_3[0], popt_3[1], popt_3[2], popt_3[3], popt_3[4], popt_3[5])
+                print '3 parameters', popt_3
+
+                print "fitting 4 params"
+                (popt_4, pcov_4)= curve_fit(exp_curve_4, (cut_time, AScurrent_end_current), AScurrent, p0=p0_4, maxfev=1000000)
                 fitV_4=exp_curve_4((cut_time, AScurrent_end_current), popt_4[0], popt_4[1], popt_4[2], popt_4[3], popt_4[4], popt_4[5], popt_4[6], popt_4[7])    
+                print '4 parameters', popt_4
                 
                 RSS_2=np.sum((AScurrent-fitV_2)**2)
                 RSS_3=np.sum((AScurrent-fitV_3)**2)
@@ -1303,3 +1330,184 @@ def R_via_subthresh_linRgress(voltage, current, dt):
     print "El via least squares", El*1e3, "mV" 
     print "tau", resistance*capacitance*1e3, "ms"
     return resistance, capacitance, El
+
+def RC_via_subthresh_GLM(voltage, current, dt):
+    '''This will only work with subthreshold noise
+    '''   
+    #Square filter for smoothing
+    ts = 1000.*1e-6
+    sq_filt = np.ones((round(ts/dt,1)))
+    sq_filt = np.squeeze(sq_filt/len(sq_filt))
+    
+    #Initial tau and C as seed inputs for optimization
+    cinit = 50.*1e-12
+    tauinit = 20.*1e-3
+    
+    start_idx = 41000; tend = 99000  # HARD-CODED SO LOOK OUT
+    
+    #Unsmoothed raw data
+    El = voltage[0]      #resting potential
+    v = voltage[start_idx:tend-1]
+    vs = voltage[start_idx+1:tend]
+    dvdt = (vs-v)/dt
+    i = current[start_idx:tend-1]
+    
+    #Smooth data
+    sm_vL = El
+    sm_v = np.convolve(sq_filt,v,'same')
+    sm_i = np.convolve(i,sq_filt,'same')
+    sm_dv = np.convolve(dvdt,sq_filt,'same')
+    
+    #Input colmn vectors to GLM
+    inp = np.zeros((tend-start_idx-1,2))
+    inp[:,0] = -(sm_v-sm_vL)/tauinit
+    inp[:,1] = i/cinit
+    inp = sm.add_constant(inp, prepend = False)
+    
+    #Output data to which model is fit
+    out = sm_dv
+    
+    #Fit GLM
+    glm_fit = sm.GLM(out[10:-9],inp[10:-9,:],family=sm.families.Gaussian(sm.families.links.identity))
+    
+    #GLM fit results
+    res = glm_fit.fit()    
+    fitprs = res.params    
+    fit_dvdt = res.mu         
+    fit_v = np.cumsum(fit_dvdt*dt)
+    
+    #COmpute TAU and C
+    tau = tauinit/fitprs[0]
+    capacitance = cinit/fitprs[1]
+    resistance=tau/capacitance
+    
+    #Compare derivative fits
+#    plt.plot(out[10:-9],lw = 0.5)
+#    plt.plot(fit_dvdt,lw = 2)
+#    plt.show()
+#    
+#    #Compare actual voltages
+#    plt.plot(-(inp[10:-9,0]-inp[10,0])*tauinit)
+#    plt.plot(fit_v,lw = 2)
+#    plt.show()
+    return resistance, capacitance
+
+def calc_a_b_from_muliblip(multi_SS, dt):
+
+    def exp_force_c((t, const), a1, k1):
+        return a1*(np.exp(k1*t))+const
+
+    def exp_fit_c(t, a1, k1, const):
+        return a1*(np.exp(k1*t))+const
+
+    multi_SS_v=multi_SS['voltage']
+    multi_SS_i=multi_SS['current']
+    
+    spike_ind=find_spikes(multi_SS_v, 'threshold', dt)
+    
+    #SHOULD I REMOVE SPIKES OR JUST ERROR THE NEURON IF THINGS ARE SPIKING OUT OF ORDER?
+    
+    
+    #these are what I want to be final
+    time_previous_spike=[]
+    threshold=[]
+    thresh_first_spike=[]  #will set constant to this
+    
+    if DEBUG_MODE:
+        plt.figure()
+    for k in range(0, len(multi_SS_v)):
+        thresh=[multi_SS_v[k][j] for j in spike_ind[k]]
+        if thresh!=[] and len(thresh)>1:# there needs to be more than one spike so that we can find the time difference
+            thresh_first_spike.append(thresh[0])
+            threshold.append(thresh[1:])
+            time_before_temp=[]
+            for j in range(1,len(thresh)):
+                time_before_temp.append((spike_ind[k][j]-spike_ind[k][j-1])*dt)
+        #for each number calculate and distance from the first spike   
+            time_previous_spike.append(time_before_temp)    
+        if DEBUG_MODE:
+            plt.subplot(2,1,1)
+            plt.plot(np.arange(0, len(multi_SS_i[k]))*dt, multi_SS_i[k]*1e12, lw=2)
+            plt.ylabel('current (pA)', fontsize=16)
+            plt.subplot(2,1,2)
+            plt.plot(np.arange(0, len(multi_SS_v[k]))*dt, multi_SS_v[k], lw=2)
+            plt.plot(spike_ind[k]*dt, thresh, '.k', ms=16)
+            plt.ylabel('voltage (mV)', fontsize=16)
+            plt.xlabel('time (s)', fontsize=16)
+
+    
+    #put numbers in one vector5
+    thresh_inf=np.mean(thresh_first_spike)
+    print "average threshold of first spike",  thresh_inf
+    threshold=np.concatenate(threshold)
+    time_previous_spike=np.concatenate(time_previous_spike)  #note that this will have nans in it
+    
+#    for thr, times in zip(threshold, time_previous_spike):
+#        print thr
+#        print times
+#        if len(thr)!=len(times):
+#            print "not equal", 
+
+    if DEBUG_MODE:
+        plt.figure()
+        plt.plot(time_previous_spike, threshold, '.k', ms=16)
+        plt.ylabel('threshold (mV)')
+        plt.xlabel('time after last spike (s)')
+    
+    p0_force=[.002, -100.]
+    p0_fit=[.002, -100., thresh_inf]
+#    guess=exp_force_c(time_previous_spike, p0_force[0], p0_force[1])
+    (popt_force, pcov_force)= curve_fit(exp_force_c, (time_previous_spike, thresh_inf), threshold, p0=p0_force, maxfev=100000)
+    (popt_fit, pcov_fit)= curve_fit(exp_fit_c, time_previous_spike, threshold, p0=p0_fit, maxfev=100000)
+    print 'popt_force', popt_force
+#    print 'popt_fit', popt_fit
+    #since time is not in order lets make new time vector
+    time_previous_spike.sort()
+    fit_force=exp_force_c((time_previous_spike, thresh_inf), popt_force[0], popt_force[1])
+    fit_fit=exp_fit_c(time_previous_spike, popt_fit[0], popt_fit[1], popt_fit[2])
+#    plt.plot(time_previous_spike, guess, label='guess')
+    if DEBUG_MODE:
+        plt.plot(time_previous_spike, fit_force, 'r', lw=4, label='exp fit (force const to thesh first spike)')
+        plt.plot(time_previous_spike, fit_fit, 'b', lw=4, label='exp fit (fit constant)')
+        plt.legend()
+        
+        plt.show(block=False)
+    
+    #TODO: Corinne abs is put in hastily make sure this is ok
+    thresh_reset=abs(popt_force[0]) 
+    b=abs(popt_force[1])
+    return thresh_reset, b
+
+def calc_deltaV_via_specified_R_and_ramp(resistance, voltage, current, rampStartInd, dt, El):
+
+    #--slope calculated from beginning of ramp and threshold 
+    rampSpikeInd = find_spikes([voltage], 'threshold', dt)[0][0]
+    v_at_spike=voltage[rampSpikeInd]
+    I_at_spike=current[rampSpikeInd]  
+    v_i=voltage[rampStartInd]
+    
+    #--HOWEVER WE CHOOSE R, WE ARE GOING TO DO A MAP AND CHANGE ALL VOLTAGE PARAMETERS
+    #v2=R(I2-I1)+v1  NOTE V1 should be el
+    v_extrapolated=resistance*I_at_spike+El
+    print 'v_at_spike', v_at_spike
+    deltaV=v_at_spike-v_extrapolated
+    print 'difference in v', deltaV
+    
+    if DEBUG_MODE:
+        rampVoltage=voltage[0:rampSpikeInd+10000]
+        rampTime=np.arange(0, len(rampVoltage))*dt
+        plt.figure()
+        plt.plot(rampTime, rampVoltage) #data
+        plt.plot(rampTime[rampStartInd], v_i, '.b', ms=16) #start dot
+#        plt.plot(rampTime[measureInd[chosen_R_ind]], rampVoltage[measureInd[chosen_R_ind]],  '.b', ms=16)
+        plt.plot(rampTime[rampSpikeInd], v_extrapolated, 'xb', ms=12, lw=12, label='extrapolated') #extrapolated
+        plt.plot([rampTime[rampStartInd], rampTime[rampSpikeInd]], [v_i, v_extrapolated], '--k', lw=4, label='R=%.3g' % (resistance))
+        plt.plot(rampSpikeInd*dt, v_at_spike, '.r', ms=16, label='spike')
+        plt.xlim([(rampStartInd-1000)*dt,(rampSpikeInd+2000)*dt])
+        plt.title('calculation of delta V with specified Resistance', fontsize=20)
+        plt.legend()
+        plt.ylabel('voltage (mV)')
+        plt.xlabel('time (s)')
+        plt.show(block=False)
+        
+    return deltaV

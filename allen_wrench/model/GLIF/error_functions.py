@@ -1,3 +1,5 @@
+import logging
+
 import sys
 #from spikeTimeDiffBtwObtainAndTarg import *
 from scipy.optimize import fmin
@@ -42,11 +44,11 @@ def TRD_list_error(paramGuess, experiment):
             TRDout=TRD(ISITarget, interpolatedISIFromLastTargSpike_list[stim_list_index])
         TRD_list.append(TRDout) 
 #    print 'TRD_list', TRD_list
-    concatinateTRDList=concatenate(TRD_list)          
-#    print 'param Guess', paramGuess, 'TRD', mean(concatinateTRDList)
-    out =mean(concatinateTRDList) 
+    concatenateTRDList=concatenate(TRD_list)          
+#    print 'param Guess', paramGuess, 'TRD', mean(concatenateTRDList)
+    out =mean(concatenateTRDList) 
 #    print 'paramGuess', paramGuess
-#    print 'mean(concatinateTRDList): ', out
+#    print 'mean(concatenateTRDList): ', out
     return out
 
 def TRD(tSpikeTargetISI, tSpikeObtainedISI):
@@ -99,8 +101,8 @@ def square_time_dist_list_error(paramGuess, experiment):
             TSDout=squareTimeDist(ISITarget, interpolatedISIFromLastTargSpike_list[stim_list_index])
         TSD_list.append(TSDout) 
 #    print 'SD_list', SD_list
-    concatinateTSDList=concatenate(TSD_list)    
-    return mean(concatinateTSDList) 
+    concatenateTSDList=concatenate(TSD_list)    
+    return mean(concatenateTSDList) 
 
 def squareTimeDist(tSpikeTargetISI, tSpikeObtainedISI):  #FOR THIS I NEED THE VOLTAGE AND THE THRESHOLD. SO RUN UNTIL SPIKE WILL HAVE TO SPIT OUT THE THRESH AND VOLT VALUES
 #Given two arrays of spike times (as defined as the time (ISI proxy) from the last target spike)
@@ -136,6 +138,8 @@ def square_voltage_dist_list_error(paramGuess, experiment, fileName=None):
     @note: the neuron experiment must have a stim_list member
     ''' 
 
+    logging.debug('running parameter guess: %s' % paramGuess)
+
     VSD_list = []
     
     (voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, 
@@ -152,21 +156,23 @@ def square_voltage_dist_list_error(paramGuess, experiment, fileName=None):
         else:
             VSDout=square_voltage_dist(voltageOfModelAtInterpolatedBioSpike_list[stim_list_index], thresholdOfModelAtInterpolatedBioSpike_list[stim_list_index], experiment)
         VSD_list.append(VSDout) 
-    print 'parameterguess', paramGuess
+
+
 #    print 'VSD_list', VSD_list
-    concatinateVSDList=concatenate(VSD_list)
-    print '  VSD', mean(concatinateVSDList)    
+    concatenateVSDList=concatenate(VSD_list)
+    logging.debug('VSD: %f' % mean(concatenateVSDList))
+
 #    if fileName!=None:
 #        print 'file name ins vsd is', fileName
 #        with open(os.path.splitext(fileName)[0]+'VSD.txt', 'a+') as f:
-#            savetxt(f, mean(concatinateVSDList))
+#            savetxt(f, mean(concatenateVSDList))
 
 #--------Put this in if you want to do diagnostic plots but you can only be doing one sweep
 #    diagnostic_plot_one_sweep(voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, 
 #                           modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, 
 #                           voltageOfModelAtGridBioSpike_list, theshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, 
 #                           thresholdOfModelAtInterpolatedBioSpike_list, 
-#                           experiment.grid_spike_time_target_list, experiment.neuron, experiment.stim_list, VSD_list, mean(concatinateVSDList))
+#                           experiment.grid_spike_time_target_list, experiment.neuron, experiment.stim_list, VSD_list, mean(concatenateVSDList))
 #    #get rid of this when actually doing optimization because it is costly
 #    #TODO: IF YOU WANT TO INCORPORATE IT IN THE FUTURE YOU NEED TO BUILD INTO THE OPTIMIZER SO CREATE NEW DIRECTIORIES FOR EACH NEW FITNEURON START UP
 #
@@ -191,7 +197,7 @@ def square_voltage_dist_list_error(paramGuess, experiment, fileName=None):
 #    #plt.show()
 #    plt.close()
         
-    return mean(concatinateVSDList) 
+    return mean(concatenateVSDList) 
 
 def square_voltage_dist(voltageOfModelAtBioSpike_array, theshOfModelAtBioSpike_array, experiment):
     '''
