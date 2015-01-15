@@ -42,7 +42,7 @@ def load_sweep(file_name, sweep_number):
     logging.debug("loading sweep %d" % sweep_number)
     
     load_start_time = time.time()
-    data = EphysDataSet(file_name).get_full_sweep(sweep_number)
+    data = EphysDataSet(file_name).get_sweep(sweep_number)
 
     logging.debug("load time %f" % (time.time() - load_start_time))
 
@@ -55,7 +55,7 @@ def write_sweep_response(file_name, sweep_number, response):
     logging.debug("writing sweep")
 
     write_start_time = time.time()
-    out_data = EphysDataSet(file_name).set_full_sweep(sweep_number, stimulus=None, response=response)
+    out_data = EphysDataSet(file_name).set_sweep(sweep_number, stimulus=None, response=response)
     
     logging.debug("write time %f" % (time.time() - write_start_time))
 

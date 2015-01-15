@@ -45,12 +45,12 @@ def setup_optimizer(data_config_file, model_config_file, method_config_file, sti
     return config.setup_optimizer(stimulus), config
 
 
-def optimize_neuron(optimizer, iterations):
+def optimize_neuron(optimizer):
     ''' Run a GLIF optimizer for a given number of iterations '''
 
     start_time = time.time()
 
-    best_params, begin_params = optimizer.run_many(iterations, iteration_finished_callback) 
+    best_params, begin_params = optimizer.run_many(iteration_finished_callback) 
 
     logging.debug("optimize time %f" % (time.time() - start_time))
 
@@ -72,7 +72,7 @@ def main():
     print config.optimizer_config
     print "*********************************"
 
-    optimize_neuron(optimizer, config.optimizer_config['outer_loop'])
+    optimize_neuron(optimizer)
 
     config.write(args.output_config_file)
 

@@ -12,7 +12,7 @@ def load_sweeps(file_name, sweep_numbers):
     
 def load_sweep(file_name, sweep_number):
     ds = EphysDataSet(file_name)
-    data = ds.get_full_sweep(sweep_number)
+    data = ds.get_sweep(sweep_number)
 
     return {
         'current': data['stimulus'],
