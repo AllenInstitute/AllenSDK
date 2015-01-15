@@ -1,74 +1,53 @@
 import h5py
+import numpy as np
 from ephys_data_set import EphysDataSet
 
 class OrcaDataSet( EphysDataSet ):
-    def get_test_pulse(self, sweep_number):
-        with h5py.File(self.file_name,'r') as f:
-            sec = f['epochs']['TestPulse_%d' % sweep_number]
-            stimulus = sec['stimulus']['timeseries']['data'].value
-            response = sec['response']['timeseries']['data'].value
-            
-            return {
-                'stimulus': stimulus,
-                'response': response,
-                'index_range': ( exp['stimulus']['idx_start'].value, exp['stimulus']['idx_stop'].value ),
-                'sampling_rate': sec['stimulus']['timeseries']['sampling_rate'].value
-            }
 
-    def get_experiment(self, sweep_number):
-        with h5py.File(self.file_name,'r') as f:
-            sec = f['epochs']['Experiment_%d' % sweep_number]
-            stimulus = sec['stimulus']['timeseries']['data'].value
-            response = sec['response']['timeseries']['data'].value
-            
-            return {
-                'stimulus': stimulus,
-                'response': response,
-                'index_range': ( exp['stimulus']['idx_start'].value, exp['stimulus']['idx_stop'].value ),
-                'sampling_rate': sec['stimulus']['timeseries']['sampling_rate'].value
-            }
-
-    def get_full_sweep(self, sweep_number):
+    def get_sweep(self, sweep_number):
         with h5py.File(self.file_name,'r') as f:
 
             swp = f['epochs']['Sweep_%d' % sweep_number]
             
             stimulus = swp['stimulus']['timeseries']['data'].value
             response = swp['response']['timeseries']['data'].value
-            
-            out = {
-                'stimulus': stimulus,
-                'response': response,
-                'sampling_rate': swp['stimulus']['timeseries']['sampling_rate'].value
-            }
-            
+
             try:
-                # if the sweep has an experiment, the index range will point to the range of values containing the experimental data.
+                # if the sweep has an experiment, extract the experiment's index range
                 exp = f['epochs']['Experiment_%d' % sweep_number]
-                out['index_range'] = ( exp['stimulus']['idx_start'].value, exp['stimulus']['idx_stop'].value )
+                sweep_index_range = ( swp['stimulus']['idx_start'].value, swp['stimulus']['idx_stop'].value )
+                experiment_index_range = ( exp['stimulus']['idx_start'].value, exp['stimulus']['idx_stop'].value )
             except KeyError, e:
                 # this sweep has no experiment.  return the index range of the entire sweep.
-                out['index_range'] = ( swp['stimulus']['idx_start'].value, swp['stimulus']['idx_stop'].value )
-                
+                sweep_index_range = ( swp['stimulus']['idx_start'].value, swp['stimulus']['idx_stop'].value )
+                experiment_index_range = sweep_index_range
+
+            assert sweep_index_range[0] == 0, Exception("index range of the full sweep does not start at 0.")
+
+            # only return data up to the end of the experiment -- ignore everything else
+            return  {
+                'stimulus': stimulus[sweep_index_range[0]:experiment_index_range[1]],
+                'response': response[sweep_index_range[0]:experiment_index_range[1]],
+                'index_range': experiment_index_range,
+                'sampling_rate': swp['stimulus']['timeseries']['sampling_rate'].value
+            }
+
             return out
 
 
-    def set_full_sweep(self, sweep_number, stimulus, response):
-        self.set_data('Sweep_%d' % sweep_number, stimulus, response)
-
-    def set_experiment(self, sweep_number, stimulus, response):
-        self.set_data('Experiment_%d' % sweep_number, stimulus, response)
-
-    def set_test_pulse(self, sweep_number, stimulus, response):
-        self.set_data('TestPulse_%d' % sweep_number, stimulus, response)
-
-    def set_data(self, epoch, stimulus, response):
+    def set_sweep(self, sweep_number, stimulus, response):
         with h5py.File(self.file_name,'r+') as f:
-            ep = f['epochs'][epoch]
+            swp = f['epochs']['Sweep_%d' % sweep_number]
 
             if stimulus is not None:
-                ep['stimulus']['timeseries']['data'][...] = stimulus
+                data = swp['stimulus']['timeseries']['data'].value
+                data[:len(stimulus)] = stimulus
+                data[len(stimulus):] = 0
+                swp['stimulus']['timeseries']['data'][...] = data
 
             if response is not None:
-                ep['response']['timeseries']['data'][...] = response
+                data = swp['response']['timeseries']['data'].value
+                data[:len(response)] = response
+                data[len(response):] = 0
+                swp['response']['timeseries']['data'][...] = data
 
