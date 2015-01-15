@@ -39,15 +39,20 @@ class OrcaDataSet( EphysDataSet ):
         with h5py.File(self.file_name,'r+') as f:
             swp = f['epochs']['Sweep_%d' % sweep_number]
 
+            sweep_index_range = ( swp['stimulus']['idx_start'].value, swp['stimulus']['idx_stop'].value )
+            sweep_length = sweep_index_range[1] - sweep_index_range[0]
+            
             if stimulus is not None:
-                data = swp['stimulus']['timeseries']['data'].value
-                data[:len(stimulus)] = stimulus
-                data[len(stimulus):] = 0
-                swp['stimulus']['timeseries']['data'][...] = data
+                missing_data = sweep_length - len(stimulus)
+                if missing_data > 0:
+                    stimulus = np.append(stimulus, np.zeros(missing_data))
+
+                swp['stimulus']['timeseries']['data'][...] = stimulus
 
             if response is not None:
-                data = swp['response']['timeseries']['data'].value
-                data[:len(response)] = response
-                data[len(response):] = 0
-                swp['response']['timeseries']['data'][...] = data
+                missing_data = sweep_length - len(response)
+                if missing_data > 0:
+                    response = np.append(response, np.zeros(missing_data))
+
+                swp['response']['timeseries']['data'][...] = response
 
