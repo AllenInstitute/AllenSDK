@@ -26,8 +26,8 @@ class OrcaDataSet( EphysDataSet ):
 
             # only return data up to the end of the experiment -- ignore everything else
             return  {
-                'stimulus': stimulus[sweep_index_range[0]:experiment_index_range[1]],
-                'response': response[sweep_index_range[0]:experiment_index_range[1]],
+                'stimulus': stimulus[sweep_index_range[0]:experiment_index_range[1]+1],
+                'response': response[sweep_index_range[0]:experiment_index_range[1]+1],
                 'index_range': experiment_index_range,
                 'sampling_rate': swp['stimulus']['timeseries']['sampling_rate'].value
             }
@@ -39,10 +39,11 @@ class OrcaDataSet( EphysDataSet ):
         with h5py.File(self.file_name,'r+') as f:
             swp = f['epochs']['Sweep_%d' % sweep_number]
 
-            sweep_index_range = ( swp['stimulus']['idx_start'].value, swp['stimulus']['idx_stop'].value )
-            sweep_length = sweep_index_range[1] - sweep_index_range[0]
+            # this is the length of the entire sweep data, including test pulse and whatever might be in front of it
+            sweep_length = swp['stimulus']['idx_stop'].value + 1
             
             if stimulus is not None:
+                # if the data is shorter than the sweep, pad it with zeros
                 missing_data = sweep_length - len(stimulus)
                 if missing_data > 0:
                     stimulus = np.append(stimulus, np.zeros(missing_data))
@@ -50,9 +51,11 @@ class OrcaDataSet( EphysDataSet ):
                 swp['stimulus']['timeseries']['data'][...] = stimulus
 
             if response is not None:
+                # if the data is shorter than the sweep, pad it with zeros
                 missing_data = sweep_length - len(response)
                 if missing_data > 0:
                     response = np.append(response, np.zeros(missing_data))
+
 
                 swp['response']['timeseries']['data'][...] = response
 
