@@ -1,11 +1,10 @@
 import logging
-DEBUG = logging.getLogger().isEnabledFor(logging.DEBUG)
 
 import numpy as np
 import copy
 import warnings
 import functools
-import json, configuration_setup
+import json, utilities
 
 
 class GLIFNeuron( object ):    
@@ -14,43 +13,52 @@ class GLIFNeuron( object ):
 
     TYPE = "GLIF"
 
-    def __init__(self, El, dt, tau, Rinput, Cap, a_vector, spike_cut_length, th_inf, **kwargs): 
-        # if something is not defined here you will not be able to fit over it
+    def __init__(self, El, dt, tau, R_input, C, asc_vector, spike_cut_length, th_inf, coeffs,
+                 AScurrent_dynamics_method, voltage_dynamics_method, threshold_dynamics_method,
+                 AScurrent_reset_method, voltage_reset_method, threshold_reset_method): 
         self.type = GLIFNeuron.TYPE
         self.El = El
         self.dt = dt
         self.tau = np.array(tau)
-        self.k = 1.0/self.tau
-        self.Rinput = Rinput
-        self.Cap = Cap
-        self.a_vector = a_vector
+        self.R_input = R_input
+        self.C = C
+        self.asc_vector = np.array(asc_vector)
         self.spike_cut_length = spike_cut_length
         self.th_inf = th_inf
-        
+
+        assert len(tau) == len(asc_vector), Exception("After-spike current vector must have same length as tau (%d vs %d)" % (asc_vector, tau))
+
+        # values computed based on inputs
+        self.k = 1.0 / self.tau
+        self.G = 1.0 / self.R_input
+
         # Values that can be fit: They scale the input values.  
         # These are allowed to have default values because they are going to get optimized.
-        self.coeff_th = kwargs.get('coeff_th', 1)
-        self.coeff_C = kwargs.get('coeff_C', 1)
-        self.coeff_G = kwargs.get('coeff_G', 1)
-        self.coeff_b = kwargs.get('coeff_b', 1)
-        self.coeff_a = kwargs.get('coeff_a', 1)
-        
-        self.coeff_a_vector = np.array(kwargs.get('coeff_a_vector', np.ones(len(self.a_vector))))
+        self.coeffs = {
+            'th_inf': 1,
+            'C': 1,
+            'G': 1,
+            'b': 1,
+            'a': 1,
+            'asc_vector': np.ones(len(self.tau))
+        }
+
+        self.coeffs.update(coeffs)
         
         logging.debug('spike cut length: %d' %  self.spike_cut_length)
 
         # initialize dynamics methods
-        self.AScurrent_dynamics_method = self.configure_library_method('AScurrent_dynamics_method', kwargs['AScurrent_dynamics_method'])
-        self.voltage_dynamics_method = self.configure_library_method('voltage_dynamics_method', kwargs['voltage_dynamics_method'])
-        self.threshold_dynamics_method = self.configure_library_method('threshold_dynamics_method', kwargs['threshold_dynamics_method'])
+        self.AScurrent_dynamics_method = self.configure_library_method('AScurrent_dynamics_method', AScurrent_dynamics_method)
+        self.voltage_dynamics_method = self.configure_library_method('voltage_dynamics_method', voltage_dynamics_method)
+        self.threshold_dynamics_method = self.configure_library_method('threshold_dynamics_method', threshold_dynamics_method)
 
         # initialize reset methods
-        self.AScurrent_reset_method = self.configure_library_method('AScurrent_reset_method', kwargs['AScurrent_reset_method'])
-        self.voltage_reset_method = self.configure_library_method('voltage_reset_method', kwargs['voltage_reset_method'])
-        self.threshold_reset_method = self.configure_library_method('threshold_reset_method', kwargs['threshold_reset_method'])
+        self.AScurrent_reset_method = self.configure_library_method('AScurrent_reset_method', AScurrent_reset_method)
+        self.voltage_reset_method = self.configure_library_method('voltage_reset_method', voltage_reset_method)
+        self.threshold_reset_method = self.configure_library_method('threshold_reset_method', threshold_reset_method)
 
     def __str__(self):
-        return json.dumps(self.to_dict(), default=configuration_setup.json_handler)
+        return json.dumps(self.to_dict(), default=utilities.json_handler)
 
     def to_dict(self):
         return {
@@ -58,17 +66,11 @@ class GLIFNeuron( object ):
             'El': self.El,
             'dt': self.dt,
             'tau': self.tau,
-            'Rinput': self.Rinput,
-            'Cap': self.Cap,
-            'a_vector': self.a_vector,
+            'R_input': self.R_input,
+            'C': self.C,
             'spike_cut_length': self.spike_cut_length,
             'th_inf': self.th_inf,
-            'coeff_th': self.coeff_th,
-            'coeff_C': self.coeff_C,
-            'coeff_G': self.coeff_G,
-            'coeff_b': self.coeff_b,
-            'coeff_a': self.coeff_a,
-            'coeff_a_vector': self.coeff_a_vector,
+            'coeffs': self.coeffs,
             'AScurrent_dynamics_method': self.AScurrent_dynamics_method,
             'voltage_dynamics_method': self.voltage_dynamics_method,
             'threshold_dynamics_method': self.threshold_dynamics_method,
@@ -112,7 +114,7 @@ class GLIFNeuron( object ):
 
         AScurrents_t1 = self.AScurrent_dynamics_method(self, AScurrents_t0, time_step, spike_time_steps)
         voltage_t1 = self.voltage_dynamics_method(self, voltage_t0, AScurrents_t0, inj)
-        threshold_t1 = self.threshold_dynamics_method(self, threshold_t0, voltage_t0)*self.coeff_th
+        threshold_t1 = self.threshold_dynamics_method(self, threshold_t0, voltage_t0)
 
         return voltage_t1, threshold_t1, AScurrents_t1
     
@@ -145,7 +147,7 @@ class GLIFNeuron( object ):
    
     #-----voltage equations all return voltage_t1
     def dynamics_voltage_linear(self, voltage_t0, AScurrents_t0, inj):
-        return voltage_t0+(inj + np.sum(AScurrents_t0) - (1.0/self.Rinput)*self.coeff_G*(voltage_t0-self.El)) * self.dt/(self.Cap*self.coeff_C) #V current based model    
+        return voltage_t0 + (inj + np.sum(AScurrents_t0) - self.G * self.coeffs['G'] * (voltage_t0 - self.El)) * self.dt / (self.C * self.coeffs['C'])
     
     def dynamics_voltage_quadraticIofV(self, voltage_t0, AScurrents_t0, inj, a, b, c, d, e):    
         I_of_v = a + b * voltage_t0 + c * voltage_t0**2  #equation for cell 6 jting
@@ -153,11 +155,11 @@ class GLIFNeuron( object ):
         if voltage_t0 > d:
             I_of_v=e
 
-        return voltage_t0+(inj + np.sum(AScurrents_t0)-I_of_v)*self.dt/(self.Cap*self.coeff_C) #V current based model
+        return voltage_t0+(inj + np.sum(AScurrents_t0)-I_of_v)*self.dt/(self.C*self.coeffs['C']) 
     
     #-----threshold equations all return threshold_t1    
     def dynamics_threshold_adapt_standard(self, threshold_t0, voltage_t0, a, b):
-        return threshold_t0 + (a*self.coeff_a*(voltage_t0-self.El) - b*self.coeff_b*(threshold_t0-self.th_inf))*self.dt 
+        return threshold_t0 + (a * self.coeffs['a'] * (voltage_t0-self.El) - b * self.coeffs['b']*(threshold_t0-self.coeffs['th_inf']*self.th_inf))*self.dt 
         
     def dynamics_threshold_fixed(self, threshold_t0, voltage_t0, value):
         return value
@@ -184,16 +186,18 @@ class GLIFNeuron( object ):
         
         AScurrents_t1 = self.AScurrent_reset_method(self, AScurrents_t0, t)  #TODO: David I think you want to feed in r here
         voltage_t1 = self.voltage_reset_method(self, voltage_t0)
-        threshold_t1 = self.threshold_reset_method(self, threshold_t0)*self.coeff_th
+        threshold_t1 = self.threshold_reset_method(self, threshold_t0, voltage_t1)
+
+        assert voltage_t1 < threshold_t1, Exception("Voltage reset above threshold: time step (%f) voltage (%f) reset (%f)" % (t, voltage_t1, threshold_t1))
+
         return voltage_t1, threshold_t1, AScurrents_t1
     
     #-----AS current reset rules all return AScurrents_t1------------------------
     def reset_AScurrent_sum(self, AScurrents_t0, t, r):
         #old way without refrectory period: var_out[2]=self.a1*self.coeffa1 # a constant multiplied by the amplitude of the excitatory current at reset
         # 2:6 are k's
-        return self.a_vector * self.coeff_a_vector + AScurrents_t0 * np.exp(self.k * self.dt)
-        #TODO: David use r again when it is implemented as a vector
-        #return self.a_vector * self.coeff_a_vector + AScurrents_t0 * r * np.exp(self.k * self.dt)
+        #return self.asc_vector * self.coeffs['asc_vector'] + AScurrents_t0 * np.exp(self.k * self.dt)
+        return self.asc_vector * self.coeffs['asc_vector'] + AScurrents_t0 * r * np.exp(self.k * self.dt)
 
     def reset_AScurrent_LIF(self, AScurrents_t0, t):
         if np.sum(AScurrents_t0)!=0:
@@ -214,18 +218,18 @@ class GLIFNeuron( object ):
         return value    
     
     #--------threshold reset rules-----------------------------------------------------------------------
-    def reset_threshold_from_paper(self, threshold_t0):
-        return max(threshold_t0, self.th_inf)  #This is a bit dangerous as it would change if El was not choosen to be zero. Perhaps could change it to absolute value
+    def reset_threshold_from_paper(self, threshold_t0, voltage_v1, delta):
+        return max(threshold_t0+delta, voltage_v1+delta)  #This is a bit dangerous as it would change if El was not choosen to be zero. Perhaps could change it to absolute value
     
-    def reset_threshold_fixed(self, threshold_t0, value):
+    def reset_threshold_fixed(self, threshold_t0, voltage_v1, value):
         return value
     
-    def reset_threshold_V_plus_const(self, threshold_t0, value):
+    def reset_threshold_V_plus_const(self, threshold_t0, voltage_v1, value):
         '''it is highly probable that at some point we will need to fit const'''
         '''threshold_t0 and value should be in mV'''
         return threshold_t0 + value
 
-    def reset_threshold_LIF(self, threshold_t0, value):
+    def reset_threshold_LIF(self, threshold_t0, voltage_v1, value):
         return value
         
     #-----------------------------------------------------------------------------------
@@ -263,8 +267,8 @@ class GLIFNeuron( object ):
 
         time_step = 0
         while time_step < num_time_steps:
-            if DEBUG and time_step % 10000 == 0:
-                logging.debug("%d / %d" % (time_step,  num_time_steps))
+            if time_step % 10000 == 0:
+                logging.info("time step %d / %d" % (time_step,  num_time_steps))
 
             # compute voltage, threshold, and ascurrents at current time step
             (voltage_t1, threshold_t1, AScurrents_t1) = self.dynamics(voltage_t0, threshold_t0, AScurrents_t0, stim[time_step], time_step, spike_time_steps) 
@@ -443,6 +447,9 @@ class GLIFNeuron( object ):
         
             start_index = 0
             for spike_num in range(num_spikes):
+                if spike_num % 10 == 0:
+                    logging.info("spike %d / %d" % (spike_num,  num_spikes))
+
                 end_index = int(spike_train_ids[spike_num])
 
                 (voltage_out, threshold_out, AScurrent_matrix_out, grid_spike_time, interpolated_spike_time, yaySpike, voltage_t1, 
@@ -488,7 +495,6 @@ class GLIFNeuron( object ):
             AScurrent_matrix[spike_train_ids[-1]:,:]=AScurrent_matrix_out
 
 
-
         #---some simple error function to make sure things are working. 
         if np.any(np.isnan(voltage)):
             logging.error(self)
@@ -502,6 +508,7 @@ class GLIFNeuron( object ):
             raise Exception('The threshold vector has not been filled to the length of the stimulus')         
         if np.any(np.isnan(AScurrent_matrix)):
             raise Exception('Your after-spike current vector has not been filled to the length of the stimulus')
+
 
         #--the following error functions only work in the case where I am thowing out the sets of data where the target doesnt spike
         if len(interpolatedTimeArray)!=num_spikes or len(interpolatedVoltageArray)!=num_spikes or len(gridTimeArray)!=num_spikes or \
@@ -592,7 +599,7 @@ class GLIFNeuron( object ):
                 logging.error('    threshold started the run at: %f' % threshold_out[0])
                 logging.error('    threshold before: %s' % threshold_out[time_step-20:time_step])
                 logging.error('    AScurrents_t0: %s' % AScurrents_t0)
-                raise Exception('Invalid threshold, voltage, or after-spike current encountered.')    
+                raise Exception('Invalid threshold, voltage, or after-spike current encountered.')
             
             (voltage_t1, threshold_t1, AScurrents_t1) = self.dynamics(voltage_t0, threshold_t0, AScurrents_t0, stim[time_step+start_index], time_step+start_index, spike_time_steps) #TODO fix list versus array
             

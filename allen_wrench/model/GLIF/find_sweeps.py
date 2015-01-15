@@ -2,6 +2,8 @@ import json, sys
 import argparse
 
 SHORT_SQUARE = 'Short Square'
+SHORT_SQUARE_60 = 'Short Square -60mv'
+SHORT_SQUARE_80 = 'Short Square -80mv'
 RAMP = 'Ramp'
 NOISE1 = 'Noise1'
 NOISE2 = 'Noise2'
@@ -47,12 +49,17 @@ def find_short_square_sweeps(sweep_list):
     subthreshold_short_square_sweeps = [ s for s in short_square_sweeps if s.get('num_spikes',None) == 0 ]
     superthreshold_short_square_sweeps = [ s for s in short_square_sweeps if s.get('num_spikes',None) > 0 ]
     multi_short_square_sweeps = get_sweeps_by_type(sweep_list, MULTI_SHORT_SQUARE)
+
+    short_square_60_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_60)
+    short_square_80_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_80)
     
     out = {
         'all_short_square': get_sweep_numbers(short_square_sweeps),
         'subthreshold_short_square': get_sweep_numbers(subthreshold_short_square_sweeps),
         'superthreshold_short_square': get_sweep_numbers(superthreshold_short_square_sweeps),
         'multi_short_square': get_sweep_numbers(multi_short_square_sweeps),
+        'short_square_60': get_sweep_numbers(short_square_60_sweeps),
+        'short_square_80': get_sweep_numbers(short_square_80_sweeps),
         'maximum_subthreshold_short_square': find_ranked_sweep(subthreshold_short_square_sweeps, 'stimulus_amplitude', reverse=True),
         'minimum_superthreshold_short_square': find_ranked_sweep(superthreshold_short_square_sweeps, 'stimulus_amplitude')
 
@@ -111,17 +118,19 @@ def find_noise_sweeps(sweep_list):
     num_noise1_sweeps = len(noise1_sweeps)
     num_noise2_sweeps = len(noise2_sweeps)
 
-    if num_noise1_sweeps >= 2:
+    if num_noise1_sweeps >= 3:
         noise1_sweep_numbers = get_sweep_numbers(noise1_sweeps)
         out['noise1_run1'] = [ noise1_sweep_numbers[0] ]
         out['noise1_run2'] = [ noise1_sweep_numbers[1] ]
+        out['noise1_run3'] = [ noise1_sweep_numbers[2] ]
     else:
         soft_fail("not enough noise1 sweeps (%d)" % (num_noise1_sweeps))
 
-    if num_noise2_sweeps >= 2:
+    if num_noise2_sweeps >= 3:
         noise2_sweep_numbers = get_sweep_numbers(noise2_sweeps)
         out['noise2_run1'] = [ noise2_sweep_numbers[0] ]
         out['noise2_run2'] = [ noise2_sweep_numbers[1] ]
+        out['noise2_run3'] = [ noise2_sweep_numbers[2] ]
     else:
         soft_fail("not enough noise2 sweeps (%d)" % (num_noise2_sweeps))
         
@@ -129,16 +138,15 @@ def find_noise_sweeps(sweep_list):
 
 def filter_sweep_list(sweep_list):
     sorted_sweeps = sorted(sweep_list, key=lambda x: x['sweep_number'] ) 
-    output_sweeps = [ { 
-        'resting_potential': sweep.get('slow_vm_mv', None),
-        'num_spikes': sweep.get('num_spikes', None),
-        'stimulus_type': sweep.get('stimulus_type', None),
-        'stimulus_amplitude': sweep.get('stimulus_amplitude', None),
-        'sweep_number': sweep['sweep_number'],
-        'workflow_state': sweep.get('workflow_state',None)
-    } for sweep in sorted_sweeps ]
-
-    return output_sweeps
+    
+    for sweep in sorted_sweeps:
+        sweep['resting_potential'] = sweep.get('slow_vm_mv', None)
+        sweep['num_spikes'] = sweep.get('num_spikes', None)
+        sweep['stimulus_type'] = sweep.get('stimulus_type', None)
+        sweep['stimulus_amplitude'] = sweep.get('stimulus_amplitude', None)
+        sweep['workflow_state'] = sweep.get('workflow_state', None)
+        
+    return sorted_sweeps
 
 def find_failed_sweeps(sweep_list, data):
     out_data = {}

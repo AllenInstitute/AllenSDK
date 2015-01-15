@@ -4,7 +4,7 @@ from scipy import *
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
-from time import time
+import time
 from scipy.optimize import fminbound, fmin
 from scipy.optimize import minimize
 import json
@@ -17,20 +17,20 @@ from uuid import uuid4
 import random
 
 
-class GLIFOptimizer(object): #not sure why object is in here
+class GLIFOptimizer(object):
     def __init__(self, experiment, dt, 
-                 inner_loop, start_time, 
+                 outer_iterations, inner_iterations, 
                  sigma_outer, sigma_inner,
-                 init_params, param_fit_names, stim, 
+                 param_fit_names, stim, 
                  error_function_name, neuron_num, 
-                 xtol, ftol, save_file_name,
-                 internal_iterations):
+                 xtol, ftol, 
+                 internal_iterations, init_params=None):
 
         self.experiment = experiment
         self.dt = dt
-        self.inner_loop = inner_loop
-        self.start_time = start_time
-        self.save_file_name = save_file_name
+        self.outer_iterations = outer_iterations
+        self.inner_iterations = inner_iterations
+        self.start_time = None
         self.init_params = init_params
         self.sigma_outer = sigma_outer
         self.sigma_inner = sigma_inner
@@ -44,11 +44,14 @@ class GLIFOptimizer(object): #not sure why object is in here
 
         self.iteration_info = [];
 
+        if self.init_params is None:
+            self.init_params = np.ones(experiment.neuron_parameter_count())
+
     def to_dict(self):
         return {
             'dt': self.dt,
-            'inner_loop': self.inner_loop,
-            'start_time': self.start_time,
+            'outer_iterations': self.outer_iterations,
+            'inner_iterations': self.inner_iterations,
             'init_params': self.init_params,
             'sigma_outer': self.sigma_outer,
             'sigma_inner': self.sigma_inner,
@@ -72,18 +75,19 @@ class GLIFOptimizer(object): #not sure why object is in here
         values[values<0] = 0
         return values
         
-    def run_many(self, outloop, iteration_finished_callback=None):
+    def run_many(self, iteration_finished_callback=None):
         params = self.init_params
-        
-        for o in range(0,outloop):  #outerloop 
-            for s in range(0,self.inner_loop):  #innerloop
-                start_time = time()
+        self.start_time = time.time()
+
+        for outer in range(0, self.outer_iterations):  #outerloop 
+            for inner in range(0, self.inner_iterations):  #innerloop
+                iteration_start_time = time.time()
 
                 # run the optimizer once.  first time is always the passed initial conditions.
                 opt = self.run_once(params)
                 xopt, fopt = opt[0], opt[1]
 
-                logging.debug('fmin took %f secs, %f mins, %f hours' %  (time()-self.start_time, (time()- self.start_time)/60, (time()-self.start_time)/60/60))
+                logging.info('fmin took %f secs, %f mins, %f hours' %  (time.time() - iteration_start_time, (time.time() - iteration_start_time)/60, (time.time() - iteration_start_time)/60/60))
 
                 self.iteration_info.append({
                     'in_params': params.tolist(),
@@ -92,7 +96,7 @@ class GLIFOptimizer(object): #not sure why object is in here
                 })
 
                 if iteration_finished_callback is not None:
-                    iteration_finished_callback(self, o, s)
+                    iteration_finished_callback(self, outer, inner)
 
                 # randomize the best fit parameters
                 params = self.randomize_parameter_values(xopt, self.sigma_inner)
@@ -127,12 +131,12 @@ class GLIFOptimizer(object): #not sure why object is in here
                 decide how to save stimulus and traces'''
                 
                 #Take the current best values and run the program again.
-                #tempTimeIterStart=time()
+                #tempTimeIterStart=time.time()
                 #(voltage_list, threshold_list, AScurrentMatrix_list, gridSpikeTime_list, interpolatedSpikeTime_list, \
                 #    gridSpikeIndex_list, interpolatedSpikeVoltage_list, interpolatedSpikeThreshold_list) = \
                 #    self.experiment.run_base_model(xtol)
 
-                #timeFor1Iter=time()-tempTimeIterStart  
+                #timeFor1Iter=time.time()-tempTimeIterStart  
 
             # outer loop uses the outer standard deviation to randomize the initial values
             params = self.randomize_parameter_values(self.init_params, self.sigma_outer)
@@ -150,7 +154,7 @@ class GLIFOptimizer(object): #not sure why object is in here
 
         self.experiment.set_neuron_parameters(best_params)
 
-        logging.debug('done optimizing')
+        logging.info('done optimizing')
         return best_params, self.init_params
 
     def run_once_bound(self, low_bound, high_bound):
@@ -170,7 +174,7 @@ class GLIFOptimizer(object): #not sure why object is in here
         '''       
 #        fmin(func, x0, args=(), xtol=1e-4, ftol=1e-4, maxiter=None, maxfun=None, full_output=0, disp=1, retall=0, callback=None):
 
-        return fmin(self.error_function, param0, args=(self.experiment,self.save_file_name),xtol=self.xtol, ftol=self.ftol,  maxiter=self.internal_iterations, maxfun=self.internal_iterations, retall=1,full_output=1, disp=1)
+        return fmin(self.error_function, param0, args=(self.experiment,),xtol=self.xtol, ftol=self.ftol,  maxiter=self.internal_iterations, maxfun=self.internal_iterations, retall=1,full_output=1, disp=1)
 
 #        #Note is defined in the top level script
 #        def mycallback_ncg(xk):
@@ -186,14 +190,14 @@ class GLIFOptimizer(object): #not sure why object is in here
 ##        options['retall']=True
 #
 #        print 'Using Newton-CG method'
-#        start_time = time()
+#        iteration_start_time = time.time()
 #        xopt = minimize(self.error_function, param0, args=(self.experiment,), method='Newton-CG', jac=f_prime_constructor(self.error_function), callback=mycallback_ncg, options=options, tol=eps)
-#        print 'Newton-CG method took', (time()-start_time)/60., 'seconds'
+#        print 'Newton-CG method took', (time.time()-iteration_start_time)/60., 'seconds'
 #
 ##        print 'Using Nelder-Mead method'
-##        start_time = time()
+##        iteration_start_time = time.time()
 ##        xopt = minimize(self.error_function, param0, args=(self.experiment,), method='Nelder-Mead', callback=mycallback_nm, options=options, tol=eps)
-##        print 'Nelder-Mead method took', (time()-start_time)/60., 'seconds'
+##        print 'Nelder-Mead method took', (time.time()-iteration_start_time)/60., 'seconds'
 #
 #        print xopt
         return xopt, fopt

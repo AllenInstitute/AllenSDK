@@ -29,36 +29,33 @@
       "name": "sum"
     },
     "th_inf": 0.027, 
-    "coeff_th": 1.0,
-    "coeff_a": 1.0, 
-    "coeff_b": 1.0,   
-    "coeff_C": 1.0, 
-    "coeff_G": 1.0, 
-    "a_vector": [
+    "coeffs": {
+        "th_inf": 1.0,
+        "a": 1.0, 
+        "b": 1.0,   
+        "C": 1.0, 
+        "G": 1.0,
+        "a_vector": [
+          1,             
+          -1      
+        ]
+    },        
+    "asc_vector": [
       1e-12, 
       1e-12
     ], 
     "type": "GLIF",  
-    "Cap": 1.4358e-10, 
-    "Rinput": 159000000.0, 
+    "C": 1.4358e-10, 
+    "R_input": 159000000.0, 
     "dt": 5e-05, 
-    "El": 0, 
-    "ER1": 0.07, 
-    "ER2": -0.02, 
-    "Vr": 0.004, 
-    "coeff_a_vector": [
-      1, 
-      -1
-    ]
+    "El": 0,
+    "Vr": 0.004
   }, 
   "optimizer": {
     "internal_iterations": 1,
     "param_fit_names": [
-    	"coeff_th",
-    	"coeff_a",
-    	"coeff_b",
-		"coeff_C",
-		"coeff_a_vector"
+		"C",
+		"a_vector"
     ], 
     "save_file_name": "default_optimizer_file_name.json", 
     "param_upper_bounds": [
@@ -69,7 +66,7 @@
       1
     ], 
     "init_threshold": 0.02, 
-    "inner_loop": 1, 
+    "inner_iterations": 1, 
     "error_function": "VSD", 
     "test_hold_out": true, 
     "sigma_inner": 0.01, 
@@ -87,7 +84,7 @@
       0
     ], 
     "init_voltage": 0.0, 
-    "outer_loop": 1,  
+    "outer_iterations": 1,  
     "single_hold_out_repeat": false, 
     "xtol": 1e-07, 
     "ftol": 1e-07

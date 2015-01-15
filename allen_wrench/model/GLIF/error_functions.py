@@ -1,12 +1,14 @@
 import logging
 
+import matplotlib.pyplot as plt
 import sys
 #from spikeTimeDiffBtwObtainAndTarg import *
 from scipy.optimize import fmin
 from time import time
 from numpy import ones, zeros, concatenate, mean, savetxt, arange, sort
 import os
-import matplotlib.pyplot as plt
+
+import numpy as np
 
 def get_error_function_by_name(func_name):
     if func_name=="TRD":
@@ -88,6 +90,7 @@ def square_time_dist_list_error(paramGuess, experiment):
     ''' 
     TSD_list = []   
     (voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, voltageOfModelAtGridBioSpike_list, theshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, thresholdOfModelAtInterpolatedBioSpike_list) = experiment.run(paramGuess)
+
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
         if len(experiment.grid_spike_index_target_list[stim_list_index])==0:
@@ -126,7 +129,7 @@ def squareTimeDist(tSpikeTargetISI, tSpikeObtainedISI):  #FOR THIS I NEED THE VO
 
     return out
 
-def square_voltage_dist_list_error(paramGuess, experiment, fileName=None):
+def square_voltage_dist_list_error(paramGuess, experiment):
     '''
     squareDistListError gets called from the optimizer once each optimizer iteration.
     It iterates over the stim_list list of stimulus vectors and passes them to the neuron run method.
@@ -138,10 +141,10 @@ def square_voltage_dist_list_error(paramGuess, experiment, fileName=None):
     @note: the neuron experiment must have a stim_list member
     ''' 
 
-    logging.debug('running parameter guess: %s' % paramGuess)
+    logging.info('running parameter guess: %s' % paramGuess)
 
     VSD_list = []
-    
+
     (voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, 
      modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, 
      voltageOfModelAtGridBioSpike_list, theshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, 
@@ -160,7 +163,7 @@ def square_voltage_dist_list_error(paramGuess, experiment, fileName=None):
 
 #    print 'VSD_list', VSD_list
     concatenateVSDList=concatenate(VSD_list)
-    logging.debug('VSD: %f' % mean(concatenateVSDList))
+    logging.info('VSD: %f' % mean(concatenateVSDList))
 
 #    if fileName!=None:
 #        print 'file name ins vsd is', fileName

@@ -6,13 +6,9 @@ import json
 import copy
 
 class GLIFExperiment( object ):
-    FIT_PARAMETERS = ["coeff_th", "coeff_C", "coeff_G", "coeff_a", "coeff_b", "coeff_a_vector"]
-
-    #If I need to get stuff from the top level script into the run functions add 
-    #a thing here and remember to set it in the initialization
     def __init__(self, neuron, dt, stim_list, grid_spike_index_target_list, grid_spike_time_target_list, 
                  interpolated_spike_time_target_list, init_voltage, init_threshold, init_AScurrents, 
-                 target_spike_mask, fit_names_list,
+                 target_spike_mask, param_fit_names,
                  **kwargs):
 
         self.neuron = neuron
@@ -25,7 +21,13 @@ class GLIFExperiment( object ):
         self.init_threshold = init_threshold
         self.init_AScurrents = init_AScurrents
         self.target_spike_mask = target_spike_mask
-        self.fit_names_list = fit_names_list
+        self.param_fit_names = param_fit_names
+
+        # make sure that the initial ascurrents have the correct size
+        if len(self.init_AScurrents) != len(self.neuron.tau):
+            warnings.warn('GLIFExperiment thinks the init_AScurrents have incorrect length.  Setting to zeros.')
+            self.init_AScurrents = np.zeros(len(self.neuron.tau))
+
         
     def run(self, param_guess):
         '''This code will run the loaded neuron model in reference to the target neuron spikes.
@@ -54,8 +56,6 @@ class GLIFExperiment( object ):
         
         self.set_neuron_parameters(param_guess)    
         
-#        print 'self.neuron.coeff_G', self.neuron.coeff_G
-#        print 'self.neuron.coeff_a_vector', self.neuron.coeff_a_vector
         interpolatedTime_list = []
         voltage_list = []   
         threshold_list=[]   
@@ -145,25 +145,44 @@ class GLIFExperiment( object ):
         return voltage_list, threshold_list, AScurrentMatrix_list, gridSpikeTime_list, interpolatedSpikeTime_list, \
             gridSpikeIndex_list, interpolatedSpikeVoltage_list, interpolatedSpikeThreshold_list
 
+    def neuron_parameter_count(self):
+        count = 0
+        for fit_name in self.param_fit_names:
+            try:
+                coeff = self.neuron.coeffs[fit_name]
+            except KeyError:
+                logging.error("Neuron coefficient %s does not exist" % fit_name)
+                raise
+
+            # is it a list?
+            try:
+                # this will throw a type error if 'coeff' is a scalar
+                coeff_size = len(coeff)
+                count += coeff_size
+            except TypeError:
+                count += 1
+        return count
+
     def set_neuron_parameters(self, param_guess): 
         '''Maps the parameter guesses to the attributes of the model.  
         input:
             param_guess is vector of values.  It is assumed that the length will be '''
 
-        if any([param not in GLIFExperiment.FIT_PARAMETERS for param in self.fit_names_list]):
-            raise Exception('you are trying to fit a variable that is not allowed')
-
         index = 0
-        for fit_name in self.fit_names_list:
-            a = getattr(self.neuron, fit_name)
+        for fit_name in self.param_fit_names:
+            try:
+                coeff = self.neuron.coeffs[fit_name]
+            except KeyError:
+                logging.error("Neuron coefficient %s does not exist" % fit_name)
+                raise
 
             # is it a list?
-            if hasattr(a, "__len__"):
-                a_size = len(a)
-                setattr(self.neuron, fit_name, param_guess[index:index+a_size])
-                index += a_size
-            else:
-                setattr(self.neuron, fit_name, param_guess[index])
+            try:
+                # this will throw a type error if 'coeff' is a scalar
+                coeff_size = len(coeff)
+                self.neuron.coeffs[fit_name] = param_guess[index:index+coeff_size]
+                index += coeff_size
+            except TypeError:
+                self.neuron.coeffs[fit_name] = param_guess[index]
                 index += 1
-
 

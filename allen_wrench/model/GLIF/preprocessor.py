@@ -98,7 +98,7 @@ class GLIFPreprocessor(object):
                 
         if zero_out_el:
             for i in xrange(len(sweeps)):
-                zero_out_el_via_inj_current(sweep_data['current'][i], self.El_reference, self.sweep_properties[i]['resting_potential'], self.neuron_config['Rinput'])
+                zero_out_el_via_inj_current(sweep_data['current'][i], self.El_reference, self.sweep_properties[i]['resting_potential'], self.neuron_config['R_input'])
 
         return sweep_data
 
@@ -125,7 +125,7 @@ class GLIFPreprocessor(object):
         
         R_via_begining_of_ramp = calculate_input_resistance_via_ramp(ramp_data['voltage'][0][ramp_data['start_idx'][0]:] - self.El_reference, 
                                                                            ramp_data['current'][0][ramp_data['start_idx'][0]:], self.neuron_config['dt'])                    
-        print 'Resistance via beigining of ramp: ', R_via_begining_of_ramp
+        print 'Resistance via begining of ramp: ', R_via_begining_of_ramp
         
         #calculate resistance via average subthreshold noise
         noise_data=self.load_stimulus(self.stimulus_file_name,all_noise_sweeps)
@@ -152,7 +152,7 @@ class GLIFPreprocessor(object):
         (R_lssq, C_lssq, El_lssq)=R_via_subthresh_linRgress(subthresh_noise_voltage, subthresh_noise_current, dt)
         print "difference in resting potential calculations", self.El_reference-El_lssq
 
-        self.neuron_config['Rinput']=R_lssq
+        self.neuron_config['R_input']=R_lssq
   
 #        #---these are for saving for Ram
 #        out={'I_stim':subthresh_noise_current, 'voltage':subthresh_noise_voltage, 'dt':dt}
@@ -163,26 +163,28 @@ class GLIFPreprocessor(object):
         self.subthreshold_blip_data = self.load_stimulus(self.stimulus_file_name, subthreshold_blip_sweeps) 
 
 #        #this approximation might not be doing so well because of capacitance compensation need to get v by fitting 2 exponentials
-#        self.neuron_config['Cap'] = calculate_capacitance_via_subthreshold_blip(self.subthreshold_blip_data['voltage'][0][self.subthreshold_blip_data['start_idx'][0]:] - self.El_reference, 
+#        self.neuron_config['C'] = calculate_capacitance_via_subthreshold_blip(self.subthreshold_blip_data['voltage'][0][self.subthreshold_blip_data['start_idx'][0]:] - self.El_reference, 
 #                                                                                self.subthreshold_blip_data['current'][0][self.subthreshold_blip_data['start_idx'][0]:], self.neuron_config['dt'])
 
         (cap_via_charge_dump, total_charge_dump)=calc_cap_via_fit_charge_dump(self.subthreshold_blip_data['voltage'][0][self.subthreshold_blip_data['start_idx'][0]:], 
                                      self.subthreshold_blip_data['current'][0][self.subthreshold_blip_data['start_idx'][0]:], 
-                                     self.neuron_config['Rinput'], dt, self.sweep_properties[subthreshold_blip_sweeps[0]]['resting_potential']*1e-3)
+                                     self.neuron_config['R_input'], dt, self.sweep_properties[subthreshold_blip_sweeps[0]]['resting_potential']*1e-3)
         print "capacitance via charge dump fit extrapolation", cap_via_charge_dump
 
-        self.neuron_config['Cap']=C_lssq
+        self.neuron_config['C']=C_lssq
         
         #calculate b constant and potential threshold reset
         muliti_SS = self.load_stimulus(self.stimulus_file_name, multi_blip_sweeps)
     
-        (thresh_reset,b_value)=calc_a_b_from_muliblip(muliti_SS, dt)
+        (const_to_add_to_thresh_for_reset,b_value)=calc_a_b_from_muliblip(muliti_SS, dt)
         #TODO: 
-        print "value added to previous threshold if method is V_plus_const", thresh_reset
+        print "value added to previous threshold if method is V_plus_const", const_to_add_to_thresh_for_reset
         
-        deltaV_ramp_and_used_R=calc_deltaV_via_specified_R_and_ramp(self.neuron_config['Rinput'], ramp_data['voltage'][0], ramp_data['current'][0], 
+        deltaV_ramp_and_used_R=calc_deltaV_via_specified_R_and_ramp(self.neuron_config['R_input'], ramp_data['voltage'][0], ramp_data['current'][0], 
                                                                                        ramp_data['start_idx'][0], dt, self.El_reference)
-        deltaV=deltaV_ramp_and_used_R
+#        deltaV=0
+        deltaV=deltaV_via_ave20to40percent_ramp
+#        deltaV=deltaV_ramp_and_used_R
         
         # extract instantaneous threshold from superthreshold blip
         self.superthreshold_blip_data = self.load_stimulus(self.stimulus_file_name, superthreshold_blip_sweeps) 
@@ -194,21 +196,28 @@ class GLIFPreprocessor(object):
         #TODO: this is now repetitive and why the different load statements
         ramp_data = self.load_stimulus(self.stimulus_file_name, ramp_sweeps) 
         self.neuron_config['th_adapt'] = find_first_spike_voltage(ramp_data['voltage'][0], dt) - self.El_reference-deltaV
+        thresh_adapted_read_from_ramp= find_first_spike_voltage(ramp_data['voltage'][0], dt) - self.El_reference
 
         #calculate threshold inf via R and c and charge dump
-        thresh_inf_via_Q_and_C=total_charge_dump/self.neuron_config['Cap']
+        thresh_inf_via_Q_and_C=total_charge_dump/self.neuron_config['C']
         self.neuron_config['th_inf']=thresh_inf_via_Q_and_C
         print "threshold infinity calculated with charge dump and calculated C", thresh_inf_via_Q_and_C
 
-        a_value=b_value*(self.neuron_config['th_adapt']-self.neuron_config['th_inf'])/(self.neuron_config['th_adapt']-self.neuron_config['El'])
+        a_value=b_value*(thresh_adapted_read_from_ramp-thresh_inf_via_Vmeasure)/(thresh_adapted_read_from_ramp-self.neuron_config['El'])
+        if abs(a_value)<0.05*abs(b_value):
+            warnings.warn('a is less than 5 percent of b.  Adjusting a to be 5 percent')
+            if a_value<0.0:
+                a_value=-.05*b_value
+            elif a_value>=0.0:
+                a_value=.05*b_value
         print 'a', a_value
         print 'b', b_value                                                                                                                                                    
         
-        print 'delta V to adjust thresholds', deltaV
+        print 'delta V used to adjust thresholds', deltaV
         print 'Adapted threshold used', self.neuron_config['th_adapt']
         print 'Instantaneous threshold used', self.neuron_config['th_inf']
-        print 'capacitance used', self.neuron_config['Cap']
-        print 'resistance used', self.neuron_config['Rinput']
+        print 'capacitance used', self.neuron_config['C']
+        print 'resistance used', self.neuron_config['R_input']
       
         compute_spike_cut_length = 'spike_cut_length' not in self.neuron_config
         
@@ -407,12 +416,43 @@ class GLIFPreprocessor(object):
             
                 slope_at_min_expVar_list, intercept_at_min_expVar_list, r_value_at_min_expVar_list, p_value_at_min_expVar_list, std_err_at_min_expVar_list = \
                     stats.linregress(np.array(all_v_spike_init_list), np.array(all_v_at_min_expVar_list))
+
                 print 'mean of voltage before spike', np.mean(all_v_spike_init_list)
                 print 'mean of voltage after spike', np.mean(all_v_at_min_expVar_list)
                 
                 if DEBUG_MODE:
                     xlim = np.array([min(all_v_spike_init_list), max(all_v_spike_init_list)])
                     plotting.plotLineRegress1(slope_at_min_expVar_list, intercept_at_min_expVar_list, r_value_at_min_expVar_list, xlim)
+                    plt.legend(loc=2, fontsize=20)
+
+                def line_force_slope_to_1(x,c):
+                    return x+c
+                
+                def line_force_int_to_0(x, m):
+                    return m*x
+                
+                if slope_at_min_expVar_list>1.0:
+                    warnings.warn('linear regression slope is bigger than one: forcing slope to 1 and refitting intercept.')
+                    slope_at_min_expVar_list=1.0
+                    (intercept_at_min_expVar_list, nothing)=curve_fit(line_force_slope_to_1, np.array(all_v_spike_init_list), np.array(all_v_at_min_expVar_list))
+                    print "NEW INTERCEPT:", intercept_at_min_expVar_list
+                    if intercept_at_min_expVar_list>0.0:
+                        warnings.warn('/t ... and intercept is bigger than zero: forcing intercept to 0')
+                        intercept_at_min_expVar_list=0.0
+                    
+                if intercept_at_min_expVar_list>0.0:
+                    warnings.warn('Intercept is bigger than zero: forcing intercept to 0 and refitting slope.')
+                    intercept_at_min_expVar_list=0.0                        
+                    (slope_at_min_expVar_list, nothing)=curve_fit(line_force_int_to_0, np.array(all_v_spike_init_list), np.array(all_v_at_min_expVar_list))  
+                    print "NEW SLOPE: ", slope_at_min_expVar_list  
+                    if slope_at_min_expVar_list>1.0:
+                        warnings.warn('/t ... and linear regression slope is bigger than one: forcing slope to 1.')
+                        slope_at_min_expVar_list=1.0
+                    
+
+                if DEBUG_MODE:
+                    xlim = np.array([min(all_v_spike_init_list), max(all_v_spike_init_list)])
+                    plotting.plotLineRegressRed(slope_at_min_expVar_list, intercept_at_min_expVar_list, r_value_at_min_expVar_list, xlim)
                     plt.legend(loc=2, fontsize=20)
                     plt.show(block=False)                   
             
@@ -425,6 +465,7 @@ class GLIFPreprocessor(object):
                 if compute_spike_cut_length:
                     self.neuron_config['spike_cut_length'] = (list_of_endPointArrays[vectorIndex_of_max_explained_var][0])-int(sec_before_thresh_to_look_at_spikes/dt) #note this is dangerous if they arent' all at the same ind
             
+
             elif method_config['name'] == 'IandVbefore':
                 method_config['params'] = {
                     'a': 1,
@@ -442,23 +483,17 @@ class GLIFPreprocessor(object):
         if method_config.get('params', None) is None:
             #TODO: rename from_paper to max or something
             if method_config['name'] == 'from_paper':
-                method_config['params'] = {}
-            if method_config['name'] == 'fixed':
+                method_config['params'] = { 'delta': const_to_add_to_thresh_for_reset }
+            elif method_config['name'] == 'fixed':
                 #TODO:this could probably also be renamed to something more descriptive like fixed_at_th_adapted
                 method_config['params'] = { 'value': self.neuron_config['th_adapt'] - deltaV }
             elif method_config['name'] == 'V_plus_const':
                 #TODO at some point this value my be fit
-                method_config['params'] = {'value': thresh_reset}
+                method_config['params'] = {'value': const_to_add_to_thresh_for_reset}
             elif method_config['name'] == 'LIF':
                 method_config['params'] = {'value': self.neuron_config['th_inf']}
             else:  
                 method_config['params'] = {}
-
-
-        # configure the AScurrent_reset_method
-        method_config = self.neuron_config['AScurrent_reset_method']
-        if method_config.get('params', {}) is None:
-            method_config['params'] = {}
 
 
         #---------------------------------------------------------------------------
@@ -503,7 +538,6 @@ class GLIFPreprocessor(object):
                 method_config['params'] = {}
 
         # configure the ascurrent dynamics method
-
         method_config = self.neuron_config['AScurrent_dynamics_method']
         if method_config.get('params', None) is None:
             print 'Configuring AScurrent_dynamics_method in preprocessor.'
@@ -517,7 +551,7 @@ class GLIFPreprocessor(object):
             elif method_config['name'] == 'expViaBlip':
                 method_config['params'] = {}
 
-                #must set a_vector, acoeff_vector, tou, r, upper and lower bounds and
+                #must set asc_vector, acoeff_vector, tou, r, upper and lower bounds and
                 #--calculate necessary voltages
                 spike_voltage=self.superthreshold_blip_data['voltage'][0]
                 spike_current=self.superthreshold_blip_data['current'][0] #used just for plotting
@@ -532,7 +566,7 @@ class GLIFPreprocessor(object):
                 ASvoltage=subtractVoltage[cut_ind:]
                 
                 #--Convert after spike voltage to after spike current 
-                AScurrent=ASvoltage/self.neuron_config['Rinput']
+                AScurrent=ASvoltage/self.neuron_config['R_input']
 
                 time=np.arange(0, len(spike_voltage))*self.neuron_config['dt'] #used just for plotting 
                 #cut_time=np.arange(0, len(cut_spike))*self.neuron_config['dt']
@@ -649,42 +683,34 @@ class GLIFPreprocessor(object):
                 
                 #TODO: Corinne--might want to penalize more exponentially more critically given how much time they add to fitting.
                 if min_AIC_index==0:
-                    #TODO make sure these are in the correct form (list versus numpy)
-                    self.neuron_config['a_vector']=popt_2[0:2]
-                    self.neuron_config['k']=popt_2[2:]       
-                    self.neuron_config['tau']=1./self.neuron_config['k']
-                    self.neuron_config['coeff_a_vector']=[1,1]
-                    #if logger.isEnabledFor(logging.DEBUG):
+                    self.neuron_config['asc_vector'] = popt_2[0:2]
+                    self.neuron_config['tau'] = 1. / popt_2[2:]       
                 elif min_AIC_index==1:
-                    self.neuron_config['a_vector']=popt_3[0:3]
-                    self.neuron_config['k']=popt_3[3:]
-                    self.neuron_config['tau']=1./self.neuron_config['k']
-                    self.neuron_config['coeff_a_vector']=np.array([1,1,1])
+                    self.neuron_config['asc_vector'] = popt_3[0:3]
+                    self.neuron_config['tau'] = 1. / popt_3[3:]
                 elif min_AIC_index==2:
-                    self.neuron_config['a_vector']=popt_4[0:4].tolist()
-                    self.neuron_config['k']=popt_4[4:].tolist()
-                    self.neuron_config['tau']=(1./np.array(self.neuron_config['k'])).tolist()
-                    self.neuron_config['coeff_a_vector']=[1,1,1,1]
+                    self.neuron_config['asc_vector'] = popt_4[0:4]
+                    self.neuron_config['tau'] = 1. / popt_4[4:]
                 else:
                     raise Exception('number of currents does not exist')
-
-                # make sure that the after spike current reset method r vector is appropriate length
-                if self.neuron_config['AScurrent_reset_method']['name'] == 'sum':
-                    asreset_params = self.neuron_config['AScurrent_reset_method']['params']
-                    num_coeffs = len(self.neuron_config['tau'])
-                    if len(asreset_params) != num_coeffs:
-                        warnings.warn('AScurrent_dynamics_method thinks the AScurrent_reset_method r vector has incorrect length.  Setting to ones.')
-                        asreset_params['r'] = np.ones(num_coeffs)
-
             
             elif method_config['name'] == 'expViaGLM':
                 method_config['params'] = {}
-                self.neuron_config['a_vector']=[3.e-12, 3.e-12]
-                self.neuron_config['tau']=[.01, .04]
+                self.neuron_config['asc_vector'] = [3.e-12, 3.e-12]
+                self.neuron_config['tau'] = [.01, .04]
             else:
                 method_config['params'] = {}
 
-
+        # configure the AScurrent_reset_method
+        # this is down here because it depends on numbers computed for the AScurrent_dynamics_method
+        method_config = self.neuron_config['AScurrent_reset_method']
+        if method_config.get('params', {}) is None:
+            if method_config['name'] == 'sum':
+                method_config['params'] = {
+                    'r': np.ones(len(self.neuron_config['tau']))
+                }
+            else:
+                method_config['params'] = {}
 
         #----------------------------------------------------------------------
         #-----------following are optional methods that alter the data  -------
@@ -1052,7 +1078,7 @@ def calculate_input_resistance_via_ramp(voltage, current, dt):
     v_on_ramp = voltage[index]
     i_on_ramp = current[index]
 
-    Rinput = v_on_ramp / i_on_ramp
+    R_input = v_on_ramp / i_on_ramp
 
     if DEBUG_MODE:
         time=np.arange(0, len(current))*dt
@@ -1069,7 +1095,7 @@ def calculate_input_resistance_via_ramp(voltage, current, dt):
         plt.xlabel('time (s)', fontsize=16)
         plt.show(block=False)         
 
-    return Rinput
+    return R_input
 
 # --calculate capacitance from the subthreshold blip sweep
 def calculate_capacitance_via_subthreshold_blip(voltage, current, dt):
@@ -1474,9 +1500,9 @@ def calc_a_b_from_muliblip(multi_SS, dt):
         plt.show(block=False)
     
     #TODO: Corinne abs is put in hastily make sure this is ok
-    thresh_reset=abs(popt_force[0]) 
+    const_to_add_to_thresh_for_reset=abs(popt_force[0]) 
     b=abs(popt_force[1])
-    return thresh_reset, b
+    return const_to_add_to_thresh_for_reset, b
 
 def calc_deltaV_via_specified_R_and_ramp(resistance, voltage, current, rampStartInd, dt, El):
 
