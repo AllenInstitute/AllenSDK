@@ -35,7 +35,7 @@
         "b": 1.0,   
         "C": 1.0, 
         "G": 1.0,
-        "a_vector": [
+        "asc_vector": [
           1,             
           -1      
         ]
@@ -52,10 +52,10 @@
     "Vr": 0.004
   }, 
   "optimizer": {
-    "internal_iterations": 1,
+    "internal_iterations": 100,
     "param_fit_names": [
 		"C",
-		"a_vector"
+		"asc_vector"
     ], 
     "save_file_name": "default_optimizer_file_name.json", 
     "param_upper_bounds": [

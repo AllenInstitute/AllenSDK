@@ -72,7 +72,7 @@ class GLIFOptimizer(object):
         # values might not have a shape if it's a single element long, depending on your numpy version
         if not values.shape:
             values = np.array([values])
-        values[values<0] = 0
+
         return values
         
     def run_many(self, iteration_finished_callback=None):
