@@ -29,7 +29,7 @@ def TRD_list_error(paramGuess, experiment):
     '''        
     TRD_list = []
     
-    (voltage_list, threshol_list, AScurrentMatrix_list, modelGridSpikeTime_list, modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, voltageOfModelAtGridBioSpike_list, theshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, thresholdOfModelAtInterpolatedBioSpike_list) = experiment.run(paramGuess)
+    (voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, voltageOfModelAtGridBioSpike_list, threshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, thresholdOfModelAtInterpolatedBioSpike_list) = experiment.run(paramGuess)
   
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
@@ -89,7 +89,7 @@ def square_time_dist_list_error(paramGuess, experiment):
     @note: the neuron experiment must have a stim_list member
     ''' 
     TSD_list = []   
-    (voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, voltageOfModelAtGridBioSpike_list, theshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, thresholdOfModelAtInterpolatedBioSpike_list) = experiment.run(paramGuess)
+    (voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, voltageOfModelAtGridBioSpike_list, threshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, thresholdOfModelAtInterpolatedBioSpike_list) = experiment.run(paramGuess)
 
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
@@ -147,7 +147,7 @@ def square_voltage_dist_list_error(paramGuess, experiment):
 
     (voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, 
      modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, 
-     voltageOfModelAtGridBioSpike_list, theshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, 
+     voltageOfModelAtGridBioSpike_list, threshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, 
      thresholdOfModelAtInterpolatedBioSpike_list) = experiment.run(paramGuess)
   
  # Print things out here
@@ -173,7 +173,7 @@ def square_voltage_dist_list_error(paramGuess, experiment):
 #--------Put this in if you want to do diagnostic plots but you can only be doing one sweep
 #    diagnostic_plot_one_sweep(voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, 
 #                           modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, 
-#                           voltageOfModelAtGridBioSpike_list, theshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, 
+#                           voltageOfModelAtGridBioSpike_list, threshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, 
 #                           thresholdOfModelAtInterpolatedBioSpike_list, 
 #                           experiment.grid_spike_time_target_list, experiment.neuron, experiment.stim_list, VSD_list, mean(concatenateVSDList))
 #    #get rid of this when actually doing optimization because it is costly
@@ -202,26 +202,26 @@ def square_voltage_dist_list_error(paramGuess, experiment):
         
     return mean(concatenateVSDList) 
 
-def square_voltage_dist(voltageOfModelAtBioSpike_array, theshOfModelAtBioSpike_array, experiment):
+def square_voltage_dist(voltageOfModelAtBioSpike_array, threshOfModelAtBioSpike_array, experiment):
     '''
     inputs
-        voltageOfModelAtBioSpike_array and theshOfModelAtBioSpike_array: arrays of thresholds and voltage of model at every target (bio) spike
+        voltageOfModelAtBioSpike_array and threshOfModelAtBioSpike_array: arrays of thresholds and voltage of model at every target (bio) spike
         experiment: a neuron experiment wrapping the neuron class.
     outputs
         out: sqared difference between voltage and threshold of model neuron at each target (bio) spike'''
        
-    if len(voltageOfModelAtBioSpike_array)!=len(theshOfModelAtBioSpike_array): 
+    if len(voltageOfModelAtBioSpike_array)!=len(threshOfModelAtBioSpike_array): 
         raise Exception('The two time vectors for the VSD are not the same length')
     
     out=zeros(len(voltageOfModelAtBioSpike_array)) #initiate vector
     for i in range(0,len(voltageOfModelAtBioSpike_array)):
-        out[i]=((theshOfModelAtBioSpike_array[i]-voltageOfModelAtBioSpike_array[i])/(experiment.neuron.th_inf-experiment.neuron.El))**2
+        out[i]=((threshOfModelAtBioSpike_array[i]-voltageOfModelAtBioSpike_array[i])/(experiment.neuron.th_inf-experiment.neuron.El))**2
 
     return out
 
 def diagnostic_plot_one_sweep(BP_v_list, BP_thresh_list, BP_AScurrentMatrix_list, BP_modelGridSpikeTime_list, 
                    BP_modelSpikeInterpolatedTime_list, BP_gridISIFromLastTargSpike_list, BP_interpolatedISIFromLastTargSpike_list, 
-                   BP_v_OfModelAtGridBioSpike_list, BP_thesh_OfModelAtGridBioSpike_list, BP_v_OfModelAtInterpolatedBioSpike_list, 
+                   BP_v_OfModelAtGridBioSpike_list, BP_thresh_OfModelAtGridBioSpike_list, BP_v_OfModelAtInterpolatedBioSpike_list, 
                    BP_threshOfModelAtInterpolatedBioSpike_list, 
                    grid_spike_time_target_list, the_neuron, stim_list, VSD_list, totalVSD): 
     '''this is a huge hack to look at stuff.  You can only do it with a single sweep comming though'''
@@ -240,7 +240,7 @@ def diagnostic_plot_one_sweep(BP_v_list, BP_thresh_list, BP_AScurrentMatrix_list
     plt.plot(grid_spike_time_target_list[0], ones(len(BP_modelGridSpikeTime_list[0]))*the_neuron.th_inf, label='thr_inf', lw=2)
 
     plt.plot(grid_spike_time_target_list[0], BP_v_OfModelAtGridBioSpike_list[0], 'xk', ms=14, lw=2)
-    plt.plot(grid_spike_time_target_list[0], BP_thesh_OfModelAtGridBioSpike_list[0], 'ok', ms=14)
+    plt.plot(grid_spike_time_target_list[0], BP_thresh_OfModelAtGridBioSpike_list[0], 'ok', ms=14)
     #plot where bio spike was and where it ended up but only needed for the TRD
 #    for jj in range(0, len(grid_spike_time_target_list[0])):
 #        #lines for voltage at time of bio spike and at interpolated model spike
@@ -248,7 +248,7 @@ def diagnostic_plot_one_sweep(BP_v_list, BP_thresh_list, BP_AScurrentMatrix_list
 #                  [BP_v_OfModelAtGridBioSpike_list[0][jj], BP_v_OfModelAtInterpolatedBioSpike_list[0][jj]], 'c-',  lw=2)
 #        #lines for threshold at time of bio spike and at interpolated model spike
 #        plt.plot([grid_spike_time_target_list[0][jj], grid_spike_time_target_list[0][jj]+BP_interpolatedISIFromLastTargSpike_list[0][jj]],
-#                  [BP_thesh_OfModelAtGridBioSpike_list[0][jj], BP_threshOfModelAtInterpolatedBioSpike_list[0][jj]], 'm-',  lw=2)
+#                  [BP_thresh_OfModelAtGridBioSpike_list[0][jj], BP_threshOfModelAtInterpolatedBioSpike_list[0][jj]], 'm-',  lw=2)
     plt.title('x and o are voltage and threshold at biospike')
     plt.legend()    
     print 'thr_inf', the_neuron.th_inf

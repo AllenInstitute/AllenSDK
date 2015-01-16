@@ -197,6 +197,7 @@ class GLIFPreprocessor(object):
         ramp_data = self.load_stimulus(self.stimulus_file_name, ramp_sweeps) 
         self.neuron_config['th_adapt'] = find_first_spike_voltage(ramp_data['voltage'][0], dt) - self.El_reference-deltaV
         thresh_adapted_read_from_ramp= find_first_spike_voltage(ramp_data['voltage'][0], dt) - self.El_reference
+        print "thresh_adapted_read_from_ramp", thresh_adapted_read_from_ramp
 
         #calculate threshold inf via R and c and charge dump
         thresh_inf_via_Q_and_C=total_charge_dump/self.neuron_config['C']
@@ -709,6 +710,8 @@ class GLIFPreprocessor(object):
                 method_config['params'] = {
                     'r': np.ones(len(self.neuron_config['tau']))
                 }
+            elif method_config['name'] == 'none':
+                method_config['params'] = {}
             else:
                 method_config['params'] = {}
 

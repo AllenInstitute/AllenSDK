@@ -3,9 +3,9 @@ import logging
 import numpy as np
 import copy
 import warnings
-import functools
 import json, utilities
 
+from neuron_methods import GLIFNeuronMethod, METHOD_LIBRARY
 
 class GLIFNeuron( object ):    
     '''Generalized Linear Integrate and Fire neuron
@@ -83,7 +83,7 @@ class GLIFNeuron( object ):
         return GLIFNeuronMethod(method_name, method, method_params)
 
     def configure_library_method(self, method_type, params):
-        method_options = self.METHOD_LIBRARY.get(method_type, None)
+        method_options = METHOD_LIBRARY.get(method_type, None)
 
         assert method_options is not None, Exception("Unknown method type (%s)" % method_type)
         
@@ -118,54 +118,6 @@ class GLIFNeuron( object ):
 
         return voltage_t1, threshold_t1, AScurrents_t1
     
-    #------------------------------------------------------------
-    #---THESE ARE ALL FUNCTIONS THAT ARE A PART OF DYNAMICS------
-    #------------------------------------------------------------
-    
-    #-----AScurrent equations all return AScurrents_t1
-    def dynamics_AScurrent_exp(self, AScurrents_t0, time_step, spike_time_steps):
-        return AScurrents_t0*(1.0 + self.k*self.dt) #calculate each after spike current 
-        
-    def dynamics_AScurrent_vector(self, AScurrents_t0, time_step, spike_time_steps, vector):
-        # an ugly hack to convert lists into numpy arrays
-        if isinstance(vector, list):
-            vector = self.AScurrent_dynamics_method.modify_parameter('vector', np.array)
-
-        total = np.zeros(len(vector))
-
-        # run through all of the spikes, adding ascurrents based on how long its been since the spike occurred
-        for spike_time_step in spike_time_steps:
-            try:
-                total += vector[:, time_step - spike_time_step]
-            except Exception, e:
-                pass
-
-        return total
-    
-    def dynamics_AScurrent_LIF(self, AScurrents_t0, time_step, spike_time_steps):
-        return np.zeros(len(AScurrents_t0))
-   
-    #-----voltage equations all return voltage_t1
-    def dynamics_voltage_linear(self, voltage_t0, AScurrents_t0, inj):
-        return voltage_t0 + (inj + np.sum(AScurrents_t0) - self.G * self.coeffs['G'] * (voltage_t0 - self.El)) * self.dt / (self.C * self.coeffs['C'])
-    
-    def dynamics_voltage_quadraticIofV(self, voltage_t0, AScurrents_t0, inj, a, b, c, d, e):    
-        I_of_v = a + b * voltage_t0 + c * voltage_t0**2  #equation for cell 6 jting
-        
-        if voltage_t0 > d:
-            I_of_v=e
-
-        return voltage_t0+(inj + np.sum(AScurrents_t0)-I_of_v)*self.dt/(self.C*self.coeffs['C']) 
-    
-    #-----threshold equations all return threshold_t1    
-    def dynamics_threshold_adapt_standard(self, threshold_t0, voltage_t0, a, b):
-        return threshold_t0 + (a * self.coeffs['a'] * (voltage_t0-self.El) - b * self.coeffs['b']*(threshold_t0-self.coeffs['th_inf']*self.th_inf))*self.dt 
-        
-    def dynamics_threshold_fixed(self, threshold_t0, voltage_t0, value):
-        return value
-
-    def dynamics_threshold_LIF(self, threshold_t0, voltage_t0, value):
-        return value
         
     #-------------------------------------------------------------------
     #----------RESET RULES----------------------------------------------
@@ -192,46 +144,8 @@ class GLIFNeuron( object ):
 
         return voltage_t1, threshold_t1, AScurrents_t1
     
-    #-----AS current reset rules all return AScurrents_t1------------------------
-    def reset_AScurrent_sum(self, AScurrents_t0, t, r):
-        #old way without refrectory period: var_out[2]=self.a1*self.coeffa1 # a constant multiplied by the amplitude of the excitatory current at reset
-        # 2:6 are k's
-        #return self.asc_vector * self.coeffs['asc_vector'] + AScurrents_t0 * np.exp(self.k * self.dt)
-        return self.asc_vector * self.coeffs['asc_vector'] + AScurrents_t0 * r * np.exp(self.k * self.dt)
 
-    def reset_AScurrent_LIF(self, AScurrents_t0, t):
-        if np.sum(AScurrents_t0)!=0:
-            raise Exception('You are running a LIF but the AScurrents are not zero!')
-        return 0
 
-    #---------voltage reset rules---------------------------------------------------------------------            
-    def reset_voltage_Vbefore(self, voltage_t0, a, b):
-        return a*(voltage_t0)+b
-
-    def reset_voltage_IandVbefore(self, voltage_t0):
-        raise Exception("reset_voltage_IandVbefore not implemented")
-    
-    def reset_voltage_fixed(self, voltage_t0, value):
-        return value
-
-    def reset_voltage_LIF(self, voltage_t0, value):
-        return value    
-    
-    #--------threshold reset rules-----------------------------------------------------------------------
-    def reset_threshold_from_paper(self, threshold_t0, voltage_v1, delta):
-        return max(threshold_t0+delta, voltage_v1+delta)  #This is a bit dangerous as it would change if El was not choosen to be zero. Perhaps could change it to absolute value
-    
-    def reset_threshold_fixed(self, threshold_t0, voltage_v1, value):
-        return value
-    
-    def reset_threshold_V_plus_const(self, threshold_t0, voltage_v1, value):
-        '''it is highly probable that at some point we will need to fit const'''
-        '''threshold_t0 and value should be in mV'''
-        return threshold_t0 + value
-
-    def reset_threshold_LIF(self, threshold_t0, voltage_v1, value):
-        return value
-        
     #-----------------------------------------------------------------------------------
     #------------run functions----------------------------------------------------------
     #-----------------------------------------------------------------------------------
@@ -637,58 +551,6 @@ class GLIFNeuron( object ):
             voltage_t0, threshold_t0, AScurrents_t0, voltage_t1, threshold_t1, \
             v_ofModelAtInterpolatedBioSpike, thresh_ofModelAtInterpolatedBioSpike 
 
-    METHOD_LIBRARY = {
-        'AScurrent_dynamics_method': { 
-            'exp': dynamics_AScurrent_exp,
-            'expViaBlip': dynamics_AScurrent_exp,
-            'expViaGLM': dynamics_AScurrent_exp,
-            'vector': dynamics_AScurrent_vector,
-            'LIF': dynamics_AScurrent_LIF
-        },
-        'voltage_dynamics_method': { 
-            'linear': dynamics_voltage_linear,
-            'quadraticIofV': dynamics_voltage_quadraticIofV
-        },
-        'threshold_dynamics_method': {
-            'fixed': dynamics_threshold_fixed,
-            'adapt_standard': dynamics_threshold_adapt_standard,
-            'LIF': dynamics_threshold_LIF
-        },
-        'AScurrent_reset_method': {
-            'sum': reset_AScurrent_sum,
-            'LIF': reset_AScurrent_LIF,
-        }, 
-        'voltage_reset_method': {
-            'Vbefore': reset_voltage_Vbefore,
-            'IandVbefore': reset_voltage_IandVbefore,
-            'fixed': reset_voltage_fixed,
-            'LIF': reset_voltage_LIF
-        }, 
-        'threshold_reset_method': {
-            'from_paper': reset_threshold_from_paper,
-            'fixed': reset_threshold_fixed,
-            'V_plus_const': reset_threshold_V_plus_const,
-            'LIF': reset_threshold_LIF
-        }
-    }
 
-class GLIFNeuronMethod( object ):
-    def __init__(self, method_name, method, method_params):
-        self.name = method_name
-        self.params = method_params
-        self.method = functools.partial(method, **method_params)
-
-    def __call__(self, *args, **kwargs):
-        return self.method(*args, **kwargs)
-
-    def to_dict(self):
-        return {
-            'name': self.name,
-            'params': self.params
-        }
-
-    def modify_parameter(self, param, operator):
-        value = operator(self.method.keywords[param])
-        self.method.keywords[param] = value
-        return value
     
+
