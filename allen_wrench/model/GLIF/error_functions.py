@@ -33,12 +33,12 @@ def TRD_list_error(paramGuess, experiment):
   
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
-        if len(experiment.grid_spike_index_target_list[stim_list_index])==0:
+        if len(experiment.spike_index_list[stim_list_index])==0:
             TRDout=[0]
         else:
             #bug found 5-16-13: TRD was being calculated in terms of stimulus spike time instead of ISI type spike time.  See beloww            
             #TRDout=TRD(experiment.interpolated_spike_time_target_list[stim_list_index], spikeActualTime_list[stim_list_index])#BUGGY!
-            ISITarget=calculateISIFromIntTime(0, experiment.interpolated_spike_time_target_list[stim_list_index], experiment.grid_spike_time_target_list[stim_list_index])
+            ISITarget=calculateISIFromIntTime(0, experiment.interpolated_spike_times[stim_list_index], experiment.grid_spike_times[stim_list_index])
 #            print '-----IN TRD FUNCTION-------'
 #            print 'ISITarget', ISITarget
 #            print 'gridISIFromLastTargSpike_list', gridISIFromLastTargSpike_list[stim_list_index]
@@ -93,10 +93,10 @@ def square_time_dist_list_error(paramGuess, experiment):
 
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
-        if len(experiment.grid_spike_index_target_list[stim_list_index])==0:
+        if len(experiment.spike_index_list[stim_list_index])==0:
             TSDout=[0]
         else:
-            ISITarget=calculateISIFromIntTime(0, experiment.interpolated_spike_time_target_list[stim_list_index], experiment.grid_spike_time_target_list[stim_list_index])
+            ISITarget=calculateISIFromIntTime(0, experiment.interpolated_spike_times[stim_list_index], experiment.grid_spike_times[stim_list_index])
 #            print '-----IN TRD FUNCTION-------'
 #            print 'ISITarget', ISITarget
 #            print 'gridISIFromLastTargSpike_list', gridISIFromLastTargSpike_list[stim_list_index]
@@ -154,7 +154,7 @@ def square_voltage_dist_list_error(paramGuess, experiment):
   
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
-        if (len(experiment.grid_spike_index_target_list[stim_list_index])==0 or experiment.target_spike_mask[stim_list_index]==False):
+        if (len(experiment.spike_index_list[stim_list_index])==0 or experiment.target_spike_mask[stim_list_index]==False):
             VSDout=[0]
         else:
             VSDout=square_voltage_dist(voltageOfModelAtInterpolatedBioSpike_list[stim_list_index], thresholdOfModelAtInterpolatedBioSpike_list[stim_list_index], experiment)

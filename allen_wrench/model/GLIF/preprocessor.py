@@ -20,10 +20,23 @@ if DEBUG_MODE:
 
 
 class GLIFPreprocessor(object):
-    def __init__(self, neuron_config, stimulus_file_name, sweep_properties, optional_methods=None):
+    def __init__(self, neuron_config, optimizer_config, 
+                 stimulus_file_name, sweep_properties, 
+                 spike_index_list = None,
+                 interpolated_spike_times=None,
+                 grid_spike_times=None,
+                 target_spike_mask=None,
+                 optional_methods=None):
+
         self.neuron_config = neuron_config
+        self.optimizer_config = optimizer_config
         self.stimulus_file_name = stimulus_file_name
         self.sweep_properties = sweep_properties
+
+        self.spike_index_list = np.array(spike_index_list) if spike_index_list else None
+        self.interpolated_spike_times = np.array(interpolated_spike_times) if interpolated_spike_times else None
+        self.grid_spike_times = np.array(grid_spike_times) if grid_spike_times else None
+        self.target_spike_mask = target_spike_mask
 
         self.optional_methods = optional_methods
         if self.optional_methods is None:
@@ -33,10 +46,14 @@ class GLIFPreprocessor(object):
         self.superthreshold_blip_data = None
         self.subthreshold_blip_data = None
 
-        self.spike_ind_list = None
-        self.interpolated_spike_time_target_list = None
-        self.grid_spike_time_target_list = None
-        self.target_spike_mask = None
+    def to_dict(self):
+        return {
+            'spike_index_list': self.spike_index_list,
+            'interpolated_spike_times': self.interpolated_spike_times,
+            'grid_spike_times': self.grid_spike_times,
+            'target_spike_mask': self.target_spike_mask,
+            'optional_methods': self.optional_methods
+            }
 
     @staticmethod
     def load_stimulus_basic(file_name, sweeps, dt=None, cut=0, bessel_filter=False):
@@ -104,7 +121,7 @@ class GLIFPreprocessor(object):
 
         
     def preprocess_stimulus(self, optimize_sweeps, superthreshold_blip_sweeps, subthreshold_blip_sweeps, ramp_sweeps, all_noise_sweeps, multi_blip_sweeps, spike_determination_method='threshold'):
-        
+
         #TODO:  instead of just taking zeroth sweep there should be should way to take the first passed sweep
         
         # reference resting potential comes from the ramp
@@ -735,18 +752,23 @@ class GLIFPreprocessor(object):
         #------------------finding spikes--------------------------------------
         #----------------------------------------------------------------------
         
-        self.spike_ind_list = find_spikes(self.optimize_data['voltage'], spike_determination_method, dt)
-        # plotting.plotSpikes(self.bio_list, self.spike_ind_list, self.neuron.dt, blockME=False, method=spike_determination_method)
+        self.spike_index_list = find_spikes(self.optimize_data['voltage'], spike_determination_method, dt)
+        # plotting.plotSpikes(self.bio_list, self.spike_index_list, self.neuron.dt, blockME=False, method=spike_determination_method)
 
         #---convert indices of spikes to times
-        self.interpolated_spike_time_target_list = np.array(self.spike_ind_list) * dt
+        self.interpolated_spike_times = np.array(self.spike_index_list) * dt
 
         # grid and interpolated target spike times are the same in the experimental data because there is only grid precision in the data
-        self.grid_spike_time_target_list = self.interpolated_spike_time_target_list 
+        self.grid_spike_times = self.interpolated_spike_times 
             
         #---find if any of the sweep arrays don't spike
-        self.target_spike_mask = [ len(ind_list) > 0 for ind_list in self.spike_ind_list ]
+        self.target_spike_mask = [ len(ind_list) > 0 for ind_list in self.spike_index_list ]
 
+
+        # make sure that the initial ascurrents have the correct size
+        if len(self.optimizer_config['init_AScurrents']) != len(self.neuron_config['tau']):
+            warnings.warn('GLIFExperiment thinks the init_AScurrents have incorrect length.  Setting to zeros.')
+            self.optimizer_config['init_AScurrents'] = np.zeros(len(self.neuron_config['tau']))
 
         #------------
         # validation
@@ -1134,12 +1156,12 @@ def calculate_capacitance_via_subthreshold_blip(voltage, current, dt):
     return cap
 
 def find_first_spike_voltage(voltage, dt):
-    spike_ind_list_blip = find_spikes([voltage], 'threshold', dt)
+    spike_index_list_blip = find_spikes([voltage], 'threshold', dt)
 
     if DEBUG_MODE:
-        plotting.plotSpikes([voltage], spike_ind_list_blip, dt, blockME=False, method='threshold')
+        plotting.plotSpikes([voltage], spike_index_list_blip, dt, blockME=False, method='threshold')
 
-    return voltage[spike_ind_list_blip[0][0]]
+    return voltage[spike_index_list_blip[0][0]]
 
 def calc_input_R_and_extrapolatedV_via_ramp(voltage, current, rampStartInd, dt, El):
         

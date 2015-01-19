@@ -10,7 +10,9 @@ from neuron_methods import GLIFNeuronMethod, METHOD_LIBRARY
 class GLIFNeuron( object ):    
     '''Generalized Linear Integrate and Fire neuron
     '''
+    
 
+    
     TYPE = "GLIF"
 
     def __init__(self, El, dt, tau, R_input, C, asc_vector, spike_cut_length, th_inf, coeffs,
@@ -244,10 +246,8 @@ class GLIFNeuron( object ):
                 
                 time_step += 1
 
-        return voltage_out, threshold_out, AScurrents_out, \
-            np.array(spike_times), np.array(interpolated_spike_times), \
-            np.array(spike_time_steps), np.array(interpolated_spike_voltages), \
-            np.array(interpolated_spike_thresholds)
+        return voltage_out, threshold_out, AScurrents_out, np.array(spike_times), np.array(interpolated_spike_times), np.array(spike_time_steps), np.array(interpolated_spike_voltages), np.array(interpolated_spike_thresholds)
+
 
     def run_wrt_target_spike_train(self, voltage_t0, threshold_t0, AScurrents_t0, stim, spike_train_ids, target_spike_exists, interpolated_spike_times):
         '''this functions takes an array of spike time indices and runs the model from where each of the spikes happen

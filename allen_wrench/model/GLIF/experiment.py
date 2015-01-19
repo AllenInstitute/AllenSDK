@@ -4,36 +4,33 @@ import neuron
 from os import remove
 import json
 import copy
+import warnings
 
 class GLIFExperiment( object ):
-    def __init__(self, neuron, dt, stim_list, grid_spike_index_target_list, grid_spike_time_target_list, 
-                 interpolated_spike_time_target_list, init_voltage, init_threshold, init_AScurrents, 
+    def __init__(self, neuron, dt, stim_list, spike_index_list, grid_spike_times, 
+                 interpolated_spike_times, init_voltage, init_threshold, init_AScurrents, 
                  target_spike_mask, param_fit_names,
                  **kwargs):
 
         self.neuron = neuron
         self.dt = dt
         self.stim_list = stim_list
-        self.grid_spike_index_target_list = grid_spike_index_target_list
-        self.grid_spike_time_target_list = grid_spike_time_target_list
-        self.interpolated_spike_time_target_list = interpolated_spike_time_target_list
+        self.spike_index_list = spike_index_list
+        self.grid_spike_times = grid_spike_times
+        self.interpolated_spike_times = interpolated_spike_times
         self.init_voltage = init_voltage
         self.init_threshold = init_threshold
         self.init_AScurrents = init_AScurrents
         self.target_spike_mask = target_spike_mask
         self.param_fit_names = param_fit_names
 
-        # make sure that the initial ascurrents have the correct size
-        if len(self.init_AScurrents) != len(self.neuron.tau):
-            warnings.warn('GLIFExperiment thinks the init_AScurrents have incorrect length.  Setting to zeros.')
-            self.init_AScurrents = np.zeros(len(self.neuron.tau))
-
+        assert len(self.init_AScurrents) == len(self.neuron.tau), Exception("init_AScurrents length (%d) must have same length as tau (%d)" % (len(self.init_AScurrents), len(self.neuron.tau)))
         
     def run(self, param_guess):
         '''This code will run the loaded neuron model in reference to the target neuron spikes.
         inputs:
             self: is the instance of the neuron model and parameters alone with the values of the target spikes.
-                NOTE the values in each array of the self.gridSpikeIndexTarge_list and the self.interpolated_spike_time_target_list
+                NOTE the values in each array of the self.gridSpikeIndexTarge_list and the self.interpolated_spike_times
                 are in reference to the time start of of the stim in each induvidual array (not the universal time)
             param_guess: array of scalars of the values that will be inserted into the mapping function below.
         returns:
@@ -52,7 +49,7 @@ class GLIFExperiment( object ):
 
         #TODO: hmm should this really be here
         stim_list = self.stim_list
-        grid_spike_index_target_list = self.grid_spike_index_target_list
+        spike_index_list = self.spike_index_list
         
         self.set_neuron_parameters(param_guess)    
         
@@ -74,8 +71,8 @@ class GLIFExperiment( object ):
              voltageOfModelAtGridBioSpike_array, theshOfModelAtGridBioSpike_array, 
              voltageOfModelAtInterpolatedTargSpike_array, thresholdOfModelAtInterpolatedTargSpike_array) =  self.neuron.run_wrt_target_spike_train(
                  self.init_voltage, self.init_threshold, self.init_AScurrents, 
-                 stim_list[stim_list_index], grid_spike_index_target_list[stim_list_index], 
-                 self.target_spike_mask[stim_list_index], self.interpolated_spike_time_target_list[stim_list_index])
+                 stim_list[stim_list_index], spike_index_list[stim_list_index], 
+                 self.target_spike_mask[stim_list_index], self.interpolated_spike_times[stim_list_index])
             
             interpolatedTime_list.append(interpolatedTime) 
             # changed this 5-13 refactor as TRD error function does not need to know universal time. interpolatedTime_list.append(interpolatedTime+len(stim_list[stim_list_index])*self.neuron.dt*stim_list_index) #putting things in reference to a master time
@@ -96,7 +93,7 @@ class GLIFExperiment( object ):
         '''This code will run the loaded neuron model.
         inputs:
             self: is the instance of the neuron model and parameters alone with the values of the target spikes.
-                NOTE the values in each array of the self.gridSpikeIndexTarge_list and the self.interpolated_spike_time_target_list
+                NOTE the values in each array of the self.gridSpikeIndexTarge_list and the self.interpolated_spike_times
                 are in reference to the time start of of the stim in each induvidual array (not the universal time)
             param_guess: array of scalars of the values that will be inserted into the mapping function below.
         returns:
