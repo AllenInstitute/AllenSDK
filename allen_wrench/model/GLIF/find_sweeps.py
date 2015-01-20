@@ -1,21 +1,21 @@
 import json, sys
+import logging
 import argparse
 
 SHORT_SQUARE = 'Short Square'
-SHORT_SQUARE_60 = 'Short Square -60mv'
-SHORT_SQUARE_80 = 'Short Square -80mv'
+SHORT_SQUARE_60 = 'Short Square - Hold -60mv'
+SHORT_SQUARE_80 = 'Short Square - Hold -80mv'
 RAMP = 'Ramp'
-NOISE1 = 'Noise1'
-NOISE2 = 'Noise2'
-MULTI_SHORT_SQUARE = 'Multi Short Square'
-RAMP_TO_RHEO = 'Ramp To Rheo'
+NOISE1 = 'Noise 1'
+NOISE2 = 'Noise 2'
+SHORT_SQUARE_TRIPLE = 'Short Square - Triple'
+RAMP_TO_RHEO = 'Ramp To Rheobase'
 
-RETURN_CODE = 0
+def fail(msg, validate):
+    logging.error(msg)
 
-def soft_fail(msg):
-    global RETURN_CODE
-    RETURN_CODE = 1
-    print "WARNING:", msg
+    if validate:
+        raise Exception(msg)
 
 def get_sweep_numbers(sweep_list):
     return [ s['sweep_number'] for s in sweep_list]
@@ -39,7 +39,7 @@ def find_ranked_sweep(sweep_list, key, reverse=False):
     else:
         return []
 
-def find_short_square_sweeps(sweep_list):
+def find_short_square_sweeps(sweep_list, validate):
     '''
     Find 1) all of the subthreshold short square sweeps
          2) all of the superthreshold short square sweeps
@@ -48,7 +48,7 @@ def find_short_square_sweeps(sweep_list):
     short_square_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE)
     subthreshold_short_square_sweeps = [ s for s in short_square_sweeps if s.get('num_spikes',None) == 0 ]
     superthreshold_short_square_sweeps = [ s for s in short_square_sweeps if s.get('num_spikes',None) > 0 ]
-    multi_short_square_sweeps = get_sweeps_by_type(sweep_list, MULTI_SHORT_SQUARE)
+    short_square_triple_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_TRIPLE)
 
     short_square_60_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_60)
     short_square_80_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_80)
@@ -57,7 +57,7 @@ def find_short_square_sweeps(sweep_list):
         'all_short_square': get_sweep_numbers(short_square_sweeps),
         'subthreshold_short_square': get_sweep_numbers(subthreshold_short_square_sweeps),
         'superthreshold_short_square': get_sweep_numbers(superthreshold_short_square_sweeps),
-        'multi_short_square': get_sweep_numbers(multi_short_square_sweeps),
+        'short_square_triple': get_sweep_numbers(short_square_triple_sweeps),
         'short_square_60': get_sweep_numbers(short_square_60_sweeps),
         'short_square_80': get_sweep_numbers(short_square_80_sweeps),
         'maximum_subthreshold_short_square': find_ranked_sweep(subthreshold_short_square_sweeps, 'stimulus_amplitude', reverse=True),
@@ -66,14 +66,14 @@ def find_short_square_sweeps(sweep_list):
     }
 
     if len(out['maximum_subthreshold_short_square']) == 0: 
-        soft_fail("no passed maximum subthreshold short square")
+        fail("No passed maximum subthreshold short square", validate)
 
     if len(out['minimum_superthreshold_short_square']) == 0:
-        soft_fail("no passed minimum short square")
+        fail("No passed minimum superthreshold short square", validate)
 
     return out
 
-def find_ramp_sweeps(sweep_list):
+def find_ramp_sweeps(sweep_list, validate):
     '''
     Find 1) all ramp sweeps
          2) all subthreshold ramps
@@ -93,11 +93,11 @@ def find_ramp_sweeps(sweep_list):
     }
 
     if len(out['superthreshold_ramp']) == 0:
-        soft_fail("no passing superthreshold ramp")
+        fail("no passing superthreshold ramp", validate)
 
     return out
     
-def find_noise_sweeps(sweep_list):
+def find_noise_sweeps(sweep_list, validate):
     '''
     Find 1) the 1st noise1 sweep (run 1)
          2) the 2nd noise1 sweep (run 2)
@@ -115,8 +115,8 @@ def find_noise_sweeps(sweep_list):
         'all_noise': get_sweep_numbers(all_noise_sweeps)
     }
 
-    num_noise1_sweeps = len(noise1_sweeps)
-    num_noise2_sweeps = len(noise2_sweeps)
+    num_noise1_sweeps = len(noise1_sweeps, validate)
+    num_noise2_sweeps = len(noise2_sweeps, validate)
 
     if num_noise1_sweeps >= 3:
         noise1_sweep_numbers = get_sweep_numbers(noise1_sweeps)
@@ -124,7 +124,7 @@ def find_noise_sweeps(sweep_list):
         out['noise1_run2'] = [ noise1_sweep_numbers[1] ]
         out['noise1_run3'] = [ noise1_sweep_numbers[2] ]
     else:
-        soft_fail("not enough noise1 sweeps (%d)" % (num_noise1_sweeps))
+        fail("not enough noise1 sweeps (%d)" % (num_noise1_sweeps))
 
     if num_noise2_sweeps >= 3:
         noise2_sweep_numbers = get_sweep_numbers(noise2_sweeps)
@@ -132,7 +132,7 @@ def find_noise_sweeps(sweep_list):
         out['noise2_run2'] = [ noise2_sweep_numbers[1] ]
         out['noise2_run3'] = [ noise2_sweep_numbers[2] ]
     else:
-        soft_fail("not enough noise2 sweeps (%d)" % (num_noise2_sweeps))
+        fail("not enough noise2 sweeps (%d)" % (num_noise2_sweeps))
         
     return out
 
@@ -157,25 +157,7 @@ def find_failed_sweeps(sweep_list, data):
 
     return out_data
 
-def main():
-    parser = argparse.ArgumentParser(description='find relevant sweeps from a sweep catalog')
-
-    parser.add_argument('sweep_file', help='json file containing a list of sweeps for a cell')
-    parser.add_argument('output_file', help='output json data config file')
-
-    args = parser.parse_args()
-
-    try:
-        assert args.sweep_file is not None, Exception("A sweep configuration file name required.")
-        assert args.output_file is not None, Exception("An output file name is required.")
-    except Exception, e:
-        parser.print_help()
-        exit(1)
-
-    input_data = None
-    with open(args.sweep_file, 'rb') as f:
-        input_data = json.loads(f.read())
-
+def find_sweeps(data_file_name, sweeps, validate):
     data = {
         'filename': input_data['filename'],
         'sweeps': filter_sweep_list(input_data['sweeps'])
@@ -187,9 +169,36 @@ def main():
 
     data['failed_sweeps'] = find_failed_sweeps(data['sweeps'], data)
 
+    return data
+    
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='find relevant sweeps from a sweep catalog')
+
+    parser.add_argument('sweep_file', help='json file containing a list of sweeps for a cell')
+    parser.add_argument('output_file', help='output json data config file')
+    parser.add_argument('validate', help='throw an exception if there was a problem', action='store_true', default=False)
+
+    args = parser.parse_args()
+
+    try:
+        assert args.sweep_file is not None, Exception("A sweep configuration file name required.")
+        assert args.output_file is not None, Exception("An output file name is required.")
+    except Exception, e:
+        parser.print_help()
+        sys.exit(1)
+
+    return args
+
+def main():
+    args = parse_arguments()
+
+    input_data = None
+    with open(args.sweep_file, 'rb') as f:
+        input_data = json.loads(f.read())
+
+    data = find_sweeps(input_data['filename'], input_data['sweeps'], args.validate)
+
     with open(args.output_file, 'wb') as f:
         f.write(json.dumps(data, indent=2))
-
-    sys.exit(RETURN_CODE)
 
 if __name__ == "__main__":  main()
