@@ -1,6 +1,7 @@
 import json, sys, os
 import logging
 import argparse
+import utilities
 
 SHORT_SQUARE = 'Short Square'
 SHORT_SQUARE_60 = 'Short Square - Hold -60mv'
@@ -202,14 +203,12 @@ def main():
     args = parse_arguments()
 
     input_data = None
-    with open(args.sweep_file, 'rb') as f:
-        input_data = json.loads(f.read())
-        file_name, sweeps = extract_input_fields(input_data)
+    utilities.read_json(args.sweep_file)
+    file_name, sweeps = extract_input_fields(input_data)
 
     data = find_sweeps(file_name, sweeps, not args.no_validate)
 
-    with open(args.output_file, 'wb') as f:
-        f.write(json.dumps(data, indent=2))
+    utilities.write_json(args.output_file, data)
 
 
 if __name__ == "__main__":  main()

@@ -1,5 +1,13 @@
 import numpy as np
 
+def read_json(file_name):
+    with open(file_name, 'rb') as f:
+        return json.loads(f.read())
+
+def write_json(file_name, obj):
+    with open(file_name, 'wb') as f:
+        f.write(json.dumps(obj, indent=2, default=json_handler))
+
 def json_handler(obj):
     if hasattr(obj, 'to_dict'):
         return obj.to_dict()

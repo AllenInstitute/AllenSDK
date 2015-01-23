@@ -11,15 +11,8 @@ import utilities
 import numpy as np
 
 def read(data_config_file_name, model_config_file_name):
-    data_config = None
-    with open(data_config_file_name, 'rb') as f:
-        data_config = json.loads(f.read())
-
-    assert data_config is not None, Exception("Could not read data configuration file: %s" % data_config_file_name)
-
-    model_config = {}
-    with open(model_config_file_name, 'rb') as f:
-        model_config = json.loads(f.read())
+    data_config = utilities.read_json(data_config_file_name)
+    model_config = utilities.read_json(model_config_file_name)
 
     return ConfigurationSetup(data_config=data_config,
                               neuron_config=model_config.get('neuron', None),
@@ -52,12 +45,10 @@ class ConfigurationSetup( object ):
         self.spike_determination_method = spike_determination_method
 
     def write(self, model_config_file_name, data_config_file_name=None):
-        with open(model_config_file_name, 'wb') as f:
-            f.write(json.dumps(self.to_dict(), indent=2, default=utilities.json_handler))
+        utilities.write_json(model_config_file_name, self.to_dict())
 
         if data_config_file_name is not None:
-            with open(data_config_file_name, 'wb') as f:
-                f.write(json.dumps(self.data_config, indent=2))
+            utilities.write_json(data_config_file_name, self.data_config)
 
     def to_dict(self):
         config = {
