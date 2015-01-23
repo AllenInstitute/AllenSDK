@@ -1,4 +1,4 @@
-import json, sys
+import json, sys, os
 import logging
 import argparse
 
@@ -10,6 +10,8 @@ NOISE1 = 'Noise 1'
 NOISE2 = 'Noise 2'
 SHORT_SQUARE_TRIPLE = 'Short Square - Triple'
 RAMP_TO_RHEO = 'Ramp to Rheobase'
+
+FILE_TYPE = 'ORCA'
 
 def fail(msg, validate):
     logging.error(msg)
@@ -139,18 +141,6 @@ def find_noise_sweeps(sweep_list, validate):
         
     return out
 
-def filter_sweep_list(sweep_list):
-    sorted_sweeps = sorted(sweep_list, key=lambda x: x['sweep_number'] ) 
-    
-    for sweep in sorted_sweeps:
-        sweep['resting_potential'] = sweep.get('slow_vm_mv', None)
-        sweep['num_spikes'] = sweep.get('num_spikes', None)
-        sweep['stimulus_type'] = sweep.get('stimulus_type', None)
-        sweep['stimulus_amplitude'] = sweep.get('stimulus_amplitude', None)
-        sweep['workflow_state'] = sweep.get('workflow_state', None)
-        
-    return sorted_sweeps
-
 def find_failed_sweeps(sweep_list, data):
     out_data = {}
 
@@ -179,7 +169,7 @@ def parse_arguments():
 
     parser.add_argument('sweep_file', help='json file containing a list of sweeps for a cell')
     parser.add_argument('output_file', help='output json data config file')
-    parser.add_argument('--no_validate', help="don't throw an exception if there was a problem", action='store_false')
+    parser.add_argument('--no_validate', help="don't throw an exception if there was a problem", action='store_true')
 
     args = parser.parse_args()
 
@@ -192,16 +182,34 @@ def parse_arguments():
 
     return args
 
+def extract_input_fields(data):
+    well_known_files = data['specimen']['ephys_roi_result']['well_known_files']
+
+    file_name = None
+    for wkf in well_known_files:
+        if wkf['well_known_file_type']['name'] == FILE_TYPE:
+            file_name = os.path.join(wkf['storage_directory'], wkf['filename'])
+            break
+
+    assert file_name, Exception("Could not find data file.")
+
+    sweeps = data['specimen']['ephys_sweeps']
+
+    return file_name, sweeps
+
+
 def main():
     args = parse_arguments()
 
     input_data = None
     with open(args.sweep_file, 'rb') as f:
         input_data = json.loads(f.read())
+        file_name, sweeps = extract_input_fields(input_data)
 
-    data = find_sweeps(input_data['filename'], input_data['sweeps'], not args.no_validate)
+    data = find_sweeps(file_name, sweeps, not args.no_validate)
 
     with open(args.output_file, 'wb') as f:
         f.write(json.dumps(data, indent=2))
+
 
 if __name__ == "__main__":  main()
