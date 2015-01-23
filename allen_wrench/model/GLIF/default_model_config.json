@@ -1,63 +1,42 @@
 {
   "neuron": {
-    "tau": [
-      0.01, 
-      0.04
-    ],      
     "threshold_reset_method": { 
       "name": "from_paper"
     }, 
     "voltage_reset_method": {
       "name": "Vbefore"
-    },
+    }, 
     "threshold_dynamics_method": {
       "name": "adapt_standard"
     }, 
     "AScurrent_dynamics_method": {
-      "name": "LIF"
-  	}, 
-  	"voltage_dynamics_method": {
-      "name": "linear"
-    },
+      "name": "expViaBlip"
+    }, 
     "AScurrent_reset_method": {
-      "params": {
-        "r": [
-          1, 
-          1
-        ]
-      }, 
       "name": "sum"
-    },
-    "th_inf": 0.027, 
-    "coeffs": {
-        "th_inf": 1.0,
-        "a": 1.0, 
-        "b": 1.0,   
-        "C": 1.0, 
-        "G": 1.0,
-        "asc_vector": [
-          1,             
-          -1      
-        ]
-    },        
-    "asc_vector": [
-      1e-12, 
-      1e-12
-    ], 
-    "type": "GLIF",  
-    "C": 1.4358e-10, 
-    "R_input": 159000000.0, 
+    }, 
+    "type": "GLIF", 
+    "voltage_dynamics_method": {
+      "name": "linear"
+    }, 
     "dt": 5e-05, 
-    "El": 0,
-    "Vr": 0.004
+    "El": 0 
   }, 
   "optimizer": {
-    "internal_iterations": 100,
-    "param_fit_names": [
-		"C",
-		"asc_vector"
-    ], 
     "save_file_name": "default_optimizer_file_name.json", 
+    "single_hold_out_repeat": false, 
+    "test_hold_out": true, 
+    "init_AScurrents": [
+      0.0, 
+      0.0, 
+      0.0
+    ], 
+    "error_function": "TRD", 
+    "xtol": 1e-07, 
+    "iteration_info": [], 
+    "ftol": 1e-07, 
+    "sigma_outer": 0.3, 
+    "neuron_number": 1, 
     "param_upper_bounds": [
       1, 
       1, 
@@ -65,13 +44,20 @@
       1, 
       1
     ], 
+    "internal_iterations": 1, 
+    "init_params": [
+      1.0, 
+      1.0, 
+      1.0, 
+      1.0
+    ], 
     "init_threshold": 0.02, 
-    "inner_iterations": 1, 
-    "error_function": "VSD", 
-    "test_hold_out": true, 
     "sigma_inner": 0.01, 
-    "sigma_outer": 0.3,
-    "neuron_number": 1, 
+    "init_voltage": 0.0, 
+    "neuron_num": 1, 
+    "inner_iterations": 1, 
+    "dt": 5e-05, 
+    "outer_iterations": 1, 
     "param_lower_bounds": [
       0, 
       0, 
@@ -79,17 +65,19 @@
       0, 
       0
     ], 
-    "init_AScurrents": [
-      0, 
-      0
-    ], 
-    "init_voltage": 0.0, 
-    "outer_iterations": 1,  
-    "single_hold_out_repeat": false, 
-    "xtol": 1e-07, 
-    "ftol": 1e-07
-  },
-    "preprocessing": {
-        "subsample": { "time_step": 0.00005 }
+    "param_fit_names": [
+        "C",
+		"asc_vector",
+        "th_inf",
+        "a",
+        "b"
+    ]
+  }, 
+  "preprocessor": {
+    "optional_methods": {
+      "subsample": {
+        "time_step": 5e-05
+      }
     }
+  }
 }
