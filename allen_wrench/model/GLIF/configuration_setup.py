@@ -34,7 +34,7 @@ class ConfigurationSetup( object ):
     MAXIMUM_SUBTHRESHOLD_SHORT_SQUARE = 'maximum_subthreshold_short_square'
     SUPERTHRESHOLD_RAMP = 'superthreshold_ramp'
     ALL_NOISE = 'all_noise'
-    MULTI_SHORT_SQUARE = 'multi_short_square'
+    SHORT_SQUARE_TRIPLE = 'short_square_triple'
 
     def __init__(self, data_config, neuron_config, optimizer_config, preprocessor_config, 
                  spike_cutting_method=None, spike_determination_method='threshold'):
@@ -82,6 +82,7 @@ class ConfigurationSetup( object ):
         '''this will load the correct neuron and configure it properly.  Right now there is only one type of neuron but 
         maybe one day there will be more.  This was called get_neuron in Tim's original experiment reader
         '''
+        
         #TODO: note that Vr is not being set here but is calculated by the linear regression
         if self.neuron_config['type'] == GLIFNeuron.TYPE:
             self.neuron = GLIFNeuron(El=self.neuron_config['El'],
@@ -92,7 +93,7 @@ class ConfigurationSetup( object ):
                                      asc_vector=self.neuron_config['asc_vector'],
                                      spike_cut_length=self.neuron_config['spike_cut_length'],
                                      th_inf=self.neuron_config['th_inf'],
-                                     coeffs=self.neuron_config['coeffs'],
+                                     coeffs=self.neuron_config.get('coeffs', {}),
                                      AScurrent_dynamics_method=self.neuron_config['AScurrent_dynamics_method'],
                                      voltage_dynamics_method=self.neuron_config['voltage_dynamics_method'],
                                      threshold_dynamics_method=self.neuron_config['threshold_dynamics_method'],
@@ -119,20 +120,22 @@ class ConfigurationSetup( object ):
                                              self.optimizer_config,
                                              self.data_config['filename'], 
                                              self.data_config['sweeps'],
-                                             self.preprocessor_config.get('spike_index_list',None),
+                                             self.preprocessor_config.get('spike_time_steps',None),
                                              self.preprocessor_config.get('interpolated_spike_times',None),
                                              self.preprocessor_config.get('grid_spike_times', None),
                                              self.preprocessor_config.get('target_spike_mask', None),
+                                             self.preprocessor_config.get('interpolated_spike_voltages',None),
+                                             self.preprocessor_config.get('grid_spike_voltages', None),
                                              self.preprocessor_config.get('optional_methods',{}))
 
         return self.preprocessor
 
     def run_preprocessor(self, optimize_stimulus_name, optimize_sweep_ids=None,
-                         superthresh_blip_name=MINIMUM_SUPERTHRESHOLD_SHORT_SQUARE, 
-                         subthresh_blip_name=MAXIMUM_SUBTHRESHOLD_SHORT_SQUARE,
+                         superthresh_ssq_name=MINIMUM_SUPERTHRESHOLD_SHORT_SQUARE, 
+                         subthresh_ssq_name=MAXIMUM_SUBTHRESHOLD_SHORT_SQUARE,
                          ramp_name=SUPERTHRESHOLD_RAMP,
                          all_noise_name=ALL_NOISE,
-                         multi_square_name=MULTI_SHORT_SQUARE,
+                         ssq_triple_name=SHORT_SQUARE_TRIPLE,
                          force_preprocessing=False):
         ''' initialize the preprocessor (if necessary) and run it '''
 
@@ -142,34 +145,33 @@ class ConfigurationSetup( object ):
         optimize_sweeps = self.get_sweeps(optimize_stimulus_name, optimize_sweep_ids)
 
         # if the preprocessor has a spike index list, no need to preprocess
-        if self.preprocessor.spike_index_list is None or force_preprocessing:
+        if not self.preprocessor.ready() or force_preprocessing:
 
             # preprocess the data (this will modify the neuron config)
             self.preprocessor.preprocess_stimulus(optimize_sweeps,
-                                                  superthreshold_blip_sweeps=self.data_config.get(superthresh_blip_name, None),
-                                                  subthreshold_blip_sweeps=self.data_config.get(subthresh_blip_name, None),
+                                                  superthresh_ssq_sweeps=self.data_config.get(superthresh_ssq_name, None),
+                                                  subthresh_ssq_sweeps=self.data_config.get(subthresh_ssq_name, None),
                                                   ramp_sweeps=self.data_config.get(ramp_name, None),
                                                   all_noise_sweeps=self.data_config.get(all_noise_name, None),
-                                                  multi_blip_sweeps=self.data_config.get(multi_square_name, None),
+                                                  ssq_triple_sweeps=self.data_config.get(ssq_triple_name, None),
                                                   spike_determination_method=self.spike_determination_method)
         return self.preprocessor
                                              
 
         
     def setup_optimizer(self, optimize_stimulus_name, optimize_sweep_ids=None,
-                        superthresh_blip_name=MINIMUM_SUPERTHRESHOLD_SHORT_SQUARE, 
-                        subthresh_blip_name=MAXIMUM_SUBTHRESHOLD_SHORT_SQUARE,
+                        superthresh_ssq_name=MINIMUM_SUPERTHRESHOLD_SHORT_SQUARE, 
+                        subthresh_ssq_name=MAXIMUM_SUBTHRESHOLD_SHORT_SQUARE,
                         ramp_name=SUPERTHRESHOLD_RAMP,
                         all_noise_name=ALL_NOISE,
-                        multi_square_name=MULTI_SHORT_SQUARE,
+                        ssq_triple_name=SHORT_SQUARE_TRIPLE,
                         force_preprocessing=False):
 
         self.run_preprocessor(optimize_stimulus_name, optimize_sweep_ids,
-                              superthresh_blip_name,
-                              subthresh_blip_name,
+                              superthresh_ssq_name,  subthresh_ssq_name,
                               ramp_name,
                               all_noise_name,
-                              multi_square_name,
+                              ssq_triple_name,
                               force_preprocessing)
 
         self.setup_neuron()
@@ -184,12 +186,15 @@ class ConfigurationSetup( object ):
             optimize_data = self.preprocessor.load_stimulus(self.data_config['filename'], optimize_sweeps)
 
         # initialize the experiment
+
         self.experiment = GLIFExperiment(neuron = self.neuron, 
                                          dt = self.neuron.dt,
                                          stim_list = optimize_data['current'],
-                                         spike_index_list = self.preprocessor.spike_index_list,
+                                         spike_time_steps = self.preprocessor.spike_time_steps,
                                          grid_spike_times = self.preprocessor.grid_spike_times,
                                          interpolated_spike_times = self.preprocessor.interpolated_spike_times,
+                                         grid_spike_voltages = self.preprocessor.grid_spike_voltages,
+                                         interpolated_spike_voltages = self.preprocessor.interpolated_spike_voltages,
                                          init_voltage = self.optimizer_config['init_voltage'],
                                          init_threshold = self.optimizer_config['init_threshold'],
                                          init_AScurrents = self.optimizer_config['init_AScurrents'],

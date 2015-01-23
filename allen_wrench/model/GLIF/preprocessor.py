@@ -12,20 +12,26 @@ import statsmodels.api as sm
 
 import logging
 logger = logging.getLogger()
+SAVE_MODE = False
 DEBUG_MODE = logger.isEnabledFor(logging.DEBUG)
 if DEBUG_MODE:
     import matplotlib.pylab as plt
     import plotting
     import time
 
+RESTING_POTENTIAL = 'slow_vm_mv'
 
 class GLIFPreprocessor(object):
-    def __init__(self, neuron_config, optimizer_config, 
-                 stimulus_file_name, sweep_properties, 
-                 spike_index_list = None,
-                 interpolated_spike_times=None,
-                 grid_spike_times=None,
+    def __init__(self, neuron_config, 
+                 optimizer_config, 
+                 stimulus_file_name, 
+                 sweep_properties, 
+                 spike_time_steps = None,
+                 interpolated_spike_times = None,
+                 grid_spike_times = None,
                  target_spike_mask=None,
+                 interpolated_spike_voltages = None,
+                 grid_spike_voltages = None,
                  optional_methods=None):
 
         self.neuron_config = neuron_config
@@ -33,9 +39,12 @@ class GLIFPreprocessor(object):
         self.stimulus_file_name = stimulus_file_name
         self.sweep_properties = sweep_properties
 
-        self.spike_index_list = np.array(spike_index_list) if spike_index_list else None
+        self.spike_time_steps = np.array(spike_time_steps) if spike_time_steps else None
         self.interpolated_spike_times = np.array(interpolated_spike_times) if interpolated_spike_times else None
         self.grid_spike_times = np.array(grid_spike_times) if grid_spike_times else None
+        
+        self.interpolated_spike_voltages = np.array(interpolated_spike_voltages) if interpolated_spike_voltages else None
+        self.grid_spike_voltages = np.array(grid_spike_voltages) if grid_spike_voltages else None
         self.target_spike_mask = target_spike_mask
 
         self.optional_methods = optional_methods
@@ -46,12 +55,23 @@ class GLIFPreprocessor(object):
         self.superthreshold_blip_data = None
         self.subthreshold_blip_data = None
 
+    def ready(self):
+        return (self.spike_time_steps is not None and
+                self.grid_spike_times is not None and
+                self.interpolated_spike_times is not None and 
+                self.target_spike_mask is not None and 
+                self.grid_spike_voltages is not None and
+                self.interpolated_spike_voltages is not None)
+    
+
     def to_dict(self):
         return {
-            'spike_index_list': self.spike_index_list,
+            'spike_time_steps': self.spike_time_steps,
             'interpolated_spike_times': self.interpolated_spike_times,
             'grid_spike_times': self.grid_spike_times,
             'target_spike_mask': self.target_spike_mask,
+            'grid_spike_voltages': self.grid_spike_voltages,
+            'interpolated_spike_voltages': self.interpolated_spike_voltages,
             'optional_methods': self.optional_methods
             }
 
@@ -115,18 +135,21 @@ class GLIFPreprocessor(object):
                 
         if zero_out_el:
             for i in xrange(len(sweeps)):
-                zero_out_el_via_inj_current(sweep_data['current'][i], self.El_reference, self.sweep_properties[i]['resting_potential'], self.neuron_config['R_input'])
+                zero_out_el_via_inj_current(sweep_data['current'][i], self.El_reference, self.sweep_properties[i][RESTING_POTENTIAL], self.neuron_config['R_input'])
 
         return sweep_data
 
         
-    def preprocess_stimulus(self, optimize_sweeps, superthreshold_blip_sweeps, subthreshold_blip_sweeps, ramp_sweeps, all_noise_sweeps, multi_blip_sweeps, spike_determination_method='threshold'):
+    def preprocess_stimulus(self, optimize_sweeps, 
+                            superthresh_ssq_sweeps, subthresh_ssq_sweeps, 
+                            ramp_sweeps, all_noise_sweeps, 
+                            ssq_triple_sweeps, spike_determination_method='threshold'):
 
         #TODO:  instead of just taking zeroth sweep there should be should way to take the first passed sweep
-        
+
         # reference resting potential comes from the ramp
         sec_before_thresh_to_look_at_spikes=.002 #used in spike cutting
-        self.El_reference = self.sweep_properties[ramp_sweeps[0]]['resting_potential']  * 1e-3
+        self.El_reference = self.sweep_properties[ramp_sweeps[0]][RESTING_POTENTIAL]  * 1e-3
         if self.El_reference>-.03 or self.El_reference<-.1:
             print "the resting potential is :", self.El_reference
             raise Exception("Resting potential is not in the correct range")
@@ -148,7 +171,7 @@ class GLIFPreprocessor(object):
         noise_data=self.load_stimulus(self.stimulus_file_name,all_noise_sweeps)
         subthresh_noise_voltage=noise_data['voltage'][0][0:int(6./dt)]
         subthresh_noise_current=noise_data['current'][0][0:int(6./dt)]
-        noise_El=self.sweep_properties[all_noise_sweeps[0]]['resting_potential']*1e-3
+        noise_El=self.sweep_properties[all_noise_sweeps[0]][RESTING_POTENTIAL]*1e-3
         
         R_via_noise=calculate_input_R_via_subthresh_noise(subthresh_noise_voltage, 
                                                           subthresh_noise_current, noise_El, noise_data['start_idx'][0], dt)
@@ -177,7 +200,7 @@ class GLIFPreprocessor(object):
 #        sys.exit()
 
         # calculate capacitance from subthreshold blip data
-        self.subthreshold_blip_data = self.load_stimulus(self.stimulus_file_name, subthreshold_blip_sweeps) 
+        self.subthreshold_blip_data = self.load_stimulus(self.stimulus_file_name, subthresh_ssq_sweeps) 
 
 #        #this approximation might not be doing so well because of capacitance compensation need to get v by fitting 2 exponentials
 #        self.neuron_config['C'] = calculate_capacitance_via_subthreshold_blip(self.subthreshold_blip_data['voltage'][0][self.subthreshold_blip_data['start_idx'][0]:] - self.El_reference, 
@@ -185,15 +208,15 @@ class GLIFPreprocessor(object):
 
         (cap_via_charge_dump, total_charge_dump)=calc_cap_via_fit_charge_dump(self.subthreshold_blip_data['voltage'][0][self.subthreshold_blip_data['start_idx'][0]:], 
                                      self.subthreshold_blip_data['current'][0][self.subthreshold_blip_data['start_idx'][0]:], 
-                                     self.neuron_config['R_input'], dt, self.sweep_properties[subthreshold_blip_sweeps[0]]['resting_potential']*1e-3)
+                                     self.neuron_config['R_input'], dt, self.sweep_properties[subthresh_ssq_sweeps[0]][RESTING_POTENTIAL]*1e-3)
         print "capacitance via charge dump fit extrapolation", cap_via_charge_dump
 
         self.neuron_config['C']=C_lssq
         
         #calculate b constant and potential threshold reset
-        muliti_SS = self.load_stimulus(self.stimulus_file_name, multi_blip_sweeps)
-    
-        (const_to_add_to_thresh_for_reset,b_value)=calc_a_b_from_muliblip(muliti_SS, dt)
+        multi_SS = self.load_stimulus(self.stimulus_file_name, ssq_triple_sweeps)
+
+        (const_to_add_to_thresh_for_reset,b_value)=calc_a_b_from_multiblip(multi_SS, dt)
         #TODO: 
         print "value added to previous threshold if method is V_plus_const", const_to_add_to_thresh_for_reset
         
@@ -204,7 +227,7 @@ class GLIFPreprocessor(object):
 #        deltaV=deltaV_ramp_and_used_R
         
         # extract instantaneous threshold from superthreshold blip
-        self.superthreshold_blip_data = self.load_stimulus(self.stimulus_file_name, superthreshold_blip_sweeps) 
+        self.superthreshold_blip_data = self.load_stimulus(self.stimulus_file_name, superthresh_ssq_sweeps) 
         thresh_inf_via_Vmeasure = find_first_spike_voltage(self.superthreshold_blip_data['voltage'][0], dt) - self.El_reference     
         print "threshold infinity measured from blip", thresh_inf_via_Vmeasure
         print "threshold infinity measured from blip minus V difference of ramp thesh verusus extrapolated threhsold", thresh_inf_via_Vmeasure-deltaV
@@ -222,6 +245,10 @@ class GLIFPreprocessor(object):
         print "threshold infinity calculated with charge dump and calculated C", thresh_inf_via_Q_and_C
 
         a_value=b_value*(thresh_adapted_read_from_ramp-thresh_inf_via_Vmeasure)/(thresh_adapted_read_from_ramp-self.neuron_config['El'])
+        if type(a_value)==list:
+            a_value=a_value[0]
+        if type(b_value)==list:
+            b_value=b_value[0]
         if abs(a_value)<0.05*abs(b_value):
             warnings.warn('a is less than 5 percent of b.  Adjusting a to be 5 percent')
             if a_value<0.0:
@@ -722,7 +749,7 @@ class GLIFPreprocessor(object):
         # configure the AScurrent_reset_method
         # this is down here because it depends on numbers computed for the AScurrent_dynamics_method
         method_config = self.neuron_config['AScurrent_reset_method']
-        if method_config.get('params', {}) is None:
+        if method_config.get('params', None) is None:
             if method_config['name'] == 'sum':
                 method_config['params'] = {
                     'r': np.ones(len(self.neuron_config['tau']))
@@ -752,18 +779,21 @@ class GLIFPreprocessor(object):
         #------------------finding spikes--------------------------------------
         #----------------------------------------------------------------------
         
-        self.spike_index_list = find_spikes(self.optimize_data['voltage'], spike_determination_method, dt)
-        # plotting.plotSpikes(self.bio_list, self.spike_index_list, self.neuron.dt, blockME=False, method=spike_determination_method)
+        self.spike_time_steps = [ np.array(a, dtype=np.uint32) for a in find_spikes(self.optimize_data['voltage'], spike_determination_method, dt) ]
 
         #---convert indices of spikes to times
-        self.interpolated_spike_times = np.array(self.spike_index_list) * dt
+        self.interpolated_spike_times = np.array(self.spike_time_steps) * dt
 
         # grid and interpolated target spike times are the same in the experimental data because there is only grid precision in the data
         self.grid_spike_times = self.interpolated_spike_times 
             
         #---find if any of the sweep arrays don't spike
-        self.target_spike_mask = [ len(ind_list) > 0 for ind_list in self.spike_index_list ]
+        self.target_spike_mask = [ len(ind_list) > 0 for ind_list in self.spike_time_steps ]
 
+        self.grid_spike_voltages = [ self.optimize_data['voltage'][i][self.spike_time_steps[i]] for i in range(len(self.spike_time_steps)) ]
+
+        # grid and interpolated voltages are the same in the experimental data because there is only grid precision in the data
+        self.interpolated_spike_voltages = self.grid_spike_voltages
 
         # make sure that the initial ascurrents have the correct size
         if len(self.optimizer_config['init_AScurrents']) != len(self.neuron_config['tau']):
@@ -977,7 +1007,7 @@ def find_zero_cross(voltage_list):
         ind = -1 
         while ind < v_array_len - 1:          
             ind += 1              
-            if voltage[ind] > 0: 
+            if voltage[ind] > -.01:  #changed from zero on 1-21-15 
                 # above_thresh_sample = voltage[ind:ind+25]
                 # top_ind = above_thresh_sample.argmax() + ind
                 spike_ind.append(ind)    
@@ -1156,12 +1186,12 @@ def calculate_capacitance_via_subthreshold_blip(voltage, current, dt):
     return cap
 
 def find_first_spike_voltage(voltage, dt):
-    spike_index_list_blip = find_spikes([voltage], 'threshold', dt)
+    spike_time_steps_blip = find_spikes([voltage], 'threshold', dt)
 
     if DEBUG_MODE:
-        plotting.plotSpikes([voltage], spike_index_list_blip, dt, blockME=False, method='threshold')
+        plotting.plotSpikes([voltage], spike_time_steps_blip, dt, blockME=False, method='threshold')
 
-    return voltage[spike_index_list_blip[0][0]]
+    return voltage[spike_time_steps_blip[0][0]]
 
 def calc_input_R_and_extrapolatedV_via_ramp(voltage, current, rampStartInd, dt, El):
         
@@ -1443,7 +1473,7 @@ def RC_via_subthresh_GLM(voltage, current, dt):
 #    plt.show()
     return resistance, capacitance
 
-def calc_a_b_from_muliblip(multi_SS, dt):
+def calc_a_b_from_multiblip(multi_SS, dt):
 
     def exp_force_c((t, const), a1, k1):
         return a1*(np.exp(k1*t))+const
@@ -1453,11 +1483,10 @@ def calc_a_b_from_muliblip(multi_SS, dt):
 
     multi_SS_v=multi_SS['voltage']
     multi_SS_i=multi_SS['current']
-    
+
     spike_ind=find_spikes(multi_SS_v, 'threshold', dt)
     
     #SHOULD I REMOVE SPIKES OR JUST ERROR THE NEURON IF THINGS ARE SPIKING OUT OF ORDER?
-    
     
     #these are what I want to be final
     time_previous_spike=[]
@@ -1467,7 +1496,9 @@ def calc_a_b_from_muliblip(multi_SS, dt):
     if DEBUG_MODE:
         plt.figure()
     for k in range(0, len(multi_SS_v)):
+
         thresh=[multi_SS_v[k][j] for j in spike_ind[k]]
+
         if thresh!=[] and len(thresh)>1:# there needs to be more than one spike so that we can find the time difference
             thresh_first_spike.append(thresh[0])
             threshold.append(thresh[1:])

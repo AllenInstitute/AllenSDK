@@ -9,7 +9,7 @@ RAMP = 'Ramp'
 NOISE1 = 'Noise 1'
 NOISE2 = 'Noise 2'
 SHORT_SQUARE_TRIPLE = 'Short Square - Triple'
-RAMP_TO_RHEO = 'Ramp To Rheobase'
+RAMP_TO_RHEO = 'Ramp to Rheobase'
 
 def fail(msg, validate):
     logging.error(msg)
@@ -20,8 +20,11 @@ def fail(msg, validate):
 def get_sweep_numbers(sweep_list):
     return [ s['sweep_number'] for s in sweep_list]
 
-def get_sweeps_by_type(sweep_list, sweep_type):
-    return [ s for s in sweep_list if s.get('stimulus_type',None) == sweep_type ]
+def get_sweeps_by_type(sweep_list, sweep_type, validate):
+    if validate:
+        return [ s for s in sweep_list if s.get('stimulus_type',None) == sweep_type and s.get('workflow_state',None) == 'passed' ]
+    else:
+        return [ s for s in sweep_list if s.get('stimulus_type',None) == sweep_type ]
 
 def find_ranked_sweep(sweep_list, key, reverse=False):
     if sweep_list:
@@ -45,13 +48,13 @@ def find_short_square_sweeps(sweep_list, validate):
          2) all of the superthreshold short square sweeps
          3) the subthresholds short square sweep with maximum stimulus amplitude
     '''
-    short_square_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE)
+    short_square_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE, validate)
     subthreshold_short_square_sweeps = [ s for s in short_square_sweeps if s.get('num_spikes',None) == 0 ]
     superthreshold_short_square_sweeps = [ s for s in short_square_sweeps if s.get('num_spikes',None) > 0 ]
-    short_square_triple_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_TRIPLE)
+    short_square_triple_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_TRIPLE, validate)
 
-    short_square_60_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_60)
-    short_square_80_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_80)
+    short_square_60_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_60, validate)
+    short_square_80_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_80, validate)
     
     out = {
         'all_short_square': get_sweep_numbers(short_square_sweeps),
@@ -79,10 +82,10 @@ def find_ramp_sweeps(sweep_list, validate):
          2) all subthreshold ramps
          3) all superthreshold ramps
     '''
-    ramp_sweeps = get_sweeps_by_type(sweep_list, RAMP)
+    ramp_sweeps = get_sweeps_by_type(sweep_list, RAMP, validate)
     subthreshold_ramp_sweeps = [ s for s in ramp_sweeps if s.get('num_spikes',None) == 0 ]
     superthreshold_ramp_sweeps = [ s for s in ramp_sweeps if s.get('num_spikes',None) > 0 ]
-    ramp_to_rheo_sweeps = get_sweeps_by_type(sweep_list, RAMP_TO_RHEO)
+    ramp_to_rheo_sweeps = get_sweeps_by_type(sweep_list, RAMP_TO_RHEO, validate)
 
     out = { 
         'all_ramps': get_sweep_numbers(ramp_sweeps),
@@ -106,8 +109,8 @@ def find_noise_sweeps(sweep_list, validate):
          4) all noise sweeps
     '''
 
-    noise1_sweeps = get_sweeps_by_type(sweep_list, NOISE1)
-    noise2_sweeps = get_sweeps_by_type(sweep_list, NOISE2)
+    noise1_sweeps = get_sweeps_by_type(sweep_list, NOISE1, validate)
+    noise2_sweeps = get_sweeps_by_type(sweep_list, NOISE2, validate)
 
     all_noise_sweeps = sorted(noise1_sweeps + noise2_sweeps, key=lambda x: x['sweep_number'])
 
@@ -115,8 +118,8 @@ def find_noise_sweeps(sweep_list, validate):
         'all_noise': get_sweep_numbers(all_noise_sweeps)
     }
 
-    num_noise1_sweeps = len(noise1_sweeps, validate)
-    num_noise2_sweeps = len(noise2_sweeps, validate)
+    num_noise1_sweeps = len(noise1_sweeps)
+    num_noise2_sweeps = len(noise2_sweeps)
 
     if num_noise1_sweeps >= 3:
         noise1_sweep_numbers = get_sweep_numbers(noise1_sweeps)
@@ -124,7 +127,7 @@ def find_noise_sweeps(sweep_list, validate):
         out['noise1_run2'] = [ noise1_sweep_numbers[1] ]
         out['noise1_run3'] = [ noise1_sweep_numbers[2] ]
     else:
-        fail("not enough noise1 sweeps (%d)" % (num_noise1_sweeps))
+        fail("not enough noise1 sweeps (%d)" % (num_noise1_sweeps), validate)
 
     if num_noise2_sweeps >= 3:
         noise2_sweep_numbers = get_sweep_numbers(noise2_sweeps)
@@ -132,7 +135,7 @@ def find_noise_sweeps(sweep_list, validate):
         out['noise2_run2'] = [ noise2_sweep_numbers[1] ]
         out['noise2_run3'] = [ noise2_sweep_numbers[2] ]
     else:
-        fail("not enough noise2 sweeps (%d)" % (num_noise2_sweeps))
+        fail("not enough noise2 sweeps (%d)" % (num_noise2_sweeps), validate)
         
     return out
 
@@ -159,13 +162,13 @@ def find_failed_sweeps(sweep_list, data):
 
 def find_sweeps(data_file_name, sweeps, validate):
     data = {
-        'filename': input_data['filename'],
-        'sweeps': filter_sweep_list(input_data['sweeps'])
+        'filename': data_file_name,
+        'sweeps': sweeps
     }
     
-    data.update(find_short_square_sweeps(data['sweeps']))
-    data.update(find_ramp_sweeps(data['sweeps']))
-    data.update(find_noise_sweeps(data['sweeps']))
+    data.update(find_short_square_sweeps(data['sweeps'], validate))
+    data.update(find_ramp_sweeps(data['sweeps'], validate))
+    data.update(find_noise_sweeps(data['sweeps'], validate))
 
     data['failed_sweeps'] = find_failed_sweeps(data['sweeps'], data)
 
@@ -176,7 +179,7 @@ def parse_arguments():
 
     parser.add_argument('sweep_file', help='json file containing a list of sweeps for a cell')
     parser.add_argument('output_file', help='output json data config file')
-    parser.add_argument('validate', help='throw an exception if there was a problem', action='store_true', default=False)
+    parser.add_argument('--no_validate', help="don't throw an exception if there was a problem", action='store_false')
 
     args = parser.parse_args()
 
@@ -196,7 +199,7 @@ def main():
     with open(args.sweep_file, 'rb') as f:
         input_data = json.loads(f.read())
 
-    data = find_sweeps(input_data['filename'], input_data['sweeps'], args.validate)
+    data = find_sweeps(input_data['filename'], input_data['sweeps'], not args.no_validate)
 
     with open(args.output_file, 'wb') as f:
         f.write(json.dumps(data, indent=2))

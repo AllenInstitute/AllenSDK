@@ -7,12 +7,10 @@ import json, utilities
 
 from neuron_methods import GLIFNeuronMethod, METHOD_LIBRARY
 
+
 class GLIFNeuron( object ):    
     '''Generalized Linear Integrate and Fire neuron
     '''
-    
-
-    
     TYPE = "GLIF"
 
     def __init__(self, El, dt, tau, R_input, C, asc_vector, spike_cut_length, th_inf, coeffs,
@@ -25,7 +23,7 @@ class GLIFNeuron( object ):
         self.R_input = R_input
         self.C = C
         self.asc_vector = np.array(asc_vector)
-        self.spike_cut_length = spike_cut_length
+        self.spike_cut_length = int(spike_cut_length)
         self.th_inf = th_inf
 
         assert len(tau) == len(asc_vector), Exception("After-spike current vector must have same length as tau (%d vs %d)" % (asc_vector, tau))
@@ -60,7 +58,7 @@ class GLIFNeuron( object ):
         self.threshold_reset_method = self.configure_library_method('threshold_reset_method', threshold_reset_method)
 
     def __str__(self):
-        return json.dumps(self.to_dict(), default=utilities.json_handler)
+        return json.dumps(self.to_dict(), default=utilities.json_handler, indent=2)
 
     def to_dict(self):
         return {
@@ -70,6 +68,7 @@ class GLIFNeuron( object ):
             'tau': self.tau,
             'R_input': self.R_input,
             'C': self.C,
+            'asc_vector': self.asc_vector,
             'spike_cut_length': self.spike_cut_length,
             'th_inf': self.th_inf,
             'coeffs': self.coeffs,
@@ -176,10 +175,10 @@ class GLIFNeuron( object ):
 
         # array that will hold spike indices
         spike_time_steps = []
-        spike_times = []
+        grid_spike_times = []
         interpolated_spike_times = []
-        interpolated_spike_voltages = []
-        interpolated_spike_thresholds = []
+        interpolated_spike_voltage = []
+        interpolated_spike_threshold = []
 
         time_step = 0
         while time_step < num_time_steps:
@@ -209,12 +208,14 @@ class GLIFNeuron( object ):
                 '''
                 # spike_time_steps are stimulus indices when voltage surpassed threshold
                 spike_time_steps.append(time_step)
-                spike_times.append(time_step * self.dt) 
+                grid_spike_times.append(time_step * self.dt) 
 
                 # compute higher fidelity spike time/voltage/threshold by linearly interpolating 
-                interpolated_spike_times.append(self.dt*(time_step+(threshold_t0-voltage_t0)/(voltage_t1-threshold_t1-voltage_t0+threshold_t0))) #estimate non grid spike time removed -1 4-22
-                interpolated_spike_voltages.append(voltage_t0+(voltage_t1-voltage_t0)*(interpolated_spike_times[-1]-(time_step-1)*self.dt)/self.dt)
-                interpolated_spike_thresholds.append(threshold_t0+(threshold_t1-threshold_t0)*(interpolated_spike_times[-1]-(time_step-1)*self.dt)/self.dt)
+                interpolated_spike_times.append(interpolate_spike_time(self.dt, time_step, threshold_t0, threshold_t1, voltage_t0, voltage_t1))
+
+                interpolated_spike_time_offset = interpolated_spike_times[-1] - (time_step - 1) * self.dt
+                interpolated_spike_voltage.append(interpolate_spike_value(self.dt, interpolated_spike_time_offset, voltage_t0, voltage_t1))
+                interpolated_spike_threshold.append(interpolate_spike_value(self.dt, interpolated_spike_time_offset, threshold_t0, threshold_t1))
             
                 # reset voltage, threshold, and after-spike currents
                 (voltage_t0, threshold_t0, AScurrents_t0) = self.reset(voltage_t1, threshold_t1, AScurrents_t1, time_step) 
@@ -246,33 +247,41 @@ class GLIFNeuron( object ):
                 
                 time_step += 1
 
-        return voltage_out, threshold_out, AScurrents_out, np.array(spike_times), np.array(interpolated_spike_times), np.array(spike_time_steps), np.array(interpolated_spike_voltages), np.array(interpolated_spike_thresholds)
+        return {
+            'voltage': voltage_out, 
+            'threshold': threshold_out, 
+            'AScurrents': AScurrents_out,
+            'grid_spike_times': np.array(grid_spike_times), 
+            'interpolated_spike_times': np.array(interpolated_spike_times), 
+            'spike_time_steps': np.array(spike_time_steps), 
+            'interpolated_spike_voltage': np.array(interpolated_spike_voltage), 
+            'interpolated_spike_threshold': np.array(interpolated_spike_threshold)
+            }
 
 
-    def run_wrt_target_spike_train(self, voltage_t0, threshold_t0, AScurrents_t0, stim, spike_train_ids, target_spike_exists, interpolated_spike_times):
+    def run_with_spikes(self, voltage_t0, threshold_t0, AScurrents_t0, stim, 
+                        in_spike_time_steps, in_spike_times, in_spike_voltages):
         '''this functions takes an array of spike time indices and runs the model from where each of the spikes happen
         input:
             voltage_t0: scalar of the initial voltage
             threshold_t0: scalar of initial threshold
             AScurrents_t0: array of initial after spike currents
             stim:  array with the stimulus at each time
-            spike_train_ids: array of indices of the spikes (in reference to the local stimulus) that will be the start points for the model
-            target_spike_exists: True or False value.  If there is only one spike in spike_train_ids, True denotes that this was a real spike,
-                False means that the spike was inserted at the end of the current injection for reference error calculations.
+            spike_time_steps: array of indices of the spikes (in reference to the local stimulus) that will be the start points for the model
             interpolated_spike_times: array of interpolated spike times of the target trace
         Output
             actualTimeArray: an array of the actual times of the spikes. NOTE: THESE TIMES ARE CALCULATED BY ADDING THE TIME OF 
             THE INDIVIDUAL SPIKE TO THE TIME OF THE LAST SPIKE. 
-            gridTimeArray: an array of the time of the spikes with the grid time precision.NOTE: THESE TIMES ARE CALCULATED BY A
+            grid_spike_times: an array of the time of the spikes with the grid time precision.NOTE: THESE TIMES ARE CALCULATED BY A
             ADDING THE TIME OF THE INDIVIDUAL SPIKE TO THE TIME OF THE LAST SPIKE.
             voltage: array of voltage values. NOTE: IF THE MODEL NEURON SPIKES BEFORE THE TARGET THE VOLTAGE WILL 
                 NOT BE CALCULATED THEREFORE THE RESULTING VECTOR WILL NOT BE AS LONG AS THE TARGET AND ALSO WILL NOT 
                 MAKE SENSE WITH THE STIMULUS UNLESS YOU CUT IT AND OUTPUT IT TOO.
             gridISIFromLastTargSpike_array:  array of spike times of the model in reference to the last target (biological) spike 
                 (not in reference to sweep start)
-            voltageOfModelAtGridBioSpike_array:  array of scalars that contain the voltage of the model neuron when the target or bio neuron spikes.    
-            threshOfModelAtBioSpike_array: array of scalars that contain the threshold of the model neuron when the target or bio neuron spikes. 
-            NOTE: voltageOfModelAtGridBioSpike_array may be larger than the corresponding values in the threshOfModelAtBioSpike_array because the model
+            grid_spike_voltage:  array of scalars that contain the voltage of the model neuron when the target or bio neuron spikes.    
+            grid_spike_threshold: array of scalars that contain the threshold of the model neuron when the target or bio neuron spikes. 
+            NOTE: grid_spike_voltage may be larger than the corresponding values in the grid_spike_threshold because the model
                 still runs until the time of the target or bio spike even if the model has already spiked.
             SIGNIFICANT CAVEATS: There are two situatations where the storage of a spike and/or how it should be punished is unclear
                 1.  The biological or target spike train does not fire throughout the entire course of the sweep but the model does.
@@ -294,26 +303,20 @@ class GLIFNeuron( object ):
                         at the end of a sweep.
                     Currently I have chosen to do a: throw out all this data    
                 '''
-        num_spikes = len(spike_train_ids)
+
+        num_spikes = len(in_spike_time_steps)
              
         # Calculate the time of the target spike in reference to the grid point right before the spike grid point
-        grid_times_before_spike = (spike_train_ids - 1) * self.dt
-        delta_t_wrt_grid_right_before_spike = interpolated_spike_times - grid_times_before_spike
-        
+        interpolated_spike_time_offsets = in_spike_times - (in_spike_time_steps - 1) * self.dt
+
         # if there are no target spikes, just run until the model spikes
         if num_spikes == 0:  
-            assert target_spike_exists is False, Exception('Error: target_spike_exists is true, but spike_train_ids has length 0')
-
             # evaluate the model starting from the beginning until the model spikes
-            (voltage_out, threshold_out, AScurrent_matrix_out, grid_spike_time, interpolated_spike_time, yaySpike, voltage_t1, threshold_t1, 
-                AScurrents_t1, voltageOfModelAtGridBioSpike, threshOfModelAtGridBioSpike, v_ofModelAtInterpolatedBioSpike, 
-                thresh_ofModelAtInterpolatedBioSpike) = self.run_until_spike(voltage_t0, threshold_t0, AScurrents_t0, 
-                                                                             stim, 0, len(stim)-1,
-                                                                             [], target_spike_exists, self.dt) 
+            run_data = self.run_until_spike(voltage_t0, threshold_t0, AScurrents_t0, stim, 0, len(stim), [], self.dt, np.nan) 
 
-            voltage=voltage_out
-            threshold=threshold_out
-            AScurrent_matrix=AScurrent_matrix_out
+            voltage = run_data['voltage']
+            threshold = run_data['threshold']
+            AScurrent_matrix = run_data['AScurrent_matrix']
 
             if len(voltage)!=len(stim):
                 warnings.warn('YOUR VOLTAGE OUTPUT IS NOT THE SAME LENGTH AS YOUR STIMULUS')
@@ -324,72 +327,75 @@ class GLIFNeuron( object ):
                                           
             #--right now I am not going to keep track of the spikes in the model that spike if the target doesnt spike.
             #--in essence, I am thowing out the cases when the target neuron doesnt spike
-            gridISIFromLastTargSpike_array=np.array([])
-            interpolatedISIFromLastTargSpike_array=np.array([])
-            interpolatedTimeArray=np.array([]) #since there is only one spike it is already in reference to stim start
-            interpolatedVoltageArray=np.array([])
-            gridTimeArray=np.array([]) #since there is only one spike it is already in reference to stim start
-            voltageOfModelAtGridBioSpike_array=np.array([])
-            threshOfModelAtGridBioSpike_array=np.array([])
-            v_ofModelAtInterpolatedBioSpike_array=np.array([])                
-            thresh_ofModelAtInterpolatedBioSpike_array=np.array([])            
+            grid_ISI = np.array([])
+            interpolated_ISI = np.array([])
+            interpolated_spike_times = np.array([]) #since there is only one spike it is already in reference to stim start
+            grid_spike_times = np.array([]) #since there is only one spike it is already in reference to stim start
+            grid_spike_voltage = np.array([])
+            grid_spike_threshold = np.array([])
+            interpolated_spike_voltage = np.array([])                
+            interpolated_spike_threshold = np.array([])            
         else:
-            assert target_spike_exists is True, Exception('There should be a spike in the target')
-
-            # put a zero as the first index because that is where I am going to start counting from.
-            #spike_train_ids = np.insert(spike_train_ids,0,0)
-            
             # initialize the output arrays
-            interpolatedTimeArray=np.empty(num_spikes) #initialize the array
-            interpolatedVoltageArray=np.empty(num_spikes)
-            gridTimeArray=np.empty(num_spikes)
-            gridISIFromLastTargSpike_array=np.empty(num_spikes)
-            interpolatedISIFromLastTargSpike_array=np.empty(num_spikes)
-            voltageOfModelAtGridBioSpike_array=np.empty(num_spikes)
-            threshOfModelAtGridBioSpike_array=np.empty(num_spikes)
-            v_ofModelAtInterpolatedBioSpike_array=np.empty(num_spikes)
-            thresh_ofModelAtInterpolatedBioSpike_array=np.empty(num_spikes)
-            spikeIndStart=0
+            interpolated_spike_times = np.empty(num_spikes) #initialize the array
+            grid_spike_times = np.empty(num_spikes)
+            grid_ISI = np.empty(num_spikes)
+            interpolated_ISI = np.empty(num_spikes)
+            grid_spike_voltage = np.empty(num_spikes)
+            grid_spike_threshold = np.empty(num_spikes)
+            interpolated_spike_voltage = np.empty(num_spikes)
+            interpolated_spike_threshold = np.empty(num_spikes)
+            spikeIndStart = 0
     
             #Question: because real spikes actually have a width should I be adding some amount of time before I start calculating again?  Basically a biological spike should be considered threshold
-            voltage=np.empty(len(stim))
-            voltage[:]=np.nan  #TODO: figure out what this is is this numpy or what
-            threshold=np.empty(len(stim))
-            threshold[:]=np.nan
-            AScurrent_matrix=np.empty(shape=(len(stim), len(AScurrents_t0)))
-            AScurrent_matrix[:]=np.nan
+            voltage = np.empty(len(stim))
+            voltage[:] = np.nan  
+            threshold = np.empty(len(stim))
+            threshold[:] = np.nan
+            AScurrent_matrix = np.empty(shape=(len(stim), len(AScurrents_t0)))
+            AScurrent_matrix[:] = np.nan
         
             start_index = 0
             for spike_num in range(num_spikes):
                 if spike_num % 10 == 0:
                     logging.info("spike %d / %d" % (spike_num,  num_spikes))
 
-                end_index = int(spike_train_ids[spike_num])
+                end_index = int(in_spike_time_steps[spike_num])
+    
+                assert start_index < end_index, Exception("start_index > end_index: this is probably because spike_cut_length is longer than the previous inter-spike interval")
 
-                (voltage_out, threshold_out, AScurrent_matrix_out, grid_spike_time, interpolated_spike_time, yaySpike, voltage_t1, 
-                 threshold_t1, AScurrents_t1, voltageOfModelAtGridBioSpike, threshOfModelAtGridBioSpike, v_ofModelAtInterpolatedBioSpike, 
-                 thresh_ofModelAtInterpolatedBioSpike)=self.run_until_spike(voltage_t0, threshold_t0, AScurrents_t0, 
-                                                                            stim, start_index, end_index,
-                                                                            spike_train_ids, target_spike_exists, int(delta_t_wrt_grid_right_before_spike[spike_num]))  
+                run_data = self.run_until_spike(voltage_t0, threshold_t0, AScurrents_t0, 
+                                                stim, start_index, end_index, 
+                                                in_spike_time_steps, 
+                                                interpolated_spike_time_offsets[spike_num],
+                                                in_spike_voltages[spike_num])
 
-                voltage[start_index:end_index] = voltage_out
-                threshold[start_index:end_index] = threshold_out
-                AScurrent_matrix[start_index:end_index,:] = AScurrent_matrix_out
 
-                gridISIFromLastTargSpike_array[spike_num] = grid_spike_time
-                interpolatedISIFromLastTargSpike_array[spike_num] = interpolated_spike_time
-                interpolatedTimeArray[spike_num] = interpolated_spike_time+(start_index)*self.dt #since there is only one spike it is already in reference to stim start
-                gridTimeArray[spike_num] = grid_spike_time+(start_index)*self.dt #since there is only one spike it is already in reference to stim start
-                voltageOfModelAtGridBioSpike_array[spike_num] = voltageOfModelAtGridBioSpike
-                threshOfModelAtGridBioSpike_array[spike_num] = threshOfModelAtGridBioSpike
-                v_ofModelAtInterpolatedBioSpike_array[spike_num] = v_ofModelAtInterpolatedBioSpike               
-                thresh_ofModelAtInterpolatedBioSpike_array[spike_num] = thresh_ofModelAtInterpolatedBioSpike                
+                voltage[start_index:end_index] = run_data['voltage']
+                threshold[start_index:end_index] = run_data['threshold']
+                AScurrent_matrix[start_index:end_index,:] = run_data['AScurrent_matrix']
 
-                voltage_t0 = voltage_t1
-                threshold_t0 = threshold_t1
-                AScurrents_t0 = AScurrents_t1
+                grid_ISI[spike_num] = run_data['grid_spike_time']
+                interpolated_ISI[spike_num] = run_data['interpolated_spike_time']
+                interpolated_spike_times[spike_num] = run_data['interpolated_spike_time'] + start_index * self.dt 
+                grid_spike_times[spike_num] = run_data['grid_spike_time'] + start_index * self.dt 
+                grid_spike_voltage[spike_num] = run_data['grid_spike_voltage']
+                grid_spike_threshold[spike_num] = run_data['grid_spike_threshold']
+                interpolated_spike_voltage[spike_num] = run_data['interpolated_spike_voltage']
+                interpolated_spike_threshold[spike_num] = run_data['interpolated_spike_threshold']
+
+                voltage_t0 = run_data['voltage_t0']
+                threshold_t0 = run_data['threshold_t0']
+                AScurrents_t0 = run_data['AScurrents_t0']
 
                 start_index = end_index
+
+                if self.spike_cut_length > 0:
+                    voltage[end_index:end_index+self.spike_cut_length] = np.nan
+                    threshold[end_index:end_index+self.spike_cut_length] = np.nan
+                    AScurrent_matrix[end_index:end_index+self.spike_cut_length,:] = np.nan
+
+                    start_index += self.spike_cut_length
                 
 #                if spike_num==1:
 #                    AScurrent_matrix[spike_num,:]=AScurrent_matrix_out #initializing the matrix
@@ -397,49 +403,50 @@ class GLIFNeuron( object ):
 #                    AScurrent_matrix=append(AScurrent_matrix, AScurrent_matrix_out, axis=0)
 #                            
             #--get the voltage of the last part of the stim sweep after the last biological spike
-            #--currently I am throwing out the data (I am not recording spike times etc) if the model spikes in this time perion  
-            (voltage_out, threshold_out, AScurrent_matrix_out, grid_spike_time, interpolated_spike_time, yaySpike, voltage_t1, threshold_t1, \
-                AScurrents_t1, voltageOfModelAtGridBioSpike, threshOfModelAtGridBioSpike, v_ofModelAtInterpolatedBioSpike, thresh_ofModelAtInterpolatedBioSpike)= \
-                self.run_until_spike(voltage_t0, threshold_t0, AScurrents_t0, 
-                                     stim, spike_train_ids[-1].astype(int), len(stim),
-                                     spike_train_ids, target_spike_exists, self.dt) #there is no end spike so don't put in a spike
+            #--currently I am throwing out the data (I am not recording spike times etc) if the model spikes in this time period  
+            run_data = self.run_until_spike(voltage_t0, threshold_t0, AScurrents_t0, 
+                                            stim, start_index, len(stim),
+                                            in_spike_time_steps, self.dt, np.nan) #there is no end spike so don't put in a spike
 
-            voltage[spike_train_ids[-1]:]=voltage_out
-            threshold[spike_train_ids[-1]:]=threshold_out
-            AScurrent_matrix[spike_train_ids[-1]:,:]=AScurrent_matrix_out
-
-
-        #---some simple error function to make sure things are working. 
-        if np.any(np.isnan(voltage)):
-            logging.error(self)
-            logging.error('voltage indices that are NAN: %s' % np.where(np.isnan(voltage)))
-            logging.error('spike indices: %s' % spike_train_ids)
-            raise Exception('The voltage vector has not been filled to the length of the stimulus')
-        if np.any(np.isnan(threshold)):
-            logging.error(self)
-            logging.error('threshold indices that are NAN: %s' % np.where(np.isnan(threshold)))
-            logging.error('spike indices' % spike_train_ids)
-            raise Exception('The threshold vector has not been filled to the length of the stimulus')         
-        if np.any(np.isnan(AScurrent_matrix)):
-            raise Exception('Your after-spike current vector has not been filled to the length of the stimulus')
+            voltage[start_index:] = run_data['voltage']
+            threshold[start_index:] = run_data['threshold']
+            AScurrent_matrix[start_index:,:] = run_data['AScurrent_matrix']
 
 
         #--the following error functions only work in the case where I am thowing out the sets of data where the target doesnt spike
-        if len(interpolatedTimeArray)!=num_spikes or len(interpolatedVoltageArray)!=num_spikes or len(gridTimeArray)!=num_spikes or \
-            len(gridISIFromLastTargSpike_array)!=num_spikes or len( interpolatedISIFromLastTargSpike_array)!=num_spikes or \
-            len(voltageOfModelAtGridBioSpike_array)!=num_spikes or len(threshOfModelAtGridBioSpike_array)!=num_spikes or \
-            len(v_ofModelAtInterpolatedBioSpike_array)!=num_spikes or len(thresh_ofModelAtInterpolatedBioSpike_array)!=num_spikes:
+        if ( len(interpolated_spike_times) != num_spikes or 
+             len(grid_spike_times) != num_spikes or 
+             len(grid_ISI) != num_spikes or 
+             len(interpolated_ISI) != num_spikes or 
+             len(grid_spike_voltage) != num_spikes or 
+             len(grid_spike_threshold)!=num_spikes or 
+             len(interpolated_spike_voltage) != num_spikes or 
+             len(interpolated_spike_threshold) != num_spikes ):
             raise Exception('The number of spikes in your output does not match your target')
             
-        return voltage, threshold, AScurrent_matrix, gridTimeArray, interpolatedTimeArray, gridISIFromLastTargSpike_array, interpolatedISIFromLastTargSpike_array, voltageOfModelAtGridBioSpike_array, threshOfModelAtGridBioSpike_array, v_ofModelAtInterpolatedBioSpike_array, thresh_ofModelAtInterpolatedBioSpike_array
+        return {
+            'voltage': voltage,
+            'threshold': threshold,
+            'AScurrent_matrix': AScurrent_matrix,
+            'grid_spike_times': grid_spike_times,
+            'interpolated_spike_times': interpolated_spike_times,
+            'grid_ISI': grid_ISI,
+            'interpolated_ISI': interpolated_ISI,
+            'grid_spike_voltage': grid_spike_voltage,
+            'interpolated_spike_voltage': interpolated_spike_voltage,
+            'grid_spike_threshold': grid_spike_threshold,
+            'interpolated_spike_threshold': interpolated_spike_threshold
+        }
                 
     def run_until_spike(self, voltage_t0, threshold_t0, AScurrents_t0, 
                         stim, start_index, end_index, 
-                        spike_time_steps, target_spike_exists, delta_t_wrt_grid_right_before_spike):
+                        spike_time_steps, 
+                        interpolated_spike_time_offset,
+                        spike_voltage):
         '''
-        Runs the Mihalas Nieber GLIF model for the stimulus input until the step max is reached
+        Runs The Mihalas Nieber Glif Model For The Stimulus Input Until The Step Max Is Reached
         Inputs:
-            stepMax: scalar number of indices before a spike has to happen or it is then forced. depreciated 5-22
+            Stepmax: Scalar Number Of Indices Before A Spike Has to happen or it is then forced. depreciated 5-22
             voltage_t0(scalar): voltage at beginning of simulation 
             threshold_t0(scalar): threshold for a spike at the beginning of the simulation. 
             init_AScurrent (array):  values of after spike currents at the beginning of the simulation
@@ -448,9 +455,9 @@ class GLIFNeuron( object ):
               from the values that are set right after a spike
             stim (array): currently this is part of stimulus array starting somewhere in the middle.  This stimulus 
                 array must be the length you want the stimulus to run until. 
-            target_spike_exists: True or False value.  If there is only one spike in spike_train_ids, True denotes that this was a real spike,
+            target_spike_exists: True or False value.  If there is only one spike in spike_time_steps, True denotes that this was a real spike,
                 False means that the spike was inserted at the end of the current injection for reference error calculations.  
-            delta_t_wrt_grid_right_before_spike: this is the time between the spike time and the time of the previous grid point.  This
+            interpolated_spike_time_offset: this is the time between the spike time and the time of the previous grid point.  This
                 is used to calculate the voltage at the interpolated time.  It is needed because you calculate the voltage between the
                 two grid points and multiply by this value. This should be set to dt the spike happens at the grid point.
         Outputs:
@@ -459,12 +466,12 @@ class GLIFNeuron( object ):
                  
                 #need to have it return the values at 34000 but not do a reset
                 
-            gridISIFromLastTargSpike_array=append(gridISIFromLastTargSpike_array, grid_spike_time)
-            interpolatedISIFromLastTargSpike_array=append(interpolatedISIFromLastTargSpike_array, interpolated_spike_time)
-            interpolatedTimeArray=append(interpolatedTimeArray, interpolated_spike_time) #since there is only one spike it is already in reference to stim start
-            gridTimeArray=append(gridTimeArray, grid_spike_time) #since there is only one spike it is already in reference to stim start
-            voltageOfModelAtGridBioSpike_array=append(voltageOfModelAtGridBioSpike_array, voltageOfModelAtGridBioSpike)
-            threshOfModelAtGridBioSpike_array=append(threshOfModelhis is in reference t=0 at the start of this function. 
+            grid_ISI=append(grid_ISI, grid_spike_time)
+            interpolated_ISI=append(interpolated_ISI, interpolated_spike_time)
+            interpolated_spike_times=append(interpolated_spike_times, interpolated_spike_time) #since there is only one spike it is already in reference to stim start
+            grid_spike_times=append(grid_spike_times, grid_spike_time) #since there is only one spike it is already in reference to stim start
+            grid_spike_voltage=append(grid_spike_voltage, voltageOfModelAtGridBioSpike)
+            grid_spike_threshold=append(threshOfModelhis is in reference t=0 at the start of this function. 
             interpolated_spike_time (scalar): interpolated or extrapolated actual time of a spike. NOTE this is in reference t=0 at the
                  start of this function. 
             yaySpike (logical): True if there was a spike within the allotted time.  False if the spike needed to be forced.
@@ -474,17 +481,10 @@ class GLIFNeuron( object ):
             voltage_t1 (scalar): value of voltage of neuron at last step (when the bio neuron spikes)
             threshold_t1 (scalar: value of threshold at the last step (when the bio neuron spikes
         '''
-#        def return_false_s():
-#            return False
-#        return_false = autojit(return_false_s)
-#        yaySpike = return_false() #initialize value
-
-        #making copies just to make sure this thing is doing pass by reference    
-        
-        AScurrents_t0 = np.copy(AScurrents_t0)
 
         #--preallocate arrays and matricies
-        num_time_steps= end_index - start_index
+        num_time_steps = end_index - start_index
+        num_spikes = len(spike_time_steps)
 
         voltage_out=np.empty(num_time_steps)
         voltage_out[:]=np.nan
@@ -524,33 +524,56 @@ class GLIFNeuron( object ):
         #figuring out whether model neuron spiked or not        
         for time_step in range(0, num_time_steps): 
             if voltage_out[time_step]>threshold_out[time_step]:
-                grid_spike_time=self.dt*time_step #not that this should be time_step even though it is index+1 in runModel function because here it isnt recorded until the next step
-                interpolated_spike_time=self.dt*((time_step-1)+(threshold_out[time_step-1]-voltage_out[time_step-1])/(voltage_out[time_step]-threshold_out[time_step]-voltage_out[time_step-1]+threshold_out[time_step-1])) 
+                grid_spike_time = self.dt * time_step #not that this should be time_step even though it is index+1 in runModel function because here it isnt recorded until the next step
+                interpolated_spike_time = interpolate_spike_time(self.dt, time_step-1, threshold_out[time_step-1], threshold_out[time_step], voltage_out[time_step-1], voltage_out[time_step])
                 break
                 
-        # if the last voltage is above threshold and there hasen't already been a spike
+        # if the last voltage is above threshold and there hasn't already been a spike
         if voltage_t0 > threshold_out[-1] and grid_spike_time is None: 
             grid_spike_time = self.dt*num_time_steps
-            interpolated_spike_time=self.dt*((num_time_steps-1)+(threshold_out[num_time_steps-1]-voltage_out[num_time_steps-1])/(voltage_t0-threshold_t0-voltage_out[num_time_steps-1]+threshold_out[num_time_steps-1])) 
+            interpolated_spike_time = interpolate_spike_time(self.dt, num_time_steps - 1, threshold_out[num_time_steps-1], threshold_t0, voltage_out[num_time_steps-1], voltage_t0)
+
                         
         # if the target spiked, reseting at the end so that next round will start at reset but not recording it in the voltage here.
-        if target_spike_exists: 
-            (voltage_t0, threshold_t0, AScurrents_t0)=self.reset(voltage_t1, threshold_t1, AScurrents_t1, time_step) #reset the variables
+        if num_spikes > 0:
+            #
+            time_between_spikes=(end_index-start_index)*self.dt
+            r=self.AScurrent_reset_method.params['r']
+            AScurrents_at_next_spike=self.asc_vector * self.coeffs['asc_vector']*r * np.exp(self.k * time_between_spikes)
+            (voltage_t0, threshold_t0, AScurrents_t0) = self.reset(spike_voltage, spike_voltage, AScurrents_at_next_spike, time_step) #reset the variables
 
         #if the model never spiked, extrapolate to guess when it would have spiked
         if grid_spike_time is None: 
-            # formula is self.dt*(num_time_steps)/(1-(threshold_t1-voltage_t1)/(threshold_t0-voltage_t0))
-            interpolated_spike_time = self.dt*(num_time_steps)/(1-(threshold_t1-voltage_t1)/(threshold_t0-voltage_t0)) 
-            grid_spike_time = np.ceil(interpolated_spike_time/self.dt)*self.dt  #grid spike time based off extrapolated spike time (changed floor to ceil 5-13-13
+            interpolated_spike_time = extrapolate_spike_time(self.dt, num_time_steps, threshold_t0, threshold_t1, voltage_t0, voltage_t1)
+            grid_spike_time = np.ceil(interpolated_spike_time / self.dt) * self.dt  #grid spike time based off extrapolated spike time (changed floor to ceil 5-13-13
+
+        interpolated_spike_voltage = interpolate_spike_value(self.dt, interpolated_spike_time_offset, voltage_out[-1], voltage_t1)
+        interpolated_spike_threshold = interpolate_spike_value(self.dt, interpolated_spike_time_offset, threshold_out[-1], threshold_t1)
         
-        v_ofModelAtInterpolatedBioSpike = voltage_out[-1]+delta_t_wrt_grid_right_before_spike*(voltage_t1-voltage_out[-1])/self.dt
-        thresh_ofModelAtInterpolatedBioSpike = threshold_out[-1]+delta_t_wrt_grid_right_before_spike*(threshold_t1-threshold_out[-1])/self.dt
-        
-        return voltage_out, threshold_out, AScurrent_matrix, \
-            grid_spike_time, interpolated_spike_time, grid_spike_time is not None, \
-            voltage_t0, threshold_t0, AScurrents_t0, voltage_t1, threshold_t1, \
-            v_ofModelAtInterpolatedBioSpike, thresh_ofModelAtInterpolatedBioSpike 
+        return {
+            'voltage': voltage_out, 
+            'threshold': threshold_out, 
+            'AScurrent_matrix': AScurrent_matrix, 
+            'grid_spike_time': grid_spike_time,
+            'interpolated_spike_time': interpolated_spike_time, 
+            'interpolated_spike_voltage': interpolated_spike_voltage,
+            'interpolated_spike_threshold': interpolated_spike_threshold,
+            'spike_exists': grid_spike_time is not None,
+            'voltage_t0': voltage_t0, 
+            'threshold_t0': threshold_t0, 
+            'AScurrents_t0': AScurrents_t0, 
+            'grid_spike_voltage': voltage_t1, 
+            'grid_spike_threshold': threshold_t1            
+            }
 
 
-    
+
+def interpolate_spike_time(dt, time_step, threshold_t0, threshold_t1, voltage_t0, voltage_t1):
+    return dt * (time_step + (threshold_t0 - voltage_t0) / (voltage_t1 - threshold_t1 - voltage_t0 + threshold_t0))
+
+def extrapolate_spike_time(dt, num_time_steps, threshold_t0, threshold_t1, voltage_t0, voltage_t1):
+    return dt * num_time_steps / (1 - (threshold_t1 - voltage_t1) / (threshold_t0 - voltage_t0)) 
+
+def interpolate_spike_value(dt, interpolated_spike_time_offset, v0, v1):
+    return v0 + (v1 - v0) * interpolated_spike_time_offset / dt
 

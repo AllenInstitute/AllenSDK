@@ -18,22 +18,22 @@ def get_error_function_by_name(func_name):
     if func_name=="VSD":
         return square_voltage_dist_list_error
 
-def TRD_list_error(paramGuess, experiment):
+def TRD_list_error(param_guess, experiment):
     '''
     gets called from the optimizer once each optimizer iteration.
     TRDerror iterates over the stim_list list of stimulus vectors and passes them to the neuron run method
-    @param paramGuess: a vector of scalar parameters
+    @param param_guess: a vector of scalar parameters
     @param experiment: a neuron experiment wrapping the neuron class
     @return: a scalar representing the error over all items in the stimulus list
     @note: the neuron experiment must have a stim_list member
     '''        
     TRD_list = []
-    
-    (voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, voltageOfModelAtGridBioSpike_list, threshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, thresholdOfModelAtInterpolatedBioSpike_list) = experiment.run(paramGuess)
+
+    run_data = experiment.run(param_guess)
   
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
-        if len(experiment.spike_index_list[stim_list_index])==0:
+        if len(experiment.spike_time_steps[stim_list_index])==0:
             TRDout=[0]
         else:
             #bug found 5-16-13: TRD was being calculated in terms of stimulus spike time instead of ISI type spike time.  See beloww            
@@ -43,13 +43,13 @@ def TRD_list_error(paramGuess, experiment):
 #            print 'ISITarget', ISITarget
 #            print 'gridISIFromLastTargSpike_list', gridISIFromLastTargSpike_list[stim_list_index]
 #            print 'diff between ISITarget and ISI Model from last target spike', ISITarget-gridISIFromLastTargSpike_list[stim_list_index]
-            TRDout=TRD(ISITarget, interpolatedISIFromLastTargSpike_list[stim_list_index])
+            TRDout=TRD(ISITarget, run_data['interpolated_ISI'][stim_list_index])
         TRD_list.append(TRDout) 
 #    print 'TRD_list', TRD_list
     concatenateTRDList=concatenate(TRD_list)          
-#    print 'param Guess', paramGuess, 'TRD', mean(concatenateTRDList)
+#    print 'param Guess', param_guess, 'TRD', mean(concatenateTRDList)
     out =mean(concatenateTRDList) 
-#    print 'paramGuess', paramGuess
+#    print 'param_guess', param_guess
 #    print 'mean(concatenateTRDList): ', out
     return out
 
@@ -77,31 +77,31 @@ def TRD(tSpikeTargetISI, tSpikeObtainedISI):
 
     return out
 
-def square_time_dist_list_error(paramGuess, experiment):
+def square_time_dist_list_error(param_guess, experiment):
     '''
     square_time_dist_list_error gets called from the optimizer once each optimizer iteration.
     It iterates over the stim_list list of stimulus vectors and passes them to the neuron run method.
     inputs:
-        paramGuess: a vector of scalar parameters.
+        param_guess: a vector of scalar parameters.
         experiment: a neuron experiment wrapping the neuron class.
     returns 
     a scalar representing the error over all items in the stimulus list
     @note: the neuron experiment must have a stim_list member
     ''' 
     TSD_list = []   
-    (voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, voltageOfModelAtGridBioSpike_list, threshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, thresholdOfModelAtInterpolatedBioSpike_list) = experiment.run(paramGuess)
+    run_data = experiment.run(param_guess)
 
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
-        if len(experiment.spike_index_list[stim_list_index])==0:
+        if len(experiment.spike_time_steps[stim_list_index])==0:
             TSDout=[0]
         else:
-            ISITarget=calculateISIFromIntTime(0, experiment.interpolated_spike_times[stim_list_index], experiment.grid_spike_times[stim_list_index])
+            ISITarget = calculateISIFromIntTime(0, experiment.interpolated_spike_times[stim_list_index], experiment.grid_spike_times[stim_list_index])
 #            print '-----IN TRD FUNCTION-------'
 #            print 'ISITarget', ISITarget
 #            print 'gridISIFromLastTargSpike_list', gridISIFromLastTargSpike_list[stim_list_index]
 #            print 'diff between ISITarget and ISI Model from last target spike', ISITarget-gridISIFromLastTargSpike_list[stim_list_index]
-            TSDout=squareTimeDist(ISITarget, interpolatedISIFromLastTargSpike_list[stim_list_index])
+            TSDout = squareTimeDist(ISITarget, run_data['interpolated_ISI'][stim_list_index])
         TSD_list.append(TSDout) 
 #    print 'SD_list', SD_list
     concatenateTSDList=concatenate(TSD_list)    
@@ -129,35 +129,36 @@ def squareTimeDist(tSpikeTargetISI, tSpikeObtainedISI):  #FOR THIS I NEED THE VO
 
     return out
 
-def square_voltage_dist_list_error(paramGuess, experiment):
+def square_voltage_dist_list_error(param_guess, experiment):
     '''
     squareDistListError gets called from the optimizer once each optimizer iteration.
     It iterates over the stim_list list of stimulus vectors and passes them to the neuron run method.
     inputs:
-        paramGuess: a vector of scalar parameters.
+        param_guess: a vector of scalar parameters.
         experiment: a neuron experiment wrapping the neuron class.
     returns: 
         a scalar representing the error over all items in the stimulus list
     @note: the neuron experiment must have a stim_list member
     ''' 
 
-    logging.info('running parameter guess: %s' % paramGuess)
+    logging.info('running parameter guess: %s' % param_guess)
 
     VSD_list = []
 
-    (voltage_list, threshold_list, AScurrentMatrix_list, modelGridSpikeTime_list, 
-     modelSpikeInterpolatedTime_list, gridISIFromLastTargSpike_list, interpolatedISIFromLastTargSpike_list, 
-     voltageOfModelAtGridBioSpike_list, threshOfModelAtGridBioSpike_list, voltageOfModelAtInterpolatedBioSpike_list, 
-     thresholdOfModelAtInterpolatedBioSpike_list) = experiment.run(paramGuess)
+    run_data = experiment.run(param_guess)
   
  # Print things out here
   
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
-        if (len(experiment.spike_index_list[stim_list_index])==0 or experiment.target_spike_mask[stim_list_index]==False):
-            VSDout=[0]
+        if (len(experiment.spike_time_steps[stim_list_index]) == 0 or experiment.target_spike_mask[stim_list_index] == False):
+            VSDout = [0]
         else:
-            VSDout=square_voltage_dist(voltageOfModelAtInterpolatedBioSpike_list[stim_list_index], thresholdOfModelAtInterpolatedBioSpike_list[stim_list_index], experiment)
+            print run_data['interpolated_spike_voltage'][stim_list_index]
+            print run_data['interpolated_spike_threshold'][stim_list_index]
+            VSDout = square_voltage_dist(run_data['interpolated_spike_voltage'][stim_list_index], 
+                                         run_data['interpolated_spike_threshold'][stim_list_index], 
+                                         experiment)
         VSD_list.append(VSDout) 
 
 
@@ -180,7 +181,7 @@ def square_voltage_dist_list_error(paramGuess, experiment):
 #    #TODO: IF YOU WANT TO INCORPORATE IT IN THE FUTURE YOU NEED TO BUILD INTO THE OPTIMIZER SO CREATE NEW DIRECTIORIES FOR EACH NEW FITNEURON START UP
 #
 #    #have to annotate out here since there is no knowledge of the the parameters inside
-#    plt.annotate(str(experiment.fit_names_list)+ str(paramGuess), 
+#    plt.annotate(str(experiment.fit_names_list)+ str(param_guess), 
 #             xy=(.05, .975),
 #             xycoords='figure fraction',
 #             horizontalalignment='left', verticalalignment='top',
@@ -199,7 +200,8 @@ def square_voltage_dist_list_error(paramGuess, experiment):
 #            plt.savefig(os.path.join(directory, 'iter_'+str(int(lastFileNum)+1).zfill(4)+'.png'), format='png')
 #    #plt.show()
 #    plt.close()
-        
+    
+    print 'VSD list', concatenateVSDList     
     return mean(concatenateVSDList) 
 
 def square_voltage_dist(voltageOfModelAtBioSpike_array, threshOfModelAtBioSpike_array, experiment):
