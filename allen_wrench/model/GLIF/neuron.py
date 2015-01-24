@@ -540,8 +540,8 @@ class GLIFNeuron( object ):
         if num_spikes > 0:
             #
             time_between_spikes=(end_index-start_index)*self.dt
-            r=self.AScurrent_reset_method.params['r']
-            AScurrents_at_next_spike=self.asc_vector * self.coeffs['asc_vector']*r * np.exp(self.k * time_between_spikes)
+            r = self.AScurrent_reset_method.params.get('r', 1.0)
+            AScurrents_at_next_spike=self.asc_vector * self.coeffs['asc_vector'] * r * np.exp(self.k * time_between_spikes)
             (voltage_t0, threshold_t0, AScurrents_t0) = self.reset(spike_voltage, spike_voltage, AScurrents_at_next_spike, time_step) #reset the variables
 
         #if the model never spiked, extrapolate to guess when it would have spiked
