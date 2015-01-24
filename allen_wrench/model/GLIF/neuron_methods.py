@@ -85,7 +85,7 @@ def reset_AScurrent_sum(neuron, AScurrents_t0, t, r):
 def reset_AScurrent_none(neuron, AScurrents_t0, t):
     if np.sum(AScurrents_t0)!=0:
         raise Exception('You are running a LIF but the AScurrents are not zero!')
-    return 0
+    return np.zeros(len(AScurrents_t0))
 
 # voltage reset rules
 # all return voltage_t1
