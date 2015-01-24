@@ -502,7 +502,11 @@ class GLIFPreprocessor(object):
                     plt.show(block=False)                   
             
                 #TODO:  Corinne look to see if these were calculated with zeroed out El if not does is matter?
-            
+                if isinstance(slope_at_min_expVar_list, np.ndarray):
+                    slope_at_min_expVar_list=float(slope_at_min_expVar_list[0])
+                if isinstance(intercept_at_min_expVar_list, np.ndarray):
+                    intercept_at_min_expVar_list=float(intercept_at_min_expVar_list[0])
+
                 method_config['params'] = {
                         'a': slope_at_min_expVar_list,
                         'b': intercept_at_min_expVar_list

@@ -30,6 +30,8 @@ def TRD_list_error(param_guess, experiment):
     TRD_list = []
 
     run_data = experiment.run(param_guess)
+    print "run_data['interpolated_spike_times']", run_data['interpolated_spike_times']
+    print "experiment.interpolated_spike_times", experiment.interpolated_spike_times
   
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
@@ -39,6 +41,7 @@ def TRD_list_error(param_guess, experiment):
             #bug found 5-16-13: TRD was being calculated in terms of stimulus spike time instead of ISI type spike time.  See beloww            
             #TRDout=TRD(experiment.interpolated_spike_time_target_list[stim_list_index], spikeActualTime_list[stim_list_index])#BUGGY!
             ISITarget=calculateISIFromIntTime(0, experiment.interpolated_spike_times[stim_list_index], experiment.grid_spike_times[stim_list_index])
+            
 #            print '-----IN TRD FUNCTION-------'
 #            print 'ISITarget', ISITarget
 #            print 'gridISIFromLastTargSpike_list', gridISIFromLastTargSpike_list[stim_list_index]

@@ -20,7 +20,12 @@
       "name": "linear"
     }, 
     "dt": 5e-05, 
-    "El": 0 
+    "El": 0,
+    "tau": [
+        1,
+        1,
+        1
+    ]
   }, 
   "optimizer": {
     "save_file_name": "default_optimizer_file_name.json", 
@@ -36,35 +41,21 @@
     "iteration_info": [], 
     "ftol": 1e-07, 
     "sigma_outer": 0.3, 
-    "neuron_number": 1, 
-    "param_upper_bounds": [
-      1, 
-      1, 
-      1, 
-      1, 
-      1
-    ], 
     "internal_iterations": 1, 
     "init_params": [
       1.0, 
       1.0, 
+      1.0,
       1.0, 
+      1.0,
+      1.0,
       1.0
     ], 
     "init_threshold": 0.02, 
     "sigma_inner": 0.01, 
     "init_voltage": 0.0, 
-    "neuron_num": 1, 
     "inner_iterations": 1, 
-    "dt": 5e-05, 
     "outer_iterations": 1, 
-    "param_lower_bounds": [
-      0, 
-      0, 
-      0, 
-      0, 
-      0
-    ], 
     "param_fit_names": [
         "C",
 		"asc_vector",

@@ -141,7 +141,9 @@ class GLIFNeuron( object ):
         voltage_t1 = self.voltage_reset_method(self, voltage_t0)
         threshold_t1 = self.threshold_reset_method(self, threshold_t0, voltage_t1)
 
-        assert voltage_t1 < threshold_t1, Exception("Voltage reset above threshold: time step (%f) voltage (%f) reset (%f)" % (t, voltage_t1, threshold_t1))
+        if voltage_t1 < threshold_t1:
+            print 'values comming into reset are V', voltage_t0, 'th', threshold_t0, 'AS', AScurrents_t0, 't', t
+            Exception("Voltage reset above threshold: time step (%f) voltage (%f) reset (%f)" % (t, voltage_t1, threshold_t1))
 
         return voltage_t1, threshold_t1, AScurrents_t1
     

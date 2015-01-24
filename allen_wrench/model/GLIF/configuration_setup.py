@@ -194,7 +194,7 @@ class ConfigurationSetup( object ):
 
         # initialize the optimizer
         self.optimizer = GLIFOptimizer(experiment = self.experiment, 
-                                       dt = self.experiment.dt,              
+                                       dt = self.neuron.dt,              
                                        outer_iterations = self.optimizer_config['outer_iterations'],
                                        inner_iterations = self.optimizer_config['inner_iterations'],
                                        sigma_inner = self.optimizer_config['sigma_inner'],
@@ -202,7 +202,6 @@ class ConfigurationSetup( object ):
                                        param_fit_names = self.optimizer_config['param_fit_names'],
                                        stim = optimize_data['current'],
                                        error_function_name = self.optimizer_config['error_function'],
-                                       neuron_num = self.optimizer_config['neuron_number'],
                                        xtol = self.optimizer_config['xtol'],
                                        ftol = self.optimizer_config['ftol'],
                                        internal_iterations = self.optimizer_config['internal_iterations'])

@@ -22,7 +22,7 @@ class GLIFOptimizer(object):
                  outer_iterations, inner_iterations, 
                  sigma_outer, sigma_inner,
                  param_fit_names, stim, 
-                 error_function_name, neuron_num, 
+                 error_function_name, 
                  xtol, ftol, 
                  internal_iterations, init_params=None):
 
@@ -37,7 +37,6 @@ class GLIFOptimizer(object):
         self.param_fit_names = param_fit_names
         self.stim = stim
         self.error_function = error_functions.get_error_function_by_name(error_function_name)
-        self.neuron_num = neuron_num
         self.xtol = xtol
         self.ftol = ftol
         self.internal_iterations = internal_iterations
@@ -49,14 +48,12 @@ class GLIFOptimizer(object):
 
     def to_dict(self):
         return {
-            'dt': self.dt,
             'outer_iterations': self.outer_iterations,
             'inner_iterations': self.inner_iterations,
             'init_params': self.init_params,
             'sigma_outer': self.sigma_outer,
             'sigma_inner': self.sigma_inner,
             'param_fit_names': self.param_fit_names,
-            'neuron_num': self.neuron_num,
             'xtol': self.xtol,
             'ftol': self.ftol,
             'internal_iterations': self.internal_iterations,
