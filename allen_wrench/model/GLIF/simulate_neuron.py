@@ -25,16 +25,14 @@ def simulate_sweep(neuron, stimulus, init_voltage, init_threshold, init_AScurren
 
     logging.debug("simulating")
 
-    (voltage, threshold, AScurrent_matrix, grid_spike_time, 
-     interpolated_spike_time, grid_spike_index, interpolated_spike_voltage, 
-     interpolated_spike_threshold) = neuron.run(init_voltage, 
-                                                init_threshold,
-                                                init_AScurrents,
-                                                stimulus)    
+    data = neuron.run(init_voltage, 
+                      init_threshold,
+                      init_AScurrents,
+                      stimulus)    
     
     logging.debug("simulation time %f" % (time.time() - start_time))
     
-    return voltage
+    return data['voltage']
 
 
 def load_sweep(file_name, sweep_number):
