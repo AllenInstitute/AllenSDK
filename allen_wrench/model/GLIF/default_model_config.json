@@ -23,8 +23,11 @@
     "El": 0,
     "tau": [
         1,
-        1,
         1
+    ],
+    "asc_vector":[
+    	0,
+    	0
     ]
   }, 
   "optimizer": {

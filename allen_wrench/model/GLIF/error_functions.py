@@ -26,12 +26,13 @@ def TRD_list_error(param_guess, experiment):
     @param experiment: a neuron experiment wrapping the neuron class
     @return: a scalar representing the error over all items in the stimulus list
     @note: the neuron experiment must have a stim_list member
-    '''        
+    '''   
+    logging.info('running parameter guess: %s' % param_guess)
+
+         
     TRD_list = []
 
     run_data = experiment.run(param_guess)
-    print "run_data['interpolated_spike_times']:", run_data['interpolated_spike_times']
-    print "experiment.interpolated_spike_times:", experiment.interpolated_spike_times
   
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
@@ -53,6 +54,8 @@ def TRD_list_error(param_guess, experiment):
     concatenateTRDList=concatenate(TRD_list)          
 #    print 'param Guess', param_guess, 'TRD', mean(concatenateTRDList)
     out =mean(concatenateTRDList) 
+    logging.info('TRD: %f' % mean(concatenateTRDList))
+
 #    print 'param_guess', param_guess
 #    print 'mean(concatenateTRDList): ', out
     return out
