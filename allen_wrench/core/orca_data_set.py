@@ -62,18 +62,18 @@ class OrcaDataSet( EphysDataSet ):
     def get_spike_times(self, sweep_number):
         with h5py.File(self.file_name,'r') as f:
             if "analysis" not in f.keys():
-		return []
+                return []
 
             analysis_dir = f["analysis"]
 
             if "spike_times" not in analysis_dir.keys():
-		return []
+                return []
 
             spike_dir = analysis_dir["spike_times"]
             sweep_name = "Sweep_%d" % sweep_number
 
             if sweep_name not in spike_dir.keys():
-		return []
+                return []
 
             return spike_dir[sweep_name].value
 
@@ -85,15 +85,15 @@ class OrcaDataSet( EphysDataSet ):
 
             analysis_dir = f["analysis"]
             if "spike_times" not in analysis_dir.keys():
-		analysis_dir.create_group("spike_times")
+                analysis_dir.create_group("spike_times")
 
             spike_dir = analysis_dir["spike_times"]
 
             # see if desired dataset already exists
             sweep_name = "Sweep_%d" % sweep_number
             if sweep_name in spike_dir.keys():
-		# rewriting data -- delete old dataset
-		del spike_dir[sweep_name]
+                # rewriting data -- delete old dataset
+                del spike_dir[sweep_name]
 
             spike_dir.create_dataset(sweep_name, data=spike_times, dtype='f8')
             
