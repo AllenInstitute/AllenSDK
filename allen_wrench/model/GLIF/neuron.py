@@ -60,6 +60,24 @@ class GLIFNeuron( object ):
     def __str__(self):
         return json.dumps(self.to_dict(), default=utilities.json_handler, indent=2)
 
+    @staticmethod
+    def from_dict(d):
+        return GLIFNeuron(El = d['El'],
+                          dt = d['dt'],
+                          tau = d['tau'],
+                          R_input = d['R_input'],
+                          C = d['C'],
+                          asc_vector = d['asc_vector'],
+                          spike_cut_length = d['spike_cut_length'],
+                          th_inf = d['th_inf'],
+                          coeffs = d.get('coeffs', {}),
+                          AScurrent_dynamics_method = d['AScurrent_dynamics_method'],
+                          voltage_dynamics_method = d['voltage_dynamics_method'],
+                          threshold_dynamics_method = d['threshold_dynamics_method'],
+                          voltage_reset_method = d['voltage_reset_method'],
+                          AScurrent_reset_method = d['AScurrent_reset_method'],
+                          threshold_reset_method = d['threshold_reset_method'])
+
     def to_dict(self):
         return {
             'type': self.type,

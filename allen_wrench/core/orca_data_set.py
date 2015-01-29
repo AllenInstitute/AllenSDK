@@ -59,3 +59,42 @@ class OrcaDataSet( EphysDataSet ):
 
                 swp['response']['timeseries']['data'][...] = response
 
+    def get_spike_times(self, sweep_number):
+        with h5py.File(self.file_name,'r') as f:
+            if "analysis" not in f.keys():
+		return []
+
+            analysis_dir = f["analysis"]
+
+            if "spike_times" not in analysis_dir.keys():
+		return []
+
+            spike_dir = analysis_dir["spike_times"]
+            sweep_name = "Sweep_%d" % sweep_number
+
+            if sweep_name not in spike_dir.keys():
+		return []
+
+            return spike_dir[sweep_name].value
+
+    def set_spike_times(self, sweep_number, spike_times):
+        with h5py.File(self.file_name,'r+') as f:
+            # make sure expected directory structure is in place
+            if "analysis" not in f.keys():
+                f.create_group("analysis")
+
+            analysis_dir = f["analysis"]
+            if "spike_times" not in analysis_dir.keys():
+		analysis_dir.create_group("spike_times")
+
+            spike_dir = analysis_dir["spike_times"]
+
+            # see if desired dataset already exists
+            sweep_name = "Sweep_%d" % sweep_number
+            if sweep_name in spike_dir.keys():
+		# rewriting data -- delete old dataset
+		del spike_dir[sweep_name]
+
+            spike_dir.create_dataset(sweep_name, data=spike_times, dtype='f8')
+            
+

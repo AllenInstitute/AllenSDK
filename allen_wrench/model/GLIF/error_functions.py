@@ -10,6 +10,9 @@ import os
 
 import numpy as np
 
+'''NOTE: TRD and TSD were redone here for the current version of the code 
+'''
+
 def get_error_function_by_name(func_name):
     if func_name=="TRD":
         return TRD_list_error
@@ -17,6 +20,40 @@ def get_error_function_by_name(func_name):
         return square_time_dist_list_error
     if func_name=="VSD":
         return square_voltage_dist_list_error
+    
+def calculateISIWithSelf(timeStartStim, spikeTimes):
+    '''Calculate the interspike interval of a spike train 
+    Inputs
+        timeStartStim: scalar value time of stimulus onset for the ISI calculation of the ISI of the first spike
+        spikeTimes: scalar array of times of spikes
+    Output
+        ISI: array of scalar values of ISI times
+    '''
+    if len(spikeTimes)>=2:
+        ISItemp=(spikeTimes[1:]-spikeTimes[0:-1]) #calculate the ISI between the spikes in one train
+        ISI=np.append(spikeTimes[0]-timeStartStim, ISItemp) #the first ISI is the time of the first spike
+    elif len(spikeTimes)==1.0:
+        ISI=np.array([spikeTimes[0]-timeStartStim])
+    elif len(spikeTimes)==0.0:
+        ISI=np.array([])
+    return ISI       
+    
+def calculateISIWRespect2Data(timeStartStim, spikeTimesModel, spikeTimesData):
+    '''Calculate the interspike interval of a spike train of model data to the last biological spike
+    Inputs
+        timeStartStim: scalar value time of stimulus onset for the ISI calculation of the ISI of the first spike
+        spikeTimesModel, spikeTimesData: scalar array of times of spikes
+    Output
+        ISI: array of scalar values of ISI times
+    '''
+    if len(spikeTimesModel)>=2:
+        ISItemp=(spikeTimesModel[1:]-spikeTimesData[0:-1]) #calculate the ISI between the spikes in one train
+        ISI=np.append(spikeTimesModel[0]-timeStartStim, ISItemp) #the first ISI is the time of the first spike
+    elif len(spikeTimesModel)==1.0:
+        ISI=np.array([spikeTimesModel[0]-timeStartStim])
+    elif len(spikeTimesModel)==0.0:
+        ISI=np.array([])
+    return ISI   
 
 def TRD_list_error(param_guess, experiment):
     '''
@@ -27,12 +64,14 @@ def TRD_list_error(param_guess, experiment):
     @return: a scalar representing the error over all items in the stimulus list
     @note: the neuron experiment must have a stim_list member
     '''   
-    logging.info('running parameter guess: %s' % param_guess)
-
+    logging.critical('running parameter guess: %s' % param_guess)
+    Exception('TRD is not ready to be used')
          
     TRD_list = []
 
     run_data = experiment.run(param_guess)
+    dataSpikeTimes=experiment.interpolated_spike_times
+    modelSpikeTimes=run_data['interpolated_ISI']
   
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
@@ -42,19 +81,23 @@ def TRD_list_error(param_guess, experiment):
             #bug found 5-16-13: TRD was being calculated in terms of stimulus spike time instead of ISI type spike time.  See beloww            
             #TRDout=TRD(experiment.interpolated_spike_time_target_list[stim_list_index], spikeActualTime_list[stim_list_index])#BUGGY!
             '''TODO: THE NAME OF THIS SCKETCHES ME OUT.  I THINK IT SHOULD BE CALCULATING THE TIMES SO THE ISI CAN BE CALCULATED BELOW'''
-#TODO: THIS IS WHAT WAS HERE  CONFIRM LOGIC            ISITarget=calculateISIFromIntTime(0, experiment.interpolated_spike_times[stim_list_index], experiment.grid_spike_times[stim_list_index])
-            
+            #TODO: why am I using grid and interpolated here
+            ISITarget = calculateISIWithSelf(0, dataSpikeTimes[stim_list_index])
+            ISIModel2Bio=calculateISIWRespect2Data(0, modelSpikeTimes[stim_list_index], dataSpikeTimes[stim_list_index])   
 #            print '-----IN TRD FUNCTION-------'
 #            print 'ISITarget', ISITarget
 #            print 'gridISIFromLastTargSpike_list', gridISIFromLastTargSpike_list[stim_list_index]
 #            print 'diff between ISITarget and ISI Model from last target spike', ISITarget-gridISIFromLastTargSpike_list[stim_list_index]
-            TRDout=TRD(experiment.interpolated_spike_times[stim_list_index], run_data['interpolated_ISI'][stim_list_index])
+            TRDout=TRD(ISITarget, ISIModel2Bio)
         TRD_list.append(TRDout) 
+
 #    print 'TRD_list', TRD_list
-    concatenateTRDList=concatenate(TRD_list)          
+    concatenateTRDList=concatenate(TRD_list)
+    experiment.spike_errors.append(concatenateTRDList)
+          
 #    print 'param Guess', param_guess, 'TRD', mean(concatenateTRDList)
     out =mean(concatenateTRDList) 
-    logging.info('TRD: %f' % mean(concatenateTRDList))
+    logging.critical('TRD: %f' % mean(concatenateTRDList))
 
 #    print 'param_guess', param_guess
 #    print 'mean(concatenateTRDList): ', out
@@ -96,26 +139,35 @@ def square_time_dist_list_error(param_guess, experiment):
     a scalar representing the error over all items in the stimulus list
     @note: the neuron experiment must have a stim_list member
     ''' 
+    logging.critical('running parameter guess: %s' % param_guess)
+    
     TSD_list = []   
     run_data = experiment.run(param_guess)
-
+    dataSpikeTimes=experiment.interpolated_spike_times
+    modelSpikeTimes=run_data['interpolated_ISI']
+    
     for stim_list_index in range(0,len(experiment.stim_list)):
     #TODO: the following line is a hack to take care of the case when there are no spikes in a sweep
         if len(experiment.spike_time_steps[stim_list_index])==0:
             TSDout=[0]
         else:
-            ISITarget = calculateISIFromIntTime(0, experiment.interpolated_spike_times[stim_list_index], experiment.grid_spike_times[stim_list_index])
+            ISITarget = calculateISIWithSelf(0, dataSpikeTimes[stim_list_index])
+            ISIModel2Bio=calculateISIWRespect2Data(0, modelSpikeTimes[stim_list_index], dataSpikeTimes[stim_list_index])
 #            print '-----IN TRD FUNCTION-------'
 #            print 'ISITarget', ISITarget
 #            print 'gridISIFromLastTargSpike_list', gridISIFromLastTargSpike_list[stim_list_index]
 #            print 'diff between ISITarget and ISI Model from last target spike', ISITarget-gridISIFromLastTargSpike_list[stim_list_index]
-            TSDout = squareTimeDist(ISITarget, run_data['interpolated_ISI'][stim_list_index])
+            TSDout = squareTimeDist(ISITarget, ISIModel2Bio)
         TSD_list.append(TSDout) 
+
 #    print 'SD_list', SD_list
-    concatenateTSDList=concatenate(TSD_list)    
+    concatenateTSDList=concatenate(TSD_list)
+    experiment.spike_errors.append(concatenateTSDList)
+
+    logging.critical('TSD: %f' % mean(concatenateTSDList))    
     return mean(concatenateTSDList) 
 
-def squareTimeDist(tSpikeTargetISI, tSpikeObtainedISI):  #FOR THIS I NEED THE VOLTAGE AND THE THRESHOLD. SO RUN UNTIL SPIKE WILL HAVE TO SPIT OUT THE THRESH AND VOLT VALUES
+def squareTimeDist(tSpikeTargetISI, tSpikeObtainedISI):  
 #Given two arrays of spike times (as defined as the time (ISI proxy) from the last target spike)
 # calculate the square distance error.   
 #    inputs
@@ -149,7 +201,7 @@ def square_voltage_dist_list_error(param_guess, experiment):
     @note: the neuron experiment must have a stim_list member
     ''' 
 
-    logging.info('running parameter guess: %s' % param_guess)
+    logging.critical('running parameter guess: %s' % param_guess)
 
     VSD_list = []
 
@@ -169,10 +221,11 @@ def square_voltage_dist_list_error(param_guess, experiment):
                                          experiment)
         VSD_list.append(VSDout) 
 
-
 #    print 'VSD_list', VSD_list
     concatenateVSDList=concatenate(VSD_list)
-    logging.info('VSD: %f' % mean(concatenateVSDList))
+    experiment.spike_errors.append(concatenateVSDList)
+
+    logging.critical('VSD: %f' % mean(concatenateVSDList))
 
 #    if fileName!=None:
 #        print 'file name ins vsd is', fileName
@@ -208,8 +261,7 @@ def square_voltage_dist_list_error(param_guess, experiment):
 #            plt.savefig(os.path.join(directory, 'iter_'+str(int(lastFileNum)+1).zfill(4)+'.png'), format='png')
 #    #plt.show()
 #    plt.close()
-    
-    print 'VSD list', concatenateVSDList     
+       
     return mean(concatenateVSDList) 
 
 def square_voltage_dist(voltageOfModelAtBioSpike_array, threshOfModelAtBioSpike_array, experiment):

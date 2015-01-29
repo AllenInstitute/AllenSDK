@@ -28,6 +28,8 @@ class GLIFExperiment( object ):
         self.target_spike_mask = target_spike_mask
         self.param_fit_names = param_fit_names
 
+        self.spike_errors = []
+
         assert len(self.init_AScurrents) == len(self.neuron.tau), Exception("init_AScurrents length (%d) must have same length as tau (%d)" % (len(self.init_AScurrents), len(self.neuron.tau)))
         
     def run(self, param_guess):
@@ -52,6 +54,7 @@ class GLIFExperiment( object ):
             theshOfModelAtGridBioSpike_list: list of arrays of scalars that contain the threshold of the model neuron when the target or bio neuron spikes.'''
 
         self.set_neuron_parameters(param_guess)    
+        self.spike_errors = []
 
         run_data = []
         
@@ -102,6 +105,7 @@ class GLIFExperiment( object ):
         stim_list = self.stim_list
         
         self.set_neuron_parameters(param_guess)    
+        self.spike_errors = []
         
         run_data = []
 

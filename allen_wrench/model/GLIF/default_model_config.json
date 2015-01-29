@@ -39,7 +39,7 @@
       0.0, 
       0.0
     ], 
-    "error_function": "TRD", 
+    "error_function": "VSD", 
     "xtol": 1e-07, 
     "iteration_info": [], 
     "ftol": 1e-07, 

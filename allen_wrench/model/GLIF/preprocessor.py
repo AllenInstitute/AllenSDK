@@ -1238,7 +1238,7 @@ def calc_input_R_and_extrapolatedV_via_ramp(voltage, current, rampStartInd, dt, 
         plt.plot(rampStartInd*dt, v_i, '.r', ms=16)
         plt.plot(measured_dt, v_f, '.r', ms=16)        
         plt.ylabel('voltage (mV)')
-        plt.title('New R calculation', fontsize=16)
+        plt.title('average R over 20 to 40 percent of ramp', fontsize=16)
         plt.subplot(3,1,2)
         plt.plot(measured_dt, ((v_f-v_i)/(i_f-i_i))*1e-6)
         plt.ylabel('Resistance (MOhms)')
@@ -1258,6 +1258,12 @@ def calc_input_R_and_extrapolatedV_via_ramp(voltage, current, rampStartInd, dt, 
     return resistance, deltaV
 
 def calc_cap_via_fit_charge_dump(blip_voltage, blip_current, resistance, dt, El):
+    '''Capacitance can be estimated via a charge dump: C=Q/deltaV.  
+    The question here is what value should be chosen for deltaV.
+    To answer this, the idea is to fit functions to the voltage decay as 
+    a function of time
+    
+    '''
         
     #    time_blip=np.arange(0,len(blip_voltage))*dt
     #    plt.figure()
@@ -1329,49 +1335,53 @@ def calc_cap_via_fit_charge_dump(blip_voltage, blip_current, resistance, dt, El)
     min_AIC_index=np.where(AICvec==min(AICvec))[0]
     print 'AIC', AICvec
     
-    #--Now subtract out the fast component
+    #--Want to get rid of the fast compenent of the decay using two possbile methods
+    #1. removing the exponent with the fastest tau 
+    #2. cutting off the first part of the decay and then doing a fit
     
     #HOW DO I DECIDE WHICH CURVE TO USE?
     
-    #FOR THE MOMENT I AM CHOOSING TO ELIMINATE THE FAST EXP OF THE 4 FIT
+    #FOR THE MOMENT I AM CHOOSING TO ELIMINATE THE FAST EXP OF THE 4 FIT    
     #find max k (which will give smallest tau)
     maxk=np.where(np.abs(popt_2)==np.max(np.abs(popt_2[2:])))[0][0]
     print 'maxk', maxk
-    v_minus_fast=v2fit-exp_curve_1(t2fit, popt_2[maxk-2], popt_2[maxk])
+    #TODO: these hand coded index makes me nervous
+    v_data_minus_fast=v2fit-exp_curve_1(t2fit, popt_2[maxk-2], popt_2[maxk])
     
     #now fit the cuve with one exp
-    (popt_rmfast, pcov_rmfast)= curve_fit(exp_curve_1, t2fit, v_minus_fast, p0=p0_1)
+    (popt_rmfast, pcov_rmfast)= curve_fit(exp_curve_1, t2fit, v_data_minus_fast, p0=p0_1)
     fitV_nonFast=exp_curve_1(t2fit, popt_rmfast[0], popt_rmfast[1])
     
-    #cut off fast part of curve
+    #cut off fast part of curve and fit with one exponential
     (popt_trunc, pcov_trunc)= curve_fit(exp_curve_1, t2fit[int(.007/dt):], v2fit[int(.007/dt):], p0=p0_1)
     fitV_trunc=exp_curve_1(t2fit, popt_trunc[0], popt_trunc[1])
     
     if DEBUG_MODE:
 
-        plotInd=range(0,int(.04/dt))
+        plotInd=range(0,int(.1/dt))
         
         plt.figure()
-        plt.plot(t2fit[plotInd], v2fit[plotInd], lw=8, label="data: C via charge dump=%.3g" % (total_inj_charge_during_blip/v2fit[0]))
+        plt.plot(t2fit[plotInd], v2fit[plotInd], lw=8, label="data: C=%.3g" % (total_inj_charge_during_blip/v2fit[0]))
     #    plt.plot(t2fit, guessV_1,lw=5, label='1 exp guess')
         plt.plot(t2fit[plotInd], fitV_1[plotInd], lw=6, 
-                 label="1 exp: C via charge dump=%.3g, C via tau=%.3g" % (total_inj_charge_during_blip/fitV_1[0],-1./(popt_1[1]*resistance)))    
+                 label="1 exp fit to data: C=%.3g, C via tau=%.3g" % (total_inj_charge_during_blip/fitV_1[0],-1./(popt_1[1]*resistance)))    
         plt.plot(t2fit[plotInd], fitV_2[plotInd], lw=4, 
-                 label="2 exp: C via charge dump=%.3g" % (total_inj_charge_during_blip/fitV_2[0]))
+                 label="2 exp fit to data: C=%.3g" % (total_inj_charge_during_blip/fitV_2[0]))
         #plt.plot(t2fit, guessV_3,lw=1, label='3 exp guess')
     #    plt.plot(t2fit[plotInd], fitV_3[plotInd], lw=2, label="3 exp fit: AIC=%.4g" % (AIC_3))
     #    plt.plot(t2fit[plotInd], fitV_4[plotInd], '--', lw=2, label="4 exp fit: AIC=%.4g" % (AIC_4))
         plt.xlabel('time (s)')
         plt.ylabel('voltage (V)')
         plt.title('fitting voltage of subthreshold blip', fontsize=16)
-        plt.plot(t2fit[plotInd], v_minus_fast[plotInd], '--', lw=2, 
-                 label="data-fast exp: C via charge dump=%.3g" % (total_inj_charge_during_blip/v_minus_fast[0]))
+        plt.plot(t2fit[plotInd], v_data_minus_fast[plotInd], '--', lw=2, 
+                 label="data-fast exp: C=%.3g" % (total_inj_charge_during_blip/v_data_minus_fast[0]))
         plt.plot(t2fit[plotInd], fitV_nonFast[plotInd], lw=2, 
-                 label="single exp fit to: data-fast exp: C via charge dump=%.3g, C via tau=%.3g"  % (total_inj_charge_during_blip/fitV_nonFast[0], -1./(popt_rmfast[1]*resistance)))
+                 label="single exp fit to: data-fast exp: C=%.3g, C via tau=%.3g"  % (total_inj_charge_during_blip/fitV_nonFast[0], -1./(popt_rmfast[1]*resistance)))
         plt.plot(t2fit[plotInd], fitV_trunc[plotInd], lw=2, 
-                 label="single exp fit to truncated (.0007 s) data: C via charge dump=%.3g, C via tau=%.3g" % (total_inj_charge_during_blip/fitV_trunc[0], -1./(popt_trunc[1]*resistance)))    
+                 label="single exp fit to truncated (.0007 s) data: C=%.3g, C via tau=%.3g" % (total_inj_charge_during_blip/fitV_trunc[0], -1./(popt_trunc[1]*resistance)))    
     #    plt.plot(t2fit[plotInd], v_slow[plotInd], lw=2, label="slow exp: C=%.3g" % (total_inj_charge_during_blip/v_slow[0]))
         plt.legend()
+        plt.title('Calc C=Q/V(at 0) (fitting V from charge dump)')
         plt.show(block=False)
     
     #for now I will use C from truncated 1 exponential fit via charge dump
@@ -1379,7 +1389,6 @@ def calc_cap_via_fit_charge_dump(blip_voltage, blip_current, resistance, dt, El)
 
 def calculate_input_R_via_subthresh_noise(voltage, current, El, start_idx, dt):
     
-    print 'EL FOR RAM:', El
     '''requires subthreshold noise'''
     if find_spikes([voltage], 'threshold', dt)[0]:
         raise Exception('there is a spike in your subthreshold noise')

@@ -76,21 +76,7 @@ class ConfigurationSetup( object ):
         
         #TODO: note that Vr is not being set here but is calculated by the linear regression
         if self.neuron_config['type'] == GLIFNeuron.TYPE:
-            self.neuron = GLIFNeuron(El=self.neuron_config['El'],
-                                     dt=self.neuron_config['dt'],
-                                     tau=self.neuron_config['tau'],
-                                     R_input=self.neuron_config['R_input'],
-                                     C=self.neuron_config['C'],
-                                     asc_vector=self.neuron_config['asc_vector'],
-                                     spike_cut_length=self.neuron_config['spike_cut_length'],
-                                     th_inf=self.neuron_config['th_inf'],
-                                     coeffs=self.neuron_config.get('coeffs', {}),
-                                     AScurrent_dynamics_method=self.neuron_config['AScurrent_dynamics_method'],
-                                     voltage_dynamics_method=self.neuron_config['voltage_dynamics_method'],
-                                     threshold_dynamics_method=self.neuron_config['threshold_dynamics_method'],
-                                     voltage_reset_method=self.neuron_config['voltage_reset_method'],
-                                     AScurrent_reset_method=self.neuron_config['AScurrent_reset_method'],
-                                     threshold_reset_method=self.neuron_config['threshold_reset_method'])
+            self.neuron = GLIFNeuron.from_dict(self.neuron_config)
         else: 
             raise Exception("not implemented")        
 

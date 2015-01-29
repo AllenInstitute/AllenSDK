@@ -1,18 +1,21 @@
-
 import logging, time
 import sys, argparse, json, os
+import numpy as np
 
-import allen_wrench.model.GLIF.configuration_setup as configuration_setup
+import allen_wrench.model.GLIF.utilities as utilities
+
+from allen_wrench.model.GLIF.neuron import GLIFNeuron
 from allen_wrench.core.orca_data_set import OrcaDataSet as EphysDataSet
 
 def parse_arguments():
     ''' Use argparse to get required arguments from the command line '''
     parser = argparse.ArgumentParser(description='fit a neuron')
 
-    parser.add_argument('--data_config_file', help='data configuration file name (sweeps properties, etc)', required=True)
-    parser.add_argument('--model_config_file', help='configuration file output by optimizer', required=True)
-    parser.add_argument('--output_file', help='output file name', required=True)
-    parser.add_argument('--stimulus', help='stimulus type name', default=None)
+    parser.add_argument('--ephys_file', help='ephys file name', required=True)
+    parser.add_argument('--sweeps_file', help='JSON file listing sweep properties')
+    parser.add_argument('--ephys_result_id', help='id of the ephys result, used when downloading sweep properties')
+    parser.add_argument('--neuron_config_file', help='neuron configuration JSON file ', required=True)
+    parser.add_argument('--output_ephys_file', help='output file name', required=True)
     parser.add_argument('--log_level', help='log_level', default=logging.INFO)
 
     return parser.parse_args()
@@ -32,7 +35,7 @@ def simulate_sweep(neuron, stimulus, init_voltage, init_threshold, init_AScurren
     
     logging.debug("simulation time %f" % (time.time() - start_time))
     
-    return data['voltage']
+    return data
 
 
 def load_sweep(file_name, sweep_number):
@@ -47,13 +50,16 @@ def load_sweep(file_name, sweep_number):
     return data
 
 
-def write_sweep_response(file_name, sweep_number, response):
+def write_sweep_response(file_name, sweep_number, response, spike_times):
     ''' Overwrite the response in a file. '''
 
     logging.debug("writing sweep")
 
     write_start_time = time.time()
-    out_data = EphysDataSet(file_name).set_sweep(sweep_number, stimulus=None, response=response)
+    ephds = EphysDataSet(file_name)
+    
+    ephds.set_sweep(sweep_number, stimulus=None, response=response)
+    ephds.set_spike_times(sweep_number, spike_times)
     
     logging.debug("write time %f" % (time.time() - write_start_time))
 
@@ -72,37 +78,56 @@ def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_
         # tell the neuron what dt should be for this sweep
     neuron.dt = 1.0 / data['sampling_rate']
     
-    response = simulate_sweep(neuron, data['stimulus'], init_voltage, init_threshold, init_AScurrents)
-    
-    write_sweep_response(output_file_name, sweep_number, response)
-    
+    sim_data = simulate_sweep(neuron, data['stimulus'], init_voltage, init_threshold, init_AScurrents)
+
+    write_sweep_response(output_file_name, sweep_number, sim_data['voltage'], sim_data['interpolated_spike_times'])
+
     logging.debug("total sweep time %f" % ( time.time() - sweep_start_time ))
+
+def simulate_neuron(neuron, sweeps, input_file_name, output_file_name, 
+                    init_voltage = None, init_threshold = None, init_AScurrents = None):
+
+    start_time = time.time()
+
+    filtered_sweeps = [ sweep for sweep in sweeps if sweep['ephys_stimulus']['ephys_stimulus_type']['name'] != 'Unknown' ]
+
+    if init_voltage is None:
+        init_voltage = 0.0
+
+    if init_threshold is None:
+        init_threshold = 0.0
+
+    if init_AScurrents is None:
+        init_AScurrents = np.zeros(len(neuron.tau))
+
+    for sweep in filtered_sweeps:
+        simulate_sweep_from_file(neuron, sweep['sweep_number'], 
+                                 input_file_name, output_file_name,
+                                 init_voltage,
+                                 init_threshold,
+                                 init_AScurrents)
                  
+    logging.debug("total elapsed time %f" % (time.time() - start_time))    
+
 def main():
     args = parse_arguments()
 
     logging.getLogger().setLevel(args.log_level)
-                 
-    config = configuration_setup.read(args.data_config_file, args.model_config_file)
-    neuron = config.setup_neuron(config.neuron_config)
+    
+    neuron_config = utilities.read_json(args.neuron_config_file)
 
-    if args.stimulus is None:
-        sweep_numbers = range(len(config.data_config['sweeps']))
+    if args.sweeps_file:
+        sweeps = utilities.read_json(args.sweeps_file)
+    elif args.ephys_result_id:
+        #sweeps = api.download_ephys_sweeps(args.ephys_result_id)
+        raise Exception("TODO: Code for downloading sweeps from the API still needs to be written")
     else:
-        sweep_numbers = config.data_config[args.stimulus]
+        raise Exception("No sweeps file provided. Provide an ephys_result_id to download sweep metadata automatically.")
 
-    input_file_name = config.data_config['filename']
+    neuron = GLIFNeuron.from_dict(neuron_config)
 
-    start_time = time.time()
+    simulate_neuron(neuron, sweeps, args.ephys_file, args.output_ephys_file) 
 
-    for sweep_number in sweep_numbers:
-        simulate_sweep_from_file(neuron, sweep_number, 
-                                 input_file_name, args.output_file,
-                                 config.optimizer_config['init_voltage'], 
-                                 config.optimizer_config['init_threshold'],
-                                 config.optimizer_config['init_AScurrents'])
-                 
 
-    logging.debug("total elapsed time %f" % (time.time() - start_time))
 
 if __name__ == "__main__": main()
