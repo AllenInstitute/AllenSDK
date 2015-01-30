@@ -23,11 +23,17 @@ def fail(msg, validate):
 def get_sweep_numbers(sweep_list):
     return [ s['sweep_number'] for s in sweep_list]
 
+def get_sweep_stimulus_type(sweep):
+    try:
+        return sweep['ephys_stimulus']['ephys_stimulus_type']['name']
+    except:
+        return None
+
 def get_sweeps_by_type(sweep_list, sweep_type, validate):
     if validate:
-        return [ s for s in sweep_list if s.get('stimulus_type',None) == sweep_type and s.get('workflow_state',None) == 'passed' ]
+        return [ s for s in sweep_list if get_sweep_stimulus_type(s) == sweep_type and s.get('workflow_state',None) == 'passed' ]
     else:
-        return [ s for s in sweep_list if s.get('stimulus_type',None) == sweep_type ]
+        return [ s for s in sweep_list if get_sweep_stimulus_type(s) == sweep_type ]
 
 def find_ranked_sweep(sweep_list, key, reverse=False):
     if sweep_list:
