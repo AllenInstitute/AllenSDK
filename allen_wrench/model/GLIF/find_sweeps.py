@@ -14,11 +14,13 @@ RAMP_TO_RHEO = 'Ramp to Rheobase'
 
 FILE_TYPE = 'ORCA'
 
-def fail(msg, validate):
+class MissingSweepException( Exception ): pass
+
+def fail_missing_sweep(msg, validate):
     logging.error(msg)
 
     if validate:
-        raise Exception(msg)
+        raise MissingSweepException(msg)
 
 def get_sweep_numbers(sweep_list):
     return [ s['sweep_number'] for s in sweep_list]
@@ -78,10 +80,10 @@ def find_short_square_sweeps(sweep_list, validate):
     }
 
     if len(out['maximum_subthreshold_short_square']) == 0: 
-        fail("No passed maximum subthreshold short square", validate)
+        fail_missing_sweep("No passed maximum subthreshold short square", validate)
 
     if len(out['minimum_superthreshold_short_square']) == 0:
-        fail("No passed minimum superthreshold short square", validate)
+        fail_missing_sweep("No passed minimum superthreshold short square", validate)
 
     return out
 
@@ -105,7 +107,7 @@ def find_ramp_sweeps(sweep_list, validate):
     }
 
     if len(out['superthreshold_ramp']) == 0:
-        fail("no passing superthreshold ramp", validate)
+        fail_missing_sweep("no passing superthreshold ramp", validate)
 
     return out
     
@@ -136,7 +138,7 @@ def find_noise_sweeps(sweep_list, validate):
         out['noise1_run2'] = [ noise1_sweep_numbers[1] ]
         out['noise1_run3'] = [ noise1_sweep_numbers[2] ]
     else:
-        fail("not enough noise1 sweeps (%d)" % (num_noise1_sweeps), validate)
+        fail_missing_sweep("not enough noise1 sweeps (%d)" % (num_noise1_sweeps), validate)
 
     if num_noise2_sweeps >= 3:
         noise2_sweep_numbers = get_sweep_numbers(noise2_sweeps)
@@ -144,7 +146,7 @@ def find_noise_sweeps(sweep_list, validate):
         out['noise2_run2'] = [ noise2_sweep_numbers[1] ]
         out['noise2_run3'] = [ noise2_sweep_numbers[2] ]
     else:
-        fail("not enough noise2 sweeps (%d)" % (num_noise2_sweeps), validate)
+        fail_missing_sweep("not enough noise2 sweeps (%d)" % (num_noise2_sweeps), validate)
         
     return out
 
