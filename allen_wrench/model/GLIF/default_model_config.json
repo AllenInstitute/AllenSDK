@@ -28,17 +28,16 @@
     "asc_vector":[
     	0,
     	0
-    ]
-  }, 
-  "optimizer": {
-    "save_file_name": "default_optimizer_file_name.json", 
-    "single_hold_out_repeat": false, 
-    "test_hold_out": true, 
+    ],
     "init_AScurrents": [
       0.0, 
       0.0, 
       0.0
     ], 
+    "init_threshold": 0.02, 
+    "init_voltage": 0.0
+  }, 
+  "optimizer": {
     "error_function": "VSD", 
     "xtol": 1e-07, 
     "iteration_info": [], 
@@ -54,9 +53,7 @@
       1.0,
       1.0
     ], 
-    "init_threshold": 0.02, 
     "sigma_inner": 0.01, 
-    "init_voltage": 0.0, 
     "inner_iterations": 1, 
     "outer_iterations": 1, 
     "param_fit_names": [

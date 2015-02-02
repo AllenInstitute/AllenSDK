@@ -21,17 +21,14 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def simulate_sweep(neuron, stimulus, init_voltage, init_threshold, init_AScurrents):
+def simulate_sweep(neuron, stimulus):
     ''' Simulate a neuron given a stimulus and initial conditions. '''
 
     start_time = time.time()
 
     logging.debug("simulating")
 
-    data = neuron.run(init_voltage, 
-                      init_threshold,
-                      init_AScurrents,
-                      stimulus)    
+    data = neuron.run(stimulus)    
     
     logging.debug("simulation time %f" % (time.time() - start_time))
     
@@ -64,7 +61,7 @@ def write_sweep_response(file_name, sweep_number, response, spike_times):
     logging.debug("write time %f" % (time.time() - write_start_time))
 
     
-def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_name, init_voltage, init_threshold, init_AScurrents):
+def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_name):
     ''' Load a sweep stimulus, simulate the response, and write it out. '''
     
     sweep_start_time = time.time()
@@ -78,34 +75,20 @@ def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_
         # tell the neuron what dt should be for this sweep
     neuron.dt = 1.0 / data['sampling_rate']
     
-    sim_data = simulate_sweep(neuron, data['stimulus'], init_voltage, init_threshold, init_AScurrents)
+    sim_data = simulate_sweep(neuron, data['stimulus'])
 
     write_sweep_response(output_file_name, sweep_number, sim_data['voltage'], sim_data['interpolated_spike_times'])
 
     logging.debug("total sweep time %f" % ( time.time() - sweep_start_time ))
 
-def simulate_neuron(neuron, sweeps, input_file_name, output_file_name, 
-                    init_voltage = None, init_threshold = None, init_AScurrents = None):
+def simulate_neuron(neuron, sweeps, input_file_name, output_file_name):
 
     start_time = time.time()
 
     filtered_sweeps = [ sweep for sweep in sweeps if sweep['ephys_stimulus']['ephys_stimulus_type']['name'] != 'Unknown' ]
 
-    if init_voltage is None:
-        init_voltage = 0.0
-
-    if init_threshold is None:
-        init_threshold = 0.0
-
-    if init_AScurrents is None:
-        init_AScurrents = np.zeros(len(neuron.tau))
-
     for sweep in filtered_sweeps:
-        simulate_sweep_from_file(neuron, sweep['sweep_number'], 
-                                 input_file_name, output_file_name,
-                                 init_voltage,
-                                 init_threshold,
-                                 init_AScurrents)
+        simulate_sweep_from_file(neuron, sweep['sweep_number'], input_file_name, output_file_name)
                  
     logging.debug("total elapsed time %f" % (time.time() - start_time))    
 
