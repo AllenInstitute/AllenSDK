@@ -13,11 +13,14 @@ SHORT_SQUARE_TRIPLE = 'Short Square - Triple'
 RAMP_TO_RHEO = 'Ramp to Rheobase'
 
 FILE_TYPE = 'ORCA'
+SUCCESS=0
 
 class MissingSweepException( Exception ): pass
 
 def fail_missing_sweep(msg, validate):
     logging.error(msg)
+    global SUCCESS
+    SUCCESS=1
 
     if validate:
         raise MissingSweepException(msg)
@@ -200,13 +203,14 @@ def extract_input_fields(data):
 def main():
     args = parse_arguments()
 
-    input_data = None
-    utilities.read_json(args.sweep_file)
+    input_data = utilities.read_json(args.sweep_file)
     file_name, sweeps = extract_input_fields(input_data)
 
     data = find_sweeps(file_name, sweeps, not args.no_validate)
 
     utilities.write_json(args.output_file, data)
+
+    sys.exit(SUCCESS)
 
 
 if __name__ == "__main__":  main()

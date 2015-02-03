@@ -38,7 +38,7 @@
     "init_voltage": 0.0
   }, 
   "optimizer": {
-    "error_function": "VSD", 
+    "error_function": "TSD", 
     "xtol": 1e-07, 
     "iteration_info": [], 
     "ftol": 1e-07, 
