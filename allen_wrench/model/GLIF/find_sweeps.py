@@ -113,10 +113,8 @@ def find_ramp_sweeps(sweep_list, validate):
     
 def find_noise_sweeps(sweep_list, validate):
     '''
-    Find 1) the 1st noise1 sweep (run 1)
-         2) the 2nd noise1 sweep (run 2)
-         2) the 1st noise2 sweep (run 1)
-         3) the 2nd noise2 sweep (run 2)
+    Find 1) the noise1 sweeps
+         2) the noise2 sweeps
          4) all noise sweeps
     '''
 
@@ -126,26 +124,18 @@ def find_noise_sweeps(sweep_list, validate):
     all_noise_sweeps = sorted(noise1_sweeps + noise2_sweeps, key=lambda x: x['sweep_number'])
 
     out = {
+        'noise1': get_sweep_numbers(noise1_sweeps),
+        'noise2': get_sweep_numbers(noise2_sweeps),
         'all_noise': get_sweep_numbers(all_noise_sweeps)
     }
 
     num_noise1_sweeps = len(noise1_sweeps)
     num_noise2_sweeps = len(noise2_sweeps)
 
-    if num_noise1_sweeps >= 3:
-        noise1_sweep_numbers = get_sweep_numbers(noise1_sweeps)
-        out['noise1_run1'] = [ noise1_sweep_numbers[0] ]
-        out['noise1_run2'] = [ noise1_sweep_numbers[1] ]
-        out['noise1_run3'] = [ noise1_sweep_numbers[2] ]
-    else:
+    if num_noise1_sweeps < 3:
         fail_missing_sweep("not enough noise1 sweeps (%d)" % (num_noise1_sweeps), validate)
 
-    if num_noise2_sweeps >= 3:
-        noise2_sweep_numbers = get_sweep_numbers(noise2_sweeps)
-        out['noise2_run1'] = [ noise2_sweep_numbers[0] ]
-        out['noise2_run2'] = [ noise2_sweep_numbers[1] ]
-        out['noise2_run3'] = [ noise2_sweep_numbers[2] ]
-    else:
+    if num_noise2_sweeps < 3:
         fail_missing_sweep("not enough noise2 sweeps (%d)" % (num_noise2_sweeps), validate)
         
     return out
