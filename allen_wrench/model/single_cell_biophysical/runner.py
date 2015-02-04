@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import allen_wrench.model.single_cell_biophysical.model_load as ml
 from allen_wrench.model.single_cell_biophysical.iclamp_stimulus import IclampStimulus
 from allen_wrench.model.single_cell_biophysical.orca_lob_parser import OrcaLobParser
@@ -17,7 +15,7 @@ def run(stimulus_path, morphology_path,
         iclamp = IclampStimulus(h)
         iclamp.setup_instance(stimulus_path, sweep=sweep)
     
-        vec = ml.track_typical_values()
+        vec = ml.record_values()
     
         h.finitialize()
         h.run()

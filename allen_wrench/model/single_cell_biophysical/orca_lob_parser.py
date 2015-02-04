@@ -86,7 +86,7 @@ class OrcaLobParser(object):
 
                 output_len = len(stim_epoch["response"][timeseries_string]["data"])
                 data_len = len(data)
-                if data_len < output_len:
+                if data_len <= output_len:
                     output_len = data_len
                 else:
                     OrcaLobParser.log.warn(

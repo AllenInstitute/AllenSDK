@@ -34,7 +34,7 @@ class IclampStimulus(object):
         self.stim.dur = 1e12 # just set to be really big; doesn't need to match the waveform
 
         self.read_stimulus(stimulus_path, sweep=sweep)
-        
+        self.h.dt = self.sampling_rate
         stim_vec = self.h.Vector(self.stim_curr)
         stim_vec.play(self.stim._ref_amp, self.sampling_rate)
         
