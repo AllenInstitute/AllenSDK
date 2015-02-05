@@ -3,6 +3,8 @@ import logging
 import argparse
 import utilities
 
+from utilities import MissingSweepException
+
 SHORT_SQUARE = 'Short Square'
 SHORT_SQUARE_60 = 'Short Square - Hold -60mv'
 SHORT_SQUARE_80 = 'Short Square - Hold -80mv'
@@ -15,13 +17,11 @@ RAMP_TO_RHEO = 'Ramp to Rheobase'
 FILE_TYPE = 'ORCA'
 SUCCESS=0
 
-class MissingSweepException( Exception ): pass
-
 def fail_missing_sweep(msg, validate):
     logging.error(msg)
     global SUCCESS
     SUCCESS=1
-
+    
     if validate:
         raise MissingSweepException(msg)
 
@@ -203,7 +203,8 @@ def extract_input_fields(data):
 def main():
     args = parse_arguments()
 
-    input_data = utilities.read_json(args.sweep_file)
+    input_data = None
+    utilities.read_json(args.sweep_file)
     file_name, sweeps = extract_input_fields(input_data)
 
     data = find_sweeps(file_name, sweeps, not args.no_validate)

@@ -56,7 +56,7 @@ def dynamics_AScurrent_none(neuron, AScurrents_t0, time_step, spike_time_steps):
 def dynamics_voltage_linear(neuron, voltage_t0, AScurrents_t0, inj):
     return voltage_t0 + (inj + np.sum(AScurrents_t0) - neuron.G * neuron.coeffs['G'] * (voltage_t0 - neuron.El)) * neuron.dt / (neuron.C * neuron.coeffs['C'])
     
-def dynamics_voltage_quadraticIofV(neuron, voltage_t0, AScurrents_t0, inj, a, b, c, d, e):    
+def dynamics_voltage_quadratic_i_of_v(neuron, voltage_t0, AScurrents_t0, inj, a, b, c, d, e):    
     I_of_v = a + b * voltage_t0 + c * voltage_t0**2  #equation for cell 6 jting
         
     if voltage_t0 > d:
@@ -70,6 +70,9 @@ def dynamics_voltage_quadraticIofV(neuron, voltage_t0, AScurrents_t0, inj, a, b,
 def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, a, b):
     return threshold_t0 + (a * neuron.coeffs['a'] * (voltage_t0-neuron.El) - b * neuron.coeffs['b']*(threshold_t0-neuron.coeffs['th_inf']*neuron.th_inf))*neuron.dt 
         
+def dynamics_threshold_inf(neuron, threshold_t0, voltage_t0):
+    return neuron.th_inf
+
 def dynamics_threshold_fixed(neuron, threshold_t0, voltage_t0, value):
     return value
 
@@ -90,62 +93,71 @@ def reset_AScurrent_none(neuron, AScurrents_t0, t):
 # voltage reset rules
 # all return voltage_t1
 
-def reset_voltage_Vbefore(neuron, voltage_t0, a, b):
+def reset_voltage_v_before(neuron, voltage_t0, a, b):
     return a*(voltage_t0)+b
 
-def reset_voltage_IandVbefore(neuron, voltage_t0):
+def reset_voltage_i_v_before(neuron, voltage_t0):
     raise Exception("reset_voltage_IandVbefore not implemented")
-    
+
+def reset_voltage_zero(neuron, voltage_t0):
+    return 0.0
+
 def reset_voltage_fixed(neuron, voltage_t0, value):
     return value
-
+    
 # threshold reset rules
 # all return threshold_t1
 
-def reset_threshold_from_paper(self, threshold_t0, voltage_v1, delta):
-    return max(threshold_t0+delta, voltage_v1+delta)  #This is a bit dangerous as it would change if El was not choosen to be zero. Perhaps could change it to absolute value
+def reset_threshold_max_v_th(neuron, threshold_t0, voltage_v1, delta):
+    return max(threshold_t0, voltage_v1) + delta  #This is a bit dangerous as it would change if El was not choosen to be zero. Perhaps could change it to absolute value
     
-def reset_threshold_fixed(self, threshold_t0, voltage_v1, value):
-    return value
-    
-def reset_threshold_V_plus_const(self, threshold_t0, voltage_v1, value):
+def reset_threshold_th_before(neuron, threshold_t0, voltage_v1, delta):
     '''it is highly probable that at some point we will need to fit const'''
     '''threshold_t0 and value should be in mV'''
-    return threshold_t0 + value
+    return threshold_t0 + delta
+
+def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
+    '''it is highly probable that at some point we will need to fit const'''
+    '''threshold_t0 and value should be in mV'''
+    return neuron.th_inf
+
+def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
+    '''it is highly probable that at some point we will need to fit const'''
+    '''threshold_t0 and value should be in mV'''
+    return value
 
 METHOD_LIBRARY = {
     'AScurrent_dynamics_method': { 
         'exp': dynamics_AScurrent_exp,
-        'expViaBlip': dynamics_AScurrent_exp,
-        'expViaGLM': dynamics_AScurrent_exp,
+        'exp_ssq': dynamics_AScurrent_exp,
+        'exp_glm': dynamics_AScurrent_exp,
         'vector': dynamics_AScurrent_vector,
-        'none': dynamics_AScurrent_none,
-        'LIF': dynamics_AScurrent_none
+        'none': dynamics_AScurrent_none
         },
     'voltage_dynamics_method': { 
         'linear': dynamics_voltage_linear,
-        'quadraticIofV': dynamics_voltage_quadraticIofV
+        'quadratic_i_of_v': dynamics_voltage_quadratic_i_of_v
         },
     'threshold_dynamics_method': {
-        'fixed': dynamics_threshold_fixed,
         'adapt_standard': dynamics_threshold_adapt_standard,
-        'LIF': dynamics_threshold_fixed
+        'inf': dynamics_threshold_inf,
+        'fixed': dynamics_threshold_fixed
         },
     'AScurrent_reset_method': {
         'sum': reset_AScurrent_sum,
-        'none': reset_AScurrent_none,
-        'LIF': reset_AScurrent_none
+        'none': reset_AScurrent_none
         }, 
     'voltage_reset_method': {
-        'Vbefore': reset_voltage_Vbefore,
-        'IandVbefore': reset_voltage_IandVbefore,
-        'fixed': reset_voltage_fixed,
-        'LIF': reset_voltage_fixed
+        'v_before': reset_voltage_v_before,
+        'i_v_before': reset_voltage_i_v_before,
+        'zero': reset_voltage_zero,
+        'fixed': reset_voltage_fixed
         }, 
     'threshold_reset_method': {
-        'from_paper': reset_threshold_from_paper,
-        'fixed': reset_threshold_fixed,
-        'V_plus_const': reset_threshold_V_plus_const,
-        'LIF': reset_threshold_fixed
+        'max_v_th': reset_threshold_max_v_th,
+        'th_before': reset_threshold_th_before,
+        'inf': reset_threshold_inf,
+        'adapted': reset_threshold_fixed,
+        'fixed': reset_threshold_fixed
         }
 }
