@@ -1,8 +1,9 @@
 import allen_wrench.model.single_cell_biophysical.model_load as ml
 from allen_wrench.model.single_cell_biophysical.iclamp_stimulus import IclampStimulus
-from allen_wrench.model.single_cell_biophysical.orca_lob_parser import OrcaLobParser
+
 from neuron import h
 import numpy as np
+from allen_wrench.core.orca_data_set import OrcaDataSet
 
 def run(stimulus_path, morphology_path,
         fit_parameter_path, sweeps,
@@ -10,6 +11,8 @@ def run(stimulus_path, morphology_path,
         json_out_path="lims_response.json"):
     ml.load_model_from_lims(morphology_path,
                             fit_parameter_path)   # TODO: different load style, separate params from swc, sweeps, etc.
+    
+    output = OrcaDataSet(orcas_out_path)
     
     for sweep in sweeps:
         iclamp = IclampStimulus(h)
@@ -21,6 +24,6 @@ def run(stimulus_path, morphology_path,
         h.run()
             
         # And to an Orca File
-        output_parser = OrcaLobParser()
+        
         output_data = np.array(vec['v']) * 1.0e-3
-        output_parser.write(orcas_out_path, output_data, sweep=sweep)    
+        output.set_sweep(sweep, None, output_data)    
