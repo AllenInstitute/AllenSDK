@@ -22,8 +22,9 @@ def run(stimulus_path, morphology_path,
     
         h.finitialize()
         h.run()
-            
+        
         # And to an Orca File
         
-        output_data = np.array(vec['v']) * 1.0e-3
-        output.set_sweep(sweep, None, output_data)    
+        excess_data = 5
+        output_data = np.array(vec['v'])[0:-excess_data] * 1.0e-3
+        output.set_sweep(sweep, None, output_data)

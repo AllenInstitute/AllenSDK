@@ -44,7 +44,7 @@ class IclampStimulus(object):
 
     def read_stimulus(self, stimulus_path, sweep=0):
         stimulus_data = OrcaDataSet(stimulus_path)
-        sweep_data = stimulus_data.get_sweep(sweep=sweep)
+        sweep_data = stimulus_data.get_sweep(sweep)
         self.stim_curr = sweep_data['stimulus'] * 1.0e9 # convert to nA for NEURON
         self.sampling_rate = 1.0e3 / sweep_data['sampling_rate'] # convert from Hz
         
