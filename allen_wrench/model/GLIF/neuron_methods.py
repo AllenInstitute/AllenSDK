@@ -68,10 +68,10 @@ def dynamics_voltage_quadratic_i_of_v(neuron, voltage_t0, AScurrents_t0, inj, a,
 # all return threshold_t1    
 
 def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, a, b):
-    return threshold_t0 + (a * neuron.coeffs['a'] * (voltage_t0-neuron.El) - b * neuron.coeffs['b']*(threshold_t0-neuron.coeffs['th_inf']*neuron.th_inf))*neuron.dt 
+    return threshold_t0 + (a * neuron.coeffs['a'] * (voltage_t0-neuron.El) - b * neuron.coeffs['b'] * (threshold_t0 - neuron.coeffs['th_inf'] * neuron.th_inf)) * neuron.dt 
         
 def dynamics_threshold_inf(neuron, threshold_t0, voltage_t0):
-    return neuron.th_inf
+    return neuron.coeffs['th_inf'] * neuron.th_inf
 
 def dynamics_threshold_fixed(neuron, threshold_t0, voltage_t0, value):
     return value
@@ -119,12 +119,12 @@ def reset_threshold_th_before(neuron, threshold_t0, voltage_v1, delta):
 def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
     '''it is highly probable that at some point we will need to fit const'''
     '''threshold_t0 and value should be in mV'''
-    return neuron.th_inf
+    return neuron.coeffs['th_inf'] * neuron.th_inf
 
 def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
     '''it is highly probable that at some point we will need to fit const'''
     '''threshold_t0 and value should be in mV'''
-    return value
+    return  value
 
 METHOD_LIBRARY = {
     'AScurrent_dynamics_method': { 
@@ -140,6 +140,7 @@ METHOD_LIBRARY = {
         },
     'threshold_dynamics_method': {
         'adapt_standard': dynamics_threshold_adapt_standard,
+        'adapt_rebound': dynamics_threshold_adapt_standard,
         'inf': dynamics_threshold_inf,
         'fixed': dynamics_threshold_fixed
         },

@@ -7,6 +7,8 @@ import allen_wrench.model.GLIF.utilities as utilities
 from allen_wrench.model.GLIF.neuron import GLIFNeuron
 from allen_wrench.core.orca_data_set import OrcaDataSet as EphysDataSet
 
+DEFAULT_SPIKE_CUT_VALUE = 0.05 # 50mV
+
 def parse_arguments():
     ''' Use argparse to get required arguments from the command line '''
     parser = argparse.ArgumentParser(description='fit a neuron')
@@ -16,12 +18,13 @@ def parse_arguments():
     parser.add_argument('--ephys_result_id', help='id of the ephys result, used when downloading sweep properties')
     parser.add_argument('--neuron_config_file', help='neuron configuration JSON file ', required=True)
     parser.add_argument('--output_ephys_file', help='output file name', required=True)
-    parser.add_argument('--log_level', help='log_level', default=logging.INFO)
+    parser.add_argument('--log_level', help='log level', default=logging.INFO)
+    parser.add_argument('--spike_cut_value', help='value to fill in for spike duration', default=DEFAULT_SPIKE_CUT_VALUE, type=float)
 
     return parser.parse_args()
 
 
-def simulate_sweep(neuron, stimulus):
+def simulate_sweep(neuron, stimulus, spike_cut_value):
     ''' Simulate a neuron given a stimulus and initial conditions. '''
 
     start_time = time.time()
@@ -29,6 +32,9 @@ def simulate_sweep(neuron, stimulus):
     logging.debug("simulating")
 
     data = neuron.run(stimulus)    
+
+    voltage = data['voltage']
+    voltage[np.isnan(voltage)] = spike_cut_value
     
     logging.debug("simulation time %f" % (time.time() - start_time))
     
@@ -61,7 +67,7 @@ def write_sweep_response(file_name, sweep_number, response, spike_times):
     logging.debug("write time %f" % (time.time() - write_start_time))
 
     
-def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_name):
+def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_name, spike_cut_value):
     ''' Load a sweep stimulus, simulate the response, and write it out. '''
     
     sweep_start_time = time.time()
@@ -75,20 +81,20 @@ def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_
         # tell the neuron what dt should be for this sweep
     neuron.dt = 1.0 / data['sampling_rate']
     
-    sim_data = simulate_sweep(neuron, data['stimulus'])
+    sim_data = simulate_sweep(neuron, data['stimulus'], spike_cut_value)
 
     write_sweep_response(output_file_name, sweep_number, sim_data['voltage'], sim_data['interpolated_spike_times'])
 
     logging.debug("total sweep time %f" % ( time.time() - sweep_start_time ))
 
-def simulate_neuron(neuron, sweeps, input_file_name, output_file_name):
+def simulate_neuron(neuron, sweeps, input_file_name, output_file_name, spike_cut_value):
 
     start_time = time.time()
 
     filtered_sweeps = [ sweep for sweep in sweeps if sweep['ephys_stimulus']['ephys_stimulus_type']['name'] != 'Unknown' ]
 
     for sweep in filtered_sweeps:
-        simulate_sweep_from_file(neuron, sweep['sweep_number'], input_file_name, output_file_name)
+        simulate_sweep_from_file(neuron, sweep['sweep_number'], input_file_name, output_file_name, spike_cut_value)
                  
     logging.debug("total elapsed time %f" % (time.time() - start_time))    
 
@@ -109,7 +115,7 @@ def main():
 
     neuron = GLIFNeuron.from_dict(neuron_config)
 
-    simulate_neuron(neuron, sweeps, args.ephys_file, args.output_ephys_file) 
+    simulate_neuron(neuron, sweeps, args.ephys_file, args.output_ephys_file, args.spike_cut_value) 
 
 
 
