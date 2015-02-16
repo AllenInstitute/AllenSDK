@@ -34,11 +34,11 @@ def get_sweep_stimulus_type(sweep):
     except:
         return None
 
-def get_sweeps_by_type(sweep_list, sweep_type, validate):
+def get_sweeps_by_type(sweeps, sweep_type, validate):
     if validate:
-        return [ s for s in sweep_list if get_sweep_stimulus_type(s) == sweep_type and s.get('workflow_state',None) == 'passed' ]
+        return [ s for sn, s in sweeps.iteritems() if get_sweep_stimulus_type(s) == sweep_type and s.get('workflow_state',None) == 'passed' ]
     else:
-        return [ s for s in sweep_list if get_sweep_stimulus_type(s) == sweep_type ]
+        return [ s for sn, s in sweeps.iteritems() if get_sweep_stimulus_type(s) == sweep_type ]
 
 def find_ranked_sweep(sweep_list, key, reverse=False):
     if sweep_list:
@@ -56,19 +56,19 @@ def find_ranked_sweep(sweep_list, key, reverse=False):
     else:
         return []
 
-def find_short_square_sweeps(sweep_list, validate):
+def find_short_square_sweeps(sweeps, validate):
     '''
     Find 1) all of the subthreshold short square sweeps
          2) all of the superthreshold short square sweeps
          3) the subthresholds short square sweep with maximum stimulus amplitude
     '''
-    short_square_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE, validate)
+    short_square_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE, validate)
     subthreshold_short_square_sweeps = [ s for s in short_square_sweeps if s.get('num_spikes',None) == 0 ]
     superthreshold_short_square_sweeps = [ s for s in short_square_sweeps if s.get('num_spikes',None) > 0 ]
-    short_square_triple_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_TRIPLE, validate)
+    short_square_triple_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE_TRIPLE, validate)
 
-    short_square_60_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_60, validate)
-    short_square_80_sweeps = get_sweeps_by_type(sweep_list, SHORT_SQUARE_80, validate)
+    short_square_60_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE_60, validate)
+    short_square_80_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE_80, validate)
     
     out = {
         'all_short_square': get_sweep_numbers(short_square_sweeps),
@@ -90,16 +90,16 @@ def find_short_square_sweeps(sweep_list, validate):
 
     return out
 
-def find_ramp_sweeps(sweep_list, validate):
+def find_ramp_sweeps(sweeps, validate):
     '''
     Find 1) all ramp sweeps
          2) all subthreshold ramps
          3) all superthreshold ramps
     '''
-    ramp_sweeps = get_sweeps_by_type(sweep_list, RAMP, validate)
+    ramp_sweeps = get_sweeps_by_type(sweeps, RAMP, validate)
     subthreshold_ramp_sweeps = [ s for s in ramp_sweeps if s.get('num_spikes',None) == 0 ]
     superthreshold_ramp_sweeps = [ s for s in ramp_sweeps if s.get('num_spikes',None) > 0 ]
-    ramp_to_rheo_sweeps = get_sweeps_by_type(sweep_list, RAMP_TO_RHEO, validate)
+    ramp_to_rheo_sweeps = get_sweeps_by_type(sweeps, RAMP_TO_RHEO, validate)
 
     out = { 
         'all_ramps': get_sweep_numbers(ramp_sweeps),
@@ -114,15 +114,15 @@ def find_ramp_sweeps(sweep_list, validate):
 
     return out
     
-def find_noise_sweeps(sweep_list, validate):
+def find_noise_sweeps(sweeps, validate):
     '''
     Find 1) the noise1 sweeps
          2) the noise2 sweeps
          4) all noise sweeps
     '''
 
-    noise1_sweeps = get_sweeps_by_type(sweep_list, NOISE1, validate)
-    noise2_sweeps = get_sweeps_by_type(sweep_list, NOISE2, validate)
+    noise1_sweeps = get_sweeps_by_type(sweeps, NOISE1, validate)
+    noise2_sweeps = get_sweeps_by_type(sweeps, NOISE2, validate)
 
     all_noise_sweeps = sorted(noise1_sweeps + noise2_sweeps, key=lambda x: x['sweep_number'])
 
@@ -143,19 +143,20 @@ def find_noise_sweeps(sweep_list, validate):
         
     return out
 
-def find_failed_sweeps(sweep_list, data):
+def find_failed_sweeps(sweeps, data):
     out_data = {}
 
     for k,v in data.iteritems():
         if all([ isinstance(vi, int) for vi in v ]):
-            out_data[k] = [ sweep_list[vi].get('workflow_state',None) for vi in v ]
+            out_data[k] = [ sweeps[vi].get('workflow_state',None) for vi in v ]
 
     return out_data
 
 def find_sweeps(data_file_name, sweeps, validate):
+    
     data = {
         'filename': data_file_name,
-        'sweeps': sweeps
+        'sweeps': { s['sweep_number']: s for s in sweeps }
     }
     
     data.update(find_short_square_sweeps(data['sweeps'], validate))
