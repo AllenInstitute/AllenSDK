@@ -32,7 +32,7 @@ setup(
                    'coverage>=3.7.1'],
     setup_requires=['setuptools', 'sphinx'],
     url='http://',
-    scripts=['allen_wrench/biophys_sim/scripts/bps'],
+    scripts=['allen_wrench/model/biophys_sim/scripts/bps'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',

@@ -1,4 +1,4 @@
-from allen_wrench.biophys_sim.neuron.hoc_utils import HocUtils
+from allen_wrench.model.biophys_sim.neuron.hoc_utils import HocUtils
 
 class ParallelContext(object):
     def __init__(self):

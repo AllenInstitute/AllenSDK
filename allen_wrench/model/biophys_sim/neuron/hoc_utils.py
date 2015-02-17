@@ -42,9 +42,9 @@ class HocUtils(object):
         HocUtils.h = h
         h.load_file('stdgui.hoc')
 
-        self.load_hoc_files('allen_wrench.biophys_sim.neuron_hoc.import3d', self.hoc_3d_files)
-        self.load_hoc_files('allen_wrench.biophys_sim.neuron_hoc.common', self.hoc_files)
-        self.load_hoc_files('allen_wrench.biophys_sim.neuron_hoc', self.hoc_lib_files)
+        self.load_hoc_files('allen_wrench.model.biophys_sim.neuron_hoc.import3d', self.hoc_3d_files)
+        self.load_hoc_files('allen_wrench.model.biophys_sim.neuron_hoc.common', self.hoc_files)
+        self.load_hoc_files('allen_wrench.model.biophys_sim.neuron_hoc', self.hoc_lib_files)
         
         h('starttime = startsw()')
         

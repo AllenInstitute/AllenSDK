@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python -m allen_wrench.model.biophys_sim.bps_command $1 $2

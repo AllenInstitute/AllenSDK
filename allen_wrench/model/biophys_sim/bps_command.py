@@ -17,11 +17,11 @@ import subprocess as sp
 import logging
 from allen_wrench.config.model.configuration_parser import ConfigurationParser
 from allen_wrench.config.model.description import Description
-from allen_wrench.biophys_sim.misc.config import Config
+from allen_wrench.model.biophys_sim.misc.config import Config
 
 
 def choose_bps_command(command='bps_simple', conf_file=None):
-    log = logging.getLogger('allen_wrench.biophys_sim.bps_command')
+    log = logging.getLogger('allen_wrench.model.biophys_sim.bps_command')
 
     log.info("bps command: %s" % (command))
         
@@ -48,7 +48,7 @@ def choose_bps_command(command='bps_simple', conf_file=None):
         log.info('num mpi processes: %d' % 
                  (num_mpi_processes))
         
-        start_module = resource_filename('allen_wrench.biophys_sim.bps_command',
+        start_module = resource_filename('allen_wrench.model.biophys_sim.bps_command',
                                          'bps_command.py')
         log.info("START_MODULE: %s" % (start_module))
         my_env = os.environ.copy()
@@ -77,7 +77,7 @@ def choose_bps_command(command='bps_simple', conf_file=None):
         log.info('num mpi processes: %d' % 
                  (num_mpi_processes))
         
-        start_module = resource_filename('allen_wrench.biophys_sim.bps_command',
+        start_module = resource_filename('allen_wrench.model.biophys_sim.bps_command',
                                          'bps_command.py')
         log.info("START_MODULE: %s" % (start_module))
         my_env = os.environ.copy()
