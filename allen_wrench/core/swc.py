@@ -8,7 +8,36 @@ DEFAULT_COLUMNS = [ 'id', 'type', 'x', 'y', 'z', 'radius', 'parent' ]
 # Default columns to convert to numeric types automatically 
 DEFAULT_NUMERIC_COLUMNS = [ 'type', 'x', 'y', 'z', 'radius' ]
 
-def read_compartments(file_name, columns=None, numeric_columns=None):
+def read_rows(rows, columns, numeric_columns):
+    rows = [ r.strip() for r in rows if len(r) > 0 and r.strip()[0] != '#' ]
+    
+    reader = csv.DictReader(rows, fieldnames=columns, delimiter=' ', skipinitialspace=True, restkey='other')
+    
+    compartment_list = []
+
+    # convert numeric columns 
+    for compartment in reader:
+        for nh in numeric_columns:
+            compartment[nh] = str_to_num(compartment[nh])
+                
+        compartment_list.append(compartment)
+
+    return Morphology(compartment_list=compartment_list)    
+    
+
+def read_string(s, columns=None, numeric_columns=None):
+    if columns is None:
+        columns = DEFAULT_COLUMNS
+        
+    if numeric_columns is None:
+        numeric_columns = DEFAULT_NUMERIC_COLUMNS 
+
+    rows = s.split('\n')
+
+    return read_rows(rows, columns, numeric_columns)
+
+    
+def read_swc(file_name, columns=None, numeric_columns=None):
     """  Read in an SWC file and return a Morphology object.
 
     file_name: file to be read
@@ -21,25 +50,12 @@ def read_compartments(file_name, columns=None, numeric_columns=None):
     if numeric_columns is None:
         numeric_columns = DEFAULT_NUMERIC_COLUMNS 
 
-    compartment_list = []
-
     with open(file_name, "rb") as f:
         # skip comment rows, strip off extra whitespace
-        rows = [ r.strip() for r in f if r.strip()[0] != '#' ]
+        return read_rows(f, columns, numeric_columns)
         
-        reader = csv.DictReader(rows, fieldnames=columns, delimiter=' ', skipinitialspace=True, restkey='other')
-    
-        # convert numeric columns 
-        for compartment in reader:
-            for nh in numeric_columns:
-                compartment[nh] = str_to_num(compartment[nh])
-                
-            compartment_list.append(compartment)
-    return compartment_list
 
-def read(file_name, columns=None, numeric_columns=None):
-    compartment_list = read_compartments(file_name, columns, numeric_columns)
-    return Morphology(compartment_list=compartment_list)
+
 
 class Morphology( object ):
     SOMA = 1
