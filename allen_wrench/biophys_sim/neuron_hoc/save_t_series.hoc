@@ -1,0 +1,43 @@
+objref rec_t_vec, rec_value_vec, rec_t_vec_list, rec_value_vec_list
+
+rec_t_vec_list = new List()
+rec_value_vec_list = new List()
+
+
+proc save_t_series_prep() {
+// $s1 -- the string containing information about the cell, section, and the value that should be saved.
+
+  rec_t_vec = new Vector()
+  rec_t_vec_list.append(rec_t_vec)
+  rec_value_vec = new Vector()
+  rec_value_vec_list.append(rec_value_vec)
+
+  rec_t_vec.record(&t)
+  strdef tmp_string
+  sprint(tmp_string,"rec_value_vec.record(&%s)", $s1)
+  execute(tmp_string)
+
+}
+
+
+proc save_t_series_write() {localobj tmp_matrix, f_out_data
+// $s1 -- name of the file for writing out the data;
+// $2 -- ID of the value that was previously recorded.
+
+  rec_t_vec = new Vector()
+  rec_value_vec = new Vector()
+  rec_t_vec = rec_t_vec_list.o($2)
+  rec_value_vec = rec_value_vec_list.o($2)
+
+  tmp_matrix = new Matrix()
+  tmp_matrix.resize(rec_value_vec.size(),2)
+  tmp_matrix.setcol(0, rec_t_vec)
+  tmp_matrix.setcol(1, rec_value_vec)
+
+  f_out_data = new File()
+  f_out_data.wopen($s1)
+  tmp_matrix.fprint(0, f_out_data, " %g")
+  f_out_data.close()
+
+}
+

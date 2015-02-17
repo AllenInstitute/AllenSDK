@@ -1,0 +1,73 @@
+objref synList
+
+obfunc distSynsUniform() { local i, totalL, totalSyns localobj lengthList, cumLList, tobj, toAdd, randomNum, r2, randomVec, distList, tempref
+	// INPUTS
+	// totalSyns = $1
+	// section list for synapses to be distributed over= $2
+	// $o3 is a stream of random numbers.
+
+   
+   lengthList = new Vector(0) // a vector of branch lengths in order
+   totalSyns = $1	 
+   tempref = $o2
+
+//print $1, $o2, $o3
+
+   totalL = 0
+   forsec tempref {
+       totalL += L
+       lengthList.append(L)
+    }
+
+
+cumLList = new Vector(lengthList.size()) // a vector of the cummulative 
+											// branch length, in order
+
+for i=0,lengthList.size()-1{
+    cumLList.x[i]=lengthList.sum(0,i)
+}
+
+
+synList = new List()
+
+
+randomNum = $o3.r
+randomNum.uniform(0,totalL)
+randomVec = new Vector(totalSyns)
+randomVec.setrand(randomNum)
+randomVec.sort()
+
+toAdd = new Vector(0)
+
+for i=0, lengthList.size()-1{
+    howManyToAdd=0
+    while (randomVec.x[0]<cumLList.x[i]){
+    	  howManyToAdd += 1
+	  randomVec.remove(0)
+	  if (randomVec.size()<1){randomVec.append(99999999999999)}
+    }
+  toAdd.append(howManyToAdd)
+}
+
+
+ind = 0
+distList = new Vector(0)
+
+forsec tempref {
+       for i=1,toAdd.x[ind]{
+       	   where = randomNum.uniform(0,1)
+	   distList.append(distance(where))
+
+	   tobj = new Exp2Syn(where)
+	   // Debugging.
+	   //tobj = new Exp2SynPrint(where)
+
+	   synList.append(tobj)
+       }
+       ind+=1
+}
+
+	return synList
+
+} //end procedure
+

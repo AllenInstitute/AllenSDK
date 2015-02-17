@@ -1,0 +1,13 @@
+objref pyctx
+pyctx = new PythonObject()
+
+nrnpython("\n\
+from logging import getLogger\n\
+l = getLogger('NEURON')\n\
+def biophys_log_python(msg):\n\
+    l.info(msg)\n\
+")
+
+proc biophys_log() {
+    pyctx.biophys_log_python($s1)
+}
