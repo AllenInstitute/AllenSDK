@@ -8,7 +8,7 @@ Quick Start Install Using Pip (Linux)
 
  #. Pip install for a single user.
     ::
-        pip install http://bamboo.corp.alleninstitute.org/browse/IFR-ALLENWRENCH/latestSuccessful/artifact/shared/package/allen_wrench.tgz --user
+        pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allen_wrench-|version|.tar.gz --user
 
 
 Install Using Setup Tools
@@ -16,19 +16,19 @@ Install Using Setup Tools
 
  #. Download the distribution.
     ::
-        wget http://bamboo.corp.alleninstitute.org/browse/IFR-ALLENWRENCH/latestSuccessful/artifact/shared/package/allen_wrench.tgz
+        wget http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allen_wrench-|version|.tar.gz
  #. Unpack the distribution.
     ::
-        tar xvzf allen_wrench.tgz
+        tar xvzf allen_wrench-|version|.tar.gz
  #. Install using setuptools
     ::
-        cd allen_wrench
+        cd allen_wrench-|version|
         python setup.py install --user
         
 Uninstall
 ---------
 
- #. Simply use pip.   
+ #. Simply use pip.
     ::
         pip uninstall allen_wrench
        

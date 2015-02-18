@@ -7,13 +7,13 @@ Quick Start (Linux)
 
  #. Download the source distribution.
     ::
-        wget http://bamboo.corp.alleninstitute.org/browse/IFR-ALLENWRENCH/latestSuccessful/artifact/shared/package/allen_wrench.tgz
+        wget http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allen_wrench-|version|.tar.gz
  #. Unpack the source code.
     ::
-        tar -x -v --ungzip -f allen_wrench.tgz
+        tar -x -v --ungzip -f allen_wrench-|version|.tar.gz
  #. Install using setuptools
     ::
-        cd allen_wrench
+        cd allen_wrench-|version|
         python setup.py install
  #. Run the tests with coverage
     :: 
@@ -21,7 +21,7 @@ Quick Start (Linux)
         
  #. Rebuild from source
     ::
-        make clean doc 	sdist
+        make clean doc sdist
 
 Other Distribution Formats
 --------------------------
@@ -41,6 +41,7 @@ Build Server
 ------------
 
  * `Allen Institute Internal Bamboo Server <http://http://bamboo.corp.alleninstitute.org/browse/IFR-ALLENWRENCH/>`_
+ * `Allen Wrench / Biophys Sim Combined build <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/>`_
 
  Unit test results and code coverage reports can be found on here.
 

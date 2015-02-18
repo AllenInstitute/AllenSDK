@@ -1,8 +1,7 @@
 PROJECTNAME = allen_wrench
 DISTDIR = dist
 BUILDDIR = build
-VERSION = 0.2.0
-RELEASE = dev123
+export RELEASE=dev$(BUILD_NUMBER)
 RELEASEDIR = $(PROJECTNAME)-$(VERSION).$(RELEASE)
 EGGINFODIR = $(PROJECTNAME).egg-info
 DOCDIR = doc
@@ -15,13 +14,19 @@ build:
 
 distutils_build: clean
 	python setup.py build
+	
+setversion:
+	sed -ie 's/'\''[0-9]\+.[0-9]\+.[0-9]\+.dev[0-9]\+'\''/'\''${VERSION}.${RELEASE}'\''/g' allen_wrench/__init__.py
 
 sdist: distutils_build
 	python setup.py sdist
 	
 doc: clean
-	sphinx-apidoc -d 4 -H "Allen Wrench" -A "Allen Institute for Brain Science" -V $(VERSION) -R $(VERSION)$(RELEASE) --full -o doc $(PROJECTNAME)
-	cp doc_template/*.rst doc_template/conf.py doc
+	sphinx-apidoc -d 4 -H "Allen Wrench" -A "Allen Institute for Brain Science" -V $(VERSION) -R $(VERSION).dev$(RELEASE) --full -o doc $(PROJECTNAME)
+	cp doc_template/*.rst doc_template/conf.py doc	
+	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/user.rst
+	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/developer.rst
+	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/links.rst
 	cd doc && make html || true
 
 clean:
