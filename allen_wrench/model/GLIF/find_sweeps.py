@@ -36,7 +36,7 @@ def get_sweep_stimulus_type(sweep):
 
 def get_sweeps_by_type(sweeps, sweep_type, validate):
     if validate:
-        return [ s for sn, s in sweeps.iteritems() if get_sweep_stimulus_type(s) == sweep_type and s.get('workflow_state',None) == 'passed' ]
+        return [ s for sn, s in sweeps.iteritems() if get_sweep_stimulus_type(s) == sweep_type and s.get('workflow_state',None) == 'auto_passed' ]
     else:
         return [ s for sn, s in sweeps.iteritems() if get_sweep_stimulus_type(s) == sweep_type ]
 
