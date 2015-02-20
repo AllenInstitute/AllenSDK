@@ -15,6 +15,7 @@ SHORT_SQUARE_TRIPLE = 'Short Square - Triple'
 RAMP_TO_RHEO = 'Ramp to Rheobase'
 
 FILE_TYPE = 'ORCA'
+PASSED_WORKFLOW_STATE = 'auto_passed'
 SUCCESS=0
 
 def fail_missing_sweep(msg, validate):
@@ -34,11 +35,8 @@ def get_sweep_stimulus_type(sweep):
     except:
         return None
 
-def get_sweeps_by_type(sweeps, sweep_type, validate):
-    if validate:
-        return [ s for sn, s in sweeps.iteritems() if get_sweep_stimulus_type(s) == sweep_type and s.get('workflow_state',None) == 'auto_passed' ]
-    else:
-        return [ s for sn, s in sweeps.iteritems() if get_sweep_stimulus_type(s) == sweep_type ]
+def get_sweeps_by_type(sweeps, sweep_type):
+    return [ s for sn, s in sweeps.iteritems() if get_sweep_stimulus_type(s) == sweep_type ]
 
 def find_ranked_sweep(sweep_list, key, reverse=False):
     if sweep_list:
@@ -62,13 +60,13 @@ def find_short_square_sweeps(sweeps, validate):
          2) all of the superthreshold short square sweeps
          3) the subthresholds short square sweep with maximum stimulus amplitude
     '''
-    short_square_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE, validate)
+    short_square_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE)
     subthreshold_short_square_sweeps = [ s for s in short_square_sweeps if s.get('num_spikes',None) == 0 ]
     superthreshold_short_square_sweeps = [ s for s in short_square_sweeps if s.get('num_spikes',None) > 0 ]
-    short_square_triple_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE_TRIPLE, validate)
+    short_square_triple_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE_TRIPLE)
 
-    short_square_60_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE_60, validate)
-    short_square_80_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE_80, validate)
+    short_square_60_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE_60)
+    short_square_80_sweeps = get_sweeps_by_type(sweeps, SHORT_SQUARE_80)
     
     out = {
         'all_short_square': get_sweep_numbers(short_square_sweeps),
@@ -96,10 +94,10 @@ def find_ramp_sweeps(sweeps, validate):
          2) all subthreshold ramps
          3) all superthreshold ramps
     '''
-    ramp_sweeps = get_sweeps_by_type(sweeps, RAMP, validate)
+    ramp_sweeps = get_sweeps_by_type(sweeps, RAMP)
     subthreshold_ramp_sweeps = [ s for s in ramp_sweeps if s.get('num_spikes',None) == 0 ]
     superthreshold_ramp_sweeps = [ s for s in ramp_sweeps if s.get('num_spikes',None) > 0 ]
-    ramp_to_rheo_sweeps = get_sweeps_by_type(sweeps, RAMP_TO_RHEO, validate)
+    ramp_to_rheo_sweeps = get_sweeps_by_type(sweeps, RAMP_TO_RHEO)
 
     out = { 
         'all_ramps': get_sweep_numbers(ramp_sweeps),
@@ -121,8 +119,8 @@ def find_noise_sweeps(sweeps, validate):
          4) all noise sweeps
     '''
 
-    noise1_sweeps = get_sweeps_by_type(sweeps, NOISE1, validate)
-    noise2_sweeps = get_sweeps_by_type(sweeps, NOISE2, validate)
+    noise1_sweeps = get_sweeps_by_type(sweeps, NOISE1)
+    noise2_sweeps = get_sweeps_by_type(sweeps, NOISE2)
 
     all_noise_sweeps = sorted(noise1_sweeps + noise2_sweeps, key=lambda x: x['sweep_number'])
 
@@ -143,17 +141,12 @@ def find_noise_sweeps(sweeps, validate):
         
     return out
 
-def find_failed_sweeps(sweeps, data):
-    out_data = {}
-
-    for k,v in data.iteritems():
-        if all([ isinstance(vi, int) for vi in v ]):
-            out_data[k] = [ sweeps[vi].get('workflow_state',None) for vi in v ]
-
-    return out_data
 
 def find_sweeps(data_file_name, sweeps, validate):
     
+    if validate:
+        sweeps = [ s for s in sweeps if s['workflow_state'] == PASSED_WORKFLOW_STATE ]
+
     data = {
         'filename': data_file_name,
         'sweeps': { s['sweep_number']: s for s in sweeps }
@@ -163,10 +156,9 @@ def find_sweeps(data_file_name, sweeps, validate):
     data.update(find_ramp_sweeps(data['sweeps'], validate))
     data.update(find_noise_sweeps(data['sweeps'], validate))
 
-    data['failed_sweeps'] = find_failed_sweeps(data['sweeps'], data)
-
     return data
     
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='find relevant sweeps from a sweep catalog')
 
