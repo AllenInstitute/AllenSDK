@@ -10,6 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from allen_wrench.config.app.pydev_connector import PydevConnector
 
 try:
     from ConfigParser import ConfigParser # Python 2
@@ -19,12 +20,10 @@ except:
 import argparse
 import os
 from pkg_resources import resource_filename
-from urlparse import urlparse, parse_qs
 
 import logging
 import logging.config as lc
 import sys
-
 
 class ApplicationConfig(object):
     ''' Convenience class that consolidates the handling of application configuration
@@ -32,36 +31,43 @@ class ApplicationConfig(object):
         using Python standard libraries and formats.
     '''
     
-    log = logging.getLogger(__name__)
-    DEFAULT_LOG_CONFIG = resource_filename(__name__, 'logging.conf')
-    lc.fileConfig(DEFAULT_LOG_CONFIG)
+    _log = logging.getLogger(__name__)
+    _DEFAULT_LOG_CONFIG = resource_filename(__name__, 'logging.conf')
+    lc.fileConfig(_DEFAULT_LOG_CONFIG)
 
     def __init__(self, 
                  defaults,
                  name="app",
                  halp="Run application.",
+                 pydev=False,
                  default_log_config=None):
         self.application_name = name
         self.help = halp
+        self.debug_enabled = False
 
         if default_log_config == None:
-            default_log_config = ApplicationConfig.DEFAULT_LOG_CONFIG
+            default_log_config = ApplicationConfig._DEFAULT_LOG_CONFIG
 
-        logging.info("default log config: %s" % (default_log_config))
+        ApplicationConfig._log.info("default log config: %s" % (default_log_config))
 
         self.defaults = {
             'config_file_path': {
                 'default': "%s.conf" % (self.application_name),
                 'help': 'configuration file path'
             },
-            'debug': { 'default': 'off',
-                       'help': 'pydev_remote or off (default)'},
-                         
             'log_config_path': {
                 'default': default_log_config,
                 'help': 'logging configuration path'
             }
         }
+        
+        if pydev:
+            self.debug_enabled = True
+            self.defaults['debug'] = {
+                'default': 'off',
+                'help': 'pydev_remote or off (default)'
+            }
+ 
 
         self.defaults.update(defaults)
 
@@ -72,28 +78,6 @@ class ApplicationConfig(object):
         for key, value in self.defaults.items():
             setattr(self, key, value['default'])
 
-
-    def pydev_connect(self, url=None):
-        ''' Convenience method for connecting to the Eclipse/pydev remote debugger.
-            see: http://pydev.org/manual_adv_remote_debugger.html
-        '''
-        if url == None:
-            url = 'pydev://localhost:5678'
-        
-        try:
-            parsed_url = urlparse(url)
-            hostname = parsed_url.hostname
-            port = parsed_url.port
-            
-            suspend = False
-            queries = parse_qs(parsed_url.query)
-            if 'suspend' in queries and len(queries['suspend']) > 0 and queries['suspend'][0].lower() == 'true':
-                suspend = True
-            
-            import pydevd; pydevd.settrace(host=hostname, port=port, suspend=suspend)
-        except:
-            self.log.warn("Could not connect to PyDev remote debug server: %s" % (url))
-                        
 
     def load(self, command_line_args, disable_existing_loggers=True):
         ''' Load application configuration options, first from the environment,
@@ -121,8 +105,8 @@ class ApplicationConfig(object):
                            (parsed_args.config_file_path,
                             e))
 
-        if self.debug.startswith('pydev'):
-            self.pydev_connect(self.debug)
+        if self.debug_enabled and self.debug.startswith('pydev'):
+            PydevConnector.connect(self.debug)
 
         try:
             lc.fileConfig(self.log_config_path,

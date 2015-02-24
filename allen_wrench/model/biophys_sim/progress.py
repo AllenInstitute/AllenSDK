@@ -1,4 +1,4 @@
-class Progress(object):    
+class Progress(object):
     def __init__(self, init_k=0, skip=1, total=100.0, log=None, message="Working"):
         self.k = init_k
         self.skip = skip

@@ -17,25 +17,28 @@ import subprocess as sp
 import logging
 from allen_wrench.config.model.configuration_parser import ConfigurationParser
 from allen_wrench.config.model.description import Description
-from allen_wrench.model.biophys_sim.misc.config import Config
+from allen_wrench.model.biophys_sim.config import Config
 
 
 def choose_bps_command(command='bps_simple', conf_file=None):
     log = logging.getLogger('allen_wrench.model.biophys_sim.bps_command')
 
     log.info("bps command: %s" % (command))
-        
-    conf_file = os.path.abspath(conf_file)
     
-    if command == 'nrnivmodl':
+    if conf_file:
+        conf_file = os.path.abspath(conf_file)
+    
+    if command == 'help':
+        print Config().argparser.parse_args(['--help'])
+    elif command == 'nrnivmodl':
         sp.call(['nrnivmodl', 'modfiles']) # TODO: alternate location in manifest?
     elif command == 'run_simple':
-        description = read_model_run_config(conf_file)   
+        description = read_model_run_config(conf_file)
         sys.path.insert(1, description.manifest.get_path('CODE_DIR'))
         (module_name, function_name) = description.data['runs'][0]['main'].split('#')
         run_module(description, module_name, function_name)
     elif command == 'run_model':
-        from abapy.queue.mpi_job import MpiJob
+        from allen_wrench.config.app.mpi_job import MpiJob
         
         description = read_model_run_config(conf_file)
         run_params = description.data['runs'][0]
@@ -61,7 +64,7 @@ def choose_bps_command(command='bps_simple', conf_file=None):
                      env=my_env)
         job.run()
     elif command == 'cluster_run_model':
-        from abapy.queue.mpi_job import MpiJob
+        from allen_wrench.config.app.mpi_job import MpiJob
         
         description = read_model_run_config(conf_file)
         run_params = description.data['runs'][0]
@@ -88,9 +91,9 @@ def choose_bps_command(command='bps_simple', conf_file=None):
                      python_args=['-nobanner', '-mpi'],
                      module=start_module,
                      env=my_env)
-        job.run()        
+        job.run()
     elif command == 'run_model_cluster' or command == 'qsub_script':
-        from abapy.queue.pbs_job import PbsJob
+        from allen_wrench.config.app.pbs_job import PbsJob
         
         description = read_model_run_config(conf_file)
         pbs_args = description.data['cluster'][0]
@@ -104,7 +107,7 @@ bps cluster_run_model
         
         job = PbsJob(**pbs_args)
         
-        if command == 'run_model_cluster':        
+        if command == 'run_model_cluster':
             jobid = job.run()
             log.info("job id: %s" % (jobid))
         else:
@@ -133,7 +136,7 @@ def read_model_run_config(application_config_path):
                     
     unpack_lobs=['positions',
                  'connections',
-                 'external_inputs']    
+                 'external_inputs']
     reader = ConfigurationParser()
     description = Description()
     
