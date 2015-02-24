@@ -151,7 +151,7 @@ def find_sweeps(data_file_name, sweeps, validate):
         'filename': data_file_name,
         'sweeps': { s['sweep_number']: s for s in sweeps }
     }
-    
+
     data.update(find_short_square_sweeps(data['sweeps'], validate))
     data.update(find_ramp_sweeps(data['sweeps'], validate))
     data.update(find_noise_sweeps(data['sweeps'], validate))
