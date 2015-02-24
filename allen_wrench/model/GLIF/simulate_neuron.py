@@ -91,9 +91,13 @@ def simulate_neuron(neuron, sweeps, input_file_name, output_file_name, spike_cut
 
     start_time = time.time()
 
-    filtered_sweeps = [ sweep for sweep in sweeps if sweep['ephys_stimulus']['ephys_stimulus_type']['name'] != 'Unknown' ]
+    for sweep in sweeps:
+        sweep_type = sweep['ephys_stimulus']['ephys_stimulus_type']['name']
 
-    for sweep in filtered_sweeps:
+        if sweep_type == 'Unknown' or sweep_type == 'Test':
+            logging.debug("skipping sweep %d with type %s" % (sweep['sweep_number'], sweep_type))
+            continue
+
         simulate_sweep_from_file(neuron, sweep['sweep_number'], input_file_name, output_file_name, spike_cut_value)
                  
     logging.debug("total elapsed time %f" % (time.time() - start_time))    

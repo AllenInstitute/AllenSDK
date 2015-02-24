@@ -79,13 +79,11 @@ def dynamics_threshold_fixed(neuron, threshold_t0, voltage_t0, value):
 # AScurrent reset rules 
 # all return AScurrents_t1
 
-def reset_AScurrent_sum(neuron, AScurrents_t0, t, r):
+def reset_AScurrent_sum(neuron, AScurrents_t0, r):
     #old way without refrectory period: var_out[2]=neuron.a1*neuron.coeffa1 # a constant multiplied by the amplitude of the excitatory current at reset
-    # 2:6 are k's
-    #return neuron.asc_vector * neuron.coeffs['asc_vector'] + AScurrents_t0 * np.exp(neuron.k * neuron.dt)
-    return neuron.asc_vector * neuron.coeffs['asc_vector'] + AScurrents_t0 * r * np.exp(neuron.k * neuron.dt)
+    return neuron.asc_vector * neuron.coeffs['asc_vector'] + AScurrents_t0 * r * np.exp(neuron.k * neuron.dt * neuron.spike_cut_length)
 
-def reset_AScurrent_none(neuron, AScurrents_t0, t):
+def reset_AScurrent_none(neuron, AScurrents_t0):
     if np.sum(AScurrents_t0)!=0:
         raise Exception('You are running a LIF but the AScurrents are not zero!')
     return np.zeros(len(AScurrents_t0))
@@ -114,6 +112,7 @@ def reset_threshold_max_v_th(neuron, threshold_t0, voltage_v1, delta):
 def reset_threshold_th_before(neuron, threshold_t0, voltage_v1, delta):
     '''it is highly probable that at some point we will need to fit const'''
     '''threshold_t0 and value should be in mV'''
+    raise Exception ('reset_threshold_th_before should not be called')
     return threshold_t0 + delta
 
 def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
@@ -124,6 +123,7 @@ def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
 def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
     '''it is highly probable that at some point we will need to fit const'''
     '''threshold_t0 and value should be in mV'''
+    raise Exception('reset_threshold_fixed should not be called')
     return  value
 
 METHOD_LIBRARY = {
