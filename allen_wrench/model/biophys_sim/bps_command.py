@@ -15,8 +15,6 @@ from pkg_resources import resource_filename
 import os
 import subprocess as sp
 import logging
-from allen_wrench.config.model.configuration_parser import ConfigurationParser
-from allen_wrench.config.model.description import Description
 from allen_wrench.model.biophys_sim.config import Config
 
 
@@ -33,14 +31,20 @@ def choose_bps_command(command='bps_simple', conf_file=None):
     elif command == 'nrnivmodl':
         sp.call(['nrnivmodl', 'modfiles']) # TODO: alternate location in manifest?
     elif command == 'run_simple':
-        description = read_model_run_config(conf_file)
+        app_config = Config(unpack_lobs=['positions',
+                                         'connections',
+                                         'external_inputs'])
+        description = app_config.load(conf_file)
         sys.path.insert(1, description.manifest.get_path('CODE_DIR'))
         (module_name, function_name) = description.data['runs'][0]['main'].split('#')
         run_module(description, module_name, function_name)
     elif command == 'run_model':
         from allen_wrench.config.app.mpi_job import MpiJob
         
-        description = read_model_run_config(conf_file)
+        app_config = Config(unpack_lobs=['positions',
+                                         'connections',
+                                         'external_inputs'])
+        description = app_config.load(conf_file)
         run_params = description.data['runs'][0]
 
         if 'num_mpi_processes' in run_params:
@@ -66,11 +70,14 @@ def choose_bps_command(command='bps_simple', conf_file=None):
     elif command == 'cluster_run_model':
         from allen_wrench.config.app.mpi_job import MpiJob
         
-        description = read_model_run_config(conf_file)
+        app_config = Config(unpack_lobs=['positions',
+                                         'connections',
+                                         'external_inputs'])
+        description = app_config.load(conf_file)
         run_params = description.data['runs'][0]
 
         pbs_args = description.data['cluster'][0]
-        num_mpi_processes = 1            
+        num_mpi_processes = 1
         
         if 'nodes' in pbs_args and 'ppn' in pbs_args:
             num_mpi_processes = int(pbs_args['nodes']) * int(pbs_args['ppn'])
@@ -95,7 +102,10 @@ def choose_bps_command(command='bps_simple', conf_file=None):
     elif command == 'run_model_cluster' or command == 'qsub_script':
         from allen_wrench.config.app.pbs_job import PbsJob
         
-        description = read_model_run_config(conf_file)
+        app_config = Config(unpack_lobs=['positions',
+                                         'connections',
+                                         'external_inputs'])
+        description = app_config.load(conf_file)
         pbs_args = description.data['cluster'][0]
         description.manifest.resolve_paths(pbs_args)
         pbs_args['script'] = '''\
@@ -114,7 +124,8 @@ bps cluster_run_model
             script = job.generate_script()
             print script
     elif command == 'nrnivmodl_cluster':
-        description = read_model_run_config(conf_file)
+        app_config = Config(unpack_lobs=[])
+        description = app_config.load(conf_file)
 
         modfiles_dir = resource_filename('biophys_sim', 'modfiles')
         pbs_args = description.data['cluster'][0]
@@ -128,32 +139,7 @@ bps cluster_run_model
         log.info("job id: %s" % (jobid))
     else:
         raise Exception("unknown command %s" %(command))
-    
-    
-def read_model_run_config(application_config_path):
-    application_config = Config()
-    application_config.load([application_config_path], False)
-                    
-    unpack_lobs=['positions',
-                 'connections',
-                 'external_inputs']
-    reader = ConfigurationParser()
-    description = Description()
-    
-    manifest_default_file = resource_filename(__name__,
-                                              'manifest_default.json')
-    reader.read(manifest_default_file, description)
-    
-    for model_file in application_config.model_file.split(','):
-        reader.read(model_file, description)
-    
-    if application_config.run_file != 'param_run.json':
-        reader.read(application_config.run_file,
-                    description,
-                    unpack_lobs=unpack_lobs)
-    
-    return description
-    
+
 
 def run_module(description, module_name, function_name):
     m = __import__(module_name, fromlist=[function_name])

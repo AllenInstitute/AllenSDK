@@ -101,9 +101,9 @@ class ApplicationConfig(object):
             # apply the remaining command line options
             self.apply_configuration_from_command_line(parsed_args)
         except Exception as e:
-            self.log.error("Could not load configuration file: %s\n%s" % 
-                           (parsed_args.config_file_path,
-                            e))
+            ApplicationConfig._log.error("Could not load configuration file: %s\n%s" % 
+                                         (parsed_args.config_file_path,
+                                         e))
 
         if self.debug_enabled and self.debug.startswith('pydev'):
             PydevConnector.connect(self.debug)

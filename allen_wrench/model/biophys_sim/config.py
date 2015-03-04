@@ -2,6 +2,8 @@ import re
 import logging
 from pkg_resources import resource_filename
 from allen_wrench.config.app.application_config import ApplicationConfig
+from allen_wrench.config.model.configuration_parser import ConfigurationParser
+from allen_wrench.config.model.description import Description
 
 class Config(ApplicationConfig):
     _log = logging.getLogger(__name__)
@@ -30,13 +32,38 @@ class Config(ApplicationConfig):
             self.database_name = d
             self.data_model_paths = dp
         
-    def __init__(self):
+    def __init__(self, unpack_lobs=['positions',
+                                    'connections',
+                                    'external_inputs']):
         super(Config, self).__init__(Config._DEFAULTS, 
                                      name='biophys', 
                                      halp='tools for biophysically detailed modelling at the Allen Institute.',
                                      pydev=True,
                                      default_log_config=Config._DEFAULT_LOG_CONFIG)
+        self.unpack_lobs=unpack_lobs
         
         
-    def load(self, config_path, disable_existing_logs=True):
-        super(Config, self).load(config_path, disable_existing_logs)
+    def load(self, config_path,
+             disable_existing_logs=False):
+        super(Config, self).load([config_path], disable_existing_logs)
+        return self.read_model_run_config(config_path)
+        
+        
+    def read_model_run_config(self, application_config_path):
+        reader = ConfigurationParser()
+        description = Description()
+        
+        manifest_default_file = resource_filename(__name__,
+                                                  'manifest_default.json')
+        reader.read(manifest_default_file, description)
+        
+        # TODO: make space aware w/ regex
+        for model_file in self.model_file.split(','):
+            reader.read(model_file, description)
+        
+        if self.run_file != 'param_run.json':
+            reader.read(self.run_file,
+                        description,
+                        unpack_lobs=self.unpack_lobs)
+        
+        return description

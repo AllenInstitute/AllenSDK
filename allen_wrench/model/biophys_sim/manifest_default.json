@@ -6,30 +6,30 @@
         {   "key": "BASEDIR",
             "type": "dir",
             "spec": "."
-        },    
+        },
         {   "key": "WORKDIR",
             "type": "dir",
             "spec": "/work",
             "parent_key": "BASEDIR"
-        },    
+        },
         {
             "key": "connection_statistics_file_path",
             "type": "file",
             "spec": "connection-statistics.dat",
             "parent_key": "WORKDIR"
-        },                
+        },
         {
             "key": "tuning_variable_connectivity_path",
             "type": "file",
             "spec": "tuning_variable_connectivity.dat",
             "parent_key": "WORKDIR"
-        },                
+        },
         {
             "key": "total_firing_rate_file_path",
             "type": "file",
             "spec": "tot_f_rate.dat",
             "parent_key": "WORKDIR"
-        },                
+        },
         {
             "key": "f_rate_dir",
             "type": "file",

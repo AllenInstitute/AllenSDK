@@ -13,6 +13,13 @@ Contents:
 
    user
    developer
+   neuron
+   model_description
+   template_application
+   resource_manifest
+   large_object_parser
+   customization
+   data_warehouse_client
    allen_wrench
 
 
