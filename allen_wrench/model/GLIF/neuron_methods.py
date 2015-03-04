@@ -21,6 +21,11 @@ class GLIFNeuronMethod( object ):
         self.method.keywords[param] = value
         return value
 
+def two_lines(x,b,c,d):
+    one = b
+    two = c*x+d
+    return np.maximum(one,two)
+
 #------------------------------------------------------------
 # dynamics methods
 #------------------------------------------------------------
@@ -63,6 +68,13 @@ def dynamics_voltage_quadratic_i_of_v(neuron, voltage_t0, AScurrents_t0, inj, a,
         I_of_v=e
 
     return voltage_t0+(inj + np.sum(AScurrents_t0)-I_of_v)*neuron.dt/(neuron.C*neuron.coeffs['C']) 
+
+def dynamics_voltage_piecewise_linear(neuron, voltage_t0, AScurrents_t0, inj, R_tlparam1, R_tlparam2, R_t1param3, El_tlparam1, El_tlparam2, El_t1param3):
+    '''this method requires 3 parameters for equations of both resistance and resting potential 
+    '''
+    G=1./(two_lines(voltage_t0, R_tlparam1, R_tlparam2, R_t1param3))
+    El=-two_lines(voltage_t0, El_tlparam1, El_tlparam2, El_t1param3)
+    return voltage_t0 + (inj + np.sum(AScurrents_t0) - G * neuron.coeffs['G'] * (voltage_t0 - El)) * neuron.dt / (neuron.C * neuron.coeffs['C'])
     
 # threshold equations 
 # all return threshold_t1    
@@ -136,7 +148,8 @@ METHOD_LIBRARY = {
         },
     'voltage_dynamics_method': { 
         'linear': dynamics_voltage_linear,
-        'quadratic_i_of_v': dynamics_voltage_quadratic_i_of_v
+        'quadratic_i_of_v': dynamics_voltage_quadratic_i_of_v,
+        'piecewise': dynamics_voltage_piecewise_linear
         },
     'threshold_dynamics_method': {
         'adapt_standard': dynamics_threshold_adapt_standard,
