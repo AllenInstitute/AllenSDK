@@ -40,6 +40,7 @@ class GLIFNeuronMethod( object ):
 
 def two_lines(x,b,c,d):
     """ Find the maximum of a value and a position on a line 
+
     :parameter x: x position on line 1
     :type x: float
     :parameter c: slope of line 1
@@ -81,6 +82,7 @@ def dynamics_AScurrent_vector(neuron, AScurrents_t0, time_step, spike_time_steps
     """ The vector afterspike current dynamics method keeps track of all of the afterspike
     currents for every previous spike and updates them based on the current time step.
     This method is very slow.
+
     :parameter vector: an array of all running afterspike current values.
     :type vector: np.ndarray
     """
@@ -120,6 +122,7 @@ def dynamics_voltage_linear(neuron, voltage_t0, AScurrents_t0, inj):
 
 def dynamics_voltage_quadratic_i_of_v(neuron, voltage_t0, AScurrents_t0, inj, a, b, c, d, e):    
     """ Quadratic voltage dynamics equation.
+
     :parameter a: constant coefficient of voltage equation
     :type a: float
     :parameter b: linear coefficient of voltage equation
@@ -141,6 +144,7 @@ def dynamics_voltage_quadratic_i_of_v(neuron, voltage_t0, AScurrents_t0, inj, a,
 
 def dynamics_voltage_piecewise_linear(neuron, voltage_t0, AScurrents_t0, inj, R_tlparam1, R_tlparam2, R_t1param3, El_tlparam1, El_tlparam2, El_t1param3):
     """ Piecewise linear voltage dynamics methods. This method requires 3 parameters for equations of both resistance and resting potential. 
+
     :parameter R_tlparam1: 
     :type R_tlparam1: float
     :parameter R_tlparam2: 
@@ -168,9 +172,9 @@ other function parameters must be fixed using the GLIFNeuronMethod class.  They 
 updated threshold value.
 """
 
-
 def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, a, b):
     """ Standard adapting threshold dynamics equation.
+
     :parameter a: coefficient of voltage
     :type a: float
     :parameter b: coefficient of threshold
@@ -186,6 +190,7 @@ def dynamics_threshold_inf(neuron, threshold_t0, voltage_t0):
 
 def dynamics_threshold_fixed(neuron, threshold_t0, voltage_t0, value):
     """ Set threshold a fixed constant.
+
     :parameter value: fixed constant to use for threshold. 
     :type value: float
     """
@@ -208,6 +213,7 @@ class.  They all return an updated afterspike current array.
 
 def reset_AScurrent_sum(neuron, AScurrents_t0, r):
     """ Reset afterspike currents by adding summed exponentials. 
+
     :parameter r: a coeffient vector applied to the afterspike currents
     :type r: np.ndarray
     """
@@ -233,6 +239,7 @@ fixed using the GLIFNeuronMethod class.  They all return an updated voltage valu
 
 def reset_voltage_v_before(neuron, voltage_t0, a, b):
     """ Reset voltage to the previous value with a scale and offset applied.
+
     :parameter a: voltage scale constant
     :type a: float
     :parameter b: voltage offset constant
@@ -254,6 +261,7 @@ def reset_voltage_zero(neuron, voltage_t0):
 
 def reset_voltage_fixed(neuron, voltage_t0, value):
     """ Reset voltage to a fixed value. 
+
     :parameter value: the value to which voltage will be reset.
     :type value: float
     """
@@ -271,6 +279,7 @@ class.  They all return an updated threshold value.
 
 def reset_threshold_max_v_th(neuron, threshold_t0, voltage_v1, delta):
     """ Return the maximum of threshold and reset voltage offset by a constant. 
+
     :parameter delta: value used to offset the return threshold.
     :type delta: float
     """
@@ -280,6 +289,7 @@ def reset_threshold_max_v_th(neuron, threshold_t0, voltage_v1, delta):
 
 def reset_threshold_th_before(neuron, threshold_t0, voltage_v1, delta):
     """ Return the previous threshold by a constant. This method is not used and will raise an exception if called.
+
     :parameter delta: value used to offset the return threshold.
     :type delta: float
     """
@@ -293,6 +303,7 @@ def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
 
 def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
     """ Reset the threshold to a fixed value. This method is not sued and will raise an exception if called.
+
     :parameter value: value to return as the reset threshold
     :type value: float
     """

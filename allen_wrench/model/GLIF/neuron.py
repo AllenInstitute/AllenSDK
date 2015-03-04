@@ -29,6 +29,7 @@ class GLIFNeuron( object ):
                  AScurrent_reset_method, voltage_reset_method, threshold_reset_method,
                  init_voltage, init_threshold, init_AScurrents): 
         """ Initialize the neuron.
+
         :parameter El: resting potential 
         :type El: float
         :parameter dt: duration between time steps
@@ -139,6 +140,7 @@ class GLIFNeuron( object ):
                           init_AScurrents = d['init_AScurrents'])
 
     def to_dict(self):
+        """ Convert the neuron to a serializable dictionary. """
         return {
             'type': self.type,
             'El': self.El,
@@ -165,6 +167,7 @@ class GLIFNeuron( object ):
     def configure_method(method_name, method, method_params):
         """ Create a GLIFNeuronMethod instance given a name, a function, and function parameters. 
         This is just a shortcut to the GLIFNeuronMethod constructor.
+
         :parameter method_name: name for refering to this method later
         :type method_name: string
         :parameter method: a python function 
@@ -182,6 +185,7 @@ class GLIFNeuron( object ):
         """ Create a GLIFNeuronMethod instance out of a library of functions organized by type name. 
         This refers to the METHOD_LIBRARY in neuron_methods.py, which lays out the available functions 
         that can be used for dynamics and reset rules.
+
         :parameter method_type: the name of a function category (e.g. 'AScurrent_dynamics_method' for the afterspike current dynamics methods)
         :type method_type: string
         :parameter params: a dictionary with two members. 'name': the string name of function you want, and 'params': parameters you want to pass to that function
@@ -233,6 +237,7 @@ class GLIFNeuron( object ):
         
     def reset(self, voltage_t0, threshold_t0, AScurrents_t0):
         """ Apply reset rules to the neuron's voltage, threshold, and afterspike currents assuming a spike has occurred (voltage is above threshold). 
+
         :parameter voltage_t0: the current voltage of the neuron
         :type voltage_t0: float
         :parameter threshold_t0: the current spike threshold level of the neuron
@@ -257,6 +262,7 @@ class GLIFNeuron( object ):
         After each step it checks if voltage is above threshold.  If so, self.spike_cut_length NaNs are inserted 
         into the output voltages, reset rules are applied to the voltage, threshold, and afterspike currents, and the 
         simulation resumes.
+
         :parameter stim: vector of scalar current values
         :type stim: np.ndarray
         :returns: a dictionary containing: 
@@ -366,6 +372,7 @@ class GLIFNeuron( object ):
         The model is optimized in this way so that history effects due to spiking can be adequately modeled.  For example, 
         every time the model spikes a new set of afterspike currents will be initiated. To ensure that afterspike currents 
         can be optimized, we force them to be initiated at the time of the biological spike.
+
         :parameter stim: vector of scalar current values
         :type stim: np.ndarray
         :parameter bio_spike_time_steps: spike time step indices
@@ -548,6 +555,7 @@ class GLIFNeuron( object ):
         """ Run the neuron simulation over a segment of a stimulus given initial conditions. The model simulates
         until either the model spikes or the end of the segment is reached.  If the model does not spike, a 
         spike time is extrapolated past the end of the simulation segment.
+
         :parameter voltage_t0: the current voltage of the neuron
         :type voltage_t0: float
         :parameter threshold_t0: the current spike threshold level of the neuron
