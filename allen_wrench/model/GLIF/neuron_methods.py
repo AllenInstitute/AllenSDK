@@ -1,3 +1,6 @@
+""" The methods in this module are used for configuring dynamics and reset rules for the GLIFNeuron.  For more details on how to use these methods, see :doc:`glif_models`.
+"""
+
 import functools
 import numpy as np
 
@@ -57,22 +60,6 @@ def two_lines(x,b,c,d):
     return np.maximum(one,two)
 
 
-"""
-Dynamics Methods
-================
-These methods are used to update the threshold, voltage, and afterspike currents
-of the model at a given time step of the simulation.
-"""
-
-"""
-Afterspike Current Dynamics Methods
------------------------------------
-These methods expect current afterspike current coefficients, current time step, 
-and time steps of all previous spikes to be passed in by the GLIFNeuron. All other function 
-parameters must be fixed using the GLIFNeuronMethod class.  They all return an updated
-afterspike current array.
-"""
-
 def dynamics_AScurrent_exp(neuron, AScurrents_t0, time_step, spike_time_steps):
     """ Exponential afterspike current dynamics method """
     return AScurrents_t0*(1.0 + neuron.k*neuron.dt) 
@@ -106,14 +93,6 @@ def dynamics_AScurrent_none(neuron, AScurrents_t0, time_step, spike_time_steps):
     """ This method always returns zeros for the afterspike currents, regardless of input. """
     return np.zeros(len(AScurrents_t0))
 
-"""
-Voltage Dynamics Methods
-------------------------
-These methods update the output voltage of the simulation.  They all expect a voltage, 
-afterspike current vector, and current injection value to be passed in by the GLIFNeuron. All 
-other function parameters must be fixed using the GLIFNeuronMethod class.  They all return an 
-updated voltage value.
-"""
 
 def dynamics_voltage_linear(neuron, voltage_t0, AScurrents_t0, inj):
     """ Linear voltage dynamics. """
@@ -163,15 +142,6 @@ def dynamics_voltage_piecewise_linear(neuron, voltage_t0, AScurrents_t0, inj, R_
     return voltage_t0 + (inj + np.sum(AScurrents_t0) - G * neuron.coeffs['G'] * (voltage_t0 - El)) * neuron.dt / (neuron.C * neuron.coeffs['C'])
     
 
-"""
-Threshold Dynamics Equations
-----------------------------
-These methods update the spike threshold of the simulation.  They all expect the current
-threshold and voltage values of the simulation to be passed in by the GLIFNeuron. All 
-other function parameters must be fixed using the GLIFNeuronMethod class.  They all return an 
-updated threshold value.
-"""
-
 def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, a, b):
     """ Standard adapting threshold dynamics equation.
 
@@ -196,20 +166,6 @@ def dynamics_threshold_fixed(neuron, threshold_t0, voltage_t0, value):
     """
     return value
 
-"""
-Reset Methods
-=============
-These methods are used to reset the threshold, voltage, and afterspike currents
-of the model after voltage has surpassed spike threshold.
-"""
-
-"""
-Afterspike Current Reset Methods
---------------------------------
-These methods expect current afterspike current coefficients to be passed in by 
-the GLIFNeuron. All other function parameters must be fixed using the GLIFNeuronMethod 
-class.  They all return an updated afterspike current array.
-"""
 
 def reset_AScurrent_sum(neuron, AScurrents_t0, r):
     """ Reset afterspike currents by adding summed exponentials. 
@@ -228,14 +184,6 @@ def reset_AScurrent_none(neuron, AScurrents_t0):
         raise Exception('You are running a LIF but the AScurrents are not zero!')
     return np.zeros(len(AScurrents_t0))
 
-
-"""
-Voltage Reset Methods
----------------------
-These methods update the output voltage of the simulation after voltage has surpassed threshold. 
-They all expect a voltageto be passed in by the GLIFNeuron. All other function parameters must be 
-fixed using the GLIFNeuronMethod class.  They all return an updated voltage value.
-"""
 
 def reset_voltage_v_before(neuron, voltage_t0, a, b):
     """ Reset voltage to the previous value with a scale and offset applied.
@@ -267,15 +215,6 @@ def reset_voltage_fixed(neuron, voltage_t0, value):
     """
     return value
 
-
-"""
-Threshold Reset Methods
------------------------
-These methods update the spike threshold of the simulation after a spike has been detected.  
-They all expect the current threshold and the reset voltage value of the simulation to be passed in 
-by the GLIFNeuron. All other function parameters must be fixed using the GLIFNeuronMethod 
-class.  They all return an updated threshold value.
-"""    
 
 def reset_threshold_max_v_th(neuron, threshold_t0, voltage_v1, delta):
     """ Return the maximum of threshold and reset voltage offset by a constant. 

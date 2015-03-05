@@ -14,6 +14,7 @@ Contents:
    user
    developer
    neuron
+   glif_models
    model_description
    template_application
    resource_manifest
