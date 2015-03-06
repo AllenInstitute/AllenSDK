@@ -20,6 +20,45 @@ class GLIFNeuron( object ):
     rules are applied until voltage crosses threshold, at which point a set of modular reset rules are 
     applied. See neuron_methods.py for a list of what options there are for voltage, threshold, and
     afterspike current dynamics and reset rules.
+
+    Parameters
+    ----------
+     El : float 
+         resting potential 
+     dt : float
+         duration between time steps
+     tau: np.ndarray
+         TODO
+     R_input : float
+         input resistance
+     C : float
+         capacitance
+     asc_vector : np.ndarray
+         afterspike current vector.  one element per element of tau.
+     spike_cut_length : int
+         how many time steps to replace with NaNs when a spike occurs.
+     th_inf : float
+         instantaneous threshold
+     coeffs : doct
+        dictionary coefficients premultiplied to neuron properties during simulation. used for optimization.
+     AScurrent_dynamics_method : dict
+         dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     voltage_dynamics_method : dict
+         dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     threshold_dynamics_method : dict
+         dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     AScurrent_reset_method : dict
+         dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     voltage_reset_method : dict
+         dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     threshold_reset_method : dict
+         dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     init_voltage : float 
+        initial voltage value
+     init_threshold : float
+         initial spike threshold value
+     init_AScurrents : np.ndarray
+        initial afterspike current vector. one element per element of tau.
     """
 
     TYPE = "GLIF"
@@ -28,45 +67,7 @@ class GLIFNeuron( object ):
                  AScurrent_dynamics_method, voltage_dynamics_method, threshold_dynamics_method,
                  AScurrent_reset_method, voltage_reset_method, threshold_reset_method,
                  init_voltage, init_threshold, init_AScurrents): 
-        """ Initialize the neuron.
-
-        :parameter El: resting potential 
-        :type El: float
-        :parameter dt: duration between time steps
-        :type dt: float
-        :parameter tau: 
-        :type tau:
-        :parameter R_input: input resistance
-        :type R_input: float
-        :parameter C: capacitance
-        :type C: float
-        :parameter asc_vector: afterspike current vector.  one element per element of tau.
-        :type asc_vector: np.ndarray
-        :parameter spike_cut_length: how many time steps to replace with NaNs when a spike occurs.
-        :type spike_cut_length: int
-        :parameter th_inf: instantaneous threshold
-        :type th_inf: float
-        :parameter coeffs: dictionary coefficients premultiplied to neuron properties during simulation. used for optimization.
-        :type coeffs: dict
-        :parameter AScurrent_dynamics_method: dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type AScurrent_dynamics_method: dict
-        :parameter voltage_dynamics_method: dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type voltage_dynamics_method: dict
-        :parameter threshold_dynamics_method: dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type threshold_dynamics_method: dict
-        :parameter AScurrent_reset_method: dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type AScurrent_reset_method: dict
-        :parameter voltage_reset_method: dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type voltage_reset_method: dict
-        :parameter threshold_reset_method: dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type threshold_reset_method: dict
-        :parameter init_voltage: initial voltage value
-        :type init_voltage: float
-        :parameter init_threshold: initiali spike threshold value
-        :type init_threshold: float
-        :parameter init_AScurrents: initial afterspike current vector. one element per element of tau.
-        :type init_AScurrents: np.ndarray
-        """
+        """ Initialize the neuron. """
 
         self.type = GLIFNeuron.TYPE
         self.El = El
@@ -140,7 +141,6 @@ class GLIFNeuron( object ):
                           init_AScurrents = d['init_AScurrents'])
 
     def to_dict(self):
-        """ Convert the neuron to a serializable dictionary. """
         return {
             'type': self.type,
             'El': self.El,
@@ -168,14 +168,19 @@ class GLIFNeuron( object ):
         """ Create a GLIFNeuronMethod instance given a name, a function, and function parameters. 
         This is just a shortcut to the GLIFNeuronMethod constructor.
 
-        :parameter method_name: name for refering to this method later
-        :type method_name: string
-        :parameter method: a python function 
-        :type method: function
-        :parameter method_parameters: function arguments whose values should be fixed
-        :type method: dict
-        :returns: a GLIFNeuronMethod instance
-        :rtype: GLIFNeuronMethod
+        Parameters
+        ----------
+        method_name : string
+            name for refering to this method later
+        method : function
+            a python function 
+        method_parameters : dict
+           function arguments whose values should be fixed
+
+        Returns
+        -------
+        GLIFNeuronMethod
+            a GLIFNeuronMethod instance
         """ 
 
         return GLIFNeuronMethod(method_name, method, method_params)
@@ -186,12 +191,17 @@ class GLIFNeuron( object ):
         This refers to the METHOD_LIBRARY in neuron_methods.py, which lays out the available functions 
         that can be used for dynamics and reset rules.
 
-        :parameter method_type: the name of a function category (e.g. 'AScurrent_dynamics_method' for the afterspike current dynamics methods)
-        :type method_type: string
-        :parameter params: a dictionary with two members. 'name': the string name of function you want, and 'params': parameters you want to pass to that function
-        :type params: dict
-        :returns: a GLIFNeuronMethod instance
-        :rtype: GLIFNeuronMethod
+        Parameters
+        ----------
+        method_type : string
+            the name of a function category (e.g. 'AScurrent_dynamics_method' for the afterspike current dynamics methods)
+        params : dict
+            a dictionary with two members. 'name': the string name of function you want, and 'params': parameters you want to pass to that function
+
+        Returns
+        -------
+        GLIFNeuronMethod
+            a GLIFNeuronMethod instance
         """
         method_options = METHOD_LIBRARY.get(method_type, None)
 
@@ -212,20 +222,26 @@ class GLIFNeuron( object ):
 
     def dynamics(self, voltage_t0, threshold_t0, AScurrents_t0, inj, time_step, spike_time_steps):    
         """ Update the voltage, threshold, and afterspike currents of the neuron for a single time step.
-        :parameter voltage_t0: the current voltage of the neuron
-        :type voltage_t0: float
-        :parameter threshold_t0: the current spike threshold level of the neuron
-        :type threshold_t0: float
-        :parameter AScurrents_t0: the current state of the afterspike currents in the neuron
-        :type AScurrents_t0: np.ndarray
-        :parameter inj: the current value of the current injection into the neuron
-        :type inj: float
-        :parameter time_step: the current time step of the neuron simulation
-        :type time_step: int
-        :parameter spike_time_steps: a list of all of the time steps of spikes in the neuron
-        :type spike_time_steps: list
-        :returns: voltage_t1 (voltage at next time step), threshold_t1 (threshold at next time step), AScurrents_t1 (afterspike currents at next time step)
-        :rtype: tuple
+
+        Parameters
+        ----------
+        voltage_t0 : float
+            the current voltage of the neuron
+        threshold_t0 : float
+            the current spike threshold level of the neuron
+        AScurrents_t0 : np.ndarray
+            the current state of the afterspike currents in the neuron
+        inj : float
+            the current value of the current injection into the neuron
+        time_step : int
+            the current time step of the neuron simulation
+        spike_time_steps : list
+            a list of all of the time steps of spikes in the neuron
+
+        Returns
+        -------
+        tuple
+            voltage_t1 (voltage at next time step), threshold_t1 (threshold at next time step), AScurrents_t1 (afterspike currents at next time step)
         """
 
         AScurrents_t1 = self.AScurrent_dynamics_method(self, AScurrents_t0, time_step, spike_time_steps)
@@ -238,14 +254,19 @@ class GLIFNeuron( object ):
     def reset(self, voltage_t0, threshold_t0, AScurrents_t0):
         """ Apply reset rules to the neuron's voltage, threshold, and afterspike currents assuming a spike has occurred (voltage is above threshold). 
 
-        :parameter voltage_t0: the current voltage of the neuron
-        :type voltage_t0: float
-        :parameter threshold_t0: the current spike threshold level of the neuron
-        :type threshold_t0: float
-        :parameter AScurrents_t0: the current state of the afterspike currents in the neuron
-        :type AScurrents_t0: np.ndarray
-        :returns: voltage_t1 (voltage at next time step), threshold_t1 (threshold at next time step), AScurrents_t1 (afterspike currents at next time step)
-        :rtype: tuple
+        Parameters
+        ----------
+        voltage_t0 : float
+           the current voltage of the neuron
+        threshold_t0 : float
+            the current spike threshold level of the neuron
+        AScurrents_t0 : np.ndarray
+            the current state of the afterspike currents in the neuron
+
+        Returns
+        -------
+        tuple
+            voltage_t1 (voltage at next time step), threshold_t1 (threshold at next time step), AScurrents_t1 (afterspike currents at next time step)
         """
         
         AScurrents_t1 = self.AScurrent_reset_method(self, AScurrents_t0)  
@@ -263,18 +284,23 @@ class GLIFNeuron( object ):
         into the output voltages, reset rules are applied to the voltage, threshold, and afterspike currents, and the 
         simulation resumes.
 
-        :parameter stim: vector of scalar current values
-        :type stim: np.ndarray
-        :returns: a dictionary containing: 
-          'voltage': simulated voltage values, 
-          'threshold': threshold values during the simulation,
-          'AScurrents': afterspike current values during the simulation, 
-          'grid_spike_times': spike times (in uits of self.dt) aligned to simulation time steps, 
-          'interpolated_spike_times': spike times (in units of self.dt) linearly interpolated between time steps, 
-          'spike_time_steps': the indices of grid spike times, 
-          'interpolated_spike_voltage': voltage of the simulation at interpolated spike times, 
-          'interpolated_spike_threshold': threshold of the simulation at interpolated spike times
-        :rtype: dict
+        Parameters
+        ----------
+        stim : np.ndarray
+            vector of scalar current values
+
+        Returns
+        -------
+        dict
+            a dictionary containing: 
+                'voltage': simulated voltage values, 
+                'threshold': threshold values during the simulation,
+                'AScurrents': afterspike current values during the simulation, 
+                'grid_spike_times': spike times (in uits of self.dt) aligned to simulation time steps, 
+                'interpolated_spike_times': spike times (in units of self.dt) linearly interpolated between time steps, 
+                'spike_time_steps': the indices of grid spike times, 
+                'interpolated_spike_voltage': voltage of the simulation at interpolated spike times, 
+                'interpolated_spike_threshold': threshold of the simulation at interpolated spike times
         """
 
         # initialize the voltage, threshold, and afterspike current values
@@ -373,20 +399,26 @@ class GLIFNeuron( object ):
         every time the model spikes a new set of afterspike currents will be initiated. To ensure that afterspike currents 
         can be optimized, we force them to be initiated at the time of the biological spike.
 
-        :parameter stim: vector of scalar current values
-        :type stim: np.ndarray
-        :parameter bio_spike_time_steps: spike time step indices
-        :returns: a dictionary containing:
-          'voltage': simulated voltage values,
-          'threshold': simulated threshold values,
-          'AScurrent_matrix': afterspike currents during the simulation,
-          'grid_model_spike_times': spike times of the model aligned to the simulation grid (when it would have spiked),
-          'interpolated_model_spike_times': spike times of the model linearly interpolated between time steps,
-          'grid_ISI': interspike interval between grid model spike times,
-          'interpolated_ISI': interspike interval between interpolated model spike times,
-          'grid_bio_spike_model_voltage': voltage of the model at biological/input spike times,
-          'grid_bio_spike_model_threshold': voltage of the model at biological/input spike times interpolated between time steps
-        :rtype: dict
+        Parameters
+        ----------
+        stim : np.ndarray
+            vector of scalar current values
+        bio_spike_time_steps : list
+            spike time step indices
+
+        Returns
+        -------
+        dict
+            a dictionary containing:
+                'voltage': simulated voltage values,
+                'threshold': simulated threshold values,
+                'AScurrent_matrix': afterspike currents during the simulation,
+                'grid_model_spike_times': spike times of the model aligned to the simulation grid (when it would have spiked),
+                'interpolated_model_spike_times': spike times of the model linearly interpolated between time steps,
+                'grid_ISI': interspike interval between grid model spike times,
+                'interpolated_ISI': interspike interval between interpolated model spike times,
+                'grid_bio_spike_model_voltage': voltage of the model at biological/input spike times,
+                'grid_bio_spike_model_threshold': voltage of the model at biological/input spike times interpolated between time steps
         """
 
         voltage_t0 = self.init_voltage
@@ -426,7 +458,10 @@ class GLIFNeuron( object ):
                 interpolated_ISI = np.array([])
 
                 grid_model_spike_times = np.array([]) 
-                interpolated_model_spike_times = np.array([]) 
+                interpolated_model_spike_times = np.array([])
+                
+                grid_model_spike_voltages = np.array([]) 
+                interpolated_model_spike_voltages = np.array([]) 
 
                 grid_bio_spike_model_voltage = np.array([])
                 grid_bio_spike_model_threshold = np.array([])
@@ -437,6 +472,9 @@ class GLIFNeuron( object ):
 
                 grid_model_spike_times = np.empty(num_spikes)
                 interpolated_model_spike_times = np.empty(num_spikes)
+                
+                grid_model_spike_voltages = np.empty(num_spikes) 
+                interpolated_model_spike_voltages = np.empty(num_spikes)
 
                 grid_bio_spike_model_voltage = np.empty(num_spikes)
                 grid_bio_spike_model_threshold = np.empty(num_spikes)
@@ -475,7 +513,10 @@ class GLIFNeuron( object ):
                     interpolated_ISI[spike_num] = run_data['interpolated_model_spike_time']
 
                     grid_model_spike_times[spike_num] = run_data['grid_model_spike_time'] + start_index * self.dt 
-                    interpolated_model_spike_times[spike_num] = run_data['interpolated_model_spike_time'] + start_index * self.dt 
+                    interpolated_model_spike_times[spike_num] = run_data['interpolated_model_spike_time'] + start_index * self.dt
+                    
+                    grid_model_spike_voltages[spike_num] = run_data['grid_model_spike_voltage']
+                    interpolated_model_spike_voltages[spike_num] = run_data['interpolated_model_spike_voltage'] 
 
                     grid_bio_spike_model_voltage[spike_num] = run_data['grid_bio_spike_model_voltage']
                     grid_bio_spike_model_threshold[spike_num] = run_data['grid_bio_spike_model_threshold']
@@ -527,6 +568,9 @@ class GLIFNeuron( object ):
 
                 'grid_model_spike_times': grid_model_spike_times,
                 'interpolated_model_spike_times': interpolated_model_spike_times,
+                
+                'grid_model_spike_voltages': grid_model_spike_voltages,
+                'interpolated_model_spike_voltages': interpolated_model_spike_voltages,
 
                 'grid_bio_spike_model_voltage': grid_bio_spike_model_voltage,
                 'grid_bio_spike_model_threshold': grid_bio_spike_model_threshold
@@ -541,6 +585,9 @@ class GLIFNeuron( object ):
 
             'grid_model_spike_times': grid_model_spike_times,
             'interpolated_model_spike_times': interpolated_model_spike_times,
+            
+            'grid_model_spike_voltages': grid_model_spike_voltages,
+            'interpolated_model_spike_voltages': interpolated_model_spike_voltages,
 
             'grid_ISI': grid_ISI,
             'interpolated_ISI': interpolated_ISI,
@@ -556,32 +603,37 @@ class GLIFNeuron( object ):
         until either the model spikes or the end of the segment is reached.  If the model does not spike, a 
         spike time is extrapolated past the end of the simulation segment.
 
-        :parameter voltage_t0: the current voltage of the neuron
-        :type voltage_t0: float
-        :parameter threshold_t0: the current spike threshold level of the neuron
-        :type threshold_t0: float
-        :parameter AScurrents_t0: the current state of the afterspike currents in the neuron
-        :type AScurrents_t0: np.ndarray
-        :parameter stim: the full stimulus array (not just the segment of data being simulated)
-        :type stim: np.ndarray
-        :parameter start_index: index to start simulating
-        :type start_index: int
-        :parameter end_index: index *after* the last index to be simulated
-        :type end_index: int
-        :parameter bio_spike_time_steps: time steps of input spikes
-        :type bio_spike_time_steps: list
-        :returns: a dictionary containing:
-            'voltage': simulated voltage value
-            'threshold': simulated threshold values
-            'AScurrent_matrix': afterspike current values during the simulation
-            'grid_model_spike_time': model spike time (in units of dt) 
-            'interpolated_model_spike_time': model spike time (in units of dt) interpolated between time steps
-            'voltage_t0': reset voltage value to be used in subsequent simulation interval 
-            'threshold_t0': reset threshold value to be used in subsequent simulation interval
-            'AScurrents_t0': reset afterspike current value to be used in subsequent simulation interval
-            'grid_bio_spike_model_voltage': model voltage at the time of the input spike
-            'grid_bio_spike_model_threshold': model threshold at the time of the input spike
-        :rtype: dict
+        Parameters
+        ----------
+        voltage_t0 : float
+            the current voltage of the neuron
+        threshold_t0 : float
+            the current spike threshold level of the neuron
+        AScurrents_t0 : np.ndarray
+            the current state of the afterspike currents in the neuron
+        stim : np.ndarray
+            the full stimulus array (not just the segment of data being simulated)
+        start_index : int
+            index to start simulating
+        end_index : int
+            index *after* the last index to be simulated
+        bio_spike_time_steps : list
+            time steps of input spikes
+
+        Returns
+        -------
+        dict
+            a dictionary containing:
+                'voltage': simulated voltage value
+                'threshold': simulated threshold values
+                'AScurrent_matrix': afterspike current values during the simulation
+                'grid_model_spike_time': model spike time (in units of dt) 
+                'interpolated_model_spike_time': model spike time (in units of dt) interpolated between time steps
+                'voltage_t0': reset voltage value to be used in subsequent simulation interval 
+                'threshold_t0': reset threshold value to be used in subsequent simulation interval
+                'AScurrents_t0': reset afterspike current value to be used in subsequent simulation interval
+                'grid_bio_spike_model_voltage': model voltage at the time of the input spike
+                'grid_bio_spike_model_threshold': model threshold at the time of the input spike
         """
 
         # preallocate arrays and matricies
@@ -596,7 +648,10 @@ class GLIFNeuron( object ):
         AScurrent_matrix[:] = np.nan
 
         grid_model_spike_time = None
+        grid_model_spike_voltage = None
+        
         interpolated_model_spike_time = None
+        interpolated_model_spike_voltage = None
         
         # calculate the model values between the two target spikes (don't stop if there is a spike)
         for time_step in xrange(num_time_steps):
@@ -627,23 +682,34 @@ class GLIFNeuron( object ):
             voltage_t0=voltage_t1
             threshold_t0=threshold_t1
             AScurrents_t0=AScurrents_t1
-            
+        
+        
+        #-----commented out 3-6-15 to always extrapolate st and v based on initial and final values    
         # figure out whether model neuron spiked or not        
-        for time_step in range(0, num_time_steps): 
-            if voltage_out[time_step] > threshold_out[time_step]:
-                grid_model_spike_time = self.dt * time_step #not that this should be time_step even though it is index+1 in runModel function because here it isnt recorded until the next step
-                interpolated_model_spike_time = interpolate_spike_time(self.dt, time_step-1, threshold_out[time_step-1], threshold_out[time_step], voltage_out[time_step-1], voltage_out[time_step])
-                break
-                
-        # if the last voltage is above threshold and there hasn't already been a spike
-        if voltage_t1 > threshold_t1 and grid_model_spike_time is None: 
-            grid_model_spike_time = self.dt*num_time_steps
-            interpolated_model_spike_time = interpolate_spike_time(self.dt, num_time_steps - 1, threshold_out[num_time_steps-1], threshold_t1, voltage_out[num_time_steps-1], voltage_t1)
+#        for time_step in range(0, num_time_steps): 
+#            if voltage_out[time_step] > threshold_out[time_step]:
+#                grid_model_spike_time = self.dt * (time_step-1)
+#                grid_model_spike_voltage = voltage_out[time_step-1]
+#                
+#                interpolated_model_spike_time = interpolate_spike_time(self.dt, time_step-1, threshold_out[time_step-1], threshold_out[time_step], voltage_out[time_step-1], voltage_out[time_step])
+#                interpolated_model_spike_voltage = interpolate_spike_voltage(self.dt, time_step-1, threshold_out[time_step-1], threshold_out[time_step], voltage_out[time_step-1], voltage_out[time_step])
+#                break
+#                
+#        # if the last voltage is above threshold and there hasn't already been a spike
+#        if voltage_t1 > threshold_t1 and grid_model_spike_time is None: 
+#            grid_model_spike_time = self.dt*(num_time_steps-1)
+#            grid_model_spike_voltage = voltage_t1
+#            
+#            interpolated_model_spike_time = interpolate_spike_time(self.dt, num_time_steps - 1, threshold_out[num_time_steps-1], threshold_t1, voltage_out[num_time_steps-1], voltage_t1)
+#            interpolated_model_spike_voltage = interpolate_spike_voltage(self.dt, num_time_steps, threshold_out[-1], threshold_t1, voltage_out[-1], voltage_t1)
 
         #if the model never spiked, extrapolate to guess when it would have spiked
         if grid_model_spike_time is None: 
-            interpolated_model_spike_time = extrapolate_spike_time(self.dt, num_time_steps, threshold_out[-1], threshold_t1, voltage_out[-1], voltage_t1)
+            interpolated_model_spike_time = extrapolate_spike_time(self.dt, num_time_steps, threshold_out[0], threshold_t1, voltage_out[0], voltage_t1)
+            interpolated_model_spike_voltage = extrapolate_spike_voltage(self.dt, num_time_steps, threshold_out[0], threshold_t1, voltage_out[0], voltage_t1)
+            
             grid_model_spike_time = np.ceil(interpolated_model_spike_time / self.dt) * self.dt  #grid spike time based off extrapolated spike time
+            grid_model_spike_voltage = interpolated_model_spike_voltage
         
         # if the target spiked, reset so that next round will start at reset but not recording it in the voltage here.
         # note that at the last section of the stimulus where there is no current injected the model will be reset even if
@@ -657,7 +723,10 @@ class GLIFNeuron( object ):
             'AScurrent_matrix': AScurrent_matrix, 
 
             'grid_model_spike_time': grid_model_spike_time,
-            'interpolated_model_spike_time': interpolated_model_spike_time, 
+            'interpolated_model_spike_time': interpolated_model_spike_time,
+            
+            'grid_model_spike_voltage': grid_model_spike_voltage,
+            'interpolated_model_spike_voltage': interpolated_model_spike_voltage,
 
             'voltage_t0': voltage_t0, 
             'threshold_t0': threshold_t0, 
@@ -674,16 +743,37 @@ def extrapolate_spike_time(dt, num_time_steps, threshold_t0, threshold_t1, volta
     by intersecting lines the thresholds and voltages. """
     return line_crossing_x(dt * num_time_steps, voltage_t0, voltage_t1, threshold_t0, threshold_t1)
 
+def extrapolate_spike_voltage(dt, num_time_steps, threshold_t0, threshold_t1, voltage_t0, voltage_t1):
+    """ Given two voltage and threshold values and an interval between them, extrapolate a spike time
+    by intersecting lines the thresholds and voltages. """
+    return line_crossing_y(dt * num_time_steps, voltage_t0, voltage_t1, threshold_t0, threshold_t1)
+
+
 def interpolate_spike_time(dt, time_step, threshold_t0, threshold_t1, voltage_t0, voltage_t1):
     """ Given two voltage and threshold values, the dt between them and the initial time step, interpolate
     a spike time within the dt interval by intersecting the two lines. """
     return time_step*dt + line_crossing_x(dt, voltage_t0, voltage_t1, threshold_t0, threshold_t1)
+
+
+def interpolate_spike_voltage(dt, time_step, threshold_t0, threshold_t1, voltage_t0, voltage_t1):
+    """ Given two voltage and threshold values, the dt between them and the initial time step, interpolate
+    a spike time within the dt interval by intersecting the two lines. """
+    return time_step*dt + line_crossing_y(dt, voltage_t0, voltage_t1, threshold_t0, threshold_t1)
+
 
 def interpolate_spike_value(dt, interpolated_spike_time_offset, v0, v1):
     """ Take a value at two adjacent time steps and linearly interpolate what the value would be
     at an offset between the two time steps. """
     return v0 + (v1 - v0) * interpolated_spike_time_offset / dt
 
+
 def line_crossing_x(dx, a0, a1, b0, b1):
     """ Find the x value of the intersection of two lines. """
+    assert type(a0) != int and type(a1) != int and type(b0) != int and type(b1) != int, Exception("Do not pass integers into this function!")
     return dx * (b0 - a0) / ( (a1 - a0) - (b1 - b0) )
+        
+
+def line_crossing_y(dx, a0, a1, b0, b1):
+    """ Find the y value of the intersection of two lines. """
+    return b0 + (b1 - b0) * (b0 - a0) / ((a1 - a0) - (b1 - b0))
+

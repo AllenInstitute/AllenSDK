@@ -12,6 +12,15 @@ class GLIFNeuronMethod( object ):
     fixed in this way are assumed to be passed into the method when it is called.  If the passed
     parameters contain an argument that is not part of the function signature, an exception will
     be raised.    
+
+    Parameters
+    ----------
+    method_name : string
+        A shorthand name that will be used to reference this method in the `GLIFNeuron`.
+    method : function
+        A python function to be called when this instance is called.
+    method_params : dict
+        A dictionary mapping function arguments to values for values that should be fixed.
     """
 
     def __init__(self, method_name, method, method_params):
@@ -31,10 +40,18 @@ class GLIFNeuronMethod( object ):
 
     def modify_parameter(self, param, operator):
         """ Modify a function parameter needs to be modified after initialization. 
-        :parameter param: the name of the parameter to modify
-        :type param: string
-        :parameter operator: a function or lambda that returns the desired modified value
-        :type operator: callable
+        
+        Parameters
+        ----------
+        param : string
+            the name of the parameter to modify
+        operator : callable
+            a function or lambda that returns the desired modified value
+
+        Returns
+        -------
+        type
+            the new value of the variable that was just modified.
         """
         value = operator(self.method.keywords[param])
         self.method.keywords[param] = value
@@ -44,17 +61,23 @@ class GLIFNeuronMethod( object ):
 def two_lines(x,b,c,d):
     """ Find the maximum of a value and a position on a line 
 
-    :parameter x: x position on line 1
-    :type x: float
-    :parameter c: slope of line 1
-    :type c: float
-    :parameter d: y-intercept of line 1
-    :type d: float
-    :parameter b: y-intercept of line 2
-    :type b: float
-    :returns: the max of a line value and a constant
-    :rtype: float
+    Parameters
+    ----------
+    x: float
+        x position on line 1
+    c: float
+        slope of line 1
+    d: float
+        y-intercept of line 1
+    b: float
+        y-intercept of line 2
+
+    Returns
+    -------
+    float
+        the max of a line value and a constant
     """
+
     one = b
     two = c*x+d
     return np.maximum(one,two)
@@ -70,8 +93,10 @@ def dynamics_AScurrent_vector(neuron, AScurrents_t0, time_step, spike_time_steps
     currents for every previous spike and updates them based on the current time step.
     This method is very slow.
 
-    :parameter vector: an array of all running afterspike current values.
-    :type vector: np.ndarray
+    Parameters
+    ----------
+    vector : np.ndarray
+        an array of all running afterspike current values.
     """
     # an ugly hack to convert lists into numpy arrays
     if isinstance(vector, list):
@@ -95,23 +120,25 @@ def dynamics_AScurrent_none(neuron, AScurrents_t0, time_step, spike_time_steps):
 
 
 def dynamics_voltage_linear(neuron, voltage_t0, AScurrents_t0, inj):
-    """ Linear voltage dynamics. """
+    """ (TODO) Linear voltage dynamics. """
     return voltage_t0 + (inj + np.sum(AScurrents_t0) - neuron.G * neuron.coeffs['G'] * (voltage_t0 - neuron.El)) * neuron.dt / (neuron.C * neuron.coeffs['C'])
     
 
 def dynamics_voltage_quadratic_i_of_v(neuron, voltage_t0, AScurrents_t0, inj, a, b, c, d, e):    
-    """ Quadratic voltage dynamics equation.
+    """ (TODO) Quadratic voltage dynamics equation.
 
-    :parameter a: constant coefficient of voltage equation
-    :type a: float
-    :parameter b: linear coefficient of voltage equation
-    :type b: float
-    :parameter c: quadratic coefficient of voltage equation
-    :type c: float
-    :parameter d: voltage threshold
-    :type d: float
-    :parameter e: voltage used if voltage surpasses threshold (d)
-    :type e: float
+    Parameters
+    ----------
+    a : float
+        constant coefficient of voltage equation
+    b : float
+        linear coefficient of voltage equation
+    c : float
+        quadratic coefficient of voltage equation
+    d : float
+        voltage threshold
+    e : float
+        voltage used if voltage surpasses threshold (d)
     """
     I_of_v = a + b * voltage_t0 + c * voltage_t0**2  
         
@@ -124,18 +151,20 @@ def dynamics_voltage_quadratic_i_of_v(neuron, voltage_t0, AScurrents_t0, inj, a,
 def dynamics_voltage_piecewise_linear(neuron, voltage_t0, AScurrents_t0, inj, R_tlparam1, R_tlparam2, R_t1param3, El_tlparam1, El_tlparam2, El_t1param3):
     """ Piecewise linear voltage dynamics methods. This method requires 3 parameters for equations of both resistance and resting potential. 
 
-    :parameter R_tlparam1: 
-    :type R_tlparam1: float
-    :parameter R_tlparam2: 
-    :type R_tlparam2: float
-    :parameter R_tlparam3: 
-    :type R_tlparam3: float
-    :parameter El_tlparam1: 
-    :type El_tlparam1: float
-    :parameter El_tlparam2: 
-    :type El_tlparam2: float
-    :parameter El_tlparam3: 
-    :type El_tlparam3: float
+    Parameters
+    ----------
+    R_tlparam1 : float 
+        TODO
+    R_tlparam2 : float
+        TODO
+    R_tlparam3 : float
+        TODO
+    El_tlparam1 : float
+        TODO
+    El_tlparam2 : float
+        TODO
+    El_tlparam3 : float
+        TOOD
     """
     G = 1. / (two_lines(voltage_t0, R_tlparam1, R_tlparam2, R_t1param3))
     El = -two_lines(voltage_t0, El_tlparam1, El_tlparam2, El_t1param3)
@@ -145,10 +174,12 @@ def dynamics_voltage_piecewise_linear(neuron, voltage_t0, AScurrents_t0, inj, R_
 def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, a, b):
     """ Standard adapting threshold dynamics equation.
 
-    :parameter a: coefficient of voltage
-    :type a: float
-    :parameter b: coefficient of threshold
-    :type b: float
+    Parameters
+    ----------
+    a : float
+        coefficient of voltage
+    b : float
+        coefficient of threshold
     """
     return threshold_t0 + (a * neuron.coeffs['a'] * (voltage_t0-neuron.El) - b * neuron.coeffs['b'] * (threshold_t0 - neuron.coeffs['th_inf'] * neuron.th_inf)) * neuron.dt 
         
@@ -160,9 +191,11 @@ def dynamics_threshold_inf(neuron, threshold_t0, voltage_t0):
 
 def dynamics_threshold_fixed(neuron, threshold_t0, voltage_t0, value):
     """ Set threshold a fixed constant.
-
-    :parameter value: fixed constant to use for threshold. 
-    :type value: float
+    
+    Parameters
+    ----------
+    value : float
+        fixed constant to use for threshold. 
     """
     return value
 
@@ -170,8 +203,10 @@ def dynamics_threshold_fixed(neuron, threshold_t0, voltage_t0, value):
 def reset_AScurrent_sum(neuron, AScurrents_t0, r):
     """ Reset afterspike currents by adding summed exponentials. 
 
-    :parameter r: a coeffient vector applied to the afterspike currents
-    :type r: np.ndarray
+    Parameters
+    ----------
+    r : np.ndarray
+        a coeffient vector applied to the afterspike currents
     """
 
     #old way without refrectory period: var_out[2]=neuron.a1*neuron.coeffa1 # a constant multiplied by the amplitude of the excitatory current at reset
@@ -188,10 +223,12 @@ def reset_AScurrent_none(neuron, AScurrents_t0):
 def reset_voltage_v_before(neuron, voltage_t0, a, b):
     """ Reset voltage to the previous value with a scale and offset applied.
 
-    :parameter a: voltage scale constant
-    :type a: float
-    :parameter b: voltage offset constant
-    :type b: float
+    Parameters
+    ----------
+    a : float
+        voltage scale constant
+    b : float
+        voltage offset constant
     """
 
     return a*(voltage_t0)+b
@@ -210,8 +247,10 @@ def reset_voltage_zero(neuron, voltage_t0):
 def reset_voltage_fixed(neuron, voltage_t0, value):
     """ Reset voltage to a fixed value. 
 
-    :parameter value: the value to which voltage will be reset.
-    :type value: float
+    Parameters
+    ----------
+    value : float
+        the value to which voltage will be reset.
     """
     return value
 
@@ -219,8 +258,10 @@ def reset_voltage_fixed(neuron, voltage_t0, value):
 def reset_threshold_max_v_th(neuron, threshold_t0, voltage_v1, delta):
     """ Return the maximum of threshold and reset voltage offset by a constant. 
 
-    :parameter delta: value used to offset the return threshold.
-    :type delta: float
+    Parameters
+    ----------
+    delta : float
+        value used to offset the return threshold.
     """
     #This is a bit dangerous as it would change if El was not choosen to be zero. Perhaps could change it to absolute value.
     return max(threshold_t0, voltage_v1) + delta  
@@ -229,8 +270,10 @@ def reset_threshold_max_v_th(neuron, threshold_t0, voltage_v1, delta):
 def reset_threshold_th_before(neuron, threshold_t0, voltage_v1, delta):
     """ Return the previous threshold by a constant. This method is not used and will raise an exception if called.
 
-    :parameter delta: value used to offset the return threshold.
-    :type delta: float
+    Parameters
+    ----------
+    delta : float
+        value used to offset the return threshold.
     """
     raise Exception ('reset_threshold_th_before should not be called')
     return threshold_t0 + delta
@@ -243,8 +286,10 @@ def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
 def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
     """ Reset the threshold to a fixed value. This method is not sued and will raise an exception if called.
 
-    :parameter value: value to return as the reset threshold
-    :type value: float
+    Parameters
+    ----------
+    value : float
+        value to return as the reset threshold
     """
     raise Exception('reset_threshold_fixed should not be called')
     return  value
