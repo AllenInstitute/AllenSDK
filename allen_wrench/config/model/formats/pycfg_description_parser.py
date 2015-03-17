@@ -15,14 +15,14 @@ import six
 import logging
 from pprint import pprint, pformat
 from allen_wrench.config.model.description import Description
-from allen_wrench.config.model.configuration_parser import ConfigurationParser
+from allen_wrench.config.model.description_parser import DescriptionParser
 
 
-class PycfgConfigurationParser(ConfigurationParser):
+class PycfgDescriptionParser(DescriptionParser):
     log = logging.getLogger(__name__)
     
     def __init__(self):
-        super(PycfgConfigurationParser, self).__init__()
+        super(PycfgDescriptionParser, self).__init__()
     
     
     def read(self, pycfg_file_path, description=None, **kwargs):
@@ -56,14 +56,14 @@ class PycfgConfigurationParser(ConfigurationParser):
         ns = {}
         code = compile(python_string, 'string', 'exec')
         exec_(code, ns)
-        data = ns['allen_wrench_configuration']
+        data = ns['allen_toolkit_description']
         description.unpack(data)
         
         return description
 
 
     def write(self, filename, description):
-        '''Write the configuration to a Python (.pycfg) file.
+        '''Write the description to a Python (.pycfg) file.
         :parameter filename: the name of the file to write.
         :type filename: string
         '''        
@@ -72,15 +72,15 @@ class PycfgConfigurationParser(ConfigurationParser):
                     pprint(description.data, f, indent=2)
 
         except Exception:
-            self.log.warn("Couldn't write allen_wrench python configuration: %s" % filename)
+            self.log.warn("Couldn't write allen_toolkit python description: %s" % filename)
             raise
         
         return
     
     def write_string(self, description):
-        '''Write the configuration to a pretty-printed Python string.
-        :parameter description: the configuration object to write
-        :type simluation_configuration: SimulationConfiguration
+        '''Write the description to a pretty-printed Python string.
+        :parameter description: the description object to write
+        :type description: Description
         '''        
         pycfg_string = pformat(description.data, indent=2)
         

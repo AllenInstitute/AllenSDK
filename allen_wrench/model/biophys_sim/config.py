@@ -2,7 +2,7 @@ import re
 import logging
 from pkg_resources import resource_filename
 from allen_wrench.config.app.application_config import ApplicationConfig
-from allen_wrench.config.model.configuration_parser import ConfigurationParser
+from allen_wrench.config.model.description_parser import DescriptionParser
 from allen_wrench.config.model.description import Description
 
 
@@ -26,18 +26,11 @@ class Config(ApplicationConfig):
                   'help' : 'module#function that runs the actual simulation' }
     }
     
-    class DataModelConfig(object):
-        def __init__(self, gn=None, d=None, dp=[]):
-            ''' Helper class for configuring data model servers'''
-            self.group_name = gn # for reference
-            self.database_name = d
-            self.data_model_paths = dp
-    
     
     def __init__(self):
         super(Config, self).__init__(Config._DEFAULTS, 
                                      name='biophys', 
-                                     halp='tools for biophysically detailed modelling at the Allen Institute.',
+                                     halp='tools for biophysically detailed modeling at the Allen Institute.',
                                      pydev=True,
                                      default_log_config=Config._DEFAULT_LOG_CONFIG)
         
@@ -45,13 +38,13 @@ class Config(ApplicationConfig):
     def load(self, config_path,
              disable_existing_logs=False):
         super(Config, self).load([config_path], disable_existing_logs)
-        description = self.read_model_run_config()
+        description = self.read_model_description()
         
         return description
         
         
-    def read_model_run_config(self):
-        reader = ConfigurationParser()
+    def read_model_description(self):
+        reader = DescriptionParser()
         description = Description()
         
         Config._log.info("model file: %s" % self.model_file)

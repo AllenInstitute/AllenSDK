@@ -13,18 +13,18 @@
 
 import logging
 from json import dump, dumps
-from allen_wrench.config.model.configuration_parser import ConfigurationParser
+from allen_wrench.config.model.description_parser import DescriptionParser
 from allen_wrench.config.model.formats.json_util import JsonUtil,\
     NumpyAwareJsonEncoder
 from allen_wrench.config.model.description import Description
 
 
-class JsonConfigurationParser(ConfigurationParser):
+class JsonDescriptionParser(DescriptionParser):
     log = logging.getLogger(__name__)
     
     
     def __init__(self):
-        super(JsonConfigurationParser, self).__init__()
+        super(JsonDescriptionParser, self).__init__()
     
     
     def read(self, file_path, description=None, **kwargs):
@@ -68,16 +68,16 @@ class JsonConfigurationParser(ConfigurationParser):
         except Exception:
             self.log.warn("Couldn't write allen_wrench json description: %s" % filename)
             raise
-
+        
         return
     
     
     def write_string(self, description):
-        """Write the configuration to a JSON string.  
+        """Write the description to a JSON string.  
         
         :parameter filename: the name of the file to write.
         :type filename: string
-        :return json_string: the json serialization of the configuration
+        :return json_string: the json serialization of the description
         """        
         try:
             json_string = dumps(description.data,
@@ -85,5 +85,5 @@ class JsonConfigurationParser(ConfigurationParser):
                                 cls=NumpyAwareJsonEncoder)
             return json_string
         except Exception:
-            self.log.warn("Couldn't write allen_wrench json configuration: %s")
+            self.log.warn("Couldn't write allen_wrench json description: %s")
             raise

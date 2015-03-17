@@ -14,15 +14,26 @@
 import logging
 
 from allen_wrench.config.model.manifest import Manifest
-from allen_wrench.config.model.internal.simulation_configuration import SimulationConfiguration
 
 
-class Description(SimulationConfiguration):
+class Description(object):
     _log = logging.getLogger(__name__)
     
     def __init__(self):
-        super(Description, self).__init__()
+        self.data = {}
+        self.reserved_data = []
         self.manifest = Manifest()
+    
+    
+    def update_data(self, data):
+        self.data.update(data)
+    
+    
+    def is_empty(self):
+        if self.data:
+            return False
+        
+        return True
     
     
     def unpack(self, data):

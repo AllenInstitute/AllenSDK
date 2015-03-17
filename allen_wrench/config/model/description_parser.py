@@ -15,7 +15,7 @@ import logging
 from allen_wrench.config.model.description import Description
 
 
-class ConfigurationParser(object):
+class DescriptionParser(object):
     log = logging.getLogger(__name__)
     
     
@@ -52,15 +52,15 @@ class ConfigurationParser(object):
     
     def parser_for_extension(self, filename):
         # Circular imports
-        from allen_wrench.config.model.formats.json_configuration_parser import JsonConfigurationParser
-        from allen_wrench.config.model.formats.pycfg_configuration_parser import PycfgConfigurationParser
+        from allen_wrench.config.model.formats.json_description_parser import JsonDescriptionParser
+        from allen_wrench.config.model.formats.pycfg_description_parser import PycfgDescriptionParser
         
         parser = None
         
         if filename.endswith('.json'):
-            parser = JsonConfigurationParser()
+            parser = JsonDescriptionParser()
         elif filename.endswith('.pycfg'):
-            parser = PycfgConfigurationParser()
+            parser = PycfgDescriptionParser()
         else:
             raise Exception('could not determine file format')
             
