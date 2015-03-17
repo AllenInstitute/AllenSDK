@@ -32,12 +32,11 @@ class PycfgConfigurationParser(ConfigurationParser):
         :returns the description
         :rtype: Description
         """
-        header = kwargs.get('prefix',
-                           "from numpy import *\nfrom csa import *\n\n")
+        header = kwargs.get('prefix', '')
         
         with open(pycfg_file_path, 'r') as f:
             return self.read_string(f.read(), description, header=header)
-        
+    
     
     def read_string(self, python_string, description=None, **kwargs):
         """Read a serialized description from a Python (.pycfg) string.
@@ -48,10 +47,9 @@ class PycfgConfigurationParser(ConfigurationParser):
         """
         
         if description == None:
-            description = Description()        
+            description = Description()
         
-        header = kwargs.get('header',
-                            'from dipde.internals import *\n')
+        header = kwargs.get('header', '')
                     
         python_string = header + python_string
         
@@ -59,18 +57,18 @@ class PycfgConfigurationParser(ConfigurationParser):
         code = compile(python_string, 'string', 'exec')
         exec_(code, ns)
         data = ns['allen_wrench_configuration']
-        self.unpack(description, data)
+        description.unpack(data)
         
         return description
 
 
     def write(self, filename, description):
-        '''Write the configuration to a Python (.pycfg) file.          
+        '''Write the configuration to a Python (.pycfg) file.
         :parameter filename: the name of the file to write.
         :type filename: string
         '''        
         try:
-            with open(filename, 'w') as f:               
+            with open(filename, 'w') as f:
                     pprint(description.data, f, indent=2)
 
         except Exception:
@@ -80,7 +78,7 @@ class PycfgConfigurationParser(ConfigurationParser):
         return
     
     def write_string(self, description):
-        '''Write the configuration to a pretty-printed Python string.          
+        '''Write the configuration to a pretty-printed Python string.
         :parameter description: the configuration object to write
         :type simluation_configuration: SimulationConfiguration
         '''        

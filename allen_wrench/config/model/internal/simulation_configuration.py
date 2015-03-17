@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import logging
-from copy import copy
 
 
 class SimulationConfiguration(object):
@@ -27,16 +26,6 @@ class SimulationConfiguration(object):
         self.data.update(data)
         
         
-    def copy_to_data(self, more_data):
-        """Copy the expanded representation of the network (without archetypes or matrix parameters) 
-        from ``self._final`` to ``self.data`` so it can be used by other methods.  TODO:  deprecate.
-        """
-        section_names = more_data.keys()
-        
-        for section_name in section_names:
-            self.data[section_name] = copy(more_data[section_name])
-
-            
     def is_empty(self):
         if self.data:
             return False

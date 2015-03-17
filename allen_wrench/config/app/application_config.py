@@ -11,19 +11,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from allen_wrench.config.app.pydev_connector import PydevConnector
+from allen_wrench.config.model.formats.json_util import JsonUtil
 
 try:
     from ConfigParser import ConfigParser # Python 2
 except:
     from configparser import ConfigParser # Python 3
 
-import argparse
-import os
+import argparse, os, sys, json, io
+import logging, logging.config as lc
 from pkg_resources import resource_filename
-
-import logging
-import logging.config as lc
-import sys
 
 class ApplicationConfig(object):
     ''' Convenience class that consolidates the handling of application configuration
@@ -90,12 +87,14 @@ class ApplicationConfig(object):
         
         # command line so we can find the config file.
         parsed_args = self.parse_command_line_args(command_line_args)
-
+        
         try:
             # read and apply the configuration file options
             config_file_path = parsed_args.config_file_path
+            
             if config_file_path:
                 self.config_file_path = config_file_path
+            
             self.apply_configuration_from_file(self.config_file_path)
             
             # apply the remaining command line options
@@ -104,18 +103,18 @@ class ApplicationConfig(object):
             ApplicationConfig._log.error("Could not load configuration file: %s\n%s" % 
                                          (parsed_args.config_file_path,
                                          e))
-
+        
         if self.debug_enabled and self.debug.startswith('pydev'):
             PydevConnector.connect(self.debug)
-
+        
         try:
             lc.fileConfig(self.log_config_path,
                           disable_existing_loggers=disable_existing_loggers)
         except:
             logging.error("Could not load log configuration file: %s" %
                          (parsed_args.log_config_path))
-
-
+    
+    
     def to_boolean(self, v):
         if str(v).lower() == 'true':
             return True
@@ -127,8 +126,7 @@ class ApplicationConfig(object):
         parser = argparse.ArgumentParser(prog=self.application_name,
                                          description=self.help)
         # defaults are set at the first environment reading.  Command line args only override them when present
-
-        for key, value in self.defaults.items():        
+        for key, value in self.defaults.items():
             if key == 'config_file_path':
                 parser.add_argument("%s" % (key), default=None, help=value['help'])
             else:
@@ -136,7 +134,7 @@ class ApplicationConfig(object):
        
         return parser
     
-
+    
     def parse_command_line_args(self, args):
         return self.argparser.parse_args(args)
     
@@ -150,7 +148,7 @@ class ApplicationConfig(object):
             set to their default values,
             or None if no default is specified at init time.
             Assigned variables will overwrite the previous value.
-        
+            
             see: https://docs.python.org/2/howto/argparse.html
         '''
         logging.info('command_line args: %s' % (parsed_args))
@@ -173,8 +171,42 @@ class ApplicationConfig(object):
             environment_value = os.environ.get(environment_variable)
             if environment_value:
                 setattr(self, key, environment_value)
-
-
+    
+    
+    def from_json_file(self, json_path):
+        description = JsonUtil.read_json_file(json_path)
+        
+        return self.to_cofig_string(description)
+    
+    
+    def from_json_string(self, json_string):
+        description = JsonUtil.read_json_string(json_string)
+        
+        return self.to_cofig_string(description)
+    
+    
+    def to_cofig_string(self, description):
+        bps_config = description['biophys'][0]
+        
+        cfg_array = ['[biophys]']
+        
+        if 'log_config_path' in bps_config:
+            cfg_array.append(str('log_config_path: %s' % bps_config['log_config_path']))
+         
+        if 'debug' in bps_config:
+            cfg_array.append(str('debug: %s' % bps_config['debug']))
+         
+        if 'model_file' in bps_config:
+            cfg_array.append(str('model_file: %s' % ','.join(bps_config['model_file'])))
+            
+        cfg_array.append("\n")
+        
+        bps_cfg_string = "\n".join(cfg_array)
+        ApplicationConfig._log.info(bps_cfg_string)
+        
+        return bps_cfg_string
+    
+    
     def apply_configuration_from_file(self, config_file_path):
         ''' Read application configuration variables from a .conf file.
             Unassigned variables are set to their default values 
@@ -200,9 +232,14 @@ class ApplicationConfig(object):
         except:
             logging.warn("This python installation does not support configuration defaults.")
             config = ConfigParser()
-    
-        config.read(config_file_path)
-                    
+        
+        if config_file_path.endswith('.json'):
+            cfg_string = ""
+            cfg_string = self.from_json_file(config_file_path)
+            config.readfp(io.BytesIO(cfg_string))
+        else:
+            config.read(config_file_path)
+        
         for key in self.defaults:
             try:
                 file_value = config.get(self.application_name, key)
@@ -212,6 +249,3 @@ class ApplicationConfig(object):
             except:
                 logging.info("Configuration option not specified: %s" %
                              (key))
-
-
-        return config

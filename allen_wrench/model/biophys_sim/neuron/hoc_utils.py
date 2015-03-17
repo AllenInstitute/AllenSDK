@@ -5,6 +5,8 @@ import logging
 class HocUtils(object):
     log = logging.getLogger(__name__)
     h = None
+    nrn = None
+    neuron = None
     
     def __init__(self, manifest):
         self.manifest = manifest
@@ -31,14 +33,17 @@ class HocUtils(object):
     def load_hoc_files(self, package, files):
         for hoc_file in files:
             HocUtils.h.load_file(resource_filename(package, hoc_file))
-            
-        
+    
+    
     def initialize_hoc(self, params):
         ''' :parameter params: a dict of key-values
         '''
         import neuron
+        import nrn
         
         h = neuron.h
+        HocUtils.neuron = neuron
+        HocUtils.nrn = nrn
         HocUtils.h = h
         h.load_file('stdgui.hoc')
 

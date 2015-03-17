@@ -25,7 +25,6 @@ setup(
     package_data={'': ['*.hoc', '*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.xyz', '*.env', '*.sh', 'bps'] },
     description = 'core libraries for the allen_wrench.',
     requires = ['h5py',
-                'pandas',
                 'argparse',
                 'six'],
     tests_require=['nose>=1.2.1',

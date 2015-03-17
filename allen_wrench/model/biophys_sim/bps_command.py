@@ -16,6 +16,7 @@ import os
 import subprocess as sp
 import logging
 from allen_wrench.model.biophys_sim.config import Config
+from allen_wrench.config.model.lob_parser import LobParser
 
 
 def choose_bps_command(command='bps_simple', conf_file=None):
@@ -31,20 +32,28 @@ def choose_bps_command(command='bps_simple', conf_file=None):
     elif command == 'nrnivmodl':
         sp.call(['nrnivmodl', 'modfiles']) # TODO: alternate location in manifest?
     elif command == 'run_simple':
-        app_config = Config(unpack_lobs=['positions',
-                                         'connections',
-                                         'external_inputs'])
+        app_config = Config()
         description = app_config.load(conf_file)
+        LobParser.unpack_lobs(
+            description.manifest,
+            description.data,
+            unpack_lobs=['positions',
+                         'connections',
+                         'external_inputs'])
         sys.path.insert(1, description.manifest.get_path('CODE_DIR'))
         (module_name, function_name) = description.data['runs'][0]['main'].split('#')
         run_module(description, module_name, function_name)
     elif command == 'run_model':
         from allen_wrench.config.app.mpi_job import MpiJob
         
-        app_config = Config(unpack_lobs=['positions',
-                                         'connections',
-                                         'external_inputs'])
+        app_config = Config()
         description = app_config.load(conf_file)
+        LobParser.unpack_lobs(
+            description.manifest,
+            description.data,
+            unpack_lobs=['positions',
+                         'connections',
+                         'external_inputs'])
         run_params = description.data['runs'][0]
 
         if 'num_mpi_processes' in run_params:
@@ -70,10 +79,14 @@ def choose_bps_command(command='bps_simple', conf_file=None):
     elif command == 'cluster_run_model':
         from allen_wrench.config.app.mpi_job import MpiJob
         
-        app_config = Config(unpack_lobs=['positions',
-                                         'connections',
-                                         'external_inputs'])
+        app_config = Config()
         description = app_config.load(conf_file)
+        LobParser.unpack_lobs(
+            description.manifest,
+            description.data,
+            unpack_lobs=['positions',
+                         'connections',
+                         'external_inputs'])
         run_params = description.data['runs'][0]
 
         pbs_args = description.data['cluster'][0]
@@ -102,10 +115,14 @@ def choose_bps_command(command='bps_simple', conf_file=None):
     elif command == 'run_model_cluster' or command == 'qsub_script':
         from allen_wrench.config.app.pbs_job import PbsJob
         
-        app_config = Config(unpack_lobs=['positions',
-                                         'connections',
-                                         'external_inputs'])
+        app_config = Config()
         description = app_config.load(conf_file)
+        LobParser.unpack_lobs(
+            description.manifest,
+            description.data,
+            unpack_lobs=['positions',
+                         'connections',
+                         'external_inputs'])
         pbs_args = description.data['cluster'][0]
         description.manifest.resolve_paths(pbs_args)
         pbs_args['script'] = '''\
@@ -124,7 +141,7 @@ bps cluster_run_model
             script = job.generate_script()
             print script
     elif command == 'nrnivmodl_cluster':
-        app_config = Config(unpack_lobs=[])
+        app_config = Config()
         description = app_config.load(conf_file)
 
         modfiles_dir = resource_filename('biophys_sim', 'modfiles')

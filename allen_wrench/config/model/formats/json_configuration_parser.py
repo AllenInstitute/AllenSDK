@@ -12,80 +12,21 @@
 # limitations under the License.
 
 import logging
-import numpy
-import re
-from json import dump, dumps, loads
-from json.encoder import JSONEncoder
+from json import dump, dumps
 from allen_wrench.config.model.configuration_parser import ConfigurationParser
-from scipy.sparse import csr_matrix
-from numpy import array
+from allen_wrench.config.model.formats.json_util import JsonUtil,\
+    NumpyAwareJsonEncoder
 from allen_wrench.config.model.description import Description
 
 
-class NumpyAwareJsonEncoder(JSONEncoder):
-    def default(self, o):
-        serializable = None
-        
-        try:
-            serializable = super(NumpyAwareJsonEncoder, self).default(o)
-        except:
-            if isinstance(o, numpy.ndarray):
-                serializable = o.tolist()
-            elif isinstance(o, csr_matrix):
-                serializable = { '__csr__': True,
-                                 'data': o.data.tolist(),
-                                 'indices': o.indices.tolist(),
-                                 'indptr': o.indptr.tolist(),
-                                 'shape': o.shape
-                                }
-        
-        return serializable
-            
-def hinted_hook(obj):
-    if '__csr__' in obj:
-        data = array(obj['data'])
-        indices = array(obj['indices'])
-        indptr = array(obj['indptr'])
-        shape = (obj['shape'][0], obj['shape'][1])
-        return csr_matrix((data, indices, indptr),
-                          shape=shape)
-    else:
-        return obj
-            
-
 class JsonConfigurationParser(ConfigurationParser):
     log = logging.getLogger(__name__)
-    _oneline_comment_regex = re.compile(r"\/\/.*$",
-                                        re.MULTILINE)
-    _multiline_comment_regex = re.compile(r"\/\*.*\*\/",
-                                          re.MULTILINE | re.DOTALL)
-    _blank_line_regex = re.compile(r"\n?^\s*$",
-                                   re.MULTILINE)
-    _carriage_return_regex = re.compile(r"\r$", re.MULTILINE)
     
     
     def __init__(self):
         super(JsonConfigurationParser, self).__init__()
     
     
-    def remove_comments(self, json):
-        """ Strip single and multiline javascript-style comments from
-            a json string.
-            :param json: a json string with javascript-style comments.
-            :type json: string
-            :return: the json string with comments removed.
-            :rtype string:
-            
-            A json decoder MAY accept and ignore comments.
-        """
-        json = JsonConfigurationParser._oneline_comment_regex.sub('', json)
-        json = JsonConfigurationParser._carriage_return_regex.sub('', json)
-        json = JsonConfigurationParser._multiline_comment_regex.sub('', json)
-        json = JsonConfigurationParser._blank_line_regex.sub('', json)
-        
-        return json
-
-
     def read(self, file_path, description=None, **kwargs):
         """Read a serialized description from a JSON file.
         
@@ -93,44 +34,35 @@ class JsonConfigurationParser(ConfigurationParser):
         :type filename: string
         :parameter prefix: ignored
         :type prefix: NoneType
-        :returns: the description
-        :rtype: Description
-        """        
-        
-        try:
-            with open(file_path, 'r') as f:
-                json_string = f.read()
-                description = self.read_string(json_string,
-                                               description,
-                                               **kwargs)
-        except Exception:
-            self.log.warn("Couldn't load json description: %s" % file_path)
-            raise
+        """
+        if description == None:
+            description = Description()
+            
+        data = JsonUtil.read_json_file(file_path)
+        description.unpack(data)
         
         return description
-
-
+    
+    
     def read_string(self, json_string, description=None, **kwargs):
         if description == None:
             description = Description()
-
-        json_string = self.remove_comments(json_string)
-        data = loads(json_string)
         
-        unpack_lobs = kwargs.get('unpack_lobs', [])
-        self.unpack(description, data, unpack_lobs=unpack_lobs)
+        data = JsonUtil.read_json_string(json_string)
+        
+        description.unpack(data)
         
         return description
-
-
+    
+    
     def write(self, filename, description):
         """Write the description to a JSON file.  
         
         :parameter filename: the name of the file to write.
         :type filename: string
-        """        
+        """
         try:
-            with open(filename, 'w') as f:               
+            with open(filename, 'w') as f:
                     dump(description.data, f, indent=2, cls=NumpyAwareJsonEncoder)
 
         except Exception:
@@ -139,7 +71,7 @@ class JsonConfigurationParser(ConfigurationParser):
 
         return
     
-
+    
     def write_string(self, description):
         """Write the configuration to a JSON string.  
         

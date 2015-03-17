@@ -14,39 +14,39 @@
 import logging
 
 from allen_wrench.config.model.manifest import Manifest
-from allen_wrench.config.model.lob_parser import LobParser
 from allen_wrench.config.model.internal.simulation_configuration import SimulationConfiguration
 
+
 class Description(SimulationConfiguration):
-    log = logging.getLogger(__name__)
+    _log = logging.getLogger(__name__)
     
     def __init__(self):
         super(Description, self).__init__()
-
         self.manifest = Manifest()
-        self._expanded = {}
-        self._final = {}
-        
-        # these are still used by the experimental model builder
-        self.metadata_schema = None
-        self.archetypes = None
-        self.tables = None
-        self.parameter_matrices = None
-        
-        
-    def unpack(self, data, unpack_lobs=None):
-        if unpack_lobs is None:
-            unpack_lobs = []
-
-        data_manifest = data.pop("manifest", {})
-        
-        reserved_data = { "manifest": data_manifest }
-        
-        self.reserved_data.append(reserved_data)
-        
-        self.manifest.load_config(data_manifest)
+    
+    
+    def unpack(self, data):
+        self.unpack_manifest(data)
         self.update_data(data)
+    
+    
+    def unpack_manifest(self, data):
+        data_manifest = data.pop("manifest", {})
+        reserved_data = { "manifest": data_manifest }
+        self.reserved_data.append(reserved_data)
+        self.manifest.load_config(data_manifest)
+    
+    
+    def fix_unary_sections(self, section_names=None):
+        ''' Wrap section contents that don't have the proper
+            array surrounding them in an array.
+        '''
+        if section_names is None:
+            section_names = []
         
-        LobParser.unpack_lobs(self.manifest,
-                              self.data,
-                              unpack_lobs)
+        for section in section_names:
+            if section in self.data:
+                if type(self.data[section]) is dict:
+                    self.data[section] = [ self.data[section] ];
+                    Description._log.warn("wrapped description section %s in an array." % (section))
+
