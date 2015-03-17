@@ -6,16 +6,14 @@ class IclampStimulus(object):
     _log = logging.getLogger(__name__)
     
     def __init__(self, h):
-        super(IclampStimulus, self).__init__()
-        
         self.h = h
         self.stim = None
         self.stim_curr = None
         self.sampling_rate = None
-
+    
         self.stim_vec_list = []
     
-
+    
     def setup_instance(self, *args, **kwargs):
         self.setup_instance_orca(*args, **kwargs)
     
@@ -45,4 +43,3 @@ class IclampStimulus(object):
         sweep_data = stimulus_data.get_sweep(sweep)
         self.stim_curr = sweep_data['stimulus'] * 1.0e9 # convert to nA for NEURON
         self.sampling_rate = 1.0e3 / sweep_data['sampling_rate'] # convert from Hz
-        

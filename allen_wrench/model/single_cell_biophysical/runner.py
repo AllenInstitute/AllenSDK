@@ -1,16 +1,26 @@
 from allen_wrench.model.biophys_sim.config import Config
 import allen_wrench.model.single_cell_biophysical.model_load as ml
 from allen_wrench.model.single_cell_biophysical.iclamp_stimulus import IclampStimulus
+from load_cell_parameters import load_cell_parameters
 
-from neuron import h
+
 import numpy as np
 from allen_wrench.core.orca_data_set import OrcaDataSet
 
 def run(description):
-    print description.data['biophys']
     manifest = description.manifest
+
+    from neuron import h
+    h.load_file("stdgui.hoc")
+    h.load_file("import3d.hoc")
     
-    ml.load_model_from_description(description)
+    morphology_path = description.manifest.get_path('MORPHOLOGY')
+    ml.generate_morphology(morphology_path.encode('ascii', 'ignore'))
+    load_cell_parameters(h,
+                         description.data['passive'][0],
+                         description.data['genome'],
+                         description.data['conditions'][0])
+    ml.setup_conditions(h, description.data['conditions'][0])
     
     orcas_out_path = manifest.get_path("output_orca")
     output = OrcaDataSet(orcas_out_path)
