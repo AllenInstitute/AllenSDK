@@ -31,8 +31,8 @@ class IclampStimulus(object):
         stim_vec = self.h.Vector(self.stim_curr)
         stim_vec.play(self.stim._ref_amp, self.sampling_rate)
         
-        self.h.tstop = len(self.stim_curr) * self.sampling_rate
-        # self.h.tstop = params['stimulus']['tstop']  # TODO: make sure this is done at the top level.
+        stimulus_stop_index = len(self.stim_curr) - 1
+        self.h.tstop = stimulus_stop_index * self.sampling_rate
         self.stim_vec_list.append(stim_vec)
     
     

@@ -1,7 +1,4 @@
-from neuron import h
-
-
-def generate_morphology(morph_filename):
+def generate_morphology(h, morph_filename):
     swc = h.Import3d_SWC_read()
     swc.input(morph_filename)
     imprt = h.Import3d_GUI(swc, 0)
@@ -29,7 +26,7 @@ def setup_conditions(h, conditions):
     h.v_init = conditions["v_init"]
 
 
-def record_values():
+def record_values(h):
     vec = { "v": h.Vector(),
             "t": h.Vector() }
 

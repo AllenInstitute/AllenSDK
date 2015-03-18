@@ -15,7 +15,7 @@ def run(description):
     h.load_file("import3d.hoc")
     
     morphology_path = description.manifest.get_path('MORPHOLOGY')
-    ml.generate_morphology(morphology_path.encode('ascii', 'ignore'))
+    ml.generate_morphology(h, morphology_path.encode('ascii', 'ignore'))
     load_cell_parameters(h,
                          description.data['passive'][0],
                          description.data['genome'],
@@ -34,22 +34,27 @@ def run(description):
         iclamp = IclampStimulus(h)
         iclamp.setup_instance(stimulus_path, sweep=sweep)
     
-        vec = ml.record_values()
+        vec = ml.record_values(h)
     
         h.finitialize()
         h.run()
         
         # And to an Orca File
         
-        excess_data = 5
-        output_data = np.array(vec['v'])[0:-excess_data] * 1.0e-3
+        mV = 1.0e-3
+        junction_potential = description.data['fitting'][0]['junction_potential']
+        output_data = (np.array(vec['v']) - junction_potential) * mV
         output.set_sweep(sweep, None, output_data)
 
 
 if '__main__' == __name__:
-    manifest_json_path = 'manifest.json'
+    import sys
+    manifest_json_path = sys.argv[-1]
+    
+    fix_sections = ['passive', 'axon_morph,', 'conditions', 'fitting']
     
     description = Config().load(manifest_json_path)
+    description.fix_unary_sections(fix_sections)
     
     run(description)
 
