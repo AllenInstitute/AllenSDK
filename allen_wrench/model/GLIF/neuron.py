@@ -4,6 +4,7 @@ import numpy as np
 import copy
 import warnings
 import json, utilities
+import copy
 
 from neuron_methods import GLIFNeuronMethod, METHOD_LIBRARY
 
@@ -13,6 +14,12 @@ class GLIFNeuronException( Exception ):
     def __init__(self, message, data):
         super(Exception, self).__init__(message)
         self.data = data
+
+class GLIFBadResetException( Exception ):
+    """ Exception raised when voltage is still above threshold after a reset rule is applied. """
+    def __init__(self, message, dv):
+        super(Exception, self).__init__(message)
+        self.dv = dv
     
 class GLIFNeuron( object ):    
     """ Implements the current-based Mihalas Neiber GLIF neuron.  Simulations model the voltage, 
@@ -66,7 +73,8 @@ class GLIFNeuron( object ):
     def __init__(self, El, dt, tau, R_input, C, asc_vector, spike_cut_length, th_inf, coeffs,
                  AScurrent_dynamics_method, voltage_dynamics_method, threshold_dynamics_method,
                  AScurrent_reset_method, voltage_reset_method, threshold_reset_method,
-                 init_voltage, init_threshold, init_AScurrents): 
+                 init_method_data, init_voltage, init_threshold, init_AScurrents): 
+
         """ Initialize the neuron. """
 
         self.type = GLIFNeuron.TYPE
@@ -78,7 +86,10 @@ class GLIFNeuron( object ):
         self.asc_vector = np.array(asc_vector)
         self.spike_cut_length = int(spike_cut_length)
         self.th_inf = th_inf
-        
+
+        self.init_method_data = init_method_data
+        self.update_method_data = copy.deepcopy(init_method_data)
+
         self.init_voltage = init_voltage
         self.init_threshold = init_threshold
         self.init_AScurrents = init_AScurrents
@@ -136,11 +147,13 @@ class GLIFNeuron( object ):
                           voltage_reset_method = d['voltage_reset_method'],
                           AScurrent_reset_method = d['AScurrent_reset_method'],
                           threshold_reset_method = d['threshold_reset_method'],
+                          init_method_data = d.get('init_method_data', {}),
                           init_voltage = d['init_voltage'],
                           init_threshold = d['init_threshold'],
                           init_AScurrents = d['init_AScurrents'])
 
     def to_dict(self):
+        """ Convert the neuron to a serializable dictionary. """
         return {
             'type': self.type,
             'El': self.El,
@@ -158,6 +171,7 @@ class GLIFNeuron( object ):
             'AScurrent_reset_method': self.AScurrent_reset_method,
             'voltage_reset_method': self.voltage_reset_method,
             'threshold_reset_method': self.threshold_reset_method,
+            'init_method_data': self.init_method_data,
             'init_voltage': self.init_voltage,
             'init_threshold': self.init_threshold,
             'init_AScurrents': self.init_AScurrents
@@ -219,6 +233,8 @@ class GLIFNeuron( object ):
         
         return GLIFNeuron.configure_method(method_name, method, method_params)
 
+    def reset_method_data(self):
+        self.update_method_data = copy.deepcopy(self.init_method_data)
 
     def dynamics(self, voltage_t0, threshold_t0, AScurrents_t0, inj, time_step, spike_time_steps):    
         """ Update the voltage, threshold, and afterspike currents of the neuron for a single time step.
@@ -274,7 +290,7 @@ class GLIFNeuron( object ):
         threshold_t1 = self.threshold_reset_method(self, threshold_t0, voltage_t1)
 
         if voltage_t1 > threshold_t1:
-            Exception("Voltage reset above threshold at time step (%f): voltage_t1 (%f) threshold_t1 (%f), voltage_t0 (%f) threshold_t0 (%f) AScurrents_t0 (%s)" % (t, voltage_t1, threshold_t1, voltage_t0, threshold_t0, repr(AScurrents_t0)))
+            raise GLIFBadResetException("Voltage reset above threshold: voltage_t1 (%f) threshold_t1 (%f), voltage_t0 (%f) threshold_t0 (%f) AScurrents_t0 (%s)" % ( voltage_t1, threshold_t1, voltage_t0, threshold_t0, repr(AScurrents_t0)), voltage_t1 - threshold_t1)
 
         return voltage_t1, threshold_t1, AScurrents_t1
     
