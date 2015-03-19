@@ -16,9 +16,9 @@ It is in "INI" format, and the comment character is #.
     workdir: 10_cells/work
     log_config_path: common/logs_on.conf
     debug: off
-    model_file: 10_cells/model.json
-    run_file: 10_cells/run_config.json
-    
+    model_file: 10_cells/model.json, 10_cells/run_config.json
+
+
 It tells bps what wordir to run in, the location of the log configuration,
 whether to connect to a debugger, the locations of the model file(s) relative to the workdir,
 and the location of the run configuration.
@@ -31,6 +31,31 @@ The run_file is used for other experimental conditions including the stimulus.
 
 The logging config file is also in "INI" format.
 It is a standard Python logging configuration file.
+
+
+Embedding Application Configuration in a Model Description File
+---------------------------------------------------------------
+
+Rather than using a .conf file, it is possible to embed application configuration
+in a :doc:`model description </model_description>` file in a "biophys" section.
+Note that the model_file value is an array rather than a comma-separated string.
+An application configuration section embedded in the same file as model description sections
+would reference itself in the model_file entry.
+
+
+model.json:
+::
+
+    {
+        "biophys": [{
+            "workdir": "10_cells/work",
+            "log_config_path": "common/logs_on.conf",
+            "debug": "off",
+            "model_file": [ "model.json", "run_config.json" ]
+        }]
+    }
+
+
 
 BPS Commands
 ------------

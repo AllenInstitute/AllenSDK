@@ -38,12 +38,8 @@ class Manifest(object):
         for path_info in config:
             path_type = path_info['type']
             path_format = None
-            path_schema = None
             if 'format' in path_info:
                 path_format = path_info['format']
-                
-            if 'schema' in path_info:
-                path_schema = path_info['schema']
             
             if path_type == 'file':
                 try:
@@ -54,8 +50,7 @@ class Manifest(object):
                 self.add_file(path_info['key'],
                               path_info['spec'],
                               parent_key,
-                              path_format,
-                              path_schema)
+                              path_format)
             elif path_type == 'dir':
                 try:
                     parent_key = path_info['parent_key']
@@ -103,7 +98,7 @@ class Manifest(object):
         self.path_info[key] = { 'type': path_type,
                                 'spec': path}
         
-        if path_type == Manifest.FILE:
+        if path_type == Manifest.FILE and path_format != None:
             self.path_info[key]['format'] = path_format
 
 
@@ -117,28 +112,25 @@ class Manifest(object):
             
             if 'format' in path_data:
                 path_format = path_data['format']
-
-            if 'schema' in path_data:
-                path_schema = path_data['schema']
-            else:
-                path_schema = { 'data': [] }                
-                            
+            
             Manifest.log.info("Adding path.  type: %s, format: %s, spec: %s" %
                               (path_data['type'],
                                path_data['spec'],
                                path_format))
-            self.path_info[path_key] = { 'type': path_data['type'],
-                                         'spec': path_data['spec'],
-                                         'format': path_format,
-                                         'schema': path_schema }
+            entry = { 'type': path_data['type'],
+                      'spec': path_data['spec'] 
+                    }
+            if path_format != None:
+                entry['format'] = path_format
+
+            self.path_info[path_key] = entry
     
     
     def add_file(self,
                  file_key,
                  file_name,
                  dir_key=None,
-                 path_format=None,
-                 schema=None):
+                 path_format=None):
         path_args = []
         
         if dir_key:
@@ -148,19 +140,20 @@ class Manifest(object):
             except:
                 Manifest.log.error("cannot resolve directory key %s" % (dir_key))
                 raise
-        else:
+        elif not file_name.startswith('/'):
             path_args.append(os.curdir)
+        else:
+            path_args.append(os.path.sep)
         
         path_args.extend(file_name.split('/'))
         file_path = os.path.join(*path_args)
         
         self.path_info[file_key] = { 'type': Manifest.FILE,
-                                     'format': path_format,
                                      'spec': file_path }
         
-        if schema != None:
-            self.path_info[file_key].update({ 'schema': schema })
-
+        if path_format:
+            self.path_info[file_key]['format'] = path_format
+    
     def get_path(self, path_key, *args):
         path_spec = str(self.path_info[path_key]['spec'].encode('ascii',
                                                                 'ignore'))
@@ -181,16 +174,6 @@ class Manifest(object):
             
         return path_format
     
-    
-    def get_schema(self, path_key):
-        path_entry = self.path_info[path_key]
-        path_schema = None
-
-        if 'schema' in path_entry:
-            path_schema = path_entry['schema']
-            
-        return path_schema
-        
     
     def create_dir(self, path_key):
         dir_path = self.get_path(path_key)

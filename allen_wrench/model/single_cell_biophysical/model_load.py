@@ -1,22 +1,4 @@
-from neuron import h
-from load_cell_parameters import load_cell_parameters
-import json
-
-
-def load_model_from_lims(morphology_path,
-                         fit_parameter_json):
-    h.load_file("stdgui.hoc")
-    h.load_file("import3d.hoc")
-
-    with open(fit_parameter_json, 'r') as f:
-        params = json.load(f)
-
-    generate_morphology(morphology_path.encode('ascii', 'ignore'))
-    load_cell_parameters(h, params)
-    setup_conditions(params)
-
-
-def generate_morphology(morph_filename):
+def generate_morphology(h, morph_filename):
     swc = h.Import3d_SWC_read()
     swc.input(morph_filename)
     imprt = h.Import3d_GUI(swc, 0)
@@ -39,12 +21,12 @@ def generate_morphology(morph_filename):
     h.define_shape()
 
 
-def setup_conditions(params):
-    h.celsius = params["conditions"]["celsius"]
-    h.v_init = params["conditions"]["v_init"]
+def setup_conditions(h, conditions):
+    h.celsius = conditions["celsius"]
+    h.v_init = conditions["v_init"]
 
 
-def record_values():
+def record_values(h):
     vec = { "v": h.Vector(),
             "t": h.Vector() }
 
