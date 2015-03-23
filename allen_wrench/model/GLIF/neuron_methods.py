@@ -202,7 +202,7 @@ def dynamics_threshold_adapt_slow_plus_fast(neuron, threshold_t0, voltage_t0):
     voltage_component=th_voltage+(md['a_voltage'] * neuron.coeffs['a'] * (voltage_t0-neuron.El) - 
                         md['b_voltage'] * neuron.coeffs['b'] * (th_voltage - neuron.coeffs['th_inf'] * neuron.th_inf)) * neuron.dt
     spike_component=th_spike -md['b_spike']*th_spike *neuron.dt
-    
+
     #------update the voltage and spiking values of the the
     md['th_spike']=spike_component
     md['th_voltage']=voltage_component
@@ -326,9 +326,12 @@ def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
 
 
 def reset_threshold_for_adapt_slow_fast(neuron, threshold_t0, voltage_v1):
+    '''this method resets voltage and threshold.  Here there are two components a spike (fast)
+    component and a slow(component) which getted added 
+    '''
     md=neuron.update_method_data
     md['th_spike'] = md['a_spike']
-    md['th_voltage'] = md['th_voltage']
+    md['th_voltage'] = md['th_voltage'] #note these are the same value.
 
     return md['th_spike']+md['th_voltage']
 

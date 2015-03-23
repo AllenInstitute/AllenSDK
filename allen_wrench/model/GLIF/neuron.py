@@ -20,6 +20,13 @@ class GLIFBadResetException( Exception ):
     def __init__(self, message, dv):
         super(Exception, self).__init__(message)
         self.dv = dv
+        
+class GLIFBadInitializationException( Exception ):
+    """ Exception raised when voltage is above threshold at the beginning of a sweep. i.e. probably caused by the optimizer. """
+    def __init__(self, message, dv, step):
+        super(Exception, self).__init__(message)
+        self.dv = dv
+        self.step=step
     
 class GLIFNeuron( object ):    
     """ Implements the current-based Mihalas Neiber GLIF neuron.  Simulations model the voltage, 
@@ -440,6 +447,9 @@ class GLIFNeuron( object ):
         voltage_t0 = self.init_voltage
         threshold_t0 = self.init_threshold
         AScurrents_t0 = self.init_AScurrents
+        
+        if voltage_t0>threshold_t0:
+            raise GLIFBadInitializationException("Voltage STARTS above threshold: voltage_t0 (%f) threshold_t0 (%f)" % ( voltage_t0, threshold_t0, voltage_t0 - threshold_t0, 10000000.0))
 
         start_index = 0
         end_index = 0
@@ -702,22 +712,22 @@ class GLIFNeuron( object ):
         
         #-----commented out 3-6-15 to always extrapolate st and v based on initial and final values    
         # figure out whether model neuron spiked or not        
-#        for time_step in range(0, num_time_steps): 
-#            if voltage_out[time_step] > threshold_out[time_step]:
-#                grid_model_spike_time = self.dt * (time_step-1)
-#                grid_model_spike_voltage = voltage_out[time_step-1]
-#                
-#                interpolated_model_spike_time = interpolate_spike_time(self.dt, time_step-1, threshold_out[time_step-1], threshold_out[time_step], voltage_out[time_step-1], voltage_out[time_step])
-#                interpolated_model_spike_voltage = interpolate_spike_voltage(self.dt, time_step-1, threshold_out[time_step-1], threshold_out[time_step], voltage_out[time_step-1], voltage_out[time_step])
-#                break
-#                
-#        # if the last voltage is above threshold and there hasn't already been a spike
-#        if voltage_t1 > threshold_t1 and grid_model_spike_time is None: 
-#            grid_model_spike_time = self.dt*(num_time_steps-1)
-#            grid_model_spike_voltage = voltage_t1
-#            
-#            interpolated_model_spike_time = interpolate_spike_time(self.dt, num_time_steps - 1, threshold_out[num_time_steps-1], threshold_t1, voltage_out[num_time_steps-1], voltage_t1)
-#            interpolated_model_spike_voltage = interpolate_spike_voltage(self.dt, num_time_steps, threshold_out[-1], threshold_t1, voltage_out[-1], voltage_t1)
+        for time_step in range(0, num_time_steps): 
+            if voltage_out[time_step] > threshold_out[time_step]:
+                grid_model_spike_time = self.dt * (time_step-1)
+                grid_model_spike_voltage = voltage_out[time_step-1]
+                
+                interpolated_model_spike_time = interpolate_spike_time(self.dt, time_step-1, threshold_out[time_step-1], threshold_out[time_step], voltage_out[time_step-1], voltage_out[time_step])
+                interpolated_model_spike_voltage = interpolate_spike_voltage(self.dt, time_step-1, threshold_out[time_step-1], threshold_out[time_step], voltage_out[time_step-1], voltage_out[time_step])
+                break
+                
+        # if the last voltage is above threshold and there hasn't already been a spike
+        if voltage_t1 > threshold_t1 and grid_model_spike_time is None: 
+            grid_model_spike_time = self.dt*(num_time_steps-1)
+            grid_model_spike_voltage = voltage_t1
+            
+            interpolated_model_spike_time = interpolate_spike_time(self.dt, num_time_steps - 1, threshold_out[num_time_steps-1], threshold_t1, voltage_out[num_time_steps-1], voltage_t1)
+            interpolated_model_spike_voltage = interpolate_spike_voltage(self.dt, num_time_steps, threshold_out[-1], threshold_t1, voltage_out[-1], voltage_t1)
 
         #if the model never spiked, extrapolate to guess when it would have spiked
         if grid_model_spike_time is None: 
