@@ -3,53 +3,37 @@ import logging
 
 
 class HocUtils(object):
-    log = logging.getLogger(__name__)
+    _log = logging.getLogger(__name__)
     h = None
     nrn = None
     neuron = None
     
-    def __init__(self, manifest):
-        self.manifest = manifest
-        
-        self.hoc_3d_files = ['import3d_sec.hoc',
-                             'read_swc.hoc',
-                             'read_nlcda.hoc',
-                             'read_nlcda3.hoc',
-                             'read_nts.hoc',
-                             'read_morphml.hoc',
-                             'import3d_gui.hoc']
-        
-        self.hoc_files = ['log.hoc',
-                          'parlib.hoc',
-                          'import3d.hoc',
-                          'distSynsUniform_caa_as.hoc']
-        
-        self.hoc_lib_files = ['progress.hoc',
-                              'save_t_series.hoc',
-                              'spikefile.hoc',
-                              'mkstim-SEClamp.hoc']
-            
-    
-    def load_hoc_files(self, package, files):
-        for hoc_file in files:
-            HocUtils.h.load_file(resource_filename(package, hoc_file))
-    
-    
-    def initialize_hoc(self, params):
-        ''' :parameter params: a dict of key-values
-        '''
+    def __init__(self, description):
         import neuron
         import nrn
         
-        h = neuron.h
+        self.h = neuron.h
         HocUtils.neuron = neuron
         HocUtils.nrn = nrn
-        HocUtils.h = h
-        h.load_file('stdgui.hoc')
-
-        self.load_hoc_files('allen_wrench.model.biophys_sim.neuron_hoc.import3d', self.hoc_3d_files)
-        self.load_hoc_files('allen_wrench.model.biophys_sim.neuron_hoc.common', self.hoc_files)
-        self.load_hoc_files('allen_wrench.model.biophys_sim.neuron_hoc', self.hoc_lib_files)
+        HocUtils.h = self.h
+        
+        self.description = description
+        self.manifest = description.manifest
+        
+        self.hoc_files = description.data['neuron'][0]['hoc']
+        
+        self.initialize_hoc()
+    
+    
+    def initialize_hoc(self):
+        ''' :parameter params: a dict of key-values
+        '''
+        h = self.h
+        params = self.description.data['conditions'][0]
+        
+        for hoc_file in self.hoc_files:
+            HocUtils._log.info("loading hoc file %s" % (hoc_file))
+            HocUtils.h.load_file(str(hoc_file))
         
         h('starttime = startsw()')
         
@@ -66,5 +50,3 @@ class HocUtils(object):
         if 'tstop' in params:
             h.tstop = params['tstop']
             h.runStopAt = h.tstop
-        
-        return h
