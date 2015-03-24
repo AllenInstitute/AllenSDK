@@ -22,8 +22,12 @@ sdist: distutils_build
 	python setup.py sdist
 	
 doc: clean
+	pip install numpydoc
 	sphinx-apidoc -d 4 -H "Allen Wrench" -A "Allen Institute for Brain Science" -V $(VERSION) -R $(VERSION).dev$(RELEASE) --full -o doc $(PROJECTNAME)
-	cp doc_template/*.rst doc_template/conf.py doc	
+	cp doc_template/*.rst doc_template/conf.py doc_template/logo.jpg doc
+	mkdir -p doc/_static/stylesheets
+	cp -R doc_template/aibs_sphinx/static/* doc/_static
+	cp -R doc_template/aibs_sphinx/templates/* doc/_templates
 	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/user.rst
 	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/developer.rst
 	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/links.rst

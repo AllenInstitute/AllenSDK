@@ -1,0 +1,12 @@
+{% extends '!layout.html' %}
+
+{% block header %}
+{% include "header.html" %}
+<link rel="stylesheet" type="text/css" href="_static/stylesheets/common_layout.css.scss" />
+{{ super() }}
+{% endblock %}
+
+{% block footer %}
+{% include "footer.html" %}
+{{ super() }}
+{% endblock %}
