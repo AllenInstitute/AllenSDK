@@ -41,13 +41,13 @@ Objects Within Sections
     #. All objects within a section are the same structure.
        Common operations on a section are to display it as a table,
        iterate over it, load from or write to a spreadsheet or csv file.
-       These operations are all easier if the section is fairly homogenous.
+       These operations are all easier if the section is fairly homogeneous.
     #. Objects are not deeply nested.
        While some shallow nesting is often useful, deep nesting such as a tree structure
        is not recommended.
        It makes interoperability with other tools and data formats more difficult.
-    #. Arrays are ok, though they should not be deeply nested either.
-    #. Object member values should be literals.  Do not use pickeled classes, for example.
+    #. Arrays are allowed, though they should not be deeply nested either.
+    #. Object member values should be literals.  Do not use pickled classes, for example.
 
 Comments
 --------
@@ -63,6 +63,7 @@ Comments
     
     commented.json:
     ::
+    
         {
            /*
             *  multi-line comment
@@ -87,20 +88,20 @@ Split Description Files by Section
     cells.json:
     ::
     
-            {
-               "cell_section": [
-                   { 
-                     "name": "cell 1",
-                     "shape": "pyramidal"
-                     "position": [ 0.1, 0.2, 0.3 ]
-                   },
-                   {
-                     "name": "cell 2",
-                     "shape": "glial",
-                     "position": [ 0.1, 0.2, 0.3 ]
-                   }
-               ]
-           }
+        {
+           "cell_section": [
+               {
+                 "name": "cell 1",
+                 "shape": "pyramidal"
+                 "position": [ 0.1, 0.2, 0.3 ]
+               },
+               {
+                 "name": "cell 2",
+                 "shape": "glial",
+                 "position": [ 0.1, 0.2, 0.3 ]
+               }
+           ]
+        }
     
     extras.json:
     ::

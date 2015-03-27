@@ -1,5 +1,0 @@
-objref tobj, nil
-proc makeimport3dtool() {
-	tobj = new Import3d_GUI(nil)
-	tobj = nil
-}

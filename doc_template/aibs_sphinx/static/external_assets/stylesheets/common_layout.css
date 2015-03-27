@@ -198,6 +198,22 @@ div.ontology_container {
     display: none;
 }
 
+.highlight-python {
+ 	border: 1px dashed;
+ 	border-color: rgb(102, 153, 204);
+ 	background-color: rgb(240, 240, 240);
+ 	padding: 2px;
+    font-size: 11px;
+	font-family: Courier;
+    margin: 10px;
+	line-height: 13px;
+    overflow: auto;
+}
+
+.document {
+    padding: 5px;
+}
+
 
 
 
