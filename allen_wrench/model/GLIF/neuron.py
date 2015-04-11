@@ -64,54 +64,18 @@ class GLIFNeuron( object ):
     def __init__(self, El, dt, tau, R_input, C, asc_vector, spike_cut_length, th_inf, th_adapt, coeffs,
                  AScurrent_dynamics_method, voltage_dynamics_method, threshold_dynamics_method,
                  AScurrent_reset_method, voltage_reset_method, threshold_reset_method,
-                 init_method_data, init_voltage, init_threshold, init_AScurrents): 
+                 init_method_data, init_voltage, init_threshold, init_AScurrents, **kwargs): 
 
-        """ Initialize the neuron.
-
-        :parameter El: resting potential 
-        :type El: float
-        :parameter dt: duration between time steps
-        :type dt: float
-        :parameter tau: 
-        :type tau:
-        :parameter R_input: input resistance
-        :type R_input: float
-        :parameter C: capacitance
-        :type C: float
-        :parameter asc_vector: afterspike current vector.  one element per element of tau.
-        :type asc_vector: np.ndarray
-        :parameter spike_cut_length: how many time steps to replace with NaNs when a spike occurs.
-        :type spike_cut_length: int
-        :parameter th_inf: instantaneous threshold
-        :type th_inf: float
-        :parameter coeffs: dictionary coefficients premultiplied to neuron properties during simulation. used for optimization.
-        :type coeffs: dict
-        :parameter AScurrent_dynamics_method: dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type AScurrent_dynamics_method: dict
-        :parameter voltage_dynamics_method: dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type voltage_dynamics_method: dict
-        :parameter threshold_dynamics_method: dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type threshold_dynamics_method: dict
-        :parameter AScurrent_reset_method: dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type AScurrent_reset_method: dict
-        :parameter voltage_reset_method: dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type voltage_reset_method: dict
-        :parameter threshold_reset_method: dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
-        :type threshold_reset_method: dict
-        :parameter init_voltage: initial voltage value
-        :type init_voltage: float
-        :parameter init_threshold: initiali spike threshold value
-        :type init_threshold: float
-        :parameter init_AScurrents: initial afterspike current vector. one element per element of tau.
-        :type init_AScurrents: np.ndarray
-        """
+        """ Initialize the neuron."""
 
         self.type = GLIFNeuron.TYPE
         self.El = El
         self.dt = dt
         self.tau = np.array(tau)
+        
         self.R_input = R_input
         self.C = C
+
         self.asc_vector = np.array(asc_vector)
         self.spike_cut_length = int(spike_cut_length)
         self.th_inf = th_inf
@@ -159,6 +123,10 @@ class GLIFNeuron( object ):
 
     def __str__(self):
         return json.dumps(self.to_dict(), default=utilities.json_handler, indent=2)
+
+    @property
+    def tau_m(self):
+        return self.R_input*self.C
 
     @classmethod
     def from_dict(cls, d):
