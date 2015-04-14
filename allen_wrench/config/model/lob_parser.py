@@ -34,7 +34,7 @@ class LobParser(object):
     @classmethod
     def unpack_lobs(cls, manifest, configuration_data, sections):
         # Circular imports
-        from allen_wrench.config.model.formats.hdf5_lob_parser import Hdf5LobParser
+        from allensdk.config.model.formats.hdf5_lob_parser import Hdf5LobParser
         
         for section in sections:
             if not section in configuration_data:

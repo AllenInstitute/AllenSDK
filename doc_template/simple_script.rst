@@ -14,7 +14,7 @@ bps.conf
 my_model.py
 ::
 
-    from allen_wrench.model.biophys_sim.config import Config
+    from allensdk.model.biophys_sim.config import Config
     
     description = Config().load('bps.conf')
 
@@ -24,7 +24,7 @@ Initialize HOC
 
 ::
 
-    from allen_wrench.model.biophys_sim.neuron.hoc_utils import HocUtils
+    from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
     hoc_utils = HocUtils(description.manifest)
 
 

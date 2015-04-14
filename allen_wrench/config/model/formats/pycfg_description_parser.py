@@ -14,8 +14,8 @@
 import six
 import logging
 from pprint import pprint, pformat
-from allen_wrench.config.model.description import Description
-from allen_wrench.config.model.description_parser import DescriptionParser
+from allensdk.config.model.description import Description
+from allensdk.config.model.description_parser import DescriptionParser
 
 
 class PycfgDescriptionParser(DescriptionParser):

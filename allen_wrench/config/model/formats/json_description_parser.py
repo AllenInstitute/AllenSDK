@@ -13,10 +13,10 @@
 
 import logging
 from json import dump, dumps
-from allen_wrench.config.model.description_parser import DescriptionParser
-from allen_wrench.config.model.formats.json_util import JsonUtil,\
+from allensdk.config.model.description_parser import DescriptionParser
+from allensdk.config.model.formats.json_util import JsonUtil,\
     NumpyAwareJsonEncoder
-from allen_wrench.config.model.description import Description
+from allensdk.config.model.description import Description
 
 
 class JsonDescriptionParser(DescriptionParser):
@@ -66,7 +66,7 @@ class JsonDescriptionParser(DescriptionParser):
                     dump(description.data, f, indent=2, cls=NumpyAwareJsonEncoder)
 
         except Exception:
-            self.log.warn("Couldn't write allen_wrench json description: %s" % filename)
+            self.log.warn("Couldn't write allensdk json description: %s" % filename)
             raise
         
         return
@@ -85,5 +85,5 @@ class JsonDescriptionParser(DescriptionParser):
                                 cls=NumpyAwareJsonEncoder)
             return json_string
         except Exception:
-            self.log.warn("Couldn't write allen_wrench json description: %s")
+            self.log.warn("Couldn't write allensdk json description: %s")
             raise

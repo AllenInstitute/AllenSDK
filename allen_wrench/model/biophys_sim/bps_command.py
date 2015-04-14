@@ -15,12 +15,12 @@ from pkg_resources import resource_filename
 import os
 import subprocess as sp
 import logging
-from allen_wrench.model.biophys_sim.config import Config
-from allen_wrench.config.model.lob_parser import LobParser
+from allensdk.model.biophys_sim.config import Config
+from allensdk.config.model.lob_parser import LobParser
 
 
 def choose_bps_command(command='bps_simple', conf_file=None):
-    log = logging.getLogger('allen_wrench.model.biophys_sim.bps_command')
+    log = logging.getLogger('allensdk.model.biophys_sim.bps_command')
 
     log.info("bps command: %s" % (command))
     
@@ -44,7 +44,7 @@ def choose_bps_command(command='bps_simple', conf_file=None):
         (module_name, function_name) = description.data['runs'][0]['main'].split('#')
         run_module(description, module_name, function_name)
     elif command == 'run_model':
-        from allen_wrench.config.app.mpi_job import MpiJob
+        from allensdk.config.app.mpi_job import MpiJob
         
         app_config = Config()
         description = app_config.load(conf_file)
@@ -64,7 +64,7 @@ def choose_bps_command(command='bps_simple', conf_file=None):
         log.info('num mpi processes: %d' % 
                  (num_mpi_processes))
         
-        start_module = resource_filename('allen_wrench.model.biophys_sim.bps_command',
+        start_module = resource_filename('allensdk.model.biophys_sim.bps_command',
                                          'bps_command.py')
         log.info("START_MODULE: %s" % (start_module))
         my_env = os.environ.copy()
@@ -77,7 +77,7 @@ def choose_bps_command(command='bps_simple', conf_file=None):
                      env=my_env)
         job.run()
     elif command == 'cluster_run_model':
-        from allen_wrench.config.app.mpi_job import MpiJob
+        from allensdk.config.app.mpi_job import MpiJob
         
         app_config = Config()
         description = app_config.load(conf_file)
@@ -100,7 +100,7 @@ def choose_bps_command(command='bps_simple', conf_file=None):
         log.info('num mpi processes: %d' % 
                  (num_mpi_processes))
         
-        start_module = resource_filename('allen_wrench.model.biophys_sim.bps_command',
+        start_module = resource_filename('allensdk.model.biophys_sim.bps_command',
                                          'bps_command.py')
         log.info("START_MODULE: %s" % (start_module))
         my_env = os.environ.copy()
@@ -113,7 +113,7 @@ def choose_bps_command(command='bps_simple', conf_file=None):
                      env=my_env)
         job.run()
     elif command == 'run_model_cluster' or command == 'qsub_script':
-        from allen_wrench.config.app.pbs_job import PbsJob
+        from allensdk.config.app.pbs_job import PbsJob
         
         app_config = Config()
         description = app_config.load(conf_file)

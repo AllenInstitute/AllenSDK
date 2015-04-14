@@ -2,7 +2,7 @@ import urllib2
 from json import load
 import os
 import logging
-from allen_wrench.wh_client.rma_canned_query_cookbook import RmaCannedQueryCookbook
+from allensdk.wh_client.rma_canned_query_cookbook import RmaCannedQueryCookbook
 
 class Warehouse:
     log = logging.getLogger(__name__)

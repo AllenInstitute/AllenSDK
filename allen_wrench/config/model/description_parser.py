@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import logging
-from allen_wrench.config.model.description import Description
+from allensdk.config.model.description import Description
 
 
 class DescriptionParser(object):
@@ -52,8 +52,8 @@ class DescriptionParser(object):
     
     def parser_for_extension(self, filename):
         # Circular imports
-        from allen_wrench.config.model.formats.json_description_parser import JsonDescriptionParser
-        from allen_wrench.config.model.formats.pycfg_description_parser import PycfgDescriptionParser
+        from allensdk.config.model.formats.json_description_parser import JsonDescriptionParser
+        from allensdk.config.model.formats.pycfg_description_parser import PycfgDescriptionParser
         
         parser = None
         

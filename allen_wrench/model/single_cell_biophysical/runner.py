@@ -1,6 +1,6 @@
-from allen_wrench.model.biophys_sim.config import Config
-from allen_wrench.model.single_cell_biophysical.utils import Utils
-from allen_wrench.core.orca_data_set import OrcaDataSet
+from allensdk.model.biophys_sim.config import Config
+from allensdk.model.single_cell_biophysical.utils import Utils
+from allensdk.core.orca_data_set import OrcaDataSet
 import numpy
 
 

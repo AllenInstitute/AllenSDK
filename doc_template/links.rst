@@ -1,3 +1,3 @@
- * `allen_wrench-|version|.tar.gz <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allen_wrench-|version|.tar.gz>`_
- * `allen_wrench-|version|.tar.bz2 <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allen_wrench-|version|.tar.bz2>`_
- * `allen_wrench-|version|.zip <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allen_wrench-|version|.zip>`_
+ * `allensdk-|version|.tar.gz <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-|version|.tar.gz>`_
+ * `allensdk-|version|.tar.bz2 <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-|version|.tar.bz2>`_
+ * `allensdk-|version|.zip <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-|version|.zip>`_

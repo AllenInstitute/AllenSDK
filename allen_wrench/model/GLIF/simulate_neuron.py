@@ -2,10 +2,10 @@ import logging, time
 import sys, argparse, json, os
 import numpy as np
 
-import allen_wrench.model.GLIF.utilities as utilities
+import allensdk.model.GLIF.utilities as utilities
 
-from allen_wrench.model.GLIF.neuron import GLIFNeuron
-from allen_wrench.core.orca_data_set import OrcaDataSet as EphysDataSet
+from allensdk.model.GLIF.neuron import GLIFNeuron
+from allensdk.core.orca_data_set import OrcaDataSet as EphysDataSet
 
 DEFAULT_SPIKE_CUT_VALUE = 0.05 # 50mV
 

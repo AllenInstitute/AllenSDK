@@ -10,8 +10,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from allen_wrench.config.app.pydev_connector import PydevConnector
-from allen_wrench.config.model.formats.json_util import JsonUtil
+from allensdk.config.app.pydev_connector import PydevConnector
+from allensdk.config.model.formats.json_util import JsonUtil
 
 try:
     from ConfigParser import ConfigParser # Python 2

@@ -13,7 +13,7 @@
 
 import logging
 
-from allen_wrench.config.model.manifest import Manifest
+from allensdk.config.model.manifest import Manifest
 
 
 class Description(object):

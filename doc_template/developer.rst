@@ -7,13 +7,13 @@ Quick Start (Linux)
 
  #. Download the source distribution.
     ::
-        wget http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allen_wrench-|version|.tar.gz
+        wget http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-|version|.tar.gz
  #. Unpack the source code.
     ::
-        tar -x -v --ungzip -f allen_wrench-|version|.tar.gz
+        tar -x -v --ungzip -f allensdk-|version|.tar.gz
  #. Install using setuptools
     ::
-        cd allen_wrench-|version|
+        cd allensdk-|version|
         python setup.py install
  #. Run the tests with coverage
     :: 
@@ -35,7 +35,7 @@ WIKI
 Source Control
 --------------
 
- * `Allen Institute Internal Stash Server <http://stash.corp.alleninstitute.org/projects/INF/repos/allen_wrench/browse/>`_
+ * `Allen Institute Internal Stash Server <http://stash.corp.alleninstitute.org/projects/INF/repos/allensdk/browse/>`_
  
 Build Server
 ------------

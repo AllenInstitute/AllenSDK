@@ -21,7 +21,7 @@ Contents:
    large_object_parser
    customization
    data_warehouse_client
-   allen_wrench
+   allensdk
 
 
 Indices and tables

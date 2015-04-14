@@ -1,6 +1,6 @@
 import logging
-from allen_wrench.model.biophys_sim.neuron.hoc_utils import HocUtils
-from allen_wrench.core.orca_data_set import OrcaDataSet
+from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
+from allensdk.core.orca_data_set import OrcaDataSet
 
 
 class Utils(HocUtils):

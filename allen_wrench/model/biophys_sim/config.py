@@ -1,9 +1,9 @@
 import re
 import logging
 from pkg_resources import resource_filename
-from allen_wrench.config.app.application_config import ApplicationConfig
-from allen_wrench.config.model.description_parser import DescriptionParser
-from allen_wrench.config.model.description import Description
+from allensdk.config.app.application_config import ApplicationConfig
+from allensdk.config.model.description_parser import DescriptionParser
+from allensdk.config.model.description import Description
 
 
 class Config(ApplicationConfig):
