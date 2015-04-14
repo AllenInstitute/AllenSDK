@@ -81,15 +81,33 @@ class RmaCannedQueryCookbook:
                         current_model_name = None
                         
                         if 'name' in biophysical_model:
-                            current_model_name = biophysical_model['name']                            
+                            current_model_name = biophysical_model['name']
                         if 'well_known_files' in biophysical_model:
                             for well_known_file in biophysical_model['well_known_files']:
                                 if 'id' in well_known_file:
                                     model_to_file_id_dict[current_model_name] = str(well_known_file['id'])
         
-        return model_to_file_id_dict        
+        return model_to_file_id_dict
         
-                        
-    
-                        
-            
+        
+    def build_rma_url_biophysical_neuronal_model_run(self, neuronal_model_run_id, fmt='json'):
+        include_associations = ''.join([
+            'neuronal_model',
+            '(neuronal_model_template,',
+            'specimen(neuron_reconstructions(well_known_files),',
+            'ephys_sweeps),',
+            'well_known_files),',
+            'well_known_files'])
+        criteria_associations = ''.join([
+            ("[id$eq%d]," % (neuronal_model_run_id)),
+            include_associations])
+        
+        return ''.join([self.rma_endpoint, 
+                        '/query.',
+                        fmt,
+                        '?q=',
+                        'model::NeuronalModelRun,',
+                        'rma::criteria,',
+                        criteria_associations,
+                        ',rma::include,',
+                        include_associations])

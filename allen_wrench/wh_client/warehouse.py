@@ -2,7 +2,7 @@ import urllib2
 from json import load
 import os
 import logging
-from allen_wrench.whclient.rma_canned_query_cookbook import RmaCannedQueryCookbook
+from allen_wrench.wh_client.rma_canned_query_cookbook import RmaCannedQueryCookbook
 
 class Warehouse:
     log = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ class Warehouse:
     def __init__(self, warehouse_base_url_string=default_warehouse_url):
         self.set_warehouse_urls(warehouse_base_url_string)
         self.default_working_directory = None
-
+    
     
     def set_warehouse_urls(self, warehouse_base_url_string):
         '''Set the internal RMA and well known file download endpoint urls based on a warehouse server url.
@@ -31,8 +31,8 @@ class Warehouse:
         :type working_directory: string
         '''
         self.default_working_directory = working_directory
-
-
+    
+    
     def do_rma_query(self, rma_builder_fn, json_traversal_fn, *args, **kwargs):
         '''Bundle an RMA query url construction function with a corresponding response json traversal function.
         
@@ -52,8 +52,8 @@ class Warehouse:
         json_parsed_data = self.retrieve_parsed_json_over_http(rma_url)
         
         return json_traversal_fn(json_parsed_data)
-
-
+    
+    
     def get_sample_well_known_file_ids(self, structure_names=['DG']):
         '''Query the current RMA endpoint with a list of structure names to get the corresponding well known file ids.
         
@@ -76,8 +76,8 @@ class Warehouse:
         json_traversal_fn = lambda x: RmaCannedQueryCookbook(self.rma_endpoint).read_json_biophysical_model_well_known_file_id(x)
         
         return self.do_rma_query(rma_builder_fn, json_traversal_fn, cell_type_names) 
-
-
+    
+    
     def cache_cell_types_data(self, cell_type_names, suffix='.hoc', prefix='', working_directory=None,):
         '''Take a list of cell-type names, query the Warehouse RMA to get well-known-files, download the files, and store them in the working directory.
             
@@ -99,8 +99,8 @@ class Warehouse:
             well_known_file_url = self.construct_well_known_file_download_url(well_known_file_id)
             cached_file_path = os.path.join(working_directory, "%s%s%s" % (prefix, cell_type_name, suffix))
             self.retrieve_file_over_http(well_known_file_url, cached_file_path)
-
-        
+    
+    
     def load_warehouse_schema(self):
         '''Download the RMA schema from the current RMA endpoint
         
@@ -111,8 +111,8 @@ class Warehouse:
         json_parsed_schema_data = self.retrieve_parsed_json_over_http(schema_url)
         
         return json_parsed_schema_data
-        
-        
+    
+    
     def construct_well_known_file_download_url(self, well_known_file_id):
         ''' 
         :parameter well_known_file_id: a well known file id
@@ -121,8 +121,8 @@ class Warehouse:
         :rtype: string
         '''
         return self.well_known_file_endpoint + str(well_known_file_id)
-                        
-        
+    
+    
     def retrieve_file_over_http(self, url, file_path):
         '''Very simple method to get a file via http and save it.
                 
@@ -138,7 +138,8 @@ class Warehouse:
         except urllib2.HTTPError:
             self.log.error("Couldn't retrieve file from %s" % url)
             raise
-            
+    
+    
     def retrieve_parsed_json_over_http(self, rma_url):
         '''Very simple method to get a json message via http and parse it into a Python data structure
         
@@ -151,9 +152,3 @@ class Warehouse:
         json_parsed_data = load(response)
         
         return json_parsed_data
-    
-        
-        
-        
-        
-                
