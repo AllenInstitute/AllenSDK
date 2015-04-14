@@ -1,6 +1,6 @@
 Developer Guide
 ===============
-This guide is a resource for contributing to the Allen Wrench library.  It is maintained by the `Allen Institute for Brain Science <http://www.alleninstitute.org/>`_.
+This guide is a resource for contributing to the Allen SDK library.  It is maintained by the `Allen Institute for Brain Science <http://www.alleninstitute.org/>`_.
 
 Quick Start (Linux)
 -------------------
@@ -40,8 +40,8 @@ Source Control
 Build Server
 ------------
 
- * `Allen Institute Internal Bamboo Server <http://http://bamboo.corp.alleninstitute.org/browse/IFR-ALLENWRENCH/>`_
- * `Allen Wrench / Biophys Sim Combined build <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/>`_
+ * `Allen Institute Internal Bamboo Server <http://http://bamboo.corp.alleninstitute.org/browse/IFR-Allen SDK/>`_
+ * `Allen SDK / Biophys Sim Combined build <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/>`_
 
  Unit test results and code coverage reports can be found on here.
 

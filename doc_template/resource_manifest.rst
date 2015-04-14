@@ -5,7 +5,7 @@ Large or complex models and experiments generally need more than
 a single :doc:`model description file </model_description>`
 to completely describe an experiment.  A manifest file is a way to
 describe all of the resources needed within
-the Allen Wrench description format itself.
+the Allen SDK description format itself.
 
 The manifest section is named "manifest" by default,
 though it is configurable.  The objects in the manifest section
@@ -84,7 +84,7 @@ A common use for a manifest
 is to reference a :doc:`large object file </large_object_parser>`
 from a model description.  This is done by specifying a "format" in
 the manifest object.  If the format is one that is recognized by an
-internal Allen Wrench large object parser or one that is user-provided,
+internal Allen SDK large object parser or one that is user-provided,
 the data from the large object can be accessed from the description object
 at simulation time.
 

@@ -25,12 +25,12 @@ be used independently of each other.  Some changes you can make are:
      general-purpose viewing and processing tools.
      
   #. Add a specialized data format.  If there is a need to access a specialized data format,
-     Allen Wrench has the concept of a LOB (large object) parser.  This can be used to read or
+     Allen SDK has the concept of a LOB (large object) parser.  This can be used to read or
      write the format using a third-party library, and then access the data through the manifest.
      LOBParsers are not intended to be an all-purpose solution, but they can be helpful in
      accessing data that is not easy to encode in JSON format.
 
   #. Use a different programming language.  While the examples use the Python programming
-     language, it is not a requirement.  The formats in Allen Wrench are designed to be
+     language, it is not a requirement.  The formats in Allen SDK are designed to be
      readable from other programming languages.
      

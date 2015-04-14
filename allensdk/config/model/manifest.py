@@ -16,7 +16,7 @@ import logging
 
 class Manifest(object):
     """Manages the location of external files and large objects 
-     referenced in an Allen Wrench configuration """
+     referenced in an Allen SDK configuration """
 
     DIR = 'dir'
     FILE = 'file'
@@ -31,8 +31,8 @@ class Manifest(object):
        
         
     def load_config(self, config):
-        ''' Load paths into the manifest from an Allen Wrench config section
-            :param config: the manifest section of an Allen Wrench config
+        ''' Load paths into the manifest from an Allen SDK config section
+            :param config: the manifest section of an Allen SDK config
             :type config: Config
         '''
         for path_info in config:

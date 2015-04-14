@@ -1,6 +1,6 @@
 User Guide
 ==========
-This guide is a resource for using the Allen Wrench package.
+This guide is a resource for using the Allen SDK package.
 It is maintained by the `Allen Institute for Brain Science <http://www.alleninstitute.org/>`_.
 
 Quick Start Install Using Pip (Linux)

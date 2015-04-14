@@ -53,7 +53,7 @@ Comments
 --------
 
     The JSON specification does not allow comments.
-    However, the Allen Wrench library applies a preprocessing stage
+    However, the Allen SDK library applies a preprocessing stage
     to remove C++-style comments, so they can be used in description files.
     
     Multi-line comments should be surrounded by /* */
@@ -170,7 +170,7 @@ Manifests, Large Data and Special Situations
 
 JSON has many advantages.  It is widely supported, readable and easy to parse and edit.
 As data sets get larger or specialized those advantages diminish.
-The Allen Wrench library has several mechanisms for handling parts of the model description
+The Allen SDK library has several mechanisms for handling parts of the model description
 that are not easily expressable as JSON. 
 :doc:`Large object parsers </large_object_parser>` can be used to create an interface
 between the model description and the large data files.  They can be thought of as a thin

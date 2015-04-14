@@ -1,7 +1,7 @@
 Biophysical Models
 ==================
 This guide is a resource for creating a biophysical model using
-NEURON and the Allen Wrench package.
+NEURON and the Allen SDK package.
 
 Create the Directory Structure
 ------------------------------
@@ -25,7 +25,7 @@ Create the Directory Structure
         
     Your NEURON NMODL (.mod) files go in the modfiles directory.
     Your .swc morphologies go in the morphology directory.
-    The remaining files are specific to Allen Wrench and are described below.
+    The remaining files are specific to Allen SDK and are described below.
     
  #. Create your model description.
     

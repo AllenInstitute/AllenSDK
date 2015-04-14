@@ -1,13 +1,13 @@
 Large Object Parser
 ===================
 
-The :doc:`model description </model_description>` JSON format provided by Allen Wrench
+The :doc:`model description </model_description>` JSON format provided by Allen SDK
 is not ideal for representing large or specialized data.
 Examples include large connection matrices, electrophysiology stimulus data,
 image or video data to be used as stimulus, or even small data that is already 
 available in another format from another source, such as a comma-separated-values (CSV)
 file exported from a spreadsheet.
-The Allen Wrench library provides a large object parser (LOBParser) interface
+The Allen SDK library provides a large object parser (LOBParser) interface
 to handle such files.
 
 

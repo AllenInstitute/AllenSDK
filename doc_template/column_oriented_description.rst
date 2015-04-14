@@ -59,7 +59,7 @@ Stream-able Split Descriptions
     
     { "name": "cell100000", "position": [0.5, 0.3, 0.1], "type": "pyramidal", "Vr": -1.6 }
     
-    This allows the streaming system to still use the Allen Wrench library
+    This allows the streaming system to still use the Allen SDK library
     to access the individual objects without having to load the entire description into memory.
     
     Column-oriented sections should not be stored as stream-able description files.
@@ -91,6 +91,6 @@ Model Description API
 ---------------------
 
 A model description can simply be built in memory using a Python script.
-This approach is best for developing tools that would generate an Allen Wrench configuration,
+This approach is best for developing tools that would generate an Allen SDK configuration,
 either from scratch or from another format.  It can also be used where complex transformations
 to the data are needed to generate the model that aren't available in the JSON format.
