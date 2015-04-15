@@ -198,6 +198,10 @@ div.ontology_container {
     display: none;
 }
 
+.highlight {
+	background-color: rgb(240, 240, 240);
+}
+
 .highlight-python {
  	border: 1px dashed;
  	border-color: rgb(102, 153, 204);
