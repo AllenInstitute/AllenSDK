@@ -24,14 +24,14 @@ from pkg_resources import resource_filename
 
 class ApplicationConfig(object):
     ''' Convenience class that consolidates the handling of application configuration
-        from environment variables, .conf files and the command line
-        using Python standard libraries and formats.
+    from environment variables, .conf files and the command line
+    using Python standard libraries and formats.
     '''
     
     _log = logging.getLogger(__name__)
     _DEFAULT_LOG_CONFIG = resource_filename(__name__, 'logging.conf')
     lc.fileConfig(_DEFAULT_LOG_CONFIG)
-
+    
     def __init__(self, 
                  defaults,
                  name="app",
@@ -41,12 +41,12 @@ class ApplicationConfig(object):
         self.application_name = name
         self.help = halp
         self.debug_enabled = False
-
+    
         if default_log_config == None:
             default_log_config = ApplicationConfig._DEFAULT_LOG_CONFIG
-
+        
         ApplicationConfig._log.info("default log config: %s" % (default_log_config))
-
+        
         self.defaults = {
             'config_file_path': {
                 'default': "%s.conf" % (self.application_name),
@@ -64,23 +64,35 @@ class ApplicationConfig(object):
                 'default': 'off',
                 'help': 'pydev_remote or off (default)'
             }
- 
-
+        
+        
         self.defaults.update(defaults)
-
+        
         logging.info("defaults: %s" % (self.defaults))
-
+        
         self.argparser = self.create_argparser()
                 
         for key, value in self.defaults.items():
             setattr(self, key, value['default'])
-
-
+    
+    
     def load(self, command_line_args, disable_existing_loggers=True):
         ''' Load application configuration options, first from the environment,
-            then from the configuration file, then from the command line.
+        then from the configuration file, then from the command line.
             
-            Each stage of loading can override the previous stage.
+        Each stage of loading can override the previous stage.
+        
+        Parameters
+        ----------
+        command_line_args : dict
+            Parameters passed to the application.
+        disable_existing_loggers : boolean
+            Reset the logging system or not.
+        
+        Returns
+        -------
+        fileConfig
+            Configuration object with all levels applied
         '''
         # read and apply options from the environment
         self.apply_configuration_from_environment()
@@ -115,17 +127,30 @@ class ApplicationConfig(object):
                          (parsed_args.log_config_path))
     
     
-    def to_boolean(self, v):
-        if str(v).lower() == 'true':
-            return True
-        
-        return False  
-   
-   
     def create_argparser(self):
+        '''Initialization for the command-line parsing stage.
+        
+        An application specific prefix is applied to argument names. 
+        
+        Parameters
+        ----------
+        prog : string
+            Application specific prefix for argument names.
+        description : string
+            A brief 'help' description of the application.
+        
+        Returns
+        -------
+        argParse.ArgumentParser
+            The initialized argument parser object.
+        
+        Notes
+        -----
+        Defaults are set at the first environment reading.
+        Command line args only override them when present
+        '''
         parser = argparse.ArgumentParser(prog=self.application_name,
                                          description=self.help)
-        # defaults are set at the first environment reading.  Command line args only override them when present
         for key, value in self.defaults.items():
             if key == 'config_file_path':
                 parser.add_argument("%s" % (key), default=None, help=value['help'])
@@ -136,20 +161,36 @@ class ApplicationConfig(object):
     
     
     def parse_command_line_args(self, args):
+        '''Simply call the internal argparser object.
+        
+        Parameters
+        ----------
+        args : array
+            Parameters passed to the application.
+        
+        Returns
+        -------
+        Namespace
+            Parsed paramenters.
+        '''
         return self.argparser.parse_args(args)
     
     
     def apply_configuration_from_command_line(self, parsed_args):
-        ''' Read application configuration variables from the command line.
-            :param parsed_args: the arguments as parsed from the command line.
-            :type parsed_args: dict
-            
-            Unassigned variables are left unchanged if previously assigned,
-            set to their default values,
-            or None if no default is specified at init time.
-            Assigned variables will overwrite the previous value.
-            
-            see: https://docs.python.org/2/howto/argparse.html
+        '''Read application configuration variables from the command line.
+        
+        Unassigned variables are left unchanged if previously assigned,
+        set to their default values,
+        or None if no default is specified at init time.
+        Assigned variables will overwrite the previous value.
+        
+        see: https://docs.python.org/2/howto/argparse.html
+        
+        Parameters
+        ----------
+        parsed_args : dict
+            the arguments as parsed from the command line.
+        
         '''
         logging.info('command_line args: %s' % (parsed_args))
         
@@ -160,11 +201,12 @@ class ApplicationConfig(object):
     
     
     def apply_configuration_from_environment(self):
-        ''' Read application configuration variables from the environment.
-            The variable names are upper case and have a 
-            prefix defined by the application.
+        '''Read application configuration variables from the environment.
+        
+        The variable names are upper case and have a 
+        prefix defined by the application.
             
-            See: https://docs.python.org/2/library/os.html
+        See: https://docs.python.org/2/library/os.html
         '''
         for key in self.defaults:
             environment_variable = "%s_%s" % (self.application_name.upper(), key.upper())
@@ -174,18 +216,59 @@ class ApplicationConfig(object):
     
     
     def from_json_file(self, json_path):
+        '''Read an application configuration from a JSON format file.
+        
+        Parameters
+        ----------
+        json_path : string
+            Path to the JSON file.
+        
+        Returns
+        -------
+        string
+            An application configuration in INI format
+        
+        '''
         description = JsonUtil.read_json_file(json_path)
         
-        return self.to_cofig_string(description)
+        return self.to_config_string(description)
     
     
     def from_json_string(self, json_string):
+        '''Read a configuration from a JSON format string.
+        
+        Parameters
+        ----------
+        json_string : string
+            A JSON-formatted string containing an application configuration.
+        
+        Returns
+        -------
+        string
+            An application configuration in INI format
+        '''
         description = JsonUtil.read_json_string(json_string)
         
-        return self.to_cofig_string(description)
+        return self.to_config_string(description)
     
     
-    def to_cofig_string(self, description):
+    def to_config_string(self, description):
+        '''Create a configuration string from a dict.
+        
+        Parameters
+        ----------
+        description : dict
+            Configuration options for an application.
+        
+        Returns
+        -------
+        string
+            Equivalent configuration as an INI format string
+        
+        Notes
+        -----
+        The Python configparser library natively supports this functionality in Python 3.
+        '''
         bps_config = description['biophys'][0]
         
         cfg_array = ['[biophys]']
@@ -209,11 +292,20 @@ class ApplicationConfig(object):
     
     def apply_configuration_from_file(self, config_file_path):
         ''' Read application configuration variables from a .conf file.
-            Unassigned variables are set to their default values 
-            or None if no default is specified at init time.
-            The variables are found in a section named by the application.
         
-            see: https://docs.python.org/2/library/configparser.html
+        Unassigned variables are set to their default values 
+        or None if no default is specified at init time.
+        The variables are found in a section named by the application.
+        
+        Parameters
+        ----------
+        config_file_path : string
+            path to to an INI (.conf) or JSON format application config file.
+        
+        Returns
+        -------
+        
+        see: https://docs.python.org/2/library/configparser.html
         '''
         none_defaults = {}
         

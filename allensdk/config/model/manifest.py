@@ -31,9 +31,12 @@ class Manifest(object):
        
         
     def load_config(self, config):
-        ''' Load paths into the manifest from an Allen SDK config section
-            :param config: the manifest section of an Allen SDK config
-            :type config: Config
+        ''' Load paths into the manifest from an Allen SDK config section.
+        
+        Parameters
+        ----------
+        config : Config
+            Manifest section of an Allen SDK config.
         '''
         for path_info in config:
             path_type = path_info['type']
@@ -74,6 +77,23 @@ class Manifest(object):
         
     def add_path(self, key, path, path_type=DIR,
                  absolute=True, path_format=None, parent_key=None):
+        '''Insert a new entry.
+        
+        Parameters
+        ----------
+        key : string
+            Identifier for referencing the entry.
+        path : string
+            Specification for a path using %s, %d style substitution.
+        path_type : string enumeration
+            'dir' (default) or 'file'
+        absolute : boolean
+            Is the spec relative to the process current directory.
+        path_format : string, optional
+            Indicate a known file type for further parsing.
+        parent_key : string
+            Refer to another entry.
+        '''
         if parent_key:
             path_args = []
             
@@ -104,8 +124,10 @@ class Manifest(object):
 
     def add_paths(self, path_info):
         ''' add information about paths stored in the manifest.
-            :param path_info: a dictionary with information about the new paths
-            :type path_info: dict
+        
+        Parameters
+            path_info : dict
+                Information about the new paths
         '''
         for path_key, path_data in path_info.items():
             path_format = None
@@ -131,6 +153,19 @@ class Manifest(object):
                  file_name,
                  dir_key=None,
                  path_format=None):
+        '''Insert a new file entry.
+        
+        Parameters
+        ----------
+        file_key : string
+            Reference to the entry.
+        file_name : string
+            Subtitutions of the %s, %d style allowed.
+        dir_key : string
+            Reference to the parent directory entry.
+        path_format : string, optional
+            File type for further parsing.
+        '''
         path_args = []
         
         if dir_key:
@@ -154,7 +189,22 @@ class Manifest(object):
         if path_format:
             self.path_info[file_key]['format'] = path_format
     
+    
     def get_path(self, path_key, *args):
+        '''Retrieve an entry with substitutions.
+        
+        Parameters
+        ----------
+        path_key : string
+            Refer to the entry to retrieve.
+        args : any types, optional
+           arguments to be substituted into the path spec for %s, %d, etc.
+        
+        Returns
+        -------
+        string
+            Path with parent structure and substitutions applied.
+        '''
         path_spec = str(self.path_info[path_key]['spec'].encode('ascii',
                                                                 'ignore'))
         
@@ -165,7 +215,20 @@ class Manifest(object):
             
         return path
     
+    
     def get_format(self, path_key):
+        '''Retrieve the type of a path entry.
+        
+        Parameters
+        ----------
+        path_key : string
+            reference to the entry
+        
+        Returns
+        -------
+        string
+            File type.
+        '''
         path_entry = self.path_info[path_key]
         path_format = None
         
@@ -176,14 +239,31 @@ class Manifest(object):
     
     
     def create_dir(self, path_key):
+        '''Make a directory for an entry.
+        
+        Parameters
+        ----------
+        path_key : string
+            Reference to the entry.
+        '''
         dir_path = self.get_path(path_key)
         
         try:
             os.stat(dir_path)
         except:
             os.mkdir(dir_path)
-            
+    
+    
     def check_dir(self, path_key, do_exit=False):
+        '''Verify a directories existence or optionally exit.
+        
+        Parameters
+        ----------
+        path_key : string
+            Reference to the entry.
+        do_exit : boolean
+            What to do if the directory is not present.
+        '''
         dir_path = self.get_path(path_key)
         
         if not os.path.exists(dir_path):
@@ -193,6 +273,15 @@ class Manifest(object):
                 quit()
     
     def resolve_paths(self, description_dict, suffix='_key'):
+        '''Walk input items and expand those that refer to a manifest entry.
+        
+        Parameters
+        ----------
+        description_dict : dict
+            Any entries with key names ending in suffix will be expanded.
+        suffix : string
+            Indicates the entries to be expanded.
+        '''
         key_pattern =  re.compile('(.*)%s$' % (suffix))
         
         for description_key, manifest_key in description_dict.items():
