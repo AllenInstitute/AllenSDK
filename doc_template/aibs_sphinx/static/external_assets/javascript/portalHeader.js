@@ -191,17 +191,7 @@ function import_portal()  {
 "		text-decoration:none;" + 
 "	}" + 
 "" + 
-"	#top_chrome a:visited {" + 
-"" + 
-"		color:inherit !important;	" + 
-"	}" + 
-"" + 
 "	#top_chrome a:hover {" + 
-"" + 
-"		color:inherit !important;	" + 
-"	}" + 
-"" + 
-"	#top_chrome a:hover:visited {" + 
 "" + 
 "		color:inherit !important;	" + 
 "	}" + 

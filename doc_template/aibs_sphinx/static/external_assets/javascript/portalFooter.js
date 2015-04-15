@@ -100,11 +100,6 @@ function import_portal()  {
 "	color:#0779BE !important;" + 
 "}" + 
 "" + 
-".portal_link_stack a:visited {" + 
-"" + 
-"	color:#0779BE !important;" + 
-"}" + 
-"" + 
 "/* overriding application tab bar styles */" + 
 "#pTabBar {" + 
 "" + 
@@ -276,11 +271,6 @@ function import_portal()  {
 "" + 
 "/* This is a global change to link colors that will affect all the apps */" + 
 "a:hover {" + 
-"" + 
-"	color:#47AEDC !important;" + 
-"}" + 
-"" + 
-"a:visited:hover {" + 
 "" + 
 "	color:#47AEDC !important;" + 
 "}" + 

@@ -418,11 +418,10 @@ p.subhead {
     margin-top: 20px;
 }
 
-a:link:active           { color: #ff0000; }
-a:link:hover            { background-color: #bbeeff; }
-a:visited:hover         { background-color: #bbeeff; }
-a:visited               { color: #551a8b; }
-a:link                  { color: #0000bb; }
+a:link             { color: #0779be; }
+a:visited          { color: #0779be; }
+a:hover            { color: #bbeeff; }
+a:active           { color: #bbeeff; }
 
 div.body h1,
 div.body h2,
