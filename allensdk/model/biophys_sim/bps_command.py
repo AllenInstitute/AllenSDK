@@ -18,7 +18,6 @@ import os
 import subprocess as sp
 import logging
 from allensdk.model.biophys_sim.config import Config
-from allensdk.config.model.lob_parser import LobParser
 
 
 def choose_bps_command(command='bps_simple', conf_file=None):
@@ -36,12 +35,6 @@ def choose_bps_command(command='bps_simple', conf_file=None):
     elif command == 'run_simple':
         app_config = Config()
         description = app_config.load(conf_file)
-        LobParser.unpack_lobs(
-            description.manifest,
-            description.data,
-            unpack_lobs=['positions',
-                         'connections',
-                         'external_inputs'])
         sys.path.insert(1, description.manifest.get_path('CODE_DIR'))
         (module_name, function_name) = description.data['runs'][0]['main'].split('#')
         run_module(description, module_name, function_name)
@@ -50,12 +43,6 @@ def choose_bps_command(command='bps_simple', conf_file=None):
         
         app_config = Config()
         description = app_config.load(conf_file)
-        LobParser.unpack_lobs(
-            description.manifest,
-            description.data,
-            unpack_lobs=['positions',
-                         'connections',
-                         'external_inputs'])
         run_params = description.data['runs'][0]
 
         if 'num_mpi_processes' in run_params:
@@ -83,12 +70,6 @@ def choose_bps_command(command='bps_simple', conf_file=None):
         
         app_config = Config()
         description = app_config.load(conf_file)
-        LobParser.unpack_lobs(
-            description.manifest,
-            description.data,
-            unpack_lobs=['positions',
-                         'connections',
-                         'external_inputs'])
         run_params = description.data['runs'][0]
 
         pbs_args = description.data['cluster'][0]
@@ -119,12 +100,6 @@ def choose_bps_command(command='bps_simple', conf_file=None):
         
         app_config = Config()
         description = app_config.load(conf_file)
-        LobParser.unpack_lobs(
-            description.manifest,
-            description.data,
-            unpack_lobs=['positions',
-                         'connections',
-                         'external_inputs'])
         pbs_args = description.data['cluster'][0]
         description.manifest.resolve_paths(pbs_args)
         pbs_args['script'] = '''\

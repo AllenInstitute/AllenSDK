@@ -18,7 +18,7 @@ import re
 import logging
 
 class Manifest(object):
-    """Manages the location of external files and large objects 
+    """Manages the location of external files 
      referenced in an Allen SDK configuration """
 
     DIR = 'dir'

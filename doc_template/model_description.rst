@@ -165,18 +165,16 @@ description of the interconnections.
             ]
         }
 
-Manifests, Large Data and Special Situations
---------------------------------------------
+Manifests, External Data and Special Situations
+-----------------------------------------------
 
-JSON has many advantages.  It is widely supported, readable and easy to parse and edit.
+JSON has many advantages.  It is widely supported,
+readable and easy to parse and edit.
 As data sets get larger or specialized those advantages diminish.
-The Allen SDK library has several mechanisms for handling parts of the model description
-that are not easily expressable as JSON. 
-:doc:`Large object parsers </large_object_parser>` can be used to create an interface
-between the model description and the large data files.  They can be thought of as a thin
-translation layer.  The :doc:`resource manifest </resource_manifest>`
-is a way of storing the file and directory locations in a model description.
-Some :doc:`techniques </column_oriented_description>` to make the JSON more compatible
+The :doc:`resource manifest </resource_manifest>`
+is a way of storing the file and directory locations.
+Some :doc:`techniques </column_oriented_description>`
+to make the JSON more compatible
 with big data technologies are also available in specific instances
 without resorting to external formats.
 

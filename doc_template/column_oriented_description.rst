@@ -4,10 +4,8 @@ Large Models and Special Situations
 Models with large data structures can be difficult to represent in JSON.
 Often it is best to use a file format better suited to the data and connect it to the
 :doc:`json description </model_description>` 
-using a :doc:`large object parser </large_object_parser>` (LobParser)
-with a resource manifest.
-However for data that has not quite met that threshold,
-the following techniques may help.
+using an alternative format with a resource manifest.
+The following techniques might also help.
 
 
 Column-Oriented Data
@@ -63,8 +61,8 @@ Stream-able Split Descriptions
     to access the individual objects without having to load the entire description into memory.
     
     Column-oriented sections should not be stored as stream-able description files.
-    Instead a large object parser (LobParser) should be used with a
-    format that natively supports column-oriented data such as pandas or HDF5.
+    Instead use an alternate format that natively supports column-oriented data 
+    such as pandas or HDF5.
   
   
 Python Configuration Parser

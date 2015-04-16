@@ -75,44 +75,6 @@ interpolated:
     }
 
 
-.. _lob_in_manifest:
-
-Large Object References
------------------------
-
-A common use for a manifest
-is to reference a :doc:`large object file </large_object_parser>`
-from a model description.  This is done by specifying a "format" in
-the manifest object.  If the format is one that is recognized by an
-internal Allen SDK large object parser or one that is user-provided,
-the data from the large object can be accessed from the description object
-at simulation time.
-
-::
-
-    {
-        "manifest": [
-            {   "key": "BASEDIR",
-                "type": "dir",
-                "spec": "."
-            },
-            {
-                "key": "positions_path",
-                "type": "file",
-                "format": "hdf5",
-                "spec": "positions.h5",
-                "parent_key": "WORKDIR"
-            }
-        ] }
-    }
-    
-While large object parsers are designed to work
-with manifest files, there's no reason that a manifest could be use
-without a LobParser if the simulation software provides
-an alternate way of accessing the external file.  Similarly,
-it is possible to pass a filename directly to a large object file
-without using a manifest.
-
 Split Manifest Files
 --------------------
 

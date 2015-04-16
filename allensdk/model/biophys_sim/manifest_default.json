@@ -57,15 +57,13 @@
         {
             "key": "connection_path",
             "type": "file",
-            "format": "hdf5",
-            "spec": "connections.h5",
+            "spec": "connections.dat",
             "parent_key": "WORKDIR"
         },
         {
             "key": "positions_path",
             "type": "file",
-            "format": "hdf5",
-            "spec": "positions.h5",
+            "spec": "positions.dat",
             "parent_key": "WORKDIR"
         },
         {
