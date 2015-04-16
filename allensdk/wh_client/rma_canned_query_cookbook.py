@@ -106,6 +106,18 @@ class RmaCannedQueryCookbook:
         
         
     def build_rma_url_biophysical_neuronal_model_run(self, neuronal_model_run_id, fmt='json'):
+        '''Construct a query to find all files related to a neuronal model run.
+        
+        Parameters
+        ----------
+        neuronal_model_run_id : integer or string representation
+            key of experiment to retrieve.
+            
+        Returns
+        -------
+        string
+            RMA query url.
+        '''
         include_associations = ''.join([
             'neuronal_model',
             '(neuronal_model_template,',
