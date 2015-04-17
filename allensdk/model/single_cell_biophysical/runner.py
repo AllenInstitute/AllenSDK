@@ -20,6 +20,13 @@ import numpy
 
 
 def run(description):
+    '''Main function for running a single cell biophysical experiment.
+    
+    Parameters
+    ----------
+    description : Config
+        All information needed to run the experiment.
+    '''
     # configure NEURON
     utils = Utils(description)
     h = utils.h
@@ -53,6 +60,18 @@ def run(description):
 
 
 def load_description(manifest_json_path):
+    '''
+    
+    Parameters
+    ----------
+    manifest_json_path : string
+        File containing the experiment configuration.
+    
+    Returns
+    -------
+    Config
+        Object with all information needed to run the experiment.
+    '''
     description = Config().load(manifest_json_path)
     
     # fix nonstandard description sections
