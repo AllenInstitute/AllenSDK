@@ -11,7 +11,7 @@ Create the Directory Structure
         my_biophysical_project
         |-- bps.conf
         |-- my_model_description.json
-        |-- my_stimulus.orca
+        |-- my_stimulus.nwb
         |-- manifest.json
         |-- morphology
         |   |-- my_cell.swc
@@ -58,7 +58,7 @@ Run Your Simulation
      If you are using a template script, pass the model description and stimulus files
      to your script:
      ::
-         template/my_simulator.py my_model_description.json my_stimulus.orca
+         template/my_simulator.py my_model_description.json my_stimulus.nwb
      or using bps:
      ::
          bps run_simple bps.conf

@@ -15,7 +15,7 @@
 
 from allensdk.model.biophys_sim.config import Config
 from allensdk.model.single_cell_biophysical.utils import Utils
-from allensdk.core.orca_data_set import OrcaDataSet
+from allensdk.core.nwb_data_set import NwbDataSet
 import numpy
 
 
@@ -39,24 +39,47 @@ def run(description):
     
     # configure stimulus and recording
     stimulus_path = description.manifest.get_path('stimulus_path')
-    orcas_out_path = manifest.get_path("output_orca")
-    output = OrcaDataSet(orcas_out_path)
     run_params = description.data['runs'][0]
     sweeps = run_params['sweeps']
     junction_potential = description.data['fitting'][0]['junction_potential']
     mV = 1.0e-3
     
+    stimulus_format = manifest.get_format('stimulus_path')
+    output_format = manifest.get_format('output')
+    
     # run sweeps
     for sweep in sweeps:
-        utils.setup_iclamp(stimulus_path, sweep=sweep)
+        if stimulus_format == 'NWB':
+            utils.setup_iclamp(stimulus_path, sweep=sweep)
+        elif stimulus_format == 'dat':
+            utils.setup_iclamp_dat(stimulus_path)
+        
         vec = utils.record_values()
         
         h.finitialize()
         h.run()
         
-        # write to an Orca File
+        # write to an NWB File
         output_data = (numpy.array(vec['v']) - junction_potential) * mV
-        output.set_sweep(sweep, None, output_data)
+        output_times = numpy.array(vec['t'])
+        
+        if output_format == 'NWB':
+            output_path = manifest.get_path("output")
+            save_nwb(output_path, output_data, sweep)
+        elif output_format == 'dat':
+            output_path = manifest.get_path("output", sweep)
+            save_dat(output_path, output_data, output_times)
+
+
+def save_nwb(output_path, v, sweep):
+    output = NwbDataSet(output_path)
+    output.set_sweep(sweep, None, v)
+
+
+def save_dat(output_path, v, t):
+    data = numpy.transpose(numpy.vstack((t, v)))
+    with open (output_path, "w") as f:
+        numpy.savetxt(f, data)
 
 
 def load_description(manifest_json_path):

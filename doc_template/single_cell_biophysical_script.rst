@@ -1,12 +1,10 @@
 Single Cell Biophysical Models
 ==============================
 
-Running a Single Cell Biophysical Simulation
---------------------------------------------
+Prerequisites
+-------------
 
-::
-    nrnivmodl .
-    python -m allensdk.model.single_cell_biophysical.runner manifest.json
+You must have pyNEURON and Allen SDK installed.
 
 
 Retrieving Data from the Allen Institute
@@ -19,9 +17,44 @@ This may be done programmatically
         SingleCellBiophysical
     
     scb = SingleCellBiophysical('http://iwarehouse.corp.alleninstitute.org')  ### TODO REMOVE INTERNAL URL
-    scb.cache_data(464137111, working_directory=<dir>)
+    scb.cache_data(464137111, working_directory='neuronal_model_run')
 
 or you can download the data manually from the web site.
+
+
+Directory Structure
+-------------------
+
+The structure of the directory created looks like this.
+It includes stimulus files, model parameters, morphology, cellular mechanisms
+and application configuration.
+::
+
+    neuronal_model_run
+    |-- manifest.json
+    |-- 169248.04.02.01_fit.json
+    |-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01.nwb
+    |-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01_403165543_m.swc
+    |-- modfiles
+    |   |--CaDynamics.mod
+    |   |--Ca_HVA.mod
+    |   |--Ca_LVA.mod
+    |   |--Ih.mod
+    |   `--...etc.
+    |
+    |--x86_64
+    `---work
+
+
+Running the Simulation
+--------------------------------------------
+
+::
+
+    cd neuronal_model_run
+    nrnivmodl ./modfiles
+    python -m allensdk.model.single_cell_biophysical.runner manifest.json
+
 
 Simulation Main Loop
 --------------------
@@ -50,8 +83,8 @@ Then read the stimulus and recording configuration and configure NEURON
 
     # configure stimulus and recording
     stimulus_path = description.manifest.get_path('stimulus_path')
-    orcas_out_path = manifest.get_path("output_orca")
-    output = OrcaDataSet(orcas_out_path)
+    nwb_out_path = manifest.get_path("output")
+    output = NwbDataSet(nwb_out_path)
     run_params = description.data['runs'][0]
     sweeps = run_params['sweeps']
     junction_potential = description.data['fitting'][0]['junction_potential']
@@ -68,7 +101,7 @@ Loop through the stimulus sweeps and write the output.
         h.finitialize()
         h.run()
         
-        # write to an Orca File
+        # write to an NWB File
         output_data = (numpy.array(vec['v']) - junction_potential) * mV
         output.set_sweep(sweep, None, output_data)
 
@@ -76,30 +109,10 @@ Loop through the stimulus sweeps and write the output.
 Selecting a Specific Sweep
 --------------------------
 
+The sweeps are listed in manifest.json.
+You can remove all of the sweep numbers that you do not want run.
+
 
 Exporting Output to Text Format
 -------------------------------
 
-
-Directory Structure
--------------------
-
-A typical directory created to reproduce a neuronal model run looks like this.
-It includes stimulus files, model parameters, morphology, cellular mechanisms
-and application configuration.
-::
-
-    neuronal_model_run_123456
-    |-- manifest.json
-    |-- 169248.04.02.01_fit.json
-    |-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01.orca
-    |-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01_403165543_m.swc
-    |-- modfiles
-    |   |--CaDynamics.mod
-    |   |--Ca_HVA.mod
-    |   |--Ca_LVA.mod
-    |   |--Ih.mod
-    |   `--...etc.
-    
-    |--x86_64
-    `---work

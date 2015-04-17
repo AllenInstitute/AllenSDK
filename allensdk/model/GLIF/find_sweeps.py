@@ -29,7 +29,7 @@ NOISE2 = 'Noise 2'
 SHORT_SQUARE_TRIPLE = 'Short Square - Triple'
 RAMP_TO_RHEO = 'Ramp to Rheobase'
 
-FILE_TYPE = 'ORCA'
+FILE_TYPE = 'NWB'
 PASSED_WORKFLOW_STATE = 'auto_passed'
 SUCCESS=0
 

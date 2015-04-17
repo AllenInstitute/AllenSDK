@@ -20,7 +20,7 @@ import numpy as np
 import allensdk.model.GLIF.utilities as utilities
 
 from allensdk.model.GLIF.neuron import GLIFNeuron
-from allensdk.core.orca_data_set import OrcaDataSet as EphysDataSet
+from allensdk.core.nwb_data_set import NwbDataSet as EphysDataSet
 
 DEFAULT_SPIKE_CUT_VALUE = 0.05 # 50mV
 

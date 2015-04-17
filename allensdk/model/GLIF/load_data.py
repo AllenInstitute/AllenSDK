@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.core.orca_data_set import OrcaDataSet as EphysDataSet
+from allensdk.core.nwb_data_set import NwbDataSet as EphysDataSet
 
 def load_sweeps(file_name, sweep_numbers):
     data = [ load_sweep(file_name, sweep_number) for sweep_number in sweep_numbers ]

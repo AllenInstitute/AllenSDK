@@ -136,9 +136,9 @@ class SingleCellBiophysical(Warehouse):
     
     
     def create_manifest(self,
-                        fit_path='fit.json',
-                        stimulus_filename='run.orca',
-                        swc_morphology_path='foo.swc',
+                        fit_path='',
+                        stimulus_filename='',
+                        swc_morphology_path='',
                         sweeps=[]):
         self.manifest = OrderedDict()
         self.manifest['biophys'] = [{
@@ -174,14 +174,16 @@ class SingleCellBiophysical(Warehouse):
                 },
                 {
                     'type': 'file',
+                    'format': 'NWB',
                     'spec': stimulus_filename,
                     'key': 'stimulus_path'
                 },
                 {
                   'parent_key': 'WORKDIR', 
                   'type': 'file', 
+                  'format': 'NWB',
                   'spec': stimulus_filename, 
-                  'key': 'output_orca'
+                  'key': 'output'
                 }
             ]
     
