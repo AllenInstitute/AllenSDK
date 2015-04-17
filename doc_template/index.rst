@@ -14,7 +14,7 @@ Contents:
    user
    developer
    neuron
-   single_cell_biohpysical_script
+   single_cell_biophysical_script
    glif_models
    model_description
    template_application
