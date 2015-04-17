@@ -1,2 +1,2 @@
-recursive-include allensdk *.py *.conf *.hoc *.json
+recursive-include allensdk *.py *.conf *.json
 include README.md

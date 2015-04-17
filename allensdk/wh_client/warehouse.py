@@ -123,7 +123,6 @@ class Warehouse(object):
             Absolute path including the file name to save.
         '''
         try:
-            print(url)
             with open(file_path, 'wb') as f:
                 response = urllib2.urlopen(url)
                 f.write(response.read())

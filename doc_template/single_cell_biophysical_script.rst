@@ -4,6 +4,10 @@ Single Cell Biophysical Models
 Running a Single Cell Biophysical Simulation
 --------------------------------------------
 
+::
+    nrnivmodl .
+    python -m allensdk.model.single_cell_biophysical.runner manifest.json
+
 
 Retrieving Data from the Allen Institute
 ----------------------------------------
@@ -14,21 +18,25 @@ This may be done programmatically
     from allensdk.wh_client.queries.single_cell_biophysical import \
         SingleCellBiophysical
     
-    scb = SingleCellBiophysical('http://iwarehouse.corp.alleninstitute.org/api/v2/data')
-    print scb.build_rma_url_biophysical_neuronal_model_run(464137111)
+    scb = SingleCellBiophysical('http://iwarehouse.corp.alleninstitute.org')  ### TODO REMOVE INTERNAL URL
+    scb.cache_data(464137111, working_directory=<dir>)
 
-or you can download the data from the web site.
+or you can download the data manually from the web site.
 
 Simulation Main Loop
 --------------------
 
 From allensdk.model.single_cell_biophysical.runner#run():
+
+The first step is to configure NEURON based on the configuration file.
+The configuration file was read in from the command line at the very bottom of the script.
 ::
 
     # configure NEURON
     utils = Utils(description)
     h = utils.h
 
+The next step is to get the path of the morphology file and pass it to NEURON.
 ::
 
     # configure model
@@ -37,6 +45,7 @@ From allensdk.model.single_cell_biophysical.runner#run():
     utils.generate_morphology(morphology_path.encode('ascii', 'ignore'))
     utils.load_cell_parameters()
 
+Then read the stimulus and recording configuration and configure NEURON
 ::
 
     # configure stimulus and recording
@@ -48,6 +57,7 @@ From allensdk.model.single_cell_biophysical.runner#run():
     junction_potential = description.data['fitting'][0]['junction_potential']
     mV = 1.0e-3
 
+Loop through the stimulus sweeps and write the output.
 ::
 
     # run sweeps
@@ -74,15 +84,22 @@ Exporting Output to Text Format
 Directory Structure
 -------------------
 
-The directory for the model data, configuration files and output files.
+A typical directory created to reproduce a neuronal model run looks like this.
+It includes stimulus files, model parameters, morphology, cellular mechanisms
+and application configuration.
 ::
 
     neuronal_model_run_123456
     |-- manifest.json
-    |-- ABCD_123456.orca
-    |-- morphology.swc
+    |-- 169248.04.02.01_fit.json
+    |-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01.orca
+    |-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01_403165543_m.swc
     |-- modfiles
-    |   |--xyz.mod
+    |   |--CaDynamics.mod
+    |   |--Ca_HVA.mod
+    |   |--Ca_LVA.mod
+    |   |--Ih.mod
     |   `--...etc.
+    
     |--x86_64
     `---work

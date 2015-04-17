@@ -22,7 +22,7 @@ setup(
     author = 'David Feng',
     author_email = 'davidf@alleninstitute.org',
     packages = prepend_find_packages('allensdk'),
-    package_data={'': ['*.hoc', '*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.xyz', '*.env', '*.sh', 'bps'] },
+    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', 'bps'] },
     description = 'core libraries for the allensdk.',
     requires = ['h5py',
                 'argparse',
