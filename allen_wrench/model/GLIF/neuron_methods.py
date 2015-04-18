@@ -5,6 +5,9 @@ For more details on how to use these methods, see :doc:`glif_models`.
 import functools
 import numpy as np
 
+#fast_threshold=[]
+#slow_threshold=[]
+
 class GLIFNeuronMethod( object ):
     """ A simple class to keep track of the name and parameters associated with a neuron method.
     This class is initialized with a name, function, and parameters to pass to the function.  The
@@ -86,9 +89,12 @@ def two_lines(x,b,c,d):
 
 def dynamics_AScurrent_exp(neuron, AScurrents_t0, time_step, spike_time_steps):
     """ Exponential afterspike current dynamics method takes a current at t0 and returns the current at
-    a time step later. 
+    a time step later.
     """
-    return AScurrents_t0*(1.0 + neuron.k*neuron.dt) 
+
+#     print 'HERE: dynamics_threshold_inf'
+    
+    return AScurrents_t0*(1.0 + neuron.k*neuron.dt)
         
 
 def dynamics_AScurrent_vector(neuron, AScurrents_t0, time_step, spike_time_steps, vector):
@@ -124,8 +130,18 @@ def dynamics_AScurrent_none(neuron, AScurrents_t0, time_step, spike_time_steps):
 
 def dynamics_voltage_linear(neuron, voltage_t0, AScurrents_t0, inj):
     """ (TODO) Linear voltage dynamics. """
-
     return voltage_t0 + (inj + np.sum(AScurrents_t0) - neuron.G * neuron.coeffs['G'] * (voltage_t0 - neuron.El)) * neuron.dt / (neuron.C * neuron.coeffs['C'])
+
+def dynamics_voltage_euler_exact(neuron, voltage_t0, AScurrents_t0, inj):
+    """ (TODO) Linear voltage dynamics. """
+
+    tau = (neuron.C * neuron.coeffs['C'])
+    I = inj + np.sum(AScurrents_t0)
+    g = neuron.G * neuron.coeffs['G']
+    A = g/tau
+    N = (I+ g*neuron.El)/tau
+
+    return voltage_t0*np.exp(-neuron.dt*A) + N*(1-np.exp(-A*neuron.dt))/A
     
 
 def dynamics_voltage_quadratic_i_of_v(neuron, voltage_t0, AScurrents_t0, inj, a, b, c, d, e):    
@@ -185,7 +201,7 @@ def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, a, b):
     b : float
         coefficient of threshold
     """
-
+#     print 'HERE: dynamics_threshold_adapt_standard'
     return threshold_t0 + (a * neuron.coeffs['a'] * (voltage_t0-neuron.El) - 
                            b * neuron.coeffs['b'] * (threshold_t0 - neuron.coeffs['th_inf'] * neuron.th_inf)) * neuron.dt 
 
@@ -207,19 +223,72 @@ def dynamics_threshold_adapt_slow_plus_fast(neuron, threshold_t0, voltage_t0):
     th_spike = md['th_spike'][-1]
     th_voltage = md['th_voltage'][-1] 
 
+#     print 'a_spike', md['a_spike']
+#     print 'b_spike', md['b_spike']
+#     print 'a_voltage', md['a_voltage']
+#     print 'b_voltage', md['b_voltage']
+
     voltage_component = th_voltage + ( md['a_voltage'] * neuron.coeffs['a'] * ( voltage_t0 - neuron.El ) - 
                                        md['b_voltage'] * neuron.coeffs['b'] * ( th_voltage - neuron.coeffs['th_inf'] * neuron.th_inf ) ) * neuron.dt
     spike_component = th_spike - md['b_spike'] * th_spike * neuron.dt
 
+    
+    #------hack to plot slow and fast component
+#    global fast_threshold
+#    global slow_threshold
+#    fast_threshold.append(spike_component)
+#    slow_threshold.append(voltage_component)
+    
     #------update the voltage and spiking values of the the
     md['th_spike'].append(spike_component)
     md['th_voltage'].append(voltage_component)
     
     return voltage_component+spike_component
+
+def dynamics_threshold_three_sep_components(neuron, threshold_t0, voltage_t0):        
+    """The threshold will adapt via two mechanisms: 1. a slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard. 
+    These are the components which are fit via optimization and inditial conditions are supplied via the GLM. 2. A fast component initiated 
+    by a spike which quickly decays.  These values are estimated via the multi short square stimuli. 
+    """
     
+    md = neuron.update_method_data
+
+    # initial conditions
+    if 'th_spike' not in md:
+        md['th_spike'] = [ 0 ]
+    if 'th_voltage' not in md:
+        md['th_voltage'] = [ 0 ]
+
+    th_spike = md['th_spike'][-1]
+    th_voltage = md['th_voltage'][-1] 
+
+#     print 'a_spike', md['a_spike']
+#     print 'b_spike', md['b_spike']
+#     print 'a_voltage', md['a_voltage']
+#     print 'b_voltage', md['b_voltage']
+
+    voltage_component = th_voltage + ( md['a_voltage'] *  ( voltage_t0 - neuron.El ) - 
+                                       md['b_voltage'] * neuron.coeffs['b'] * ( th_voltage ) ) * neuron.dt
+    spike_component = th_spike - md['b_spike'] * th_spike * neuron.dt
+
+    
+    #------hack to plot slow and fast component
+#    global fast_threshold
+#    global slow_threshold
+#    fast_threshold.append(spike_component)
+#    slow_threshold.append(voltage_component)
+    
+    #------update the voltage and spiking values of the the
+    md['th_spike'].append(spike_component)
+    md['th_voltage'].append(voltage_component)
+    
+    return neuron.coeffs['a']*voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
     
 def dynamics_threshold_inf(neuron, threshold_t0, voltage_t0):
     """ Set threshold to the neuron's instantaneous threshold. """
+    
+#     print 'HERE: dynamics_threshold_inf'
+    
     return neuron.coeffs['th_inf'] * neuron.th_inf
 
 
@@ -254,6 +323,7 @@ def reset_AScurrent_sum(neuron, AScurrents_t0, r):
 
 def reset_AScurrent_none(neuron, AScurrents_t0):
     """ Reset afterspike currents to zero. """
+    
     if np.sum(AScurrents_t0)!=0:
         raise Exception('You are running a LIF but the AScurrents are not zero!')
     return np.zeros(len(AScurrents_t0))
@@ -271,6 +341,11 @@ def reset_voltage_v_before(neuron, voltage_t0, a, b):
     """
 
     return a*(voltage_t0)+b
+
+
+def reset_voltage_i_v_before(neuron, voltage_t0):
+    """ This method is not implemented yet.  It will raise an exception. """
+    raise Exception("reset_voltage_IandVbefore not implemented")
 
 
 def reset_voltage_zero(neuron, voltage_t0):
@@ -299,13 +374,38 @@ def reset_threshold_max_v_th(neuron, threshold_t0, voltage_v1, delta):
     #This is a bit dangerous as it would change if El was not choosen to be zero. Perhaps could change it to absolute value.
     return max(threshold_t0, voltage_v1) + delta  
     
+
+def reset_threshold_th_before(neuron, threshold_t0, voltage_v1, delta):
+    """ Return the previous threshold by a constant. This method is not used and will raise an exception if called.
+
+    Parameters
+    ----------
+    delta : float
+        value used to offset the return threshold.
+    """
+    raise Exception ('reset_threshold_th_before should not be called')
+    return threshold_t0 + delta
+
+
 def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
     """ Reset the threshold to instantaneous threshold. """
     return neuron.coeffs['th_inf'] * neuron.th_inf
 
+def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
+    """ Reset the threshold to a fixed value. This method is not sued and will raise an exception if called.
+
+    Parameters
+    ----------
+    value : float
+        value to return as the reset threshold
+    """
+    raise Exception('reset_threshold_fixed should not be called')
+    return  value
+
+
 def reset_threshold_for_adapt_slow_fast(neuron, threshold_t0, voltage_v1):
-    '''this method resets voltage and threshold.  Here there are two components a spike (fast)
-    component and a slow(component) which getted added 
+    '''This method resets the two components of the threshold: a spike (fast)
+    component and a (voltage) component which are summed. 
     '''
     md = neuron.update_method_data
     
@@ -313,6 +413,17 @@ def reset_threshold_for_adapt_slow_fast(neuron, threshold_t0, voltage_v1):
     md['th_voltage'].append( md['th_voltage'][-1] ) #note these are the same value.
 
     return md['th_spike'][-1] + md['th_voltage'][-1]
+
+def reset_threshold_for_three_sep_components(neuron, threshold_t0, voltage_v1):
+    '''This method resets the two components of the threshold: a spike (fast)
+    component and a (voltage) component which are summed. 
+    '''
+    md = neuron.update_method_data
+    
+    md['th_spike'].append( md['th_spike'][-1] + md['a_spike'] )
+    md['th_voltage'].append( md['th_voltage'][-1] ) #note these are the same value.
+
+    return md['th_spike'][-1] + md['th_voltage'][-1] + neuron.th_inf * neuron.coeffs['th_inf']
 
 
 #: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. 'voltage_dynamics_method').  Those groups assign each method in this file a string name.  This is used by the GLIFNeuron when initializing its dynamics and reset methods.
@@ -327,11 +438,12 @@ METHOD_LIBRARY = {
     'voltage_dynamics_method': { 
         'linear': dynamics_voltage_linear,
         'quadratic_i_of_v': dynamics_voltage_quadratic_i_of_v,
-        'piecewise': dynamics_voltage_piecewise_linear
+        'piecewise': dynamics_voltage_piecewise_linear,
+        'euler_exact':dynamics_voltage_euler_exact
         },
     'threshold_dynamics_method': {
-        'adapt_sum_slow_fast':  dynamics_threshold_adapt_slow_plus_fast,                        
-        'adapt_rebound': dynamics_threshold_adapt_slow_plus_fast,
+        'adapt_sum_slow_fast':  dynamics_threshold_three_sep_components,                        
+        'adapt_rebound': dynamics_threshold_three_sep_components,
         'inf': dynamics_threshold_inf,
         'fixed': dynamics_threshold_fixed
         },
@@ -341,12 +453,16 @@ METHOD_LIBRARY = {
         }, 
     'voltage_reset_method': {
         'v_before': reset_voltage_v_before,
+        'i_v_before': reset_voltage_i_v_before,
         'zero': reset_voltage_zero,
         'fixed': reset_voltage_fixed
         }, 
     'threshold_reset_method': {
         'max_v_th': reset_threshold_max_v_th,
+        'th_before': reset_threshold_th_before,
         'inf': reset_threshold_inf,
-        'adapt_sum_slow_fast': reset_threshold_for_adapt_slow_fast
+        'adapted': reset_threshold_fixed,
+        'fixed': reset_threshold_fixed,
+        'adapt_sum_slow_fast': reset_threshold_for_three_sep_components
         }
 }
