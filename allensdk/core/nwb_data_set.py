@@ -20,6 +20,7 @@ class NwbDataSet(object):
     def __init__(self, file_name):
         self.file_name = file_name
     
+    # TODO: compensate for orca files still lying around.
     
     def get_sweep(self, sweep_number):
         with h5py.File(self.file_name,'r') as f:
@@ -29,14 +30,26 @@ class NwbDataSet(object):
             stimulus = swp['stimulus']['timeseries']['data'].value
             response = swp['response']['timeseries']['data'].value
             
+            swp_idx_start = swp['stimulus']['idx_start'].value
+            if 'idx_stop' in swp['stimulus']:
+                swp_idx_stop = swp['stimulus']['idx_stop'].value
+            else:
+                swp_length = swp['stimulus']['count'].value
+                swp_idx_stop = swp_idx_start + swp_length - 1
+            sweep_index_range = ( swp_idx_start, swp_idx_stop )
+                
+            # if the sweep has an experiment, extract the experiment's index range
             try:
-                # if the sweep has an experiment, extract the experiment's index range
                 exp = f['epochs']['Experiment_%d' % sweep_number]
-                sweep_index_range = ( swp['stimulus']['idx_start'].value, swp['stimulus']['idx_stop'].value )
-                experiment_index_range = ( exp['stimulus']['idx_start'].value, exp['stimulus']['idx_stop'].value )
+                exp_idx_start = exp['stimulus']['idx_start'].value
+                if 'idx_stop' in exp['stimulus']:
+                    exp_idx_stop = exp['stimulus']['idx_stop'].value
+                else:
+                    exp_length = exp['stimulus']['count'].value
+                    exp_idx_stop = exp_idx_start + exp_length - 1
+                experiment_index_range = ( exp_idx_start, exp_idx_stop )
             except KeyError, _:
                 # this sweep has no experiment.  return the index range of the entire sweep.
-                sweep_index_range = ( swp['stimulus']['idx_start'].value, swp['stimulus']['idx_stop'].value )
                 experiment_index_range = sweep_index_range
             
             assert sweep_index_range[0] == 0, Exception("index range of the full sweep does not start at 0.")
@@ -55,7 +68,10 @@ class NwbDataSet(object):
             swp = f['epochs']['Sweep_%d' % sweep_number]
             
             # this is the length of the entire sweep data, including test pulse and whatever might be in front of it
-            sweep_length = swp['stimulus']['idx_stop'].value + 1
+            if 'idx_stop' in swp['stimulus']:
+                sweep_length = swp['stimulus']['idx_stop'].value + 1
+            else:
+                sweep_length = swp['stimulus']['count'].value
             
             if stimulus is not None:
                 # if the data is shorter than the sweep, pad it with zeros
@@ -105,4 +121,3 @@ class NwbDataSet(object):
                 del spike_dir[sweep_name]
             
             spike_dir.create_dataset(sweep_name, data=spike_times, dtype='f8')
-
