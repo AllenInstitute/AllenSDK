@@ -59,7 +59,10 @@ Running the Simulation
 Simulation Main Loop
 --------------------
 
-From allensdk.model.single_cell_biophysical.runner#run():
+The top level script is in the
+:python:meth`~allensdk.model.single_cell_biophysical.runner.run`
+method of the :python:module`allensdk.model.single_cell_biophysical.runner`
+module.
 
 The first step is to configure NEURON based on the configuration file.
 The configuration file was read in from the command line at the very bottom of the script.
@@ -105,6 +108,42 @@ Loop through the stimulus sweeps and write the output.
         output_data = (numpy.array(vec['v']) - junction_potential) * mV
         output.set_sweep(sweep, None, output_data)
 
+
+Customized Utilities
+--------------------
+
+Much of the code in the single cell example is not core Allen SDK code.
+The runner.py script largely reads the configuration file and calls into
+methods in the :py:class:`~allensdk.model.single_cell_biophysical.utils.Utils` class.
+Utils is a subclass of the :py:class:`~allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils`
+class, which provides access to objects in the NEURON package.
+
+::
+
+    from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
+    
+    .....
+    
+    class Utils(HocUtils):
+    .....
+    
+        def __init__(self, description):
+            super(Utils, self).__init__(description)
+    ....
+
+
+The various methods called by the runner.script are implemented here, including:
+:py:meth:`~allensdk.model.single_cell_biophysical.utils.Utils.generate_morphology`,
+:py:meth:`~allensdk.model.single_cell_biophysical.utils.Utils.load_cell_parameters`,
+:py:meth:`~allensdk.model.single_cell_biophysical.utils.Utils.setup_iclamp`,
+:py:meth:`~allensdk.model.single_cell_biophysical.utils.Utils.read_stimulus`
+and
+:py:meth:`~allensdk.model.single_cell_biophysical.utils.Utils.record_values`.
+Other applications are free to implement their own subclasses of HocUtils as needed.
+
+
+
+	
 
 Selecting a Specific Sweep
 --------------------------
