@@ -173,8 +173,4 @@ readable and easy to parse and edit.
 As data sets get larger or specialized those advantages diminish.
 The :doc:`resource manifest </resource_manifest>`
 is a way of storing the file and directory locations.
-Some :doc:`techniques </column_oriented_description>`
-to make the JSON more compatible
-with big data technologies are also available in specific instances
-without resorting to external formats.
 

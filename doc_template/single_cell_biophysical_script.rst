@@ -60,8 +60,8 @@ Simulation Main Loop
 --------------------
 
 The top level script is in the
-:python:meth`~allensdk.model.single_cell_biophysical.runner.run`
-method of the :python:module`allensdk.model.single_cell_biophysical.runner`
+:py:meth:`~allensdk.model.single_cell_biophysical.runner.run`
+method of the :py:mod:`allensdk.model.single_cell_biophysical.runner`
 module.
 
 The first step is to configure NEURON based on the configuration file.
@@ -142,8 +142,12 @@ and
 Other applications are free to implement their own subclasses of HocUtils as needed.
 
 
+Simple Example
+--------------
 
-	
+A :download:`minimal example (simple_example.tgz)<./examples/simple_example.tgz>`
+is available to use as a starting point for your own projects.
+
 
 Selecting a Specific Sweep
 --------------------------

@@ -20,7 +20,6 @@ Contents:
    template_application
    resource_manifest
    large_object_parser
-   customization
    data_warehouse_client
    allensdk
 

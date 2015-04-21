@@ -27,7 +27,7 @@ class PycfgDescriptionParser(DescriptionParser):
         super(PycfgDescriptionParser, self).__init__()
     
     
-    def read(self, pycfg_file_path, description=None, **kwargs):
+    def read(self, pycfg_file_path, description=None, section=None, **kwargs):
         """Read a serialized description from a Python (.pycfg) file.
         
         :parameter filename: the name of the .pycfg file
@@ -37,10 +37,10 @@ class PycfgDescriptionParser(DescriptionParser):
         header = kwargs.get('prefix', '')
         
         with open(pycfg_file_path, 'r') as f:
-            return self.read_string(f.read(), description, header=header)
+            return self.read_string(f.read(), description, section, header=header)
     
     
-    def read_string(self, python_string, description=None, **kwargs):
+    def read_string(self, python_string, description=None, section=None, **kwargs):
         """Read a serialized description from a Python (.pycfg) string.
         
         :parameter python_string: a python string with a serialized description.
@@ -59,7 +59,7 @@ class PycfgDescriptionParser(DescriptionParser):
         code = compile(python_string, 'string', 'exec')
         exec_(code, ns)
         data = ns['allen_toolkit_description']
-        description.unpack(data)
+        description.unpack(data, section)
         
         return description
 

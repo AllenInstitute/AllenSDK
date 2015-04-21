@@ -25,27 +25,36 @@ class DescriptionParser(object):
         pass
     
     
-    def read(self, file_path, description=None, **kwargs):
+    def read(self, file_path, description=None, section=None, **kwargs):
+        '''Parse data needed for a simulation.
+        
+        Parameters
+        ----------
+        description : dict
+            Configuration from parsing previous files.
+        section : string, optional
+            What configuration section to read it into if the file does not specify.
+        '''
         if description == None:
             description = Description()
             
         self.reader = self.parser_for_extension(file_path)
-        self.reader.read(file_path, description, **kwargs)
+        self.reader.read(file_path, description, section, **kwargs)
         
         return description
     
     
-    def read_string(self, data_string, description=None, header=None):
-        # TODO: choose an appropriate subclass and call its read function
-        # TODO: allow registering different subclasses        
+    def read_string(self, data_string, description=None, section=None, header=None):
         raise Exception("Not implemented, use a sub class")
     
     
     def write(self, filename, description):
-        """Write the description to a file.  
+        """Save the configuration.  
         
-        :parameter filename: the name of the file to write.
-        :type filename: string
+        Parameters
+        ----------
+        filename : string
+            Name of the file to write.
         """
         writer = self.parser_for_extension(filename)
         
@@ -53,6 +62,18 @@ class DescriptionParser(object):
     
     
     def parser_for_extension(self, filename):
+        '''Choose a subclass that can read the format.
+        
+        Parameters
+        ----------
+        filename : string
+           For the extension.
+           
+        Returns
+        -------
+        DescriptionParser
+            Appropriate subclass.
+        '''
         # Circular imports
         from allensdk.config.model.formats.json_description_parser import JsonDescriptionParser
         from allensdk.config.model.formats.pycfg_description_parser import PycfgDescriptionParser

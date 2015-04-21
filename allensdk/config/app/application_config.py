@@ -21,7 +21,7 @@ try:
 except:
     from configparser import ConfigParser # Python 3
 
-import argparse, os, sys, json, io
+import argparse, os, io
 import logging, logging.config as lc
 from pkg_resources import resource_filename
 

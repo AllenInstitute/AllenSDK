@@ -27,8 +27,23 @@ class Description(object):
         self.manifest = Manifest()
     
     
-    def update_data(self, data):
-        self.data.update(data)
+    def update_data(self, data, section=None):
+        '''Parse data needed for a simulation.
+        
+        Parameters
+        ----------
+        data : dict
+            Configuration structure to add.
+        section : string, optional
+            What configuration section to read it into if the file does not specify.
+        '''
+        if section == None:
+            self.data.update(data)
+        else:
+            if not section in self.data:
+                self.data[section] = []
+            
+            self.data[section].append(data)
     
     
     def is_empty(self):
@@ -38,9 +53,12 @@ class Description(object):
         return True
     
     
-    def unpack(self, data):
-        self.unpack_manifest(data)
-        self.update_data(data)
+    def unpack(self, data, section=None):
+        if section == None:
+            self.unpack_manifest(data)
+            self.update_data(data)
+        else:
+            self.update_data(data, section)
     
     
     def unpack_manifest(self, data):

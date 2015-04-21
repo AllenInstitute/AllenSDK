@@ -29,7 +29,7 @@ class JsonDescriptionParser(DescriptionParser):
         super(JsonDescriptionParser, self).__init__()
     
     
-    def read(self, file_path, description=None, **kwargs):
+    def read(self, file_path, description=None, section=None, **kwargs):
         """Read a serialized description from a JSON file.
         
         :parameter filename: the name of the JSON file
@@ -41,18 +41,18 @@ class JsonDescriptionParser(DescriptionParser):
             description = Description()
             
         data = JsonUtil.read_json_file(file_path)
-        description.unpack(data)
+        description.unpack(data, section)
         
         return description
     
     
-    def read_string(self, json_string, description=None, **kwargs):
+    def read_string(self, json_string, description=None, section=None, **kwargs):
         if description == None:
             description = Description()
         
         data = JsonUtil.read_json_string(json_string)
         
-        description.unpack(data)
+        description.unpack(data, section)
         
         return description
     
