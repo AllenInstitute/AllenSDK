@@ -16,7 +16,8 @@ This may be done programmatically
     from allensdk.wh_client.queries.single_cell_biophysical import \
         SingleCellBiophysical
     
-    scb = SingleCellBiophysical('http://iwarehouse.corp.alleninstitute.org')  ### TODO REMOVE INTERNAL URL
+    scb = SingleCellBiophysical('http://api.brain-map.org')
+    scb.cache_stimulus = False # change to True to download the stimulus file
     scb.cache_data(464137111, working_directory='neuronal_model_run')
 
 or you can download the data manually from the web site.
@@ -146,6 +147,13 @@ Simple Example
 --------------
 
 A :download:`minimal example (simple_example.tgz)<./examples/simple_example.tgz>`
+is available to use as a starting point for your own projects.
+
+
+Multicell Example
+-----------------
+
+A :download:`multicell example (multicell_example.tgz)<./examples/multicell_example.tgz>`
 is available to use as a starting point for your own projects.
 
 

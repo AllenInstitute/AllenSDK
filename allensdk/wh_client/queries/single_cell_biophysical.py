@@ -41,11 +41,11 @@ class SingleCellBiophysical(Warehouse):
         '''
         include_associations = ''.join([
             'neuronal_model',
-            '(neuronal_model_template(well_known_files),',
-            'specimen(neuron_reconstructions(well_known_files),',
+            '(neuronal_model_template(well_known_files(well_known_file_type)),',
+            'specimen(neuron_reconstructions(well_known_files(well_known_file_type)),',
             'ephys_sweeps),',
-            'well_known_files),',
-            'well_known_files'])
+            'well_known_files(well_known_file_type)),',
+            'well_known_files(well_known_file_type)'])
         criteria_associations = ''.join([
             ("[id$eq%d]," % (neuronal_model_run_id)),
             include_associations])

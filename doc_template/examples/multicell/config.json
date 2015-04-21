@@ -1,0 +1,66 @@
+{
+  "biophys": [{
+      "log_config_path": "logging.conf", 
+      "model_file": [ "config.json",
+                      "file:fit_1.json?section=fit",
+                      "file:fit_2.json?section=fit",
+                      "file:fit_3.json?section=fit" ]
+    }],
+  "fit_ids": [ { "larry": 0,
+                 "moe": 1,
+                 "curly": 2 } ],
+  "neuron": [{
+      "hoc": [
+        "stdgui.hoc"
+      ]
+    }],
+  "manifest": [
+    {
+      "type": "dir", 
+      "spec": ".", 
+      "key": "BASEDIR"
+    }, 
+    {
+      "type": "file", 
+      "spec": "Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01_328874724_m.swc",
+      "key": "MORPHOLOGY"
+    }, 
+    {
+      "type": "dir", 
+      "spec": "modfiles", 
+      "key": "MODFILE_DIR"
+    }, 
+    {
+      "type": "file", 
+      "spec": "stimulus.dat", 
+      "key": "stimulus_path"
+    }, 
+    {
+      "parent_key": "BASEDIR", 
+      "type": "file", 
+      "spec": "output.dat", 
+      "key": "output_dat"
+    }
+  ],
+  "passive": [{
+    "ra": 100.0, 
+    "cm": 1.0, 
+    "e_pas": -70.0
+  }], 
+  "conditions": [{
+    "celsius": 34.0, 
+    "erev": [
+      {
+        "ena": 50.0, 
+        "ek": -100.0
+      }
+    ], 
+    "v_init": -70.0
+  }], 
+  "channel_parameters": [
+    {
+      "gbar_Na": 0.1, 
+      "gbar_K": 0.01, 
+      "g_pas": 0.0005
+    }]
+}
