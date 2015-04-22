@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.wh_client.warehouse import Warehouse
+from allensdk.api.api import Api
 
 
-class Microarray(Warehouse):
+class Microarray(Api):
     def __init__(self, base_uri=None):
         super(Microarray, self).__init__(base_uri)
     
@@ -47,7 +47,7 @@ class Microarray(Warehouse):
     def read_json_sample_microarray_slides_well_known_file_id(self, json_parsed_data):
         '''Get the list of well_known_file ids from a response body containing nested sample,microarray_slides,well_known_files.
         
-        :parameter json_parsed_data: the json response from the Allen Institute Warehouse RMA.
+        :parameter json_parsed_data: the json response from the Allen Institute Api RMA.
         :type json_parsed_data: hash
         :returns: a list of well_known_file ids
         :rtype: list of strings

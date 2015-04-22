@@ -19,8 +19,7 @@ Contents:
    model_description
    template_application
    resource_manifest
-   large_object_parser
-   data_warehouse_client
+   data_api_client
    allensdk
 
 

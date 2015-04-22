@@ -13,7 +13,7 @@ Retrieving Data from the Allen Institute
 This may be done programmatically
 ::
 
-    from allensdk.wh_client.queries.single_cell_biophysical import \
+    from allensdk.api.queries.single_cell_biophysical import \
         SingleCellBiophysical
     
     scb = SingleCellBiophysical('http://api.brain-map.org')

@@ -18,30 +18,30 @@ from json import load
 import logging
 
 
-class Warehouse(object):
+class Api(object):
     _log = logging.getLogger(__name__)
-    default_warehouse_url = 'http://api.brain-map.org'
+    default_api_url = 'http://api.brain-map.org'
     
-    def __init__(self, warehouse_base_url_string=None):
-        if warehouse_base_url_string==None:
-            warehouse_base_url_string=Warehouse.default_warehouse_url
+    def __init__(self, api_base_url_string=None):
+        if api_base_url_string==None:
+            api_base_url_string=Api.default_api_url
             
-        self.set_warehouse_urls(warehouse_base_url_string)
+        self.set_api_urls(api_base_url_string)
         self.default_working_directory = None
     
     
-    def set_warehouse_urls(self, warehouse_base_url_string):
+    def set_api_urls(self, api_base_url_string):
         '''Set the internal RMA and well known file download endpoint urls
-        based on a warehouse server endpoint.
+        based on a api server endpoint.
         
         Parameters
         ----------
-        warehouse_base_url_string : string
-            url of the warehouse to point to
+        api_base_url_string : string
+            url of the api to point to
         '''
-        self.warehouse_url = warehouse_base_url_string
-        self.well_known_file_endpoint = warehouse_base_url_string + '/api/v2/well_known_file_download/'
-        self.rma_endpoint = warehouse_base_url_string + '/api/v2/data'  
+        self.api_url = api_base_url_string
+        self.well_known_file_endpoint = api_base_url_string + '/api/v2/well_known_file_download/'
+        self.rma_endpoint = api_base_url_string + '/api/v2/data'  
     
     
     def set_default_working_directory(self, working_directory):
@@ -82,7 +82,7 @@ class Warehouse(object):
         return json_traversal_fn(json_parsed_data)
     
     
-    def load_warehouse_schema(self):
+    def load_api_schema(self):
         '''Download the RMA schema from the current RMA endpoint
         
         Returns
@@ -97,7 +97,7 @@ class Warehouse(object):
     
     
     def construct_well_known_file_download_url(self, well_known_file_id):
-        '''Join data warehouse endpoint and id.
+        '''Join data api endpoint and id.
         
         Parameters
         ----------
@@ -107,13 +107,13 @@ class Warehouse(object):
         Returns
         -------
         string
-            the well-known-file download url for the current warehouse api server
+            the well-known-file download url for the current api api server
         '''
         return self.well_known_file_endpoint + str(well_known_file_id)
     
     
     def retrieve_file_over_http(self, url, file_path):
-        '''Get a file from the data warehouse and save it.
+        '''Get a file from the data api and save it.
         
         Parameters
         ----------

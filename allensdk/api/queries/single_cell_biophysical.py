@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.wh_client.warehouse import Warehouse
+from allensdk.api.api import Api
 import os, json
 from collections import OrderedDict
 
-class SingleCellBiophysical(Warehouse):
+class SingleCellBiophysical(Api):
     def __init__(self, base_uri=None):
         super(SingleCellBiophysical, self).__init__(base_uri)
         self.cache_stimulus = False
@@ -64,7 +64,7 @@ class SingleCellBiophysical(Warehouse):
     def read_json(self, json_parsed_data):
         '''Get the list of well_known_file ids from a response body containing nested sample,microarray_slides,well_known_files.
         
-        :parameter json_parsed_data: the json response from the Allen Institute Warehouse RMA.
+        :parameter json_parsed_data: the json response from the Allen Institute Api RMA.
         :type json_parsed_data: hash
         :returns: a list of well_known_file ids
         :rtype: list of strings
@@ -191,13 +191,13 @@ class SingleCellBiophysical(Warehouse):
     def cache_data(self,
                    neuronal_model_run_id,
                    working_directory=None):
-        '''Take a an experiment id, query the Warehouse RMA to get well-known-files
+        '''Take a an experiment id, query the Api RMA to get well-known-files
         download the files, and store them in the working directory.
         
         Parameters
         ----------
         neuronal_model_run_id : int or string representation
-            found in the neuronal_model_run table in the warehouse
+            found in the neuronal_model_run table in the api
         working_directory : string
             Absolute path name where the downloaded well-known files will be stored.
         '''

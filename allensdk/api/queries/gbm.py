@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.wh_client.warehouse import Warehouse
+from allensdk.api.api import Api
 
-class Gbm(Warehouse):
+class Gbm(Api):
     def __init__(self, base_uri=None):
         super(Gbm, self).__init__(base_uri)
