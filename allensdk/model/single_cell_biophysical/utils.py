@@ -16,6 +16,7 @@
 import logging
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
+import h5py
 
 
 class Utils(HocUtils):
@@ -123,4 +124,28 @@ class Utils(HocUtils):
         vec["t"].record(self.h._ref_t)
     
         return vec
+    
+    
+    def get_sweeps(self, file_path):
+        with h5py.File(file_path, 'a') as f:
+            sweeps = [int(e.split('_')[1]) for e in f['epochs'].keys()
+                      if e.startswith('Sweep')]
         
+        return sweeps
+    
+    
+    def zero_firing_times(self, file_path):
+        sweeps = self.get_sweeps(file_path)
+        stimulus_data = NwbDataSet(file_path)
+        
+        for sweep in sweeps:
+            stimulus_data.set_spike_times(sweep, [])
+            self._log.info("zeroing fire %d" % (sweep))
+    
+    
+    def zero_sweeps(self, file_path):
+        with h5py.File(file_path, 'a') as f:
+            for sweep in f['epochs'].keys():
+                if sweep.startswith('Sweep_'):
+                    f['epochs'][sweep]['response']['timeseries']['data'][...] = 0
+                    self._log.info("zeroing %s" % (sweep))

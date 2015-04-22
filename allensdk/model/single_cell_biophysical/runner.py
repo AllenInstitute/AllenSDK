@@ -17,6 +17,7 @@ from allensdk.model.biophys_sim.config import Config
 from allensdk.model.single_cell_biophysical.utils import Utils
 from allensdk.core.nwb_data_set import NwbDataSet
 import numpy
+import copy
 
 
 def run(description):
@@ -46,6 +47,14 @@ def run(description):
     
     stimulus_format = manifest.get_format('stimulus_path')
     output_format = manifest.get_format('output')
+    
+    # prepare output file
+    if output_format == 'NWB':
+        output_path = manifest.get_path('output')
+        copy(stimulus_path,
+             manifest.get_path('output'))
+        utils.zero_sweeps(output_path)
+        utils.zero_firing_times(output_path)
     
     # run sweeps
     for sweep in sweeps:
@@ -83,7 +92,7 @@ def save_dat(output_path, v, t):
 
 
 def load_description(manifest_json_path):
-    '''
+    '''Read configuration file.
     
     Parameters
     ----------

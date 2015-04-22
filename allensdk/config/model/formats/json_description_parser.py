@@ -16,9 +16,8 @@
 import logging
 from json import dump, dumps
 from allensdk.config.model.description_parser import DescriptionParser
-from allensdk.config.model.formats.json_util import JsonUtil,\
-    NumpyAwareJsonEncoder
 from allensdk.config.model.description import Description
+from allensdk.config.model.formats.json_util import JsonUtil
 
 
 class JsonDescriptionParser(DescriptionParser):
@@ -30,13 +29,24 @@ class JsonDescriptionParser(DescriptionParser):
     
     
     def read(self, file_path, description=None, section=None, **kwargs):
-        """Read a serialized description from a JSON file.
+        '''Parse a complete or partial configuration.
         
-        :parameter filename: the name of the JSON file
-        :type filename: string
-        :parameter prefix: ignored
-        :type prefix: NoneType
-        """
+        Parameters
+        ----------
+        json_string : string
+            Input to parse.
+        description : Description, optional
+            Where to put the parsed configuration.  If None a new one is created.
+        section : string, optional
+            Where to put the parsed configuration within the description.
+        
+        Returns
+        -------
+        Description
+            The input description with parsed configuration added.
+        
+        Section is only specified for "bare" objects that are to be added to a section array.
+        '''
         if description == None:
             description = Description()
             
@@ -47,6 +57,24 @@ class JsonDescriptionParser(DescriptionParser):
     
     
     def read_string(self, json_string, description=None, section=None, **kwargs):
+        '''Parse a complete or partial configuration.
+        
+        Parameters
+        ----------
+        json_string : string
+            Input to parse.
+        description : Description, optional
+            Where to put the parsed configuration.  If None a new one is created.
+        section : string, optional
+            Where to put the parsed configuration within the description.
+        
+        Returns
+        -------
+        Description
+            The input description with parsed configuration added.
+        
+        Section is only specified for "bare" objects that are to be added to a section array.
+        '''
         if description == None:
             description = Description()
         
@@ -58,14 +86,16 @@ class JsonDescriptionParser(DescriptionParser):
     
     
     def write(self, filename, description):
-        """Write the description to a JSON file.  
+        '''Write the description to a JSON file.
         
-        :parameter filename: the name of the file to write.
-        :type filename: string
-        """
+        Parameters
+        ----------
+        description : Description
+            Object to write.
+        '''
         try:
             with open(filename, 'w') as f:
-                    dump(description.data, f, indent=2, cls=NumpyAwareJsonEncoder)
+                    dump(description.data, f, indent=2)
 
         except Exception:
             self.log.warn("Couldn't write allensdk json description: %s" % filename)
@@ -75,16 +105,21 @@ class JsonDescriptionParser(DescriptionParser):
     
     
     def write_string(self, description):
-        """Write the description to a JSON string.  
+        '''Write the description to a JSON string.
         
-        :parameter filename: the name of the file to write.
-        :type filename: string
-        :return json_string: the json serialization of the description
-        """        
+        Parameters
+        ----------
+        description : Description
+            Object to write.
+        
+        Returns
+        -------
+        string
+           JSON serialization of the input.
+        '''
         try:
             json_string = dumps(description.data,
-                                indent=2,
-                                cls=NumpyAwareJsonEncoder)
+                                indent=2)
             return json_string
         except Exception:
             self.log.warn("Couldn't write allensdk json description: %s")
