@@ -33,6 +33,7 @@ class GlifApi(Api):
         dict
             A dictionary containing 
         '''
+        
         self.metadata = self.do_rma_query(self.build_rma_url, self.read_json, neuronal_model_id)
         return self.metadata
 
@@ -44,7 +45,7 @@ class GlifApi(Api):
             raise Exception("Neuronal model metadata required.  Please call get_neuronal_model(id)")
 
 
-    def get_sweeps(self):
+    def get_ephys_sweeps(self):
         ''' Retrieve ephys sweep information out of downloaded metadata for a neuronal model 
         
         Returns
@@ -69,7 +70,7 @@ class GlifApi(Api):
 
         self.assert_model_exists()
 
-        neuron_config = self.retrieve_parsed_json_over_http(self.metadata['neuron_config_url'])
+        neuron_config = self.retrieve_parsed_json_over_http(self.api_url + self.metadata['neuron_config_url'])
 
         if output_file_name:
             with open(output_file_name, 'wb') as f:
@@ -81,7 +82,7 @@ class GlifApi(Api):
     def cache_stimulus_file(self, output_file_name):
         self.assert_model_exists()
 
-        self.retrieve_file_over_http(self.metadata['stimulus_url'], output_file_name)
+        self.retrieve_file_over_http(self.api_url + self.metadata['stimulus_url'], output_file_name)
 
 
     def build_rma_url(self, neuronal_model_id, fmt='json'):
@@ -104,18 +105,23 @@ class GlifApi(Api):
                 'well_known_files(well_known_file_type)'])
                 
         criteria_associations = ''.join([
-                ("[id$eq%d]," % (neuronal_model_id)),
-                include_associations])
+                ("[id$eq%d]" % (neuronal_model_id))])
         
-        return ''.join([self.rma_endpoint, 
-                        '/query.',
-                        fmt,
-                        '?q=',
-                        'model::NeuronalModel,',
-                        'rma::criteria,',
-                        criteria_associations,
-                        ',rma::include,',
-                        include_associations])
+        url = ''.join([self.rma_endpoint, 
+                       '/query.',
+                       fmt,
+                       '?q=',
+                       'model::NeuronalModel,',
+                       'rma::criteria,',
+                       criteria_associations,
+                       ',rma::include,',
+                       include_associations])
+
+        print url
+
+        #neuronal_model_template(well_known_files(well_known_file_type)),specimen(ephys_sweeps,ephys_result(well_known_files(well_known_file_type))),well_known_files(well_known_file_type),rma::include,neuronal_model_template(well_known_files(well_known_file_type)),specimen(ephys_sweeps,ephys_result(well_known_files(well_known_file_type))),well_known_files(well_known_file_type)
+
+        return url
 
 
     def read_json(self, json_parsed_data):
@@ -164,17 +170,23 @@ class GlifApi(Api):
         try:
             ephys_result = specimen['ephys_result']
             for wkf in ephys_result['well_known_files']:
-                if wkf['well_known_file_type'] == 'NWB':
+                if wkf['well_known_file_type']['name'] == 'NEUF': #TODO FIX THIS
                     stimulus_url = wkf['download_link']
                     break
         except Exception, e:
             logging.warning("Could not find stimulus well_known_file for this model")
             stimulus_url = None
         
-        data['ephys_sweeps'] = ephys_sweeps
+
         data['neuron_config_url'] = neuron_config_url
         data['stimulus_url'] = stimulus_url
+
+        print data
+
+        data['ephys_sweeps'] = ephys_sweeps
         data['neuronal_model'] = neuronal_model
+
+
         
         return data
 

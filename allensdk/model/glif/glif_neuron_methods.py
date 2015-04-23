@@ -353,12 +353,8 @@ def reset_threshold_for_three_sep_components(neuron, threshold_t0, voltage_v1):
     return md['th_spike'][-1] + md['th_voltage'][-1] + neuron.th_inf * neuron.coeffs['th_inf']
 
 
-<<<<<<< HEAD:allensdk/model/glif/glif_neuron_methods.py
-#: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. 'voltage_dynamics_method').  Those groups assign each method in this file a string name.  This is used by the GlifNeuron when initializing its dynamics and reset methods.
-=======
 #: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. 'voltage_dynamics_method').  
-#Those groups assign each method in this file a string name.  This is used by the GLIFNeuron when initializing its dynamics and reset methods.
->>>>>>> c33f87eac4b3ab5ad91b62637e017636c758348a:allensdk/model/GLIF/neuron_methods.py
+#Those groups assign each method in this file a string name.  This is used by the GlifNeuron when initializing its dynamics and reset methods.
 METHOD_LIBRARY = {
     'AScurrent_dynamics_method': { 
         'exp_glm': dynamics_AScurrent_exp,

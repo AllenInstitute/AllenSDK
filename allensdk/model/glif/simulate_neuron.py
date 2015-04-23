@@ -17,9 +17,9 @@ import logging, time
 import sys, argparse, json, os
 import numpy as np
 
-import allensdk.model.GLIF.utilities as utilities
+import allensdk.model.glif.utilities as utilities
 
-from allensdk.model.GLIF.neuron import GLIFNeuron
+from allensdk.model.glif.glif_neuron import GlifNeuron
 from allensdk.core.nwb_data_set import NwbDataSet as EphysDataSet
 from allensdk.api.queries.glif import GlifApi
 
@@ -32,7 +32,7 @@ def parse_arguments():
     parser.add_argument('--ephys_file', help='ephys file name')
     parser.add_argument('--sweeps_file', help='JSON file listing sweep properties')
     parser.add_argument('--neuron_config_file', help='neuron configuration JSON file ')
-    parser.add_argument('--neuronal_model_id', help='id of the neuronal model. Used when downloading sweep properties.')
+    parser.add_argument('--neuronal_model_id', help='id of the neuronal model. Used when downloading sweep properties.', type=int)
     parser.add_argument('--output_ephys_file', help='output file name', required=True)
     parser.add_argument('--log_level', help='log level', default=logging.INFO)
     parser.add_argument('--spike_cut_value', help='value to fill in for spike duration', default=DEFAULT_SPIKE_CUT_VALUE, type=float)
@@ -108,7 +108,7 @@ def simulate_neuron(neuron, sweeps, input_file_name, output_file_name, spike_cut
     start_time = time.time()
 
     for sweep in sweeps:
-        sweep_type = sweep['ephys_stimulus']['ephys_stimulus_type']['name']
+        sweep_type = sweep['stimulus_name']
 
         if sweep_type == 'Unknown' or sweep_type == 'Test':
             logging.debug("skipping sweep %d with type %s" % (sweep['sweep_number'], sweep_type))
@@ -130,7 +130,7 @@ def main():
 
         assert args.neuronal_model_id is not None, Exception("A neuronal model id is required if no neuron config file, sweeps file, or ephys data file is provided.")
 
-        glif_api = GlifApi()
+        glif_api = GlifApi('http://testwarehouse:9000')
         glif_api.get_neuronal_model(args.neuronal_model_id)
 
     if args.neuron_config_file:
@@ -144,13 +144,16 @@ def main():
         sweeps = glif_api.get_ephys_sweeps()
 
     if args.ephys_file:
+        print "********"
+        print args.ephys_file
+        print "********"
         ephys_file = args.ephys_file
     else:
         ephys_file = 'stimulus_%d.nwb' % args.neuronal_model_id
         glif_api.cache_stimulus_file(ephys_file)
         
 
-    neuron = GLIFNeuron.from_dict(neuron_config)
+    neuron = GlifNeuron.from_dict(neuron_config)
 
     simulate_neuron(neuron, sweeps, ephys_file, args.output_ephys_file, args.spike_cut_value) 
 
