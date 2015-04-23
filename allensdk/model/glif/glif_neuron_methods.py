@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-""" The methods in this module are used for configuring dynamics and reset rules for the GLIFNeuron.  
+""" The methods in this module are used for configuring dynamics and reset rules for the GlifNeuron.  
 For more details on how to use these methods, see :doc:`glif_models`.
 """
 
@@ -21,7 +21,7 @@ import functools
 import numpy as np
 
 
-class GLIFNeuronMethod( object ):
+class GlifNeuronMethod( object ):
     """ A simple class to keep track of the name and parameters associated with a neuron method.
     This class is initialized with a name, function, and parameters to pass to the function.  The
     function then has those passed parameters fixed to a partial function using functools.partial.  
@@ -33,7 +33,7 @@ class GLIFNeuronMethod( object ):
     Parameters
     ----------
     method_name : string
-        A shorthand name that will be used to reference this method in the `GLIFNeuron`.
+        A shorthand name that will be used to reference this method in the `GlifNeuron`.
     method : function
         A python function to be called when this instance is called.
     method_params : dict
@@ -410,7 +410,7 @@ def reset_threshold_for_three_sep_components(neuron, threshold_t0, voltage_v1):
     return md['th_spike'][-1] + md['th_voltage'][-1] + neuron.th_inf * neuron.coeffs['th_inf']
 
 
-#: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. 'voltage_dynamics_method').  Those groups assign each method in this file a string name.  This is used by the GLIFNeuron when initializing its dynamics and reset methods.
+#: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. 'voltage_dynamics_method').  Those groups assign each method in this file a string name.  This is used by the GlifNeuron when initializing its dynamics and reset methods.
 METHOD_LIBRARY = {
     'AScurrent_dynamics_method': { 
         'exp': dynamics_AScurrent_exp,

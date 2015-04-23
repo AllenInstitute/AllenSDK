@@ -201,7 +201,7 @@ class SingleCellBiophysical(Api):
         working_directory : string
             Absolute path name where the downloaded well-known files will be stored.
         '''
-        if working_directory == None:
+        if working_directory is None:
             working_directory = self.default_working_directory
         
         modfile_dir = os.path.join(working_directory, 'modfiles')

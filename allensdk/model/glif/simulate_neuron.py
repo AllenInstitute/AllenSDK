@@ -21,6 +21,7 @@ import allensdk.model.GLIF.utilities as utilities
 
 from allensdk.model.GLIF.neuron import GLIFNeuron
 from allensdk.core.nwb_data_set import NwbDataSet as EphysDataSet
+from allensdk.api.queries.glif import GlifApi
 
 DEFAULT_SPIKE_CUT_VALUE = 0.05 # 50mV
 
@@ -28,10 +29,10 @@ def parse_arguments():
     ''' Use argparse to get required arguments from the command line '''
     parser = argparse.ArgumentParser(description='fit a neuron')
 
-    parser.add_argument('--ephys_file', help='ephys file name', required=True)
+    parser.add_argument('--ephys_file', help='ephys file name')
     parser.add_argument('--sweeps_file', help='JSON file listing sweep properties')
-    parser.add_argument('--ephys_result_id', help='id of the ephys result, used when downloading sweep properties')
-    parser.add_argument('--neuron_config_file', help='neuron configuration JSON file ', required=True)
+    parser.add_argument('--neuron_config_file', help='neuron configuration JSON file ')
+    parser.add_argument('--neuronal_model_id', help='id of the neuronal model. Used when downloading sweep properties.')
     parser.add_argument('--output_ephys_file', help='output file name', required=True)
     parser.add_argument('--log_level', help='log level', default=logging.INFO)
     parser.add_argument('--spike_cut_value', help='value to fill in for spike duration', default=DEFAULT_SPIKE_CUT_VALUE, type=float)
@@ -121,20 +122,37 @@ def main():
     args = parse_arguments()
 
     logging.getLogger().setLevel(args.log_level)
-    
-    neuron_config = utilities.read_json(args.neuron_config_file)
+
+    glif_api = None
+    if (args.neuron_config_file is None or 
+        args.sweeps_file is None or
+        args.ephys_file is None):
+
+        assert args.neuronal_model_id is not None, Exception("A neuronal model id is required if no neuron config file, sweeps file, or ephys data file is provided.")
+
+        glif_api = GlifApi()
+        glif_api.get_neuronal_model(args.neuronal_model_id)
+
+    if args.neuron_config_file:
+        neuron_config = utilities.read_json(args.neuron_config_file)
+    else:
+        neuron_config = glif_api.get_neuron_config()
 
     if args.sweeps_file:
         sweeps = utilities.read_json(args.sweeps_file)
-    elif args.ephys_result_id:
-        #sweeps = api.download_ephys_sweeps(args.ephys_result_id)
-        raise Exception("TODO: Code for downloading sweeps from the API still needs to be written")
     else:
-        raise Exception("No sweeps file provided. Provide an ephys_result_id to download sweep metadata automatically.")
+        sweeps = glif_api.get_ephys_sweeps()
+
+    if args.ephys_file:
+        ephys_file = args.ephys_file
+    else:
+        ephys_file = 'stimulus_%d.nwb' % args.neuronal_model_id
+        glif_api.cache_stimulus_file(ephys_file)
+        
 
     neuron = GLIFNeuron.from_dict(neuron_config)
 
-    simulate_neuron(neuron, sweeps, args.ephys_file, args.output_ephys_file, args.spike_cut_value) 
+    simulate_neuron(neuron, sweeps, ephys_file, args.output_ephys_file, args.spike_cut_value) 
 
 
 

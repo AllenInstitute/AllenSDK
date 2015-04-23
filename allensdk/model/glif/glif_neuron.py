@@ -19,19 +19,19 @@ import numpy as np
 import json, utilities
 import copy
 
-from neuron_methods import GLIFNeuronMethod, METHOD_LIBRARY
+from glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
 
-class GLIFBadResetException( Exception ):
+class GlifBadResetException( Exception ):
     """ Exception raised when voltage is still above threshold after a reset rule is applied. """
     def __init__(self, message, dv):
         super(Exception, self).__init__(message)
         self.dv = dv
             
-class GLIFNeuron( object ):    
+class GlifNeuron( object ):    
     """ Implements the current-based Mihalas Neiber GLIF neuron.  Simulations model the voltage, 
     threshold, and afterspike currents of a neuron given an input stimulus.  A set of modular dynamics
     rules are applied until voltage crosses threshold, at which point a set of modular reset rules are 
-    applied. See neuron_methods.py for a list of what options there are for voltage, threshold, and
+    applied. See glif_neuron_methods.py for a list of what options there are for voltage, threshold, and
     afterspike current dynamics and reset rules.
 
     Parameters
@@ -83,7 +83,7 @@ class GLIFNeuron( object ):
 
         """ Initialize the neuron."""
 
-        self.type = GLIFNeuron.TYPE
+        self.type = GlifNeuron.TYPE
         self.El = El
         self.dt = dt
         self.tau = np.array(tau)
@@ -194,8 +194,8 @@ class GLIFNeuron( object ):
 
     @staticmethod
     def configure_method(method_name, method, method_params):
-        """ Create a GLIFNeuronMethod instance given a name, a function, and function parameters. 
-        This is just a shortcut to the GLIFNeuronMethod constructor.
+        """ Create a GlifNeuronMethod instance given a name, a function, and function parameters. 
+        This is just a shortcut to the GlifNeuronMethod constructor.
 
         Parameters
         ----------
@@ -208,16 +208,16 @@ class GLIFNeuron( object ):
 
         Returns
         -------
-        GLIFNeuronMethod
-            a GLIFNeuronMethod instance
+        GlifNeuronMethod
+            a GlifNeuronMethod instance
         """ 
 
-        return GLIFNeuronMethod(method_name, method, method_params)
+        return GlifNeuronMethod(method_name, method, method_params)
 
     @staticmethod
     def configure_library_method(method_type, params):
-        """ Create a GLIFNeuronMethod instance out of a library of functions organized by type name. 
-        This refers to the METHOD_LIBRARY in neuron_methods.py, which lays out the available functions 
+        """ Create a GlifNeuronMethod instance out of a library of functions organized by type name. 
+        This refers to the METHOD_LIBRARY in glif_neuron_methods.py, which lays out the available functions 
         that can be used for dynamics and reset rules.
 
         Parameters
@@ -229,8 +229,8 @@ class GLIFNeuron( object ):
 
         Returns
         -------
-        GLIFNeuronMethod
-            a GLIFNeuronMethod instance
+        GlifNeuronMethod
+            a GlifNeuronMethod instance
         """
         method_options = METHOD_LIBRARY.get(method_type, None)
 
@@ -246,7 +246,7 @@ class GLIFNeuron( object ):
         
         assert method is not None, Exception("unknown method name %s of type %s" % (method_name, method_type))
         
-        return GLIFNeuron.configure_method(method_name, method, method_params)
+        return GlifNeuron.configure_method(method_name, method, method_params)
 
     def reset_method_data(self):
         self.update_method_data = copy.deepcopy(self.init_method_data)
@@ -305,7 +305,7 @@ class GLIFNeuron( object ):
         threshold_t1 = self.threshold_reset_method(self, threshold_t0, voltage_t1)
 
         if voltage_t1 > threshold_t1:
-            raise GLIFBadResetException("Voltage reset above threshold: voltage_t1 (%f) threshold_t1 (%f), voltage_t0 (%f) threshold_t0 (%f) AScurrents_t0 (%s)" % ( voltage_t1, threshold_t1, voltage_t0, threshold_t0, repr(AScurrents_t0)), voltage_t1 - threshold_t1)
+            raise GlifBadResetException("Voltage reset above threshold: voltage_t1 (%f) threshold_t1 (%f), voltage_t0 (%f) threshold_t0 (%f) AScurrents_t0 (%s)" % ( voltage_t1, threshold_t1, voltage_t0, threshold_t0, repr(AScurrents_t0)), voltage_t1 - threshold_t1)
 
         return voltage_t1, threshold_t1, AScurrents_t1
     
