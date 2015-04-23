@@ -26,12 +26,12 @@ class SingleCellBiophysical(Api):
         self.manifest = {}
     
     
-    def build_rma_url_biophysical_neuronal_model_run(self, neuronal_model_run_id, fmt='json'):
-        '''Construct a query to find all files related to a neuronal model run.
+    def build_rma(self, neuronal_model_id, fmt='json'):
+        '''Construct a query to find all files related to a neuronal model.
         
         Parameters
         ----------
-        neuronal_model_run_id : integer or string representation
+        neuronal_model_id : integer or string representation
             key of experiment to retrieve.
             
         Returns
@@ -40,21 +40,21 @@ class SingleCellBiophysical(Api):
             RMA query url.
         '''
         include_associations = ''.join([
-            'neuronal_model',
-            '(neuronal_model_template(well_known_files(well_known_file_type)),',
-            'specimen(neuron_reconstructions(well_known_files(well_known_file_type)),',
+            'neuronal_model_template(well_known_files(well_known_file_type)),',
+            'specimen',
+            '(ephys_result(well_known_files(well_known_file_type)),'
+            'neuron_reconstructions(well_known_files(well_known_file_type)),',
             'ephys_sweeps),',
-            'well_known_files(well_known_file_type)),',
             'well_known_files(well_known_file_type)'])
         criteria_associations = ''.join([
-            ("[id$eq%d]," % (neuronal_model_run_id)),
+            ("[id$eq%d]," % (neuronal_model_id)),
             include_associations])
         
         return ''.join([self.rma_endpoint, 
                         '/query.',
                         fmt,
                         '?q=',
-                        'model::NeuronalModelRun,',
+                        'model::NeuronalModel,',
                         'rma::criteria,',
                         criteria_associations,
                         ',rma::include,',
@@ -78,44 +78,45 @@ class SingleCellBiophysical(Api):
         self.sweeps = []
         
         if 'msg' in json_parsed_data:
-            for neuronal_model_run in json_parsed_data['msg']:
-                if 'well_known_files' in neuronal_model_run:
-                    for well_known_file in neuronal_model_run['well_known_files']:
+            for neuronal_model in json_parsed_data['msg']:
+                if 'well_known_files' in neuronal_model:
+                    for well_known_file in neuronal_model['well_known_files']:
                         if 'id' in well_known_file and 'path' in well_known_file:
-                            self.ids['stimulus'][str(well_known_file['id'])] = \
+                            self.ids['fit'][str(well_known_file['id'])] = \
                                 os.path.split(well_known_file['path'])[1]
-
-                if 'neuronal_model' in neuronal_model_run:
-                    neuronal_model = neuronal_model_run['neuronal_model']
-                    
-                    if 'well_known_files' in neuronal_model:
-                        for well_known_file in neuronal_model['well_known_files']:
+                
+                if 'neuronal_model_template' in neuronal_model:
+                    neuronal_model_template = neuronal_model['neuronal_model_template']
+                    if 'well_known_files' in neuronal_model_template:
+                        for well_known_file in neuronal_model_template['well_known_files']:
                             if 'id' in well_known_file and 'path' in well_known_file:
-                                self.ids['fit'][str(well_known_file['id'])] = \
-                                    os.path.split(well_known_file['path'])[1]
+                                self.ids['modfiles'][str(well_known_file['id'])] = \
+                                    os.path.join('modfiles',
+                                                 os.path.split(well_known_file['path'])[1])
+                
+                if 'specimen' in neuronal_model:
+                    specimen = neuronal_model['specimen']
                     
-                    if 'neuronal_model_template' in neuronal_model:
-                        neuronal_model_template = neuronal_model['neuronal_model_template']
-                        if 'well_known_files' in neuronal_model_template:
-                            for well_known_file in neuronal_model_template['well_known_files']:
+                    if 'neuron_reconstructions' in specimen:
+                        for neuron_reconstruction in specimen['neuron_reconstructions']:
+                            if 'well_known_files' in neuron_reconstruction:
+                                for well_known_file in neuron_reconstruction['well_known_files']:
+                                    if 'id' in well_known_file and 'path' in well_known_file:
+                                        self.ids['morphology'][str(well_known_file['id'])] = \
+                                            os.path.split(well_known_file['path'])[1]
+                    
+                    if 'ephys_result' in specimen:
+                        ephys_result = specimen['ephys_result']
+                        if 'well_known_files' in ephys_result:
+                            for well_known_file in ephys_result['well_known_files']:
                                 if 'id' in well_known_file and 'path' in well_known_file:
-                                    self.ids['modfiles'][str(well_known_file['id'])] = \
-                                        os.path.join('modfiles',
-                                                     os.path.split(well_known_file['path'])[1])
+                                    self.ids['stimulus'][str(well_known_file['id'])] = \
+                                        os.path.split(well_known_file['path'])[1]
                     
-                    if 'specimen' in neuronal_model:
-                        specimen = neuronal_model['specimen']
-                        if 'neuron_reconstructions' in specimen:
-                            for neuron_reconstruction in specimen['neuron_reconstructions']:
-                                if 'well_known_files' in neuron_reconstruction:
-                                    for well_known_file in neuron_reconstruction['well_known_files']:
-                                        if 'id' in well_known_file and 'path' in well_known_file:
-                                            self.ids['morphology'][str(well_known_file['id'])] = \
-                                                os.path.split(well_known_file['path'])[1]
-                        
-                        self.sweeps = [sweep['sweep_number'] 
-                                       for sweep in specimen['ephys_sweeps']
-                                       if 'ephys_sweeps' in specimen]
+                    
+                    self.sweeps = [sweep['sweep_number'] 
+                                   for sweep in specimen['ephys_sweeps']
+                                   if 'ephys_sweeps' in specimen]
         
         return self.ids
     
@@ -129,7 +130,7 @@ class SingleCellBiophysical(Api):
         list
             A list of well known file id strings.
         '''
-        rma_builder_fn = self.build_rma_url_biophysical_neuronal_model_run
+        rma_builder_fn = self.build_rma
         json_traversal_fn = self.read_json
         
         return self.do_rma_query(rma_builder_fn, json_traversal_fn, neuronal_model_run_id)
