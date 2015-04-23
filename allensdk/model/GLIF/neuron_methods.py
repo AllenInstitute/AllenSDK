@@ -316,7 +316,7 @@ def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
     threshold_t0: float
         value of threshold at spike
     voltage_v1: float
-        undepreciated unused variable
+        voltage after reset
 
     Returns
     -------
@@ -335,7 +335,7 @@ def reset_threshold_for_three_sep_components(neuron, threshold_t0, voltage_v1):
     threshold_t0: float
         value of threshold at spike
     voltage_v1: float
-        undepreciated unused variable
+        voltage after reset
 
     Returns
     -------
