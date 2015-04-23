@@ -16,8 +16,8 @@
 from allensdk.model.biophys_sim.config import Config
 from allensdk.model.single_cell_biophysical.utils import Utils
 from allensdk.core.nwb_data_set import NwbDataSet
+from shutil import copy
 import numpy
-import copy
 
 
 def run(description):

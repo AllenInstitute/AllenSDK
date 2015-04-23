@@ -41,18 +41,18 @@ class GlifNeuron( object ):
      dt : float
          duration between time steps
      tau: np.ndarray
-         TODO
+         time constants of the after-spike currents
      R_input : float
          input resistance
      C : float
          capacitance
      asc_vector : np.ndarray
-         afterspike current vector.  one element per element of tau.
+         afterspike current amplitude vector.  one element per element of tau.
      spike_cut_length : int
          how many time steps to replace with NaNs when a spike occurs.
      th_inf : float
          instantaneous threshold
-     coeffs : doct
+     coeffs : dict
         dictionary coefficients premultiplied to neuron properties during simulation. used for optimization.
      AScurrent_dynamics_method : dict
          dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
@@ -71,7 +71,7 @@ class GlifNeuron( object ):
      init_threshold : float
          initial spike threshold value
      init_AScurrents : np.ndarray
-        initial afterspike current vector. one element per element of tau.
+        initial afterspike current amplitude vector. one element per element of tau.
     """
 
     TYPE = "GLIF"
@@ -114,11 +114,11 @@ class GlifNeuron( object ):
         # Values that can be fit: They scale the input values.  
         # These are allowed to have default values because they are going to get optimized.
         self.coeffs = {
-            'th_inf': 1,
-            'C': 1,
-            'G': 1,
-            'b': 1,
-            'a': 1,
+            'th_inf': 1.0,
+            'C': 1.0,
+            'G': 1.0,
+            'b': 1.0,
+            'a': 1.0,
             'asc_vector': np.ones(len(self.tau))
         }
 

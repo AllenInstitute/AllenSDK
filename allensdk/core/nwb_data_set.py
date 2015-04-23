@@ -31,22 +31,16 @@ class NwbDataSet(object):
             response = swp['response']['timeseries']['data'].value
             
             swp_idx_start = swp['stimulus']['idx_start'].value
-            if 'idx_stop' in swp['stimulus']:
-                swp_idx_stop = swp['stimulus']['idx_stop'].value
-            else:
-                swp_length = swp['stimulus']['count'].value
-                swp_idx_stop = swp_idx_start + swp_length - 1
+            swp_length = swp['stimulus']['count'].value
+            swp_idx_stop = swp_idx_start + swp_length - 1
             sweep_index_range = ( swp_idx_start, swp_idx_stop )
                 
             # if the sweep has an experiment, extract the experiment's index range
             try:
                 exp = f['epochs']['Experiment_%d' % sweep_number]
                 exp_idx_start = exp['stimulus']['idx_start'].value
-                if 'idx_stop' in exp['stimulus']:
-                    exp_idx_stop = exp['stimulus']['idx_stop'].value
-                else:
-                    exp_length = exp['stimulus']['count'].value
-                    exp_idx_stop = exp_idx_start + exp_length - 1
+                exp_length = exp['stimulus']['count'].value
+                exp_idx_stop = exp_idx_start + exp_length - 1
                 experiment_index_range = ( exp_idx_start, exp_idx_stop )
             except KeyError, _:
                 # this sweep has no experiment.  return the index range of the entire sweep.
@@ -59,7 +53,8 @@ class NwbDataSet(object):
                 'stimulus': stimulus[sweep_index_range[0]:experiment_index_range[1]+1],
                 'response': response[sweep_index_range[0]:experiment_index_range[1]+1],
                 'index_range': experiment_index_range,
-                'sampling_rate': swp['stimulus']['timeseries']['sampling_rate'].value
+                'sampling_rate': swp['stimulus']['timeseries']['timestamps'].attrs['rate']
+                #'sampling_rate_new': swp['stimulus']['timeseries']['starting_time'].attrs['rate']
             }
     
     
