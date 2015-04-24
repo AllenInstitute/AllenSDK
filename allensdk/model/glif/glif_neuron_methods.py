@@ -168,7 +168,7 @@ def dynamics_voltage_euler_exact(neuron, voltage_t0, AScurrents_t0, inj):
     return voltage_t0*np.exp(-neuron.dt*A) + N*(1-np.exp(-A*neuron.dt))/A
     
 
-def dynamics_threshold_three_sep_components(neuron, threshold_t0, voltage_t0):        
+def dynamics_threshold_three_components(neuron, threshold_t0, voltage_t0):        
     """The threshold will adapt via two mechanisms: 1. a slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard. 
     These are the components which are fit via optimization and inditial conditions are supplied via the GLM. 2. A fast component initiated 
     by a spike which quickly decays.  These values are estimated via the tri short square stimuli. 
@@ -187,7 +187,7 @@ def dynamics_threshold_three_sep_components(neuron, threshold_t0, voltage_t0):
 
     """
     
-    #update_method_data keeps track of parameters that need to be shared between methods
+    # update_method_data keeps track of parameters that need to be shared between methods
     md = neuron.update_method_data
 
     # initial conditions
@@ -203,12 +203,13 @@ def dynamics_threshold_three_sep_components(neuron, threshold_t0, voltage_t0):
                                        md['b_voltage'] * neuron.coeffs['b'] * ( th_voltage ) ) * neuron.dt
     spike_component = th_spike - md['b_spike'] * th_spike * neuron.dt
 
-    #------update the subtrheshold voltage and spiking values of the threshold
+    # update the subtrheshold voltage and spiking values of the threshold
     md['th_spike'].append(spike_component)
     md['th_voltage'].append(voltage_component)
     
-    return neuron.coeffs['a']*voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
+    return neuron.coeffs['a'] * voltage_component + spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
     
+
 def dynamics_threshold_inf(neuron, threshold_t0, voltage_t0):
     """ Set threshold to the neuron's instantaneous threshold.
     
@@ -246,8 +247,12 @@ def reset_AScurrent_sum(neuron, AScurrents_t0, r):
     type: np.ndarray
         array of new after-spike currents.
     """
-    new_currents=neuron.asc_vector * neuron.coeffs['asc_vector'] #neuron.asc_vector are amplitudes initiating after the spike is cut
-    left_over_currents=AScurrents_t0 * r * np.exp(neuron.k * neuron.dt * neuron.spike_cut_length) #advancing cut currents though the spike    
+
+    # neuron.asc_vector are amplitudes initiating after the spike is cut
+    new_currents = neuron.asc_vector * neuron.coeffs['asc_vector'] 
+
+    #advancing cut currents though the spike    
+    left_over_currents=AScurrents_t0 * r * np.exp(neuron.k * neuron.dt * neuron.spike_cut_length) 
 
     return new_currents+left_over_currents
 
@@ -326,7 +331,7 @@ def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
     return neuron.coeffs['th_inf'] * neuron.th_inf
 
 
-def reset_threshold_for_three_sep_components(neuron, threshold_t0, voltage_v1):
+def reset_threshold_three_components(neuron, threshold_t0, voltage_v1):
     """This method resets the two components of the threshold: a spike
     component and a subthreshold voltage component which are added to the instantaneous threshold.
     
@@ -343,10 +348,10 @@ def reset_threshold_for_three_sep_components(neuron, threshold_t0, voltage_v1):
         value of threshold after the spike
     """
     
-    #update_method_data keeps track of parameters that need to be shared between methods
+    # update_method_data keeps track of parameters that need to be shared between methods
     md = neuron.update_method_data
     
-    #------update the subtrheshold voltage and spiking values of the threshold
+    # update the subthreshold voltage and spiking values of the threshold
     md['th_spike'].append( md['th_spike'][-1] + md['a_spike'] )
     md['th_voltage'].append( md['th_voltage'][-1] ) #note these are the same value.
 
@@ -369,8 +374,8 @@ METHOD_LIBRARY = {
         'euler_exact':dynamics_voltage_euler_exact
         },
     'threshold_dynamics_method': {
-        'adapt_sum_slow_fast':  dynamics_threshold_three_sep_components,                        
-        'adapt_rebound': dynamics_threshold_three_sep_components,
+        'adapt_sum_slow_fast':  dynamics_threshold_three_components,                        
+        'adapt_rebound': dynamics_threshold_three_components,
         'inf': dynamics_threshold_inf
         },
     'AScurrent_reset_method': {
@@ -383,6 +388,6 @@ METHOD_LIBRARY = {
         }, 
     'threshold_reset_method': {
         'inf': reset_threshold_inf,
-        'adapt_sum_slow_fast': reset_threshold_for_three_sep_components
+        'adapt_sum_slow_fast': reset_threshold_three_components
         }
 }

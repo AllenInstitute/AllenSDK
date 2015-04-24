@@ -27,6 +27,7 @@ class GlifBadResetException( Exception ):
         super(Exception, self).__init__(message)
         self.dv = dv
             
+
 class GlifNeuron( object ):    
     """ Implements the current-based Mihalas Neiber GLIF neuron.  Simulations model the voltage, 
     threshold, and afterspike currents of a neuron given an input stimulus.  A set of modular dynamics
@@ -137,14 +138,18 @@ class GlifNeuron( object ):
         self.threshold_reset_method = self.configure_library_method('threshold_reset_method', threshold_reset_method)
 
     def __str__(self):
+        """ Convert an instance of the neuron to a string """
         return json.dumps(self.to_dict(), default=utilities.json_handler, indent=2)
 
     @property
     def tau_m(self):
+        """ Return the cell's membrane tau, which is the product of its input resistance and capacitance. """
         return self.R_input*self.C
 
     @classmethod
     def from_dict(cls, d):
+        """ Initialize a GlifNeuron instance from a dictionary of initialization parameters. """
+
         return cls(El = d['El'],
                    dt = d['dt'],
                    tau = d['tau'],
@@ -168,6 +173,7 @@ class GlifNeuron( object ):
 
     def to_dict(self):
         """ Convert the neuron to a serializable dictionary. """
+
         return {
             'type': self.type,
             'El': self.El,
@@ -248,8 +254,11 @@ class GlifNeuron( object ):
         
         return GlifNeuron.configure_method(method_name, method, method_params)
 
+
     def reset_method_data(self):
+        """ Reinitialize self.update_method_data to its initial state (self.init_method_data). """
         self.update_method_data = copy.deepcopy(self.init_method_data)
+
 
     def dynamics(self, voltage_t0, threshold_t0, AScurrents_t0, inj, time_step, spike_time_steps):    
         """ Update the voltage, threshold, and afterspike currents of the neuron for a single time step.
@@ -421,9 +430,6 @@ class GlifNeuron( object ):
             'interpolated_spike_voltage': np.array(interpolated_spike_voltage), 
             'interpolated_spike_threshold': np.array(interpolated_spike_threshold)
             }
-
-
-
 
 
 def interpolate_spike_time(dt, time_step, threshold_t0, threshold_t1, voltage_t0, voltage_t1):
