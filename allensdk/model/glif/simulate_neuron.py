@@ -129,7 +129,7 @@ def main():
 
         assert args.neuronal_model_id is not None, Exception("A neuronal model id is required if no neuron config file, sweeps file, or ephys data file is provided.")
 
-        glif_api = GlifApi('http://testwarehouse:9000')
+        glif_api = GlifApi()
         glif_api.get_neuronal_model(args.neuronal_model_id)
 
     if args.neuron_config_file:
