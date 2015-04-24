@@ -32,9 +32,10 @@ class NwbDataSet(object):
             
             swp_idx_start = swp['stimulus']['idx_start'].value
             swp_length = swp['stimulus']['count'].value
+
             swp_idx_stop = swp_idx_start + swp_length - 1
             sweep_index_range = ( swp_idx_start, swp_idx_stop )
-                
+
             # if the sweep has an experiment, extract the experiment's index range
             try:
                 exp = f['epochs']['Experiment_%d' % sweep_number]
@@ -53,8 +54,7 @@ class NwbDataSet(object):
                 'stimulus': stimulus[sweep_index_range[0]:experiment_index_range[1]+1],
                 'response': response[sweep_index_range[0]:experiment_index_range[1]+1],
                 'index_range': experiment_index_range,
-                'sampling_rate': swp['stimulus']['timeseries']['timestamps'].attrs['rate']
-                #'sampling_rate_new': swp['stimulus']['timeseries']['starting_time'].attrs['rate']
+                'sampling_rate': 1.0 * swp['stimulus']['timeseries']['starting_time'].attrs['rate']
             }
     
     

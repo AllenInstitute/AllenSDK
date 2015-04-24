@@ -17,11 +17,10 @@ import logging, time
 import sys, argparse, json, os
 import numpy as np
 
-import allensdk.model.glif.utilities as utilities
-
-from allensdk.model.glif.glif_neuron import GlifNeuron
-from allensdk.core.nwb_data_set import NwbDataSet as EphysDataSet
+import allensdk.core.json_utilities 
+from allensdk.core.nwb_data_set import NwbDataSet 
 from allensdk.api.queries.glif import GlifApi
+from allensdk.model.glif.glif_neuron import GlifNeuron
 
 DEFAULT_SPIKE_CUT_VALUE = 0.05 # 50mV
 
@@ -62,7 +61,7 @@ def load_sweep(file_name, sweep_number):
     logging.debug("loading sweep %d" % sweep_number)
     
     load_start_time = time.time()
-    data = EphysDataSet(file_name).get_sweep(sweep_number)
+    data = NwbDataSet(file_name).get_sweep(sweep_number)
 
     logging.debug("load time %f" % (time.time() - load_start_time))
 
@@ -75,7 +74,7 @@ def write_sweep_response(file_name, sweep_number, response, spike_times):
     logging.debug("writing sweep")
 
     write_start_time = time.time()
-    ephds = EphysDataSet(file_name)
+    ephds = NwbDataSet(file_name)
     
     ephds.set_sweep(sweep_number, stimulus=None, response=response)
     ephds.set_spike_times(sweep_number, spike_times)
@@ -134,12 +133,12 @@ def main():
         glif_api.get_neuronal_model(args.neuronal_model_id)
 
     if args.neuron_config_file:
-        neuron_config = utilities.read_json(args.neuron_config_file)
+        neuron_config = json_utilities.read(args.neuron_config_file)
     else:
         neuron_config = glif_api.get_neuron_config()
 
     if args.sweeps_file:
-        sweeps = utilities.read_json(args.sweeps_file)
+        sweeps = json_utilities.read(args.sweeps_file)
     else:
         sweeps = glif_api.get_ephys_sweeps()
 
@@ -147,7 +146,12 @@ def main():
         ephys_file = args.ephys_file
     else:
         ephys_file = 'stimulus_%d.nwb' % args.neuronal_model_id
-        glif_api.cache_stimulus_file(ephys_file)
+
+        if not os.path.exists(ephys_file):
+            logging.info("Downloading stimulus to %s." % ephys_file)
+            glif_api.cache_stimulus_file(ephys_file)
+        else:
+            logging.warning("Reusing %s because it already exists." % ephys_file)
 
     if args.output_ephys_file:
         output_ephys_file = args.output_ephys_file

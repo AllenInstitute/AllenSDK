@@ -117,10 +117,6 @@ class GlifApi(Api):
                        ',rma::include,',
                        include_associations])
 
-        print url
-
-        #neuronal_model_template(well_known_files(well_known_file_type)),specimen(ephys_sweeps,ephys_result(well_known_files(well_known_file_type))),well_known_files(well_known_file_type),rma::include,neuronal_model_template(well_known_files(well_known_file_type)),specimen(ephys_sweeps,ephys_result(well_known_files(well_known_file_type))),well_known_files(well_known_file_type)
-
         return url
 
 
@@ -170,7 +166,7 @@ class GlifApi(Api):
         try:
             ephys_result = specimen['ephys_result']
             for wkf in ephys_result['well_known_files']:
-                if wkf['well_known_file_type']['name'] == 'NEUF': #TODO FIX THIS
+                if wkf['well_known_file_type']['name'] == 'NWB':
                     stimulus_url = wkf['download_link']
                     break
         except Exception, e:
@@ -180,9 +176,6 @@ class GlifApi(Api):
 
         data['neuron_config_url'] = neuron_config_url
         data['stimulus_url'] = stimulus_url
-
-        print data
-
         data['ephys_sweeps'] = ephys_sweeps
         data['neuronal_model'] = neuronal_model
 
