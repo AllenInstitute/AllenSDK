@@ -33,7 +33,7 @@ def parse_arguments():
     parser.add_argument('--sweeps_file', help='JSON file listing sweep properties')
     parser.add_argument('--neuron_config_file', help='neuron configuration JSON file ')
     parser.add_argument('--neuronal_model_id', help='id of the neuronal model. Used when downloading sweep properties.', type=int)
-    parser.add_argument('--output_ephys_file', help='output file name', required=True)
+    parser.add_argument('--output_ephys_file', help='output file name')
     parser.add_argument('--log_level', help='log level', default=logging.INFO)
     parser.add_argument('--spike_cut_value', help='value to fill in for spike duration', default=DEFAULT_SPIKE_CUT_VALUE, type=float)
 
@@ -144,18 +144,21 @@ def main():
         sweeps = glif_api.get_ephys_sweeps()
 
     if args.ephys_file:
-        print "********"
-        print args.ephys_file
-        print "********"
         ephys_file = args.ephys_file
     else:
         ephys_file = 'stimulus_%d.nwb' % args.neuronal_model_id
         glif_api.cache_stimulus_file(ephys_file)
+
+    if args.output_ephys_file:
+        output_ephys_file = args.output_ephys_file
+    else:
+        logging.warning("Overwriting input file data with simulated data in place.")
+        output_ephys_file = ephys_file
         
 
     neuron = GlifNeuron.from_dict(neuron_config)
 
-    simulate_neuron(neuron, sweeps, ephys_file, args.output_ephys_file, args.spike_cut_value) 
+    simulate_neuron(neuron, sweeps, ephys_file, output_ephys_file, args.spike_cut_value) 
 
 
 

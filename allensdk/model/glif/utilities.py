@@ -17,11 +17,6 @@
 import numpy as np
 import json
 
-
-class MissingSweepException( Exception ): 
-    """ An exception that can be used to indicate that a sweep required for processing is not available """
-    pass
-
 def read_json(file_name):
     """ Shortcut reading JSON from a file. """
     with open(file_name, 'rb') as f:
