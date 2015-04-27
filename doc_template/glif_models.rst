@@ -2,15 +2,8 @@ Generalized LIF Models
 ======================
 
 The Allen Cell Types Database contains Generalized Leaky Integrate and Fire 
-(GLIF) that model the firing behavior of neurons at five levels of complexity:
-
-    1. Leaky Integrate and Fire (LIF)
-    2. LIF + Reset Rules (LIF-R)
-    3. LIF + Afterspike Currents (LIF-ASC)
-    4. LIF-R + Afterspike Currents (LIF-R-ASC)
-    5. LIF-R-ASC + Threshold Adaptation (LIF-R-ASC-A)
-
-Please review the GLIF technical white paper for details on these models and
+(GLIF) that model the firing behavior of neurons at five levels of complexity.
+Review the GLIF technical white paper for details on these models and
 how their parameters were optimized (TODO).
 
 The GLIF simulator in this package has a modular architecture
@@ -20,22 +13,27 @@ during the simulation. The GLIF package contains a built-in set of rules,
 however developers can plug in custom rule implementations provided they
 follow a simple argument specification scheme.
 
-Running a GLIF Simulation
--------------------------
+Downloading  GLIF Models
+------------------------
 
-The Allen Cell Types Atlas contains a large number of GLIF models that
-have been optimized under various configurations against electrophysiology
-traces from cells in the Atlas.  To run a model, first download that cell's
-model configuration file, sweep information, and electrophysiology file
-from the Allen Brain Atlas API::
+Visit http://celltypes.brain-map.org to find cells that have GLIF models
+available for download.  Specifically:
+
+   1. Click 'More Options +' and filter for GLIF models.
+   2. Click the electrophysiology thumbnail for a cell on the right hand panel.
+   3. Choose a GLIF model from the 'Show model responses' dropdown.
+   4. Scroll down to the model response click 'Download model'.
+
+One such link (for a simple LIF neuronal model, ID 472423251), would look
+like this::
 
     http://api.brain-map.org/neuronal_model/download/472423251
 
-The result will be a .zip archive containing the model configuration file 
+This link returns .zip archive containing the neuron configuration file 
 and sweep metadata required to simulate the model.  If you would like to 
 download the stimulus used to train the model, the following code 
-demonstrates how to download the corresponding NWB file (as well as the
-model configuration file and sweep metadata)::
+demonstrates how to download the corresponding cell's NWB file 
+(as well as the neuron configuration file and sweep metadata)::
 
     from allensdk.api.queries.glif_api import GlifApi
     import allensdk.core.json_utilities as json_utilities
@@ -52,8 +50,11 @@ model configuration file and sweep metadata)::
     ephys_sweeps = glif_api.get_ephys_sweeps()
     json_utilities.write('ephys_sweeps.json', ephys_sweeps)
 
-You can use these files to simulate all of the sweeps for that cell as 
-follows::
+Running a GLIF Simulation
+-------------------------
+
+You can use the files downloaded above to simulate all of the sweeps presented 
+to the original cell as follows::
 
     from allensdk.model.glif.neuron import GlifNeuron
     from allensdk.model.glif.simulate_neuron import simulation_neuron
@@ -67,7 +68,31 @@ follows::
 
 Note that in this case, simulated sweep voltages will overwrite the responses in 
 the downloaded NWB file.
+
+If you have a custom stimulus you would like to apply to a neuronal model, 
+you can instead do the following::
+
+    from allensdk.model.glif.neuron import GlifNeuron
+    import allensdk.core.json_utilities as json_utilities
+
+    neuron_config = read_json('neuron_config.json')
+    neuron = GlifNeuron.from_dict(neuron_config)
+
+    # provide your own stimulus as an array of voltages (in volts)
+    stimulus = ... 
+
+    output = neuron.run(stimulus)
+
+    voltage = output['voltage']
+    threshold = output['threshold']
+    spike_times = output['interpolated_spike_times']
+
+GLIF Configuration
+------------------
+
+TODO
     
+
 Built-in Dynamics Rules
 -----------------------
 
