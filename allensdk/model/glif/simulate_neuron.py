@@ -17,7 +17,7 @@ import logging, time
 import sys, argparse, json, os
 import numpy as np
 
-import allensdk.core.json_utilities 
+import allensdk.core.json_utilities as json_utilities
 from allensdk.core.nwb_data_set import NwbDataSet 
 from allensdk.api.queries.glif import GlifApi
 from allensdk.model.glif.glif_neuron import GlifNeuron
