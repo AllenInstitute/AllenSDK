@@ -120,10 +120,21 @@ class NwbDataSet(object):
 
 
     def get_sweep_numbers(self):
+        """ Get all of the sweep numbers in the file, including test sweeps. """
+        
         with h5py.File(file_path, 'r') as f:
             sweeps = [int(e.split('_')[1]) for e in f['epochs'].keys() if e.startswith('Sweep_')]
             return sweeps
+
+
+    def get_experiment_sweep_numbers(self):
+        """ Get all of the sweep numbers for experiment epochs in the file, not including test sweeps. """
         
+        with h5py.File(file_path, 'r') as f:
+            sweeps = [int(e.split('_')[1]) for e in f['epochs'].keys() if e.startswith('Experiment_')]
+            return sweeps
+        
+
     def fill_sweep_responses(self, fill_value, sweep_numbers=None):
         """ Fill sweep response arrays with a single value.
 
