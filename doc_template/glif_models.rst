@@ -1,9 +1,9 @@
-Generalized Linear Integrate and Fire Models
-============================================
+Generalized LIF Models
+======================
 
 **TODO: High description level of GLIF models goes here.**
 
-The GLIF model implementation in this package has a modular architecture
+The Generalized Leaky Integrate and Fire model implementation in this package has a modular architecture
 that enables users to choose from a number of dynamics and reset rules that
 will be applied to simulation voltage, spike threshold, and afterspike currents
 during the simulation. The GLIF package contains a built-in set of rules,
