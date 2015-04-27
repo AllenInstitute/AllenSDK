@@ -127,6 +127,10 @@ class Utils(HocUtils):
     
     
     def get_sweeps(self, file_path):
+        # TODO: try these:
+        # data_set = NwbDataSet(file_path)
+        # return data_set.get_sweep_numbers()
+
         with h5py.File(file_path, 'a') as f:
             sweeps = [int(e.split('_')[1]) for e in f['epochs'].keys()
                       if e.startswith('Sweep')]
@@ -144,6 +148,10 @@ class Utils(HocUtils):
     
     
     def zero_sweeps(self, file_path):
+        # TODO: try these
+        #data_set = NwbDataSet(file_path)
+        #data_set.fill_sweep_responses(0.0)
+
         with h5py.File(file_path, 'a') as f:
             for sweep in f['epochs'].keys():
                 if sweep.startswith('Sweep_'):

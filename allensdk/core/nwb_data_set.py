@@ -7,7 +7,7 @@
 #
 # Allen SDK is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -85,6 +85,7 @@ class NwbDataSet(object):
                 
                 swp['response']['timeseries']['data'][...] = response
     
+
     def get_spike_times(self, sweep_number):
         with h5py.File(self.file_name,'r') as f:
             sweep_name = "Sweep_%d" % sweep_number
@@ -116,3 +117,33 @@ class NwbDataSet(object):
                 del spike_dir[sweep_name]
             
             spike_dir.create_dataset(sweep_name, data=spike_times, dtype='f8')
+
+
+    def get_sweep_numbers(self):
+        with h5py.File(file_path, 'r') as f:
+            sweeps = [int(e.split('_')[1]) for e in f['epochs'].keys() if e.startswith('Sweep_')]
+            return sweeps
+        
+    def fill_sweep_responses(self, fill_value, sweep_numbers=None):
+        """ Fill sweep response arrays with a single value.
+
+        Parameters
+        ----------
+        fill_value: float
+            Value used to fill sweep response array
+        
+        sweep_numbers: list
+            List of integery sweep numbers to be filled (default all sweeps)
+            
+        """
+
+        with h5py.File(file_path, 'a') as f:
+            if sweep_numbers is None:
+                # no sweep numbers given, grab all of them
+                epochs = [ k for k in f['epochs'].keys() if k.startswith('Sweep_') ]
+            else:
+                epochs = [ 'Sweep_%d' % sweep_number for sweep_number in sweep_numbers ]
+
+            for epoch in epochs:
+                if epoch in f['epochs']:
+                    f['epochs'][epoch]['response']['timeseries']['data'][...] = 0
