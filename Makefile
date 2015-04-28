@@ -27,8 +27,7 @@ doc: clean
 	cp -R doc_template/examples doc
 	cp -R doc_template/aibs_sphinx/static/* doc/_static
 	cp -R doc_template/aibs_sphinx/templates/* doc/_templates
-	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/user.rst
-	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/developer.rst
+	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/install.rst
 	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/links.rst
 	sed -ie "s/\/external_assets/_static\/external_assets/g" doc/_templates/portalHeader.html
 	sed -id "s/\/external_assets/_static/g" doc/_static/external_assets/javascript/portal.js

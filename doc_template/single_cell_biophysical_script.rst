@@ -7,11 +7,13 @@ Prerequisites
 You must have pyNEURON and Allen SDK installed.
 
 The Allen Institute data is generated using
-`NEURON version v7.3.ansi-1078 <http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078>`_.
-`Instructions for compiling NEURON with the Python interpreter <http://www.neuron.yale.edu/neuron/download/compile_linux>`_
-are available from the `NEURON team <http://www.neuron.yale.edu/neuron/>`.
+NEURON `version v7.3.ansi-1078 <http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078>`_.
+Instructions for `compiling NEURON <http://www.neuron.yale.edu/neuron/download/compile_linux>`_ with the Python interpreter 
+are available from the `NEURON team <http://www.neuron.yale.edu/neuron/>`_.
 
 Allen SDK is compatible with Python version 2.7, including the Anaconda distribution.
+
+Instructions for `Docker installation <./install.html#docker-installation>`_ are also available.
 
 
 Retrieving Data from the Allen Institute

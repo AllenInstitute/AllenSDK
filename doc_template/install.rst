@@ -21,7 +21,6 @@ Uninstall
         pip uninstall allensdk
 
 
-.. _DockerInstall
 Docker Installation
 -------------------
 
