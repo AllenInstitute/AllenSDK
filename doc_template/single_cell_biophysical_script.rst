@@ -6,6 +6,13 @@ Prerequisites
 
 You must have pyNEURON and Allen SDK installed.
 
+The Allen Institute data is generated using
+`NEURON version v7.3.ansi-1078 <http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078>`_.
+`Instructions for compiling NEURON with the Python interpreter <http://www.neuron.yale.edu/neuron/download/compile_linux>`_
+are available from the `NEURON team <http://www.neuron.yale.edu/neuron/>`.
+
+Allen SDK is compatible with Python version 2.7, including the Anaconda distribution.
+
 
 Retrieving Data from the Allen Institute
 ----------------------------------------
@@ -18,9 +25,20 @@ This may be done programmatically
     
     scb = SingleCellBiophysical('http://api.brain-map.org')
     scb.cache_stimulus = False # change to True to download the stimulus file
-    scb.cache_data(464137111, working_directory='neuronal_model_run')
+    neuronal_model_id = 464137111    # get this from the web site as below
+    scb.cache_data(neuronal_model_id, working_directory='neuronal_model')
 
-or you can download the data manually from the web site.
+or you can download the data manually from the web site:
+
+    #. Go to `http://tcelltypes.corp.alleninstitute.org <http://tcelltypes.corp.alleninstitute.org>`_
+    #. Use the Filters, Cell Location and Cell Feature Filters to narrow your results.
+    #. Click on a Cell Summary to view the Mouse Experiment Electrophysiology.
+    #. Click "show model response" and select "Biophysical - perisomatic".
+    #. Scroll down and click the Biophysical - perisomatic"download model" link.
+
+More help can be found in the
+`online help <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_
+for the ALLEN **Cell Types Database** web application.
 
 
 Directory Structure
@@ -31,7 +49,7 @@ It includes stimulus files, model parameters, morphology, cellular mechanisms
 and application configuration.
 ::
 
-    neuronal_model_run
+    neuronal_model
     |-- manifest.json
     |-- 169248.04.02.01_fit.json
     |-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01.nwb
@@ -52,7 +70,7 @@ Running the Simulation
 
 ::
 
-    cd neuronal_model_run
+    cd neuronal_model
     nrnivmodl ./modfiles
     python -m allensdk.model.single_cell_biophysical.runner manifest.json
 

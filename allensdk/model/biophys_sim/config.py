@@ -32,10 +32,8 @@ class Config(ApplicationConfig):
                      'help': 'writable directory where intermediate and output files are written.' },
         'data_dir': { 'default': '',
                       'help': 'writable directory where intermediate and output files are written.' },
-        'model_file': { 'default': 'param.json',
+        'model_file': { 'default': 'config.json',
                         'help': 'file where the model parameters are set.' },
-        'run_file': { 'default': 'param_run.json',
-                      'help': 'file where the run flags are set.' },
         'main': { 'default': 'simulation#run',
                   'help' : 'module#function that runs the actual simulation' }
     }

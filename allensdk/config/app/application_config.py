@@ -118,6 +118,7 @@ class ApplicationConfig(object):
             ApplicationConfig._log.error("Could not load configuration file: %s\n%s" % 
                                          (parsed_args.config_file_path,
                                          e))
+            raise
         
         if self.debug_enabled and self.debug.startswith('pydev'):
             PydevConnector.connect(self.debug)

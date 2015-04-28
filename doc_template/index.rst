@@ -11,8 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
-   user
-   developer
+   install
    neuron
    single_cell_biophysical_script
    glif_models

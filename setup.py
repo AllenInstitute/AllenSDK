@@ -29,7 +29,7 @@ setup(
                 'six'],
     tests_require=['nose>=1.2.1',
                    'coverage>=3.7.1'],
-    setup_requires=['setuptools', 'sphinx'],
+    setup_requires=['setuptools', 'sphinx', 'numpydoc'],
     url='http://',
     scripts=['allensdk/model/biophys_sim/scripts/bps'],
     classifiers=[
