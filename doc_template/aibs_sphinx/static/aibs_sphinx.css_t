@@ -763,11 +763,12 @@ div.figure p.caption span.caption-text {
 /* davidf: new stuff here */
 
 img.align-right {
-    float: left;
-    padding: 5px;
+    float: right;
+    padding: 10px;
 }               
 
 hr.docutils {
   border: none;
   clear: both;
 }
+

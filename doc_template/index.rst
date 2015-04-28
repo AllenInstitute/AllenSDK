@@ -25,12 +25,12 @@ The Allen Software Development Kit houses source code for reading and processing
 For the initial release, the Allen SDK focuses primarily on the newly released Allen Cell Types Database.
 Functionality relevant to other atlases is coming in future releases.
 
+.. image:: /_static/ccf_v3_sdk.png
+    :align: right
 
 Allen Cell Types Database
 -------------------------
 
-.. image:: /_static/ccf_v3_sdk.png
-    :align: right
 
 The Allen Cell Types Database contains electrophysiological and morphological characterizations
 of individual neurons in the mouse primary visual cortex.  The Allen SDK provides python code
@@ -39,11 +39,15 @@ reconstructions (SWC files) for a subset of neurons.
 
 The Database also contains two classes of models trained on this data set: perisomatic biophysical 
 models produced using the NEURON simulator and generalized leaky integrate and fire models (GLIFs) 
-produced using custom python code provided with this toolkit.
+produced using custom python code provided with this toolkit. 
 
-The Allen SDK provides sample code demonstrating how to download neuronal model parameters from the Allen 
-Brain Atlas API and run your own simulations using stimuli from the Allen Cell Types Database or 
-custom current injections.
+The Allen SDK provides sample code 
+demonstrating how to download neuronal model parameters from the Allen Brain Atlas API and run 
+your own simulations using stimuli from the Allen Cell Types Database or custom current injections:
+
+    * :doc:`single_cell_biophysical_script`
+    * :doc:`glif_models`
+
 
 ....
 
