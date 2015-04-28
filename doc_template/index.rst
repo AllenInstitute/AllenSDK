@@ -12,7 +12,7 @@ Welcome to the Allen SDK
 
    install
    neuron
-   single_cell_biophysical_script
+   biophysical_perisomatic_script
    glif_models
    model_description
    template_application
@@ -44,7 +44,7 @@ The Allen SDK provides sample code
 demonstrating how to download neuronal model parameters from the Allen Brain Atlas API and run 
 your own simulations using stimuli from the Allen Cell Types Database or custom current injections:
 
-    * :doc:`single_cell_biophysical_script`
+    * :doc:`biophysical_perisomatic_script`
     * :doc:`glif_models`
 
 

@@ -14,14 +14,14 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.model.biophys_sim.config import Config
-from allensdk.model.single_cell_biophysical.utils import Utils
+from allensdk.model.biophysical_perisomatic.utils import Utils
 from allensdk.core.nwb_data_set import NwbDataSet
 from shutil import copy
 import numpy
 
 
 def run(description):
-    '''Main function for running a single cell biophysical experiment.
+    '''Main function for running a perisomatic biophysical experiment.
     
     Parameters
     ----------

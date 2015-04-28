@@ -22,10 +22,10 @@ Retrieving Data from the Allen Institute
 This may be done programmatically
 ::
 
-    from allensdk.api.queries.single_cell_biophysical import \
-        SingleCellBiophysical
+    from allensdk.api.queries.biophysical_perisomatic import \
+        BiophysicalPerisomatic
     
-    scb = SingleCellBiophysical('http://api.brain-map.org')
+    scb = BiophysicalPerisomatic('http://api.brain-map.org')
     scb.cache_stimulus = False # change to True to download the stimulus file
     neuronal_model_id = 464137111    # get this from the web site as below
     scb.cache_data(neuronal_model_id, working_directory='neuronal_model')
@@ -74,15 +74,15 @@ Running the Simulation
 
     cd neuronal_model
     nrnivmodl ./modfiles
-    python -m allensdk.model.single_cell_biophysical.runner manifest.json
+    python -m allensdk.model.biophysical_perisomatic.runner manifest.json
 
 
 Simulation Main Loop
 --------------------
 
 The top level script is in the
-:py:meth:`~allensdk.model.single_cell_biophysical.runner.run`
-method of the :py:mod:`allensdk.model.single_cell_biophysical.runner`
+:py:meth:`~allensdk.model.biophysical_perisomatic.runner.run`
+method of the :py:mod:`allensdk.model.biophysical_perisomatic.runner`
 module.
 
 The first step is to configure NEURON based on the configuration file.
@@ -135,7 +135,7 @@ Customized Utilities
 
 Much of the code in the single cell example is not core Allen SDK code.
 The runner.py script largely reads the configuration file and calls into
-methods in the :py:class:`~allensdk.model.single_cell_biophysical.utils.Utils` class.
+methods in the :py:class:`~allensdk.model.biophysical_perisomatic.utils.Utils` class.
 Utils is a subclass of the :py:class:`~allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils`
 class, which provides access to objects in the NEURON package.
 
@@ -154,12 +154,12 @@ class, which provides access to objects in the NEURON package.
 
 
 The various methods called by the runner.script are implemented here, including:
-:py:meth:`~allensdk.model.single_cell_biophysical.utils.Utils.generate_morphology`,
-:py:meth:`~allensdk.model.single_cell_biophysical.utils.Utils.load_cell_parameters`,
-:py:meth:`~allensdk.model.single_cell_biophysical.utils.Utils.setup_iclamp`,
-:py:meth:`~allensdk.model.single_cell_biophysical.utils.Utils.read_stimulus`
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology`,
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters`,
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp`,
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus`
 and
-:py:meth:`~allensdk.model.single_cell_biophysical.utils.Utils.record_values`.
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.record_values`.
 Other applications are free to implement their own subclasses of HocUtils as needed.
 
 
