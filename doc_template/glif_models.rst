@@ -30,10 +30,10 @@ like this::
     http://api.brain-map.org/neuronal_model/download/472423251
 
 This link returns .zip archive containing the neuron configuration file 
-and sweep metadata required to simulate the model.  If you would like to 
-download the stimulus used to train the model, the following code 
-demonstrates how to download the corresponding cell's NWB file 
-(as well as the neuron configuration file and sweep metadata)::
+and sweep metadata required to simulate the model using stimuli applied to 
+the cell.  To download the stimulus itself, the following code demonstrates 
+how to retrieve the corresponding cell's NWB file (as well as the neuron 
+configuration file and sweep metadata)::
 
     from allensdk.api.queries.glif_api import GlifApi
     import allensdk.core.json_utilities as json_utilities
