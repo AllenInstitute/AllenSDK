@@ -28,7 +28,8 @@ div.bodywrapper {
 
 div.body {
     background-color: white;
-    padding: 0 0px 30px 0px;
+    padding: 20px 50px 30px 0px;
+    font-family: Verdana, sans-serif;
 }
 
 div.sphinxsidebarwrapper {
@@ -88,6 +89,15 @@ div.related li.right {
 /* ::: SIDEBAR :::: */
 div.sphinxsidebar h3 {
     margin: 0;
+    margin-top: 20px;
+    font-family: bebas_neueregular;
+    font-weight: bold;
+    font-size: 40px;
+    color: rgb(66,66,66);
+}
+
+div.sphinxsidebar h3 a {
+    color: rgb(66,66,66);
 }
 
 div.sphinxsidebar h4 {
@@ -102,7 +112,15 @@ div.sphinxsidebar ul {
     margin: 10px;
     margin-left: 15px;
     padding: 0;
+    font-family: arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    list-style-type: none;
 }
+
+div.sphinxsidebar li {
+    margin-top: 11px;
+}                         
 
 div.sphinxsidebar ul ul {
     margin-top: 0;
@@ -741,3 +759,16 @@ div.figure p.caption span.caption-number {
 
 div.figure p.caption span.caption-text {
 }
+
+/* davidf: new stuff here */
+
+img.align-right {
+    float: right;
+    padding: 10px;
+}               
+
+hr.docutils {
+  border: none;
+  clear: both;
+}
+

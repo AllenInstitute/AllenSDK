@@ -1,5 +1,5 @@
-Model Description
-=================
+Model Description Files
+=======================
 
 Basic Structure
 ---------------

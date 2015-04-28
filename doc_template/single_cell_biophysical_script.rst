@@ -1,4 +1,4 @@
-Single Cell Biophysical Models
+Perisomatic Biophysical Models
 ==============================
 
 Prerequisites

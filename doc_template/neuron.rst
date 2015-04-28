@@ -1,5 +1,5 @@
-Biophysical Models
-==================
+NEURON Models
+=============
 This guide is a resource for creating a biophysical model using
 NEURON and the Allen SDK package.
 
