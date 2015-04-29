@@ -21,8 +21,42 @@ class GlifApi(Api):
     def __init__(self, base_uri=None):
         super(GlifApi, self).__init__(base_uri)
 
-        self.metadata = None
+        self.neuronal_model = None
+        self.ephys_sweeps = None
+        self.stimulus_url = None
+        self.neuron_config_url = None
+
+    def list_neuronal_models(self):
+        ''' Query the API for a list of all GLIF neuronal models. 
+
+        Returns
+        -------
+        list
+            Meta data for all GLIF neuronal models.
+        '''
         
+        return self.do_rma_query(self.build_neuronal_model_list_rma_url, self.read_neuronal_model_list_json)
+
+
+    def build_neuronal_model_list_rma_url(self, fmt='json'):
+        include_associations = "specimen(ephys_result),neuronal_model_template[name$il'*LIF*']"
+
+        url = ''.join([self.rma_endpoint, 
+                       '/query.',
+                       fmt,
+                       '?q=',
+                       'model::NeuronalModel,',
+                       'rma::include,',
+                       include_associations,
+                       ',rma::options[num_rows$eq2000]'])
+
+        return url
+        
+
+    def read_neuronal_model_list_json(self, json_parsed_data):
+        ''' Return basic meta data for all neuronal models'''
+        return json_parsed_data['msg']
+
 
     def get_neuronal_model(self, neuronal_model_id):
         '''Query the current RMA endpoint with a neuronal_model id
@@ -34,15 +68,8 @@ class GlifApi(Api):
             A dictionary containing 
         '''
         
-        self.metadata = self.do_rma_query(self.build_rma_url, self.read_json, neuronal_model_id)
+        self.metadata = self.do_rma_query(self.build_neuronal_model_rma_url, self.read_neuronal_model_json, neuronal_model_id)
         return self.metadata
-
-
-    def assert_model_exists(self):
-        ''' Make sure that a neuronal model has been downloaded. '''
-
-        if self.metadata is None:
-            raise Exception("Neuronal model metadata required.  Please call get_neuronal_model(id)")
 
 
     def get_ephys_sweeps(self):
@@ -53,9 +80,7 @@ class GlifApi(Api):
         list
             A list of sweeps metadata dictionaries
         '''
-        self.assert_model_exists()
-
-        return self.metadata['ephys_sweeps']
+        return self.ephys_sweeps
 
 
     def get_neuron_config(self, output_file_name=None):
@@ -67,10 +92,10 @@ class GlifApi(Api):
         output_file_name: string
             File name to store the neuron configuration (optional).
         '''
+        if self.neuron_config_url is None:
+            raise Exception("URL for neuron config file is empty.")
 
-        self.assert_model_exists()
-
-        neuron_config = self.retrieve_parsed_json_over_http(self.api_url + self.metadata['neuron_config_url'])
+        neuron_config = self.retrieve_parsed_json_over_http(self.api_url + self.neuron_config_url)
 
         if output_file_name:
             with open(output_file_name, 'wb') as f:
@@ -78,14 +103,21 @@ class GlifApi(Api):
         
         return neuron_config
 
-
     def cache_stimulus_file(self, output_file_name):
-        self.assert_model_exists()
+        ''' Download the NWB file for the current neuronal model and save it to a file.
+
+        Parameters
+        ----------
+        output_file_name: string
+            File name to store the NWB file.
+        '''
+        if self.stimulus_url is None:
+            raise Exception("URL for stimulus file is empty.")
 
         self.retrieve_file_over_http(self.api_url + self.metadata['stimulus_url'], output_file_name)
 
 
-    def build_rma_url(self, neuronal_model_id, fmt='json'):
+    def build_neuronal_model_rma_url(self, neuronal_model_id, fmt='json'):
         '''Construct a query to find all files related to a GLIF neuronal model.
         
         Parameters
@@ -120,7 +152,7 @@ class GlifApi(Api):
         return url
 
 
-    def read_json(self, json_parsed_data):
+    def read_neuronal_model_json(self, json_parsed_data):
         ''' Reformat the RMA query results into a more usable dictionary
         
         Parameters
@@ -134,53 +166,55 @@ class GlifApi(Api):
             a dictionary containing fields necessary to run a GLIF model
         '''
 
-        data = {
-            'ephys_sweeps': None,
-            'neuron_config_url': None,
-            'stimulus_url': None            
-            }
-
-        neuronal_model = json_parsed_data['msg'][0]
+        self.ephys_sweeps = None
+        self.neuron_config_url = None
+        self.stimulus_url = None            
+        self.neuronal_model = json_parsed_data['msg'][0]
 
         # sweeps come from the specimen
         try:
-            specimen = neuronal_model['specimen']
-            ephys_sweeps = specimen['ephys_sweeps']
+            specimen = self.neuronal_model['specimen']
+            self.ephys_sweeps = specimen['ephys_sweeps']
         except Exception, e:
-            logging.warning("Could not find ephys_sweeps for this model")
-            ephys_sweeps = None
+            self.ephys_sweeps = None
+            
+        if self.ephys_sweeps is None:
+            logging.warning("Could not find ephys_sweeps for this model (%d)" % self.neuronal_model['id'])
+
         
         # neuron config file comes from the neuronal model's well known files
-        neuron_config_url = None
         try:
-            for wkf in neuronal_model['well_known_files']:
+            for wkf in self.neuronal_model['well_known_files']:
                 if wkf['path'].endswith('neuron_config.json'):
-                    neuron_config_url = wkf['download_link']
+                    self.neuron_config_url = wkf['download_link']
                     break
         except Exception, e:
-            logging.warning("Could not find neuron config well_known_file for this model")
-            neuron_config_url = None
+            self.neuron_config_url = None
+
+        if self.neuron_config_url is None:
+            logging.warning("Could not find neuron config well_known_file for this model (%d)" % self.neuronal_model['id'])
 
         # NWB file comes from the ephys_result's well known files
-        stimulus_url = None
         try:
             ephys_result = specimen['ephys_result']
             for wkf in ephys_result['well_known_files']:
                 if wkf['well_known_file_type']['name'] == 'NWB':
-                    stimulus_url = wkf['download_link']
+                    self.stimulus_url = wkf['download_link']
                     break
         except Exception, e:
-            logging.warning("Could not find stimulus well_known_file for this model")
-            stimulus_url = None
-        
+            self.stimulus_url = None
 
-        data['neuron_config_url'] = neuron_config_url
-        data['stimulus_url'] = stimulus_url
-        data['ephys_sweeps'] = ephys_sweeps
-        data['neuronal_model'] = neuronal_model
+        if self.stimulus_url is None:
+            logging.warning("Could not find stimulus well_known_file for this model (%d)" % self.neuronal_model['id'])
 
 
-        
+        data = {
+            'neuron_config_url': self.neuron_config_url,
+            'stimulus_url': self.stimulus_url,
+            'ephys_sweeps': self.ephys_sweeps,
+            'neuronal_model': self.neuronal_model
+            }
+
         return data
 
 

@@ -18,6 +18,7 @@ Welcome to the Allen SDK
    template_application
    resource_manifest
    data_api_client
+   nwb
    allensdk
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  

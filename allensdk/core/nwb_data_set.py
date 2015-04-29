@@ -144,7 +144,7 @@ class NwbDataSet(object):
             Value used to fill sweep response array
         
         sweep_numbers: list
-            List of integery sweep numbers to be filled (default all sweeps)
+            List of integer sweep numbers to be filled (default all sweeps)
             
         """
 

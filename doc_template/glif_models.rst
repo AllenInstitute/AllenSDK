@@ -90,7 +90,12 @@ you can instead do the following::
 GLIF Configuration
 ------------------
 
-TODO
+The 'neuron_config.json' files contain
+
+El, dt, tau, R_input, C, asc_vector, spike_cut_length, th_inf, th_adapt, coeffs,
+                 AScurrent_dynamics_method, voltage_dynamics_method, threshold_dynamics_method,
+                 AScurrent_reset_method, voltage_reset_method, threshold_reset_method,
+                 init_method_data, init_voltage, init_threshold, init_AScurrents, 
     
 
 Built-in Dynamics Rules
