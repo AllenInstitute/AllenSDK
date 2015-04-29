@@ -18,6 +18,17 @@ import logging
 
 
 class HocUtils(object):
+    '''A helper class for containing references to NEUORN.
+    
+    Attributes
+    ----------
+    h : object
+        The NEURON hoc object.
+    nrn : object
+        The NEURON python object.
+    neuron : module
+        The NEURON module.
+    '''
     _log = logging.getLogger(__name__)
     h = None
     nrn = None
@@ -41,8 +52,7 @@ class HocUtils(object):
     
     
     def initialize_hoc(self):
-        ''' :parameter params: a dict of key-values
-        '''
+        '''Basic setup for NEURON.'''
         h = self.h
         params = self.description.data['conditions'][0]
         

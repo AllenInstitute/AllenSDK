@@ -45,6 +45,7 @@ class DescriptionParser(object):
     
     
     def read_string(self, data_string, description=None, section=None, header=None):
+        '''Parse data needed for a simulation from a string.'''
         raise Exception("Not implemented, use a sub class")
     
     

@@ -22,13 +22,12 @@ Retrieving Data from the Allen Institute
 This may be done programmatically
 ::
 
-    from allensdk.api.queries.biophysical_perisomatic import \
-        BiophysicalPerisomatic
+    from allensdk.api.queries.biophysical_perisomatic import *
     
-    scb = BiophysicalPerisomatic('http://api.brain-map.org')
-    scb.cache_stimulus = False # change to True to download the stimulus file
+    bp = BiophysicalPerisomatic('http://api.brain-map.org')
+    bp.cache_stimulus = False # change to True to download the stimulus file
     neuronal_model_id = 464137111    # get this from the web site as below
-    scb.cache_data(neuronal_model_id, working_directory='neuronal_model')
+    bp.cache_data(neuronal_model_id, working_directory='neuronal_model')
 
 or you can download the data manually from the web site:
 

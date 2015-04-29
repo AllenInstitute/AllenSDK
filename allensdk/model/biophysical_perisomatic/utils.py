@@ -20,6 +20,19 @@ import h5py
 
 
 class Utils(HocUtils):
+    '''A helper class for NEURON functionality needed for
+    perisomatic biophysical simulations.
+    
+    Attributes
+    ----------
+    h : object
+        The NEURON hoc object.
+    nrn : object
+        The NEURON python object.
+    neuron : module
+        The NEURON module.
+    '''
+    
     _log = logging.getLogger(__name__)
     
     def __init__(self, description):
@@ -32,6 +45,13 @@ class Utils(HocUtils):
     
     
     def generate_morphology(self, morph_filename):
+        '''Load a swc-format cell morphology file.
+        
+        Parameters
+        ----------
+        morph_filename : string
+            Path to swc.
+        '''
         h = self.h
         
         swc = self.h.Import3d_SWC_read()
@@ -57,6 +77,7 @@ class Utils(HocUtils):
     
     
     def load_cell_parameters(self):
+        '''Configure a neuron after the cell morphology has been loaded.'''
         passive = self.description.data['passive'][0]
         genome = self.description.data['genome']
         conditions = self.description.data['conditions'][0]
@@ -92,6 +113,13 @@ class Utils(HocUtils):
     def setup_iclamp(self,
                      stimulus_path,
                      sweep=0):
+        '''Assign a current waveform as input stimulus.
+        
+        Parameters
+        ----------
+        stimulus_path : string
+            NWB file name
+        '''
         self.stim = self.h.IClamp(self.h.soma[0](0.5))  # TODO: does soma have to be parametrized?
         self.stim.amp = 0
         self.stim.delay = 0
@@ -108,6 +136,15 @@ class Utils(HocUtils):
     
     
     def read_stimulus(self, stimulus_path, sweep=0):
+        '''load current values for a specific experiment sweep.
+        
+        Parameters
+        ----------
+        stimulus path : string
+            NWB file name
+        sweep : integer, optional
+            sweep index
+        '''
         Utils._log.info("reading stimulus path: %s, sweep %s" %
                         (stimulus_path, sweep))
         stimulus_data = NwbDataSet(stimulus_path)
@@ -117,6 +154,7 @@ class Utils(HocUtils):
     
     
     def record_values(self):
+        '''Set up output voltage recording.'''
         vec = { "v": self.h.Vector(),
                 "t": self.h.Vector() }
     
@@ -127,6 +165,13 @@ class Utils(HocUtils):
     
     
     def get_sweeps(self, file_path):
+        '''List the indexes of current inputs in an NWB file.
+        
+        Parameters
+        ----------
+        file_path : string
+            path to NWB file
+        '''
         # TODO: try these:
         # data_set = NwbDataSet(file_path)
         # return data_set.get_sweep_numbers()
@@ -139,6 +184,13 @@ class Utils(HocUtils):
     
     
     def zero_firing_times(self, file_path):
+        '''Reset spike output for all sweeps in an NWB file.
+        
+        Parameters
+        ----------
+        file_path : string
+            path to NWB file
+        '''
         sweeps = self.get_sweeps(file_path)
         stimulus_data = NwbDataSet(file_path)
         
@@ -148,6 +200,13 @@ class Utils(HocUtils):
     
     
     def zero_sweeps(self, file_path):
+        '''Reset voltage output for all sweeps in an NWB file.
+        
+        Parameters
+        ----------
+        file_path : string
+            path to NWB file
+        '''
         # TODO: try these
         #data_set = NwbDataSet(file_path)
         #data_set.fill_sweep_responses(0.0)

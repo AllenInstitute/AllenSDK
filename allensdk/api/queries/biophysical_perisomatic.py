@@ -33,7 +33,9 @@ class BiophysicalPerisomatic(Api):
         ----------
         neuronal_model_id : integer or string representation
             key of experiment to retrieve.
-            
+        fmt : string, optional
+            json (default) or xml
+        
         Returns
         -------
         string
@@ -147,6 +149,20 @@ class BiophysicalPerisomatic(Api):
                         stimulus_filename='',
                         swc_morphology_path='',
                         sweeps=[]):
+        '''Generate a json configuration file with parameters for a 
+        a biophysical experiment.
+        
+        Parameters
+        ----------
+        fit_path : string
+            filename of a json configuration file with cell parameters.
+        stimulus_filename : string
+            path to an NWB file with input currents.
+        swc_morphology_path : string
+            file in SWC format.
+        sweeps : array of integers
+            which sweeps in the stimulus file are to be used.
+        '''
         self.manifest = OrderedDict()
         self.manifest['biophys'] = [{
                 'model_file': [ 'manifest.json',  fit_path ]

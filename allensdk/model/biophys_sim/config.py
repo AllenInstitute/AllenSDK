@@ -49,6 +49,14 @@ class Config(ApplicationConfig):
     
     def load(self, config_path,
              disable_existing_logs=False):
+        '''Parse the application configuration then immediately load
+        the model configuration files.
+        
+        Parameters
+        ----------
+        disable_existing_logs : boolean, optional
+            If false (default) leave existing logs after configuration.
+        '''
         super(Config, self).load([config_path], disable_existing_logs)
         description = self.read_model_description()
         
@@ -56,6 +64,24 @@ class Config(ApplicationConfig):
         
         
     def read_model_description(self):
+        '''parse the model_file field of the application configuration
+        and read the files.
+        
+        The model_file field of the application configuration is
+        first split at commas, since it may list more than one file.
+        
+        The files may be uris of the form :samp:`file:filename?section=name`,
+        in which case a bare configuration object is read from filename
+        into the configuration section with key 'name'.
+        
+        A simple filename without a section option
+        is treated as a standard multi-section configuration file.
+        
+        Returns
+        -------
+        description : Description
+            Configuration object.
+        '''
         reader = DescriptionParser()
         description = Description()
         
