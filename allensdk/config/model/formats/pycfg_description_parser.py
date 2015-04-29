@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import six
 import logging
 from pprint import pprint, pformat
 from allensdk.config.model.description import Description
@@ -28,12 +27,18 @@ class PycfgDescriptionParser(DescriptionParser):
     
     
     def read(self, pycfg_file_path, description=None, section=None, **kwargs):
-        """Read a serialized description from a Python (.pycfg) file.
+        '''Read a serialized description from a Python (.pycfg) file.
         
-        :parameter filename: the name of the .pycfg file
-        :returns the description
-        :rtype: Description
-        """
+        Parameters
+        ----------
+        filename : string
+            Name of the .pycfg file.
+        
+        Returns
+        -------
+        Description
+            Configuration object.
+        '''
         header = kwargs.get('prefix', '')
         
         with open(pycfg_file_path, 'r') as f:
@@ -41,12 +46,18 @@ class PycfgDescriptionParser(DescriptionParser):
     
     
     def read_string(self, python_string, description=None, section=None, **kwargs):
-        """Read a serialized description from a Python (.pycfg) string.
+        '''Read a serialized description from a Python (.pycfg) string.
         
-        :parameter python_string: a python string with a serialized description.
-        :returns the description object.
-        :rtype: Description
-        """
+        Parameters
+        ----------
+        python_string : string
+            Python string with a serialized description.
+        
+        Returns
+        -------
+        Description
+            Configuration object.
+        '''
         
         if description == None:
             description = Description()
@@ -66,9 +77,12 @@ class PycfgDescriptionParser(DescriptionParser):
 
     def write(self, filename, description):
         '''Write the description to a Python (.pycfg) file.
-        :parameter filename: the name of the file to write.
-        :type filename: string
-        '''        
+        
+        Parameters
+        ----------
+        filename : string
+            Name of the file to write.
+        '''
         try:
             with open(filename, 'w') as f:
                     pprint(description.data, f, indent=2)
@@ -81,9 +95,12 @@ class PycfgDescriptionParser(DescriptionParser):
     
     def write_string(self, description):
         '''Write the description to a pretty-printed Python string.
-        :parameter description: the description object to write
-        :type description: Description
-        '''        
+        
+        Parameters
+        ----------
+        description : Description
+            Configuration object to write.
+        '''
         pycfg_string = pformat(description.data, indent=2)
         
         return pycfg_string

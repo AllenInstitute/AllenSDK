@@ -62,12 +62,18 @@ class BiophysicalPerisomatic(Api):
     
     
     def read_json(self, json_parsed_data):
-        '''Get the list of well_known_file ids from a response body containing nested sample,microarray_slides,well_known_files.
+        '''Get the list of well_known_file ids from a response body
+        containing nested sample,microarray_slides,well_known_files.
         
-        :parameter json_parsed_data: the json response from the Allen Institute Api RMA.
-        :type json_parsed_data: hash
-        :returns: a list of well_known_file ids
-        :rtype: list of strings
+        Parameters
+        ----------
+        json_parsed_data : dict
+           Response from the Allen Institute Api RMA.
+        
+        Returns
+        -------
+        list of strings
+            Well known file ids.
         '''
         self.ids = {
             'stimulus': {},

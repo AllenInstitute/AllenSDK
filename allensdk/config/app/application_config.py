@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.config.app.pydev_connector import PydevConnector
 from allensdk.config.model.formats.json_util import JsonUtil
 
 try:
@@ -26,7 +25,7 @@ import logging, logging.config as lc
 from pkg_resources import resource_filename
 
 class ApplicationConfig(object):
-    ''' Convenience class that consolidates the handling of application configuration
+    ''' Convenience class that handles of application configuration
     from environment variables, .conf files and the command line
     using Python standard libraries and formats.
     '''
@@ -39,7 +38,6 @@ class ApplicationConfig(object):
                  defaults,
                  name="app",
                  halp="Run application.",
-                 pydev=False,
                  default_log_config=None):
         self.application_name = name
         self.help = halp
@@ -60,14 +58,6 @@ class ApplicationConfig(object):
                 'help': 'logging configuration path'
             }
         }
-        
-        if pydev:
-            self.debug_enabled = True
-            self.defaults['debug'] = {
-                'default': 'off',
-                'help': 'pydev_remote or off (default)'
-            }
-        
         
         self.defaults.update(defaults)
         
@@ -119,9 +109,6 @@ class ApplicationConfig(object):
                                          (parsed_args.config_file_path,
                                          e))
             raise
-        
-        if self.debug_enabled and self.debug.startswith('pydev'):
-            PydevConnector.connect(self.debug)
         
         try:
             lc.fileConfig(self.log_config_path,
