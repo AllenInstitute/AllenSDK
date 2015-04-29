@@ -25,15 +25,16 @@ Docker Installation
 -------------------
 
  #. Download one of the example `Docker <http://www.docker.com/>`_ files:
-     * :download:`Ubuntu Standalone <./examples/docker/ubuntu/Dockerfile>`.
-     * :download:`BrainScales combined Neural-Networks <./examples/docker/brainscales/Dockerfile>`.
- #. Use docker to build the image:
+     * :download:`Ubuntu Standalone <./examples/docker/Dockerfile.ubuntu>`.
+     * :download:`BrainScales combined Neural-Networks <./examples/docker/Dockerfile.brainscales>`.
+ #. Use Docker to build the image:
      ::
      
          mkdir work
-         cp Dockerfile work
+         cp Dockerfile.ubuntu work
          cd work
-         docker build --tag alleninstitute/allensdk .
+         docker build --tag alleninstitute/allensdk -f Dockerfile.ubuntu .
+         
  #. Run the docker image:
      ::
      

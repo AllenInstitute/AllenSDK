@@ -22,7 +22,7 @@ from allensdk.model.biophys_sim.config import Config
 
 def choose_bps_command(command='bps_simple', conf_file=None):
     log = logging.getLogger('allensdk.model.biophys_sim.bps_command')
-
+    
     log.info("bps command: %s" % (command))
     
     if conf_file:
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     import sys
     conf_file = None
     argv = sys.argv
-
+    
     if len(argv) > 1:
         if argv[0] == 'nrniv':
             command = 'run_simple'
@@ -65,7 +65,8 @@ if __name__ == '__main__':
     else:        
         command = 'run_simple'
     
-    if len(argv) > 2 and argv[-1].endswith('.conf'):
+    if len(argv) > 2 and (argv[-1].endswith('.conf') or
+                          argv[-1].endswith('.json')):
         conf_file = argv[-1]
     else:    
         try:

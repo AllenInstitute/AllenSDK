@@ -45,4 +45,4 @@ RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --wi
 RUN echo 'export PATH=$PATH:/opt/neuron/iv/x86_64/bin:/opt/neuron/nrn/x86_64/bin' >> /etc/bash.bashrc
 RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
 
-RUN pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS-60/artifact/shared/tgz/allensdk-0.2.0.dev60.tar.gz
+RUN pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS-66/artifact/shared/tgz/allensdk-0.2.0.dev66.tar.gz
