@@ -26,12 +26,13 @@ This may be done programmatically
     
     bp = BiophysicalPerisomatic('http://api.brain-map.org')
     bp.cache_stimulus = False # change to True to download the stimulus file
-    neuronal_model_id = 464137111    # get this from the web site as below
+    neuronal_model_id = 472451419    # get this from the web site as below
     bp.cache_data(neuronal_model_id, working_directory='neuronal_model')
 
-or you can download the data manually from the web site:
+You can search for model ids and also download the data manually from the web site:
 
-    #. Go to `http://tcelltypes.corp.alleninstitute.org <http://tcelltypes.corp.alleninstitute.org>`_
+    #. Go to `http://celltypes.corp.alleninstitute.org <http://celltypes.corp.alleninstitute.org>`_
+    #. Check 'More Options+'...'has reconstruction'
     #. Use the Filters, Cell Location and Cell Feature Filters to narrow your results.
     #. Click on a Cell Summary to view the Mouse Experiment Electrophysiology.
     #. Click "show model response" and select "Biophysical - perisomatic".
@@ -52,7 +53,7 @@ and application configuration.
 
     neuronal_model
     |-- manifest.json
-    |-- 169248.04.02.01_fit.json
+    |-- 472451419_fit.json
     |-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01.nwb
     |-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01_403165543_m.swc
     |-- modfiles

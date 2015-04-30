@@ -43,7 +43,6 @@ class Config(ApplicationConfig):
         super(Config, self).__init__(Config._DEFAULTS, 
                                      name='biophys', 
                                      halp='tools for biophysically detailed modeling at the Allen Institute.',
-                                     pydev=True,
                                      default_log_config=Config._DEFAULT_LOG_CONFIG)
     
     

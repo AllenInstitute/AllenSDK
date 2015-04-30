@@ -20,19 +20,23 @@ RUN apt-get -yq install \
     python \
     python-pip \
     python-scipy \
-    python-matplotlib
+    python-matplotlib \
     ipython \
     python-dev
     
 RUN apt-get -yq install \
     libxext-dev \
     libncurses-dev \
+    libhdf5-dev \
     wget
 
-RUn apt-get -yq install \
+RUN apt-get -yq install \
     openmpi-bin \
     libopenmpi-dev
 
+
+# upgrade cython and h5py
+RUN pip install cython h5py
 
 #neuron installation
 RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078/nrn-7.3.ansi-1078.tar.gz
@@ -45,4 +49,4 @@ RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --wi
 RUN echo 'export PATH=$PATH:/opt/neuron/iv/x86_64/bin:/opt/neuron/nrn/x86_64/bin' >> /etc/bash.bashrc
 RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
 
-RUN pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS-66/artifact/shared/tgz/allensdk-0.2.0.dev66.tar.gz
+RUN pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS-68/artifact/shared/tgz/allensdk-0.2.0.dev68.tar.gz

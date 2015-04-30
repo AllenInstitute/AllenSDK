@@ -48,13 +48,9 @@ def run(description):
     stimulus_format = manifest.get_format('stimulus_path')
     output_format = manifest.get_format('output')
     
-    # prepare output file
-    if output_format == 'NWB':
-        output_path = manifest.get_path('output')
-        copy(stimulus_path,
-             manifest.get_path('output'))
-        utils.zero_sweeps(output_path)
-        utils.zero_firing_times(output_path)
+    if stimulus_path == 'NWB' and output_format == 'NWB':
+        prepare_nwb_output(manifest.get_path('stimulus_path'),
+                           manifest.get_path('output'))
     
     # run sweeps
     for sweep in sweeps:
@@ -80,12 +76,55 @@ def run(description):
             save_dat(output_path, output_data, output_times)
 
 
+def prepare_nwb_output(nwb_stimulus_path,
+                       nwb_result_path):
+    '''Copy the stimulus file, zero out the recorded voltages and spike times.
+    
+    Parameters
+    ----------
+    nwb_stimulus_path : string
+        NWB file name
+    nwb_result_path : string
+        NWB file name
+    '''
+    copy(nwb_stimulus_path, nwb_result_path)
+    data_set = NwbDataSet(nwb_result_path)
+    data_set.fill_sweep_responses(0.0)
+    for sweep in data_set.get_sweep_numbers():
+        data_set.set_spike_times(sweep, [])
+
+
 def save_nwb(output_path, v, sweep):
+    '''Save a single voltage output result into an existing sweep in a NWB file.
+    This is intended to overwrite a recorded trace with a simulated voltage.
+    
+    Parameters
+    ----------
+    output_path : string
+        file name of a pre-existing NWB file.
+    v : numpy array
+        voltage
+    sweep : integer
+        which entry to overwrite in the file.
+    '''
     output = NwbDataSet(output_path)
     output.set_sweep(sweep, None, v)
 
 
 def save_dat(output_path, v, t):
+    '''Save a single voltage output result into a simple text format.
+    
+    The output file is one t v pair per line.
+    
+    Parameters
+    ----------
+    output_path : string
+        file name for output
+    v : numpy array
+        voltage
+    t : numpy array
+        time
+    '''
     data = numpy.transpose(numpy.vstack((t, v)))
     with open (output_path, "w") as f:
         numpy.savetxt(f, data)
