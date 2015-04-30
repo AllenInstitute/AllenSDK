@@ -20,6 +20,10 @@ during the simulation. The GLIF package contains a built-in set of rules,
 however developers can plug in custom rule implementations provided they
 follow a simple argument specification scheme.
 
+**Note:** the GLIF simulator module is still under heavy development and
+may change significantly in the future.
+
+
 Downloading  GLIF Models
 ------------------------
 
@@ -120,6 +124,11 @@ electrophysiology data.  Optimized coefficients for these
 parameters are stored by name in the instance.coeffs dictionary. For more details
 on which parameters where optimized, please see the technical white paper.
 
+**Note about spike_cut_length**: the GLIF simulator can optionally skip ahead for 
+a fixed amount of time when a spike is detected.  If you set `spike_cut_length` to
+a positive value, `spike_cut_length` time steps will not be simulated and instead
+be replaced with NaN values in the simulated outputs.
+
 The GlifNeuron class has six methods that can be customized: three rules 
 for updating voltage, spike threshold, and afterspike currents during the 
 simulation; and three rules for updating those values when a spike is detected
@@ -133,7 +142,7 @@ threshold_dynamics_method Update simulation spike threshold for the next time st
 AScurrent_dynamics_method Update afterspike current coefficients for the next time step.
 voltage_reset_method      Reset simulation voltage after a spike occurs.
 threshold_reset_method    Reset simulation spike threshold after a spike occurs.
-AScurrent_reset_method    Reset afterspike current coeffections after a spike occurs.
+AScurrent_reset_method    Reset afterspike current coefficients after a spike occurs.
 ========================= ==============================================================
 
 The GLIF neuron configuration files available from the Allen Brain Atlas API use built-in
