@@ -56,21 +56,23 @@ Running a GLIF Simulation
 You can use the files downloaded above to simulate all of the sweeps presented 
 to the original cell as follows::
 
-    from allensdk.model.glif.neuron import GlifNeuron
-    from allensdk.model.glif.simulate_neuron import simulation_neuron
+    
     import allensdk.core.json_utilities as json_utilities
 
+    from allensdk.model.glif.neuron import GlifNeuron
+    from allensdk.model.glif.simulate_neuron import simulation_neuron
+
     neuron_config = read_json('neuron_config.json')
-    ephys_sweeps = json_utilities.read('ephys_sweeps.json)
+    ephys_sweeps = json_utilities.read('ephys_sweeps.json')
     neuron = GlifNeuron.from_dict(neuron_config)
 
-    simulate_neuron(neuron, ephys_sweeps, 'experiment.nwb', 'experiment.nwb', .05)
+    simulate_neuron(neuron, ephys_sweeps, 'experiment.nwb', 'experiment.nwb', 0.05)
 
-Note that in this case, simulated sweep voltages will overwrite the responses in 
-the downloaded NWB file.
+Note: in this case, simulated sweep voltages will overwrite the responses in 
+the downloaded NWB file.  
 
 If you have a custom stimulus you would like to apply to a neuronal model, 
-you can instead do the following::
+try the following::
 
     from allensdk.model.glif.neuron import GlifNeuron
     import allensdk.core.json_utilities as json_utilities
@@ -90,13 +92,41 @@ you can instead do the following::
 GLIF Configuration
 ------------------
 
-The 'neuron_config.json' files contain
+Instances of the GlifNeuron class require a large number of parameters for initialization.  
+Fixed neuron parameters are stored directly as parameters on the class instance:
 
-El, dt, tau, R_input, C, asc_vector, spike_cut_length, th_inf, th_adapt, coeffs,
-                 AScurrent_dynamics_method, voltage_dynamics_method, threshold_dynamics_method,
-                 AScurrent_reset_method, voltage_reset_method, threshold_reset_method,
-                 init_method_data, init_voltage, init_threshold, init_AScurrents, 
-    
+================ ===================================== ========== ========
+Parameter        Description                           Units      Type
+================ ===================================== ========== ========
+El               resting potential                     Volts      float
+dt               time duration of each simulation step seconds    float
+R_input          input resistance                      Ohms       float
+C                capacitance                           Farads     float
+asc_vector       afterspike current coeffecients                  np.array 
+spike_cut_length spike duration                        time steps int
+th_inf           instantaneous threshold               Volts      float
+th_adapt         adapted threshold                     Volts      float
+================ ===================================== ========== ========
+
+Some of these fixed parameters were optimized.  Optimized coefficients for these
+parameters are stored by name in the instance.coeffs dictionary. For more details, 
+on which parameters where optimized, please see the technical white paper.
+
+The GlifNeuron class has six methods that can be customized: three rules 
+for updating voltage, spike threshold, and afterspike currents during the 
+simulation; and three rules for updating those values when a spike is detect 
+(voltage surpasses spike threshold).
+
+========================= ================================== ===========
+Method                    Name                               Description
+========================= ================================== ===========
+AScurrent_dynamics_method Afterspike Current Dynamics Method 
+voltage_dynamics_method   Voltage Dynamics Method
+threshold_dynamics_method Threshold Dynamics Method
+AScurrent_reset_method    Afterspike Current Reset Method
+voltage_reset_method      Voltage Reset Method
+threshold_reset_method    Threshold Reset Method
+========================= ================================== ===========
 
 Built-in Dynamics Rules
 -----------------------
