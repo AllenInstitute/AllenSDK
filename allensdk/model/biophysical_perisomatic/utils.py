@@ -16,7 +16,6 @@
 import logging
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
-import h5py
 
 
 class Utils(HocUtils):
@@ -57,6 +56,7 @@ class Utils(HocUtils):
         swc = self.h.Import3d_SWC_read()
         swc.input(morph_filename)
         imprt = self.h.Import3d_GUI(swc, 0)
+        
         h("objref this")
         imprt.instantiate(h.this)
         

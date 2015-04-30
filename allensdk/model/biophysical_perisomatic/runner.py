@@ -18,6 +18,7 @@ from allensdk.model.biophysical_perisomatic.utils import Utils
 from allensdk.core.nwb_data_set import NwbDataSet
 from shutil import copy
 import numpy
+from allensdk.core.dat_utilities import DatUtilities
 
 
 def run(description):
@@ -48,7 +49,7 @@ def run(description):
     stimulus_format = manifest.get_format('stimulus_path')
     output_format = manifest.get_format('output')
     
-    if stimulus_path == 'NWB' and output_format == 'NWB':
+    if stimulus_format == 'NWB' and output_format == 'NWB':
         prepare_nwb_output(manifest.get_path('stimulus_path'),
                            manifest.get_path('output'))
     
@@ -73,7 +74,7 @@ def run(description):
             save_nwb(output_path, output_data, sweep)
         elif output_format == 'dat':
             output_path = manifest.get_path("output", sweep)
-            save_dat(output_path, output_data, output_times)
+            DatUtilities.save_voltage(output_path, output_data, output_times)
 
 
 def prepare_nwb_output(nwb_stimulus_path,
@@ -109,25 +110,6 @@ def save_nwb(output_path, v, sweep):
     '''
     output = NwbDataSet(output_path)
     output.set_sweep(sweep, None, v)
-
-
-def save_dat(output_path, v, t):
-    '''Save a single voltage output result into a simple text format.
-    
-    The output file is one t v pair per line.
-    
-    Parameters
-    ----------
-    output_path : string
-        file name for output
-    v : numpy array
-        voltage
-    t : numpy array
-        time
-    '''
-    data = numpy.transpose(numpy.vstack((t, v)))
-    with open (output_path, "w") as f:
-        numpy.savetxt(f, data)
 
 
 def load_description(manifest_json_path):
