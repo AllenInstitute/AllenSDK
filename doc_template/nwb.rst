@@ -1,4 +1,3 @@
-
 Neurodata Without Borders
 =========================
 
