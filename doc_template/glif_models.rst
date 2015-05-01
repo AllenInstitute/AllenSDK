@@ -131,7 +131,7 @@ files does not correspond to the sampling rate of the original stimulus.  Stimul
 subsampled and filtered for parameter optimization.  Be sure to overwrite the neuron's
 `dt` with the correct sampling rate::
 
-    from allensdk.model.glif.neuron import GlifNeuron
+    from allensdk.model.glif.glif_neuron import GlifNeuron
     import allensdk.core.json_utilities as json_utilities
     from allensdk.core.nwb_data_set import NwbDataSet
 
@@ -144,7 +144,7 @@ subsampled and filtered for parameter optimization.  Be sure to overwrite the ne
     sweep_data = ds.get_sweep(sweep_number)
 
     # initialize the neuron
-    neuron_config = read_json(neuron_config_file_name)
+    neuron_config = json_utilities.read(neuron_config_file_name)
     neuron = GlifNeuron.from_dict(neuron_config)
 
     # overwrite dt and simulate the neuron
