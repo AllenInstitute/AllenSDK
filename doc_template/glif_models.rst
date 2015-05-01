@@ -191,7 +191,9 @@ methods, however you can supply your own custom method if you like::
 
 Notice that the function is allowed to take custom parameters (here 'a' and 'b'), which are
 configured on method initialization from a dictionary. For more details, see the documentation 
-for the :py:class:`GlifNeuron` and :py:class:`GlifNeuronMethod` classes.
+for the :py:class:`GlifNeuron <allensdk.model.glif.glif_neuron.GlifNeuron>` and 
+:py:class:`GlifNeuronMethod <allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod>` classes.
+
 
 Built-in Dynamics Rules
 -----------------------
