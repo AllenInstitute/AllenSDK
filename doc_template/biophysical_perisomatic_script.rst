@@ -31,7 +31,7 @@ This may be done programmatically
 
 You can search for model ids and also download the data manually from the web site:
 
-    #. Go to `http://celltypes.corp.alleninstitute.org <http://celltypes.corp.alleninstitute.org>`_
+    #. Go to `http://celltypes.brain-map.org <http://celltypes.brain-map.org>`_
     #. Check 'More Options+'...'has reconstruction'
     #. Use the Filters, Cell Location and Cell Feature Filters to narrow your results.
     #. Click on a Cell Summary to view the Mouse Experiment Electrophysiology.

@@ -8,7 +8,7 @@ how their parameters were optimized (TODO).
 
 The Allen SDK GLIF simulation module is an explicit time-stepping simulator 
 that evolves a neuron's simulated voltage over the course of an input
-current stimulus.  The modules also tracks the neuron's simulated spike
+current stimulus.  The module also tracks the neuron's simulated spike
 threshold and registers action potentials whenever voltage surpasses threshold.
 Action potentials initiate reset rules that update voltage, threshold, and 
 (optionally) trigger afterspike currents.  

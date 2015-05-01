@@ -3,30 +3,28 @@ Install Guide
 This guide is a resource for using the Allen SDK package.
 It is maintained by the `Allen Institute for Brain Science <http://www.alleninstitute.org/>`_.
 
-Quick Start Install Using Pip (Linux)
--------------------------------------
+Quick Start Using Pip
+---------------------
 
- #. Pip install for a single user.
-    ::
-    
-        pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-|version|.tar.gz --user
+First ensure you have `pip <http://pypi.python.org/pypi/pip>`_ installed.  To install for a single user::
+
+    pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-|version|.tar.gz --user
 
 
-Uninstall
----------
+Uninstalling the SDK is simple with pip::
 
- #. Simply use pip.
-    ::
-    
-        pip uninstall allensdk
+    pip uninstall allensdk
 
 
 Docker Installation
 -------------------
 
- #. Download one of the example `Docker <http://www.docker.com/>`_ files:
+ #. Ensure you have `Docker <http://www.docker.com/>`_ installed.
+
+ #. Download one of the example Docker files:
      * :download:`Ubuntu Standalone <./examples/docker/Dockerfile.ubuntu>`.
      * :download:`BrainScales combined Neural-Networks <./examples/docker/Dockerfile.brainscales>`.
+
  #. Use Docker to build the image:
      ::
      
