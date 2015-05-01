@@ -5,8 +5,8 @@ Data API Client
 The `allensdk.api <allensdk.api.html>`_ package
 is designed to help retrieve data from the Allen Brain Atlas Data Portal.
 Currently there are only two API queries in Allen SDK.
-The first is for the :py:class:`BiophysicalPerisomatic <allensdk.api.queries.biophysical_perisomatic.BiophysicalPerisomatic>` neuronal model.
-The other is for :py:class:`GLIF <allensdk.api.queries.glif.GlifApi>` models.
+The first is for the :py:class:`BiophysicalPerisomaticApi <allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi>` neuronal model.
+The other is for :py:class:`GLIF <allensdk.api.queries.glif_api.GlifApi>` models.
 
 Using an API Query
 ------------------
@@ -14,8 +14,8 @@ Using an API Query
 First import a query module:
     ::
     
-        from allensdk.api.queries.biophysical_perisomatic import \
-            BiophysicalPerisomatic
+        from allensdk.api.queries.biophysical_perisomatic_api import \
+            BiophysicalPerisomaticApi
 
 
 For more information on using specific query modules, see the 
@@ -23,7 +23,7 @@ For more information on using specific query modules, see the
 documentation for details.
     ::
     
-        bp = BiophysicalPerisomatic()
+        bp = BiophysicalPerisomaticApi()
         bp.cache_stimulus = False           # change to True to download the stimulus file
         bp.neuronal_model_id = 464137111    # get this from the web site
         bp.cache_data(neuronal_model_id, working_directory='neuronal_model')
