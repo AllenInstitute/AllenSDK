@@ -6,12 +6,23 @@ The Allen Cell Types Database contains Generalized Leaky Integrate and Fire
 Review the GLIF technical white paper for details on these models and
 how their parameters were optimized (TODO).
 
+The Allen SDK GLIF simulation module is an explicit time-stepping simulator 
+that evolves a neuron's simulated voltage over the course of an input
+current stimulus.  The modules also tracks the neuron's simulated spike
+threshold and registers action potentials whenever voltage surpasses threshold.
+Action potentials initiate reset rules that update voltage, threshold, and 
+(optionally) trigger afterspike currents.  
+
 The GLIF simulator in this package has a modular architecture
 that enables users to choose from a number of dynamics and reset rules that
 update the simulation's voltage, spike threshold, and afterspike currents
 during the simulation. The GLIF package contains a built-in set of rules,
 however developers can plug in custom rule implementations provided they
 follow a simple argument specification scheme.
+
+**Note:** the GLIF simulator module is still under heavy development and
+may change significantly in the future.
+
 
 Downloading  GLIF Models
 ------------------------
@@ -82,7 +93,9 @@ try the following::
 
     # provide your own stimulus as an array of voltages (in volts)
     stimulus = ... 
-
+    
+    # important! provide the dt of your stimulus
+    neuron.dt = 5e-6
     output = neuron.run(stimulus)
 
     voltage = output['voltage']
@@ -92,7 +105,7 @@ try the following::
 GLIF Configuration
 ------------------
 
-Instances of the GlifNeuron class require a large number of parameters for initialization.  
+Instances of the GlifNeuron class require many parameters for initialization.  
 Fixed neuron parameters are stored directly as parameters on the class instance:
 
 ================ ===================================== ========== ========
@@ -102,31 +115,85 @@ El               resting potential                     Volts      float
 dt               time duration of each simulation step seconds    float
 R_input          input resistance                      Ohms       float
 C                capacitance                           Farads     float
-asc_vector       afterspike current coeffecients                  np.array 
+asc_vector       afterspike current coefficients                  np.array 
 spike_cut_length spike duration                        time steps int
 th_inf           instantaneous threshold               Volts      float
 th_adapt         adapted threshold                     Volts      float
 ================ ===================================== ========== ========
 
-Some of these fixed parameters were optimized.  Optimized coefficients for these
-parameters are stored by name in the instance.coeffs dictionary. For more details, 
-on which parameters where optimized, please see the technical white paper.
+Some of these fixed parameters were optimized to fit Allen Cell Types Database 
+electrophysiology data.  Optimized coefficients for these
+parameters are stored by name in the instance.coeffs dictionary. For more details
+on which parameters where optimized, please see the technical white paper (TODO link).
+
+**Note about dt**: the `dt` value provided in the downloadable GLIF neuron configuration
+files does not correspond to the sampling rate of the original stimulus.  Stimuli were
+subsampled and filtered for parameter optimization.  Be sure to overwrite the neuron's
+`dt` with the correct sampling rate::
+
+    from allensdk.model.glif.neuron import GlifNeuron
+    import allensdk.core.json_utilities as json_utilities
+    from allensdk.core.nwb_data_set import NwbDataSet
+
+    nwb_file_name = ...
+    neuron_config_file_name = ...
+    sweep_number = ...
+
+    # load an NWB file
+    ds = NwbDataSet(nwb_file_name)
+    sweep_data = ds.get_sweep(sweep_number)
+
+    # initialize the neuron
+    neuron_config = read_json(neuron_config_file_name)
+    neuron = GlifNeuron.from_dict(neuron_config)
+
+    # overwrite dt and simulate the neuron
+    neuron.dt = 1.0 / sweep_data['sampling_rate']
+    neuron.run(sweep_data['stimulus'])
+
+**Note about spike_cut_length**: the GLIF simulator can optionally skip ahead for 
+a fixed amount of time when a spike is detected.  If you set `spike_cut_length` to
+a positive value, `spike_cut_length` time steps will not be simulated after a spike
+and instead be replaced with NaN values in the simulated outputs.
 
 The GlifNeuron class has six methods that can be customized: three rules 
 for updating voltage, spike threshold, and afterspike currents during the 
-simulation; and three rules for updating those values when a spike is detect 
+simulation; and three rules for updating those values when a spike is detected
 (voltage surpasses spike threshold).
 
-========================= ================================== ===========
-Method                    Name                               Description
-========================= ================================== ===========
-AScurrent_dynamics_method Afterspike Current Dynamics Method 
-voltage_dynamics_method   Voltage Dynamics Method
-threshold_dynamics_method Threshold Dynamics Method
-AScurrent_reset_method    Afterspike Current Reset Method
-voltage_reset_method      Voltage Reset Method
-threshold_reset_method    Threshold Reset Method
-========================= ================================== ===========
+========================= ==============================================================
+Method Type               Description
+========================= ==============================================================
+voltage_dynamics_method   Update simulation voltage for the next time step.
+threshold_dynamics_method Update simulation spike threshold for the next time step.
+AScurrent_dynamics_method Update afterspike current coefficients for the next time step.
+voltage_reset_method      Reset simulation voltage after a spike occurs.
+threshold_reset_method    Reset simulation spike threshold after a spike occurs.
+AScurrent_reset_method    Reset afterspike current coefficients after a spike occurs.
+========================= ==============================================================
+
+The GLIF neuron configuration files available from the Allen Brain Atlas API use built-in
+methods, however you can supply your own custom method if you like::
+
+    # define your own custom voltage reset rule 
+    # this one just returns the previous voltage value
+    def custom_voltage_reset_rule(neuron, voltage_t0, custom_param_a, custom_param_b):
+        return voltage_t0  
+
+    # initialize a neuron from a neuron config file
+    neuron_config = json_utilities.read('neuron_config.json')
+    neuron = GlifNeuron.from_dict(neuron_config)
+
+    # configure a new method and overwrite the neuron's old method
+    method = neuron.configure_method('custom', custom_voltage_reset_rule, 
+                                     { 'custom_param_a':1, 'custom_param_b': 2 })
+    neuron.voltage_reset_method = method
+
+Notice that the function is allowed to take custom parameters (here 'a' and 'b'), which are
+configured on method initialization from a dictionary. For more details, see the documentation 
+for the :py:class:`GlifNeuron <allensdk.model.glif.glif_neuron.GlifNeuron>` and 
+:py:class:`GlifNeuronMethod <allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod>` classes.
+
 
 Built-in Dynamics Rules
 -----------------------
@@ -143,10 +210,10 @@ afterspike current vector, and current injection value to be passed in by the Gl
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an 
 updated voltage value.
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear
+.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_voltage_forward_euler
     :noindex:
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_voltage_piecewise_linear
+.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_voltage_euler_exact
     :noindex:
 
 Threshold Dynamics Rules
@@ -157,13 +224,10 @@ threshold and voltage values of the simulation to be passed in by the GlifNeuron
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an 
 updated threshold value.
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_threshold_adapt_standard
+.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components
     :noindex:
 
 .. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf
-    :noindex:
-
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_threshold_fixed
     :noindex:
 
 Afterspike Current Dynamics Rules
@@ -198,11 +262,9 @@ fixed using the GlifNeuronMethod class.  They all return an updated voltage valu
 .. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_voltage_zero
     :noindex:
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before
+.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_voltage_bio_rules
     :noindex:
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_voltage_fixed
-    :noindex:
 
 Threshold Reset Rules
 +++++++++++++++++++++
@@ -211,13 +273,10 @@ These methods update the spike threshold of the simulation after a spike has bee
 They all expect the current threshold and the reset voltage value of the simulation to be passed in by the GlifNeuron. All other function parameters must be fixed using the GlifNeuronMethod 
 class.  They all return an updated threshold value.
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_threshold_max_v_th
-    :noindex:
-
 .. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_threshold_inf
     :noindex:
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_threshold_fixed
+.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components
     :noindex:
 
 Afterspike Reset Reset Rules

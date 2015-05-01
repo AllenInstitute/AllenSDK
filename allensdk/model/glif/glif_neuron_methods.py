@@ -259,6 +259,7 @@ def reset_AScurrent_sum(neuron, AScurrents_t0, r):
 
 def reset_AScurrent_none(neuron, AScurrents_t0):
     """ Reset afterspike currents to zero. 
+
     Parameters
     ----------
     AScurrents_t0: np.ndarray
