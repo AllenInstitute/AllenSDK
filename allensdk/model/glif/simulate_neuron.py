@@ -14,12 +14,12 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging, time
-import sys, argparse, json, os
+import argparse, os
 import numpy as np
 
 import allensdk.core.json_utilities as json_utilities
 from allensdk.core.nwb_data_set import NwbDataSet 
-from allensdk.api.queries.glif import GlifApi
+from allensdk.api.queries.glif_api import GlifApi
 from allensdk.model.glif.glif_neuron import GlifNeuron
 
 DEFAULT_SPIKE_CUT_VALUE = 0.05 # 50mV

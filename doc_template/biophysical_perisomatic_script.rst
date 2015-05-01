@@ -22,7 +22,8 @@ Retrieving Data from the Allen Institute
 This may be done programmatically
 ::
 
-    from allensdk.api.queries.biophysical_perisomatic import *
+    from allensdk.api.queries.biophysical_perisomatic import \
+        BiophysicalPerisomatic
     
     bp = BiophysicalPerisomatic('http://api.brain-map.org')
     bp.cache_stimulus = False # change to True to download the stimulus file
@@ -187,3 +188,47 @@ You can remove all of the sweep numbers that you do not want run.
 Exporting Output to Text Format
 -------------------------------
 
+This is an example of using the AllenSDK
+to save a response voltage to another format.
+
+    ::
+    
+        from allensdk.core.dat_utilities import \
+            DatUtilities
+        from allensdk.core.nwb_data_set import \
+            NwbDataSet
+        
+        nwb_file = '318808419.nwb'
+        sweep_number = 67
+        dat_file = '318808419_67.dat'
+        
+        nwb = NwbDataSet(nwb_file)
+        sweep = nwb.get_sweep(sweep_number)
+        
+        v = sweep['response']
+        dt = 1.0e3 / sweep['sampling_rate']
+        num_samples = len(v)
+        tstop = (num_samples -1) * dt
+        t = numpy.linspace(0.0, tstop, num_samples)
+        DatUtilities.save_voltage(dat_file, v, t)
+
+
+To view the dat format in gnuplot, for example:
+
+        view_dat.gnuplot
+        ::
+        
+        set term png
+        set output "v_result.png"
+        
+        set title "Vout"
+        plot "318808419_67.dat"
+        
+        quit
+
+Render using gnuplot and gthumb:
+        ::
+        
+        gplot < view_dat.gnuplot
+        gthumb v_result.png
+        

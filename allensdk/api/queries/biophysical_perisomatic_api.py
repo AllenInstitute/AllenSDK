@@ -17,9 +17,9 @@ from allensdk.api.api import Api
 import os, json
 from collections import OrderedDict
 
-class BiophysicalPerisomatic(Api):
+class BiophysicalPerisomaticApi(Api):
     def __init__(self, base_uri=None):
-        super(BiophysicalPerisomatic, self).__init__(base_uri)
+        super(BiophysicalPerisomaticApi, self).__init__(base_uri)
         self.cache_stimulus = False
         self.ids = {}
         self.sweeps = []
