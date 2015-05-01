@@ -93,7 +93,9 @@ try the following::
 
     # provide your own stimulus as an array of voltages (in volts)
     stimulus = ... 
-
+    
+    # important! provide the dt of your stimulus
+    neuron.dt = 5e-6
     output = neuron.run(stimulus)
 
     voltage = output['voltage']
@@ -122,12 +124,37 @@ th_adapt         adapted threshold                     Volts      float
 Some of these fixed parameters were optimized to fit Allen Cell Types Database 
 electrophysiology data.  Optimized coefficients for these
 parameters are stored by name in the instance.coeffs dictionary. For more details
-on which parameters where optimized, please see the technical white paper.
+on which parameters where optimized, please see the technical white paper (TODO link).
+
+**Note about dt**: the `dt` value provided in the downloadable GLIF neuron configuration
+files does not correspond to the sampling rate of the original stimulus.  Stimuli were
+subsampled and filtered for parameter optimization.  Be sure to overwrite the neuron's
+`dt` with the correct sampling rate::
+
+    from allensdk.model.glif.neuron import GlifNeuron
+    import allensdk.core.json_utilities as json_utilities
+    from allensdk.core.nwb_data_set import NwbDataSet
+
+    nwb_file_name = ...
+    neuron_config_file_name = ...
+    sweep_number = ...
+
+    # load an NWB file
+    ds = NwbDataSet(nwb_file_name)
+    sweep_data = ds.get_sweep(sweep_number)
+
+    # initialize the neuron
+    neuron_config = read_json(neuron_config_file_name)
+    neuron = GlifNeuron.from_dict(neuron_config)
+
+    # overwrite dt and simulate the neuron
+    neuron.dt = 1.0 / sweep_data['sampling_rate']
+    neuron.run(sweep_data['stimulus'])
 
 **Note about spike_cut_length**: the GLIF simulator can optionally skip ahead for 
 a fixed amount of time when a spike is detected.  If you set `spike_cut_length` to
-a positive value, `spike_cut_length` time steps will not be simulated and instead
-be replaced with NaN values in the simulated outputs.
+a positive value, `spike_cut_length` time steps will not be simulated after a spike
+and instead be replaced with NaN values in the simulated outputs.
 
 The GlifNeuron class has six methods that can be customized: three rules 
 for updating voltage, spike threshold, and afterspike currents during the 
@@ -148,7 +175,8 @@ AScurrent_reset_method    Reset afterspike current coefficients after a spike oc
 The GLIF neuron configuration files available from the Allen Brain Atlas API use built-in
 methods, however you can supply your own custom method if you like::
 
-    # define your own custom voltage reset rule (that just returns the previous voltage value)
+    # define your own custom voltage reset rule 
+    # this one just returns the previous voltage value
     def custom_voltage_reset_rule(neuron, voltage_t0, custom_param_a, custom_param_b):
         return voltage_t0  
 
@@ -157,7 +185,8 @@ methods, however you can supply your own custom method if you like::
     neuron = GlifNeuron.from_dict(neuron_config)
 
     # configure a new method and overwrite the neuron's old method
-    method = neuron.configure_method('custom', custom_voltage_reset_rule, { 'custom_param_a':1, 'custom_param_b': 2 })
+    method = neuron.configure_method('custom', custom_voltage_reset_rule, 
+                                     { 'custom_param_a':1, 'custom_param_b': 2 })
     neuron.voltage_reset_method = method
 
 Notice that the function is allowed to take custom parameters (here 'a' and 'b'), which are

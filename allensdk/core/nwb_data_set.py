@@ -20,8 +20,6 @@ class NwbDataSet(object):
     def __init__(self, file_name):
         self.file_name = file_name
     
-    # TODO: compensate for orca files still lying around.
-    
     def get_sweep(self, sweep_number):
         with h5py.File(self.file_name,'r') as f:
             

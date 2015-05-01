@@ -109,7 +109,7 @@ def simulate_neuron(neuron, sweeps, input_file_name, output_file_name, spike_cut
     for sweep in sweeps:
         sweep_type = sweep['stimulus_name']
 
-        if sweep_type == 'Unknown' or sweep_type == 'Test':
+        if sweep_type == 'Test':
             logging.debug("skipping sweep %d with type %s" % (sweep['sweep_number'], sweep_type))
             continue
 
