@@ -85,10 +85,10 @@ the downloaded NWB file.
 If you have a custom stimulus you would like to apply to a neuronal model, 
 try the following::
 
-    from allensdk.model.glif.neuron import GlifNeuron
+    from allensdk.model.glif.glif_neuron import GlifNeuron
     import allensdk.core.json_utilities as json_utilities
 
-    neuron_config = read_json('neuron_config.json')
+    neuron_config = json_utilities.read('neuron_config.json')
     neuron = GlifNeuron.from_dict(neuron_config)
 
     # provide your own stimulus as an array of voltages (in volts)
