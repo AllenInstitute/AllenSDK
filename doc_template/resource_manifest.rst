@@ -78,7 +78,7 @@ interpolated:
 Split Manifest Files
 --------------------
 
-manifest files can be split like any description file.
+Manifest files can be split like any description file.
 This allows the specification of a general directory structure in a
 shared file and specific files in a separate configuration
 (i.e. stimulus and working directory)

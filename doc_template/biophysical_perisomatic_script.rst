@@ -37,7 +37,7 @@ You can search for model ids and also download the data manually from the web si
     #. Use the Filters, Cell Location and Cell Feature Filters to narrow your results.
     #. Click on a Cell Summary to view the Mouse Experiment Electrophysiology.
     #. Click "show model response" and select "Biophysical - perisomatic".
-    #. Scroll down and click the Biophysical - perisomatic"download model" link.
+    #. Scroll down and click the Biophysical - perisomatic "download model" link.
 
 More help can be found in the
 `online help <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_

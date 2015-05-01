@@ -33,13 +33,13 @@ Allen Cell Types Database
 
 
 The Allen Cell Types Database contains electrophysiological and morphological characterizations
-of individual neurons in the mouse primary visual cortex.  The Allen SDK provides python code
+of individual neurons in the mouse primary visual cortex.  The Allen SDK provides Python code
 for accessing electrophysiology measurements (:doc:`NWB <nwb>` files) for all neurons and morphological 
 reconstructions (SWC files) for a subset of neurons.
 
 The Database also contains two classes of models fit to this data set: perisomatic biophysical 
 models produced using the NEURON simulator and generalized leaky integrate and fire models (GLIFs) 
-produced using custom python code provided with this toolkit. 
+produced using custom Python code provided with this toolkit. 
 
 The Allen SDK provides sample code 
 demonstrating how to download neuronal model parameters from the Allen Brain Atlas API and run 

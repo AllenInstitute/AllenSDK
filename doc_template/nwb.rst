@@ -16,11 +16,11 @@ labeling system designed so software tools can easily access contained data.
 Allen Cell Types Database NWB Files
 -----------------------------------
 
-The Allen SDK provides a basic python class for extracting data from 
+The Allen SDK provides a basic Python class for extracting data from 
 Allen Cell Types Database NWB files. These files store data from intracellular 
 patch-clamp recordings. A stimulus current is presented to the cell and the cell's 
 voltage response is recorded.  The file stores both stimulus and response for
-several experimental trials, here called "sweeps".  The following code snippet
+several experimental trials, here called "sweeps."  The following code snippet
 demonstrates how to extract a sweep's stimulus, response, sampling rate, 
 and estimated spike times::
 
@@ -52,7 +52,7 @@ HDF5 Overview
 
 NWB is implemented in HDF5_.  HDF5 files provide a hierarchical data storage that mirrors the organization of a file system.  Just as a file system has directories and files, and HDF5 file has groups and datasets.  The best way to understand an HDF5 (and NWB) file is to open a data file in an HDF5 browser. HDFView_ is the recommended browser from the makers of HDF5.  
 
-There are HDF5 manipulation libraries for many languages and platorms.  Matlab and python in particular have strong HDF5 support.  
+There are HDF5 manipulation libraries for many languages and platorms.  MATLAB and Python in particular have strong HDF5 support.  
 
 .. _HDF5: https://hdfgroup.org/HDF5
 .. _HDFView: https://hdfgroup.org/products/java/hdfview
