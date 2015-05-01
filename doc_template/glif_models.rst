@@ -7,7 +7,7 @@ Review the GLIF technical white paper for details on these models and
 how their parameters were optimized (TODO).
 
 The Allen SDK GLIF simulation module is an explicit time-stepping simulator 
-that evolves a neuron's simulated output voltage over the course of an input
+that evolves a neuron's simulated voltage over the course of an input
 current stimulus.  The modules also tracks the neuron's simulated spike
 threshold and registers action potentials whenever voltage surpasses threshold.
 Action potentials initiate reset rules that update voltage, threshold, and 
@@ -191,7 +191,7 @@ methods, however you can supply your own custom method if you like::
 
 Notice that the function is allowed to take custom parameters (here 'a' and 'b'), which are
 configured on method initialization from a dictionary. For more details, see the documentation 
-for the :py:class:`allensdk.model.glif.GlifNeuron` and :py:class:`allensdk.model.glif_neuron_methods.GlifNeuronMethod` classes.
+for the :py:class:`GlifNeuron` and :py:class:`GlifNeuronMethod` classes.
 
 Built-in Dynamics Rules
 -----------------------
