@@ -71,7 +71,7 @@ to the original cell as follows::
     import allensdk.core.json_utilities as json_utilities
 
     from allensdk.model.glif.neuron import GlifNeuron
-    from allensdk.model.glif.simulate_neuron import simulation_neuron
+    from allensdk.model.glif.simulate_neuron import simulate_neuron
 
     neuron_config = read_json('neuron_config.json')
     ephys_sweeps = json_utilities.read('ephys_sweeps.json')
