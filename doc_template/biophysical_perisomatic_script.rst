@@ -22,7 +22,8 @@ Retrieving Data from the Allen Institute
 This may be done programmatically
 ::
 
-    from allensdk.api.queries.biophysical_perisomatic import *
+    from allensdk.api.queries.biophysical_perisomatic import \
+        BiophysicalPerisomatic
     
     bp = BiophysicalPerisomatic('http://api.brain-map.org')
     bp.cache_stimulus = False # change to True to download the stimulus file
@@ -192,8 +193,10 @@ to save a response voltage to another format.
 
     ::
     
-        from allensdk.core.dat_utilities import *
-        from allensdk.core.nwb_data_set import *
+        from allensdk.core.dat_utilities import \
+            DatUtilities
+        from allensdk.core.nwb_data_set import \
+            NwbDataSet
         
         nwb_file = '318808419.nwb'
         sweep_number = 67

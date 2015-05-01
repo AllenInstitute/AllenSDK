@@ -14,7 +14,8 @@ Using an API Query
 First import a query module:
     ::
     
-        from allensdk.api.queries.biophysical_perisomatic import *
+        from allensdk.api.queries.biophysical_perisomatic import \
+            BiophysicalPerisomatic
 
 
 For more information on using specific query modules, see the 
@@ -81,7 +82,7 @@ The query class is then simple to use in a script.
 main.py:
     ::
     
-        from gene_acronym_query import *
+        from gene_acronym_query import GeneAcronymQuery
         
         query = GeneAcronymQuery()
         gene_info = query.get_data('ABAT')
