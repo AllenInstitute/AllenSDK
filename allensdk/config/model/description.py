@@ -38,7 +38,11 @@ class Description(object):
             What configuration section to read it into if the file does not specify.
         '''
         if section == None:
-            self.data.update(data)
+            for (section, entries) in data.items():
+                if not section in self.data:
+                    self.data[section] = entries
+                else:
+                    self.data[section].extend(entries)
         else:
             if not section in self.data:
                 self.data[section] = []

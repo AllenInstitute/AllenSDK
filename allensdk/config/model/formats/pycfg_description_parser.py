@@ -64,12 +64,12 @@ class PycfgDescriptionParser(DescriptionParser):
         
         header = kwargs.get('header', '')
                     
-        python_string = header + python_string
+        python_string = "%s\n\nallensdk_description = %s" % (header, python_string)
         
         ns = {}
         code = compile(python_string, 'string', 'exec')
-        exec_(code, ns)
-        data = ns['allen_toolkit_description']
+        exec(code, ns)
+        data = ns['allensdk_description']
         description.unpack(data, section)
         
         return description
@@ -88,7 +88,7 @@ class PycfgDescriptionParser(DescriptionParser):
                     pprint(description.data, f, indent=2)
 
         except Exception:
-            self.log.warn("Couldn't write allen_toolkit python description: %s" % filename)
+            self.log.warn("Couldn't write allensdk python description: %s" % filename)
             raise
         
         return
