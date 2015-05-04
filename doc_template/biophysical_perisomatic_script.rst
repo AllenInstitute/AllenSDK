@@ -215,9 +215,9 @@ to save a response voltage to another format.
 
 To view the dat format in gnuplot, for example:
 
-        view_dat.gnuplot
-        ::
-        
+view_dat.gnuplot:
+    ::
+    
         set term png
         set output "v_result.png"
         
@@ -227,8 +227,7 @@ To view the dat format in gnuplot, for example:
         quit
 
 Render using gnuplot and gthumb:
-        ::
-        
+    ::
+    
         gplot < view_dat.gnuplot
         gthumb v_result.png
-        
