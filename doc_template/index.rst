@@ -7,7 +7,7 @@ Welcome to the Allen SDK
 ========================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :hidden:
 
    install
@@ -18,7 +18,7 @@ Welcome to the Allen SDK
    template_application
    resource_manifest
    data_api_client
-   nwb
+   file_formats
    allensdk
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  

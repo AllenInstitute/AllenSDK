@@ -1,5 +1,8 @@
+File Formats
+============
+
 Neurodata Without Borders
-=========================
+-------------------------
 
 The electrophysiology data collected in the Allen Cell Types Database 
 is stored in the `Neurodata Without Borders`_ (NWB) file format.
