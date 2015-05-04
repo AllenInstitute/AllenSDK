@@ -22,10 +22,10 @@ Retrieving Data from the Allen Institute
 This may be done programmatically
 ::
 
-    from allensdk.api.queries.biophysical_perisomatic import \
-        BiophysicalPerisomatic
+    from allensdk.api.queries.biophysical_perisomatic_api import \
+        BiophysicalPerisomaticApi
     
-    bp = BiophysicalPerisomatic('http://api.brain-map.org')
+    bp = BiophysicalPerisomaticApi('http://api.brain-map.org')
     bp.cache_stimulus = False # change to True to download the stimulus file
     neuronal_model_id = 472451419    # get this from the web site as below
     bp.cache_data(neuronal_model_id, working_directory='neuronal_model')
