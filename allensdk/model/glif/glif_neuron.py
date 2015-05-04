@@ -16,8 +16,10 @@
 import logging
 
 import numpy as np
-import json, utilities
+import json
 import copy
+
+import allensdk.core.json_utilities as json_utilities
 
 from glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
 
@@ -139,7 +141,7 @@ class GlifNeuron( object ):
 
     def __str__(self):
         """ Convert an instance of the neuron to a string """
-        return json.dumps(self.to_dict(), default=utilities.json_handler, indent=2)
+        return json.dumps(self.to_dict(), default=json_utilities.handler, indent=2)
 
     @property
     def tau_m(self):

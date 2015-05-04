@@ -17,10 +17,45 @@ import h5py
 import numpy as np
 
 class NwbDataSet(object):
+    """ A very simple interface for exracting electrophysiology data
+    from an NWB file.
+    """
+
     def __init__(self, file_name):
+        """ Initialize the NwbDataSet instance with a file name
+
+        Parameters
+        ----------
+        file_name: string
+           NWB file name
+        """
         self.file_name = file_name
     
     def get_sweep(self, sweep_number):
+        """ Retrieve the stimulus, response, index_range, and sampling rate
+        for a particular sweep.  This method hides the NWB file's distinction 
+        between a "Sweep" and an "Experiment".  An experiment is a subset of
+        of a sweep that excludes the initial test pulse.  It also excludes 
+        any erroneous response data at the end of the sweep (usually for
+        ramp sweeps, where recording was terminated mid-stimulus).  
+
+        Some sweeps do not have an experiment, so full data arrays are 
+        returned.  Sweeps that have an experiment return full data arrays
+        (include the test pulse) with any erroneous data trimmed from the 
+        back of the sweep.  
+
+        Parameters
+        ----------
+        sweep_number: int
+
+        Returns
+        -------
+        dict
+            A dictionary with 'stimulus', 'response', 'index_range', and
+            'sampling_rate' elements.  The index range is a 2-tuple where
+            the first element indicates the end of the test pulse and the
+            second index is the end of valid response data.
+        """
         with h5py.File(self.file_name,'r') as f:
             
             swp = f['epochs']['Sweep_%d' % sweep_number]
@@ -57,10 +92,28 @@ class NwbDataSet(object):
     
     
     def set_sweep(self, sweep_number, stimulus, response):
+        """ Overwrite the stimulus or response of an NWB file.  
+        If the supplied arrays are shorter than stored arrays,
+        they are padded with zeros to match the original data 
+        size.
+
+        Parameters
+        ----------
+        sweep_number: int
+
+        stimulus: np.array
+           Overwrite the stimulus with this array.  If None, stimulus is unchanged.
+
+        response: np.array
+            Overwrite the response with this array.  If None, response is unchanged.
+        """
+
         with h5py.File(self.file_name,'r+') as f:
             swp = f['epochs']['Sweep_%d' % sweep_number]
             
-            # this is the length of the entire sweep data, including test pulse and whatever might be in front of it
+            # this is the length of the entire sweep data, including test pulse and 
+            # whatever might be in front of it
+            # TODO: remove deprecated 'idx_stop'
             if 'idx_stop' in swp['stimulus']:
                 sweep_length = swp['stimulus']['idx_stop'].value + 1
             else:
@@ -85,6 +138,17 @@ class NwbDataSet(object):
     
 
     def get_spike_times(self, sweep_number):
+        """ Return any spike times stored in the NWB file for a sweep.
+
+        Parameters
+        ----------
+        sweep_number: int
+
+        Returns
+        -------
+        list
+           list of spike times in seconds relative to the start of the sweep
+        """
         with h5py.File(self.file_name,'r') as f:
             sweep_name = "Sweep_%d" % sweep_number
             
@@ -97,6 +161,15 @@ class NwbDataSet(object):
     
     
     def set_spike_times(self, sweep_number, spike_times):
+        """ Set or overwrite the spikes times for a sweep.
+        
+        Parameters
+        ----------
+        sweep_number: int
+        
+        spike_times: np.array
+           array of spike times in seconds
+        """
         with h5py.File(self.file_name,'r+') as f:
             # make sure expected directory structure is in place
             if "analysis" not in f.keys():

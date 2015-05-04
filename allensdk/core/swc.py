@@ -23,7 +23,61 @@ DEFAULT_COLUMNS = [ 'id', 'type', 'x', 'y', 'z', 'radius', 'parent' ]
 # Default columns to convert to numeric types automatically 
 DEFAULT_NUMERIC_COLUMNS = [ 'type', 'x', 'y', 'z', 'radius' ]
 
+def read_swc(file_name, columns=None, numeric_columns=None):
+    """  Read in an SWC file and return a Morphology object.
+    SWC are basically CSV files, but they often don't have headers. 
+    You can pass those in explicitly and also indicate which
+    columns are numeric.
+
+    Parameters
+    ----------
+    file_name: string
+        SWC file name.
+
+    columns: list of strings
+        names of the columns in this file (default: DEFAULT_COLUMNS)
+
+    numeric_columns: list of strings
+        names of the numeric columns in this file (default: DEFAULT_NUMERIC_COLUMNS)
+
+    Returns
+    -------
+    Morphology
+        A Morphology instance.
+    """
+
+    if columns is None:
+        columns = DEFAULT_COLUMNS
+        
+    if numeric_columns is None:
+        numeric_columns = DEFAULT_NUMERIC_COLUMNS 
+
+    with open(file_name, "rb") as f:
+        # skip comment rows, strip off extra whitespace
+        return read_rows(f, columns, numeric_columns)
+
+
 def read_rows(rows, columns, numeric_columns):
+    """ Parse a list of string SWC rows.  Lines that start with '#'
+    are ignored.  Numeric types are properly converted.
+
+    Parameters
+    ----------
+    rows: list of strings
+        usually the rows of an SWC file
+
+    columns: list of strings
+        names of the columns in this file
+
+    numeric_columns: list of strings
+        names of the numeric columns in this file
+
+    Returns
+    -------
+    Morphology
+        A Morphology instance.
+    """
+
     rows = [ r.strip() for r in rows if len(r) > 0 and r.strip()[0] != '#' ]
     
     reader = csv.DictReader(rows, fieldnames=columns, delimiter=' ', skipinitialspace=True, restkey='other')
@@ -41,6 +95,26 @@ def read_rows(rows, columns, numeric_columns):
     
 
 def read_string(s, columns=None, numeric_columns=None):
+    """ Parse a list of string SWC rows.  Lines that start with '#'
+    are ignored.  Numeric types are properly converted.
+
+    Parameters
+    ----------
+    s: string
+        the contents of an SWC file as a string
+
+    columns: list of strings
+        names of the columns in this file (default: DEFAULT_COLUMNS)
+
+    numeric_columns: list of strings
+        names of the numeric columns in this file (default: DEFAULT_NUMERIC_COLUMNS)
+
+    Returns
+    -------
+    Morphology
+        A Morphology instance.
+    
+    """
     if columns is None:
         columns = DEFAULT_COLUMNS
         
@@ -51,43 +125,28 @@ def read_string(s, columns=None, numeric_columns=None):
 
     return read_rows(rows, columns, numeric_columns)
 
-    
-def read_swc(file_name, columns=None, numeric_columns=None):
-    """  Read in an SWC file and return a Morphology object.
-
-    file_name: file to be read
-    columns: columns to read from the SWC file (default: DEFAULT_COLUMNS)
-    """
-
-    if columns is None:
-        columns = DEFAULT_COLUMNS
-        
-    if numeric_columns is None:
-        numeric_columns = DEFAULT_NUMERIC_COLUMNS 
-
-    with open(file_name, "rb") as f:
-        # skip comment rows, strip off extra whitespace
-        return read_rows(f, columns, numeric_columns)
-        
-
-
 
 class Morphology( object ):
-    SOMA = 1
-    
     """ Keep track of the list of compartments in a morphology and provide 
     a few helper methods (index by id, sparsify, root, etc).  During initialization
     the compartments are assigned a 'children' property that is a list of
     pointers to child compartments.
     """
 
+    SOMA = 1
+
     def __init__(self, compartment_list=None, compartment_index=None):
         """ Try to initialize from a list of compartments first, then from
         a dictionary indexed by compartment id if that fails, and finally just
         leave everything empty.
 
-        compartment_list: list of compartments
-        compartment_index: dictionary of compartments indexed by id
+        Parameters
+        ----------
+        compartment_list: list 
+            list of compartment dictionaries
+            
+        compartment_index: dict
+            dictionary of compartments indexed by id
         """
 
         self._compartment_list = []
@@ -99,11 +158,13 @@ class Morphology( object ):
         elif compartment_index:
             self.compartment_index = compartment_index
 
+
     @property 
     def compartment_list(self):
         """ Return the compartment list.  This is a property to ensure that the 
         compartment list and compartment index are in sync. """
         return self._compartment_list
+
 
 
     @compartment_list.setter
@@ -112,6 +173,7 @@ class Morphology( object ):
         self._compartment_list = compartment_list
         self._compartment_index = { c['id']: c for c in compartment_list }
         self.update_children()
+
 
     @property
     def compartment_index(self):
@@ -127,6 +189,7 @@ class Morphology( object ):
         self._compartment_list = compartment_index.values()
         self.update_children()
 
+
     @property
     def root(self):
         """ Search through the compartment index for the root compartment """
@@ -135,14 +198,30 @@ class Morphology( object ):
                 return c
         return None
 
+
     def compartment_index_by_type(self, compartment_type):
+        """ Return an dictionary of compartments indexed by id that all have
+        a particular compartment type.
+
+        Parameters
+        ----------
+        compartment_type: int
+            Desired compartment type
+        """
+
         return { c['id']: c for c in self._compartment_list if c['type'] == compartment_type }
+
 
     def write(self, file_name, columns=None):
         """ Write this morphology out to an SWC file 
-        
-        file_name: desired name of your SWC file
-        columns: columns to write to your SWC file (default: DEFAULT_COLUMNS)
+      
+        Parameters
+        ----------
+        file_name: string
+            desired name of your SWC file
+
+        columns: list
+            columns to write to your SWC file (default: DEFAULT_COLUMNS)
         """
         if columns is None:
             columns = DEFAULT_COLUMNS
@@ -163,9 +242,10 @@ class Morphology( object ):
                 
             for child in c['children']:
                 assert child in compartments, "bad child id: %s" % (child)
+
         
     def update_children(self):
-        """ Re-fill each compartment's array of children """
+        """ Fill each compartment's array of children """
         compartments = self._compartment_index
 
         for i,compartment in compartments.iteritems():
@@ -184,9 +264,20 @@ class Morphology( object ):
 
     def sparsify(self, modulo, compress_ids=False):
         """ Return a new Morphology object that has a given number of non-leaf,
-        non-root segments removed.  IDs are reassigned so as to be continuous.
+        non-root segments removed.  IDs can be reassigned so as to be continuous.
 
-        modulo: keep 1 out of every modulo segments.
+        Parameters
+        ----------
+        modulo: int
+           keep 1 out of every modulo segments.
+
+        compress_ids: boolean
+           Reassign ids so that ids are continuous (no missing id numbers).
+
+        Returns
+        -------   
+        Morphology
+            A new morphology instance
         """
         
         compartments = copy.deepcopy(self.compartment_index)
@@ -239,6 +330,7 @@ class Morphology( object ):
             return Morphology(compartment_index=out_compartments)
         else:
             return Morphology(compartment_index=sparsified_compartments)
+
 
 def str_to_num(s):
     """ Try to convert a string s into a number """
