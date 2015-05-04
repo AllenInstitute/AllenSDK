@@ -67,17 +67,14 @@ Running a GLIF Simulation
 You can use the files downloaded above to simulate all of the sweeps presented 
 to the original cell as follows::
 
-    
     import allensdk.core.json_utilities as json_utilities
 
-    from allensdk.model.glif.neuron import GlifNeuron
+    from allensdk.model.glif.glif_neuron import GlifNeuron
     from allensdk.model.glif.simulate_neuron import simulate_neuron
 
-    neuron_config = read_json('neuron_config.json')
+    neuron_config = json_utilities.read('neuron_config.json')
     ephys_sweeps = json_utilities.read('ephys_sweeps.json')
     neuron = GlifNeuron.from_dict(neuron_config)
-
-    simulate_neuron(neuron, ephys_sweeps, 'experiment.nwb', 'experiment.nwb', 0.05)
 
 Note: in this case, simulated sweep voltages will overwrite the responses in 
 the downloaded NWB file.  
