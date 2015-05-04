@@ -110,12 +110,16 @@ class ApplicationConfig(object):
                                          e))
             raise
         
-        try:
-            lc.fileConfig(self.log_config_path,
-                          disable_existing_loggers=disable_existing_loggers)
-        except:
-            logging.error("Could not load log configuration file: %s" %
-                         (parsed_args.log_config_path))
+        if parsed_args.log_config_path:
+            try:
+                lc.fileConfig(self.log_config_path,
+                              disable_existing_loggers=disable_existing_loggers)
+            except:
+                logging.error("Could not load log configuration file: %s" %
+                             (parsed_args.log_config_path))
+        else:
+            # TODO: configure default logging
+            pass
     
     
     def create_argparser(self):

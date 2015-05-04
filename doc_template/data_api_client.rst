@@ -71,7 +71,6 @@ gene_acronym_query.py:
                     raise Exception("no message!")
             
             def get_data(self, acronym):
-                rma_builder_fn = self.build_rma
                 return self.do_rma_query(self.build_rma,
                                          self.read_json,
                                          acronym)
