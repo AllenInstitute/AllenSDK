@@ -14,11 +14,11 @@ Welcome to the Allen SDK
    neuron
    biophysical_perisomatic_script
    glif_models
+   file_formats
+   data_api_client
    model_description
    template_application
    resource_manifest
-   data_api_client
-   file_formats
    allensdk
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
