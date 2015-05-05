@@ -11,7 +11,6 @@ Welcome to the Allen SDK
    :hidden:
 
    install
-   neuron
    biophysical_perisomatic_script
    glif_models
    file_formats

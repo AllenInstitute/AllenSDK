@@ -19,6 +19,13 @@ import logging
 
 
 class Api(object):
+    '''
+    
+    Notes
+    -----
+    `Additional documentation <data_api_client.html#the-api-class>`_ is available.
+    '''
+    
     _log = logging.getLogger(__name__)
     default_api_url = 'http://api.brain-map.org'
     default_api_url = 'http://iwarehouse' # TODO: REMOVE THIS
@@ -75,6 +82,10 @@ class Api(object):
         -------
         any type
             The data extracted from the json response.
+        
+        Examples
+        --------
+        `A simple Api subclass example <http:data_api_client.html#the-api-class>`_.
         '''
         rma_url = rma_builder_fn(*args, **kwargs) 
                            
@@ -109,6 +120,10 @@ class Api(object):
         -------
         string
             the well-known-file download url for the current api api server
+        
+        See Also
+        --------
+        retrieve_file_over_http: Can be used to retrieve the file from the url.
         '''
         return self.well_known_file_endpoint + str(well_known_file_id)
     
@@ -119,9 +134,17 @@ class Api(object):
         Parameters
         ----------
         url : string
-            Url from which to get the file.
+            Url[1]_ from which to get the file.
         file_path : string
             Absolute path including the file name to save.
+        
+        See Also
+        --------
+        construct_well_known_file_download_url: Can be used to construct the url.
+        
+        References
+        ----------
+        .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
         '''
         try:
             with open(file_path, 'wb') as f:

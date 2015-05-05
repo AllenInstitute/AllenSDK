@@ -84,10 +84,12 @@ Simulation Main Loop
 The top level script is in the
 :py:meth:`~allensdk.model.biophysical_perisomatic.runner.run`
 method of the :py:mod:`allensdk.model.biophysical_perisomatic.runner`
-module.
+module.  The implementation of the method is shown here step-by-step:
 
-The first step is to configure NEURON based on the configuration file.
-The configuration file was read in from the command line at the very bottom of the script.
+First configure NEURON based on the configuration file, which was 
+read in from the command line at the very bottom of the script.
+
+:py:meth:`~allensdk.model.biophysical_perisomatic.runner.run`:
 ::
 
     # configure NEURON
@@ -131,15 +133,23 @@ Loop through the stimulus sweeps and write the output.
         output.set_sweep(sweep, None, output_data)
 
 
-Customized Utilities
---------------------
+Customization
+-------------
 
-Much of the code in the single cell example is not core Allen SDK code.
+Much of the code in the perisomatic simulation is not core Allen SDK code.
 The runner.py script largely reads the configuration file and calls into
 methods in the :py:class:`~allensdk.model.biophysical_perisomatic.utils.Utils` class.
 Utils is a subclass of the :py:class:`~allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils`
 class, which provides access to objects in the NEURON package.
+The various methods called by the runner.script are implemented here, including:
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology`,
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters`,
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp`,
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus`
+and
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.record_values`.
 
+:py:class:`~allensdk.model.biophysical_perisomatic.utils.Utils`:
 ::
 
     from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
@@ -153,29 +163,30 @@ class, which provides access to objects in the NEURON package.
             super(Utils, self).__init__(description)
     ....
 
+To create a biophysical model using your own software or data,
+simply model your directory structure on one of the downloaded simulations
+or one of the examples below.
+Add your own runner.py and utils.py module to the simulation directory.
 
-The various methods called by the runner.script are implemented here, including:
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology`,
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters`,
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp`,
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus`
-and
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.record_values`.
-Other applications are free to implement their own subclasses of HocUtils as needed.
+Compile the .mod files using NEURON's nrnivmodl command:
+::
+
+    nrnivmodl modfiles
+
+Then call your runner script directly, passing in the manifest file to your script:
+::
+
+    python runner.py manifest.json
+
+The output from your simulation and any intermediate files will go in the work directory.
 
 
-Simple Example
---------------
+Examples
+--------
 
 A :download:`minimal example (simple_example.tgz)<./examples/simple_example.tgz>`
-is available to use as a starting point for your own projects.
-
-
-Multicell Example
------------------
-
-A :download:`multicell example (multicell_example.tgz)<./examples/multicell_example.tgz>`
-is available to use as a starting point for your own projects.
+and a :download:`multicell example (multicell_example.tgz)<./examples/multicell_example.tgz>`
+are available to download as a starting point for your own projects.
 
 
 Selecting a Specific Sweep
@@ -191,43 +202,51 @@ Exporting Output to Text Format
 This is an example of using the AllenSDK
 to save a response voltage to another format.
 
-    ::
+::
+
+    from allensdk.core.dat_utilities import \
+        DatUtilities
+    from allensdk.core.nwb_data_set import \
+        NwbDataSet
     
-        from allensdk.core.dat_utilities import \
-            DatUtilities
-        from allensdk.core.nwb_data_set import \
-            NwbDataSet
-        
-        nwb_file = '318808419.nwb'
-        sweep_number = 67
-        dat_file = '318808419_67.dat'
-        
-        nwb = NwbDataSet(nwb_file)
-        sweep = nwb.get_sweep(sweep_number)
-        
-        v = sweep['response']
-        dt = 1.0e3 / sweep['sampling_rate']
-        num_samples = len(v)
-        tstop = (num_samples -1) * dt
-        t = numpy.linspace(0.0, tstop, num_samples)
-        DatUtilities.save_voltage(dat_file, v, t)
+    nwb_file = '318808419.nwb'
+    sweep_number = 67
+    dat_file = '318808419_67.dat'
+    
+    nwb = NwbDataSet(nwb_file)
+    sweep = nwb.get_sweep(sweep_number)
+    
+    v = sweep['response']
+    dt = 1.0e3 / sweep['sampling_rate']
+    num_samples = len(v)
+    tstop = (num_samples -1) * dt
+    t = numpy.linspace(0.0, tstop, num_samples)
+    DatUtilities.save_voltage(dat_file, v, t)
 
 
 To view the dat format in gnuplot, for example:
 
 view_dat.gnuplot:
-    ::
+::
+
+    set term png
+    set output "v_result.png"
     
-        set term png
-        set output "v_result.png"
-        
-        set title "Vout"
-        plot "318808419_67.dat"
-        
-        quit
+    set title "Vout"
+    plot "318808419_67.dat"
+    
+    quit
 
 Render using gnuplot and gthumb:
-    ::
-    
-        gplot < view_dat.gnuplot
-        gthumb v_result.png
+::
+
+    gplot < view_dat.gnuplot
+    gthumb v_result.png
+
+
+Further Reading
+---------------
+
+ * `NEURON <http://www.neuron.yale.edu/neuron>`_
+ * `Python <https://www.python.org/>`_
+ * `JSON <http://www.w3schools.com/json/>`_
