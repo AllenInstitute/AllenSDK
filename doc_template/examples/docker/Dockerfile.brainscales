@@ -1,7 +1,7 @@
 # DOCKER-VERSION 0.3.4
 #
 # docker build --tag alleninstitute/allensdk .
-# docker run -it -v /docker_share:/docker_share alleninstitute/allensdk /bin/bash
+# docker run -it -v /docker_share:/docker_share alleninstitute/allensdk:fridayharbor /bin/bash
 #
 FROM brainscales/neural-networks:software
 
@@ -15,4 +15,4 @@ RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --wi
 RUN cd /opt/neuron/nrn/src/nrnpython; pip uninstall neuron; python setup.py install
 
 RUN pip install six --upgrade
-RUN pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-0.2.0.dev68.tar.gz
+RUN pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS-99/artifact/shared/tgz/allensdk-0.2.0.dev99.tar.gz

@@ -15,42 +15,17 @@ Uninstalling the SDK is simple with pip::
 
     pip uninstall allensdk
 
-
-Docker Installation
--------------------
-
- #. Ensure you have `Docker <http://www.docker.com/>`_ installed.
-
- #. Download one of the example Docker files:
-     * :download:`Ubuntu Standalone <./examples/docker/Dockerfile.ubuntu>`.
-     * :download:`BrainScales combined Neural-Networks <./examples/docker/Dockerfile.brainscales>`.
-
- #. Use Docker to build the image:
-     ::
-     
-         mkdir work
-         cp Dockerfile.ubuntu work
-         cd work
-         docker build --tag alleninstitute/allensdk -f Dockerfile.ubuntu .
-         
- #. Run the docker image:
-     ::
-     
-         docker run -it -v /data:/data alleninstitute/allensdk /bin/bash
-
-
 Other Distribution Formats
 --------------------------
 
  .. include:: links.rst
 
- 		 
+
 Required Dependencies
 ---------------------
 
  * `NumPy <http://wiki.scipy.org/Tentative_NumPy_Tutorial>`_
  * `SciPy <http://www.scipy.org/>`_
- * `MatPlotLib <http://matplotlib.org/>`_
 
 
 Optional Dependencies
@@ -58,5 +33,30 @@ Optional Dependencies
 
  * `nose <https://nose.readthedocs.org/en/latest>`_ is nicer testing for python
  * `coverage <http://nedbatchelder.com/code/coverage>`_
+ * `matplotlib <http://matplotlib.org/>`_
+
+
+Installation with Docker (Optional)
+-----------------------------------
+
+`Docker <http://www.docker.com/>`_ is an open-source technology
+for building and deploying applications with a consistent environment
+including required dependencies.
+The AllenSDK is not distributed as a Docker image, but
+example Dockerfiles are available.
+
+ #. Ensure you have Docker installed.
+
+ #. Download one of the example Docker files:
+     * :download:`Ubuntu Standalone <./examples/docker/Dockerfile.ubuntu>`.
+     * :download:`BrainScales combined Neural-Networks <./examples/docker/Dockerfile.brainscales>`.
+
+ #. Use Docker to build the image::
  
-	
+     cd examples/docker
+     docker build --tag alleninstitute/allensdk -f Dockerfile.ubuntu .
+     
+ #. Run the docker image::
+ 
+     docker run -it -v /data:/data alleninstitute/allensdk /bin/bash
+

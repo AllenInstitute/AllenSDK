@@ -4,16 +4,17 @@ Perisomatic Biophysical Models
 Prerequisites
 -------------
 
-You must have pyNEURON and Allen SDK installed.
+You must have NEURON with the Python interpreter enabled and Allen SDK installed.
 
-The Allen Institute periosomatic biophysical models were generated using
+The Allen Institute perisomatic biophysical models were generated using
 NEURON `version v7.3.ansi-1078 <http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078>`_.
 Instructions for `compiling NEURON <http://www.neuron.yale.edu/neuron/download/compile_linux>`_ with the Python interpreter 
 are available from the `NEURON team <http://www.neuron.yale.edu/neuron/>`_.
-
 Allen SDK is compatible with Python version 2.7.8, included in the Anaconda 2.1.0 distribution.
 
-Instructions for `Docker installation <./install.html#docker-installation>`_ are also available.
+Instructions for optional
+`Docker installation <./install.html#installation-with-docker-optional>`_ 
+are also available.
 
 
 Retrieving Data from the Allen Institute

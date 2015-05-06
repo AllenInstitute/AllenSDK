@@ -19,13 +19,6 @@ import logging
 
 
 class Api(object):
-    '''
-    
-    Notes
-    -----
-    `Additional documentation <data_api_client.html#the-api-class>`_ is available.
-    '''
-    
     _log = logging.getLogger(__name__)
     default_api_url = 'http://api.brain-map.org'
     default_api_url = 'http://iwarehouse' # TODO: REMOVE THIS
@@ -85,7 +78,8 @@ class Api(object):
         
         Examples
         --------
-        `A simple Api subclass example <http:data_api_client.html#the-api-class>`_.
+        `A simple Api subclass example
+        <data_api_client.html#creating-new-api-query-classes>`_.
         '''
         rma_url = rma_builder_fn(*args, **kwargs) 
                            
@@ -101,6 +95,15 @@ class Api(object):
         -------
         dict
             the parsed json schema message
+        
+        Notes
+        -----
+        This information and other 
+        `Allen Brain Atlas Data Portal Data Model <http://help.brain-map.org/display/api/Data+Model>`_
+        documentation is also available as a
+        `Class Hierarchy <http://api.brain-map.org/class_hierarchy>`_
+        and `Class List <http://api.brain-map.org/class_hierarchy>`_.
+        
         '''
         schema_url = self.rma_endpoint + '/enumerate.json'
         json_parsed_schema_data = self.retrieve_parsed_json_over_http(schema_url)
