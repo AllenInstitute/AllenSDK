@@ -74,7 +74,11 @@ to the original cell as follows::
 
     neuron_config = json_utilities.read('neuron_config.json')
     ephys_sweeps = json_utilities.read('ephys_sweeps.json')
+    ephys_file_name = 'input.nwb'
+
     neuron = GlifNeuron.from_dict(neuron_config)
+
+    simulate_neuron(neuron, ephys_sweeps, ephys_file_name, ephys_file_name, 0.05):
 
 Note: in this case, simulated sweep voltages will overwrite the responses in 
 the downloaded NWB file.  
