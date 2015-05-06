@@ -1,6 +1,62 @@
 File Formats
 ============
 
+This page provides a short description of the file formats for data accessable by the Allen SDK.
+
+Morphology SWC Files
+--------------------
+
+Morphological neuron reconstructions are available for download as SWC files.  The SWC file format is a white-space delimited text file with a standard set of headers.  The file lists a set of 3D neuronal compartments, each of which has:
+
+====== ========= ===========================
+Column Data Type Description
+====== ========= ===========================
+id     string    compartment ID
+type   integer   compartment type
+x      float     3D compartment position (x)
+y      float     3D compartment position (y)
+z      float     3D compartment position (z)
+radius float     compartment radius
+parent string    parent compartment ID
+====== ========= ===========================
+
+Comment lines begin with a '#'.  Reconstructions in the Allen Cell Types Database can contain the following compartment types:
+
+==== ===============
+Type Description
+==== ===============
+0    unknown
+1    soma
+2    axon
+3    basal dendrite
+4    apical dendrite
+==== ===============
+
+The Allen SDK comes with a :py:mod:`~allensdk.core.swc` Python module that provides helper functions and classes for manipulating SWC files.  Consider the following example::
+
+    import allensdk.core.swc as swc
+
+    file_name = 'example.swc'
+    morphology = swc.read_swc(file_name)
+    
+    # subsample the morphology 3x. root, soma, junctions, and the first child of the root are preserved.
+    sparse_morphology = morphology.sparsify(3)
+
+    # compartments in the order that they were specified in the file
+    compartment_list = sparse_morphology.compartment_list
+
+    # a dictionary of compartments indexed by compartment id
+    compartments_by_id = sparse_morphology.compartment_index
+
+    # the root compartment (usually the soma)
+    root = morphology.root
+
+    # all compartments are dictionaries of compartment properties 
+    # compartments also keep track of their children
+    for child in root['children']:
+       print child['x'], child['y'], child['z'], child['radius']
+    
+
 Neurodata Without Borders
 -------------------------
 
@@ -17,7 +73,7 @@ labeling system designed so software tools can easily access contained data.
 .. _NWB Github Repository: http://github.com/NeurodataWithoutBorders
 
 Allen Cell Types Database NWB Files
------------------------------------
++++++++++++++++++++++++++++++++++++
 
 The Allen SDK provides a basic Python class for extracting data from 
 Allen Cell Types Database NWB files. These files store data from intracellular 
@@ -51,7 +107,7 @@ and estimated spike times::
     index_range = sweep_data['index_range']
 
 HDF5 Overview
--------------
++++++++++++++
 
 NWB is implemented in HDF5_.  HDF5 files provide a hierarchical data storage that mirrors the organization of a file system.  Just as a file system has directories and files, and HDF5 file has groups and datasets.  The best way to understand an HDF5 (and NWB) file is to open a data file in an HDF5 browser. HDFView_ is the recommended browser from the makers of HDF5.  
 
