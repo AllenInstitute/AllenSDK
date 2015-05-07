@@ -82,8 +82,10 @@ class Api(object):
         <data_api_client.html#creating-new-api-query-classes>`_.
         '''
         rma_url = rma_builder_fn(*args, **kwargs) 
+
+        quoted_rma_url = urllib2.quote(rma_url,';/?:@&=+$,')
                            
-        json_parsed_data = self.retrieve_parsed_json_over_http(rma_url)
+        json_parsed_data = self.retrieve_parsed_json_over_http(quoted_rma_url)
         
         return json_traversal_fn(json_parsed_data)
     
