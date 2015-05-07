@@ -27,8 +27,10 @@ may change significantly in the future.
 Downloading  GLIF Models
 ------------------------
 
-Visit http://celltypes.brain-map.org to find cells that have GLIF models
-available for download.  Specifically:
+There are two ways to download files necessary to run a GLIF model.  The
+first way is to visit http://celltypes.brain-map.org and find cells that have 
+GLIF models available for download.  The electrophysiology details page
+for a cell has a neuronal model download link.  Specifically:
 
    1. Click 'More Options +' and filter for GLIF models.
    2. Click the electrophysiology thumbnail for a cell on the right hand panel.
@@ -42,9 +44,20 @@ like this::
 
 This link returns .zip archive containing the neuron configuration file 
 and sweep metadata required to simulate the model using stimuli applied to 
-the cell.  To download the stimulus itself, the following code demonstrates 
-how to retrieve the corresponding cell's NWB file (as well as the neuron 
-configuration file and sweep metadata)::
+the cell.  Specifically, the .zip archive will contain:
+
+    * **472423251_neuron_config.json**: JSON config file for the GLIF model
+    * **ephys_sweeps.json**: JSON with metadata for sweeps presented to the cell
+    * **neuronal_model.json**: JSON with general metadata for the cell
+
+If you would like to reproduce the model traces seen in the Cell Types Database,
+you can download an NWB file containing both the stimulus and cell response
+traces via a 'Download data' link on the cell's electrophysiology page.
+
+You can also download all of the files necessary to run a GLIF model
+using the :py:class:`GlifApi <allensdk.api.queries.glif_api.GlifApi>` 
+class.  The following code demonstrates how to retrieve a cell's NWB 
+file, neuron configuration file, and sweep metadata::
 
     from allensdk.api.queries.glif_api import GlifApi
     import allensdk.core.json_utilities as json_utilities
@@ -53,10 +66,10 @@ configuration file and sweep metadata)::
     
     glif_api = GlifApi()
     glif_api.get_neuronal_model(neuronal_model_id)
-    glif_api.cache_stimulus_file('experiment.nwb')
+    glif_api.cache_stimulus_file('472423251.nwb')
     
     neuron_config = glif_api.get_neuron_config()
-    json_utilities.write('neuron_config.json', neuron_config)
+    json_utilities.write('472423251_neuron_config.json', neuron_config)
     
     ephys_sweeps = glif_api.get_ephys_sweeps()
     json_utilities.write('ephys_sweeps.json', ephys_sweeps)
@@ -72,13 +85,13 @@ to the original cell as follows::
     from allensdk.model.glif.glif_neuron import GlifNeuron
     from allensdk.model.glif.simulate_neuron import simulate_neuron
 
-    neuron_config = json_utilities.read('neuron_config.json')
+    neuron_config = json_utilities.read('472423251_neuron_config.json')
     ephys_sweeps = json_utilities.read('ephys_sweeps.json')
-    ephys_file_name = 'input.nwb'
+    ephys_file_name = '472423251.nwb'
 
     neuron = GlifNeuron.from_dict(neuron_config)
 
-    simulate_neuron(neuron, ephys_sweeps, ephys_file_name, ephys_file_name, 0.05):
+    simulate_neuron(neuron, ephys_sweeps, ephys_file_name, ephys_file_name, 0.05)
 
 Note: in this case, simulated sweep voltages will overwrite the responses in 
 the downloaded NWB file.  
