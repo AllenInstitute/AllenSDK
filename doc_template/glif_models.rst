@@ -20,6 +20,9 @@ during the simulation. The GLIF package contains a built-in set of rules,
 however developers can plug in custom rule implementations provided they
 follow a simple argument specification scheme.
 
+The rest of this page provides examples demonstrating how to download models, 
+examples of simulating these models, and general GLIF model documentation. 
+
 **Note:** the GLIF simulator module is still under heavy development and
 may change significantly in the future.
 
@@ -48,13 +51,16 @@ the cell.  Specifically, the .zip archive will contain:
 
     * **472423251_neuron_config.json**: JSON config file for the GLIF model
     * **ephys_sweeps.json**: JSON with metadata for sweeps presented to the cell
-    * **neuronal_model.json**: JSON with general metadata for the cell
+    * **neuronal_model.json**: JSON with general metadata for the cell (not required to run a model)
 
-If you would like to reproduce the model traces seen in the Cell Types Database,
-you can download an NWB file containing both the stimulus and cell response
-traces via a 'Download data' link on the cell's electrophysiology page.
+With these files you can run a GLIF model simulation, but they do not include the 
+actual stimulus traces presented to the cell.  If you would like to reproduce the 
+model traces seen in the Cell Types Database, you can download an NWB file containing 
+both the stimulus and cell response traces via a 'Download data' link on the cell's 
+electrophysiology page.  See the :doc:`File Formats <file_formats>` page for more details
+on the NWB file format.
 
-You can also download all of the files necessary to run a GLIF model
+You can also download all of these files, and in addition the cell's NWB file,
 using the :py:class:`GlifApi <allensdk.api.queries.glif_api.GlifApi>` 
 class.  The following code demonstrates how to retrieve a cell's NWB 
 file, neuron configuration file, and sweep metadata::
@@ -93,28 +99,44 @@ to the original cell as follows::
 
     simulate_neuron(neuron, ephys_sweeps, ephys_file_name, ephys_file_name, 0.05)
 
-Note: in this case, simulated sweep voltages will overwrite the responses in 
-the downloaded NWB file.  
+The ``simulate_neuron`` function call simulates all sweeps in the NWB file, **which
+can take over an hour**.  Because the same NWB file is being used for both input and output, 
+the cell's response traces will be overwritten as stimuli are simulated. 
 
-If you have a custom stimulus you would like to apply to a neuronal model, 
-try the following::
+Note: the GLIF simulator does not simulate during action potentials.  Instead it
+inserts NaNs for a fixed number of time steps when voltage surpasses threshold.
+``simulate_neuron`` optionally accepts a value which will be used to overwrite
+these ``NaN`` values (in this case 0.05 Volts).
 
-    from allensdk.model.glif.glif_neuron import GlifNeuron
+If you would like to run a single sweep instead of all sweeps, try the following::
+
     import allensdk.core.json_utilities as json_utilities
+    from allensdk.model.glif.glif_neuron import GlifNeuron
+    from allensdk.core.nwb_data_set import NwbDataSet
 
-    neuron_config = json_utilities.read('neuron_config.json')
+    neuron_config = json_utilities.read('472423251_neuron_config.json')
+    ephys_sweeps = json_utilities.read('ephys_sweeps.json')
+    ephys_file_name = '472423251.nwb'
+
+    # pull out the stimulus for the first sweep
+    ephys_sweep = ephys_sweeps[0]
+    ds = NwbDataSet(ephys_file_name)
+    data = ds.get_sweep(ephys_sweep['sweep_number']) 
+
+    # initialize the neuron
+    # important! update the neuron's dt for your stimulus
     neuron = GlifNeuron.from_dict(neuron_config)
+    neuron.dt = 1.0 / data['sampling_rate']
 
-    # provide your own stimulus as an array of voltages (in volts)
-    stimulus = ... 
-    
-    # important! provide the dt of your stimulus
-    neuron.dt = 5e-6
-    output = neuron.run(stimulus)
+    # simulate the neuron
+    output = neuron.run(data['stimulus'])
 
     voltage = output['voltage']
     threshold = output['threshold']
     spike_times = output['interpolated_spike_times']
+
+If you have a custom stimulus you would like to apply to a neuronal model,
+simply provide your own stimulus array to the ``neuron.run`` method.
 
 GLIF Configuration
 ------------------
