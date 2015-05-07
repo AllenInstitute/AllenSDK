@@ -5,31 +5,32 @@ Data API Client
 The `allensdk.api <allensdk.api.html>`_ package
 is designed to help retrieve data from the
 `Allen Brain Atlas API <http://help.brain-map.org/display/api/Allen+Brain+Atlas+API>`_.
-Currently there are only two API queries in Allen SDK.
-The first is for the :py:class:`Biophysical Perisomatic <allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi>` neuronal model.
-The other is for :py:class:`GLIF <allensdk.api.queries.glif_api.GlifApi>` models.
-The SDK can also be used to develop new queries.
- 
- 
-Using an API Query
-------------------
+Currently there are only three API queries in Allen SDK.
+The first is for downloading general metadata and files for cells in the :py:class:`Allen Cell Types Database <allensdk.api.queries.cell_types_api.CellTypesApi>`.  The second is for :py:class:`Biophysical Perisomatic <allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi>` neuronal models, and the third is for :py:class:`GLIF <allensdk.api.queries.glif_api.GlifApi>` models.
+
+API Package Examples
+--------------------
+
+The following example will download a list of cells from the Allen Cell Types Database 
+that have neuron reconstructions, then download the electrophysiology NWB and morphology SWC file
+for one of those cells::
+
+   from allensdk.api.queries.cell_types_api import CellTypesApi
+
+   ct = CellTypesApi()
+
+   cells = ct.list_cells(require_reconstruction=True)
+   ct.save_ephys_data(cells[0]['id'], 'example.nwb')
+   ct.save_reconstruction(cells[0]['id'], 'example.swc')
 
 This example will download a biophysical perisomatic neuronal model to the working directory.
 More information about running these models is available on the 
 `perisomatic biophysical models <./biophysical_perisomatic_script.html>`_ page.
 Another example of downloading and running GLIF models is available on the 
-`GLIF models <glif_models.html#downloading-glif-models>`_ page.
-
-First import a query module::
+`GLIF models <glif_models.html#downloading-glif-models>`_ page::
 
     from allensdk.api.queries.biophysical_perisomatic_api import \
         BiophysicalPerisomaticApi
-
-
-For more information on using specific query modules, see the 
-`queries package <allensdk.api.queries.html>`_ 
-documentation for details.
-::
 
     bp = BiophysicalPerisomaticApi()
     bp.cache_stimulus = False           # change to True to download the stimulus file

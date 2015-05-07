@@ -75,11 +75,11 @@ class CellTypesApi(Api):
         return parsed_json['msg']
 
 
-    def save_ephys_file(self, specimen_id, file_name):
+    def save_ephys_data(self, specimen_id, file_name):
         ''' Find the electrophysiology data file for a specimen and save it. '''
 
         
-        file_url = self.do_rma_query(self.build_ephys_file_rma, self.read_ephys_file_json, specimen_id)
+        file_url = self.do_rma_query(self.build_ephys_data_rma, self.read_ephys_data_json, specimen_id)
 
         if file_url is None:
             raise Exception("Could not find electrophysiology file for specimen %d " % specimen_id)
@@ -87,8 +87,8 @@ class CellTypesApi(Api):
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
     
 
-    def build_ephys_file_rma(self, specimen_id, fmt='json'):
-        ''' Build the URL for the save_ephys_file command. '''
+    def build_ephys_data_rma(self, specimen_id, fmt='json'):
+        ''' Build the URL for the save_ephys_data command. '''
         criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eqNWB]))' % specimen_id
         includes = 'ephys_result(well_known_files(well_known_file_type))'
 
@@ -106,12 +106,52 @@ class CellTypesApi(Api):
         return url
 
 
-    def read_ephys_file_json(self, parsed_json):
-        ''' Extract the download link from the save_ephys_file RMA. '''
+    def read_ephys_data_json(self, parsed_json):
+        ''' Extract the download link from the save_ephys_data RMA. '''
 
         try:
             return parsed_json['msg'][0]['ephys_result']['well_known_files'][0]['download_link']
         except Exception, e:
             logging.error("Error finding ephys file: %s" % e.message)
             return None
-        
+
+
+    def save_reconstruction(self, specimen_id, file_name):
+        ''' Find the reconstruction file for a specimen and save it. '''
+
+        file_url = self.do_rma_query(self.build_reconstruction_rma, self.read_reconstruction_json, specimen_id)
+
+        if file_url is None:
+            raise Exception("Could not find reconstruction file for specimen %d " % specimen_id)
+
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+
+
+    def build_reconstruction_rma(self, specimen_id, fmt='json'):
+        ''' Build the URL for the save_reconstruction command. '''
+        criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
+        includes = 'neuron_reconstructions(well_known_files)'
+
+        url = ''.join([self.rma_endpoint, 
+                       '/query.',
+                       fmt,
+                       '?q=',
+                       'model::Specimen,',
+                       'rma::criteria,',
+                       criteria,
+                       ',rma::include,',
+                       includes,
+                       ',rma::options[num_rows$eqall]'])
+
+        return url
+
+
+    def read_reconstruction_json(self, parsed_json):
+        ''' Extract the download link from the save_ephys_file RMA. '''
+
+        try:
+            return parsed_json['msg'][0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
+        except Exception, e:
+            logging.error("Error finding reconstruction file: %s" % e.message)
+            return None
+    
