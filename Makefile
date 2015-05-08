@@ -6,6 +6,12 @@ RELEASEDIR = $(PROJECTNAME)-$(VERSION).$(RELEASE)
 EGGINFODIR = $(PROJECTNAME).egg-info
 DOCDIR = doc
 
+DOC_URL=http://alleninstitute.github.io/AllenSDK
+ZIP_URL=$(ZIP_URL)
+TGZ_URL=$(TGZ_URL)
+ZIP_FILENAME=$(ZIP_FILENAME)
+TGZ_FILENAME=$(TGZ_FILENAME)
+
 build:
 	mkdir -p $(DISTDIR)/$(PROJECTNAME)
 	cp -r allensdk setup.py README.md $(DISTDIR)/$(PROJECTNAME)/
@@ -27,8 +33,13 @@ doc: FORCE
 	cp -R doc_template/examples doc
 	cp -R doc_template/aibs_sphinx/static/* doc/_static
 	cp -R doc_template/aibs_sphinx/templates/* doc/_templates
-	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/install.rst
-	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/links.rst
+	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/install.rst
+	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/links.rst
+	sed -ie "s/|zip_url|/${ZIP_URL}/g" doc/links.rst
+	sed -ie "s/|tgz_filename|/${TGZ_FILENAME}/g" doc/links.rst
+	sed -ie "s/|zip_filename|/${ZIP_FILENAME}/g" doc/links.rst
+	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.brainscales
+	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.ubuntu
 	sed -ie "s/\/external_assets/_static\/external_assets/g" doc/_templates/portalHeader.html
 	sed -ie "s/\/external_assets/_static\/external_assets/g" doc/_static/external_assets/javascript/portal.js
 	cd doc && make html || true

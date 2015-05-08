@@ -13,7 +13,7 @@ Quick Start Using Pip
 
 First ensure you have `pip <http://pypi.python.org/pypi/pip>`_ installed.  To install for a single user::
 
-    pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-|version|.tar.gz --user
+    pip install |tgz_url| --user
 
 
 Uninstalling the SDK is simple with pip::
