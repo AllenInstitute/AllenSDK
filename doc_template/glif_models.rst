@@ -3,8 +3,8 @@ Generalized LIF Models
 
 The Allen Cell Types Database contains Generalized Leaky Integrate and Fire 
 (GLIF) that model the firing behavior of neurons at five levels of complexity.
-Review the GLIF technical white paper for details on these models and
-how their parameters were optimized (TODO).
+Review the GLIF technical `white paper <http://help.brain-map.org/display/celltypes/Documentation>`_ 
+for details on these models and how their parameters were optimized.
 
 The Allen SDK GLIF simulation module is an explicit time-stepping simulator 
 that evolves a neuron's simulated voltage over the course of an input
@@ -46,24 +46,21 @@ like this::
     http://api.brain-map.org/neuronal_model/download/472423251
 
 This link returns .zip archive containing the neuron configuration file 
-and sweep metadata required to simulate the model using stimuli applied to 
+and sweep metadata required to simulate the model with stimuli applied to 
 the cell.  Specifically, the .zip archive will contain:
 
     * **472423251_neuron_config.json**: JSON config file for the GLIF model
     * **ephys_sweeps.json**: JSON with metadata for sweeps presented to the cell
-    * **neuronal_model.json**: JSON with general metadata for the cell (not required to run a model)
+    * **neuronal_model.json**: JSON with general metadata for the cell
 
-With these files you can run a GLIF model simulation, but they do not include the 
-actual stimulus traces presented to the cell.  If you would like to reproduce the 
-model traces seen in the Cell Types Database, you can download an NWB file containing 
-both the stimulus and cell response traces via a 'Download data' link on the cell's 
-electrophysiology page.  See the :doc:`File Formats <file_formats>` page for more details
-on the NWB file format.
+If you would like to reproduce the model traces seen in the Cell Types Database, 
+you can download an NWB file containing both the stimulus and cell response traces via a 
+'Download data' link on the cell's electrophysiology page. See the :doc:`File Formats <file_formats>` 
+page for more details on the NWB file format.
 
-You can also download all of these files, and in addition the cell's NWB file,
+You can also download all of these files, including the cell's NWB file,
 using the :py:class:`GlifApi <allensdk.api.queries.glif_api.GlifApi>` 
-class.  The following code demonstrates how to retrieve a cell's NWB 
-file, neuron configuration file, and sweep metadata::
+class::
 
     from allensdk.api.queries.glif_api import GlifApi
     import allensdk.core.json_utilities as json_utilities
@@ -83,8 +80,39 @@ file, neuron configuration file, and sweep metadata::
 Running a GLIF Simulation
 -------------------------
 
-You can use the files downloaded above to simulate all of the sweeps presented 
-to the original cell as follows::
+The most important file you you need to run a simulation is the ``neuron_config`` JSON file.  You can
+use this file to instantiate a simulator and feed in your own stimulus::
+
+    import allensdk.core.json_utilities as json_utilities
+    from allensdk.model.glif.glif_neuron import GlifNeuron
+
+    # initialize the neuron
+    neuron_config = json_utilities.read('472423251_neuron_config.json')
+    neuron = GlifNeuron.from_dict(neuron_config)
+
+    # make a short square pulse. stimulus units should be in Amps.
+    stimulus = [ 0.0 ] * 100 + [ 10e-9 ] * 100 + [ 0.0 ] * 100
+
+    # important! set the neuron's dt value for your stimulus in seconds
+    neuron.dt = 5e-6
+
+    # simulate the neuron
+    output = neuron.run(stimulus)
+
+    voltage = output['voltage']
+    threshold = output['threshold']
+    spike_times = output['interpolated_spike_times']
+
+.. note:: 
+    
+    The GLIF simulator does not simulate during action potentials.  
+    Instead it inserts ``NaN`` values for a fixed number of time steps when voltage 
+    surpasses threshold.  The simulator skips ``neuron.spike_cut_length`` time steps 
+    after voltage surpasses threshold.
+
+To reproduce the model's traces displayed on the Allen Cell Types Database web page,
+the Allen SDK provides the :py:mod:`allensdk.core.model.glif.simulate_neuron` 
+module for simulating all sweeps presented to a cell and storing them in the NWB format::
 
     import allensdk.core.json_utilities as json_utilities
 
@@ -99,14 +127,16 @@ to the original cell as follows::
 
     simulate_neuron(neuron, ephys_sweeps, ephys_file_name, ephys_file_name, 0.05)
 
-The ``simulate_neuron`` function call simulates all sweeps in the NWB file, **which
-can take over an hour**.  Because the same NWB file is being used for both input and output, 
-the cell's response traces will be overwritten as stimuli are simulated. 
+.. warning::
 
-Note: the GLIF simulator does not simulate during action potentials.  Instead it
-inserts NaNs for a fixed number of time steps when voltage surpasses threshold.
+    These stimuli are sampled at a very high resolution (200kHz), 
+    and a given cell can have many sweeps.  This process can take over and hour.
+
+The ``simulate_neuron`` function call simulates all sweeps in the NWB file.  
+Because the same NWB file is being used for both input and output, 
+the cell's response traces will be overwritten as stimuli are simulated. 
 ``simulate_neuron`` optionally accepts a value which will be used to overwrite
-these ``NaN`` values (in this case 0.05 Volts).
+these ``NaN`` values generated during action potentials (in this case 0.05 Volts).
 
 If you would like to run a single sweep instead of all sweeps, try the following::
 
@@ -135,13 +165,18 @@ If you would like to run a single sweep instead of all sweeps, try the following
     threshold = output['threshold']
     spike_times = output['interpolated_spike_times']
 
-If you have a custom stimulus you would like to apply to a neuronal model,
-simply provide your own stimulus array to the ``neuron.run`` method.
+.. note:: 
+    
+    The ``dt`` value provided in the downloadable GLIF neuron configuration
+    files does not correspond to the sampling rate of the original stimulus.  Stimuli were
+    subsampled and filtered for parameter optimization.  Be sure to overwrite the neuron's
+    ``dt`` with the correct sampling rate.
 
 GLIF Configuration
 ------------------
 
-Instances of the GlifNeuron class require many parameters for initialization.  
+Instances of the :py:class:`~allensdk.model.glif.glif_neuron.GlifNeuron` 
+class require many parameters for initialization.  
 Fixed neuron parameters are stored directly as parameters on the class instance:
 
 ================ ===================================== ========== ========
@@ -151,7 +186,7 @@ El               resting potential                     Volts      float
 dt               time duration of each simulation step seconds    float
 R_input          input resistance                      Ohms       float
 C                capacitance                           Farads     float
-asc_vector       afterspike current coefficients                  np.array 
+asc_vector       afterspike current coefficients       Amps       np.array 
 spike_cut_length spike duration                        time steps int
 th_inf           instantaneous threshold               Volts      float
 th_adapt         adapted threshold                     Volts      float
@@ -159,52 +194,24 @@ th_adapt         adapted threshold                     Volts      float
 
 Some of these fixed parameters were optimized to fit Allen Cell Types Database 
 electrophysiology data.  Optimized coefficients for these
-parameters are stored by name in the instance.coeffs dictionary. For more details
-on which parameters where optimized, please see the technical white paper (TODO link).
+parameters are stored by name in the ``neuron.coeffs`` dictionary. For more details
+on which parameters were optimized, please see the technical 
+`white paper <http://help.brain-map.org/display/celltypes/Documentation>`_.
 
-**Note about dt**: the `dt` value provided in the downloadable GLIF neuron configuration
-files does not correspond to the sampling rate of the original stimulus.  Stimuli were
-subsampled and filtered for parameter optimization.  Be sure to overwrite the neuron's
-`dt` with the correct sampling rate::
-
-    from allensdk.model.glif.glif_neuron import GlifNeuron
-    import allensdk.core.json_utilities as json_utilities
-    from allensdk.core.nwb_data_set import NwbDataSet
-
-    nwb_file_name = ...
-    neuron_config_file_name = ...
-    sweep_number = ...
-
-    # load an NWB file
-    ds = NwbDataSet(nwb_file_name)
-    sweep_data = ds.get_sweep(sweep_number)
-
-    # initialize the neuron
-    neuron_config = json_utilities.read(neuron_config_file_name)
-    neuron = GlifNeuron.from_dict(neuron_config)
-
-    # overwrite dt and simulate the neuron
-    neuron.dt = 1.0 / sweep_data['sampling_rate']
-    neuron.run(sweep_data['stimulus'])
-
-**Note about spike_cut_length**: the GLIF simulator can optionally skip ahead for 
-a fixed amount of time when a spike is detected.  If you set `spike_cut_length` to
-a positive value, `spike_cut_length` time steps will not be simulated after a spike
-and instead be replaced with NaN values in the simulated outputs.
-
-The GlifNeuron class has six methods that can be customized: three rules 
-for updating voltage, spike threshold, and afterspike currents during the 
+The :py:class:`~allensdk.model.glif.glif_neuron.GlifNeuron` class has six 
+methods that can be customized: three rules 
+for updating voltage, threshold, and afterspike currents during the 
 simulation; and three rules for updating those values when a spike is detected
-(voltage surpasses spike threshold).
+(voltage surpasses threshold).
 
 ========================= ==============================================================
 Method Type               Description
 ========================= ==============================================================
 voltage_dynamics_method   Update simulation voltage for the next time step.
-threshold_dynamics_method Update simulation spike threshold for the next time step.
+threshold_dynamics_method Update simulation threshold for the next time step.
 AScurrent_dynamics_method Update afterspike current coefficients for the next time step.
 voltage_reset_method      Reset simulation voltage after a spike occurs.
-threshold_reset_method    Reset simulation spike threshold after a spike occurs.
+threshold_reset_method    Reset simulation threshold after a spike occurs.
 AScurrent_reset_method    Reset afterspike current coefficients after a spike occurs.
 ========================= ==============================================================
 
@@ -212,9 +219,9 @@ The GLIF neuron configuration files available from the Allen Brain Atlas API use
 methods, however you can supply your own custom method if you like::
 
     # define your own custom voltage reset rule 
-    # this one just returns the previous voltage value
+    # this one linearly scales the input voltage
     def custom_voltage_reset_rule(neuron, voltage_t0, custom_param_a, custom_param_b):
-        return voltage_t0  
+        return custom_param_a * voltage_t0 + custom_param_b
 
     # initialize a neuron from a neuron config file
     neuron_config = json_utilities.read('neuron_config.json')
@@ -225,9 +232,9 @@ methods, however you can supply your own custom method if you like::
                                      { 'custom_param_a':1, 'custom_param_b': 2 })
     neuron.voltage_reset_method = method
 
-Notice that the function is allowed to take custom parameters (here 'a' and 'b'), which are
-configured on method initialization from a dictionary. For more details, see the documentation 
-for the :py:class:`GlifNeuron <allensdk.model.glif.glif_neuron.GlifNeuron>` and 
+Notice that the function is allowed to take custom parameters (here ``custom_param_a`` and 
+``custom_param_b``), which are configured on method initialization from a dictionary. For more details, 
+see the documentation for the :py:class:`GlifNeuron <allensdk.model.glif.glif_neuron.GlifNeuron>` and 
 :py:class:`GlifNeuronMethod <allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod>` classes.
 
 
