@@ -184,7 +184,7 @@ If you would like to plot the outputs of this simulation using numpy and matplot
     spike_times = output['interpolated_spike_times']
     interpolated_spike_voltages = output['interpolated_spike_voltage']
     interpolated_spike_thresholds = output['interpolated_spike_threshold']
-    grid_spike_indicies = output['spike_time_steps']
+    grid_spike_indices = output['spike_time_steps']
     grid_spike_times = output['grid_spike_times']
     after_spike_currents = output['AScurrents']
 
@@ -206,7 +206,7 @@ If you would like to plot the outputs of this simulation using numpy and matplot
     plt.plot(time,  threshold, label='threshold')
     plt.plot(interpolated_spike_times, interpolated_spike_voltages, 'x', 
              label='interpolated spike')
-    plt.plot((grid_spike_indicies-1)*neuron.dt, voltage[grid_spike_indicies-1], '.', 
+    plt.plot((grid_spike_indices-1)*neuron.dt, voltage[grid_spike_indices-1], '.', 
              label='last step before spike')
     plt.xlabel('time (s)')
     plt.ylabel('voltage (V)')
