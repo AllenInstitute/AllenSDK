@@ -37,7 +37,7 @@ class GlifNeuron( object ):
     applied. See glif_neuron_methods.py for a list of what options there are for voltage, threshold, and
     afterspike current dynamics and reset rules.
 
-    Parameters
+    Attributes
     ----------
      El : float 
          resting potential 

@@ -130,7 +130,7 @@ module for simulating all sweeps presented to a cell and storing them in the NWB
 .. warning::
 
     These stimuli are sampled at a very high resolution (200kHz), 
-    and a given cell can have many sweeps.  This process can take over and hour.
+    and a given cell can have many sweeps.  This process can take over an hour.
 
 The ``simulate_neuron`` function call simulates all sweeps in the NWB file.  
 Because the same NWB file is being used for both input and output, 
@@ -253,11 +253,8 @@ afterspike current vector, and current injection value to be passed in by the Gl
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an 
 updated voltage value.
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_voltage_forward_euler
-    :noindex:
-
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_voltage_euler_exact
-    :noindex:
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_voltage_forward_euler`
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_voltage_euler_exact`
 
 Threshold Dynamics Rules
 ++++++++++++++++++++++++
@@ -267,11 +264,8 @@ threshold and voltage values of the simulation to be passed in by the GlifNeuron
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an 
 updated threshold value.
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components
-    :noindex:
-
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf
-    :noindex:
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components`
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf`
 
 Afterspike Current Dynamics Rules
 +++++++++++++++++++++++++++++++++
@@ -281,11 +275,8 @@ and time steps of all previous spikes to be passed in by the GlifNeuron. All oth
 parameters must be fixed using the GlifNeuronMethod class.  They all return an updated
 afterspike current array.
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp
-    :noindex:
-
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none
-    :noindex:
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp`
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none`
 
 Built-in Reset Rules
 --------------------
@@ -302,12 +293,8 @@ These methods update the output voltage of the simulation after voltage has surp
 They all expect a voltageto be passed in by the GlifNeuron. All other function parameters must be 
 fixed using the GlifNeuronMethod class.  They all return an updated voltage value.
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_voltage_zero
-    :noindex:
-
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_voltage_bio_rules
-    :noindex:
-
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_voltage_zero`
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_voltage_bio_rules`
 
 Threshold Reset Rules
 +++++++++++++++++++++
@@ -316,11 +303,8 @@ These methods update the spike threshold of the simulation after a spike has bee
 They all expect the current threshold and the reset voltage value of the simulation to be passed in by the GlifNeuron. All other function parameters must be fixed using the GlifNeuronMethod 
 class.  They all return an updated threshold value.
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_threshold_inf
-    :noindex:
-
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components
-    :noindex:
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_threshold_inf`
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components`
 
 Afterspike Reset Reset Rules
 ++++++++++++++++++++++++++++
@@ -329,11 +313,7 @@ These methods expect current afterspike current coefficients to be passed in by
 the GlifNeuron. All other function parameters must be fixed using the GlifNeuronMethod 
 class.  They all return an updated afterspike current array.
 
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none
-    :noindex:
-
-.. autofunction:: allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum
-    :noindex:
-
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none`
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum`
 
 
