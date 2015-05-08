@@ -245,8 +245,7 @@ The job of a dynamics rule is to describe how the simulator should update
 the voltage, spike threshold, and afterspike currents of the simulator at
 a given simulation time step.  
 
-Voltage Dynamics Rules
-++++++++++++++++++++++
+**Voltage Dynamics Rules**
 
 These methods update the output voltage of the simulation.  They all expect a voltage, 
 afterspike current vector, and current injection value to be passed in by the GlifNeuron. All 
@@ -256,8 +255,7 @@ updated voltage value.
     :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_voltage_forward_euler`
     :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_voltage_euler_exact`
 
-Threshold Dynamics Rules
-++++++++++++++++++++++++
+**Threshold Dynamics Rules**
 
 These methods update the spike threshold of the simulation.  They all expect the current
 threshold and voltage values of the simulation to be passed in by the GlifNeuron. All 
@@ -267,8 +265,7 @@ updated threshold value.
     :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components`
     :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf`
 
-Afterspike Current Dynamics Rules
-+++++++++++++++++++++++++++++++++
+**Afterspike Current Dynamics Rules**
 
 These methods expect current afterspike current coefficients, current time step, 
 and time steps of all previous spikes to be passed in by the GlifNeuron. All other function 
@@ -286,8 +283,7 @@ the voltage, spike threshold, and afterspike currents of the simulator
 after the simulator has detected that the simulated voltage has surpassed
 threshold.
 
-Voltage Reset Rules
-+++++++++++++++++++
+**Voltage Reset Rules**
 
 These methods update the output voltage of the simulation after voltage has surpassed threshold. 
 They all expect a voltageto be passed in by the GlifNeuron. All other function parameters must be 
@@ -296,8 +292,7 @@ fixed using the GlifNeuronMethod class.  They all return an updated voltage valu
     :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_voltage_zero`
     :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_voltage_bio_rules`
 
-Threshold Reset Rules
-+++++++++++++++++++++
+**Threshold Reset Rules**
 
 These methods update the spike threshold of the simulation after a spike has been detected.  
 They all expect the current threshold and the reset voltage value of the simulation to be passed in by the GlifNeuron. All other function parameters must be fixed using the GlifNeuronMethod 
@@ -306,8 +301,7 @@ class.  They all return an updated threshold value.
     :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_threshold_inf`
     :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components`
 
-Afterspike Reset Reset Rules
-++++++++++++++++++++++++++++
+**Afterspike Reset Reset Rules**
 
 These methods expect current afterspike current coefficients to be passed in by 
 the GlifNeuron. All other function parameters must be fixed using the GlifNeuronMethod 
