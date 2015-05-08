@@ -5,10 +5,6 @@
  * Changes made here should also be reflected in corresponding changes to browserVersion.js
  */
 
- // minimum required Flash Player version needed. Three part version number, major.minor.revision
- var flashVersion = ['11', '9', '900'];
-
-
 //  Note that the userAgent reported versions are not always the same as the app-reported versions.
 //  See http://www.useragentstring.com/pages/Safari/ for 'webkit'
 //  See http://www.useragentstring.com/pages/Internet%20Explorer/ for 'msie'
