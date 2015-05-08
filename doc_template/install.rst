@@ -2,6 +2,9 @@ Install Guide
 =============
 This guide is a resource for using the Allen SDK package.
 It is maintained by the `Allen Institute for Brain Science <http://www.alleninstitute.org/>`_.
+This packaged was developed and tested with Python 2.7.8, installed
+as part of Anaconda Python distribution version 2.1.0.  We do not guarantee
+consistent behavior with other Python versions.  
 
 Quick Start Using Pip
 ---------------------
