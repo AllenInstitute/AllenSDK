@@ -13,7 +13,6 @@ document.write("<h1>Supported Platforms</h1> \
                     <li>Chrome 38.0.2125.101 m</li> \
                     <li>Firefox 33.0</li> \
                     <li>Internet Explorer 9.0</li> \
-                    <li>Flash 11.9.900.170</li> \
                   </ul> \
                 </td> \
                 <td> \
@@ -22,15 +21,8 @@ document.write("<h1>Supported Platforms</h1> \
                     <li>Chrome 38.0.2125.101 m</li> \
                     <li>Firefox 33.0</li> \
                     <li>Safari 7</li> \
-                    <li>Flash 11.9.900.170</li> \
                   </ul> \
               </td> \
             </table> \
-         </p> \
-         <p> \
-         Before you install/upgrade Flash Player, uninstall existing players \
-         using the Adobe uninstall program.<br> \
-         There are uninstallers available for <a href='http://helpx.adobe.com/flash-player/kb/uninstall-flash-player-windows.html' target='_blank.'>Windows</a> or \
-         <a href='http://helpx.adobe.com/flash-player/kb/uninstall-flash-player-mac-os.html' target='_blank'>Macintosh</a>. \
          </p> \
 	");

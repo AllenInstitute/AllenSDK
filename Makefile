@@ -30,7 +30,7 @@ doc: FORCE
 	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/install.rst
 	sed -ie "s/|version|/${VERSION}.${RELEASE}/g" doc/links.rst
 	sed -ie "s/\/external_assets/_static\/external_assets/g" doc/_templates/portalHeader.html
-	sed -id "s/\/external_assets/_static/g" doc/_static/external_assets/javascript/portal.js
+	sed -ie "s/\/external_assets/_static\/external_assets/g" doc/_static/external_assets/javascript/portal.js
 	cd doc && make html || true
 	cp doc_template/.nojekyll doc/_build/html
 
