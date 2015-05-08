@@ -111,7 +111,7 @@ use this file to instantiate a simulator and feed in your own stimulus::
     after voltage surpasses threshold.
 
 To reproduce the model's traces displayed on the Allen Cell Types Database web page,
-the Allen SDK provides the :py:mod:`~allensdk.core.model.glif.simulate_neuron` 
+the Allen SDK provides the :py:mod:`allensdk.core.model.glif.simulate_neuron` 
 module for simulating all sweeps presented to a cell and storing them in the NWB format::
 
     import allensdk.core.json_utilities as json_utilities
