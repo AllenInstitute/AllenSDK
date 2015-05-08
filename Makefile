@@ -20,8 +20,8 @@ setversion:
 
 sdist: distutils_build
 	python setup.py sdist
-	
-doc: clean
+
+doc: FORCE
 	sphinx-apidoc -d 4 -H "Allen SDK" -A "Allen Institute for Brain Science" -V $(VERSION) -R $(VERSION).dev$(RELEASE) --full -o doc $(PROJECTNAME)
 	cp doc_template/*.rst doc_template/conf.py doc
 	cp -R doc_template/examples doc
@@ -32,6 +32,9 @@ doc: clean
 	sed -ie "s/\/external_assets/_static\/external_assets/g" doc/_templates/portalHeader.html
 	sed -id "s/\/external_assets/_static/g" doc/_static/external_assets/javascript/portal.js
 	cd doc && make html || true
+	cp doc_template/.nojekyll doc/_build/html
+
+FORCE:
 
 clean:
 	rm -rf $(DISTDIR)
