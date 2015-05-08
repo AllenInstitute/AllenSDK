@@ -7,10 +7,10 @@ EGGINFODIR = $(PROJECTNAME).egg-info
 DOCDIR = doc
 
 DOC_URL=http://alleninstitute.github.io/AllenSDK
-ZIP_URL=$(ZIP_URL)
-TGZ_URL=$(TGZ_URL)
-ZIP_FILENAME=$(ZIP_FILENAME)
-TGZ_FILENAME=$(TGZ_FILENAME)
+#ZIP_FILENAME=AllenSDK-master.zip
+#TGZ_FILENAME=AllenSDK-master.tar.gz
+#ZIP_URL=https:\/\/github.com\/AllenInstitute\/AllenSDK\/archive\/master.zip
+#TGZ_URL=https:\/\/github.com\/AllenInstitute\/AllenSDK\/archive\/master.tar.gz
 
 build:
 	mkdir -p $(DISTDIR)/$(PROJECTNAME)
