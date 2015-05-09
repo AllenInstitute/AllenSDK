@@ -3,22 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+:tocdepth: -1
+
 Welcome to the Allen SDK
 ========================
 
 .. toctree::
    :maxdepth: 2
+   :titlesonly:
    :hidden:
 
    install
-   biophysical_perisomatic_script
-   glif_models
-   file_formats
-   data_api_client
-   model_description
-   template_application
-   resource_manifest
-   allensdk
+   data_resources
+   models
+   Package Index <allensdk>
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
 For the initial release, the Allen SDK focuses primarily on the newly released Allen Cell Types Database.

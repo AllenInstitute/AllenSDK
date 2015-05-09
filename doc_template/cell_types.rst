@@ -1,7 +1,39 @@
-File Formats
-============
+Cell Types
+==========
 
-This page provides a short description of the file formats for Allen Cell Types data.
+The Allen Cell Types data set is a database of neuronal cell types based on multimodal characterization
+of single cells to enable data-driven approaches to classification and is fully integrated with other
+Allen Brain Atlas resources.  The database currently includes:
+
+    * **electrophysiology**: whole cell current clamp recordings made from Cre-positive neurons
+    * **morphology**: 3D bright-field images of the complete structure of neurons from the visual cortex
+
+Cell Types API Access
+---------------------
+
+The `allensdk.api.queries.cell_types_api` class provides a Python interface for downloading data
+in the Allen Cell Types Database.  The following example demonstrates how to download meta data for
+all cells with 3D reconstructions, then download the reconstruction and electrophysiology recordings
+for one of those cells::
+
+    from allensdk.api.queries.cell_types_api import CellTypesApi
+
+    ct = CellTypesApi()
+
+    # a list of dictionaries containing metadata for cells
+    # that have morphological reconstructions
+    cells = ct.list_cells(require_reconstruction=True)
+
+    # download the electrophysiology data for one cell
+    ct.save_ephys_data(cells[0]['id'], 'example.nwb')
+
+    # download the reconstruction for the same cell
+    ct.save_reconstruction(cells[0]['id'], 'example.swc')
+
+File Formats
+------------
+
+This section provides a short description of the file formats used for Allen Cell Types data.
 
 Morphology SWC Files
 --------------------
@@ -72,9 +104,6 @@ labeling system designed so software tools can easily access contained data.
 .. _Neurodata Without Borders: http://neurodatawithoutborders.github.io/
 .. _NWB initiative: http://crcns.org/NWB/Overview
 
-Allen Cell Types Database NWB Files
-+++++++++++++++++++++++++++++++++++
-
 The Allen SDK provides a basic Python class for extracting data from 
 Allen Cell Types Database NWB files. These files store data from intracellular 
 patch-clamp recordings. A stimulus current is presented to the cell and the cell's 
@@ -115,8 +144,3 @@ There are HDF5 manipulation libraries for many languages and platorms.  MATLAB a
 
 .. _HDF5: https://hdfgroup.org/HDF5
 .. _HDFView: https://hdfgroup.org/products/java/hdfview
-
-
-
-    
-

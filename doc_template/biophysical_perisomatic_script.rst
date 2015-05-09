@@ -1,6 +1,12 @@
 Perisomatic Biophysical Models
 ==============================
 
+The biophysical models currently in the Allen Cell Types Database are 
+compartmental models of neurons that account for neuronal morphology 
+and emulate electrophysiological responses by assuming biophysically 
+detailed mechanisms for specific families of ionic conductances.  These models
+were generated using the `NEURON <http://www.neuron.yale.edu/neuron/>`_ simulator.
+
 Prerequisites
 -------------
 
@@ -15,6 +21,9 @@ Allen SDK is compatible with Python version 2.7.8, included in the Anaconda 2.1.
 Instructions for optional
 `Docker installation <./install.html#installation-with-docker-optional>`_ 
 are also available.
+
+.. note:: NEURON is not easy to install.  This page targets users that are familiar
+          with how to install and run NEURON already.
 
 
 Retrieving Data from the Allen Institute
@@ -42,7 +51,7 @@ You can search for model ids and also download the data manually from the web si
 
 More help can be found in the
 `online help <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_
-for the ALLEN **Cell Types Database** web application.
+for the Allen Cell Types Database web application.
 
 
 Directory Structure
@@ -243,6 +252,267 @@ Render using gnuplot and gthumb:
 
     gplot < view_dat.gnuplot
     gthumb v_result.png
+
+
+Model Description Files
+-----------------------
+
+Basic Structure
++++++++++++++++
+
+    A model description file is simply a JSON object with several sections at the top level
+    and an array of JSON objects within each section.
+    
+    ::
+    
+            {
+               "cell_section": [
+                   { 
+                     "name": "cell 1",
+                     "shape": "pyramidal"
+                     "position": [ 0.1, 0.2, 0.3 ]
+                   },
+                   {
+                     "name": "cell 2",
+                     "shape": "glial",
+                     "position": [ 0.1, 0.2, 0.3 ]
+                   }
+               ],
+               "extra": [
+                  { "what": "wood",
+                    "who": "woodchuck"
+                  }
+               ]
+           }
+   
+    Even if a section contains no objects or only one object the array brackets must be present.
+    
+    
+Objects Within Sections
++++++++++++++++++++++++
+
+    While no restrictions are enforced on what kinds of objects are stored in a section,
+    some rules of thumb make the file easier to work with.
+    
+    #. All objects within a section are the same structure.
+       Common operations on a section are to display it as a table,
+       iterate over it, load from or write to a spreadsheet or csv file.
+       These operations are all easier if the section is fairly homogeneous.
+    #. Objects are not deeply nested.
+       While some shallow nesting is often useful, deep nesting such as a tree structure
+       is not recommended.
+       It makes interoperability with other tools and data formats more difficult.
+    #. Arrays are allowed, though they should not be deeply nested either.
+    #. Object member values should be literals.  Do not use pickled classes, for example.
+
+Comment Lines
++++++++++++++
+
+    The JSON specification does not allow comments.
+    However, the Allen SDK library applies a preprocessing stage
+    to remove C++-style comments, so they can be used in description files.
+    
+    Multi-line comments should be surrounded by /* */
+    and single-line comments start with //.
+    Commented description files will not be recognized by strict json parsers
+    unless the comments are stripped.
+    
+    commented.json:
+    ::
+    
+        {
+           /*
+            *  multi-line comment
+            */
+           "section1": [
+               {
+                  "name": "simon"  // single line comment
+               }]
+           }
+
+Split Description Files by Section
+++++++++++++++++++++++++++++++++++
+
+    A model description can be split into multiple files
+    by putting some sections in one file and other sections into another file.
+    This can be useful if you want to put a topology of cells and connections in one file
+    and experimental conditions and stimulus in another file.  The resulting structure in
+    memory will behave the same way as if the files were not split.
+    This allows a small experiment to be described in a single file
+    and large experiments to be more modular.
+
+    cells.json:
+    ::
+    
+        {
+           "cell_section": [
+               {
+                 "name": "cell 1",
+                 "shape": "pyramidal"
+                 "position": [ 0.1, 0.2, 0.3 ]
+               },
+               {
+                 "name": "cell 2",
+                 "shape": "glial",
+                 "position": [ 0.1, 0.2, 0.3 ]
+               }
+           ]
+        }
+    
+    extras.json:
+    ::
+    
+           {
+               "extra": [
+                  { 
+                    "what": "wood",
+                    "who": "woodchuck"
+                  }
+               ]
+           }
+           
+Split Sections Between Description Files
+++++++++++++++++++++++++++++++++++++++++
+
+If two description files containing the same sections are combined,
+the resulting description will contain objects from both files.
+This feature allows sub-networks to be described in separate files.
+The sub-networks can then be composed into a larger network with an additional
+description of the interconnections.
+
+    network1.json:
+    ::
+        /* A self-contained sub-network */
+        {
+            "cells": [
+                { "name": "cell1" },
+                { "name": "cell2" }
+            ],
+            /* intra-network connections /*
+            "connections": [
+                { "source": "cell1", "target" : "cell2" }
+            ]
+        }
+    
+    network2.json:
+    ::
+        /* Another self-contained sub-network */
+        {
+            "cells": [
+                { "name": "cell3" },
+                { "name": "cell4" }
+            ],
+            "connections": [
+                { "source": "cell3", "target" : "cell4" }
+            ]
+        }
+    
+    interconnect.json:
+    ::
+    
+        {
+            // the additional connections needed to
+            // connect the network1 and network2
+            // into a ring topology.
+            "connections": [
+               { "source": "cell2", "target": "cell3" },
+               { "source": "cell4", "target": "cell1" }
+            ]
+        }
+
+Resource Manifest
+-----------------
+
+JSON has many advantages.  It is widely supported,
+readable and easy to parse and edit.
+As data sets get larger or specialized those advantages diminish.
+Large or complex models and experiments generally need more than
+a single model description file to completely describe an experiment.  
+A manifest file is a way to describe all of the resources needed within
+the Allen SDK description format itself.
+
+The manifest section is named "manifest" by default,
+though it is configurable.  The objects in the manifest section
+each specify a directory, file, or file pattern.
+Files and directories may be organized in a parent-child relationship.
+
+A Simple Manifest
++++++++++++++++++
+
+This is a simple manifest file that specifies the BASEDIR directory
+using ".", meaning the current directory:
+::
+
+    {
+        "manifest": [
+            {   "key": "BASEDIR",
+                "type": "dir",
+                "spec": "."
+            }
+        ] }
+    }
+
+Parent Child Relationships
+++++++++++++++++++++++++++
+
+Adding the optional "parent_key" member to a manifest object
+creates a parent-child relation.  In this case WORKDIR will
+be found in "./work":
+::
+
+    {
+        "manifest": [
+            {   "key": "BASEDIR",
+                "type": "dir",
+                "spec": "."
+            },
+            {   "key": "WORKDIR",
+                "type": "dir",
+                "spec": "/work",
+                "parent_key": "BASEDIR"
+            }
+        ] }
+    }
+
+File Spec Patterns
+++++++++++++++++++
+
+Files can be specified using the type "file" instead of "dir".
+If a sequence of many files is needed, the spec may contain patterns
+to indicate where the sequence number (%d) or string (%s) will be
+interpolated:
+::
+
+    {
+        "manifest": [
+            {   "key": "BASEDIR",
+                "type": "dir",
+                "spec": "."
+            },
+            {
+                "key": "voltage_out_cell_path",
+                "type": "file",
+                "spec": "v_out-cell-%d.dat",
+                "parent_key": "BASEDIR"
+            }
+        ] }
+    }
+
+
+Split Manifest Files
+++++++++++++++++++++
+
+Manifest files can be split like any description file.
+This allows the specification of a general directory structure in a
+shared file and specific files in a separate configuration
+(i.e. stimulus and working directory)
+
+
+Extensions
+++++++++++
+
+To date, manifest description files have not been used to reference
+URLs that provide model data, but it is a planned future use case.
 
 
 Further Reading

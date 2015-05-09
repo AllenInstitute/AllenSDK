@@ -2,7 +2,7 @@ Generalized LIF Models
 ======================
 
 The Allen Cell Types Database contains Generalized Leaky Integrate and Fire 
-(GLIF) that model the firing behavior of neurons at five levels of complexity.
+(GLIF) models that simulate the firing behavior of neurons at five levels of complexity.
 Review the GLIF technical `white paper <http://help.brain-map.org/display/celltypes/Documentation>`_ 
 for details on these models and how their parameters were optimized.
 
@@ -19,6 +19,10 @@ update the simulation's voltage, spike threshold, and afterspike currents
 during the simulation. The GLIF package contains a built-in set of rules,
 however developers can plug in custom rule implementations provided they
 follow a simple argument specification scheme.
+
+The Allen SDK GLIF simulator was developed and tested with Python 2.7.8, installed
+as part of `Anaconda Python <https://store.continuum.io/cshop/anaconda/>`_ distribution 
+version `2.1.0 <http://repo.continuum.io/archive/index.html>`_. 
 
 The rest of this page provides examples demonstrating how to download models, 
 examples of simulating these models, and general GLIF model documentation. 
@@ -80,8 +84,8 @@ class::
 Running a GLIF Simulation
 -------------------------
 
-The most important file you you need to run a simulation is the ``neuron_config`` JSON file.  You can
-use this file to instantiate a simulator and feed in your own stimulus::
+To run a GLIF simulation, the most important file you you need is the ``neuron_config`` 
+JSON file.  You can use this file to instantiate a simulator and feed in your own stimulus::
 
     import allensdk.core.json_utilities as json_utilities
     from allensdk.model.glif.glif_neuron import GlifNeuron
@@ -236,7 +240,7 @@ GLIF Configuration
 
 Instances of the :py:class:`~allensdk.model.glif.glif_neuron.GlifNeuron` 
 class require many parameters for initialization.  
-Fixed neuron parameters are stored directly as parameters on the class instance:
+Fixed neuron parameters are stored directly as properties on the class instance:
 
 ================ ===================================== ========== ========
 Parameter        Description                           Units      Type
