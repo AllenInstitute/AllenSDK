@@ -11,7 +11,7 @@ Allen Brain Atlas resources.  The database currently includes:
 Cell Types API Access
 ---------------------
 
-The :py:mod:`~allensdk.api.queries.cell_types_api.CellTypesApi` class provides a Python interface for downloading data
+The :py:class:`~allensdk.api.queries.cell_types_api.CellTypesApi` class provides a Python interface for downloading data
 in the Allen Cell Types Database.  The following example demonstrates how to download meta data for
 all cells with 3D reconstructions, then download the reconstruction and electrophysiology recordings
 for one of those cells::
