@@ -16,7 +16,7 @@ Welcome to the Allen SDK
    install
    data_resources
    models
-   Package Index <allensdk>
+   Source Documentation <allensdk>
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
 For the initial release, the Allen SDK focuses primarily on the newly released Allen Cell Types Database.
