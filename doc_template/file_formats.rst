@@ -63,15 +63,14 @@ Neurodata Without Borders
 
 The electrophysiology data collected in the Allen Cell Types Database 
 is stored in the `Neurodata Without Borders`_ (NWB) file format.
-This format, created as part of the NWB_ initiative, is designed to store
+This format, created as part of the `NWB initiative`_, is designed to store
 a variety of neurophysiology data, including data from intra- and
 extracellular electrophysiology experiments, optophysiology experiments,
 as well as tracking and stimulus data.  It has a defined schema and metadata
 labeling system designed so software tools can easily access contained data.
 
-.. _Neurodata Without Borders: NWB_
-.. _NWB: http://crcns.org/NWB/Overview
-.. _NWB Github Repository: http://github.com/NeurodataWithoutBorders
+.. _Neurodata Without Borders: http://neurodatawithoutborders.github.io/
+.. _NWB initiative: http://crcns.org/NWB/Overview
 
 Allen Cell Types Database NWB Files
 +++++++++++++++++++++++++++++++++++

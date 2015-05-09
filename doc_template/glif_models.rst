@@ -224,6 +224,13 @@ If you would like to plot the outputs of this simulation using numpy and matplot
     plt.tight_layout()
     plt.show()
 
+.. note:: 
+
+    There is both an interpolated and grid spike time.  The grid spike is the first time step 
+    where the voltage is higher than the threshold.  Note that if you try to plot the voltage at the grid 
+    spike indices the output will be ``NaN``. The interpolated spike is the calculated intersection of the 
+    threshold and voltage between the time steps.
+
 GLIF Configuration
 ------------------
 
