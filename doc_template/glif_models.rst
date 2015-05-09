@@ -59,8 +59,9 @@ the cell.  Specifically, the .zip archive will contain:
 
 If you would like to reproduce the model traces seen in the Cell Types Database, 
 you can download an NWB file containing both the stimulus and cell response traces via a 
-'Download data' link on the cell's electrophysiology page. See the :doc:`File Formats <file_formats>` 
-page for more details on the NWB file format.
+'Download data' link on the cell's electrophysiology page. See the 
+`NWB <cell_types.html#neurodata-without-borders>`_ description section
+for more details on the NWB file format.
 
 You can also download all of these files, including the cell's NWB file,
 using the :py:class:`GlifApi <allensdk.api.queries.glif_api.GlifApi>` 
