@@ -23,7 +23,7 @@ Uninstalling the SDK is simple with pip::
 Other Distribution Formats
 --------------------------
 
- .. include:: links.rst
+.. include:: links.rst
 
 
 Required Dependencies
