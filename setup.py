@@ -3,7 +3,8 @@ import os
 import allensdk
 
 # http://bugs.python.org/issue8876#msg208792
-del os.link
+if hasattr(os, 'link'):
+    del os.link
 
 def prepend_find_packages(*roots):
     ''' Recursively traverse nested packages under the root directories
