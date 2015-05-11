@@ -27,8 +27,8 @@ version `2.1.0 <http://repo.continuum.io/archive/index.html>`_.
 The rest of this page provides examples demonstrating how to download models, 
 examples of simulating these models, and general GLIF model documentation. 
 
-**Note:** the GLIF simulator module is still under heavy development and
-may change significantly in the future.
+.. note:: the GLIF simulator module is still under heavy development and
+          may change significantly in the future.
 
 
 Downloading  GLIF Models
