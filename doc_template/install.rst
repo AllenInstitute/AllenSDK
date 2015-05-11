@@ -11,7 +11,8 @@ consistent behavior with other Python versions.
 Quick Start Using Pip
 ---------------------
 
-First ensure you have `pip <http://pypi.python.org/pypi/pip>`_ installed.  To install for a single user::
+First ensure you have `pip <http://pypi.python.org/pypi/pip>`_ installed.
+To install the Allen SDK for a single user::
 
     pip install |tgz_url| --user
 
@@ -22,6 +23,9 @@ Uninstalling the SDK is simple with pip::
 
 Other Distribution Formats
 --------------------------
+
+The Allen SDK is also available from the source repository or as a downloadable .zip or .tar.gz archive.
+The package can also be `installed from these formats <https://packaging.python.org/en/latest/installing.html>`_.
 
 .. include:: links.rst
 
@@ -39,6 +43,7 @@ Optional Dependencies
  * `nose <https://nose.readthedocs.org/en/latest>`_ is nicer testing for python
  * `coverage <http://nedbatchelder.com/code/coverage>`_
  * `matplotlib <http://matplotlib.org/>`_
+ * `h5py <http://www.h5py.org>`_
 
 
 Installation with Docker (Optional)
@@ -59,9 +64,10 @@ example Dockerfiles are available.
  #. Use Docker to build the image::
  
      cd examples/docker
-     docker build --tag alleninstitute/allensdk -f Dockerfile.ubuntu .
+     cp Dockerfile.ubuntu Dockerfile
+     docker build --tag alleninstitute/allensdk:ubuntu  .
      
  #. Run the docker image::
  
-     docker run -it -v /data:/data alleninstitute/allensdk /bin/bash
+     docker run -it -v /data:/data alleninstitute/allensdk:ubuntu /bin/bash
 

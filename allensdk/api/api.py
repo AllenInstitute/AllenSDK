@@ -21,7 +21,6 @@ import logging
 class Api(object):
     _log = logging.getLogger(__name__)
     default_api_url = 'http://api.brain-map.org'
-    default_api_url = 'http://iwarehouse' # TODO: REMOVE THIS
     
     def __init__(self, api_base_url_string=None):
         if api_base_url_string==None:

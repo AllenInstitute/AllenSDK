@@ -25,7 +25,7 @@ class BiophysicalPerisomaticApi(Api):
     
     def __init__(self, base_uri=None):
         super(BiophysicalPerisomaticApi, self).__init__(base_uri)
-        self.cache_stimulus = False
+        self.cache_stimulus = True
         self.ids = {}
         self.sweeps = []
         self.manifest = {}
@@ -136,12 +136,12 @@ class BiophysicalPerisomaticApi(Api):
                                     self.is_well_known_file_type(well_known_file,
                                                                  BiophysicalPerisomaticApi._NWB_file_type)):
                                         self.ids['stimulus'][str(well_known_file['id'])] = \
-                                            os.path.split(well_known_file['path'])[1]
+                                            "%d.nwb" % (ephys_result['id'])
                     
                     
                     self.sweeps = [sweep['sweep_number'] 
                                    for sweep in specimen['ephys_sweeps']
-                                   if 'ephys_sweeps' in specimen]
+                                   if sweep['stimulus_name'] != 'Test']
         
         return self.ids
     
@@ -263,6 +263,17 @@ class BiophysicalPerisomaticApi(Api):
         '''
         if working_directory is None:
             working_directory = self.default_working_directory
+        try:
+            os.stat(working_directory)
+        except:
+            os.mkdir(working_directory)
+        
+        
+        work_dir = os.path.join(working_directory, 'work')
+        try:
+            os.stat(work_dir)
+        except:
+            os.mkdir(work_dir)
         
         modfile_dir = os.path.join(working_directory, 'modfiles')
         try:

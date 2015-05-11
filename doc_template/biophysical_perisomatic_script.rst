@@ -1,11 +1,22 @@
 Perisomatic Biophysical Models
 ==============================
 
-The biophysical models currently in the Allen Cell Types Database are 
-compartmental models of neurons that account for neuronal morphology 
-and emulate electrophysiological responses by assuming biophysically 
-detailed mechanisms for specific families of ionic conductances.  These models
-were generated using the `NEURON <http://www.neuron.yale.edu/neuron/>`_ simulator.
+The Allen Cell Types Database contains biophysical models that
+characterize the firing behavior of neurons measured in slices
+through current injection by a somatic whole-cell patch clamp electrode.
+These models contain a set of 10 active conductances placed at the soma
+and use the reconstructed 3D morphologies of the modeled neurons.
+The biophysical modeling 
+`technical white paper <http://help.brain-map.org/display/celltypes/Documentation>`_
+contains details
+on the specific construction of these models and the optimization
+of the model parameters to match the experimentally-recorded firing behaviors. 
+
+The biophysical models are run with the `NEURON <http://www.neuron.yale.edu/neuron/>`_ 
+simulation environment.  The Allen SDK package contains libraries that assist
+in downloading and setting up the models available on the Allen Institute web site
+for users to run using NEUORN. 
+
 
 Prerequisites
 -------------
@@ -14,40 +25,47 @@ You must have NEURON with the Python interpreter enabled and the Allen SDK insta
 
 The Allen Institute perisomatic biophysical models were generated using
 NEURON `version v7.3.ansi-1078 <http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078>`_.
-Instructions for `compiling NEURON <http://www.neuron.yale.edu/neuron/download/compile_linux>`_ with the Python interpreter 
-are available from the `NEURON team <http://www.neuron.yale.edu/neuron/>`_.
-Allen SDK is compatible with Python version 2.7.8, included in the Anaconda 2.1.0 distribution.
+Instructions for compiling NEURON with the Python interpreter 
+are available from the NEURON team under the heading 
+`Installation with Python as an alternative interpreter <http://www.neuron.yale.edu/neuron/download/compile_linux#otheroptions>`_.
+The Allen SDK is compatible with Python version 2.7.8, included in the Anaconda 2.1.0 distribution.
 
 Instructions for optional
 `Docker installation <./install.html#installation-with-docker-optional>`_ 
 are also available.
 
-.. note:: Building NEURON with the Python wrapper enabled is not always easy to install.  
+.. note:: Building and installing NEURON with the Python wrapper enabled is not always easy.  
           This page targets users that have a background in NEURON usage and installation.
 
 
-Retrieving Data from the Allen Institute
-----------------------------------------
+Downloading Biophysical Models
+------------------------------
 
-This may be done programmatically
+There are two ways to download files necessary to run a biophysical model.
+The first way is to visit http://celltypes.brain-map.org and find cells that have 
+GLIF models available for download.  The electrophysiology details page
+for a cell has a neuronal model download link.  Specifically:
+
+    #. Check 'More Options+'...'Models -> Biophysical'
+    #. Use the Filters, Cell Location and Cell Feature Filters to narrow your results.
+    #. Click on a Cell Summary to view the Mouse Experiment Electrophysiology.
+    #. Click the "download data" link to download the NWB stimulus and response file.
+    #. Click "show model response" and select "Biophysical - perisomatic".
+    #. Scroll down and click the Biophysical - perisomatic "download model" link.
+
+
+This may be also be done programmatically.
+The neuronal model id can be found to the left of
+the corresponding 'Biophysical - perisomatic "download model" link.
 ::
 
     from allensdk.api.queries.biophysical_perisomatic_api import \
         BiophysicalPerisomaticApi
     
     bp = BiophysicalPerisomaticApi('http://api.brain-map.org')
-    bp.cache_stimulus = False # change to True to download the stimulus file
-    neuronal_model_id = 472451419    # get this from the web site as below
+    bp.cache_stimulus = True # change to False to not download the large stimulus NWB file
+    neuronal_model_id = 472451419    # get this from the web site as above
     bp.cache_data(neuronal_model_id, working_directory='neuronal_model')
-
-You can search for model ids and also download the data manually from the web site:
-
-    #. Go to `http://celltypes.brain-map.org <http://celltypes.brain-map.org>`_
-    #. Check 'More Options+'...'has reconstruction'
-    #. Use the Filters, Cell Location and Cell Feature Filters to narrow your results.
-    #. Click on a Cell Summary to view the Mouse Experiment Electrophysiology.
-    #. Click "show model response" and select "Biophysical - perisomatic".
-    #. Scroll down and click the Biophysical - perisomatic "download model" link.
 
 More help can be found in the
 `online help <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_
@@ -79,13 +97,23 @@ and application configuration.
 
 
 Running the Simulation
---------------------------------------------
+----------------------
+
+All of the sweeps available from the web site are included in manifest.json and will be run by default.
+This can take some time.
 
 ::
 
     cd neuronal_model
-    nrnivmodl ./modfiles
+    nrnivmodl ./modfiles   # compile the model (only needs to be done once)
     python -m allensdk.model.biophysical_perisomatic.runner manifest.json
+
+
+Selecting a Specific Sweep
+--------------------------
+
+The sweeps are listed in manifest.json.
+You can remove all of the sweep numbers that you do not want run.
 
 
 Simulation Main Loop
@@ -197,13 +225,6 @@ Examples
 A :download:`minimal example (simple_example.tgz)<./examples/simple_example.tgz>`
 and a :download:`multicell example (multicell_example.tgz)<./examples/multicell_example.tgz>`
 are available to download as a starting point for your own projects.
-
-
-Selecting a Specific Sweep
---------------------------
-
-The sweeps are listed in manifest.json.
-You can remove all of the sweep numbers that you do not want run.
 
 
 Exporting Output to Text Format
