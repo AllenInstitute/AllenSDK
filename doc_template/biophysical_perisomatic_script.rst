@@ -10,7 +10,7 @@ were generated using the `NEURON <http://www.neuron.yale.edu/neuron/>`_ simulato
 Prerequisites
 -------------
 
-You must have NEURON with the Python interpreter enabled and Allen SDK installed.
+You must have NEURON with the Python interpreter enabled and the Allen SDK installed.
 
 The Allen Institute perisomatic biophysical models were generated using
 NEURON `version v7.3.ansi-1078 <http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078>`_.
@@ -22,8 +22,8 @@ Instructions for optional
 `Docker installation <./install.html#installation-with-docker-optional>`_ 
 are also available.
 
-.. note:: NEURON is not easy to install.  This page targets users that are familiar
-          with how to install and run NEURON already.
+.. note:: Building NEURON with the Python wrapper enabled is not always easy to install.  
+          This page targets users that have a background in NEURON usage and installation.
 
 
 Retrieving Data from the Allen Institute
