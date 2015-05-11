@@ -8,6 +8,10 @@ Allen Brain Atlas resources.  The database currently includes:
     * **electrophysiology**: whole cell current clamp recordings made from Cre-positive neurons
     * **morphology**: 3D bright-field images of the complete structure of neurons from the visual cortex
 
+This page describes how the SDK can be used to access data in the Cell Types Database.  For more information, 
+please visit the Cell Types `home page <http://celltypes.brain-map.org/>`_ and the 
+`documentation <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_.
+
 Cell Types API Access
 ---------------------
 
@@ -36,7 +40,7 @@ File Formats
 This section provides a short description of the file formats used for Allen Cell Types data.
 
 Morphology SWC Files
---------------------
+++++++++++++++++++++
 
 Morphological neuron reconstructions are available for download as SWC files.  The SWC file format is a white-space delimited text file with a standard set of headers.  The file lists a set of 3D neuronal compartments, each of which has:
 
@@ -91,7 +95,7 @@ The Allen SDK comes with a :py:mod:`~allensdk.core.swc` Python module that provi
     
 
 Neurodata Without Borders
--------------------------
++++++++++++++++++++++++++
 
 The electrophysiology data collected in the Allen Cell Types Database 
 is stored in the `Neurodata Without Borders`_ (NWB) file format.
