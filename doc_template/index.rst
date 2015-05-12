@@ -17,10 +17,11 @@ Welcome to the Allen SDK
    data_resources
    models
    Source Documentation <allensdk>
+   Github Profile <https://github.com/AllenInstitute/AllenSDK>
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
 For the initial release, the Allen SDK focuses primarily on the newly released Allen Cell Types Database.
-Functionality relevant to other atlases is coming in future releases.
+Functionality relevant to other atlases is coming in future releases.  
 
 .. image:: /_static/ccf_v3_sdk.png
     :align: right
@@ -29,7 +30,7 @@ Allen Cell Types Database
 -------------------------
 
 
-The Allen Cell Types Database contains electrophysiological and morphological characterizations
+The `Allen Cell Types Database <celltypes.brain-map.org>`_ contains electrophysiological and morphological characterizations
 of individual neurons in the mouse primary visual cortex.  The Allen SDK provides Python code
 for accessing electrophysiology measurements (`NWB files <cell_types.html#neurodata-without-borders>`_) 
 for all neurons and morphological reconstructions (`SWC files <cell_types.html#morphology-swc-files>`_) for a subset of neurons.

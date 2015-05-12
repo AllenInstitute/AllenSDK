@@ -43,7 +43,7 @@ Downloading Biophysical Models
 
 There are two ways to download files necessary to run a biophysical model.
 The first way is to visit http://celltypes.brain-map.org and find cells that have 
-GLIF models available for download.  The electrophysiology details page
+biophysical models available for download.  The electrophysiology details page
 for a cell has a neuronal model download link.  Specifically:
 
     #. Check 'More Options+'...'Models -> Biophysical'
