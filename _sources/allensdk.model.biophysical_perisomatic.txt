@@ -1,0 +1,30 @@
+allensdk.model.biophysical_perisomatic package
+==============================================
+
+Submodules
+----------
+
+allensdk.model.biophysical_perisomatic.runner module
+----------------------------------------------------
+
+.. automodule:: allensdk.model.biophysical_perisomatic.runner
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.model.biophysical_perisomatic.utils module
+---------------------------------------------------
+
+.. automodule:: allensdk.model.biophysical_perisomatic.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.model.biophysical_perisomatic
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,38 @@
+allensdk.api.queries package
+============================
+
+Submodules
+----------
+
+allensdk.api.queries.biophysical_perisomatic_api module
+-------------------------------------------------------
+
+.. automodule:: allensdk.api.queries.biophysical_perisomatic_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.api.queries.cell_types_api module
+------------------------------------------
+
+.. automodule:: allensdk.api.queries.cell_types_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.api.queries.glif_api module
+------------------------------------
+
+.. automodule:: allensdk.api.queries.glif_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.api.queries
+    :members:
+    :undoc-members:
+    :show-inheritance:

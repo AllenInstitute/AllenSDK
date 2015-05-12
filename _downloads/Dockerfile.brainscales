@@ -1,0 +1,19 @@
+# DOCKER-VERSION 0.3.4
+#
+# docker build --tag alleninstitute/allensdk .
+# docker run -it -v /docker_share:/docker_share alleninstitute/allensdk:fridayharbor /bin/bash
+#
+FROM brainscales/neural-networks:software
+
+MAINTAINER Tim Fliss <timf@alleninstitute.org>
+
+#rebuild neuron installation
+RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078/nrn-7.3.ansi-1078.tar.gz
+RUN cd /opt; rm -rf neuron/nrn; mv /root/nrn-7.3.ansi-1078.tar.gz neuron/
+RUN cd /opt/neuron; tar xzf nrn-7.3.ansi-1078.tar.gz; rm nrn-7.3.ansi-1078.tar.gz; mv nrn-7.3 nrn
+RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --with-paranrn --with-nrnpython --with-mpi --with-music=/usr/local && make && make install
+RUN cd /opt/neuron/nrn/src/nrnpython; pip uninstall neuron; python setup.py install
+
+RUN pip install six --upgrade
+RUN pip install cython h5py
+RUN pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.9.0.tar.gz

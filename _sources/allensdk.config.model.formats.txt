@@ -1,0 +1,38 @@
+allensdk.config.model.formats package
+=====================================
+
+Submodules
+----------
+
+allensdk.config.model.formats.json_description_parser module
+------------------------------------------------------------
+
+.. automodule:: allensdk.config.model.formats.json_description_parser
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.config.model.formats.json_util module
+----------------------------------------------
+
+.. automodule:: allensdk.config.model.formats.json_util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.config.model.formats.pycfg_description_parser module
+-------------------------------------------------------------
+
+.. automodule:: allensdk.config.model.formats.pycfg_description_parser
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.config.model.formats
+    :members:
+    :undoc-members:
+    :show-inheritance:

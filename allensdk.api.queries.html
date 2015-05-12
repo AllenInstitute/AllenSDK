@@ -1,0 +1,1270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.api.queries package &mdash; Allen SDK 0.2.0dev documentation</title>
+    
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.2.0dev documentation" href="index.html" />
+    <link rel="up" title="allensdk.api package" href="allensdk.api.html" />
+    <link rel="prev" title="allensdk.api package" href="allensdk.api.html" /> 
+  </head>
+  <body>
+<script type="text/javascript" src="_static/external_assets/javascript/portal.js"></script>
+<style>
+
+	/* the icon font-family definition and helper classes */
+	@font-face {
+	  font-family: 'portal_icon_font';
+	  src: url('_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  font-weight: normal;
+	  font-style: normal;
+	}
+	 
+	 [class^="icon-"]:before, [class*=" icon-"]:before {
+	  font-family: "portal_icon_font";
+	  font-style: normal;
+	  font-weight: normal;
+	  speak: none;
+	 
+	  display: inline-block;
+	  text-decoration: inherit;
+	  width: 1em;
+	  margin-right: .2em;
+	  text-align: center;
+	  /* opacity: .8; */
+	 
+	  /* For safety - reset parent styles, that can break glyph codes*/
+	  font-variant: normal;
+	  text-transform: none;
+	     
+	  /* fix buttons height, for twitter bootstrap */
+	  line-height: 1em;
+	 
+	  /* Animation center compensation - margins should be symmetric */
+	  /* remove if not needed */
+	  margin-left: .2em;
+	
+	}
+	 
+	.icon-spin5:before { content: '\e806'; } /* '' */
+	.icon-left-open-1:before { content: '\e81e'; } /* '' */
+	.icon-plus-1:before { content: '\e801'; } /* '' */
+	.icon-facebook:before { content: '\e816'; } /* '' */
+	.icon-gplus:before { content: '\e818'; } /* '' */
+	.icon-linkedin-3:before { content: '\e815'; } /* '' */
+	.icon-twitter:before { content: '\e817'; } /* '' */
+	.icon-youtube-play:before { content: '\e805'; } /* '' */
+	.icon-plus-2:before { content: '\e809'; } /* '' */
+	.icon-record-1:before { content: '\e81c'; } /* '' */
+	.icon-cancel:before { content: '\e80b'; } /* '' */
+	.icon-search:before { content: '\e804'; } /* '' */
+	.icon-cancel-2:before { content: '\e80c'; } /* '' */
+	.icon-plus-4:before { content: '\e80d'; } /* '' */
+	.icon-cancel-3:before { content: '\e80e'; } /* '' */
+	.icon-plus:before { content: '\e808'; } /* '' */
+	.icon-down-open:before { content: '\e800'; } /* '' */
+	.icon-right-open:before { content: '\e802'; } /* '' */
+	.icon-up-open:before { content: '\e803'; } /* '' */
+	.icon-stop:before { content: '\e813'; } /* '' */
+	.icon-cancel-1:before { content: '\e820'; } /* '' */
+	.icon-plus-3:before { content: '\e80a'; } /* '' */
+	/* end icon font helpers */
+
+	/* icon font spin animation */
+	.animate-spin {
+	  -moz-animation: spin 2s infinite linear;
+	  -o-animation: spin 2s infinite linear;
+	  -webkit-animation: spin 2s infinite linear;
+	  animation: spin 2s infinite linear;
+	  display: inline-block;
+	}
+	@-moz-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-webkit-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-o-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-ms-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	/*  end spin animation */	
+
+	@font-face {
+	    font-family: 'bebas_neueregular';
+	    src: url('_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	/* top chrome styles */
+	#top_chrome {
+
+		width:100%;
+		height:28px;
+		background-color:#163E65;
+	}
+
+	.chrome_link_block {
+
+		color:#fff !important;	
+		display:inline-block;
+		height:100%;
+		max-height:28px;
+	}
+
+	.chrome_link_block:hover {
+
+		background-color:#eee;
+		color:#0779BE !important;	
+		cursor:pointer;
+	}
+
+	#top_chrome a {
+
+		color:inherit !important;	
+		text-decoration:none;
+	}
+
+	#top_chrome a:hover {
+
+		color:inherit !important;	
+	}
+
+	#top_chrome_buttons {
+
+		float:right;
+		margin-right:50px;
+	}
+
+	.chrome_button {
+
+		font-family:arial,sans-serif;
+		font-weight:bold;
+		display:inline-block;
+		font-size:9px;
+		text-align:left;
+		text-decoration:none;
+		margin:9px 20px 10px 20px;
+	}
+
+	.chrome_active {
+
+		background-color:#1b7abd;
+		color:#fff;
+	}
+
+
+	/* header element styles*/
+	#header_content {
+
+		font-family: bebas_neueregular, arial, sans-serif;
+		font-size:22px;
+		color:#0779be;		
+		letter-spacing:0.03em;
+
+		position:relative;
+		width:calc(100% - 112px);
+		min-width:800px;
+		height:76px;
+		border-bottom:2px solid #A5A8AB;
+		margin-left:50px;
+		margin-right:50px;
+        z-index:9999; /* IT-9508 */
+	}
+
+	#portal_logo {
+
+		position:absolute;
+		top:20px;
+		left:0px;
+		width:236px;
+	}
+
+	#portal_tabs {
+
+		position: absolute;
+		bottom: 12px;
+		left: 0px;
+		margin-bottom: -12px;
+		display: block;
+	}
+
+	.horizontal_list
+	{
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		display: inline; 		
+	}
+
+	.horizontal_list li { 
+
+		display: inline; 	
+	}	
+
+	#portal_tab_menu_container {
+
+		display:none;
+	}
+
+	#portal_search_input_group {
+
+		position:absolute;
+		margin: 0;
+		padding: 0;
+		bottom:12px;
+		right:0px;
+		border:1px solid #DAD9D3;
+		color:#DAD9D3;
+	}
+
+	#portal_search_input_group input {
+
+		margin: 0;
+		padding: 0;
+		border:none;
+		width:110px;
+		color:#DAD9D3;
+		font-family:Helvetica,sans-serif;
+		font-size:12px;
+		height:28px;
+		margin-left:10px;
+
+		outline:none;
+	}
+
+	input::-ms-clear {
+		display: none;
+	}
+
+	#portal_search_input_group i {
+
+		font-size:0.8em;
+		cursor:pointer;
+	}
+
+	#pSiteSearchTextInput:focus {
+
+		color:#000;
+	}
+
+	.icon_menu_down {
+
+		font-size: 12px;
+		margin-left: 4px;
+		vertical-align: text-top;
+		padding-top: 4px;
+		display: inline-block;
+	}
+
+	.portal_tab_item {
+
+		background-color: #fff;
+		padding: 12px;
+		padding-left:20px;
+		padding-right:20px;
+		display: inline-block !important;		
+	}
+
+	.portal_tab_item a:hover {
+
+		color:#fbe300;	
+	}
+
+	.portal_tab_item:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}	
+
+
+	.portal_menu_active {
+
+		background-color: #EEEEEE;
+	}	
+
+	.portal_menu_item_active {
+
+		color:#fbe300 !important;	
+	}
+
+	.portal_tab_active {
+
+		color:#a5a8ab !important;
+	}
+
+	#header_content a {		
+
+		color:inherit !important;
+	}
+
+	#header_content a:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}
+
+	#header_content ul {
+
+		list-style: none;
+		position: relative;
+		top: 58px;
+		display: inline-table;
+	}
+
+	#header_content ul ul {
+		
+		display:none;
+		opacity:0;
+	}
+
+	/* the fly out menus */
+	#header_content ul li:hover > ul,
+	#header_content ul li.hover > ul {
+
+		position: absolute;
+		top: 48px;
+		z-index:999;
+
+		display: block;
+		width: 152px;
+		padding:0px;
+		padding-top:20px;
+		padding-bottom:10px;
+		font-size: 12px;
+		font-family: Arial,Sans-Serif;
+		font-weight: bold;
+		text-transform: uppercase;
+
+		background-color: rgba(8,122,191,0.98);
+		color: #fff !important;
+		opacity: 1;
+
+		-webkit-animation: fade 0.25s;
+		animation: fade 0.25s;
+	}
+
+	@-webkit-keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}
+	@keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}	
+
+	#header_content ul li:hover > ul li {
+
+		padding: 10px;
+		padding-top: 0px;
+		padding-left: 20px;
+		display: block;
+		opacity:1;
+	}
+
+	#header_content ul li:hover > ul a {
+
+		display: block;
+		opacity:1;
+		white-space:nowrap;
+	}
+
+	#portal_menu_start_list {
+
+		left: 81px;
+
+		/* IE sauce */
+		left:85px\9;
+
+		/* Safari sauce */
+		(;left:79px;);
+	}
+
+	#portal_menu_atlases_list {
+
+		left: 290px;
+		width: 210px !important;
+        height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 303px\9;
+        height: 225px\9;
+
+		/* Safari sauce */
+		(;left:279px;);
+	}
+
+	#portal_menu_tools_list {
+
+		left: 500px;
+		width: 172px !important;
+		height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 513px\9;
+		height:225px\9;
+
+		/* Safari sauce */
+		(;left:489px;);
+		(;height:227px;);
+	}
+
+	/* mozilla sauce */
+	@-moz-document url-prefix() {
+
+		#header_content {
+
+			height:107px;
+		}
+
+		#portal_menu_start_list {
+
+			left:85px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 302px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 512px;
+			height:236px;
+		}
+	}
+
+
+	/* make it look OK on iPad also */
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}  
+	}
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}	  
+	}
+
+	.portal_menu_list_heading {
+
+		color:#9ccae5;
+		border-bottom:1px solid #9ccae5;
+		padding-bottom:5px !important;
+	}
+
+	.portal_menu_list_heading + li {
+
+		padding-top:10px !important;
+	}
+
+	.portal_menu_list_heading li {
+
+		padding-bottom:0px;
+	}	
+
+	#portal_menu_atlases_list li:last-of-type {
+
+		padding-bottom:15px !important;
+	}
+
+	.icon-spin5 {
+
+		color:#000;
+	}
+</style>
+<div id="pHeader">
+<div id="top_chrome">
+	<div id="top_chrome_buttons">
+		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
+		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
+	</div>
+</div>
+
+<div id="header_content">
+
+	<a href="http://AllenInstitute.github.io/AllenSDK">
+		<img id="portal_logo" style="border:0;" src="_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+	</a>
+</div>
+</div>
+
+<script>
+
+jQuery('#portal_tab_menu').bind('touchstart', function() {
+
+	if(window.console)
+		console.log("touchstart");
+});
+</script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="allensdk-api-queries-package">
+<h1>allensdk.api.queries package<a class="headerlink" href="#allensdk-api-queries-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-allensdk.api.queries.biophysical_perisomatic_api">
+<span id="allensdk-api-queries-biophysical-perisomatic-api-module"></span><h2>allensdk.api.queries.biophysical_perisomatic_api module<a class="headerlink" href="#module-allensdk.api.queries.biophysical_perisomatic_api" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi">
+<em class="property">class </em><tt class="descclassname">allensdk.api.queries.biophysical_perisomatic_api.</tt><tt class="descname">BiophysicalPerisomaticApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.api.Api" title="allensdk.api.api.Api"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.api.Api</span></tt></a></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma"><tt class="xref py py-obj docutils literal"><span class="pre">build_rma</span></tt></a>(neuronal_model_id[,&nbsp;fmt])</td>
+<td>Construct a query to find all files related to a neuronal model.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data"><tt class="xref py py-obj docutils literal"><span class="pre">cache_data</span></tt></a>(neuronal_model_id[,&nbsp;...])</td>
+<td>Take a an experiment id, query the Api RMA to get well-known-files download the files, and store them in the working directory.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
+<td>Join data api endpoint and id.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest"><tt class="xref py py-obj docutils literal"><span class="pre">create_manifest</span></tt></a>([fit_path,&nbsp;...])</td>
+<td>Generate a json configuration file with parameters for a  a biophysical experiment.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
+<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids"><tt class="xref py py-obj docutils literal"><span class="pre">get_well_known_file_ids</span></tt></a>(neuronal_model_id)</td>
+<td>Query the current RMA endpoint with a neuronal_model id to get the corresponding well known file ids.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type"><tt class="xref py py-obj docutils literal"><span class="pre">is_well_known_file_type</span></tt></a>(wkf,&nbsp;name)</td>
+<td>Check if a structure has the expected name.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
+<td>Download the RMA schema from the current RMA endpoint</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json"><tt class="xref py py-obj docutils literal"><span class="pre">read_json</span></tt></a>(json_parsed_data)</td>
+<td>Get the list of well_known_file ids from a response body containing nested sample,microarray_slides,well_known_files.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
+<td>Get a file from the data api and save it.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(rma_url)</td>
+<td>Get the document and put it in a Python data structure</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
+<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
+<td>Set the working directory where files will be saved.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma">
+<tt class="descname">build_rma</tt><big>(</big><em>neuronal_model_id</em>, <em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.build_rma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a query to find all files related to a neuronal model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>neuronal_model_id</strong> : integer or string representation</p>
+<blockquote>
+<div><p>key of experiment to retrieve.</p>
+</div></blockquote>
+<p><strong>fmt</strong> : string, optional</p>
+<blockquote>
+<div><p>json (default) or xml</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
+<blockquote class="last">
+<div><p>RMA query url.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data">
+<tt class="descname">cache_data</tt><big>(</big><em>neuronal_model_id</em>, <em>working_directory=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.cache_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a an experiment id, query the Api RMA to get well-known-files
+download the files, and store them in the working directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>neuronal_model_id</strong> : int or string representation</p>
+<blockquote>
+<div><p>found in the neuronal_model table in the api</p>
+</div></blockquote>
+<p><strong>working_directory</strong> : string</p>
+<blockquote class="last">
+<div><p>Absolute path name where the downloaded well-known files will be stored.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest">
+<tt class="descname">create_manifest</tt><big>(</big><em>fit_path=''</em>, <em>stimulus_filename=''</em>, <em>swc_morphology_path=''</em>, <em>sweeps=[]</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.create_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a json configuration file with parameters for a 
+a biophysical experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fit_path</strong> : string</p>
+<blockquote>
+<div><p>filename of a json configuration file with cell parameters.</p>
+</div></blockquote>
+<p><strong>stimulus_filename</strong> : string</p>
+<blockquote>
+<div><p>path to an NWB file with input currents.</p>
+</div></blockquote>
+<p><strong>swc_morphology_path</strong> : string</p>
+<blockquote>
+<div><p>file in SWC format.</p>
+</div></blockquote>
+<p><strong>sweeps</strong> : array of integers</p>
+<blockquote class="last">
+<div><p>which sweeps in the stimulus file are to be used.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids">
+<tt class="descname">get_well_known_file_ids</tt><big>(</big><em>neuronal_model_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.get_well_known_file_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the current RMA endpoint with a neuronal_model id
+to get the corresponding well known file ids.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
+<blockquote class="last">
+<div><p>A list of well known file id strings.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type">
+<tt class="descname">is_well_known_file_type</tt><big>(</big><em>wkf</em>, <em>name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.is_well_known_file_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a structure has the expected name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>wkf</strong> : dict</p>
+<blockquote>
+<div><p>A well-known-file structure with nested type information.</p>
+</div></blockquote>
+<p><strong>name</strong> : string</p>
+<blockquote class="last">
+<div><p>The expected type name</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<dl class="last docutils">
+<dt><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json"><tt class="xref py py-obj docutils literal"><span class="pre">read_json</span></tt></a></dt>
+<dd>where this helper function is used.</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json">
+<tt class="descname">read_json</tt><big>(</big><em>json_parsed_data</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.read_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the list of well_known_file ids from a response body
+containing nested sample,microarray_slides,well_known_files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json_parsed_data</strong> : dict</p>
+<blockquote>
+<div><p>Response from the Allen Institute Api RMA.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of strings</p>
+<blockquote class="last">
+<div><p>Well known file ids.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.api.queries.cell_types_api">
+<span id="allensdk-api-queries-cell-types-api-module"></span><h2>allensdk.api.queries.cell_types_api module<a class="headerlink" href="#module-allensdk.api.queries.cell_types_api" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi">
+<em class="property">class </em><tt class="descclassname">allensdk.api.queries.cell_types_api.</tt><tt class="descname">CellTypesApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.api.Api" title="allensdk.api.api.Api"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.api.Api</span></tt></a></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.build_ephys_data_rma" title="allensdk.api.queries.cell_types_api.CellTypesApi.build_ephys_data_rma"><tt class="xref py py-obj docutils literal"><span class="pre">build_ephys_data_rma</span></tt></a>(specimen_id[,&nbsp;fmt])</td>
+<td>Build the URL for the save_ephys_data command.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.build_list_cells_rma" title="allensdk.api.queries.cell_types_api.CellTypesApi.build_list_cells_rma"><tt class="xref py py-obj docutils literal"><span class="pre">build_list_cells_rma</span></tt></a>(require_morphology,&nbsp;...)</td>
+<td>Build the RMA URL that will fetch meta data for all cells in the cell types database</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.build_reconstruction_rma" title="allensdk.api.queries.cell_types_api.CellTypesApi.build_reconstruction_rma"><tt class="xref py py-obj docutils literal"><span class="pre">build_reconstruction_rma</span></tt></a>(specimen_id[,&nbsp;fmt])</td>
+<td>Build the URL for the save_reconstruction command.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
+<td>Join data api endpoint and id.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
+<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="allensdk.api.queries.cell_types_api.CellTypesApi.list_cells"><tt class="xref py py-obj docutils literal"><span class="pre">list_cells</span></tt></a>([require_morphology,&nbsp;...])</td>
+<td>Query the API for a list of all cells in the Cell Types Database.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
+<td>Download the RMA schema from the current RMA endpoint</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.read_ephys_data_json" title="allensdk.api.queries.cell_types_api.CellTypesApi.read_ephys_data_json"><tt class="xref py py-obj docutils literal"><span class="pre">read_ephys_data_json</span></tt></a>(parsed_json)</td>
+<td>Extract the download link from the save_ephys_data RMA.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.read_list_cells_json" title="allensdk.api.queries.cell_types_api.CellTypesApi.read_list_cells_json"><tt class="xref py py-obj docutils literal"><span class="pre">read_list_cells_json</span></tt></a>(parsed_json)</td>
+<td>Return the list of cells from the parsed query.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.read_reconstruction_json" title="allensdk.api.queries.cell_types_api.CellTypesApi.read_reconstruction_json"><tt class="xref py py-obj docutils literal"><span class="pre">read_reconstruction_json</span></tt></a>(parsed_json)</td>
+<td>Extract the download link from the save_ephys_file RMA.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
+<td>Get a file from the data api and save it.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(rma_url)</td>
+<td>Get the document and put it in a Python data structure</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data" title="allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data"><tt class="xref py py-obj docutils literal"><span class="pre">save_ephys_data</span></tt></a>(specimen_id,&nbsp;file_name)</td>
+<td>Find the electrophysiology data file for a specimen and save it.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction" title="allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction"><tt class="xref py py-obj docutils literal"><span class="pre">save_reconstruction</span></tt></a>(specimen_id,&nbsp;file_name)</td>
+<td>Find the reconstruction file for a specimen and save it.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
+<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
+<td>Set the working directory where files will be saved.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.build_ephys_data_rma">
+<tt class="descname">build_ephys_data_rma</tt><big>(</big><em>specimen_id</em>, <em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.build_ephys_data_rma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.build_ephys_data_rma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the URL for the save_ephys_data command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.build_list_cells_rma">
+<tt class="descname">build_list_cells_rma</tt><big>(</big><em>require_morphology</em>, <em>require_reconstruction</em>, <em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.build_list_cells_rma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.build_list_cells_rma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the RMA URL that will fetch meta data for all cells in the cell types database</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.build_reconstruction_rma">
+<tt class="descname">build_reconstruction_rma</tt><big>(</big><em>specimen_id</em>, <em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.build_reconstruction_rma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.build_reconstruction_rma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the URL for the save_reconstruction command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.list_cells">
+<tt class="descname">list_cells</tt><big>(</big><em>require_morphology=False</em>, <em>require_reconstruction=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.list_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the API for a list of all cells in the Cell Types Database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>require_morphology: boolean</strong></p>
+<blockquote>
+<div><p>Only return cells that have morphology images.</p>
+</div></blockquote>
+<p><strong>require_reconstruction: boolean</strong></p>
+<blockquote>
+<div><p>Only return cells that have morphological reconstructions.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
+<blockquote class="last">
+<div><p>Meta data for all cells.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.read_ephys_data_json">
+<tt class="descname">read_ephys_data_json</tt><big>(</big><em>parsed_json</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.read_ephys_data_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.read_ephys_data_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the download link from the save_ephys_data RMA.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.read_list_cells_json">
+<tt class="descname">read_list_cells_json</tt><big>(</big><em>parsed_json</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.read_list_cells_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.read_list_cells_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of cells from the parsed query.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.read_reconstruction_json">
+<tt class="descname">read_reconstruction_json</tt><big>(</big><em>parsed_json</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.read_reconstruction_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.read_reconstruction_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the download link from the save_ephys_file RMA.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data">
+<tt class="descname">save_ephys_data</tt><big>(</big><em>specimen_id</em>, <em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.save_ephys_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the electrophysiology data file for a specimen and save it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction">
+<tt class="descname">save_reconstruction</tt><big>(</big><em>specimen_id</em>, <em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.save_reconstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the reconstruction file for a specimen and save it.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.api.queries.glif_api">
+<span id="allensdk-api-queries-glif-api-module"></span><h2>allensdk.api.queries.glif_api module<a class="headerlink" href="#module-allensdk.api.queries.glif_api" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.api.queries.glif_api.GlifApi">
+<em class="property">class </em><tt class="descclassname">allensdk.api.queries.glif_api.</tt><tt class="descname">GlifApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.api.Api" title="allensdk.api.api.Api"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.api.Api</span></tt></a></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_list_rma_url" title="allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_list_rma_url"><tt class="xref py py-obj docutils literal"><span class="pre">build_neuronal_model_list_rma_url</span></tt></a>([fmt])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_rma_url" title="allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_rma_url"><tt class="xref py py-obj docutils literal"><span class="pre">build_neuronal_model_rma_url</span></tt></a>(neuronal_model_id)</td>
+<td>Construct a query to find all files related to a GLIF neuronal model.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file" title="allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file"><tt class="xref py py-obj docutils literal"><span class="pre">cache_stimulus_file</span></tt></a>(output_file_name)</td>
+<td>Download the NWB file for the current neuronal model and save it to a file.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
+<td>Join data api endpoint and id.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
+<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps" title="allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps"><tt class="xref py py-obj docutils literal"><span class="pre">get_ephys_sweeps</span></tt></a>()</td>
+<td>Retrieve ephys sweep information out of downloaded metadata for a neuronal model</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.get_neuron_config" title="allensdk.api.queries.glif_api.GlifApi.get_neuron_config"><tt class="xref py py-obj docutils literal"><span class="pre">get_neuron_config</span></tt></a>([output_file_name])</td>
+<td>Retrieve a model configuration file from the API, optionally save it to disk, and  return the contents of that file as a dictionary.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.get_neuronal_model" title="allensdk.api.queries.glif_api.GlifApi.get_neuronal_model"><tt class="xref py py-obj docutils literal"><span class="pre">get_neuronal_model</span></tt></a>(neuronal_model_id)</td>
+<td>Query the current RMA endpoint with a neuronal_model id to get the corresponding well known files and meta data.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.list_neuronal_models" title="allensdk.api.queries.glif_api.GlifApi.list_neuronal_models"><tt class="xref py py-obj docutils literal"><span class="pre">list_neuronal_models</span></tt></a>()</td>
+<td>Query the API for a list of all GLIF neuronal models.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
+<td>Download the RMA schema from the current RMA endpoint</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_json" title="allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_json"><tt class="xref py py-obj docutils literal"><span class="pre">read_neuronal_model_json</span></tt></a>(json_parsed_data)</td>
+<td>Reformat the RMA query results into a more usable dictionary</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_list_json" title="allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_list_json"><tt class="xref py py-obj docutils literal"><span class="pre">read_neuronal_model_list_json</span></tt></a>(json_parsed_data)</td>
+<td>Return basic meta data for all neuronal models</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
+<td>Get a file from the data api and save it.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(rma_url)</td>
+<td>Get the document and put it in a Python data structure</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
+<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
+<td>Set the working directory where files will be saved.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_list_rma_url">
+<tt class="descname">build_neuronal_model_list_rma_url</tt><big>(</big><em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.build_neuronal_model_list_rma_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_list_rma_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_rma_url">
+<tt class="descname">build_neuronal_model_rma_url</tt><big>(</big><em>neuronal_model_id</em>, <em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.build_neuronal_model_rma_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_rma_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a query to find all files related to a GLIF neuronal model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>neuronal_model_id</strong> : integer or string representation</p>
+<blockquote>
+<div><p>key of experiment to retrieve.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
+<blockquote class="last">
+<div><p>RMA query url.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file">
+<tt class="descname">cache_stimulus_file</tt><big>(</big><em>output_file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.cache_stimulus_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the NWB file for the current neuronal model and save it to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>output_file_name: string</strong></p>
+<blockquote class="last">
+<div><p>File name to store the NWB file.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps">
+<tt class="descname">get_ephys_sweeps</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.get_ephys_sweeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve ephys sweep information out of downloaded metadata for a neuronal model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
+<blockquote class="last">
+<div><p>A list of sweeps metadata dictionaries</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.get_neuron_config">
+<tt class="descname">get_neuron_config</tt><big>(</big><em>output_file_name=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.get_neuron_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.get_neuron_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a model configuration file from the API, optionally save it to disk, and 
+return the contents of that file as a dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>output_file_name: string</strong></p>
+<blockquote class="last">
+<div><p>File name to store the neuron configuration (optional).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.get_neuronal_model">
+<tt class="descname">get_neuronal_model</tt><big>(</big><em>neuronal_model_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.get_neuronal_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.get_neuronal_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the current RMA endpoint with a neuronal_model id
+to get the corresponding well known files and meta data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>A dictionary containing</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.list_neuronal_models">
+<tt class="descname">list_neuronal_models</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.list_neuronal_models"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.list_neuronal_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the API for a list of all GLIF neuronal models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
+<blockquote class="last">
+<div><p>Meta data for all GLIF neuronal models.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_json">
+<tt class="descname">read_neuronal_model_json</tt><big>(</big><em>json_parsed_data</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.read_neuronal_model_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reformat the RMA query results into a more usable dictionary</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json_parsed_data: dict</strong></p>
+<blockquote>
+<div><p>the json response from the Allen Institute API RMA.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">hash</p>
+<blockquote class="last">
+<div><p>a dictionary containing fields necessary to run a GLIF model</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_list_json">
+<tt class="descname">read_neuronal_model_list_json</tt><big>(</big><em>json_parsed_data</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.read_neuronal_model_list_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_list_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return basic meta data for all neuronal models</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.api.queries">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-allensdk.api.queries" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer">
+    </div>
+<script type="text/javascript" src="_static/external_assets/javascript/portalFooter.js"></script>
+
+  </body>
+</html>

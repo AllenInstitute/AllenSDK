@@ -1,0 +1,1724 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Index &mdash; Allen SDK 0.2.0dev documentation</title>
+    
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.2.0dev documentation" href="index.html" /> 
+  </head>
+  <body>
+<script type="text/javascript" src="_static/external_assets/javascript/portal.js"></script>
+<style>
+
+	/* the icon font-family definition and helper classes */
+	@font-face {
+	  font-family: 'portal_icon_font';
+	  src: url('_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  font-weight: normal;
+	  font-style: normal;
+	}
+	 
+	 [class^="icon-"]:before, [class*=" icon-"]:before {
+	  font-family: "portal_icon_font";
+	  font-style: normal;
+	  font-weight: normal;
+	  speak: none;
+	 
+	  display: inline-block;
+	  text-decoration: inherit;
+	  width: 1em;
+	  margin-right: .2em;
+	  text-align: center;
+	  /* opacity: .8; */
+	 
+	  /* For safety - reset parent styles, that can break glyph codes*/
+	  font-variant: normal;
+	  text-transform: none;
+	     
+	  /* fix buttons height, for twitter bootstrap */
+	  line-height: 1em;
+	 
+	  /* Animation center compensation - margins should be symmetric */
+	  /* remove if not needed */
+	  margin-left: .2em;
+	
+	}
+	 
+	.icon-spin5:before { content: '\e806'; } /* '' */
+	.icon-left-open-1:before { content: '\e81e'; } /* '' */
+	.icon-plus-1:before { content: '\e801'; } /* '' */
+	.icon-facebook:before { content: '\e816'; } /* '' */
+	.icon-gplus:before { content: '\e818'; } /* '' */
+	.icon-linkedin-3:before { content: '\e815'; } /* '' */
+	.icon-twitter:before { content: '\e817'; } /* '' */
+	.icon-youtube-play:before { content: '\e805'; } /* '' */
+	.icon-plus-2:before { content: '\e809'; } /* '' */
+	.icon-record-1:before { content: '\e81c'; } /* '' */
+	.icon-cancel:before { content: '\e80b'; } /* '' */
+	.icon-search:before { content: '\e804'; } /* '' */
+	.icon-cancel-2:before { content: '\e80c'; } /* '' */
+	.icon-plus-4:before { content: '\e80d'; } /* '' */
+	.icon-cancel-3:before { content: '\e80e'; } /* '' */
+	.icon-plus:before { content: '\e808'; } /* '' */
+	.icon-down-open:before { content: '\e800'; } /* '' */
+	.icon-right-open:before { content: '\e802'; } /* '' */
+	.icon-up-open:before { content: '\e803'; } /* '' */
+	.icon-stop:before { content: '\e813'; } /* '' */
+	.icon-cancel-1:before { content: '\e820'; } /* '' */
+	.icon-plus-3:before { content: '\e80a'; } /* '' */
+	/* end icon font helpers */
+
+	/* icon font spin animation */
+	.animate-spin {
+	  -moz-animation: spin 2s infinite linear;
+	  -o-animation: spin 2s infinite linear;
+	  -webkit-animation: spin 2s infinite linear;
+	  animation: spin 2s infinite linear;
+	  display: inline-block;
+	}
+	@-moz-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-webkit-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-o-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-ms-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	/*  end spin animation */	
+
+	@font-face {
+	    font-family: 'bebas_neueregular';
+	    src: url('_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	/* top chrome styles */
+	#top_chrome {
+
+		width:100%;
+		height:28px;
+		background-color:#163E65;
+	}
+
+	.chrome_link_block {
+
+		color:#fff !important;	
+		display:inline-block;
+		height:100%;
+		max-height:28px;
+	}
+
+	.chrome_link_block:hover {
+
+		background-color:#eee;
+		color:#0779BE !important;	
+		cursor:pointer;
+	}
+
+	#top_chrome a {
+
+		color:inherit !important;	
+		text-decoration:none;
+	}
+
+	#top_chrome a:hover {
+
+		color:inherit !important;	
+	}
+
+	#top_chrome_buttons {
+
+		float:right;
+		margin-right:50px;
+	}
+
+	.chrome_button {
+
+		font-family:arial,sans-serif;
+		font-weight:bold;
+		display:inline-block;
+		font-size:9px;
+		text-align:left;
+		text-decoration:none;
+		margin:9px 20px 10px 20px;
+	}
+
+	.chrome_active {
+
+		background-color:#1b7abd;
+		color:#fff;
+	}
+
+
+	/* header element styles*/
+	#header_content {
+
+		font-family: bebas_neueregular, arial, sans-serif;
+		font-size:22px;
+		color:#0779be;		
+		letter-spacing:0.03em;
+
+		position:relative;
+		width:calc(100% - 112px);
+		min-width:800px;
+		height:76px;
+		border-bottom:2px solid #A5A8AB;
+		margin-left:50px;
+		margin-right:50px;
+        z-index:9999; /* IT-9508 */
+	}
+
+	#portal_logo {
+
+		position:absolute;
+		top:20px;
+		left:0px;
+		width:236px;
+	}
+
+	#portal_tabs {
+
+		position: absolute;
+		bottom: 12px;
+		left: 0px;
+		margin-bottom: -12px;
+		display: block;
+	}
+
+	.horizontal_list
+	{
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		display: inline; 		
+	}
+
+	.horizontal_list li { 
+
+		display: inline; 	
+	}	
+
+	#portal_tab_menu_container {
+
+		display:none;
+	}
+
+	#portal_search_input_group {
+
+		position:absolute;
+		margin: 0;
+		padding: 0;
+		bottom:12px;
+		right:0px;
+		border:1px solid #DAD9D3;
+		color:#DAD9D3;
+	}
+
+	#portal_search_input_group input {
+
+		margin: 0;
+		padding: 0;
+		border:none;
+		width:110px;
+		color:#DAD9D3;
+		font-family:Helvetica,sans-serif;
+		font-size:12px;
+		height:28px;
+		margin-left:10px;
+
+		outline:none;
+	}
+
+	input::-ms-clear {
+		display: none;
+	}
+
+	#portal_search_input_group i {
+
+		font-size:0.8em;
+		cursor:pointer;
+	}
+
+	#pSiteSearchTextInput:focus {
+
+		color:#000;
+	}
+
+	.icon_menu_down {
+
+		font-size: 12px;
+		margin-left: 4px;
+		vertical-align: text-top;
+		padding-top: 4px;
+		display: inline-block;
+	}
+
+	.portal_tab_item {
+
+		background-color: #fff;
+		padding: 12px;
+		padding-left:20px;
+		padding-right:20px;
+		display: inline-block !important;		
+	}
+
+	.portal_tab_item a:hover {
+
+		color:#fbe300;	
+	}
+
+	.portal_tab_item:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}	
+
+
+	.portal_menu_active {
+
+		background-color: #EEEEEE;
+	}	
+
+	.portal_menu_item_active {
+
+		color:#fbe300 !important;	
+	}
+
+	.portal_tab_active {
+
+		color:#a5a8ab !important;
+	}
+
+	#header_content a {		
+
+		color:inherit !important;
+	}
+
+	#header_content a:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}
+
+	#header_content ul {
+
+		list-style: none;
+		position: relative;
+		top: 58px;
+		display: inline-table;
+	}
+
+	#header_content ul ul {
+		
+		display:none;
+		opacity:0;
+	}
+
+	/* the fly out menus */
+	#header_content ul li:hover > ul,
+	#header_content ul li.hover > ul {
+
+		position: absolute;
+		top: 48px;
+		z-index:999;
+
+		display: block;
+		width: 152px;
+		padding:0px;
+		padding-top:20px;
+		padding-bottom:10px;
+		font-size: 12px;
+		font-family: Arial,Sans-Serif;
+		font-weight: bold;
+		text-transform: uppercase;
+
+		background-color: rgba(8,122,191,0.98);
+		color: #fff !important;
+		opacity: 1;
+
+		-webkit-animation: fade 0.25s;
+		animation: fade 0.25s;
+	}
+
+	@-webkit-keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}
+	@keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}	
+
+	#header_content ul li:hover > ul li {
+
+		padding: 10px;
+		padding-top: 0px;
+		padding-left: 20px;
+		display: block;
+		opacity:1;
+	}
+
+	#header_content ul li:hover > ul a {
+
+		display: block;
+		opacity:1;
+		white-space:nowrap;
+	}
+
+	#portal_menu_start_list {
+
+		left: 81px;
+
+		/* IE sauce */
+		left:85px\9;
+
+		/* Safari sauce */
+		(;left:79px;);
+	}
+
+	#portal_menu_atlases_list {
+
+		left: 290px;
+		width: 210px !important;
+        height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 303px\9;
+        height: 225px\9;
+
+		/* Safari sauce */
+		(;left:279px;);
+	}
+
+	#portal_menu_tools_list {
+
+		left: 500px;
+		width: 172px !important;
+		height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 513px\9;
+		height:225px\9;
+
+		/* Safari sauce */
+		(;left:489px;);
+		(;height:227px;);
+	}
+
+	/* mozilla sauce */
+	@-moz-document url-prefix() {
+
+		#header_content {
+
+			height:107px;
+		}
+
+		#portal_menu_start_list {
+
+			left:85px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 302px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 512px;
+			height:236px;
+		}
+	}
+
+
+	/* make it look OK on iPad also */
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}  
+	}
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}	  
+	}
+
+	.portal_menu_list_heading {
+
+		color:#9ccae5;
+		border-bottom:1px solid #9ccae5;
+		padding-bottom:5px !important;
+	}
+
+	.portal_menu_list_heading + li {
+
+		padding-top:10px !important;
+	}
+
+	.portal_menu_list_heading li {
+
+		padding-bottom:0px;
+	}	
+
+	#portal_menu_atlases_list li:last-of-type {
+
+		padding-bottom:15px !important;
+	}
+
+	.icon-spin5 {
+
+		color:#000;
+	}
+</style>
+<div id="pHeader">
+<div id="top_chrome">
+	<div id="top_chrome_buttons">
+		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
+		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
+	</div>
+</div>
+
+<div id="header_content">
+
+	<a href="http://AllenInstitute.github.io/AllenSDK">
+		<img id="portal_logo" style="border:0;" src="_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+	</a>
+</div>
+</div>
+
+<script>
+
+jQuery('#portal_tab_menu').bind('touchstart', function() {
+
+	if(window.console)
+		console.log("touchstart");
+});
+</script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.add_file">add_file() (allensdk.config.model.manifest.Manifest method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.add_path">add_path() (allensdk.config.model.manifest.Manifest method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.add_paths">add_paths() (allensdk.config.model.manifest.Manifest method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.html#module-allensdk">allensdk (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#module-allensdk.api">allensdk.api (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#module-allensdk.api.api">allensdk.api.api (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#module-allensdk.api.queries">allensdk.api.queries (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#module-allensdk.api.queries.biophysical_perisomatic_api">allensdk.api.queries.biophysical_perisomatic_api (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#module-allensdk.api.queries.cell_types_api">allensdk.api.queries.cell_types_api (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#module-allensdk.api.queries.glif_api">allensdk.api.queries.glif_api (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.html#module-allensdk.config">allensdk.config (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#module-allensdk.config.app">allensdk.config.app (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#module-allensdk.config.app.application_config">allensdk.config.app.application_config (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#module-allensdk.config.model">allensdk.config.model (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#module-allensdk.config.model.description">allensdk.config.model.description (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#module-allensdk.config.model.description_parser">allensdk.config.model.description_parser (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.formats.html#module-allensdk.config.model.formats">allensdk.config.model.formats (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_description_parser">allensdk.config.model.formats.json_description_parser (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_util">allensdk.config.model.formats.json_util (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.pycfg_description_parser">allensdk.config.model.formats.pycfg_description_parser (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#module-allensdk.config.model.manifest">allensdk.config.model.manifest (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#module-allensdk.core">allensdk.core (module)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.core.html#module-allensdk.core.dat_utilities">allensdk.core.dat_utilities (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#module-allensdk.core.json_utilities">allensdk.core.json_utilities (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#module-allensdk.core.nwb_data_set">allensdk.core.nwb_data_set (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#module-allensdk.core.swc">allensdk.core.swc (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.html#module-allensdk.model">allensdk.model (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophys_sim.html#module-allensdk.model.biophys_sim">allensdk.model.biophys_sim (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophys_sim.html#module-allensdk.model.biophys_sim.bps_command">allensdk.model.biophys_sim.bps_command (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophys_sim.html#module-allensdk.model.biophys_sim.config">allensdk.model.biophys_sim.config (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophys_sim.neuron.html#module-allensdk.model.biophys_sim.neuron">allensdk.model.biophys_sim.neuron (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophys_sim.neuron.html#module-allensdk.model.biophys_sim.neuron.hoc_utils">allensdk.model.biophys_sim.neuron.hoc_utils (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#module-allensdk.model.biophysical_perisomatic">allensdk.model.biophysical_perisomatic (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#module-allensdk.model.biophysical_perisomatic.runner">allensdk.model.biophysical_perisomatic.runner (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#module-allensdk.model.biophysical_perisomatic.utils">allensdk.model.biophysical_perisomatic.utils (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#module-allensdk.model.glif">allensdk.model.glif (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#module-allensdk.model.glif.glif_neuron">allensdk.model.glif.glif_neuron (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#module-allensdk.model.glif.glif_neuron_methods">allensdk.model.glif.glif_neuron_methods (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#module-allensdk.model.glif.simulate_neuron">allensdk.model.glif.simulate_neuron (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.api.Api">Api (class in allensdk.api.api)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig">ApplicationConfig (class in allensdk.config.app.application_config)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_command_line">apply_configuration_from_command_line() (allensdk.config.app.application_config.ApplicationConfig method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_environment">apply_configuration_from_environment() (allensdk.config.app.application_config.ApplicationConfig method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_file">apply_configuration_from_file() (allensdk.config.app.application_config.ApplicationConfig method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi">BiophysicalPerisomaticApi (class in allensdk.api.queries.biophysical_perisomatic_api)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.build_ephys_data_rma">build_ephys_data_rma() (allensdk.api.queries.cell_types_api.CellTypesApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.build_list_cells_rma">build_list_cells_rma() (allensdk.api.queries.cell_types_api.CellTypesApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_list_rma_url">build_neuronal_model_list_rma_url() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_rma_url">build_neuronal_model_rma_url() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.build_reconstruction_rma">build_reconstruction_rma() (allensdk.api.queries.cell_types_api.CellTypesApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma">build_rma() (allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data">cache_data() (allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file">cache_stimulus_file() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi">CellTypesApi (class in allensdk.api.queries.cell_types_api)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.check_dir">check_dir() (allensdk.config.model.manifest.Manifest method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.bps_command.choose_bps_command">choose_bps_command() (in module allensdk.model.biophys_sim.bps_command)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.compartment_index">compartment_index (allensdk.core.swc.Morphology attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.compartment_index_by_type">compartment_index_by_type() (allensdk.core.swc.Morphology method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.compartment_list">compartment_list (allensdk.core.swc.Morphology attribute)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.config.Config">Config (class in allensdk.model.biophys_sim.config)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.configure_library_method">configure_library_method() (allensdk.model.glif.glif_neuron.GlifNeuron static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.configure_method">configure_method() (allensdk.model.glif.glif_neuron.GlifNeuron static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.api.Api.construct_well_known_file_download_url">construct_well_known_file_download_url() (allensdk.api.api.Api method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.create_argparser">create_argparser() (allensdk.config.app.application_config.ApplicationConfig method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.create_dir">create_dir() (allensdk.config.model.manifest.Manifest method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest">create_manifest() (allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.core.html#allensdk.core.dat_utilities.DatUtilities">DatUtilities (class in allensdk.core.dat_utilities)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.api.Api.default_api_url">default_api_url (allensdk.api.api.Api attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description.Description">Description (class in allensdk.config.model.description)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser">DescriptionParser (class in allensdk.config.model.description_parser)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.DIR">DIR (allensdk.config.model.manifest.Manifest attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.DIRNAME">DIRNAME (allensdk.config.model.manifest.Manifest attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.api.Api.do_rma_query">do_rma_query() (allensdk.api.api.Api method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.dynamics">dynamics() (allensdk.model.glif.glif_neuron.GlifNeuron method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp">dynamics_AScurrent_exp() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none">dynamics_AScurrent_none() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf">dynamics_threshold_inf() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components">dynamics_threshold_three_components() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_euler_exact">dynamics_voltage_euler_exact() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_forward_euler">dynamics_voltage_forward_euler() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.FILE">FILE (allensdk.config.model.manifest.Manifest attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses">fill_sweep_responses() (allensdk.core.nwb_data_set.NwbDataSet method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description.Description.fix_unary_sections">fix_unary_sections() (allensdk.config.model.description.Description method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.from_dict">from_dict() (allensdk.model.glif.glif_neuron.GlifNeuron class method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.from_json_file">from_json_file() (allensdk.config.app.application_config.ApplicationConfig method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.from_json_string">from_json_string() (allensdk.config.app.application_config.ApplicationConfig method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology">generate_morphology() (allensdk.model.biophysical_perisomatic.utils.Utils method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps">get_ephys_sweeps() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_experiment_sweep_numbers">get_experiment_sweep_numbers() (allensdk.core.nwb_data_set.NwbDataSet method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.get_format">get_format() (allensdk.config.model.manifest.Manifest method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_neuron_config">get_neuron_config() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_neuronal_model">get_neuronal_model() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.get_path">get_path() (allensdk.config.model.manifest.Manifest method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_spike_times">get_spike_times() (allensdk.core.nwb_data_set.NwbDataSet method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_sweep">get_sweep() (allensdk.core.nwb_data_set.NwbDataSet method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers">get_sweep_numbers() (allensdk.core.nwb_data_set.NwbDataSet method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids">get_well_known_file_ids() (allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi">GlifApi (class in allensdk.api.queries.glif_api)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifBadResetException">GlifBadResetException</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron">GlifNeuron (class in allensdk.model.glif.glif_neuron)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod">GlifNeuronMethod (class in allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils.h">h (allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.json_utilities.handler">handler() (in module allensdk.core.json_utilities)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils">HocUtils (class in allensdk.model.biophys_sim.neuron.hoc_utils)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils.initialize_hoc">initialize_hoc() (allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.interpolate_spike_time">interpolate_spike_time() (in module allensdk.model.glif.glif_neuron)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.interpolate_spike_value">interpolate_spike_value() (in module allensdk.model.glif.glif_neuron)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description.Description.is_empty">is_empty() (allensdk.config.model.description.Description method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type">is_well_known_file_type() (allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser">JsonDescriptionParser (class in allensdk.config.model.formats.json_description_parser)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_util.JsonUtil">JsonUtil (class in allensdk.config.model.formats.json_util)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.line_crossing_x">line_crossing_x() (in module allensdk.model.glif.glif_neuron)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.line_crossing_y">line_crossing_y() (in module allensdk.model.glif.glif_neuron)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells">list_cells() (allensdk.api.queries.cell_types_api.CellTypesApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.list_neuronal_models">list_neuronal_models() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.load">load() (allensdk.config.app.application_config.ApplicationConfig method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.config.Config.load">(allensdk.model.biophys_sim.config.Config method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.api.html#allensdk.api.api.Api.load_api_schema">load_api_schema() (allensdk.api.api.Api method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters">load_cell_parameters() (allensdk.model.biophysical_perisomatic.utils.Utils method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.load_config">load_config() (allensdk.config.model.manifest.Manifest method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.load_description">load_description() (in module allensdk.model.biophysical_perisomatic.runner)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.load_sweep">load_sweep() (in module allensdk.model.glif.simulate_neuron)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser.log">log (allensdk.config.model.description_parser.DescriptionParser attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.log">(allensdk.config.model.formats.json_description_parser.JsonDescriptionParser attribute)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.log">(allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser attribute)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.log">(allensdk.config.model.manifest.Manifest attribute)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.main">main() (in module allensdk.model.glif.simulate_neuron)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest">Manifest (class in allensdk.config.model.manifest)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.METHOD_LIBRARY">METHOD_LIBRARY (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod.modify_parameter">modify_parameter() (allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology">Morphology (class in allensdk.core.swc)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils.neuron">neuron (allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils.nrn">nrn (allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils attribute)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet">NwbDataSet (class in allensdk.core.nwb_data_set)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.parse_arguments">parse_arguments() (in module allensdk.model.glif.simulate_neuron)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.parse_command_line_args">parse_command_line_args() (allensdk.config.app.application_config.ApplicationConfig method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser.parser_for_extension">parser_for_extension() (allensdk.config.model.description_parser.DescriptionParser method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.prepare_nwb_output">prepare_nwb_output() (in module allensdk.model.biophysical_perisomatic.runner)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser">PycfgDescriptionParser (class in allensdk.config.model.formats.pycfg_description_parser)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser.read">read() (allensdk.config.model.description_parser.DescriptionParser method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.read">(allensdk.config.model.formats.json_description_parser.JsonDescriptionParser method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.read">(allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.core.html#allensdk.core.json_utilities.read">(in module allensdk.core.json_utilities)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.read_ephys_data_json">read_ephys_data_json() (allensdk.api.queries.cell_types_api.CellTypesApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json">read_json() (allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_util.JsonUtil.read_json_file">read_json_file() (allensdk.config.model.formats.json_util.JsonUtil class method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_util.JsonUtil.read_json_string">read_json_string() (allensdk.config.model.formats.json_util.JsonUtil class method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.read_list_cells_json">read_list_cells_json() (allensdk.api.queries.cell_types_api.CellTypesApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.config.Config.read_model_description">read_model_description() (allensdk.model.biophys_sim.config.Config method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_json">read_neuronal_model_json() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_list_json">read_neuronal_model_list_json() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.read_reconstruction_json">read_reconstruction_json() (allensdk.api.queries.cell_types_api.CellTypesApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.read_rows">read_rows() (in module allensdk.core.swc)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus">read_stimulus() (allensdk.model.biophysical_perisomatic.utils.Utils method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser.read_string">read_string() (allensdk.config.model.description_parser.DescriptionParser method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.read_string">(allensdk.config.model.formats.json_description_parser.JsonDescriptionParser method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.read_string">(allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.core.html#allensdk.core.swc.read_string">(in module allensdk.core.swc)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.read_swc">read_swc() (in module allensdk.core.swc)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.record_values">record_values() (allensdk.model.biophysical_perisomatic.utils.Utils method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_util.JsonUtil.remove_comments">remove_comments() (allensdk.config.model.formats.json_util.JsonUtil class method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_util.JsonUtil.remove_multiline_comments">remove_multiline_comments() (allensdk.config.model.formats.json_util.JsonUtil class method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.reset">reset() (allensdk.model.glif.glif_neuron.GlifNeuron method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none">reset_AScurrent_none() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum">reset_AScurrent_sum() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.reset_method_data">reset_method_data() (allensdk.model.glif.glif_neuron.GlifNeuron method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_inf">reset_threshold_inf() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components">reset_threshold_three_components() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_bio_rules">reset_voltage_bio_rules() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_zero">reset_voltage_zero() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.manifest.Manifest.resolve_paths">resolve_paths() (allensdk.config.model.manifest.Manifest method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.api.Api.retrieve_file_over_http">retrieve_file_over_http() (allensdk.api.api.Api method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.api.Api.retrieve_parsed_json_over_http">retrieve_parsed_json_over_http() (allensdk.api.api.Api method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.root">root (allensdk.core.swc.Morphology attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.run">run() (allensdk.model.glif.glif_neuron.GlifNeuron method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.run">(in module allensdk.model.biophysical_perisomatic.runner)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.bps_command.run_module">run_module() (in module allensdk.model.biophys_sim.bps_command)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data">save_ephys_data() (allensdk.api.queries.cell_types_api.CellTypesApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.save_nwb">save_nwb() (in module allensdk.model.biophysical_perisomatic.runner)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction">save_reconstruction() (allensdk.api.queries.cell_types_api.CellTypesApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.dat_utilities.DatUtilities.save_voltage">save_voltage() (allensdk.core.dat_utilities.DatUtilities class method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.api.Api.set_api_urls">set_api_urls() (allensdk.api.api.Api method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.api.Api.set_default_working_directory">set_default_working_directory() (allensdk.api.api.Api method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.set_spike_times">set_spike_times() (allensdk.core.nwb_data_set.NwbDataSet method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.set_sweep">set_sweep() (allensdk.core.nwb_data_set.NwbDataSet method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp">setup_iclamp() (allensdk.model.biophysical_perisomatic.utils.Utils method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.simulate_neuron">simulate_neuron() (in module allensdk.model.glif.simulate_neuron)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.simulate_sweep">simulate_sweep() (in module allensdk.model.glif.simulate_neuron)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.simulate_sweep_from_file">simulate_sweep_from_file() (in module allensdk.model.glif.simulate_neuron)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.SOMA">SOMA (allensdk.core.swc.Morphology attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.sparsify">sparsify() (allensdk.core.swc.Morphology method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.str_to_num">str_to_num() (in module allensdk.core.swc)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.tau_m">tau_m (allensdk.model.glif.glif_neuron.GlifNeuron attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.to_config_string">to_config_string() (allensdk.config.app.application_config.ApplicationConfig method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.to_dict">to_dict() (allensdk.model.glif.glif_neuron.GlifNeuron method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod.to_dict">(allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.TYPE">TYPE (allensdk.model.glif.glif_neuron.GlifNeuron attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description.Description.unpack">unpack() (allensdk.config.model.description.Description method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description.Description.unpack_manifest">unpack_manifest() (allensdk.config.model.description.Description method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.update_children">update_children() (allensdk.core.swc.Morphology method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description.Description.update_data">update_data() (allensdk.config.model.description.Description method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils">Utils (class in allensdk.model.biophysical_perisomatic.utils)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.validate">validate() (allensdk.core.swc.Morphology method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser.write">write() (allensdk.config.model.description_parser.DescriptionParser method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.write">(allensdk.config.model.formats.json_description_parser.JsonDescriptionParser method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.write">(allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.write">(allensdk.core.swc.Morphology method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.core.html#allensdk.core.json_utilities.write">(in module allensdk.core.json_utilities)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.write_string">write_string() (allensdk.config.model.formats.json_description_parser.JsonDescriptionParser method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.write_string">(allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.write_sweep_response">write_sweep_response() (in module allensdk.model.glif.simulate_neuron)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer">
+    </div>
+<script type="text/javascript" src="_static/external_assets/javascript/portalFooter.js"></script>
+
+  </body>
+</html>

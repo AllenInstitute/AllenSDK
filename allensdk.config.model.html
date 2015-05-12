@@ -1,0 +1,1240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.config.model package &mdash; Allen SDK 0.2.0dev documentation</title>
+    
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.2.0dev documentation" href="index.html" />
+    <link rel="up" title="allensdk.config package" href="allensdk.config.html" />
+    <link rel="next" title="allensdk.config.model.formats package" href="allensdk.config.model.formats.html" /> 
+  </head>
+  <body>
+<script type="text/javascript" src="_static/external_assets/javascript/portal.js"></script>
+<style>
+
+	/* the icon font-family definition and helper classes */
+	@font-face {
+	  font-family: 'portal_icon_font';
+	  src: url('_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  font-weight: normal;
+	  font-style: normal;
+	}
+	 
+	 [class^="icon-"]:before, [class*=" icon-"]:before {
+	  font-family: "portal_icon_font";
+	  font-style: normal;
+	  font-weight: normal;
+	  speak: none;
+	 
+	  display: inline-block;
+	  text-decoration: inherit;
+	  width: 1em;
+	  margin-right: .2em;
+	  text-align: center;
+	  /* opacity: .8; */
+	 
+	  /* For safety - reset parent styles, that can break glyph codes*/
+	  font-variant: normal;
+	  text-transform: none;
+	     
+	  /* fix buttons height, for twitter bootstrap */
+	  line-height: 1em;
+	 
+	  /* Animation center compensation - margins should be symmetric */
+	  /* remove if not needed */
+	  margin-left: .2em;
+	
+	}
+	 
+	.icon-spin5:before { content: '\e806'; } /* '' */
+	.icon-left-open-1:before { content: '\e81e'; } /* '' */
+	.icon-plus-1:before { content: '\e801'; } /* '' */
+	.icon-facebook:before { content: '\e816'; } /* '' */
+	.icon-gplus:before { content: '\e818'; } /* '' */
+	.icon-linkedin-3:before { content: '\e815'; } /* '' */
+	.icon-twitter:before { content: '\e817'; } /* '' */
+	.icon-youtube-play:before { content: '\e805'; } /* '' */
+	.icon-plus-2:before { content: '\e809'; } /* '' */
+	.icon-record-1:before { content: '\e81c'; } /* '' */
+	.icon-cancel:before { content: '\e80b'; } /* '' */
+	.icon-search:before { content: '\e804'; } /* '' */
+	.icon-cancel-2:before { content: '\e80c'; } /* '' */
+	.icon-plus-4:before { content: '\e80d'; } /* '' */
+	.icon-cancel-3:before { content: '\e80e'; } /* '' */
+	.icon-plus:before { content: '\e808'; } /* '' */
+	.icon-down-open:before { content: '\e800'; } /* '' */
+	.icon-right-open:before { content: '\e802'; } /* '' */
+	.icon-up-open:before { content: '\e803'; } /* '' */
+	.icon-stop:before { content: '\e813'; } /* '' */
+	.icon-cancel-1:before { content: '\e820'; } /* '' */
+	.icon-plus-3:before { content: '\e80a'; } /* '' */
+	/* end icon font helpers */
+
+	/* icon font spin animation */
+	.animate-spin {
+	  -moz-animation: spin 2s infinite linear;
+	  -o-animation: spin 2s infinite linear;
+	  -webkit-animation: spin 2s infinite linear;
+	  animation: spin 2s infinite linear;
+	  display: inline-block;
+	}
+	@-moz-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-webkit-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-o-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-ms-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	/*  end spin animation */	
+
+	@font-face {
+	    font-family: 'bebas_neueregular';
+	    src: url('_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	/* top chrome styles */
+	#top_chrome {
+
+		width:100%;
+		height:28px;
+		background-color:#163E65;
+	}
+
+	.chrome_link_block {
+
+		color:#fff !important;	
+		display:inline-block;
+		height:100%;
+		max-height:28px;
+	}
+
+	.chrome_link_block:hover {
+
+		background-color:#eee;
+		color:#0779BE !important;	
+		cursor:pointer;
+	}
+
+	#top_chrome a {
+
+		color:inherit !important;	
+		text-decoration:none;
+	}
+
+	#top_chrome a:hover {
+
+		color:inherit !important;	
+	}
+
+	#top_chrome_buttons {
+
+		float:right;
+		margin-right:50px;
+	}
+
+	.chrome_button {
+
+		font-family:arial,sans-serif;
+		font-weight:bold;
+		display:inline-block;
+		font-size:9px;
+		text-align:left;
+		text-decoration:none;
+		margin:9px 20px 10px 20px;
+	}
+
+	.chrome_active {
+
+		background-color:#1b7abd;
+		color:#fff;
+	}
+
+
+	/* header element styles*/
+	#header_content {
+
+		font-family: bebas_neueregular, arial, sans-serif;
+		font-size:22px;
+		color:#0779be;		
+		letter-spacing:0.03em;
+
+		position:relative;
+		width:calc(100% - 112px);
+		min-width:800px;
+		height:76px;
+		border-bottom:2px solid #A5A8AB;
+		margin-left:50px;
+		margin-right:50px;
+        z-index:9999; /* IT-9508 */
+	}
+
+	#portal_logo {
+
+		position:absolute;
+		top:20px;
+		left:0px;
+		width:236px;
+	}
+
+	#portal_tabs {
+
+		position: absolute;
+		bottom: 12px;
+		left: 0px;
+		margin-bottom: -12px;
+		display: block;
+	}
+
+	.horizontal_list
+	{
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		display: inline; 		
+	}
+
+	.horizontal_list li { 
+
+		display: inline; 	
+	}	
+
+	#portal_tab_menu_container {
+
+		display:none;
+	}
+
+	#portal_search_input_group {
+
+		position:absolute;
+		margin: 0;
+		padding: 0;
+		bottom:12px;
+		right:0px;
+		border:1px solid #DAD9D3;
+		color:#DAD9D3;
+	}
+
+	#portal_search_input_group input {
+
+		margin: 0;
+		padding: 0;
+		border:none;
+		width:110px;
+		color:#DAD9D3;
+		font-family:Helvetica,sans-serif;
+		font-size:12px;
+		height:28px;
+		margin-left:10px;
+
+		outline:none;
+	}
+
+	input::-ms-clear {
+		display: none;
+	}
+
+	#portal_search_input_group i {
+
+		font-size:0.8em;
+		cursor:pointer;
+	}
+
+	#pSiteSearchTextInput:focus {
+
+		color:#000;
+	}
+
+	.icon_menu_down {
+
+		font-size: 12px;
+		margin-left: 4px;
+		vertical-align: text-top;
+		padding-top: 4px;
+		display: inline-block;
+	}
+
+	.portal_tab_item {
+
+		background-color: #fff;
+		padding: 12px;
+		padding-left:20px;
+		padding-right:20px;
+		display: inline-block !important;		
+	}
+
+	.portal_tab_item a:hover {
+
+		color:#fbe300;	
+	}
+
+	.portal_tab_item:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}	
+
+
+	.portal_menu_active {
+
+		background-color: #EEEEEE;
+	}	
+
+	.portal_menu_item_active {
+
+		color:#fbe300 !important;	
+	}
+
+	.portal_tab_active {
+
+		color:#a5a8ab !important;
+	}
+
+	#header_content a {		
+
+		color:inherit !important;
+	}
+
+	#header_content a:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}
+
+	#header_content ul {
+
+		list-style: none;
+		position: relative;
+		top: 58px;
+		display: inline-table;
+	}
+
+	#header_content ul ul {
+		
+		display:none;
+		opacity:0;
+	}
+
+	/* the fly out menus */
+	#header_content ul li:hover > ul,
+	#header_content ul li.hover > ul {
+
+		position: absolute;
+		top: 48px;
+		z-index:999;
+
+		display: block;
+		width: 152px;
+		padding:0px;
+		padding-top:20px;
+		padding-bottom:10px;
+		font-size: 12px;
+		font-family: Arial,Sans-Serif;
+		font-weight: bold;
+		text-transform: uppercase;
+
+		background-color: rgba(8,122,191,0.98);
+		color: #fff !important;
+		opacity: 1;
+
+		-webkit-animation: fade 0.25s;
+		animation: fade 0.25s;
+	}
+
+	@-webkit-keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}
+	@keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}	
+
+	#header_content ul li:hover > ul li {
+
+		padding: 10px;
+		padding-top: 0px;
+		padding-left: 20px;
+		display: block;
+		opacity:1;
+	}
+
+	#header_content ul li:hover > ul a {
+
+		display: block;
+		opacity:1;
+		white-space:nowrap;
+	}
+
+	#portal_menu_start_list {
+
+		left: 81px;
+
+		/* IE sauce */
+		left:85px\9;
+
+		/* Safari sauce */
+		(;left:79px;);
+	}
+
+	#portal_menu_atlases_list {
+
+		left: 290px;
+		width: 210px !important;
+        height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 303px\9;
+        height: 225px\9;
+
+		/* Safari sauce */
+		(;left:279px;);
+	}
+
+	#portal_menu_tools_list {
+
+		left: 500px;
+		width: 172px !important;
+		height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 513px\9;
+		height:225px\9;
+
+		/* Safari sauce */
+		(;left:489px;);
+		(;height:227px;);
+	}
+
+	/* mozilla sauce */
+	@-moz-document url-prefix() {
+
+		#header_content {
+
+			height:107px;
+		}
+
+		#portal_menu_start_list {
+
+			left:85px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 302px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 512px;
+			height:236px;
+		}
+	}
+
+
+	/* make it look OK on iPad also */
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}  
+	}
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}	  
+	}
+
+	.portal_menu_list_heading {
+
+		color:#9ccae5;
+		border-bottom:1px solid #9ccae5;
+		padding-bottom:5px !important;
+	}
+
+	.portal_menu_list_heading + li {
+
+		padding-top:10px !important;
+	}
+
+	.portal_menu_list_heading li {
+
+		padding-bottom:0px;
+	}	
+
+	#portal_menu_atlases_list li:last-of-type {
+
+		padding-bottom:15px !important;
+	}
+
+	.icon-spin5 {
+
+		color:#000;
+	}
+</style>
+<div id="pHeader">
+<div id="top_chrome">
+	<div id="top_chrome_buttons">
+		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
+		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
+	</div>
+</div>
+
+<div id="header_content">
+
+	<a href="http://AllenInstitute.github.io/AllenSDK">
+		<img id="portal_logo" style="border:0;" src="_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+	</a>
+</div>
+</div>
+
+<script>
+
+jQuery('#portal_tab_menu').bind('touchstart', function() {
+
+	if(window.console)
+		console.log("touchstart");
+});
+</script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="allensdk-config-model-package">
+<h1>allensdk.config.model package<a class="headerlink" href="#allensdk-config-model-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.config.model.formats.html">allensdk.config.model.formats package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_description_parser">allensdk.config.model.formats.json_description_parser module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_util">allensdk.config.model.formats.json_util module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.pycfg_description_parser">allensdk.config.model.formats.pycfg_description_parser module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-allensdk.config.model.description">
+<span id="allensdk-config-model-description-module"></span><h2>allensdk.config.model.description module<a class="headerlink" href="#module-allensdk.config.model.description" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.config.model.description.Description">
+<em class="property">class </em><tt class="descclassname">allensdk.config.model.description.</tt><tt class="descname">Description</tt><a class="reference internal" href="_modules/allensdk/config/model/description.html#Description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description.Description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.description.Description.fix_unary_sections" title="allensdk.config.model.description.Description.fix_unary_sections"><tt class="xref py py-obj docutils literal"><span class="pre">fix_unary_sections</span></tt></a>([section_names])</td>
+<td>Wrap section contents that don&#8217;t have the proper array surrounding them in an array.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.description.Description.is_empty" title="allensdk.config.model.description.Description.is_empty"><tt class="xref py py-obj docutils literal"><span class="pre">is_empty</span></tt></a>()</td>
+<td>Check if anything is in the object.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.description.Description.unpack" title="allensdk.config.model.description.Description.unpack"><tt class="xref py py-obj docutils literal"><span class="pre">unpack</span></tt></a>(data[,&nbsp;section])</td>
+<td>Read the manifest and other stand-alone configuration structure, or insert a configuration object into a section of an existing configuration.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.description.Description.unpack_manifest" title="allensdk.config.model.description.Description.unpack_manifest"><tt class="xref py py-obj docutils literal"><span class="pre">unpack_manifest</span></tt></a>(data)</td>
+<td>Pull the manifest configuration section into a separate place.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.description.Description.update_data" title="allensdk.config.model.description.Description.update_data"><tt class="xref py py-obj docutils literal"><span class="pre">update_data</span></tt></a>(data[,&nbsp;section])</td>
+<td>Merge configuration data possibly from multiple files.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.config.model.description.Description.fix_unary_sections">
+<tt class="descname">fix_unary_sections</tt><big>(</big><em>section_names=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/description.html#Description.fix_unary_sections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description.Description.fix_unary_sections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrap section contents that don&#8217;t have the proper
+array surrounding them in an array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>section_names</strong> : list of strings, optional</p>
+<blockquote class="last">
+<div><p>Keys of sections that might not be in array form.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.description.Description.is_empty">
+<tt class="descname">is_empty</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/description.html#Description.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description.Description.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if anything is in the object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">boolean</p>
+<blockquote class="last">
+<div><p>true if self.data is missing or empty</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.description.Description.unpack">
+<tt class="descname">unpack</tt><big>(</big><em>data</em>, <em>section=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/description.html#Description.unpack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description.Description.unpack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the manifest and other stand-alone configuration structure,
+or insert a configuration object into a section of an existing configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : dict</p>
+<blockquote>
+<div><p>A configuration object including top level sections,
+or an configuration object to be placed within a section.</p>
+</div></blockquote>
+<p><strong>section</strong> : string, optional.</p>
+<blockquote class="last">
+<div><p>If this is present, place data within an existing section array.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.description.Description.unpack_manifest">
+<tt class="descname">unpack_manifest</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/description.html#Description.unpack_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description.Description.unpack_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pull the manifest configuration section into a separate place.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : dict</p>
+<blockquote class="last">
+<div><p>A configuration structure that still has a manifest section.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.description.Description.update_data">
+<tt class="descname">update_data</tt><big>(</big><em>data</em>, <em>section=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/description.html#Description.update_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description.Description.update_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge configuration data possibly from multiple files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : dict</p>
+<blockquote>
+<div><p>Configuration structure to add.</p>
+</div></blockquote>
+<p><strong>section</strong> : string, optional</p>
+<blockquote class="last">
+<div><p>What configuration section to read it into if the file does not specify.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.config.model.description_parser">
+<span id="allensdk-config-model-description-parser-module"></span><h2>allensdk.config.model.description_parser module<a class="headerlink" href="#module-allensdk.config.model.description_parser" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.config.model.description_parser.DescriptionParser">
+<em class="property">class </em><tt class="descclassname">allensdk.config.model.description_parser.</tt><tt class="descname">DescriptionParser</tt><a class="reference internal" href="_modules/allensdk/config/model/description_parser.html#DescriptionParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description_parser.DescriptionParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.description_parser.DescriptionParser.parser_for_extension" title="allensdk.config.model.description_parser.DescriptionParser.parser_for_extension"><tt class="xref py py-obj docutils literal"><span class="pre">parser_for_extension</span></tt></a>(filename)</td>
+<td>Choose a subclass that can read the format.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.description_parser.DescriptionParser.read" title="allensdk.config.model.description_parser.DescriptionParser.read"><tt class="xref py py-obj docutils literal"><span class="pre">read</span></tt></a>(file_path[,&nbsp;description,&nbsp;section])</td>
+<td>Parse data needed for a simulation.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.description_parser.DescriptionParser.read_string" title="allensdk.config.model.description_parser.DescriptionParser.read_string"><tt class="xref py py-obj docutils literal"><span class="pre">read_string</span></tt></a>(data_string[,&nbsp;description,&nbsp;...])</td>
+<td>Parse data needed for a simulation from a string.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.description_parser.DescriptionParser.write" title="allensdk.config.model.description_parser.DescriptionParser.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(filename,&nbsp;description)</td>
+<td>Save the configuration.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.config.model.description_parser.DescriptionParser.log">
+<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x2aacbc30ba90&gt;</em><a class="headerlink" href="#allensdk.config.model.description_parser.DescriptionParser.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.description_parser.DescriptionParser.parser_for_extension">
+<tt class="descname">parser_for_extension</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/description_parser.html#DescriptionParser.parser_for_extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description_parser.DescriptionParser.parser_for_extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Choose a subclass that can read the format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
+<blockquote>
+<div><p>For the extension.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">DescriptionParser</p>
+<blockquote class="last">
+<div><p>Appropriate subclass.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.description_parser.DescriptionParser.read">
+<tt class="descname">read</tt><big>(</big><em>file_path</em>, <em>description=None</em>, <em>section=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/description_parser.html#DescriptionParser.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description_parser.DescriptionParser.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse data needed for a simulation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>description</strong> : dict</p>
+<blockquote>
+<div><p>Configuration from parsing previous files.</p>
+</div></blockquote>
+<p><strong>section</strong> : string, optional</p>
+<blockquote class="last">
+<div><p>What configuration section to read it into if the file does not specify.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.description_parser.DescriptionParser.read_string">
+<tt class="descname">read_string</tt><big>(</big><em>data_string</em>, <em>description=None</em>, <em>section=None</em>, <em>header=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/description_parser.html#DescriptionParser.read_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description_parser.DescriptionParser.read_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse data needed for a simulation from a string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.description_parser.DescriptionParser.write">
+<tt class="descname">write</tt><big>(</big><em>filename</em>, <em>description</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/description_parser.html#DescriptionParser.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description_parser.DescriptionParser.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the configuration.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>filename</strong> : string</p>
+<blockquote class="last">
+<div><p>Name of the file to write.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.config.model.manifest">
+<span id="allensdk-config-model-manifest-module"></span><h2>allensdk.config.model.manifest module<a class="headerlink" href="#module-allensdk.config.model.manifest" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.config.model.manifest.Manifest">
+<em class="property">class </em><tt class="descclassname">allensdk.config.model.manifest.</tt><tt class="descname">Manifest</tt><big>(</big><em>config=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/manifest.html#Manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.manifest.Manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Manages the location of external files 
+referenced in an Allen SDK configuration</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.add_file" title="allensdk.config.model.manifest.Manifest.add_file"><tt class="xref py py-obj docutils literal"><span class="pre">add_file</span></tt></a>(file_key,&nbsp;file_name[,&nbsp;dir_key,&nbsp;...])</td>
+<td>Insert a new file entry.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.add_path" title="allensdk.config.model.manifest.Manifest.add_path"><tt class="xref py py-obj docutils literal"><span class="pre">add_path</span></tt></a>(key,&nbsp;path[,&nbsp;path_type,&nbsp;absolute,&nbsp;...])</td>
+<td>Insert a new entry.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.add_paths" title="allensdk.config.model.manifest.Manifest.add_paths"><tt class="xref py py-obj docutils literal"><span class="pre">add_paths</span></tt></a>(path_info)</td>
+<td>add information about paths stored in the manifest.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.check_dir" title="allensdk.config.model.manifest.Manifest.check_dir"><tt class="xref py py-obj docutils literal"><span class="pre">check_dir</span></tt></a>(path_key[,&nbsp;do_exit])</td>
+<td>Verify a directories existence or optionally exit.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.create_dir" title="allensdk.config.model.manifest.Manifest.create_dir"><tt class="xref py py-obj docutils literal"><span class="pre">create_dir</span></tt></a>(path_key)</td>
+<td>Make a directory for an entry.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.get_format" title="allensdk.config.model.manifest.Manifest.get_format"><tt class="xref py py-obj docutils literal"><span class="pre">get_format</span></tt></a>(path_key)</td>
+<td>Retrieve the type of a path entry.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.get_path" title="allensdk.config.model.manifest.Manifest.get_path"><tt class="xref py py-obj docutils literal"><span class="pre">get_path</span></tt></a>(path_key,&nbsp;*args)</td>
+<td>Retrieve an entry with substitutions.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.load_config" title="allensdk.config.model.manifest.Manifest.load_config"><tt class="xref py py-obj docutils literal"><span class="pre">load_config</span></tt></a>(config)</td>
+<td>Load paths into the manifest from an Allen SDK config section.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.resolve_paths" title="allensdk.config.model.manifest.Manifest.resolve_paths"><tt class="xref py py-obj docutils literal"><span class="pre">resolve_paths</span></tt></a>(description_dict[,&nbsp;suffix])</td>
+<td>Walk input items and expand those that refer to a manifest entry.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.config.model.manifest.Manifest.DIR">
+<tt class="descname">DIR</tt><em class="property"> = 'dir'</em><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.DIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.config.model.manifest.Manifest.DIRNAME">
+<tt class="descname">DIRNAME</tt><em class="property"> = 'dir_name'</em><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.DIRNAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.config.model.manifest.Manifest.FILE">
+<tt class="descname">FILE</tt><em class="property"> = 'file'</em><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.manifest.Manifest.add_file">
+<tt class="descname">add_file</tt><big>(</big><em>file_key</em>, <em>file_name</em>, <em>dir_key=None</em>, <em>path_format=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/manifest.html#Manifest.add_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.add_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new file entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_key</strong> : string</p>
+<blockquote>
+<div><p>Reference to the entry.</p>
+</div></blockquote>
+<p><strong>file_name</strong> : string</p>
+<blockquote>
+<div><p>Subtitutions of the %s, %d style allowed.</p>
+</div></blockquote>
+<p><strong>dir_key</strong> : string</p>
+<blockquote>
+<div><p>Reference to the parent directory entry.</p>
+</div></blockquote>
+<p><strong>path_format</strong> : string, optional</p>
+<blockquote class="last">
+<div><p>File type for further parsing.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.manifest.Manifest.add_path">
+<tt class="descname">add_path</tt><big>(</big><em>key</em>, <em>path</em>, <em>path_type='dir'</em>, <em>absolute=True</em>, <em>path_format=None</em>, <em>parent_key=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/manifest.html#Manifest.add_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.add_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a new entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>key</strong> : string</p>
+<blockquote>
+<div><p>Identifier for referencing the entry.</p>
+</div></blockquote>
+<p><strong>path</strong> : string</p>
+<blockquote>
+<div><p>Specification for a path using %s, %d style substitution.</p>
+</div></blockquote>
+<p><strong>path_type</strong> : string enumeration</p>
+<blockquote>
+<div><p>&#8216;dir&#8217; (default) or &#8216;file&#8217;</p>
+</div></blockquote>
+<p><strong>absolute</strong> : boolean</p>
+<blockquote>
+<div><p>Is the spec relative to the process current directory.</p>
+</div></blockquote>
+<p><strong>path_format</strong> : string, optional</p>
+<blockquote>
+<div><p>Indicate a known file type for further parsing.</p>
+</div></blockquote>
+<p><strong>parent_key</strong> : string</p>
+<blockquote class="last">
+<div><p>Refer to another entry.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.manifest.Manifest.add_paths">
+<tt class="descname">add_paths</tt><big>(</big><em>path_info</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/manifest.html#Manifest.add_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.add_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>add information about paths stored in the manifest.</p>
+<dl class="docutils">
+<dt>Parameters</dt>
+<dd><dl class="first last docutils">
+<dt>path_info <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd>Information about the new paths</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.manifest.Manifest.check_dir">
+<tt class="descname">check_dir</tt><big>(</big><em>path_key</em>, <em>do_exit=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/manifest.html#Manifest.check_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.check_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify a directories existence or optionally exit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>path_key</strong> : string</p>
+<blockquote>
+<div><p>Reference to the entry.</p>
+</div></blockquote>
+<p><strong>do_exit</strong> : boolean</p>
+<blockquote class="last">
+<div><p>What to do if the directory is not present.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.manifest.Manifest.create_dir">
+<tt class="descname">create_dir</tt><big>(</big><em>path_key</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/manifest.html#Manifest.create_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.create_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a directory for an entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>path_key</strong> : string</p>
+<blockquote class="last">
+<div><p>Reference to the entry.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.manifest.Manifest.get_format">
+<tt class="descname">get_format</tt><big>(</big><em>path_key</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/manifest.html#Manifest.get_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.get_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the type of a path entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>path_key</strong> : string</p>
+<blockquote>
+<div><p>reference to the entry</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
+<blockquote class="last">
+<div><p>File type.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.manifest.Manifest.get_path">
+<tt class="descname">get_path</tt><big>(</big><em>path_key</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/manifest.html#Manifest.get_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.get_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve an entry with substitutions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>path_key</strong> : string</p>
+<blockquote>
+<div><p>Refer to the entry to retrieve.</p>
+</div></blockquote>
+<p><strong>args</strong> : any types, optional</p>
+<blockquote>
+<div><p>arguments to be substituted into the path spec for %s, %d, etc.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
+<blockquote class="last">
+<div><p>Path with parent structure and substitutions applied.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.manifest.Manifest.load_config">
+<tt class="descname">load_config</tt><big>(</big><em>config</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/manifest.html#Manifest.load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.load_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load paths into the manifest from an Allen SDK config section.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>config</strong> : Config</p>
+<blockquote class="last">
+<div><p>Manifest section of an Allen SDK config.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.config.model.manifest.Manifest.log">
+<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x2aacbc2de150&gt;</em><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.log" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.model.manifest.Manifest.resolve_paths">
+<tt class="descname">resolve_paths</tt><big>(</big><em>description_dict</em>, <em>suffix='_key'</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/manifest.html#Manifest.resolve_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.resolve_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Walk input items and expand those that refer to a manifest entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>description_dict</strong> : dict</p>
+<blockquote>
+<div><p>Any entries with key names ending in suffix will be expanded.</p>
+</div></blockquote>
+<p><strong>suffix</strong> : string</p>
+<blockquote class="last">
+<div><p>Indicates the entries to be expanded.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.config.model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-allensdk.config.model" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer">
+    </div>
+<script type="text/javascript" src="_static/external_assets/javascript/portalFooter.js"></script>
+
+  </body>
+</html>

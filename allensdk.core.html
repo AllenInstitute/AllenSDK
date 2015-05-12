@@ -1,0 +1,1210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.core package &mdash; Allen SDK 0.2.0dev documentation</title>
+    
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.2.0dev documentation" href="index.html" />
+    <link rel="up" title="allensdk package" href="allensdk.html" /> 
+  </head>
+  <body>
+<script type="text/javascript" src="_static/external_assets/javascript/portal.js"></script>
+<style>
+
+	/* the icon font-family definition and helper classes */
+	@font-face {
+	  font-family: 'portal_icon_font';
+	  src: url('_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  font-weight: normal;
+	  font-style: normal;
+	}
+	 
+	 [class^="icon-"]:before, [class*=" icon-"]:before {
+	  font-family: "portal_icon_font";
+	  font-style: normal;
+	  font-weight: normal;
+	  speak: none;
+	 
+	  display: inline-block;
+	  text-decoration: inherit;
+	  width: 1em;
+	  margin-right: .2em;
+	  text-align: center;
+	  /* opacity: .8; */
+	 
+	  /* For safety - reset parent styles, that can break glyph codes*/
+	  font-variant: normal;
+	  text-transform: none;
+	     
+	  /* fix buttons height, for twitter bootstrap */
+	  line-height: 1em;
+	 
+	  /* Animation center compensation - margins should be symmetric */
+	  /* remove if not needed */
+	  margin-left: .2em;
+	
+	}
+	 
+	.icon-spin5:before { content: '\e806'; } /* '' */
+	.icon-left-open-1:before { content: '\e81e'; } /* '' */
+	.icon-plus-1:before { content: '\e801'; } /* '' */
+	.icon-facebook:before { content: '\e816'; } /* '' */
+	.icon-gplus:before { content: '\e818'; } /* '' */
+	.icon-linkedin-3:before { content: '\e815'; } /* '' */
+	.icon-twitter:before { content: '\e817'; } /* '' */
+	.icon-youtube-play:before { content: '\e805'; } /* '' */
+	.icon-plus-2:before { content: '\e809'; } /* '' */
+	.icon-record-1:before { content: '\e81c'; } /* '' */
+	.icon-cancel:before { content: '\e80b'; } /* '' */
+	.icon-search:before { content: '\e804'; } /* '' */
+	.icon-cancel-2:before { content: '\e80c'; } /* '' */
+	.icon-plus-4:before { content: '\e80d'; } /* '' */
+	.icon-cancel-3:before { content: '\e80e'; } /* '' */
+	.icon-plus:before { content: '\e808'; } /* '' */
+	.icon-down-open:before { content: '\e800'; } /* '' */
+	.icon-right-open:before { content: '\e802'; } /* '' */
+	.icon-up-open:before { content: '\e803'; } /* '' */
+	.icon-stop:before { content: '\e813'; } /* '' */
+	.icon-cancel-1:before { content: '\e820'; } /* '' */
+	.icon-plus-3:before { content: '\e80a'; } /* '' */
+	/* end icon font helpers */
+
+	/* icon font spin animation */
+	.animate-spin {
+	  -moz-animation: spin 2s infinite linear;
+	  -o-animation: spin 2s infinite linear;
+	  -webkit-animation: spin 2s infinite linear;
+	  animation: spin 2s infinite linear;
+	  display: inline-block;
+	}
+	@-moz-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-webkit-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-o-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-ms-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	/*  end spin animation */	
+
+	@font-face {
+	    font-family: 'bebas_neueregular';
+	    src: url('_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	/* top chrome styles */
+	#top_chrome {
+
+		width:100%;
+		height:28px;
+		background-color:#163E65;
+	}
+
+	.chrome_link_block {
+
+		color:#fff !important;	
+		display:inline-block;
+		height:100%;
+		max-height:28px;
+	}
+
+	.chrome_link_block:hover {
+
+		background-color:#eee;
+		color:#0779BE !important;	
+		cursor:pointer;
+	}
+
+	#top_chrome a {
+
+		color:inherit !important;	
+		text-decoration:none;
+	}
+
+	#top_chrome a:hover {
+
+		color:inherit !important;	
+	}
+
+	#top_chrome_buttons {
+
+		float:right;
+		margin-right:50px;
+	}
+
+	.chrome_button {
+
+		font-family:arial,sans-serif;
+		font-weight:bold;
+		display:inline-block;
+		font-size:9px;
+		text-align:left;
+		text-decoration:none;
+		margin:9px 20px 10px 20px;
+	}
+
+	.chrome_active {
+
+		background-color:#1b7abd;
+		color:#fff;
+	}
+
+
+	/* header element styles*/
+	#header_content {
+
+		font-family: bebas_neueregular, arial, sans-serif;
+		font-size:22px;
+		color:#0779be;		
+		letter-spacing:0.03em;
+
+		position:relative;
+		width:calc(100% - 112px);
+		min-width:800px;
+		height:76px;
+		border-bottom:2px solid #A5A8AB;
+		margin-left:50px;
+		margin-right:50px;
+        z-index:9999; /* IT-9508 */
+	}
+
+	#portal_logo {
+
+		position:absolute;
+		top:20px;
+		left:0px;
+		width:236px;
+	}
+
+	#portal_tabs {
+
+		position: absolute;
+		bottom: 12px;
+		left: 0px;
+		margin-bottom: -12px;
+		display: block;
+	}
+
+	.horizontal_list
+	{
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		display: inline; 		
+	}
+
+	.horizontal_list li { 
+
+		display: inline; 	
+	}	
+
+	#portal_tab_menu_container {
+
+		display:none;
+	}
+
+	#portal_search_input_group {
+
+		position:absolute;
+		margin: 0;
+		padding: 0;
+		bottom:12px;
+		right:0px;
+		border:1px solid #DAD9D3;
+		color:#DAD9D3;
+	}
+
+	#portal_search_input_group input {
+
+		margin: 0;
+		padding: 0;
+		border:none;
+		width:110px;
+		color:#DAD9D3;
+		font-family:Helvetica,sans-serif;
+		font-size:12px;
+		height:28px;
+		margin-left:10px;
+
+		outline:none;
+	}
+
+	input::-ms-clear {
+		display: none;
+	}
+
+	#portal_search_input_group i {
+
+		font-size:0.8em;
+		cursor:pointer;
+	}
+
+	#pSiteSearchTextInput:focus {
+
+		color:#000;
+	}
+
+	.icon_menu_down {
+
+		font-size: 12px;
+		margin-left: 4px;
+		vertical-align: text-top;
+		padding-top: 4px;
+		display: inline-block;
+	}
+
+	.portal_tab_item {
+
+		background-color: #fff;
+		padding: 12px;
+		padding-left:20px;
+		padding-right:20px;
+		display: inline-block !important;		
+	}
+
+	.portal_tab_item a:hover {
+
+		color:#fbe300;	
+	}
+
+	.portal_tab_item:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}	
+
+
+	.portal_menu_active {
+
+		background-color: #EEEEEE;
+	}	
+
+	.portal_menu_item_active {
+
+		color:#fbe300 !important;	
+	}
+
+	.portal_tab_active {
+
+		color:#a5a8ab !important;
+	}
+
+	#header_content a {		
+
+		color:inherit !important;
+	}
+
+	#header_content a:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}
+
+	#header_content ul {
+
+		list-style: none;
+		position: relative;
+		top: 58px;
+		display: inline-table;
+	}
+
+	#header_content ul ul {
+		
+		display:none;
+		opacity:0;
+	}
+
+	/* the fly out menus */
+	#header_content ul li:hover > ul,
+	#header_content ul li.hover > ul {
+
+		position: absolute;
+		top: 48px;
+		z-index:999;
+
+		display: block;
+		width: 152px;
+		padding:0px;
+		padding-top:20px;
+		padding-bottom:10px;
+		font-size: 12px;
+		font-family: Arial,Sans-Serif;
+		font-weight: bold;
+		text-transform: uppercase;
+
+		background-color: rgba(8,122,191,0.98);
+		color: #fff !important;
+		opacity: 1;
+
+		-webkit-animation: fade 0.25s;
+		animation: fade 0.25s;
+	}
+
+	@-webkit-keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}
+	@keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}	
+
+	#header_content ul li:hover > ul li {
+
+		padding: 10px;
+		padding-top: 0px;
+		padding-left: 20px;
+		display: block;
+		opacity:1;
+	}
+
+	#header_content ul li:hover > ul a {
+
+		display: block;
+		opacity:1;
+		white-space:nowrap;
+	}
+
+	#portal_menu_start_list {
+
+		left: 81px;
+
+		/* IE sauce */
+		left:85px\9;
+
+		/* Safari sauce */
+		(;left:79px;);
+	}
+
+	#portal_menu_atlases_list {
+
+		left: 290px;
+		width: 210px !important;
+        height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 303px\9;
+        height: 225px\9;
+
+		/* Safari sauce */
+		(;left:279px;);
+	}
+
+	#portal_menu_tools_list {
+
+		left: 500px;
+		width: 172px !important;
+		height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 513px\9;
+		height:225px\9;
+
+		/* Safari sauce */
+		(;left:489px;);
+		(;height:227px;);
+	}
+
+	/* mozilla sauce */
+	@-moz-document url-prefix() {
+
+		#header_content {
+
+			height:107px;
+		}
+
+		#portal_menu_start_list {
+
+			left:85px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 302px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 512px;
+			height:236px;
+		}
+	}
+
+
+	/* make it look OK on iPad also */
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}  
+	}
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}	  
+	}
+
+	.portal_menu_list_heading {
+
+		color:#9ccae5;
+		border-bottom:1px solid #9ccae5;
+		padding-bottom:5px !important;
+	}
+
+	.portal_menu_list_heading + li {
+
+		padding-top:10px !important;
+	}
+
+	.portal_menu_list_heading li {
+
+		padding-bottom:0px;
+	}	
+
+	#portal_menu_atlases_list li:last-of-type {
+
+		padding-bottom:15px !important;
+	}
+
+	.icon-spin5 {
+
+		color:#000;
+	}
+</style>
+<div id="pHeader">
+<div id="top_chrome">
+	<div id="top_chrome_buttons">
+		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
+		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
+	</div>
+</div>
+
+<div id="header_content">
+
+	<a href="http://AllenInstitute.github.io/AllenSDK">
+		<img id="portal_logo" style="border:0;" src="_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+	</a>
+</div>
+</div>
+
+<script>
+
+jQuery('#portal_tab_menu').bind('touchstart', function() {
+
+	if(window.console)
+		console.log("touchstart");
+});
+</script>
+<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="allensdk-core-package">
+<h1>allensdk.core package<a class="headerlink" href="#allensdk-core-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-allensdk.core.dat_utilities">
+<span id="allensdk-core-dat-utilities-module"></span><h2>allensdk.core.dat_utilities module<a class="headerlink" href="#module-allensdk.core.dat_utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.core.dat_utilities.DatUtilities">
+<em class="property">class </em><tt class="descclassname">allensdk.core.dat_utilities.</tt><tt class="descname">DatUtilities</tt><a class="reference internal" href="_modules/allensdk/core/dat_utilities.html#DatUtilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.dat_utilities.DatUtilities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.dat_utilities.DatUtilities.save_voltage" title="allensdk.core.dat_utilities.DatUtilities.save_voltage"><tt class="xref py py-obj docutils literal"><span class="pre">save_voltage</span></tt></a>(output_path,&nbsp;v,&nbsp;t)</td>
+<td>Save a single voltage output result into a simple text format.</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="allensdk.core.dat_utilities.DatUtilities.save_voltage">
+<em class="property">classmethod </em><tt class="descname">save_voltage</tt><big>(</big><em>output_path</em>, <em>v</em>, <em>t</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/dat_utilities.html#DatUtilities.save_voltage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.dat_utilities.DatUtilities.save_voltage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a single voltage output result into a simple text format.</p>
+<p>The output file is one t v pair per line.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>output_path</strong> : string</p>
+<blockquote>
+<div><p>file name for output</p>
+</div></blockquote>
+<p><strong>v</strong> : numpy array</p>
+<blockquote>
+<div><p>voltage</p>
+</div></blockquote>
+<p><strong>t</strong> : numpy array</p>
+<blockquote class="last">
+<div><p>time</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.core.json_utilities">
+<span id="allensdk-core-json-utilities-module"></span><h2>allensdk.core.json_utilities module<a class="headerlink" href="#module-allensdk.core.json_utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.core.json_utilities.handler">
+<tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">handler</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used by write_json convert a few non-standard types to things that the json package can handle.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.json_utilities.read">
+<tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">read</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut reading JSON from a file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.json_utilities.write">
+<tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">write</tt><big>(</big><em>file_name</em>, <em>obj</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for writing JSON to a file.  This also takes care of serializing numpy and data types.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.core.nwb_data_set">
+<span id="allensdk-core-nwb-data-set-module"></span><h2>allensdk.core.nwb_data_set module<a class="headerlink" href="#module-allensdk.core.nwb_data_set" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet">
+<em class="property">class </em><tt class="descclassname">allensdk.core.nwb_data_set.</tt><tt class="descname">NwbDataSet</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A very simple interface for exracting electrophysiology data
+from an NWB file.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses" title="allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses"><tt class="xref py py-obj docutils literal"><span class="pre">fill_sweep_responses</span></tt></a>([fill_value,&nbsp;sweep_numbers])</td>
+<td>Fill sweep response arrays with a single value.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.get_experiment_sweep_numbers" title="allensdk.core.nwb_data_set.NwbDataSet.get_experiment_sweep_numbers"><tt class="xref py py-obj docutils literal"><span class="pre">get_experiment_sweep_numbers</span></tt></a>()</td>
+<td>Get all of the sweep numbers for experiment epochs in the file, not including test sweeps.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.get_spike_times" title="allensdk.core.nwb_data_set.NwbDataSet.get_spike_times"><tt class="xref py py-obj docutils literal"><span class="pre">get_spike_times</span></tt></a>(sweep_number)</td>
+<td>Return any spike times stored in the NWB file for a sweep.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep" title="allensdk.core.nwb_data_set.NwbDataSet.get_sweep"><tt class="xref py py-obj docutils literal"><span class="pre">get_sweep</span></tt></a>(sweep_number)</td>
+<td>Retrieve the stimulus, response, index_range, and sampling rate for a particular sweep.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers" title="allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers"><tt class="xref py py-obj docutils literal"><span class="pre">get_sweep_numbers</span></tt></a>()</td>
+<td>Get all of the sweep numbers in the file, including test sweeps.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.set_spike_times" title="allensdk.core.nwb_data_set.NwbDataSet.set_spike_times"><tt class="xref py py-obj docutils literal"><span class="pre">set_spike_times</span></tt></a>(sweep_number,&nbsp;spike_times)</td>
+<td>Set or overwrite the spikes times for a sweep.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.set_sweep" title="allensdk.core.nwb_data_set.NwbDataSet.set_sweep"><tt class="xref py py-obj docutils literal"><span class="pre">set_sweep</span></tt></a>(sweep_number,&nbsp;stimulus,&nbsp;response)</td>
+<td>Overwrite the stimulus or response of an NWB file.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses">
+<tt class="descname">fill_sweep_responses</tt><big>(</big><em>fill_value=0.0</em>, <em>sweep_numbers=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.fill_sweep_responses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill sweep response arrays with a single value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fill_value: float</strong></p>
+<blockquote>
+<div><p>Value used to fill sweep response array</p>
+</div></blockquote>
+<p><strong>sweep_numbers: list</strong></p>
+<blockquote class="last">
+<div><p>List of integer sweep numbers to be filled (default all sweeps)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_experiment_sweep_numbers">
+<tt class="descname">get_experiment_sweep_numbers</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_experiment_sweep_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_experiment_sweep_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all of the sweep numbers for experiment epochs in the file, not including test sweeps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_spike_times">
+<tt class="descname">get_spike_times</tt><big>(</big><em>sweep_number</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_spike_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_spike_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return any spike times stored in the NWB file for a sweep.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sweep_number: int</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list</p>
+<blockquote class="last">
+<div><p>list of spike times in seconds relative to the start of the sweep</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_sweep">
+<tt class="descname">get_sweep</tt><big>(</big><em>sweep_number</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_sweep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the stimulus, response, index_range, and sampling rate
+for a particular sweep.  This method hides the NWB file&#8217;s distinction 
+between a &#8220;Sweep&#8221; and an &#8220;Experiment&#8221;.  An experiment is a subset of
+of a sweep that excludes the initial test pulse.  It also excludes 
+any erroneous response data at the end of the sweep (usually for
+ramp sweeps, where recording was terminated mid-stimulus).</p>
+<p>Some sweeps do not have an experiment, so full data arrays are 
+returned.  Sweeps that have an experiment return full data arrays
+(include the test pulse) with any erroneous data trimmed from the 
+back of the sweep.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sweep_number: int</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>A dictionary with &#8216;stimulus&#8217;, &#8216;response&#8217;, &#8216;index_range&#8217;, and
+&#8216;sampling_rate&#8217; elements.  The index range is a 2-tuple where
+the first element indicates the end of the test pulse and the
+second index is the end of valid response data.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers">
+<tt class="descname">get_sweep_numbers</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_sweep_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all of the sweep numbers in the file, including test sweeps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.set_spike_times">
+<tt class="descname">set_spike_times</tt><big>(</big><em>sweep_number</em>, <em>spike_times</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.set_spike_times"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.set_spike_times" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set or overwrite the spikes times for a sweep.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sweep_number: int</strong></p>
+<p><strong>spike_times: np.array</strong></p>
+<blockquote class="last">
+<div><p>array of spike times in seconds</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.set_sweep">
+<tt class="descname">set_sweep</tt><big>(</big><em>sweep_number</em>, <em>stimulus</em>, <em>response</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.set_sweep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.set_sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite the stimulus or response of an NWB file.  
+If the supplied arrays are shorter than stored arrays,
+they are padded with zeros to match the original data 
+size.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>sweep_number: int</strong></p>
+<p><strong>stimulus: np.array</strong></p>
+<blockquote>
+<div><p>Overwrite the stimulus with this array.  If None, stimulus is unchanged.</p>
+</div></blockquote>
+<p><strong>response: np.array</strong></p>
+<blockquote class="last">
+<div><p>Overwrite the response with this array.  If None, response is unchanged.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.core.swc">
+<span id="allensdk-core-swc-module"></span><h2>allensdk.core.swc module<a class="headerlink" href="#module-allensdk.core.swc" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.core.swc.Morphology">
+<em class="property">class </em><tt class="descclassname">allensdk.core.swc.</tt><tt class="descname">Morphology</tt><big>(</big><em>compartment_list=None</em>, <em>compartment_index=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Keep track of the list of compartments in a morphology and provide 
+a few helper methods (index by id, sparsify, root, etc).  During initialization
+the compartments are assigned a &#8216;children&#8217; property that is a list of
+pointers to child compartments.</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.swc.Morphology.compartment_index" title="allensdk.core.swc.Morphology.compartment_index"><tt class="xref py py-obj docutils literal"><span class="pre">compartment_index</span></tt></a></td>
+<td>Return the compartment index.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.swc.Morphology.compartment_list" title="allensdk.core.swc.Morphology.compartment_list"><tt class="xref py py-obj docutils literal"><span class="pre">compartment_list</span></tt></a></td>
+<td>Return the compartment list.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.swc.Morphology.root" title="allensdk.core.swc.Morphology.root"><tt class="xref py py-obj docutils literal"><span class="pre">root</span></tt></a></td>
+<td>Search through the compartment index for the root compartment</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.swc.Morphology.compartment_index_by_type" title="allensdk.core.swc.Morphology.compartment_index_by_type"><tt class="xref py py-obj docutils literal"><span class="pre">compartment_index_by_type</span></tt></a>(compartment_type)</td>
+<td>Return an dictionary of compartments indexed by id that all have a particular compartment type.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.swc.Morphology.sparsify" title="allensdk.core.swc.Morphology.sparsify"><tt class="xref py py-obj docutils literal"><span class="pre">sparsify</span></tt></a>(modulo[,&nbsp;compress_ids])</td>
+<td>Return a new Morphology object that has a given number of non-leaf, non-root segments removed.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.swc.Morphology.update_children" title="allensdk.core.swc.Morphology.update_children"><tt class="xref py py-obj docutils literal"><span class="pre">update_children</span></tt></a>()</td>
+<td>Fill each compartment&#8217;s array of children</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.swc.Morphology.validate" title="allensdk.core.swc.Morphology.validate"><tt class="xref py py-obj docutils literal"><span class="pre">validate</span></tt></a>()</td>
+<td>Make sure that the parents and children are assigned properly.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.swc.Morphology.write" title="allensdk.core.swc.Morphology.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(file_name[,&nbsp;columns])</td>
+<td>Write this morphology out to an SWC file</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.SOMA">
+<tt class="descname">SOMA</tt><em class="property"> = 1</em><a class="headerlink" href="#allensdk.core.swc.Morphology.SOMA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.compartment_index">
+<tt class="descname">compartment_index</tt><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.compartment_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.compartment_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the compartment index.  This is a property to ensure that the
+compartment list and compartment index are in sync.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.compartment_index_by_type">
+<tt class="descname">compartment_index_by_type</tt><big>(</big><em>compartment_type</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.compartment_index_by_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.compartment_index_by_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an dictionary of compartments indexed by id that all have
+a particular compartment type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>compartment_type: int</strong></p>
+<blockquote class="last">
+<div><p>Desired compartment type</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.compartment_list">
+<tt class="descname">compartment_list</tt><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.compartment_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.compartment_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the compartment list.  This is a property to ensure that the 
+compartment list and compartment index are in sync.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.swc.Morphology.root">
+<tt class="descname">root</tt><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.root"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search through the compartment index for the root compartment</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.sparsify">
+<tt class="descname">sparsify</tt><big>(</big><em>modulo</em>, <em>compress_ids=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.sparsify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.sparsify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new Morphology object that has a given number of non-leaf,
+non-root segments removed.  IDs can be reassigned so as to be continuous.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>modulo: int</strong></p>
+<blockquote>
+<div><p>keep 1 out of every modulo segments.</p>
+</div></blockquote>
+<p><strong>compress_ids: boolean</strong></p>
+<blockquote>
+<div><p>Reassign ids so that ids are continuous (no missing id numbers).</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Morphology</p>
+<blockquote class="last">
+<div><p>A new morphology instance</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.update_children">
+<tt class="descname">update_children</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.update_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.update_children" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill each compartment&#8217;s array of children</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.validate">
+<tt class="descname">validate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make sure that the parents and children are assigned properly.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.swc.Morphology.write">
+<tt class="descname">write</tt><big>(</big><em>file_name</em>, <em>columns=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/swc.html#Morphology.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.Morphology.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write this morphology out to an SWC file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>desired name of your SWC file</p>
+</div></blockquote>
+<p><strong>columns: list</strong></p>
+<blockquote class="last">
+<div><p>columns to write to your SWC file (default: DEFAULT_COLUMNS)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.swc.read_rows">
+<tt class="descclassname">allensdk.core.swc.</tt><tt class="descname">read_rows</tt><big>(</big><em>rows</em>, <em>columns</em>, <em>numeric_columns</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/swc.html#read_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.read_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a list of string SWC rows.  Lines that start with &#8216;#&#8217;
+are ignored.  Numeric types are properly converted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rows: list of strings</strong></p>
+<blockquote>
+<div><p>usually the rows of an SWC file</p>
+</div></blockquote>
+<p><strong>columns: list of strings</strong></p>
+<blockquote>
+<div><p>names of the columns in this file</p>
+</div></blockquote>
+<p><strong>numeric_columns: list of strings</strong></p>
+<blockquote>
+<div><p>names of the numeric columns in this file</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Morphology</p>
+<blockquote class="last">
+<div><p>A Morphology instance.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.swc.read_string">
+<tt class="descclassname">allensdk.core.swc.</tt><tt class="descname">read_string</tt><big>(</big><em>s</em>, <em>columns=None</em>, <em>numeric_columns=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/swc.html#read_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.read_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a list of string SWC rows.  Lines that start with &#8216;#&#8217;
+are ignored.  Numeric types are properly converted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>s: string</strong></p>
+<blockquote>
+<div><p>the contents of an SWC file as a string</p>
+</div></blockquote>
+<p><strong>columns: list of strings</strong></p>
+<blockquote>
+<div><p>names of the columns in this file (default: DEFAULT_COLUMNS)</p>
+</div></blockquote>
+<p><strong>numeric_columns: list of strings</strong></p>
+<blockquote>
+<div><p>names of the numeric columns in this file (default: DEFAULT_NUMERIC_COLUMNS)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Morphology</p>
+<blockquote class="last">
+<div><p>A Morphology instance.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.swc.read_swc">
+<tt class="descclassname">allensdk.core.swc.</tt><tt class="descname">read_swc</tt><big>(</big><em>file_name</em>, <em>columns=None</em>, <em>numeric_columns=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/swc.html#read_swc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.read_swc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in an SWC file and return a Morphology object.
+SWC are basically CSV files, but they often don&#8217;t have headers. 
+You can pass those in explicitly and also indicate which
+columns are numeric.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>SWC file name.</p>
+</div></blockquote>
+<p><strong>columns: list of strings</strong></p>
+<blockquote>
+<div><p>names of the columns in this file (default: DEFAULT_COLUMNS)</p>
+</div></blockquote>
+<p><strong>numeric_columns: list of strings</strong></p>
+<blockquote>
+<div><p>names of the numeric columns in this file (default: DEFAULT_NUMERIC_COLUMNS)</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Morphology</p>
+<blockquote class="last">
+<div><p>A Morphology instance.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.swc.str_to_num">
+<tt class="descclassname">allensdk.core.swc.</tt><tt class="descname">str_to_num</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/swc.html#str_to_num"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.swc.str_to_num" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to convert a string s into a number</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-allensdk.core" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer">
+    </div>
+<script type="text/javascript" src="_static/external_assets/javascript/portalFooter.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,38 @@
+allensdk.model.biophys_sim package
+==================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    allensdk.model.biophys_sim.neuron
+    allensdk.model.biophys_sim.scripts
+
+Submodules
+----------
+
+allensdk.model.biophys_sim.bps_command module
+---------------------------------------------
+
+.. automodule:: allensdk.model.biophys_sim.bps_command
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.model.biophys_sim.config module
+----------------------------------------
+
+.. automodule:: allensdk.model.biophys_sim.config
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.model.biophys_sim
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,19 @@
+allensdk.model package
+======================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    allensdk.model.biophys_sim
+    allensdk.model.biophysical_perisomatic
+    allensdk.model.glif
+
+Module contents
+---------------
+
+.. automodule:: allensdk.model
+    :members:
+    :undoc-members:
+    :show-inheritance:

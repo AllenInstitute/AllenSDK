@@ -1,0 +1,89 @@
+
+/* tab bar for application menu, appears below the individual tabs */
+#pTabBar {
+    background-color: #4D6D86;
+    color:#ffffff;
+    padding: 6px;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:12px;
+    font-weight:bold;
+}
+
+#pTabBar a {
+    color:#fff;
+    text-decoration:none;
+    background-color: #4D6D86;
+    padding-left: 10px;
+    padding-right:10px;
+    text-align:center;
+    border: solid 1px #4D6D86;
+}
+
+#pTabBar a:hover {
+    background-color:#639A3C;
+    border: solid 1px #fff;
+}
+
+#pTabBar a.pTabBarSelected {
+    color:#fff;
+    border: solid 1px #fff;
+}
+
+/* common styles */
+a {
+    text-decoration:none;
+    color:#0079C0;
+}
+
+a:hover {
+#    color:#639A3C;
+}
+
+
+div.pageContent {
+  width:860px;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:auto;
+  margin-bottom:auto;
+  padding:0px;
+  position:relative;
+  min-height:80%;
+  _height:94%;
+}
+
+div.sectionHeader {
+    font-weight:bold;
+    color:#ffffff;
+    margin-top:-4px;
+    margin-left:-4px;
+    _margin-right:-4px;
+    width:100%;
+    background-color:#31506C;
+    padding:4px;
+    border-bottom:1px solid #31506C;
+}
+
+div.contentBlock {
+    border:1px solid #31506C;
+    background-color:#ffffff;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:10px;
+    margin-bottom:auto;
+    padding:4px;
+}
+
+div.comment {
+    color: #626166;
+    width:85%;
+    margin-left:auto;
+    margin-right:auto;
+    padding:0px;
+    text-align:left;
+    border-bottom:dotted 1px #8B8B8B;
+}
+
+.heading {
+    color: #0079C0;
+}

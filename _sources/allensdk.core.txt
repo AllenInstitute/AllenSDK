@@ -1,0 +1,46 @@
+allensdk.core package
+=====================
+
+Submodules
+----------
+
+allensdk.core.dat_utilities module
+----------------------------------
+
+.. automodule:: allensdk.core.dat_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.core.json_utilities module
+-----------------------------------
+
+.. automodule:: allensdk.core.json_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.core.nwb_data_set module
+---------------------------------
+
+.. automodule:: allensdk.core.nwb_data_set
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.core.swc module
+------------------------
+
+.. automodule:: allensdk.core.swc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.core
+    :members:
+    :undoc-members:
+    :show-inheritance:
