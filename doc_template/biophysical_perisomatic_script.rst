@@ -226,12 +226,28 @@ A :download:`minimal example (simple_example.tgz)<./examples/simple_example.tgz>
 and a :download:`multicell example (multicell_example.tgz)<./examples/multicell_example.tgz>`
 are available to download as a starting point for your own projects.
 
+Each example provides its own utils.py file along with a main script
+and supporting configuration files.
 
-Exporting Output to Text Format
--------------------------------
+simple_example.tgz::
+
+    tar xvzf simple_example.tgz
+    cd simple
+    python simple.py
+
+
+multicell_example.tgz::
+
+    tar xvzf multicell_example.tgz
+    cd multicell
+    python multicell.py
+
+
+Exporting Output to Text Format or Image
+----------------------------------------
 
 This is an example of using the AllenSDK
-to save a response voltage to another format.
+to save a response voltage to other formats.
 
 ::
 
@@ -239,41 +255,35 @@ to save a response voltage to another format.
         DatUtilities
     from allensdk.core.nwb_data_set import \
         NwbDataSet
+    import numpy as np
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
     
-    nwb_file = '318808419.nwb'
-    sweep_number = 67
-    dat_file = '318808419_67.dat'
+    nwb_file = '313862020.nwb'
+    sweep_number = 52
+    dat_file = '313862020_%d.dat' % (sweep_number)
     
     nwb = NwbDataSet(nwb_file)
     sweep = nwb.get_sweep(sweep_number)
     
+    # read v and t as numpy arrays
     v = sweep['response']
     dt = 1.0e3 / sweep['sampling_rate']
     num_samples = len(v)
-    tstop = (num_samples -1) * dt
-    t = numpy.linspace(0.0, tstop, num_samples)
-    DatUtilities.save_voltage(dat_file, v, t)
-
-
-To view the dat format in gnuplot, for example:
-
-view_dat.gnuplot:
-::
-
-    set term png
-    set output "v_result.png"
+    t = np.arange(num_samples) * dt
     
-    set title "Vout"
-    plot "318808419_67.dat"
+    # save as text file
+    data = np.transpose(np.vstack((t, v)))
+    with open (dat_file, "w") as f:
+        np.savetxt(f, data)
     
-    quit
-
-Render using gnuplot and gthumb:
-::
-
-    gplot < view_dat.gnuplot
-    gthumb v_result.png
-
+    # save image using matplotlib
+    fig, ax = plt.subplots(nrows=1, ncols=1)
+    ax.plot(t, v)
+    ax.set_title("Sweep %s" % (sweep_number))
+    fig.savefig('out.png')
+    
 
 Model Description Files
 -----------------------
