@@ -209,10 +209,14 @@ If you would like to plot the outputs of this simulation using numpy and matplot
     plt.subplot(3,1,2)
     plt.plot(time,  voltage, label='voltage')
     plt.plot(time,  threshold, label='threshold')
-    plt.plot(interpolated_spike_times, interpolated_spike_voltages, 'x', 
-             label='interpolated spike')
-    plt.plot((grid_spike_indices-1)*neuron.dt, voltage[grid_spike_indices-1], '.', 
-             label='last step before spike')
+    
+    if grid_spike_indices:
+        plt.plot(interpolated_spike_times, interpolated_spike_voltages, 'x', 
+                 label='interpolated spike')
+
+        plt.plot((grid_spike_indices-1)*neuron.dt, voltage[grid_spike_indices-1], '.', 
+                 label='last step before spike')
+
     plt.xlabel('time (s)')
     plt.ylabel('voltage (V)')
     plt.legend(loc=3)
@@ -231,7 +235,7 @@ If you would like to plot the outputs of this simulation using numpy and matplot
 
 .. note:: 
 
-    There is both an interpolated and grid spike time.  The grid spike is the first time step 
+    There both interpolated spike times and grid spike times.  The grid spike is the first time step 
     where the voltage is higher than the threshold.  Note that if you try to plot the voltage at the grid 
     spike indices the output will be ``NaN``. The interpolated spike is the calculated intersection of the 
     threshold and voltage between the time steps.
