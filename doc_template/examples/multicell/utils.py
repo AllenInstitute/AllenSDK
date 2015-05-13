@@ -50,13 +50,6 @@ class Utils(HocUtils):
         passive = self.description.data['passive'][type_index]
         conditions = self.description.data['conditions'][type_index]
         genome = self.description.data['genome']
-        
-        print('passive')
-        print(passive)
-        print('conditions')
-        print(conditions)
-        print('genome')
-        print(genome)
 
 
         # Set passive properties

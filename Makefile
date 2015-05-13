@@ -22,7 +22,7 @@ distutils_build: clean
 	python setup.py build
 	
 setversion:
-	sed -ie 's/'\''[0-9]\+.[0-9]\+.[0-9]\+.dev[0-9]\+'\''/'\''${VERSION}.${RELEASE}'\''/g' allensdk/__init__.py
+	sed -ie 's/'\''[0-9]\+.[0-9]\+.[0-9]\+'\''/'\''${VERSION}.${RELEASE}'\''/g' allensdk/__init__.py
 
 sdist: distutils_build
 	python setup.py sdist
@@ -40,8 +40,9 @@ doc: FORCE
 	sed -ie "s/|zip_filename|/${ZIP_FILENAME}/g" doc/links.rst
 	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.brainscales
 	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.ubuntu
-	sed -ie "s/\/external_assets/_static\/external_assets/g" doc/_templates/portalHeader.html
-	sed -ie "s/\/external_assets/_static\/external_assets/g" doc/_static/external_assets/javascript/portal.js
+	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html	
+	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
+	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_static/external_assets/javascript/portal.js
 	cd doc && make html || true
 	cp doc_template/.nojekyll doc/_build/html
 
