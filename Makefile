@@ -22,7 +22,7 @@ distutils_build: clean
 	python setup.py build
 	
 setversion:
-	sed -ie 's/'\''[0-9]\+.[0-9]\+.[0-9]\+.dev[0-9]\+'\''/'\''${VERSION}.${RELEASE}'\''/g' allensdk/__init__.py
+	sed -ie 's/'\''[0-9]\+.[0-9]\+.[0-9]\+'\''/'\''${VERSION}.${RELEASE}'\''/g' allensdk/__init__.py
 
 sdist: distutils_build
 	python setup.py sdist
