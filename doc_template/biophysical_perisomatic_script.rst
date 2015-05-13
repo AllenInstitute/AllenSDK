@@ -343,8 +343,8 @@ Comment Lines
     However, the Allen SDK library applies a preprocessing stage
     to remove C++-style comments, so they can be used in description files.
     
-    Multi-line comments should be surrounded by /* */
-    and single-line comments start with //.
+    Multi-line comments should be surrounded by \/\* \*\/
+    and single-line comments start with \/\/.
     Commented description files will not be recognized by strict json parsers
     unless the comments are stripped.
     
