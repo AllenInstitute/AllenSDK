@@ -1,9 +1,9 @@
 {% extends '!layout.html' %}
 
 {% block header %}
-<script type="text/javascript" src="_static/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 {% include "portalHeader.html" %}
-<link rel="stylesheet" type="text/css" href="_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 {{ super() }}
 {% endblock %}
 
@@ -15,5 +15,5 @@
 
 {% block footer %}
 {{ super() }}
-<script type="text/javascript" src="_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
 {% endblock %}
