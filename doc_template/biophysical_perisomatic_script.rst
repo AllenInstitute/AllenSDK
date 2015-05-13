@@ -240,7 +240,7 @@ multicell_example.tgz::
 
     tar xvzf multicell_example.tgz
     cd multicell
-    python multicell.py
+    python multi.py
 
 
 Exporting Output to Text Format or Image
