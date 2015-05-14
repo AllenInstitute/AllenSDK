@@ -50,13 +50,6 @@ class Utils(HocUtils):
         passive = self.description.data['passive'][type_index]
         conditions = self.description.data['conditions'][type_index]
         genome = self.description.data['genome']
-        
-        print('passive')
-        print(passive)
-        print('conditions')
-        print(conditions)
-        print('genome')
-        print(genome)
 
 
         # Set passive properties
@@ -70,7 +63,6 @@ class Utils(HocUtils):
 
         # Insert channels and set parameters
         for p in genome:
-            print(p)
             sections = [s for s in cell.all if s.name().split(".")[1][:4] == p["section"]]
             for sec in sections:
                 if p["mechanism"] != "":

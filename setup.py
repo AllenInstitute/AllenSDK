@@ -32,7 +32,7 @@ setup(
                    'coverage>=3.7.1',
                    'mock'],
     setup_requires=['setuptools', 'sphinx', 'numpydoc'],
-    url='http://',
+    url='http://alleninstitute.github.io/AllenSDK/',
     scripts=['allensdk/model/biophys_sim/scripts/bps'],
     classifiers=[
         'Development Status :: 4 - Beta',
