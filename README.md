@@ -1,4 +1,3 @@
-# AllenSDK
 # The Allen SDK
 
 This repository contains code for processing and analyzing data

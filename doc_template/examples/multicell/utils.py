@@ -63,7 +63,6 @@ class Utils(HocUtils):
 
         # Insert channels and set parameters
         for p in genome:
-            print(p)
             sections = [s for s in cell.all if s.name().split(".")[1][:4] == p["section"]]
             for sec in sections:
                 if p["mechanism"] != "":

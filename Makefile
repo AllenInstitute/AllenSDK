@@ -31,6 +31,7 @@ doc: FORCE
 	sphinx-apidoc -d 4 -H "Allen SDK" -A "Allen Institute for Brain Science" -V $(VERSION) -R $(VERSION).dev$(RELEASE) --full -o doc $(PROJECTNAME)
 	cp doc_template/*.rst doc_template/conf.py doc
 	cp -R doc_template/examples doc
+	sed -ie "s/|version|/${VERSION}/g" doc/conf.py
 	cp -R doc_template/aibs_sphinx/static/* doc/_static
 	cp -R doc_template/aibs_sphinx/templates/* doc/_templates
 	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/install.rst
