@@ -1,5 +1,5 @@
 // NOTE you have to configure this!
-var _pEXTERNAL_ASSETS = "_static/external_assets";
+var _pEXTERNAL_ASSETS = "/AllenSDK/_static/external_assets";
 
 document.writeln("<script src='" + _pEXTERNAL_ASSETS + "/javascript/appConfig.js'><\/script>");
 

@@ -15,5 +15,4 @@ RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --wi
 RUN cd /opt/neuron/nrn/src/nrnpython; pip uninstall neuron; python setup.py install
 
 RUN pip install six --upgrade
-RUN pip install cython h5py
-RUN pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.9.0.tar.gz
+RUN pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.9.1.tar.gz

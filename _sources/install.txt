@@ -14,7 +14,7 @@ Quick Start Using Pip
 First ensure you have `pip <http://pypi.python.org/pypi/pip>`_ installed.
 To install the Allen SDK for a single user::
 
-    pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.9.0.tar.gz --user
+    pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.9.1.tar.gz --user
 
 
 Uninstalling the SDK is simple with pip::

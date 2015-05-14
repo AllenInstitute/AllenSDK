@@ -43,7 +43,7 @@ Downloading Biophysical Models
 
 There are two ways to download files necessary to run a biophysical model.
 The first way is to visit http://celltypes.brain-map.org and find cells that have 
-GLIF models available for download.  The electrophysiology details page
+biophysical models available for download.  The electrophysiology details page
 for a cell has a neuronal model download link.  Specifically:
 
     #. Check 'More Options+'...'Models -> Biophysical'
@@ -240,7 +240,7 @@ multicell_example.tgz::
 
     tar xvzf multicell_example.tgz
     cd multicell
-    python multicell.py
+    python multi.py
 
 
 Exporting Output to Text Format or Image
@@ -343,8 +343,8 @@ Comment Lines
     However, the Allen SDK library applies a preprocessing stage
     to remove C++-style comments, so they can be used in description files.
     
-    Multi-line comments should be surrounded by /* */
-    and single-line comments start with //.
+    Multi-line comments should be surrounded by \/\* \*\/
+    and single-line comments start with \/\/.
     Commented description files will not be recognized by strict json parsers
     unless the comments are stripped.
     
