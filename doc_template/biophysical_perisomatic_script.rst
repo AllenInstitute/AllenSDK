@@ -233,6 +233,7 @@ simple_example.tgz::
 
     tar xvzf simple_example.tgz
     cd simple
+    nrnivmodl modfiles
     python simple.py
 
 
@@ -240,7 +241,9 @@ multicell_example.tgz::
 
     tar xvzf multicell_example.tgz
     cd multicell
+    nrnivmodl modfiles
     python multi.py
+    python multicell_diff.py 
 
 
 Exporting Output to Text Format or Image

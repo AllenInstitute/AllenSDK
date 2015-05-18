@@ -4,6 +4,7 @@ from utils import Utils
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 
 config = Config().load('config.json')
 
@@ -29,9 +30,17 @@ vec = utils.record_values()
 h.finitialize()
 h.run()
 
-fig, axes = plt.subplots(3, 1, sharex=True)
+# save output voltage to text file
+data = np.transpose(np.vstack((vec["t"],
+                               vec["v"][0],
+                               vec["v"][1],
+                               vec["v"][2])))
+np.savetxt('multicell.dat', data)
+
+# use matplotlib to plot to png image
+fig, axes = plt.subplots(nrows=3, ncols=1, sharex=True)
 for i in range(len(utils.cells)):
     axes[i].plot(vec["t"], vec["v"][i])
     axes[i].set_title(utils.cells_data[i]["type"])
 plt.tight_layout()
-plt.show()
+plt.savefig('multicell.png')
