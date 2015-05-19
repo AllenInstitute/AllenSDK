@@ -786,7 +786,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">sweep_name</span> <span class="o">=</span> <span class="s">&quot;Sweep_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
             
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">spikes</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">][</span><span class="s">&quot;spike_times&quot;</span><span class="p">][</span><span class="n">sweep_name</span><span class="p">]</span>
+                <span class="n">spikes</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">][</span><span class="s">&quot;aibs_spike_times&quot;</span><span class="p">][</span><span class="n">sweep_name</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">[]</span>
             
@@ -809,10 +809,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&quot;analysis&quot;</span><span class="p">)</span>
             
             <span class="n">analysis_dir</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s">&quot;spike_times&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analysis_dir</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">analysis_dir</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&quot;spike_times&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&quot;aibs_spike_times&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analysis_dir</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">analysis_dir</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&quot;aibs_spike_times&quot;</span><span class="p">)</span>
             
-            <span class="n">spike_dir</span> <span class="o">=</span> <span class="n">analysis_dir</span><span class="p">[</span><span class="s">&quot;spike_times&quot;</span><span class="p">]</span>
+            <span class="n">spike_dir</span> <span class="o">=</span> <span class="n">analysis_dir</span><span class="p">[</span><span class="s">&quot;aibs_spike_times&quot;</span><span class="p">]</span>
             
             <span class="c"># see if desired dataset already exists</span>
             <span class="n">sweep_name</span> <span class="o">=</span> <span class="s">&quot;Sweep_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>

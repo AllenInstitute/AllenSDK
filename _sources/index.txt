@@ -30,7 +30,7 @@ Allen Cell Types Database
 -------------------------
 
 
-The `Allen Cell Types Database <celltypes.brain-map.org>`_ contains electrophysiological and morphological characterizations
+The `Allen Cell Types Database <http://celltypes.brain-map.org>`_ contains electrophysiological and morphological characterizations
 of individual neurons in the mouse primary visual cortex.  The Allen SDK provides Python code
 for accessing electrophysiology measurements (`NWB files <cell_types.html#neurodata-without-borders>`_) 
 for all neurons and morphological reconstructions (`SWC files <cell_types.html#morphology-swc-files>`_) for a subset of neurons.
