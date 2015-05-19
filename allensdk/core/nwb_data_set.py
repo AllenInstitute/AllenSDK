@@ -153,7 +153,7 @@ class NwbDataSet(object):
             sweep_name = "Sweep_%d" % sweep_number
             
             try:
-                spikes = f["analysis"]["spike_times"][sweep_name]
+                spikes = f["analysis"]["aibs_spike_times"][sweep_name]
             except KeyError:
                 return []
             
@@ -176,10 +176,10 @@ class NwbDataSet(object):
                 f.create_group("analysis")
             
             analysis_dir = f["analysis"]
-            if "spike_times" not in analysis_dir.keys():
-                analysis_dir.create_group("spike_times")
+            if "aibs_spike_times" not in analysis_dir.keys():
+                analysis_dir.create_group("aibs_spike_times")
             
-            spike_dir = analysis_dir["spike_times"]
+            spike_dir = analysis_dir["aibs_spike_times"]
             
             # see if desired dataset already exists
             sweep_name = "Sweep_%d" % sweep_number
