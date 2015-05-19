@@ -47,10 +47,9 @@ class Utils(HocUtils):
         h.define_shape()
     
     def load_cell_parameters(self, cell, type_index):
-        passive = self.description.data['passive'][type_index]
-        conditions = self.description.data['conditions'][type_index]
-        genome = self.description.data['genome']
-
+        passive = self.description.data['fit'][type_index]['passive'][0]
+        conditions = self.description.data['fit'][type_index]['conditions'][0]
+        genome = self.description.data['fit'][type_index]['genome']
 
         # Set passive properties
         cm_dict = dict([(c['section'], c['cm']) for c in passive['cm']])

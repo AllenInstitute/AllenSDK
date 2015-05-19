@@ -2,8 +2,8 @@
   "biophys": [{
       "log_config_path": "logging.conf", 
       "model_file": [ "config.json",
-                      "170426.03.01.01_fit.json",
-                      "172096.04.02.01_fit.json"
+                      "file:170426.03.01.01_fit.json?section=fit",
+                      "file:172096.04.02.01_fit.json?section=fit"
                     ],
       "cells": [
         {
