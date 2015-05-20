@@ -81,9 +81,47 @@ class Api(object):
         self.default_working_directory = working_directory
     
     
+    def do_query(self, url_builder_fn, json_traversal_fn, *args, **kwargs):
+        '''Bundle an query url construction function
+        with a corresponding response json traversal function.
+        
+        Parameters
+        ----------
+        url_builder_fn : function
+            A function that takes parameters and returns an rma url.
+        json_traversal_fn : function
+            A function that takes a json-parsed python data structure and returns data from it.
+        args : arguments
+            Arguments to be passed to the url builder function.
+        kwargs : keyword arguments
+            Keyword arguments to be passed to the rma builder function.
+        
+        Returns
+        -------
+        any type
+            The data extracted from the json response.
+        
+        Examples
+        --------
+        `A simple Api subclass example
+        <data_api_client.html#creating-new-api-query-classes>`_.
+        '''
+        api_url = url_builder_fn(*args, **kwargs) 
+        
+        quoted_api_url = urllib2.quote(api_url,';/?:@&=+$,')
+                           
+        json_parsed_data = self.retrieve_parsed_json_over_http(quoted_api_url)
+        
+        return json_traversal_fn(json_parsed_data)
+    
+    
     def do_rma_query(self, rma_builder_fn, json_traversal_fn, *args, **kwargs):
         '''Bundle an RMA query url construction function
         with a corresponding response json traversal function.
+        
+        ..note:: Deprecated in AllenSDK 0.9.2
+            `do_rma_query` will be removed in AllenSDK 1.0, it is replaced by
+            `do_query` because the latter is more general.
         
         Parameters
         ----------
@@ -106,13 +144,7 @@ class Api(object):
         `A simple Api subclass example
         <data_api_client.html#creating-new-api-query-classes>`_.
         '''
-        rma_url = rma_builder_fn(*args, **kwargs) 
-
-        quoted_rma_url = urllib2.quote(rma_url,';/?:@&=+$,')
-                           
-        json_parsed_data = self.retrieve_parsed_json_over_http(quoted_rma_url)
-        
-        return json_traversal_fn(json_parsed_data)
+        return self.do_query(rma_builder_fn, json_traversal_fn, *args, **kwargs)
     
     
     def load_api_schema(self):

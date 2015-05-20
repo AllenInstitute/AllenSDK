@@ -15,7 +15,7 @@
 
 from allensdk.api.api import Api
 
-import os, json, logging, urllib
+import logging
 
 class CellTypesApi(Api):
     def __init__(self, base_uri=None):
@@ -39,7 +39,7 @@ class CellTypesApi(Api):
             Meta data for all cells.
         '''
         
-        return self.do_rma_query(self.build_list_cells_rma, self.read_list_cells_json, 
+        return self.do_query(self.build_list_cells_rma, self.read_list_cells_json, 
                                  require_morphology, require_reconstruction)
 
 

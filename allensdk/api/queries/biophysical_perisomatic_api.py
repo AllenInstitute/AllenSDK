@@ -178,7 +178,7 @@ class BiophysicalPerisomaticApi(Api):
         rma_builder_fn = self.build_rma
         json_traversal_fn = self.read_json
         
-        return self.do_rma_query(rma_builder_fn, json_traversal_fn, neuronal_model_id)
+        return self.do_query(rma_builder_fn, json_traversal_fn, neuronal_model_id)
     
     
     def create_manifest(self,
