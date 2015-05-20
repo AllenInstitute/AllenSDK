@@ -39,41 +39,41 @@ class GlifNeuron( object ):
 
     Parameters
     ----------
-     El : float 
-         resting potential 
-     dt : float
-         duration between time steps
-     tau: np.ndarray
-         time constants of the after-spike currents
-     R_input : float
-         input resistance
-     C : float
-         capacitance
-     asc_vector : np.ndarray
-         afterspike current amplitude vector.  one element per element of tau.
-     spike_cut_length : int
-         how many time steps to replace with NaNs when a spike occurs.
-     th_inf : float
-         instantaneous threshold
-     coeffs : dict
+    El : float 
+            resting potential 
+    dt : float
+        duration between time steps
+    tau : np.ndarray
+        time constants of the after-spike currents
+    R_input : float
+        input resistance
+    C : float
+        capacitance
+    asc_vector : np.ndarray
+        afterspike current amplitude vector.  one element per element of tau.
+    spike_cut_length : int
+        how many time steps to replace with NaNs when a spike occurs.
+    th_inf : float
+        instantaneous threshold
+    coeffs : dict
         dictionary coefficients premultiplied to neuron properties during simulation. used for optimization.
-     AScurrent_dynamics_method : dict
-         dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
-     voltage_dynamics_method : dict
-         dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
-     threshold_dynamics_method : dict
-         dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
-     AScurrent_reset_method : dict
-         dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
-     voltage_reset_method : dict
-         dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
-     threshold_reset_method : dict
-         dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
-     init_voltage : float 
+    AScurrent_dynamics_method : dict
+        dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
+    voltage_dynamics_method : dict
+        dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
+    threshold_dynamics_method : dict
+        dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
+    AScurrent_reset_method : dict
+        dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
+    voltage_reset_method : dict
+        dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
+    threshold_reset_method : dict
+        dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
+    init_voltage : float 
         initial voltage value
-     init_threshold : float
-         initial spike threshold value
-     init_AScurrents : np.ndarray
+    init_threshold : float
+        initial spike threshold value
+    init_AScurrents : np.ndarray
         initial afterspike current amplitude vector. one element per element of tau.
     """
 
@@ -84,7 +84,7 @@ class GlifNeuron( object ):
                  AScurrent_reset_method, voltage_reset_method, threshold_reset_method,
                  init_method_data, init_voltage, init_threshold, init_AScurrents, **kwargs): 
 
-        """ Initialize the neuron."""
+        """ Initialize the neuron. """
 
         self.type = GlifNeuron.TYPE
         self.El = El

@@ -3,7 +3,8 @@ import os
 import allensdk
 
 # http://bugs.python.org/issue8876#msg208792
-del os.link
+if hasattr(os, 'link'):
+    del os.link
 
 def prepend_find_packages(*roots):
     ''' Recursively traverse nested packages under the root directories
@@ -31,7 +32,7 @@ setup(
                    'coverage>=3.7.1',
                    'mock'],
     setup_requires=['setuptools', 'sphinx', 'numpydoc'],
-    url='http://',
+    url='http://alleninstitute.github.io/AllenSDK/',
     scripts=['allensdk/model/biophys_sim/scripts/bps'],
     classifiers=[
         'Development Status :: 4 - Beta',

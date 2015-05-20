@@ -15,11 +15,6 @@
       "key": "BASEDIR"
     }, 
     {
-      "type": "file", 
-      "spec": "Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01_328874724_m.swc",
-      "key": "MORPHOLOGY"
-    }, 
-    {
       "type": "dir", 
       "spec": "modfiles", 
       "key": "MODFILE_DIR"

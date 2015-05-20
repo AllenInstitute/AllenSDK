@@ -415,7 +415,7 @@ function import_portal()  {
 "" + 
 "" + 
 "<div id=\"bottom_chrome\">" + 
-"	<div id=\"portal_copyright_notice\">Copyright ©2014. Allen Institute for Brain Science. All Rights Reserved.</div>" + 
+"	<div id=\"portal_copyright_notice\">Copyright ©2015. Allen Institute for Brain Science. All Rights Reserved.</div>" + 
 "</div>" + 
 "</div>" + 
  ""; 

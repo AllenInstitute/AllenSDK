@@ -21,7 +21,6 @@ import logging
 class Api(object):
     _log = logging.getLogger(__name__)
     default_api_url = 'http://api.brain-map.org'
-    default_api_url = 'http://iwarehouse' # TODO: REMOVE THIS
     
     def __init__(self, api_base_url_string=None):
         if api_base_url_string==None:
@@ -101,10 +100,17 @@ class Api(object):
         -------
         any type
             The data extracted from the json response.
+        
+        Examples
+        --------
+        `A simple Api subclass example
+        <data_api_client.html#creating-new-api-query-classes>`_.
         '''
         rma_url = rma_builder_fn(*args, **kwargs) 
+
+        quoted_rma_url = urllib2.quote(rma_url,';/?:@&=+$,')
                            
-        json_parsed_data = self.retrieve_parsed_json_over_http(rma_url)
+        json_parsed_data = self.retrieve_parsed_json_over_http(quoted_rma_url)
         
         return json_traversal_fn(json_parsed_data)
     
@@ -116,6 +122,15 @@ class Api(object):
         -------
         dict
             the parsed json schema message
+        
+        Notes
+        -----
+        This information and other 
+        `Allen Brain Atlas Data Portal Data Model <http://help.brain-map.org/display/api/Data+Model>`_
+        documentation is also available as a
+        `Class Hierarchy <http://api.brain-map.org/class_hierarchy>`_
+        and `Class List <http://api.brain-map.org/class_hierarchy>`_.
+        
         '''
         schema_url = self.rma_endpoint + '/enumerate.json'
         json_parsed_schema_data = self.retrieve_parsed_json_over_http(schema_url)
@@ -135,6 +150,10 @@ class Api(object):
         -------
         string
             the well-known-file download url for the current api api server
+        
+        See Also
+        --------
+        retrieve_file_over_http: Can be used to retrieve the file from the url.
         '''
         return self.well_known_file_endpoint + str(well_known_file_id)
     
@@ -145,9 +164,17 @@ class Api(object):
         Parameters
         ----------
         url : string
-            Url from which to get the file.
+            Url[1]_ from which to get the file.
         file_path : string
             Absolute path including the file name to save.
+        
+        See Also
+        --------
+        construct_well_known_file_download_url: Can be used to construct the url.
+        
+        References
+        ----------
+        .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
         '''
         try:
             with open(file_path, 'wb') as f:

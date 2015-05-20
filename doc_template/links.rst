@@ -1,3 +1,3 @@
- * `allensdk-|version|.tar.gz <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-|version|.tar.gz>`_
- * `allensdk-|version|.tar.bz2 <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-|version|.tar.bz2>`_
- * `allensdk-|version|.zip <http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS/latestSuccessful/artifact/shared/tgz/allensdk-|version|.zip>`_
+ * `GitHub Source Repository <https://github.com/AllenInstitute/AllenSDK>`_
+ * `|tgz_filename| <|tgz_url|>`_
+ * `|zip_filename| <|zip_url|>`_

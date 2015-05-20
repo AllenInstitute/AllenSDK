@@ -37,6 +37,7 @@ RUN apt-get -yq install \
 
 # upgrade cython and h5py
 RUN pip install cython h5py
+RUN pip install sphinx numpydoc
 
 #neuron installation
 RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078/nrn-7.3.ansi-1078.tar.gz
@@ -49,4 +50,4 @@ RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --wi
 RUN echo 'export PATH=$PATH:/opt/neuron/iv/x86_64/bin:/opt/neuron/nrn/x86_64/bin' >> /etc/bash.bashrc
 RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
 
-RUN pip install http://bamboo.corp.alleninstitute.org/browse/MAT-AWBS-68/artifact/shared/tgz/allensdk-0.2.0.dev68.tar.gz
+RUN pip install |tgz_url|

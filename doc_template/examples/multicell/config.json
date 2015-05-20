@@ -2,16 +2,32 @@
   "biophys": [{
       "log_config_path": "logging.conf", 
       "model_file": [ "config.json",
-                      "file:fit_1.json?section=fit",
-                      "file:fit_2.json?section=fit",
-                      "file:fit_3.json?section=fit" ]
+                      "file:170426.03.01.01_fit.json?section=fit",
+                      "file:172096.04.02.01_fit.json?section=fit"
+                    ],
+      "cells": [
+        {
+          "type": "scnn1a"
+        },
+        {
+          "type": "scnn1a"
+        },
+        {
+          "type": "pvalb"
+        } ],
+      "connections": [
+          { "source": 0, "targets": [ 1 ], "erev": 0.0, "weight": 0.008 },
+          { "source": 1, "targets": [ 0, 2], "erev": 0.0, "weight": 0.008 },
+          { "source": 2, "targets": [ 1 ], "erev": -80.0, "weight": 0.01 }
+        ]
     }],
-  "fit_ids": [ { "larry": 0,
-                 "moe": 1,
-                 "curly": 2 } ],
+  "fit_ids": [ { "scnn1a": 0,
+                 "pvalb": 1 } ],
   "neuron": [{
       "hoc": [
-        "stdgui.hoc"
+        "stdgui.hoc",
+        "import3d.hoc",
+        "cell.hoc"
       ]
     }],
   "manifest": [
@@ -22,8 +38,13 @@
     }, 
     {
       "type": "file", 
-      "spec": "Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01_328874724_m.swc",
-      "key": "MORPHOLOGY"
+      "spec": "Scnn1a-Tg3-Cre_Ai14_IVSCC_-170426.03.01.01_328933585_m.swc",
+      "key": "MORPHOLOGY_scnn1a"
+    }, 
+    {
+      "type": "file", 
+      "spec": "Pvalb-IRES-Cre_Ai14_IVSCC_-172096.04.02.01_471781218_m.swc",
+      "key": "MORPHOLOGY_pvalb"
     }, 
     {
       "type": "dir", 
@@ -42,25 +63,17 @@
       "key": "output_dat"
     }
   ],
-  "passive": [{
-    "ra": 100.0, 
-    "cm": 1.0, 
-    "e_pas": -70.0
-  }], 
-  "conditions": [{
+  "conditions": [
+  {
     "celsius": 34.0, 
     "erev": [
       {
-        "ena": 50.0, 
-        "ek": -100.0
+        "ena": 53.0, 
+        "section": "soma", 
+        "ek": -107.0
       }
     ], 
-    "v_init": -70.0
-  }], 
-  "channel_parameters": [
-    {
-      "gbar_Na": 0.1, 
-      "gbar_K": 0.01, 
-      "g_pas": 0.0005
-    }]
+    "v_init": -80
+  }
+]
 }

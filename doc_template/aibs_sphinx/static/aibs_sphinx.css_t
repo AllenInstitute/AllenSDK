@@ -122,6 +122,11 @@ div.sphinxsidebar li {
     margin-top: 11px;
 }                         
 
+li.toctree-l2 {
+    font-size: 12px;
+    margin-top: 8px !important;
+}
+
 div.sphinxsidebar ul ul {
     margin-top: 0;
     margin-bottom: 0;
@@ -771,4 +776,8 @@ hr.docutils {
   border: none;
   clear: both;
 }
+
+a.current {
+  
+}         
 

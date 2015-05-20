@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from pkg_resources import resource_filename
+from pkg_resources import resource_filename #@UnresolvedImport
 import os
 import subprocess as sp
 import logging

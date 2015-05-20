@@ -18,11 +18,11 @@ from allensdk.config.model.formats.json_util import JsonUtil
 try:
     from ConfigParser import ConfigParser # Python 2
 except:
-    from configparser import ConfigParser # Python 3
+    from configparser import ConfigParser # Python 3 #@UnresolvedImport
 
 import argparse, os, io
 import logging, logging.config as lc
-from pkg_resources import resource_filename
+from pkg_resources import resource_filename #@UnresolvedImport
 
 class ApplicationConfig(object):
     ''' Convenience class that handles of application configuration

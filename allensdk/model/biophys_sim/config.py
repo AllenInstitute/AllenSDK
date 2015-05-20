@@ -14,7 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import re, logging
-from pkg_resources import resource_filename
+from pkg_resources import resource_filename #@UnresolvedImport
 from allensdk.config.app.application_config import ApplicationConfig
 from allensdk.config.model.description_parser import DescriptionParser
 from allensdk.config.model.description import Description

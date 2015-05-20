@@ -3,27 +3,25 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+:tocdepth: -1
+
 Welcome to the Allen SDK
 ========================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
+   :titlesonly:
    :hidden:
 
    install
-   neuron
-   biophysical_perisomatic_script
-   glif_models
-   model_description
-   template_application
-   resource_manifest
-   data_api_client
-   nwb
-   allensdk
+   data_resources
+   models
+   Source Documentation <allensdk>
+   Github Profile <https://github.com/AllenInstitute/AllenSDK>
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
 For the initial release, the Allen SDK focuses primarily on the newly released Allen Cell Types Database.
-Functionality relevant to other atlases is coming in future releases.
+Functionality relevant to other atlases is coming in future releases.  
 
 .. image:: /_static/ccf_v3_sdk.png
     :align: right
@@ -32,10 +30,10 @@ Allen Cell Types Database
 -------------------------
 
 
-The Allen Cell Types Database contains electrophysiological and morphological characterizations
+The `Allen Cell Types Database <http://celltypes.brain-map.org>`_ contains electrophysiological and morphological characterizations
 of individual neurons in the mouse primary visual cortex.  The Allen SDK provides Python code
-for accessing electrophysiology measurements (:doc:`NWB <nwb>` files) for all neurons and morphological 
-reconstructions (SWC files) for a subset of neurons.
+for accessing electrophysiology measurements (`NWB files <cell_types.html#neurodata-without-borders>`_) 
+for all neurons and morphological reconstructions (`SWC files <cell_types.html#morphology-swc-files>`_) for a subset of neurons.
 
 The Database also contains two classes of models fit to this data set: perisomatic biophysical 
 models produced using the NEURON simulator and generalized leaky integrate and fire models (GLIFs) 

@@ -236,6 +236,8 @@ class Morphology( object ):
 
     def validate(self):
         """ Make sure that the parents and children are assigned properly. """
+        compartments = self._compartment_index
+
         for cid, c in self.compartment_index.iteritems():
             if c['parent'] != "-1":
                 assert c['parent'] in compartments, "bad parent id: %s" % (c['parent'] )

@@ -10,7 +10,6 @@ h = utils.h
 
 # configure model
 manifest = config.manifest
-morphology_path = config.manifest.get_path('MORPHOLOGY')
 utils.generate_morphology()
 utils.load_cell_parameters()
 

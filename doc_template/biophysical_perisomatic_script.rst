@@ -1,47 +1,75 @@
 Perisomatic Biophysical Models
 ==============================
 
+The Allen Cell Types Database contains biophysical models that
+characterize the firing behavior of neurons measured in slices
+through current injection by a somatic whole-cell patch clamp electrode.
+These models contain a set of 10 active conductances placed at the soma
+and use the reconstructed 3D morphologies of the modeled neurons.
+The biophysical modeling 
+`technical white paper <http://help.brain-map.org/display/celltypes/Documentation>`_
+contains details
+on the specific construction of these models and the optimization
+of the model parameters to match the experimentally-recorded firing behaviors. 
+
+The biophysical models are run with the `NEURON <http://www.neuron.yale.edu/neuron/>`_ 
+simulation environment.  The Allen SDK package contains libraries that assist
+in downloading and setting up the models available on the Allen Institute web site
+for users to run using NEUORN. 
+
+
 Prerequisites
 -------------
 
-You must have pyNEURON and Allen SDK installed.
+You must have NEURON with the Python interpreter enabled and the Allen SDK installed.
 
-The Allen Institute periosomatic biophysical models were generated using
+The Allen Institute perisomatic biophysical models were generated using
 NEURON `version v7.3.ansi-1078 <http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078>`_.
-Instructions for `compiling NEURON <http://www.neuron.yale.edu/neuron/download/compile_linux>`_ with the Python interpreter 
-are available from the `NEURON team <http://www.neuron.yale.edu/neuron/>`_.
+Instructions for compiling NEURON with the Python interpreter 
+are available from the NEURON team under the heading 
+`Installation with Python as an alternative interpreter <http://www.neuron.yale.edu/neuron/download/compile_linux#otheroptions>`_.
+The Allen SDK is compatible with Python version 2.7.8, included in the Anaconda 2.1.0 distribution.
 
-Allen SDK is compatible with Python version 2.7.8, included in the Anaconda 2.1.0 distribution.
+Instructions for optional
+`Docker installation <./install.html#installation-with-docker-optional>`_ 
+are also available.
 
-Instructions for `Docker installation <./install.html#docker-installation>`_ are also available.
+.. note:: Building and installing NEURON with the Python wrapper enabled is not always easy.  
+          This page targets users that have a background in NEURON usage and installation.
 
 
-Retrieving Data from the Allen Institute
-----------------------------------------
+Downloading Biophysical Models
+------------------------------
 
-This may be done programmatically
+There are two ways to download files necessary to run a biophysical model.
+The first way is to visit http://celltypes.brain-map.org and find cells that have 
+biophysical models available for download.  The electrophysiology details page
+for a cell has a neuronal model download link.  Specifically:
+
+    #. Check 'More Options+'...'Models -> Biophysical'
+    #. Use the Filters, Cell Location and Cell Feature Filters to narrow your results.
+    #. Click on a Cell Summary to view the Mouse Experiment Electrophysiology.
+    #. Click the "download data" link to download the NWB stimulus and response file.
+    #. Click "show model response" and select "Biophysical - perisomatic".
+    #. Scroll down and click the Biophysical - perisomatic "download model" link.
+
+
+This may be also be done programmatically.
+The neuronal model id can be found to the left of
+the corresponding 'Biophysical - perisomatic "download model" link.
 ::
 
     from allensdk.api.queries.biophysical_perisomatic_api import \
         BiophysicalPerisomaticApi
     
     bp = BiophysicalPerisomaticApi('http://api.brain-map.org')
-    bp.cache_stimulus = False # change to True to download the stimulus file
-    neuronal_model_id = 472451419    # get this from the web site as below
+    bp.cache_stimulus = True # change to False to not download the large stimulus NWB file
+    neuronal_model_id = 472451419    # get this from the web site as above
     bp.cache_data(neuronal_model_id, working_directory='neuronal_model')
-
-You can search for model ids and also download the data manually from the web site:
-
-    #. Go to `http://celltypes.brain-map.org <http://celltypes.brain-map.org>`_
-    #. Check 'More Options+'...'has reconstruction'
-    #. Use the Filters, Cell Location and Cell Feature Filters to narrow your results.
-    #. Click on a Cell Summary to view the Mouse Experiment Electrophysiology.
-    #. Click "show model response" and select "Biophysical - perisomatic".
-    #. Scroll down and click the Biophysical - perisomatic "download model" link.
 
 More help can be found in the
 `online help <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_
-for the ALLEN **Cell Types Database** web application.
+for the Allen Cell Types Database web application.
 
 
 Directory Structure
@@ -69,13 +97,23 @@ and application configuration.
 
 
 Running the Simulation
---------------------------------------------
+----------------------
+
+All of the sweeps available from the web site are included in manifest.json and will be run by default.
+This can take some time.
 
 ::
 
     cd neuronal_model
-    nrnivmodl ./modfiles
+    nrnivmodl ./modfiles   # compile the model (only needs to be done once)
     python -m allensdk.model.biophysical_perisomatic.runner manifest.json
+
+
+Selecting a Specific Sweep
+--------------------------
+
+The sweeps are listed in manifest.json.
+You can remove all of the sweep numbers that you do not want run.
 
 
 Simulation Main Loop
@@ -84,10 +122,12 @@ Simulation Main Loop
 The top level script is in the
 :py:meth:`~allensdk.model.biophysical_perisomatic.runner.run`
 method of the :py:mod:`allensdk.model.biophysical_perisomatic.runner`
-module.
+module.  The implementation of the method is shown here step-by-step:
 
-The first step is to configure NEURON based on the configuration file.
-The configuration file was read in from the command line at the very bottom of the script.
+First configure NEURON based on the configuration file, which was 
+read in from the command line at the very bottom of the script.
+
+:py:meth:`~allensdk.model.biophysical_perisomatic.runner.run`:
 ::
 
     # configure NEURON
@@ -131,15 +171,23 @@ Loop through the stimulus sweeps and write the output.
         output.set_sweep(sweep, None, output_data)
 
 
-Customized Utilities
---------------------
+Customization
+-------------
 
-Much of the code in the single cell example is not core Allen SDK code.
+Much of the code in the perisomatic simulation is not core Allen SDK code.
 The runner.py script largely reads the configuration file and calls into
 methods in the :py:class:`~allensdk.model.biophysical_perisomatic.utils.Utils` class.
 Utils is a subclass of the :py:class:`~allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils`
 class, which provides access to objects in the NEURON package.
+The various methods called by the runner.script are implemented here, including:
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology`,
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters`,
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp`,
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus`
+and
+:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.record_values`.
 
+:py:class:`~allensdk.model.biophysical_perisomatic.utils.Utils`:
 ::
 
     from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
@@ -153,81 +201,357 @@ class, which provides access to objects in the NEURON package.
             super(Utils, self).__init__(description)
     ....
 
+To create a biophysical model using your own software or data,
+simply model your directory structure on one of the downloaded simulations
+or one of the examples below.
+Add your own runner.py and utils.py module to the simulation directory.
 
-The various methods called by the runner.script are implemented here, including:
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology`,
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters`,
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp`,
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus`
-and
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.record_values`.
-Other applications are free to implement their own subclasses of HocUtils as needed.
+Compile the .mod files using NEURON's nrnivmodl command:
+::
+
+    nrnivmodl modfiles
+
+Then call your runner script directly, passing in the manifest file to your script:
+::
+
+    python runner.py manifest.json
+
+The output from your simulation and any intermediate files will go in the work directory.
 
 
-Simple Example
---------------
+Examples
+--------
 
 A :download:`minimal example (simple_example.tgz)<./examples/simple_example.tgz>`
-is available to use as a starting point for your own projects.
+and a :download:`multicell example (multicell_example.tgz)<./examples/multicell_example.tgz>`
+are available to download as a starting point for your own projects.
+
+Each example provides its own utils.py file along with a main script
+and supporting configuration files.
+
+simple_example.tgz::
+
+    tar xvzf simple_example.tgz
+    cd simple
+    nrnivmodl modfiles
+    python simple.py
 
 
-Multicell Example
------------------
+multicell_example.tgz::
 
-A :download:`multicell example (multicell_example.tgz)<./examples/multicell_example.tgz>`
-is available to use as a starting point for your own projects.
-
-
-Selecting a Specific Sweep
---------------------------
-
-The sweeps are listed in manifest.json.
-You can remove all of the sweep numbers that you do not want run.
+    tar xvzf multicell_example.tgz
+    cd multicell
+    nrnivmodl modfiles
+    python multi.py
+    python multicell_diff.py 
 
 
-Exporting Output to Text Format
--------------------------------
+Exporting Output to Text Format or Image
+----------------------------------------
 
 This is an example of using the AllenSDK
-to save a response voltage to another format.
+to save a response voltage to other formats.
 
+::
+
+    from allensdk.core.dat_utilities import \
+        DatUtilities
+    from allensdk.core.nwb_data_set import \
+        NwbDataSet
+    import numpy as np
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    
+    nwb_file = '313862020.nwb'
+    sweep_number = 52
+    dat_file = '313862020_%d.dat' % (sweep_number)
+    
+    nwb = NwbDataSet(nwb_file)
+    sweep = nwb.get_sweep(sweep_number)
+    
+    # read v and t as numpy arrays
+    v = sweep['response']
+    dt = 1.0e3 / sweep['sampling_rate']
+    num_samples = len(v)
+    t = np.arange(num_samples) * dt
+    
+    # save as text file
+    data = np.transpose(np.vstack((t, v)))
+    with open (dat_file, "w") as f:
+        np.savetxt(f, data)
+    
+    # save image using matplotlib
+    fig, ax = plt.subplots(nrows=1, ncols=1)
+    ax.plot(t, v)
+    ax.set_title("Sweep %s" % (sweep_number))
+    fig.savefig('out.png')
+    
+
+Model Description Files
+-----------------------
+
+Basic Structure
++++++++++++++++
+
+    A model description file is simply a JSON object with several sections at the top level
+    and an array of JSON objects within each section.
+    
     ::
     
-        from allensdk.core.dat_utilities import \
-            DatUtilities
-        from allensdk.core.nwb_data_set import \
-            NwbDataSet
-        
-        nwb_file = '318808419.nwb'
-        sweep_number = 67
-        dat_file = '318808419_67.dat'
-        
-        nwb = NwbDataSet(nwb_file)
-        sweep = nwb.get_sweep(sweep_number)
-        
-        v = sweep['response']
-        dt = 1.0e3 / sweep['sampling_rate']
-        num_samples = len(v)
-        tstop = (num_samples -1) * dt
-        t = numpy.linspace(0.0, tstop, num_samples)
-        DatUtilities.save_voltage(dat_file, v, t)
+            {
+               "cell_section": [
+                   { 
+                     "name": "cell 1",
+                     "shape": "pyramidal"
+                     "position": [ 0.1, 0.2, 0.3 ]
+                   },
+                   {
+                     "name": "cell 2",
+                     "shape": "glial",
+                     "position": [ 0.1, 0.2, 0.3 ]
+                   }
+               ],
+               "extra": [
+                  { "what": "wood",
+                    "who": "woodchuck"
+                  }
+               ]
+           }
+   
+    Even if a section contains no objects or only one object the array brackets must be present.
+    
+    
+Objects Within Sections
++++++++++++++++++++++++
 
+    While no restrictions are enforced on what kinds of objects are stored in a section,
+    some rules of thumb make the file easier to work with.
+    
+    #. All objects within a section are the same structure.
+       Common operations on a section are to display it as a table,
+       iterate over it, load from or write to a spreadsheet or csv file.
+       These operations are all easier if the section is fairly homogeneous.
+    #. Objects are not deeply nested.
+       While some shallow nesting is often useful, deep nesting such as a tree structure
+       is not recommended.
+       It makes interoperability with other tools and data formats more difficult.
+    #. Arrays are allowed, though they should not be deeply nested either.
+    #. Object member values should be literals.  Do not use pickled classes, for example.
 
-To view the dat format in gnuplot, for example:
+Comment Lines
++++++++++++++
 
-view_dat.gnuplot:
+    The JSON specification does not allow comments.
+    However, the Allen SDK library applies a preprocessing stage
+    to remove C++-style comments, so they can be used in description files.
+    
+    Multi-line comments should be surrounded by \/\* \*\/
+    and single-line comments start with \/\/.
+    Commented description files will not be recognized by strict json parsers
+    unless the comments are stripped.
+    
+    commented.json:
     ::
     
-        set term png
-        set output "v_result.png"
-        
-        set title "Vout"
-        plot "318808419_67.dat"
-        
-        quit
+        {
+           /*
+            *  multi-line comment
+            */
+           "section1": [
+               {
+                  "name": "simon"  // single line comment
+               }]
+           }
 
-Render using gnuplot and gthumb:
+Split Description Files by Section
+++++++++++++++++++++++++++++++++++
+
+    A model description can be split into multiple files
+    by putting some sections in one file and other sections into another file.
+    This can be useful if you want to put a topology of cells and connections in one file
+    and experimental conditions and stimulus in another file.  The resulting structure in
+    memory will behave the same way as if the files were not split.
+    This allows a small experiment to be described in a single file
+    and large experiments to be more modular.
+
+    cells.json:
     ::
     
-        gplot < view_dat.gnuplot
-        gthumb v_result.png
+        {
+           "cell_section": [
+               {
+                 "name": "cell 1",
+                 "shape": "pyramidal"
+                 "position": [ 0.1, 0.2, 0.3 ]
+               },
+               {
+                 "name": "cell 2",
+                 "shape": "glial",
+                 "position": [ 0.1, 0.2, 0.3 ]
+               }
+           ]
+        }
+    
+    extras.json:
+    ::
+    
+           {
+               "extra": [
+                  { 
+                    "what": "wood",
+                    "who": "woodchuck"
+                  }
+               ]
+           }
+           
+Split Sections Between Description Files
+++++++++++++++++++++++++++++++++++++++++
+
+If two description files containing the same sections are combined,
+the resulting description will contain objects from both files.
+This feature allows sub-networks to be described in separate files.
+The sub-networks can then be composed into a larger network with an additional
+description of the interconnections.
+
+    network1.json:
+    ::
+        /* A self-contained sub-network */
+        {
+            "cells": [
+                { "name": "cell1" },
+                { "name": "cell2" }
+            ],
+            /* intra-network connections /*
+            "connections": [
+                { "source": "cell1", "target" : "cell2" }
+            ]
+        }
+    
+    network2.json:
+    ::
+        /* Another self-contained sub-network */
+        {
+            "cells": [
+                { "name": "cell3" },
+                { "name": "cell4" }
+            ],
+            "connections": [
+                { "source": "cell3", "target" : "cell4" }
+            ]
+        }
+    
+    interconnect.json:
+    ::
+    
+        {
+            // the additional connections needed to
+            // connect the network1 and network2
+            // into a ring topology.
+            "connections": [
+               { "source": "cell2", "target": "cell3" },
+               { "source": "cell4", "target": "cell1" }
+            ]
+        }
+
+Resource Manifest
+-----------------
+
+JSON has many advantages.  It is widely supported,
+readable and easy to parse and edit.
+As data sets get larger or specialized those advantages diminish.
+Large or complex models and experiments generally need more than
+a single model description file to completely describe an experiment.  
+A manifest file is a way to describe all of the resources needed within
+the Allen SDK description format itself.
+
+The manifest section is named "manifest" by default,
+though it is configurable.  The objects in the manifest section
+each specify a directory, file, or file pattern.
+Files and directories may be organized in a parent-child relationship.
+
+A Simple Manifest
++++++++++++++++++
+
+This is a simple manifest file that specifies the BASEDIR directory
+using ".", meaning the current directory:
+::
+
+    {
+        "manifest": [
+            {   "key": "BASEDIR",
+                "type": "dir",
+                "spec": "."
+            }
+        ] }
+    }
+
+Parent Child Relationships
+++++++++++++++++++++++++++
+
+Adding the optional "parent_key" member to a manifest object
+creates a parent-child relation.  In this case WORKDIR will
+be found in "./work":
+::
+
+    {
+        "manifest": [
+            {   "key": "BASEDIR",
+                "type": "dir",
+                "spec": "."
+            },
+            {   "key": "WORKDIR",
+                "type": "dir",
+                "spec": "/work",
+                "parent_key": "BASEDIR"
+            }
+        ] }
+    }
+
+File Spec Patterns
+++++++++++++++++++
+
+Files can be specified using the type "file" instead of "dir".
+If a sequence of many files is needed, the spec may contain patterns
+to indicate where the sequence number (%d) or string (%s) will be
+interpolated:
+::
+
+    {
+        "manifest": [
+            {   "key": "BASEDIR",
+                "type": "dir",
+                "spec": "."
+            },
+            {
+                "key": "voltage_out_cell_path",
+                "type": "file",
+                "spec": "v_out-cell-%d.dat",
+                "parent_key": "BASEDIR"
+            }
+        ] }
+    }
+
+
+Split Manifest Files
+++++++++++++++++++++
+
+Manifest files can be split like any description file.
+This allows the specification of a general directory structure in a
+shared file and specific files in a separate configuration
+(i.e. stimulus and working directory)
+
+
+Extensions
+++++++++++
+
+To date, manifest description files have not been used to reference
+URLs that provide model data, but it is a planned future use case.
+
+
+Further Reading
+---------------
+
+ * `NEURON <http://www.neuron.yale.edu/neuron>`_
+ * `Python <https://www.python.org/>`_
+ * `JSON <http://www.w3schools.com/json/>`_
