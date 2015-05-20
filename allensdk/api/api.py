@@ -41,8 +41,34 @@ class Api(object):
             url of the api to point to
         '''
         self.api_url = api_base_url_string
-        self.well_known_file_endpoint = api_base_url_string + '/api/v2/well_known_file_download/'
-        self.rma_endpoint = api_base_url_string + '/api/v2/data'  
+        
+        # http://help.brain-map.org/display/api/Downloading+a+WellKnownFile
+        self.well_known_file_endpoint = api_base_url_string + '/api/v2/well_known_file_download'
+        
+        # http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data
+        self.expression_grid_endpoint = api_base_url_string + '/grid_data'
+        
+        # http://help.brain-map.org/display/api/Downloading+and+Displaying+SVG
+        self.svg_download_endpoint = api_base_url_string + '/api/v2/svg_download'
+        
+        # http://help.brain-map.org/display/api/Downloading+an+Ontology%27s+Structure+Graph
+        self.structure_graph_endpoint = api_base_url_string + '/api/v2/structure_graph_download'
+        
+        # http://help.brain-map.org/display/api/Searching+a+Specimen+or+Structure+Tree
+        self.tree_search_endpoint = api_base_url_string + '/api/v2/tree_search'
+        
+        # http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets
+        self.annotated_section_data_sets_endpoint = api_base_url_string + '/api/v2/annotated_section_data_sets'
+
+        # http://help.brain-map.org/display/api/Image-to-Image+Synchronization#Image-to-ImageSynchronization-ImagetoImage
+        self.image_to_atlas_endpoint = api_base_url_string + '/api/v2/image_to_atlas'
+        self.image_to_image_endpoint = api_base_url_string + '/api/v2/image_to_image'
+        self.image_to_image_2d_endpoint = api_base_url_string + '/api/v2/image_to_image_2d'
+        self.reference_to_image_endpoint = api_base_url_string + '/api/v2/reference_to_image'
+        self.image_to_reference_endpoint = api_base_url_string + '/api/v2/image_to_reference'
+        self.structure_to_image_endpoint = api_base_url_string + '/api/v2/structure_to_image'
+        
+        self.rma_endpoint = api_base_url_string + '/api/v2/data'
     
     
     def set_default_working_directory(self, working_directory):
