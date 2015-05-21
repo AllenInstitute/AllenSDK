@@ -37,7 +37,7 @@ class StructureGraphApi(Api):
         '''
         url = ''.join([self.structure_graph_endpoint,
                        '/',
-                       structure_graph_id,
+                       str(structure_graph_id),
                        '.',
                        fmt])
         
@@ -57,6 +57,6 @@ class StructureGraphApi(Api):
     
     def get_structure_graph_by_id(self, structure_graph_id):
         '''Retrieve the structure graph data.'''
-        graph_data = self.do_rma_query(self.build_query, self.read_graph, structure_graph_id)
+        graph_data = self.do_query(self.build_query, self.read_graph, structure_graph_id)
         
         return graph_data

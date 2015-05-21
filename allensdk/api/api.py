@@ -48,6 +48,7 @@ class Api(object):
         self.expression_grid_endpoint = api_base_url_string + '/grid_data'
         
         # http://help.brain-map.org/display/api/Downloading+and+Displaying+SVG
+        self.svg_endpoint = api_base_url_string + '/api/v2/svg'
         self.svg_download_endpoint = api_base_url_string + '/api/v2/svg_download'
         
         # http://help.brain-map.org/display/api/Downloading+an+Ontology%27s+Structure+Graph
@@ -58,7 +59,8 @@ class Api(object):
         
         # http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets
         self.annotated_section_data_sets_endpoint = api_base_url_string + '/api/v2/annotated_section_data_sets'
-
+        self.compound_annotated_section_data_sets_endpoint = api_base_url_string + '/api/v2/compound_annotated_section_data_sets'
+        
         # http://help.brain-map.org/display/api/Image-to-Image+Synchronization#Image-to-ImageSynchronization-ImagetoImage
         self.image_to_atlas_endpoint = api_base_url_string + '/api/v2/image_to_atlas'
         self.image_to_image_endpoint = api_base_url_string + '/api/v2/image_to_image'
@@ -217,20 +219,38 @@ class Api(object):
             raise
     
     
-    def retrieve_parsed_json_over_http(self, rma_url):
+    def retrieve_parsed_json_over_http(self, url):
         '''Get the document and put it in a Python data structure
         
         Parameters
         ----------
-        rma_url : string
-            Full RMA query url.
+        url : string
+            Full API query url.
         
         Returns
         -------
         dict
             Result document as parsed by the JSON library.
         '''
-        response = urllib2.urlopen(rma_url)
+        response = urllib2.urlopen(url)
         json_parsed_data = load(response)
         
         return json_parsed_data
+    
+    
+    def retrieve_xml_over_http(self, url):
+        '''Get the document and put it in a Python data structure
+        
+        Parameters
+        ----------
+        url : string
+            Full API query url.
+        
+        Returns
+        -------
+        string
+            Unparsed xml string.
+        '''
+        response = urllib2.urlopen(url)
+        
+        return response.read()
