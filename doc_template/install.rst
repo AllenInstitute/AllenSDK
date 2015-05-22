@@ -53,13 +53,12 @@ Installation with Docker (Optional)
 for building and deploying applications with a consistent environment
 including required dependencies.
 The AllenSDK is not distributed as a Docker image, but
-example Dockerfiles are available.
+an example Dockerfile is available.
 
  #. Ensure you have Docker installed.
 
- #. Download one of the example Docker files:
+ #. Download the example Docker files:
      * :download:`Ubuntu Standalone <./examples/docker/Dockerfile.ubuntu>`.
-     * :download:`BrainScales combined Neural-Networks <./examples/docker/Dockerfile.brainscales>`.
 
  #. Use Docker to build the image::
  
