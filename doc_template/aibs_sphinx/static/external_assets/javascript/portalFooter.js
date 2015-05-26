@@ -407,7 +407,7 @@ function import_portal()  {
 "		<span class=\"portal_footer_item portal_link_stack\">" + 
 "			<a id=\"pPrivacyPolicy\" target=\"_blank\">Privacy Policy</a></a>" + 
 "			<br/>" + 
-"			<a id=\"pTermsOfUse\" target=\"_blank\">Terms of Use</a></a>" + 
+"			<a id=\"pTermsOfUse\" target=\"_blank\">Software License</a></a>" + 
 "		</span>		" + 
 "		<a id=\"pCitationPolicy\" target=\"_blank\"><span id=\"portal_citation_policy\" class=\"portal_footer_item portal_call_to_action\">CITATION POLICY <i class=\"icon-right-open\"></i></span></a>" + 
 "	</div>" + 
