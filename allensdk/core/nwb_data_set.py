@@ -69,6 +69,8 @@ class NwbDataSet(object):
             swp_idx_stop = swp_idx_start + swp_length - 1
             sweep_index_range = ( swp_idx_start, swp_idx_stop )
 
+            stim_metadata = {}
+
             # if the sweep has an experiment, extract the experiment's index range
             try:
                 exp = f['epochs']['Experiment_%d' % sweep_number]
@@ -79,6 +81,16 @@ class NwbDataSet(object):
             except KeyError, _:
                 # this sweep has no experiment.  return the index range of the entire sweep.
                 experiment_index_range = sweep_index_range
+            try:
+                stim_details = f['stimulus']['presentation']['Sweep_%d' % sweep_number]
+                stim_metadata['aibs_stimulus_amplitude_pa'] = stim_details['aibs_stimulus_amplitude_pa'].value
+                stim_metadata['aibs_stimulus_name'] = stim_details['aibs_stimulus_name'].value
+                stim_metadata['gain'] = stim_details['gain'].value
+                stim_metadata['initial_access_resistance'] = stim_details['initial_access_resistance'].value
+                stim_metadata['seal'] = stim_details['seal'].value
+            except KeyError, _:
+                stim_metadata = {}
+
             
             assert sweep_index_range[0] == 0, Exception("index range of the full sweep does not start at 0.")
             
@@ -87,7 +99,8 @@ class NwbDataSet(object):
                 'stimulus': stimulus[sweep_index_range[0]:experiment_index_range[1]+1],
                 'response': response[sweep_index_range[0]:experiment_index_range[1]+1],
                 'index_range': experiment_index_range,
-                'sampling_rate': 1.0 * swp['stimulus']['timeseries']['starting_time'].attrs['rate']
+                'sampling_rate': 1.0 * swp['stimulus']['timeseries']['starting_time'].attrs['rate'],
+                'stim_metadata': stim_metadata
             }
     
     
