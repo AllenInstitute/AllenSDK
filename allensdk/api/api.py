@@ -69,6 +69,9 @@ class Api(object):
         self.image_to_reference_endpoint = api_base_url_string + '/api/v2/image_to_reference'
         self.structure_to_image_endpoint = api_base_url_string + '/api/v2/structure_to_image'
         
+        # http://help.brain-map.org/display/mouseconnectivity/API
+        self.section_image_download_endpoint = api_base_url_string + '/api/v2/section_image_download'
+        
         self.rma_endpoint = api_base_url_string + '/api/v2/data'
     
     
