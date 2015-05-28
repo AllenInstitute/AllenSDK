@@ -21,6 +21,7 @@ import logging
 class Api(object):
     _log = logging.getLogger(__name__)
     default_api_url = 'http://api.brain-map.org'
+    download_url = 'http://download.alleninstitute.org'
     
     def __init__(self, api_base_url_string=None):
         if api_base_url_string==None:
@@ -71,6 +72,7 @@ class Api(object):
         
         # http://help.brain-map.org/display/mouseconnectivity/API
         self.section_image_download_endpoint = api_base_url_string + '/api/v2/section_image_download'
+        self.informatics_archive_endpoint = Api.download_url + '/informatics-archive'
         
         self.rma_endpoint = api_base_url_string + '/api/v2/data'
     

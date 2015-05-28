@@ -224,13 +224,99 @@ class MouseConnectivityApi(Api):
                                                   width,
                                                   height)
         self.retrieve_file_over_http(image_url, file_path)
+    
+    
+    def download_volumetric_data(self,
+                                 data,
+                                 file_name,
+                                 voxel_resolution=None,
+                                 save_file_path=None,
+                                 release=None,
+                                 coordinate_framework=None):
+        '''
+        Parameters
+        ----------
+        data : string
+            'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
+        voxel_resolution : int
+            10, 25, 50 or 100
+        coordinate_framework : string
+            'mouse_ccf' (default) or 'mouse_annotation'
+        '''
+        
+        if voxel_resolution == None:
+            voxel_resolution = 10
+            
+        if save_file_path == None:
+            save_file_path = file_name
+        
+        if release == None:
+            release = 'current-release'
+        
+        if coordinate_framework == None:
+            coordinate_framework = 'mouse_ccf'
+        
+        url = ''.join([self.informatics_archive_endpoint,
+                       '/%s/%s/' % (release, coordinate_framework),
+                       data,
+                       '/',
+                       file_name])
+        
+        self.retrieve_file_over_http(url, save_file_path)
 
 
 if __name__ == '__main__':
+    import nrrd
+    import numpy as np
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from PIL import Image
+
     a = MouseConnectivityApi()
     #print(json.dumps(a.get_experiments()))
     #print(json.dumps(a.get_experiments(structure_id=385)))
     #print(json.dumps(a.get_experiment_detail(experiment_id=126862385)))
     #print(json.dumps(a.get_projection_image_meta_info(experiment_id=126862385,
     #                                                  section_number=74)))
-    a.download_image(126862575, [0,932, 0,1279, 0,4095], 6)
+    #a.download_image(126862575, [0,932, 0,1279, 0,4095], 6)
+    #a.download_volumetric_data('average_template', 'average_template_25.nrrd')
+    #a.download_volumetric_data('ara_nissl', 'ara_nissl_25.nrrd')
+    #a.download_volumetric_data('annotation/ccf_2015', 'annotation_25.nrrd')
+    AVGT, metaAVGT = nrrd.read('average_template_25.nrrd')
+    NISSL, metaNISSL = nrrd.read('ara_nissl_25.nrrd')
+    ANO, metaANO = nrrd.read('annotation_25.nrrd')
+    
+    # Save one coronal section as PNG
+    slice = AVGT[264,:,:].astype(float)
+    slice /= np.max(slice)
+    im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
+    im.save('output/avgt_coronal.png')
+
+    slice = NISSL[264,:,:].astype(float)
+    slice /= np.max(slice)
+    im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
+    im.save('output/nissl_coronal.png')
+
+    slice = ANO[264,:,:].astype(float)
+    slice /= 2000
+    im = Image.fromarray(np.uint8(plt.cm.jet(slice)*255))
+    im.save('output/ano_coronal.png')
+
+    # Save one sagittal section as PNG
+    slice = AVGT[:,:,220].astype(float)
+    slice /= np.max(slice)
+im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
+im.save('output/avgt_sagittal.png')
+
+slice = NISSL[:,:,220].astype(float)
+slice /= np.max(slice)
+im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
+im.save('output/nissl_sagittal.png')
+
+slice = ANO[:,:,220].astype(float)
+slice /= 2000
+im = Image.fromarray(np.uint8(plt.cm.jet(slice)*255))
+im.save('output/ano_sagittal.png')
+    
+    
