@@ -204,28 +204,6 @@ class MouseConnectivityApi(Api):
         return url
     
     
-    def download_image(self,
-                       image_id,
-                       threshold_range,
-                       downsample=None,
-                       left=None,
-                       top=None,
-                       width=None,
-                       height=None,
-                       file_path=None):
-        if file_path == None:
-            file_path = '%d.jpg' % (image_id)
-        
-        image_url = self.build_download_image_url(image_id,
-                                                  threshold_range,
-                                                  downsample,
-                                                  left,
-                                                  top,
-                                                  width,
-                                                  height)
-        self.retrieve_file_over_http(image_url, file_path)
-    
-    
     def download_volumetric_data(self,
                                  data,
                                  file_name,
@@ -279,7 +257,6 @@ if __name__ == '__main__':
     #print(json.dumps(a.get_experiment_detail(experiment_id=126862385)))
     #print(json.dumps(a.get_projection_image_meta_info(experiment_id=126862385,
     #                                                  section_number=74)))
-    #a.download_image(126862575, [0,932, 0,1279, 0,4095], 6)
     #a.download_volumetric_data('average_template', 'average_template_25.nrrd')
     #a.download_volumetric_data('ara_nissl', 'ara_nissl_25.nrrd')
     #a.download_volumetric_data('annotation/ccf_2015', 'annotation_25.nrrd')
@@ -292,31 +269,29 @@ if __name__ == '__main__':
     slice /= np.max(slice)
     im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
     im.save('output/avgt_coronal.png')
-
+    
     slice = NISSL[264,:,:].astype(float)
     slice /= np.max(slice)
     im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
     im.save('output/nissl_coronal.png')
-
+    
     slice = ANO[264,:,:].astype(float)
     slice /= 2000
     im = Image.fromarray(np.uint8(plt.cm.jet(slice)*255))
     im.save('output/ano_coronal.png')
-
+    
     # Save one sagittal section as PNG
     slice = AVGT[:,:,220].astype(float)
     slice /= np.max(slice)
-im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
-im.save('output/avgt_sagittal.png')
-
-slice = NISSL[:,:,220].astype(float)
-slice /= np.max(slice)
-im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
-im.save('output/nissl_sagittal.png')
-
-slice = ANO[:,:,220].astype(float)
-slice /= 2000
-im = Image.fromarray(np.uint8(plt.cm.jet(slice)*255))
-im.save('output/ano_sagittal.png')
+    im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
+    im.save('output/avgt_sagittal.png')
     
+    slice = NISSL[:,:,220].astype(float)
+    slice /= np.max(slice)
+    im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
+    im.save('output/nissl_sagittal.png')
     
+    slice = ANO[:,:,220].astype(float)
+    slice /= 2000
+    im = Image.fromarray(np.uint8(plt.cm.jet(slice)*255))
+    im.save('output/ano_sagittal.png')

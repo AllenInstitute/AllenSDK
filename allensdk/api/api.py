@@ -72,6 +72,8 @@ class Api(object):
         
         # http://help.brain-map.org/display/mouseconnectivity/API
         self.section_image_download_endpoint = api_base_url_string + '/api/v2/section_image_download'
+        self.atlas_image_download_endpoint = api_base_url_string + '/api/v2/atlas_image_download'
+        self.projection_image_download_endpoint = api_base_url_string + '/api/v2/projection_image_download'
         self.informatics_archive_endpoint = Api.download_url + '/informatics-archive'
         
         self.rma_endpoint = api_base_url_string + '/api/v2/data'
