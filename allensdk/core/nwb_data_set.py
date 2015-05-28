@@ -69,8 +69,6 @@ class NwbDataSet(object):
             swp_idx_stop = swp_idx_start + swp_length - 1
             sweep_index_range = ( swp_idx_start, swp_idx_stop )
 
-            sweep_metadata = {}
-
             # if the sweep has an experiment, extract the experiment's index range
             try:
                 exp = f['epochs']['Experiment_%d' % sweep_number]
@@ -81,16 +79,6 @@ class NwbDataSet(object):
             except KeyError, _:
                 # this sweep has no experiment.  return the index range of the entire sweep.
                 experiment_index_range = sweep_index_range
-            try:
-                stim_details = f['stimulus']['presentation']['Sweep_%d' % sweep_number]
-                sweep_metadata['aibs_stimulus_amplitude_pa'] = stim_details['aibs_stimulus_amplitude_pa'].value
-                sweep_metadata['aibs_stimulus_name'] = stim_details['aibs_stimulus_name'].value
-                sweep_metadata['gain'] = stim_details['gain'].value
-                sweep_metadata['initial_access_resistance'] = stim_details['initial_access_resistance'].value
-                sweep_metadata['seal'] = stim_details['seal'].value
-            except KeyError, _:
-                sweep_metadata = {}
-
             
             assert sweep_index_range[0] == 0, Exception("index range of the full sweep does not start at 0.")
             
@@ -99,8 +87,7 @@ class NwbDataSet(object):
                 'stimulus': stimulus[sweep_index_range[0]:experiment_index_range[1]+1],
                 'response': response[sweep_index_range[0]:experiment_index_range[1]+1],
                 'index_range': experiment_index_range,
-                'sampling_rate': 1.0 * swp['stimulus']['timeseries']['starting_time'].attrs['rate'],
-                'sweep_metadata': sweep_metadata
+                'sampling_rate': 1.0 * swp['stimulus']['timeseries']['starting_time'].attrs['rate']
             }
     
     
@@ -242,3 +229,40 @@ class NwbDataSet(object):
             for epoch in epochs:
                 if epoch in f['epochs']:
                     f['epochs'][epoch]['response']['timeseries']['data'][...] = fill_value
+
+    def get_sweep_metadata(self, sweep_number):
+        """ Retrieve the sweep level metadata associated with each sweep.
+        Includes information on stimulus parameters like its name and amplitude 
+        as well as recording quality metadata, like access resistance and 
+        seal quality.
+
+        Parameters
+        ----------
+        sweep_number: int
+
+        Returns
+        -------
+        dict
+            A dictionary with 'aibs_stimulus_amplitude_pa', 'aibs_stimulus_name', 
+            'gain', 'initial_access_resistance', 'seal' elements.  These specific
+            fields are ones encoded in the original AIBS in vitro .nwb files.
+        """
+        with h5py.File(self.file_name,'r') as f:
+            
+            sweep_metadata = {}
+
+            # the sweep level metadata is stored in stimulus/presentation/Sweep_XX in the .nwb file
+
+            # indicates which metadata fields to return
+            metadata_fields = ['aibs_stimulus_amplitude_pa', 'aibs_stimulus_name', 'gain', 'initial_access_resistance', 'seal']
+            try:
+                stim_details = f['stimulus']['presentation']['Sweep_%d' % sweep_number]
+                for field in metadata_fields:
+                	# check if sweep contains the specific metadata field
+                	if field in stim_details.keys():
+                		sweep_metadata[field] = stim_details[field].value
+
+            except KeyError, _:
+                sweep_metadata = {}
+            
+            return sweep_metadata
