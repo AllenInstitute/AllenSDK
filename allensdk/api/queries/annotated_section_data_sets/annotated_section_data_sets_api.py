@@ -16,6 +16,9 @@
 from allensdk.api.api import Api
 
 class AnnotatedSectionDataSetsApi(Api):
+    '''See:
+    `Searching Annotated SectionDataSets <http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets>`_
+    '''
     def __init__(self, base_uri=None):
         super(AnnotatedSectionDataSetsApi, self).__init__(base_uri)
     
@@ -26,18 +29,19 @@ class AnnotatedSectionDataSetsApi(Api):
                     pattern_values=None,
                     age_names=None,
                     fmt='json'):
-        '''Build the URL.
+        '''For a list of target structures, specify the SectionDataSet
+        and the parameters for intensity_values, density_values, pattern_values, and Age.
         
         Parameters
         ----------
         structure_graph_id : dict of integers
             what to retrieve
         intensity_values : array of strings, optional
-            intensity values, 'High','Low', 'Medium' (default)
+            'High','Low', 'Medium' (default)
         density_values : array of strings, optional
-            density values, 'High', 'Low'
+            'High', 'Low'
         pattern_values : array of strings, optional
-            pattern values, 'Full'
+            'Full'
         age_names : array of strings, options
             for example 'E11.5', '13.5'
         fmt : string, optional
@@ -48,9 +52,9 @@ class AnnotatedSectionDataSetsApi(Api):
         url : string
             The constructed URL
         
-        See Also
-        --------
-        `http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets`
+        Notes
+        -----
+        This method uses the non-RMA Annotated SectionDataSet endpoint.
         '''
         params = ['structures=' + ','.join((str(s) for s in structures))]
         
@@ -71,7 +75,7 @@ class AnnotatedSectionDataSetsApi(Api):
                           ','.join(("'%s'" % (v) for v in age_names)))
         
         url_params = '?' + '&'.join(params)
-
+        
         url = ''.join([self.annotated_section_data_sets_endpoint,
                        '.',
                        fmt,
@@ -87,7 +91,8 @@ class AnnotatedSectionDataSetsApi(Api):
                         pattern_values=None,
                         age_names=None,
                         fmt='json'):
-        '''Build the URL.
+        '''For a list of target structures, specify the SectionDataSet
+        and the parameters for intensity_values, density_values, pattern_values, and Age.
         
         Parameters
         ----------
@@ -109,9 +114,9 @@ class AnnotatedSectionDataSetsApi(Api):
         url : string
             The constructed URL
         
-        See Also
-        --------
-        `http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets`
+        Notes
+        -----
+        This method uses the RMA endpoint to search annotated SectionDataSet data.
         '''
         
         age_include_strings = ['age']
@@ -182,7 +187,8 @@ class AnnotatedSectionDataSetsApi(Api):
     
     
     def build_compound_query(self, queries, fmt='json'):
-        '''Build the URL.
+        '''Specify the SectionDataSet and several annotated_section_data_sets queries
+        linked together with a Boolean 'and' or 'or'.
         
         Parameters
         ----------
@@ -195,10 +201,6 @@ class AnnotatedSectionDataSetsApi(Api):
         -------
         url : string
             The constructed URL
-        
-        See Also
-        --------
-        `http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets`
         '''
         url_strings = ['?query=']
         
@@ -250,7 +252,31 @@ class AnnotatedSectionDataSetsApi(Api):
                                         density_values=None,
                                         pattern_values=None,
                                         age_names=None):
-        '''Retrieve the annotated section data sets data.'''
+        '''For a list of target structures, find the SectionDataSet
+        that matches the parameters for intensity_values, density_values, pattern_values, and Age.
+        
+        Parameters
+        ----------
+        structure_graph_id : dict of integers
+            what to retrieve
+        intensity_values : array of strings, optional
+            'High','Low', 'Medium' (default)
+        density_values : array of strings, optional
+            'High', 'Low'
+        pattern_values : array of strings, optional
+            'Full'
+        age_names : array of strings, options
+            for example 'E11.5', '13.5'
+        
+        Returns
+        -------
+        data : dict
+            The parsed JSON repsonse message.
+        
+        Notes
+        -----
+        This method uses the non-RMA Annotated SectionDataSet endpoint.
+        '''
         data = self.do_query(self.build_query,
                              self.read_data,
                              structures,
@@ -268,7 +294,31 @@ class AnnotatedSectionDataSetsApi(Api):
                                                 density_values=None,
                                                 pattern_values=None,
                                                 age_names=None):
-        '''Retrieve the annotated section data sets data.'''
+        '''For a list of target structures, find the SectionDataSet
+        that matches the parameters for intensity_values, density_values, pattern_values, and Age.
+        
+        Parameters
+        ----------
+        structure_graph_id : dict of integers
+            what to retrieve
+        intensity_values : array of strings, optional
+            intensity values, 'High','Low', 'Medium' (default)
+        density_values : array of strings, optional
+            density values, 'High', 'Low'
+        pattern_values : array of strings, optional
+            pattern values, 'Full'
+        age_names : array of strings, options
+            for example 'E11.5', '13.5'
+        
+        Returns
+        -------
+        data : dict
+            The parsed JSON response message.
+        
+        Notes
+        -----
+        This method uses the RMA endpoint to search annotated SectionDataSet data.
+        '''
         data = self.do_query(self.build_rma_query,
                              self.read_data,
                              structures,
@@ -282,10 +332,22 @@ class AnnotatedSectionDataSetsApi(Api):
     
     def get_compound_annotated_section_data_sets(self,
                                                  queries):
-        '''Retrieve the annotated section data sets data.'''
+        '''Find the SectionDataSet that matches several annotated_section_data_sets queries
+        linked together with a Boolean 'and' or 'or'.
+        
+        Parameters
+        ----------
+        queries : array of dicts
+            dicts with args like build_query
+        
+        Returns
+        -------
+        data : dict
+            The parsed JSON repsonse message.
+        '''
         data = self.do_query(self.build_compound_query,
                              self.read_data,
                              queries)
         
         return data
-    
+

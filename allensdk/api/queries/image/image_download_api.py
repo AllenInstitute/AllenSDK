@@ -16,6 +16,12 @@
 from allensdk.api.api import Api
 
 class ImageDownloadApi(Api):
+    '''HTTP Client to download whole or partial two-dimensional images from the Allen Institute
+    with the SectionImage, AtlasImage and ProjectionImage Download Services.
+    
+    See `Downloading and Image <http://help.brain-map.org/display/api/Downloading+an+Image>`_
+    for more documentation.
+    '''
     def __init__(self, base_uri=None):
         super(ImageDownloadApi, self).__init__(base_uri)
     
@@ -28,26 +34,65 @@ class ImageDownloadApi(Api):
         Parameters
         ----------
         section_image_id : integer
-            primary key
-        downsample : int
-            times
-        quality : int
-            percent
-        kwargs : various
-            expression : Boolean
-            top : int
-            left :int
-            width : int
-            height : int
-            range : list
-                (red_lower,red_upper,green_lower,green_upper,blue_lower,blue_upper), each 0-4095?
-            tumor_feature_annotation : boolean
-            tumor_feature_boundary : boolean
-        
+            Image to download.
+        downsample : int, optional
+            Number of times to downsample the original image.
+        quality : int, optional
+            jpeg quality of the returned image, 0 to 100 (default)
+        expression : boolean, optional
+            True to retrieve the specified SectionImage expression mask image.
+        top : int, optional
+            Index of the topmost row of the region of interest.
+        left :int, optional
+            Index of the leftmost column of the region of interest.
+        width : int, optional
+            Number of columns in the output image.
+        height : int, optional
+            Number of rows in the output image.
+        range : list of ints, optional
+            Filter to specify the RGB channels.
+        tumor_feature_annotation : boolean, optional
+            True to retrieve the color block image for a Glioblastoma SectionImage.
+        tumor_feature_boundary : boolean, optional
+            True to retrieve the color boundary image for a Glioblastoma SectionImage.
         Returns
         -------
         url : string
             The constructed URL
+            
+        Notes
+        -----
+        'downsample=1' halves the number of pixels of the original image
+        both horizontally and vertically.
+        Specifying 'downsample=2' quarters the height and width values.
+        
+        Quality must be an integer from 0, for the lowest quality,
+        up to as high as 100. If it is not specified,
+        it defaults to the highest quality.
+        
+        Top is specified in full-resolution (largest tier) pixel coordinates.
+        SectionImage.y is the default value.
+        
+        Left is specified in full-resolution (largest tier) pixel coordinates.
+        SectionImage.x is the default value.
+        
+        Width is specified in tier-resolution (desired tier) pixel coordinates.
+        SectionImage.width is the default value. It is automatically adjusted when downsampled.
+        
+        Height is specified in tier-resolution (desired tier) pixel coordinates.
+        SectionImage.height is the default value. It is automatically adjusted when downsampled.
+        
+        The range parameter consists of 6 comma delimited integers
+        that define the lower (0) and upper (4095) bound for each channel in red-green-blue order
+        (i.e. "range=0,1500,0,1000,0,4095").
+        The default range values can be determined by referring to the following fields
+        on the Equalization model associated with the SectionDataSet:
+        red_lower, red_uppper, green_lower, green_upper, blue_lower, blue_upper.
+        For more information, see the 
+        `Image Controls <http://help.brain-map.org/display/mouseconnectivity/Projection#Projection-ImageControls>`_
+        section of the Allen Mouse Brain Connectivity Atlas: 
+        `Projection Dataset <http://help.brain-map.org/display/mouseconnectivity/Projection>`_
+        help topic.
         '''
         params = []
         
@@ -139,6 +184,14 @@ class ImageDownloadApi(Api):
                                section_image_id,
                                file_path=None,
                                **kwargs):
+        '''
+        Parameters
+        ----------
+        section_image_id : integer
+            What to download.
+        file_path : string, optional
+            Where to put it.  <section_image_id>.jpg (default).
+        '''
         if file_path == None:
             file_path = '%d.jpg' % (section_image_id)
         

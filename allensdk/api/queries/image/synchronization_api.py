@@ -16,6 +16,14 @@
 from allensdk.api.api import Api
 
 class SynchronizationApi(Api):
+    '''HTTP client for image synchronization services uses the image alignment results from 
+    the Informatics Data Processing Pipeline.
+    Note: all locations on SectionImages are reported in pixel coordinates 
+    and all locations in 3-D ReferenceSpaces are reported in microns.
+    
+    See `Image to Image Synchronization <http://help.brain-map.org/display/api/Image-to-Image+Synchronization>`_
+    for additional documentation.
+    '''
     def __init__(self, base_uri=None):
         super(SynchronizationApi, self).__init__(base_uri)
     
@@ -30,13 +38,13 @@ class SynchronizationApi(Api):
         Parameters
         ----------
         section_image_id : integer
-            primary key
+            Seed for spatial sync.
         x : float
-            coordinate
+            Pixel coordinate of the seed location in the seed SectionImage.
         y : float
-            coordinate
+            Pixel coordinate of the seed location in the seed SectionImage.
         atlas_id : int
-            primary key
+            Target Atlas for image sync.
         fmt : string, optional
             json (default) or xml
         
@@ -57,6 +65,43 @@ class SynchronizationApi(Api):
         return url
     
     
+    def build_image_to_image_query(self,
+                                   section_image_id,
+                                   x, y,
+                                   section_data_set_ids,
+                                   fmt='json'):
+        '''
+        
+        Parameters
+        ----------
+        section_image_id : integer
+            Seed for spatial sync.
+        x : float
+            Pixel coordinate of the seed location in the seed SectionImage.
+        y : float
+            Pixel coordinate of the seed location in the seed SectionImage.
+        section_data_set_ids : list of integers
+            Target SectionDataSet IDs for image sync.
+        fmt : string, optional
+            json (default) or xml
+        
+        Returns
+        -------
+        url : string
+            The constructed URL
+        '''
+        url = ''.join([self.image_to_image_2d_endpoint,
+                       '/',
+                       str(section_image_id),
+                       '.',
+                       fmt,
+                       '?x=%f&y=%f' % (x, y),
+                       '&section_image_ids=',
+                       ','.join(str(i) for i in section_data_set_ids)])
+        
+        return url
+    
+    
     def build_image_to_image_2d_query(self,
                                      section_image_id,
                                      x, y,
@@ -67,13 +112,13 @@ class SynchronizationApi(Api):
         Parameters
         ----------
         section_image_id : integer
-            what to retrieve
+            Seed for image sync.
         x : float
-            coordinate
+            Pixel coordinate of the seed location in the seed SectionImage.
         y : float
-            coordinate
+            Pixel coordinate of the seed location in the seed SectionImage.
         section_image_ids : list of ints
-            primary keys
+            Target SectionImage IDs for image sync.
         fmt : string, optional
             json (default) or xml
         
@@ -104,15 +149,15 @@ class SynchronizationApi(Api):
         Parameters
         ----------
         reference_space_id : integer
-            primary key
+            Seed for spatial sync.
         x : float
-            coordinate
+            Coordinate (in microns) of the seed location in the seed ReferenceSpace.
         y : float
-            coordinate
+            Coordinate (in microns) of the seed location in the seed ReferenceSpace.
         z : float
-            coordinate
+            Coordinate (in microns) of the seed location in the seed ReferenceSpace.
         section_data_set_ids : list of ints
-            primary keys
+            Target SectionDataSets IDs for image sync.
         fmt : string, optional
             json (default) or xml
         
@@ -142,11 +187,11 @@ class SynchronizationApi(Api):
         Parameters
         ----------
         section_image_id : integer
-            primary key
+            Seed for image sync.
         x : float
-            coordinate
+            Pixel coordinate on the specified SectionImage.
         y : float
-            coordinate
+            Pixel coordinate on the specified SectionImage.
         fmt : string, optional
             json (default) or xml
         
@@ -214,6 +259,32 @@ class SynchronizationApi(Api):
                                   section_image_id,
                                   x, y,
                                   atlas_id)
+        
+        return sync_data
+    
+    
+    def get_image_to_image(self,
+                           section_image_id,
+                           x, y,
+                           section_data_set_ids):
+        '''Retrieve the structure graph data.
+        
+        Parameters
+        ----------
+        section_image_id : integer
+            Seed for image sync.
+        x : float
+            Pixel coordinate of the seed location in the seed SectionImage
+        y : float
+            Pixel coordinate of the seed location in the seed SectionImage.
+        section_data_set_ids : list of integers
+            Target SectionDataSet IDs for image sync.
+        '''
+        sync_data = self.do_query(self.build_image_to_image_query,
+                                  self.read_data,
+                                  section_image_id,
+                                  x, y,
+                                  section_data_set_ids)
         
         return sync_data
     
