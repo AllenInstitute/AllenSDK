@@ -15,7 +15,6 @@
 
 from allensdk.api.api import Api
 from allensdk.api.queries.rma.rma_api import RmaApi
-import json
 from allensdk.api.queries.rma.connected_services import ConnectedServices
 
 class MouseConnectivityApi(Api):
@@ -261,7 +260,8 @@ class MouseConnectivityApi(Api):
         
         Notes
         -----
-        See `Projection Grid Search Service <http://help.brain-map.org/display/mouseconnectivity/API#API-ProjectionStructureUnionization#API-ProjectionGridSearchService>`_
+        See `Source Search <http://help.brain-map.org/display/mouseconnectivity/API#API-SourceSearch>`_,
+        `Target Search <http://help.brain-map.org/display/mouseconnectivity/API#API-TargetSearch>`_,
         and 
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
         
@@ -269,6 +269,116 @@ class MouseConnectivityApi(Api):
         svc = ConnectedServices()
         
         service_name = 'mouse_connectivity_injection_structure'
+        url = svc.build_url(service_name, kwargs)
+        
+        return url
+    
+    
+    def build_projection_grid_spatial_search_url(self, **kwargs):
+        '''Displays all SectionDataSets
+        with projection signal density >= 0.1 at the seed point.
+        This service also returns the path
+        along the most dense pixels from the seed point
+        to the center of each injection site..
+        
+        Parameters
+        ----------
+        seed_point : list of floats
+            The coordinates of a point in 3-D SectionDataSet space.
+        transgenic_lines : list of integers or strings, optional
+            Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
+        section_data_set : integer, optional
+            Id to filter the results.
+        injection_structures : list of integers or strings, optional
+            Integer Structure.id or String Structure.acronym.
+        primary_structure_only : boolean, optional
+        start_row : integer, optional
+            For paging purposes. Defaults to 0.
+        num_rows : integer, optional
+            For paging purposes. Defaults to 2000.
+        
+        Notes
+        -----
+        See `Spatial Search <http://help.brain-map.org/display/mouseconnectivity/API#API-SpatialSearch>`_
+        and 
+        `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitytargetspatial>`_.
+        
+        '''
+        svc = ConnectedServices()
+        
+        service_name = 'mouse_connectivity_target_spatial'
+        url = svc.build_url(service_name, kwargs)
+        
+        return url
+    
+    
+    def build_projection_grid_injection_coordinate_search_url(self, **kwargs):
+        '''User specifies a seed location within the 3D reference space.
+        The service returns a rank list of experiments
+        by distance of its injection site to the specified seed location.
+        
+        Parameters
+        ----------
+        seed_point : list of floats
+            The coordinates of a point in 3-D SectionDataSet space.
+        transgenic_lines : list of integers or strings, optional
+            Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
+        injection_structures : list of integers or strings, optional
+            Integer Structure.id or String Structure.acronym.
+        primary_structure_only : boolean, optional
+        start_row : integer, optional
+            For paging purposes. Defaults to 0.
+        num_rows : integer, optional
+            For paging purposes. Defaults to 2000.
+        
+        Notes
+        -----
+        See `Injection Coordinate Search <http://help.brain-map.org/display/mouseconnectivity/API#API-InjectionCoordinateSearch>`_
+        and 
+        `service::mouse_connectivity_injection_coordinate <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate>`_.
+        
+        '''
+        svc = ConnectedServices()
+        
+        service_name = 'mouse_connectivity_injection_coordinate'
+        url = svc.build_url(service_name, kwargs)
+        
+        return url
+    
+    
+    def build_projection_grid_correlation_search_url(self, **kwargs):
+        '''Select a seed experiment and a domain over
+        which the similarity comparison is to be made.
+        
+        
+        Parameters
+        ----------
+        row : integer
+            SectionDataSet.id to correlate against.
+        structures : list of integers or strings, optional
+            Integer Structure.id or String Structure.acronym.
+        hemisphere : string, optional
+            Use 'right' or 'left'. Defaults to both hemispheres.
+        transgenic_lines : list of integers or strings, optional
+            Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
+        injection_structures : list of integers or strings, optional
+            Integer Structure.id or String Structure.acronym.
+        primary_structure_only : boolean, optional
+        start_row : integer, optional
+            For paging purposes. Defaults to 0.
+        num_rows : integer, optional
+            For paging purposes. Defaults to 2000.
+        
+        Notes
+        -----
+        See `Correlation Search <http://help.brain-map.org/display/mouseconnectivity/API#API-CorrelationSearch>`_
+        and 
+        `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
+        
+        '''
+        svc = ConnectedServices()
+        
+        service_name = 'mouse_connectivity_correlation'
         url = svc.build_url(service_name, kwargs)
         
         return url
@@ -410,11 +520,15 @@ if __name__ == '__main__':
     from PIL import Image
 
     a = MouseConnectivityApi()
-    #print(a.build_projection_grid_search_url(injection_structures='Isocortex',
-    #                                         primary_structure_only='true'))
-    print(a.build_projection_grid_search_url(injection_structures='Isocortex',
-                                             transgenic_lines=RmaApi().quote_string('Syt6-Cre_KI148'),
-                                             primary_structure_only='true'))
+#     print(a.build_projection_grid_search_url(injection_structures='Isocortex',
+#                                              primary_structure_only=True))
+#     print(a.build_projection_grid_search_url(injection_structures='Isocortex',
+#                                              transgenic_lines=RmaApi().quote_string('Syt6-Cre_KI148'),
+#                                              primary_structure_only=True))
+#     print(a.build_projection_grid_spatial_search_url(seed_point=[6900,5050,6450]))
+#     print(a.build_projection_grid_injection_coordinate_search_url(seed_point=[6900,5050,6450]))
+#     print(a.build_projection_grid_correlation_search_url(row=112670853, structures=['TH']))
+    
     #print(json.dumps(a.get_experiments()))
     #print(json.dumps(a.get_experiments(structure_id=385)))
     #print(json.dumps(a.get_experiment_detail(experiment_id=126862385)))

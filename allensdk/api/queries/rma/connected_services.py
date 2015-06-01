@@ -705,13 +705,13 @@ class ConnectedServices(object):
                 },
                 { 'name' : 'structures',
                   'type' : ARRAY,
-                  'array_type' : [ INTEGER,STRING ], 
+                  'array_type' : [ INTEGER, STRING ], 
                   'optional' : True
                 },
                 { 'name' : 'hemisphere',
                   'type' : STRING,
                   'optional' : True,
-                  'values' : [ 'Right', 'Left']
+                  'values' : [ 'right', 'left']
                 },
                 { 'name' : 'transgenic_lines',
                   'type' : ARRAY,
@@ -747,22 +747,19 @@ class ConnectedServices(object):
         },
         'mouse_connectivity_injection_coordinate' : {
             'parameters' : [
-                { 'name': 'injection_structures',
-                  'optional' : False
-                },
-                { 'name' : 'target_domain',
-                  'optional' : True
-                },
-                { 'name' : 'injection_hemisphere',
-                  'optional' : True
-                },
-                { 'name' : 'target_hemisphere',
-                  'optional' : True
+                { 'name': 'seed_point',
+                  'type': ARRAY,
+                  'array_type': FLOAT,
+                  'optional' : False,
                 },
                 { 'name' : 'transgenic_lines',
+                  'type' : ARRAY,
+                  'array_type' : [ INTEGER, STRING ],
                   'optional' : True
                 },
-                { 'name' : 'injection_domain',
+                { 'name' : 'injection_structures',
+                  'type' : ARRAY,
+                  'array_type' : [ INTEGER, STRING ],
                   'optional' : True
                 },
                 { 'name' : 'primary_structure_only',
@@ -782,16 +779,31 @@ class ConnectedServices(object):
         },
         'mouse_connectivity_injection_structure' : {
             'parameters' : [
-                { 'name' : 'seed_point',
+                { 'name' : 'injection_structures',
                   'type' : ARRAY,
-                  'array_type' : FLOAT,
+                  'array_type' : [ INTEGER, STRING ]
+                },
+                { 'name' : 'target_domain',
+                  'type' : ARRAY,
+                  'array_type' : [ INTEGER, STRING ],
+                  'optional' : True
+                },
+                { 'name' : 'injection_hemisphere',
+                  'type' : STRING,
+                  'optional' : True,
+                  'values' : [ 'right', 'left' ]
+                },
+                { 'name' : 'target_hemisphere',
+                  'type' : STRING,
+                  'optional' : True,
+                  'values' : [ 'right', 'left' ]
                 },
                 { 'name' : 'transgenic_lines',
                   'type' : ARRAY,
                   'array_type' : [ INTEGER, STRING ],
                   'optional' : True
                 },
-                { 'name' : 'injection_structures',
+                { 'name' : 'injection_domain',
                   'type' : ARRAY,
                   'array_type' : [ INTEGER, STRING ],
                   'optional' : True
@@ -814,31 +826,20 @@ class ConnectedServices(object):
         },
         'mouse_connectivity_target_spatial' : {
             'parameters' : [
-                { 'name' : 'injection_structures',
+                { 'name' : 'seed_point',
                   'type' : ARRAY,
-                  'array_type' : [ INTEGER, STRING ]
-                },
-                { 'name' : 'target_domain',
-                  'type' : ARRAY,
-                  'array_type' : [ INTEGER, STRING ],
-                  'optional' : True
-                },
-                { 'name' : 'injection_hemisphere',
-                  'type' : STRING,
-                  'optional' : True,
-                  'values' : [ 'Right', 'Left' ]
-                },
-                { 'name' : 'target_hemisphere',
-                  'type' : STRING,
-                  'optional' : True,
-                  'values' : [ 'Right', 'Left' ]
+                  'array_type' : FLOAT,
                 },
                 { 'name' : 'transgenic_lines',
                   'type' : ARRAY,
                   'array_type' : [ INTEGER, STRING ],
                   'optional' : True
                 },
-                { 'name' : 'injection_domain',
+                { 'name' : 'section_data_set',
+                  'type' : INTEGER,
+                  'optional' : True 
+                },
+                { 'name' : 'injection_structures',
                   'type' : ARRAY,
                   'array_type' : [ INTEGER, STRING ],
                   'optional' : True

@@ -14,6 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.api import Api
+from adodbapi.adodbapi import STRING
 
 class RmaApi(Api):
     '''
@@ -290,7 +291,7 @@ class RmaApi(Api):
         
         return ''.join(filters_builder)
     
-    
+    # TODO: this needs to be more rigorous.
     def tuple_filters(self, filters):
         filters_builder = []
         
@@ -299,9 +300,17 @@ class RmaApi(Api):
                 continue
             if len(filt) == 2:
                 val = filt[1]
-                if type(val) is int:
-                    filters_builder.append("[%s$eq$d]" % (filt[0],
-                                                          filt[1]))
+                if type(val) is list:
+                    val_array = []
+                    for v in val:
+                        if type(v) is str:
+                            val_array.append(v)
+                        else:
+                            val_array.append(str(v))
+                    val = ','.join(val_array)
+                    filters_builder.append("[%s$eq%s]" % (filt[0], val))
+                elif type(val) is int:
+                    filters_builder.append("[%s$eq%d]" % (filt[0], val))
                 elif type(val) is bool:
                     if val:
                         filters_builder.append("[%s$eqtrue]" % (filt[0]))
