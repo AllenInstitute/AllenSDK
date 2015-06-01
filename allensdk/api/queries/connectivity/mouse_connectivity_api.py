@@ -16,6 +16,7 @@
 from allensdk.api.api import Api
 from allensdk.api.queries.rma.rma_api import RmaApi
 import json
+from allensdk.api.queries.rma.connected_services import ConnectedServices
 
 class MouseConnectivityApi(Api):
     '''HTTP Client for the Allen Mouse Brain Connectivity Atlas.
@@ -234,17 +235,7 @@ class MouseConnectivityApi(Api):
                        options_clause])
     
     
-    def build_projection_grid_search_url(self,
-                                         injection_structures=None,
-                                         target_domain=None,
-                                         injection_hemisphere=None,
-                                         target_hemisphere=None,
-                                         transgenic_lines=None,
-                                         injection_domain=None,
-                                         primary_structure_only=None,
-                                         start_row=None,
-                                         num_rows=None,
-                                         fmt='json'):
+    def build_projection_grid_search_url(self, **kwargs):
         '''Search over the whole projection signal statistics dataset
         to find experiments with specific projection profiles.
         
@@ -275,22 +266,10 @@ class MouseConnectivityApi(Api):
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
         
         '''
-        rma = RmaApi()
-        service_name = 'mouse_connectivity_injection_structure'
+        svc = ConnectedServices()
         
-        params = [('injection_structures', injection_structures),
-                  ('target_domain', target_domain),
-                  ('injection_hemisphere', injection_hemisphere),
-                  ('target_hemisphere', target_hemisphere),
-                  ('transgenic_lines', transgenic_lines),
-                  ('injection_domain', injection_domain),
-                  ('primary_structure_only', primary_structure_only),
-                  ('start_row', start_row),
-                  ('num_rows', num_rows)]
-        service_stage = rma.service_stage(service_name,
-                                          params)
-        url = RmaApi().build_query_url([service_stage],
-                                       fmt)
+        service_name = 'mouse_connectivity_injection_structure'
+        url = svc.build_url(service_name, kwargs)
         
         return url
     
