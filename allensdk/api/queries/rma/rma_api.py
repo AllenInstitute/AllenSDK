@@ -14,7 +14,6 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.api import Api
-from adodbapi.adodbapi import STRING
 
 class RmaApi(Api):
     '''
@@ -27,6 +26,7 @@ class RmaApi(Api):
     OPTIONS='rma::options'
     ORDER='order'
     NUM_ROWS='num_rows'
+    ALL='all'
     START_ROW='start_row'
     ONLY='only'
     EXCEPT='except'
@@ -35,6 +35,7 @@ class RmaApi(Api):
     PREVIEW='preview'
     TRUE='true'
     FALSE='false'
+    IS='$is'
     EQ='$eq'
     
     def __init__(self, base_uri=None):
@@ -44,6 +45,9 @@ class RmaApi(Api):
     def build_query_url(self,
                         stage_clauses,
                         fmt='json'):
+        if not type(stage_clauses) is list:
+            stage_clauses = [stage_clauses]
+        
         url = ''.join([
             self.rma_endpoint,
             '/query.',
@@ -92,7 +96,7 @@ class RmaApi(Api):
     
     def pipe_stage(self,
                    pipe_name,
-                   **kwargs):
+                   parameters):
         '''Connect model and service stages via their JSON responses.
         
         Notes
@@ -101,12 +105,9 @@ class RmaApi(Api):
         and
         `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
         '''
-        clauses = [self.service_clause(pipe_name)]
+        clauses = [self.pipe_clause(pipe_name)]
         
-        parameters = kwargs.get('', None)
-        
-        if parameters != None:
-            clauses.append(self.filters(parameters))
+        clauses.append(self.tuple_filters(parameters))
         
         stage = ''.join(clauses)
         
@@ -115,7 +116,7 @@ class RmaApi(Api):
     
     def service_stage(self,
                       service_name,
-                      parameters):
+                      parameters=None):
         '''Construct an RMA query fragment to send a request to a connected service.
         
         Parameters
@@ -133,7 +134,8 @@ class RmaApi(Api):
         '''
         clauses = [self.service_clause(service_name)]
         
-        clauses.append(self.tuple_filters(parameters))
+        if parameters != None:
+            clauses.append(self.tuple_filters(parameters))
         
         stage = ''.join(clauses)
         
@@ -158,11 +160,35 @@ class RmaApi(Api):
         clause = ''
         options_params = []
         
+        only = kwargs.get(RmaApi.ONLY, None)
+        
+        if only != None:
+            options_params.append(
+                self.only_except_tabular_clause(RmaApi.ONLY,
+                                                only))
+        
+        excpt = kwargs.get(RmaApi.EXCEPT, None)
+        
+        if excpt != None:
+            options_params.append(
+                self.only_except_tabular_clause(RmaApi.EXCEPT,
+                                                excpt))
+        
+        tabular = kwargs.get(RmaApi.TABULAR, None)
+        
+        if tabular != None:
+            options_params.append(
+                self.only_except_tabular_clause(RmaApi.TABULAR,
+                                                tabular))
+        
         num_rows = kwargs.get(RmaApi.NUM_ROWS, None)
         
         if num_rows != None:
-            options_params.append('[%s$eq%d]' % (RmaApi.NUM_ROWS,
-                                                 num_rows))
+            if num_rows == RmaApi.ALL:
+                options_params.append("[%s$eq'all']" % (RmaApi.NUM_ROWS))
+            else:
+                options_params.append('[%s$eq%d]' % (RmaApi.NUM_ROWS,
+                                                     num_rows))
         
         start_row = kwargs.get(RmaApi.START_ROW, None)
         
@@ -217,7 +243,7 @@ class RmaApi(Api):
         clause = ''
         
         if attribute_list != None:
-            clause = '[$s$eq%s]' % (filter_type,
+            clause = '[%s$eq%s]' % (filter_type,
                                     ','.join(attribute_list))
         
         return clause
@@ -407,4 +433,4 @@ if __name__ == '__main__':
     #                                       filters={'id': 15})]))
     #print(a.build_query_url([a.model_stage('Gene',
     #                                       filters={'acronym': a.quote_string('ABAT')})]))
-    print(a.build_query_url([a.service_stage('FooBar')]))
+    print(a.build_query_url(a.service_stage('FooBar')))
