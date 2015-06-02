@@ -200,4 +200,23 @@ class MouseConnectivityApiTests(unittest.TestCase):
                                                              file_name)
         
         self.assertEqual(actual, expected)
+    
+    
+    def test_api_doc_url_reference_aligned_image_channel_volumes(self):
+        '''
+        Notes
+        -----
+        Expected link is modified for json format and normalized RMA syntax
+        
+        See: `Reference-aligned Image Channel Volumes `<http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>_
+        , example query.
+        '''
+        expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::WellKnownFile,rma::criteria,well_known_file_type[name$eq'ImagesResampledTo25MicronARA'][attachable_id$eq156198187]"
+        
+        data_set_id = 156198187
+        actual = self.mca.build_reference_aligned_image_channel_volumes_url(data_set_id)
+        
+        self.assertEqual(actual, expected)
+
+
 

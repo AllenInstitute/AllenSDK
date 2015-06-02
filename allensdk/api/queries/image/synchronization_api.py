@@ -90,13 +90,13 @@ class SynchronizationApi(Api):
         url : string
             The constructed URL
         '''
-        url = ''.join([self.image_to_image_2d_endpoint,
+        url = ''.join([self.image_to_image_endpoint,
                        '/',
                        str(section_image_id),
                        '.',
                        fmt,
                        '?x=%f&y=%f' % (x, y),
-                       '&section_image_ids=',
+                       '&section_data_set_ids=',
                        ','.join(str(i) for i in section_data_set_ids)])
         
         return url

@@ -507,6 +507,57 @@ class MouseConnectivityApi(Api):
         return url
     
     
+    def read_reference_aligned_image_channel_volumes_response(self, parsed_json):
+        return parsed_json['msg']        
+    
+    
+    def build_reference_aligned_image_channel_volumes_url(self,
+                                                          data_set_id):
+        '''Construct url to download the red, green, and blue channels
+        aligned to the 25um adult mouse brain reference space volume.
+        
+        Parameters
+        ----------
+        data_set_id : integer
+            aka attachable_id
+            
+        Notes
+        -----
+        See: `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_ 
+        for additional documentation.
+        '''
+        rma = RmaApi()
+        
+        criteria = ['well_known_file_type',
+                    "[name$eq'ImagesResampledTo25MicronARA']",
+                    "[attachable_id$eq%d]" % (data_set_id)]
+        
+        model_stage = rma.model_stage('WellKnownFile',
+                                      criteria=criteria)
+        
+        url = rma.build_query_url([model_stage])
+        
+        return url
+    
+    
+    def get_reference_aligned_image_channel_volumes_url(self,
+                                                        data_set_id):
+        '''Retrieve the download link for a specific data set.\
+        
+        Notes
+        -----
+        See `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_
+        for additional documentation.
+        '''
+        download_link = self.do_query(self.build_reference_aligned_image_channel_volumes_url,
+                                      lambda parsed_json: str(parsed_json['msg'][0]['download_link']),
+                                      data_set_id)
+        
+        url = self.api_url + download_link
+        
+        return url
+    
+    
     def download_volumetric_data(self,
                                  data,
                                  file_name,
@@ -537,6 +588,24 @@ class MouseConnectivityApi(Api):
                                                       coordinate_framework)
         
         self.retrieve_file_over_http(url, save_file_path)
+    
+    
+    def download_reference_aligned_image_channel_volumes_url(self,
+                                                             data_set_id,
+                                                             save_file_path=None):
+        '''
+        Returns
+        -------
+            The well known file is downloaded
+        '''
+        well_known_file_url = self.get_reference_aligned_image_channel_volumes_url(data_set_id)
+        
+        if save_file_path == None:
+            save_file_path = str(data_set_id) + '.zip'
+            
+        self.retrieve_file_over_http(well_known_file_url, save_file_path)
+
+
 
 
 if __name__ == '__main__':
@@ -548,6 +617,7 @@ if __name__ == '__main__':
     from PIL import Image
 
     a = MouseConnectivityApi()
+    a.download_reference_aligned_image_channel_volumes_url(156198187)
 #     print(a.build_projection_grid_search_url(injection_structures='Isocortex',
 #                                              primary_structure_only=True))
 #     print(a.build_projection_grid_search_url(injection_structures='Isocortex',
