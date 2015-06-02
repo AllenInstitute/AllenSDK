@@ -22,7 +22,7 @@ class MouseConnectivityApi(Api):
     
     See: `Mouse Connectivity API <http://help.brain-map.org/display/mouseconnectivity/API>`_
     '''
-    product_id = 5
+    PRODUCT_ID = 5
     
     def __init__(self, base_uri=None):
         super(MouseConnectivityApi, self).__init__(base_uri)
@@ -56,7 +56,7 @@ class MouseConnectivityApi(Api):
                        '?q=',
                        'model::SectionDataSet',
                        ',rma::criteria,',
-                       'products[id$eq%d]' % (MouseConnectivityApi.product_id),
+                       'products[id$eq%d]' % (MouseConnectivityApi.PRODUCT_ID),
                        ',rma::include,',
                        'specimen',
                        '(stereotaxic_injections',
