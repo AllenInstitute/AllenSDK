@@ -105,3 +105,99 @@ class MouseConnectivityApiTests(unittest.TestCase):
                                                            section_number)
         
         self.assertEqual(actual, expected)
+    
+    
+    def test_api_doc_url_volumetric_average_template(self):
+        '''
+        Notes
+        -----
+        Expected link is slightly modified to point to a specific .nrrd file
+        
+        See: `Experimental Overview and Metadata `<http://help.brain-map.org/display/mouseconnectivity/API#API-ExperimentalOverviewandMetadata>_
+        , link labeled 'average template'.
+        '''
+        expected = "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/average_template/average_template_25.nrrd"
+        
+        data = 'average_template'
+        file_name = 'average_template_25.nrrd'
+        actual = self.mca.build_volumetric_data_download_url(data,
+                                                             file_name)
+        
+        self.assertEqual(actual, expected)
+    
+    
+    def test_api_doc_url_volumetric_ara_nissl(self):
+        '''
+        Notes
+        -----
+        Expected link is slightly modified to point to a specific .nrrd file
+        
+        See: `Experimental Overview and Metadata `<http://help.brain-map.org/display/mouseconnectivity/API#API-ExperimentalOverviewandMetadata>_
+        , link labeled 'average template'.
+        '''
+        expected = "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/ara_nissl/ara_nissl_25.nrrd"
+        
+        data = 'ara_nissl'
+        file_name = 'ara_nissl_25.nrrd'
+        actual = self.mca.build_volumetric_data_download_url(data,
+                                                             file_name)
+        
+        self.assertEqual(actual, expected)
+    
+    
+    def test_api_doc_url_volumetric_ccf_2015(self):
+        '''
+        Notes
+        -----
+        Expected link is slightly modified to point to a specific .nrrd file
+        
+        See: `Experimental Overview and Metadata `<http://help.brain-map.org/display/mouseconnectivity/API#API-ExperimentalOverviewandMetadata>_
+        , link labeled 'annotation/ccf_2015'.
+        '''
+        expected = "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/ccf_2015/annotation_25.nrrd"
+        
+        data = 'annotation/ccf_2015'
+        file_name = 'annotation_25.nrrd'
+        actual = self.mca.build_volumetric_data_download_url(data,
+                                                             file_name)
+        
+        self.assertEqual(actual, expected)
+    
+    
+    def test_api_doc_url_volumetric_mouse_2011(self):
+        '''
+        Notes
+        -----
+        Expected link is slightly modified to point to a specific .nrrd file
+        
+        See: `Experimental Overview and Metadata `<http://help.brain-map.org/display/mouseconnectivity/API#API-ExperimentalOverviewandMetadata>_
+        , link labeled 'annotation/mouse_2011'.
+        '''
+        expected = "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/mouse_2011/annotation_25.nrrd"
+        
+        data = 'annotation/mouse_2011'
+        file_name = 'annotation_25.nrrd'
+        actual = self.mca.build_volumetric_data_download_url(data,
+                                                             file_name)
+        
+        self.assertEqual(actual, expected)
+    
+    
+    def test_api_doc_url_volumetric_devmouse_2012(self):
+        '''
+        Notes
+        -----
+        Expected link is slightly modified to point to a specific .nrrd file
+        
+        See: `Experimental Overview and Metadata `<http://help.brain-map.org/display/mouseconnectivity/API#API-ExperimentalOverviewandMetadata>_
+        , link labeled 'annotation/devmouse_2012'.
+        '''
+        expected = "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/devmouse_2012/annotation_25.nrrd"
+        
+        data = 'annotation/devmouse_2012'
+        file_name = 'annotation_25.nrrd'
+        actual = self.mca.build_volumetric_data_download_url(data,
+                                                             file_name)
+        
+        self.assertEqual(actual, expected)
+

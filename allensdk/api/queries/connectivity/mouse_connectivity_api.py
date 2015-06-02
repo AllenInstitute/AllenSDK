@@ -466,6 +466,47 @@ class MouseConnectivityApi(Api):
         return data
     
     
+    def build_volumetric_data_download_url(self,
+                                           data,
+                                           file_name,
+                                           voxel_resolution=None,
+                                           release=None,
+                                           coordinate_framework=None):
+        '''Construct url to download 3D reference model in NRRD format.
+        
+        Parameters
+        ----------
+        data : string
+            'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
+        voxel_resolution : int
+            10, 25, 50 or 100
+        coordinate_framework : string
+            'mouse_ccf' (default) or 'mouse_annotation'
+            
+        Notes
+        -----
+        See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_ 
+        for additional documentation.
+        '''
+        
+        if voxel_resolution == None:
+            voxel_resolution = 10
+            
+        if release == None:
+            release = 'current-release'
+        
+        if coordinate_framework == None:
+            coordinate_framework = 'mouse_ccf'
+        
+        url = ''.join([self.informatics_archive_endpoint,
+                       '/%s/%s/' % (release, coordinate_framework),
+                       data,
+                       '/',
+                       file_name])
+        
+        return url
+    
+    
     def download_volumetric_data(self,
                                  data,
                                  file_name,
@@ -489,24 +530,11 @@ class MouseConnectivityApi(Api):
         See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_ 
         for additional documentation.
         '''
-        
-        if voxel_resolution == None:
-            voxel_resolution = 10
-            
-        if save_file_path == None:
-            save_file_path = file_name
-        
-        if release == None:
-            release = 'current-release'
-        
-        if coordinate_framework == None:
-            coordinate_framework = 'mouse_ccf'
-        
-        url = ''.join([self.informatics_archive_endpoint,
-                       '/%s/%s/' % (release, coordinate_framework),
-                       data,
-                       '/',
-                       file_name])
+        url = self.build_volumetric_data_download_url(data,
+                                                      file_name,
+                                                      voxel_resolution,
+                                                      release,
+                                                      coordinate_framework)
         
         self.retrieve_file_over_http(url, save_file_path)
 
