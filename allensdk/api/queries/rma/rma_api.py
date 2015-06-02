@@ -19,8 +19,9 @@ class RmaApi(Api):
     '''
     See: `RESTful Model Access (RMA) <http://help.brain-map.org/display/api/RESTful+Model+Access+%28RMA%29>`_
     '''
-    PIPE='rma::pipe'
-    SERVICE='rma::service'
+    MODEL='model::'
+    PIPE='pipe::'
+    SERVICE='service::'
     CRITERIA='rma::criteria'
     INCLUDE='rma::include'
     OPTIONS='rma::options'
@@ -60,7 +61,18 @@ class RmaApi(Api):
     def model_stage(self,
                     model,
                     **kwargs):
-        clauses = [self.model_clause(model)]
+        '''Construct a model stage of an RMA query string.
+        
+        Notes
+        -----
+        See `RMA Path Syntax <http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-DoubleColonforAxis>`_
+        for a brief overview of the normalized RMA syntax.
+        Normalized RMA syntax differs from the legacy syntax
+        used in much of the RMA documentation.
+        Using the &debug=true option with an RMA URL will include debugging information in the
+        response, including the normalized query.
+        '''
+        clauses = [RmaApi.MODEL + model]
         
         filters = kwargs.get('filters', None)
         
@@ -105,7 +117,7 @@ class RmaApi(Api):
         and
         `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
         '''
-        clauses = [self.pipe_clause(pipe_name)]
+        clauses = [RmaApi.PIPE + pipe_name]
         
         clauses.append(self.tuple_filters(parameters))
         
@@ -132,7 +144,7 @@ class RmaApi(Api):
         and
         `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
         '''
-        clauses = [self.service_clause(service_name)]
+        clauses = [RmaApi.SERVICE + service_name]
         
         if parameters != None:
             clauses.append(self.tuple_filters(parameters))
@@ -140,18 +152,6 @@ class RmaApi(Api):
         stage = ''.join(clauses)
         
         return stage
-    
-    
-    def model_clause(self, model):
-        return ''.join(["model::", model])
-    
-    
-    def pipe_clause(self, pipe):
-        return ''.join(["pipe::", pipe])
-    
-    
-    def service_clause(self, service):
-        return ''.join(["service::", service])
     
     
     def options_clause(self, **kwargs):
@@ -319,6 +319,13 @@ class RmaApi(Api):
     
     # TODO: this needs to be more rigorous.
     def tuple_filters(self, filters):
+        '''Construct an RMA filter clause.
+        
+        Notes
+        -----
+        
+        See `RMA Path Syntax - Square Brackets for Filters <http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-SquareBracketsforFilters>`_ for additional documentation.
+        '''
         filters_builder = []
         
         for filt in filters:
@@ -398,12 +405,17 @@ class RmaApi(Api):
     
     
     def read_data(self, parsed_json):
-        '''Return the list of cells from the parsed query.
+        '''Return the message data from the parsed query.
         
         Parameters
         ----------
         parsed_json : dict
             A python structure corresponding to the JSON data returned from the API.
+        
+        Notes
+        -----
+        See `API Response Formats - Response Envelope <http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope>`_
+        for additional documentation.
         '''
         return parsed_json['msg']
     

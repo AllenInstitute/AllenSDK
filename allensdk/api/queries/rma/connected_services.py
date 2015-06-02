@@ -15,6 +15,13 @@
 from allensdk.api.queries.rma.rma_api import RmaApi
 
 class ConnectedServices(object):
+    '''
+    Notes
+    -----
+    
+    Connected Services only include API services that are accessed
+    via the RMA endpoint using an rma::services stage. 
+    '''
     ARRAY = 'array'
     STRING = 'string'
     INTEGER = 'integer'
@@ -26,6 +33,8 @@ class ConnectedServices(object):
     
     
     def build_url(self, service_name, kwargs):
+        '''Create a single stage RMA url from a service name and parameters.
+        '''
         rma = RmaApi()
         fmt = kwargs.get('fmt', 'json')
         
@@ -45,8 +54,19 @@ class ConnectedServices(object):
         
         return url
     
+    @classmethod
+    @property
+    def schema(cls):
+        '''Dictionary of service names and parameters.
+        
+        Notes
+        -----
+        See `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
+        for a human-readable list of connected services and their parameters.
+        '''
+        return cls._schema
     
-    schema = {
+    _schema = {
         'dev_human_correlation' : {
             'parameters' : [
                 { 'name' : 'set',

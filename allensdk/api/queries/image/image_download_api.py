@@ -19,7 +19,7 @@ class ImageDownloadApi(Api):
     '''HTTP Client to download whole or partial two-dimensional images from the Allen Institute
     with the SectionImage, AtlasImage and ProjectionImage Download Services.
     
-    See `Downloading and Image <http://help.brain-map.org/display/api/Downloading+an+Image>`_
+    See `Downloading an Image <http://help.brain-map.org/display/api/Downloading+an+Image>`_
     for more documentation.
     '''
     def __init__(self, base_uri=None):
@@ -29,7 +29,8 @@ class ImageDownloadApi(Api):
     def build_section_image_url(self,
                                 section_image_id,
                                 **kwargs):
-        '''
+        ''' Download whole or partial two-dimensional images
+        from the Allen Institute with the SectionImage service.
         
         Parameters
         ----------
@@ -158,15 +159,210 @@ class ImageDownloadApi(Api):
     def build_atlas_image_url(self,
                               atlas_image_id,
                               **kwargs):
-        # see http://help.brain-map.org/display/api/Downloading+an+Image#DownloadinganImage-ProjectionImage%26nbsp%3BDownloadService
-        raise(Exception('unimplemented'))
+        ''' Download whole or partial two-dimensional images
+        from the Allen Institute with the AtlasImage service.
+        
+        Parameters
+        ----------
+        atlas_image_id : integer
+            Image to download.
+        annotation : boolean, optional
+            True to retrieve the specified AtlasImage with annotations.
+        atlas : integer, optional
+            Atlas.ID for the annotations.
+        downsample : int, optional
+            Number of times to downsample the original image.
+        quality : int, optional
+            jpeg quality of the returned image, 0 to 100 (default)
+        top : int, optional
+            Index of the topmost row of the region of interest.
+        left :int, optional
+            Index of the leftmost column of the region of interest.
+        width : int, optional
+            Number of columns in the output image.
+        height : int, optional
+            Number of rows in the output image.
+        
+        Returns
+        -------
+        url : string
+            The constructed URL
+            
+        Notes
+        -----
+        The P56 Adult Mouse Brain Atlas and Developing Mouse Brain Atlas
+        share a common AtlasDataSet, so the Atlas.ID should be specified.
+        
+        'downsample=1' halves the number of pixels of the original image
+        both horizontally and vertically.
+        Specifying 'downsample=2' quarters the height and width values.
+        
+        Quality must be an integer from 0, for the lowest quality,
+        up to as high as 100. If it is not specified,
+        it defaults to the highest quality.
+        
+        Top is specified in full-resolution (largest tier) pixel coordinates.
+        SectionImage.y is the default value.
+        
+        Left is specified in full-resolution (largest tier) pixel coordinates.
+        SectionImage.x is the default value.
+        
+        Width is specified in tier-resolution (desired tier) pixel coordinates.
+        SectionImage.width is the default value. It is automatically adjusted when downsampled.
+        
+        Height is specified in tier-resolution (desired tier) pixel coordinates.
+        SectionImage.height is the default value. It is automatically adjusted when downsampled.
+        
+        See: `Downloading an Image - ProjectionImage Download Service <http://help.brain-map.org/display/api/Downloading+an+Image#DownloadinganImage-ProjectionImage%26nbsp%3BDownloadService>`_
+        and
+        `Downloading Atlas Images and Graphics <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics>`_.
+        
+        Use :py:meth:`allensdk.api.queries.structure.ontologies_api.OntologiesApi.get_atlases_table`
+        to get atlas ids programmatically.
+        '''
+        params = []
+        
+        projection = kwargs.get('projection', None)
+        
+        if projection != None:
+            if projection == True:
+                params.append('projection=true')
+            else:
+                params.append('projection=false')
+        
+        downsample = kwargs.get('downsample', None)
+        
+        if downsample != None:
+            params.append('downsample=%d' % (downsample))
+        
+        quality = kwargs.get('quality', None)
+        
+        if quality != None:
+            params.append('quality=%d' % (quality))
+        
+        # region of interest
+        for roi_key in [ 'left', 'top', 'width', 'height']:
+            roi_value = kwargs.get(roi_key, None)
+            if roi_value != None:
+                params.append('%s=%d' % (roi_key, roi_value))
+        
+        if len(params) > 0:
+            url_params = "?" + "&".join(params)
+        else:
+            url_params = ''
+        
+        url = ''.join([self.projection_image_download_endpoint,
+                       '/',
+                       str(atlas_image_id),
+                       url_params])
+        
+        return url
     
     
     def build_projection_image_url(self,
                                    projection_image_id,
                                    **kwargs):
-        # see http://help.brain-map.org/display/api/Downloading+an+Image#DownloadinganImage-ProjectionImage%26nbsp%3BDownloadService
-        raise(Exception('unimplemented'))
+        ''' Download whole or partial two-dimensional images
+        from the Allen Institute with the AtlasImage service.
+        
+        Parameters
+        ----------
+        atlas_image_id : integer
+            Image to download.
+        projection : boolean, optional
+            True to retrieve the specified SectionImage with projection.
+        downsample : int, optional
+            Number of times to downsample the original image.
+        quality : int, optional
+            jpeg quality of the returned image, 0 to 100 (default)
+        top : int, optional
+            Index of the topmost row of the region of interest.
+        left :int, optional
+            Index of the leftmost column of the region of interest.
+        width : int, optional
+            Number of columns in the output image.
+        height : int, optional
+            Number of rows in the output image.
+            
+        Returns
+        -------
+        url : string
+            The constructed URL
+            
+        Notes
+        -----
+        The P56 Adult Mouse Brain Atlas and Developing Mouse Brain Atlas
+        share a common AtlasDataSet, so the Atlas.ID should be specified.
+        
+        'downsample=1' halves the number of pixels of the original image
+        both horizontally and vertically.
+        Specifying 'downsample=2' quarters the height and width values.
+        
+        Quality must be an integer from 0, for the lowest quality,
+        up to as high as 100. If it is not specified,
+        it defaults to the highest quality.
+        
+        Top is specified in full-resolution (largest tier) pixel coordinates.
+        SectionImage.y is the default value.
+        
+        Left is specified in full-resolution (largest tier) pixel coordinates.
+        SectionImage.x is the default value.
+        
+        Width is specified in tier-resolution (desired tier) pixel coordinates.
+        SectionImage.width is the default value. It is automatically adjusted when downsampled.
+        
+        Height is specified in tier-resolution (desired tier) pixel coordinates.
+        SectionImage.height is the default value. It is automatically adjusted when downsampled.
+        
+        See: `Downloading an Image - AtlasImage Download Service <http://help.brain-map.org/display/api/Downloading+an+Image#DownloadinganImage-AtlasImage%26nbsp%3BDownloadService>`_
+        and
+        `Downloading Atlas Images and Graphics <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics>`_.
+        
+        Use :py:meth:`allensdk.api.queries.structure.ontologies_api.OntologiesApi.get_atlases_table`
+        to get atlas ids programmatically.
+        '''
+        params = []
+        
+        annotation = kwargs.get('annotation', None)
+        
+        if annotation != None:
+            if annotation == True:
+                params.append('annotation=true')
+            else:
+                params.append('annotation=false')
+        
+        atlas = kwargs.get('atlas', None)
+        
+        if atlas != None:
+            params.append('atlas=%d' % (atlas))
+        
+        downsample = kwargs.get('downsample', None)
+        
+        if downsample != None:
+            params.append('downsample=%d' % (downsample))
+        
+        quality = kwargs.get('quality', None)
+        
+        if quality != None:
+            params.append('quality=%d' % (quality))
+        
+        # region of interest
+        for roi_key in [ 'left', 'top', 'width', 'height']:
+            roi_value = kwargs.get(roi_key, None)
+            if roi_value != None:
+                params.append('%s=%d' % (roi_key, roi_value))
+        
+        if len(params) > 0:
+            url_params = "?" + "&".join(params)
+        else:
+            url_params = ''
+        
+        url = ''.join([self.atlas_image_download_endpoint,
+                       '/',
+                       str(projection_image_id),
+                       url_params])
+        
+        return url
     
     
     def read_data(self, parsed_json):
@@ -243,6 +439,8 @@ if __name__ == '__main__':
     #a.download_section_image(311175878, downsample=4, tumor_feature_annotation=True)
     #a.download_section_image(311174547, downsample=4, tumor_feature_boundary=True)
     #a.download_section_image(71592412)
+    #print(a.build_atlas_image_url(100883869, downsample=4, annotation=True))
+    print(a.build_atlas_image_url(100883869, downsample=4, annotation=True, atlas=2))
     
     
 

@@ -429,7 +429,7 @@ class MouseConnectivityApi(Api):
         See: image examples under 
         `Experimental Overview and Metadata <http://help.brain-map.org/display/mouseconnectivity/API##API-ExperimentalOverviewandMetadata>`_
         for additional documentation.
-        Download the image using :py:meth:`allensdk.api.queries.image.image_download_api.ImageDownloadApi.download_section_image` 
+        Download the image using :py:meth:`allensdk.api.queries.image.image_download_api.ImageDownloadApi.download_section_image`
         '''
         data = self.do_query(self.build_projection_image_meta_info,
                              self.read_response,
