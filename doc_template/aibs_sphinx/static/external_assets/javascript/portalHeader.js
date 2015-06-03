@@ -191,17 +191,7 @@ function import_portal()  {
 "		text-decoration:none;" + 
 "	}" + 
 "" + 
-"	#top_chrome a:visited {" + 
-"" + 
-"		color:inherit !important;	" + 
-"	}" + 
-"" + 
 "	#top_chrome a:hover {" + 
-"" + 
-"		color:inherit !important;	" + 
-"	}" + 
-"" + 
-"	#top_chrome a:hover:visited {" + 
 "" + 
 "		color:inherit !important;	" + 
 "	}" + 
@@ -240,7 +230,7 @@ function import_portal()  {
 "" + 
 "		position:relative;" + 
 "		width:calc(100% - 112px);" + 
-"		height:106px;" + 
+"		height:76px;" + 
 "		border-bottom:2px solid #A5A8AB;" + 
 "		margin-left:50px;" + 
 "		margin-right:50px;" + 

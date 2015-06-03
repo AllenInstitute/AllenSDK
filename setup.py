@@ -1,9 +1,10 @@
 from setuptools import setup, find_packages
 import os
-import allen_wrench
+import allensdk
 
 # http://bugs.python.org/issue8876#msg208792
-del os.link
+if hasattr(os, 'link'):
+    del os.link
 
 def prepend_find_packages(*roots):
     ''' Recursively traverse nested packages under the root directories
@@ -17,25 +18,27 @@ def prepend_find_packages(*roots):
     return packages
 
 setup(
-    version = allen_wrench.__version__,
-    name = 'allen_wrench',
+    version = allensdk.__version__,
+    name = 'allensdk',
     author = 'David Feng',
     author_email = 'davidf@alleninstitute.org',
-    packages = prepend_find_packages('allen_wrench'),
-    package_data={'': ['*.hoc', '*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.xyz', '*.env', '*.sh', 'bps'] },
-    description = 'core libraries for the allen_wrench.',
+    packages = prepend_find_packages('allensdk'),
+    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', 'bps'] },
+    description = 'core libraries for the allensdk.',
     requires = ['h5py',
                 'argparse',
-                'six'],
+                'six',
+                'pynrrd'],
     tests_require=['nose>=1.2.1',
-                   'coverage>=3.7.1'],
-    setup_requires=['setuptools', 'sphinx'],
-    url='http://',
-    scripts=['allen_wrench/model/biophys_sim/scripts/bps'],
+                   'coverage>=3.7.1',
+                   'mock'],
+    setup_requires=['setuptools', 'sphinx', 'numpydoc'],
+    url='http://alleninstitute.github.io/AllenSDK/',
+    scripts=['allensdk/model/biophys_sim/scripts/bps'],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
-        'License :: Apache Software License :: 2.0',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2.7',

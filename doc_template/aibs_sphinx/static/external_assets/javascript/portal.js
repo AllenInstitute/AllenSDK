@@ -1,7 +1,7 @@
 // NOTE you have to configure this!
 var _pEXTERNAL_ASSETS = "/external_assets";
 
-document.writeln("<script src='" + _pEXTERNAL_ASSETS + "/javascripts/appConfig.js'><\/script>");
+document.writeln("<script src='" + _pEXTERNAL_ASSETS + "/javascript/appConfig.js'><\/script>");
 
 // NOTE this is a global hack to get the zap viewers to work
 document.writeln("<style>.simstripCont{white-space:nowrap}</style>");
@@ -222,10 +222,6 @@ var _pBrowserSupport = {
         this.name = this.chrome ? 'chrome' : this.webkit ? 'webkit' : this.opera ? 'opera' : this.msie ? 'msie' : this.mozilla ? 'mozilla' : 'unknown';
         this.supported = this._is_supported(this.minimum_list);
         this.not_supported = this._is_not_supported(this.minimum_list);
-
-        this.cookies = this._cookie_check();
-        this.supported_flash = this._flash_check();
-        this.flash_version = this._flash_version();
     },
 
     /**
@@ -362,8 +358,6 @@ function _pSiteWarning() {
         var msg = "Browser name: " + _pBrowserSupport.name;
         msg += "<br/>Version: " + _pBrowserSupport.version;
         msg += "<br/>IE compat version: " + _pBrowserSupport.ie_compat_version;
-        msg += "<br/>Cookies enabled: " + _pBrowserSupport.cookies;
-        msg += "<br/>Flash version: " + _pBrowserSupport.flash_version;
         add_warning(msg);
     }
 
@@ -416,11 +410,9 @@ function _pSiteWarning() {
 
         if (!browser_info.supported)
             msg += "<li style='margin-left:22px;'>Your browser version is not supported.</li>";
-        if (!browser_info.cookies)
-            msg += "<li style='margin-left:22px;'>Your browser is configured to not allow cookies.</li>";
         msg += "</ul>";
 
-        if (!browser_info.supported || !browser_info.cookies) {
+        if (!browser_info.supported) {
 
             // if the legacy warning is already present, hide it.
             var old_warn = document.getElementById('js_cookie_check');
@@ -489,14 +481,14 @@ function _pSiteWarning() {
         _pBrowserSupport.initialize(_pSUPPORTED_BROWSERS);
         var url = document.URL;
 
-        if (url.indexOf('show_browser_stats') >= 0)
-            _self.show_stats();
-        else
-            show_warning(_pBrowserSupport);
-
-        show_flash_warning();
-
-        add_warning_closer();
+//        if (url.indexOf('show_browser_stats') >= 0)
+//            _self.show_stats();
+//        else
+//            show_warning(_pBrowserSupport);
+//
+//        show_flash_warning();
+//
+//        add_warning_closer();
     }
 
     init();
@@ -516,7 +508,7 @@ function _pShowFlashWarning() {
 function _pShowSysReqs() {
 
     var reqs_win = window.open('', '_blank', 'width=460,height=400,status=0,scrollbars=0,titlebar=0,location=0');
-    reqs_win.document.writeln("<script src='" + _pEXTERNAL_ASSETS + "/javascripts/browserVersions.js'><\/script>");
+    reqs_win.document.writeln("<script src='" + _pEXTERNAL_ASSETS + "/javascript/browserVersions.js'><\/script>");
 }
 
 if (window.addEventListener)
@@ -656,7 +648,7 @@ var _pHeaderLinks = new Object();
 //****************************************
 var _pFooterLinks = [];
 _pFooterLinks["pPrivacyPolicy"] = "http://www.alleninstitute.org/Media/policies/privacy_policy_content.html";
-_pFooterLinks["pTermsOfUse"] = "http://www.alleninstitute.org/Media/policies/terms_of_use_content.html";
+_pFooterLinks["pTermsOfUse"] = "https://github.com/AllenInstitute/AllenSDK/blob/master/COPYING";
 _pFooterLinks["pCitationPolicy"] = "http://www.alleninstitute.org/Media/policies/citation_policy_content.html";
 _pFooterLinks["pAbout"] = "http://www.alleninstitute.org/about_us/overview.html";
 _pFooterLinks["pContactUs"] = "http://www.alleninstitute.org/contact_us/index.html";

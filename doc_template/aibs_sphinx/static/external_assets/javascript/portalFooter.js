@@ -100,11 +100,6 @@ function import_portal()  {
 "	color:#0779BE !important;" + 
 "}" + 
 "" + 
-".portal_link_stack a:visited {" + 
-"" + 
-"	color:#0779BE !important;" + 
-"}" + 
-"" + 
 "/* overriding application tab bar styles */" + 
 "#pTabBar {" + 
 "" + 
@@ -280,11 +275,6 @@ function import_portal()  {
 "	color:#47AEDC !important;" + 
 "}" + 
 "" + 
-"a:visited:hover {" + 
-"" + 
-"	color:#47AEDC !important;" + 
-"}" + 
-"" + 
 "/* app-specific overrides */" + 
 "#search_result_common_container {" + 
 "" + 
@@ -417,7 +407,7 @@ function import_portal()  {
 "		<span class=\"portal_footer_item portal_link_stack\">" + 
 "			<a id=\"pPrivacyPolicy\" target=\"_blank\">Privacy Policy</a></a>" + 
 "			<br/>" + 
-"			<a id=\"pTermsOfUse\" target=\"_blank\">Terms of Use</a></a>" + 
+"			<a id=\"pTermsOfUse\" target=\"_blank\">Software License</a></a>" + 
 "		</span>		" + 
 "		<a id=\"pCitationPolicy\" target=\"_blank\"><span id=\"portal_citation_policy\" class=\"portal_footer_item portal_call_to_action\">CITATION POLICY <i class=\"icon-right-open\"></i></span></a>" + 
 "	</div>" + 
@@ -425,7 +415,7 @@ function import_portal()  {
 "" + 
 "" + 
 "<div id=\"bottom_chrome\">" + 
-"	<div id=\"portal_copyright_notice\">Copyright ©2014. Allen Institute for Brain Science. All Rights Reserved.</div>" + 
+"	<div id=\"portal_copyright_notice\">Copyright ©2015. Allen Institute for Brain Science. All Rights Reserved.</div>" + 
 "</div>" + 
 "</div>" + 
  ""; 

@@ -7,7 +7,7 @@ Conf File
 ---------
 
 The .conf file is a file that can be parsed by
-the Allen Wrench application_config class.
+the Allen SDK application_config class.
 It is in "INI" format, and the comment character is #.
 
 ::

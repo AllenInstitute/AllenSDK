@@ -36,12 +36,9 @@ a {
 }
 
 a:hover {
-    color:#639A3C;
+#    color:#639A3C;
 }
 
-a:visited {
-    color:#5959DF;
-}
 
 div.pageContent {
   width:860px;
