@@ -21,6 +21,7 @@ import logging
 class Api(object):
     _log = logging.getLogger(__name__)
     default_api_url = 'http://api.brain-map.org'
+    download_url = 'http://download.alleninstitute.org'
     
     def __init__(self, api_base_url_string=None):
         if api_base_url_string==None:
@@ -40,8 +41,42 @@ class Api(object):
             url of the api to point to
         '''
         self.api_url = api_base_url_string
-        self.well_known_file_endpoint = api_base_url_string + '/api/v2/well_known_file_download/'
-        self.rma_endpoint = api_base_url_string + '/api/v2/data'  
+        
+        # http://help.brain-map.org/display/api/Downloading+a+WellKnownFile
+        self.well_known_file_endpoint = api_base_url_string + '/api/v2/well_known_file_download'
+        
+        # http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data
+        self.grid_data_endpoint = api_base_url_string + '/grid_data'
+        
+        # http://help.brain-map.org/display/api/Downloading+and+Displaying+SVG
+        self.svg_endpoint = api_base_url_string + '/api/v2/svg'
+        self.svg_download_endpoint = api_base_url_string + '/api/v2/svg_download'
+        
+        # http://help.brain-map.org/display/api/Downloading+an+Ontology%27s+Structure+Graph
+        self.structure_graph_endpoint = api_base_url_string + '/api/v2/structure_graph_download'
+        
+        # http://help.brain-map.org/display/api/Searching+a+Specimen+or+Structure+Tree
+        self.tree_search_endpoint = api_base_url_string + '/api/v2/tree_search'
+        
+        # http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets
+        self.annotated_section_data_sets_endpoint = api_base_url_string + '/api/v2/annotated_section_data_sets'
+        self.compound_annotated_section_data_sets_endpoint = api_base_url_string + '/api/v2/compound_annotated_section_data_sets'
+        
+        # http://help.brain-map.org/display/api/Image-to-Image+Synchronization#Image-to-ImageSynchronization-ImagetoImage
+        self.image_to_atlas_endpoint = api_base_url_string + '/api/v2/image_to_atlas'
+        self.image_to_image_endpoint = api_base_url_string + '/api/v2/image_to_image'
+        self.image_to_image_2d_endpoint = api_base_url_string + '/api/v2/image_to_image_2d'
+        self.reference_to_image_endpoint = api_base_url_string + '/api/v2/reference_to_image'
+        self.image_to_reference_endpoint = api_base_url_string + '/api/v2/image_to_reference'
+        self.structure_to_image_endpoint = api_base_url_string + '/api/v2/structure_to_image'
+        
+        # http://help.brain-map.org/display/mouseconnectivity/API
+        self.section_image_download_endpoint = api_base_url_string + '/api/v2/section_image_download'
+        self.atlas_image_download_endpoint = api_base_url_string + '/api/v2/atlas_image_download'
+        self.projection_image_download_endpoint = api_base_url_string + '/api/v2/projection_image_download'
+        self.informatics_archive_endpoint = Api.download_url + '/informatics-archive'
+        
+        self.rma_endpoint = api_base_url_string + '/api/v2/data'
     
     
     def set_default_working_directory(self, working_directory):
@@ -55,9 +90,47 @@ class Api(object):
         self.default_working_directory = working_directory
     
     
+    def do_query(self, url_builder_fn, json_traversal_fn, *args, **kwargs):
+        '''Bundle an query url construction function
+        with a corresponding response json traversal function.
+        
+        Parameters
+        ----------
+        url_builder_fn : function
+            A function that takes parameters and returns an rma url.
+        json_traversal_fn : function
+            A function that takes a json-parsed python data structure and returns data from it.
+        args : arguments
+            Arguments to be passed to the url builder function.
+        kwargs : keyword arguments
+            Keyword arguments to be passed to the rma builder function.
+        
+        Returns
+        -------
+        any type
+            The data extracted from the json response.
+        
+        Examples
+        --------
+        `A simple Api subclass example
+        <data_api_client.html#creating-new-api-query-classes>`_.
+        '''
+        api_url = url_builder_fn(*args, **kwargs) 
+        
+        quoted_api_url = urllib2.quote(api_url,';/?:@&=+$,')
+                           
+        json_parsed_data = self.retrieve_parsed_json_over_http(quoted_api_url)
+        
+        return json_traversal_fn(json_parsed_data)
+    
+    
     def do_rma_query(self, rma_builder_fn, json_traversal_fn, *args, **kwargs):
         '''Bundle an RMA query url construction function
         with a corresponding response json traversal function.
+        
+        ..note:: Deprecated in AllenSDK 0.9.2
+            `do_rma_query` will be removed in AllenSDK 1.0, it is replaced by
+            `do_query` because the latter is more general.
         
         Parameters
         ----------
@@ -80,13 +153,7 @@ class Api(object):
         `A simple Api subclass example
         <data_api_client.html#creating-new-api-query-classes>`_.
         '''
-        rma_url = rma_builder_fn(*args, **kwargs) 
-
-        quoted_rma_url = urllib2.quote(rma_url,';/?:@&=+$,')
-                           
-        json_parsed_data = self.retrieve_parsed_json_over_http(quoted_rma_url)
-        
-        return json_traversal_fn(json_parsed_data)
+        return self.do_query(rma_builder_fn, json_traversal_fn, *args, **kwargs)
     
     
     def load_api_schema(self):
@@ -159,20 +226,38 @@ class Api(object):
             raise
     
     
-    def retrieve_parsed_json_over_http(self, rma_url):
+    def retrieve_parsed_json_over_http(self, url):
         '''Get the document and put it in a Python data structure
         
         Parameters
         ----------
-        rma_url : string
-            Full RMA query url.
+        url : string
+            Full API query url.
         
         Returns
         -------
         dict
             Result document as parsed by the JSON library.
         '''
-        response = urllib2.urlopen(rma_url)
+        response = urllib2.urlopen(url)
         json_parsed_data = load(response)
         
         return json_parsed_data
+    
+    
+    def retrieve_xml_over_http(self, url):
+        '''Get the document and put it in a Python data structure
+        
+        Parameters
+        ----------
+        url : string
+            Full API query url.
+        
+        Returns
+        -------
+        string
+            Unparsed xml string.
+        '''
+        response = urllib2.urlopen(url)
+        
+        return response.read()

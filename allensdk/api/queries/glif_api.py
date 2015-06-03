@@ -15,7 +15,7 @@
 
 from allensdk.api.api import Api
 
-import os, json, logging
+import json, logging
 
 class GlifApi(Api):
     def __init__(self, base_uri=None):
@@ -35,7 +35,7 @@ class GlifApi(Api):
             Meta data for all GLIF neuronal models.
         '''
         
-        return self.do_rma_query(self.build_neuronal_model_list_rma_url, self.read_neuronal_model_list_json)
+        return self.do_query(self.build_neuronal_model_list_rma_url, self.read_neuronal_model_list_json)
 
 
     def build_neuronal_model_list_rma_url(self, fmt='json'):
