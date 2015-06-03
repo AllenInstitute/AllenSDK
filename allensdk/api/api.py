@@ -46,7 +46,7 @@ class Api(object):
         self.well_known_file_endpoint = api_base_url_string + '/api/v2/well_known_file_download'
         
         # http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data
-        self.expression_grid_endpoint = api_base_url_string + '/grid_data'
+        self.grid_data_endpoint = api_base_url_string + '/grid_data'
         
         # http://help.brain-map.org/display/api/Downloading+and+Displaying+SVG
         self.svg_endpoint = api_base_url_string + '/api/v2/svg'
