@@ -16,6 +16,7 @@
 import logging
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
+from allensdk.core.orca_data_set import OrcaDataSet
 
 
 class Utils(HocUtils):
@@ -112,7 +113,8 @@ class Utils(HocUtils):
     
     def setup_iclamp(self,
                      stimulus_path,
-                     sweep=0):
+                     sweep=0,
+                     fmt='NWB'):
         '''Assign a current waveform as input stimulus.
         
         Parameters
@@ -125,7 +127,7 @@ class Utils(HocUtils):
         self.stim.delay = 0
         self.stim.dur = 1e12 # just set to be really big; doesn't need to match the waveform
         
-        self.read_stimulus(stimulus_path, sweep=sweep)
+        self.read_stimulus(stimulus_path, sweep=sweep, fmt=fmt)
         self.h.dt = self.sampling_rate
         stim_vec = self.h.Vector(self.stim_curr)
         stim_vec.play(self.stim._ref_amp, self.sampling_rate)
@@ -135,7 +137,7 @@ class Utils(HocUtils):
         self.stim_vec_list.append(stim_vec)
     
     
-    def read_stimulus(self, stimulus_path, sweep=0):
+    def read_stimulus(self, stimulus_path, sweep=0, fmt='NWB'):
         '''load current values for a specific experiment sweep.
         
         Parameters
@@ -147,7 +149,12 @@ class Utils(HocUtils):
         '''
         Utils._log.info("reading stimulus path: %s, sweep %s" %
                         (stimulus_path, sweep))
-        stimulus_data = NwbDataSet(stimulus_path)
+        
+        if fmt == 'ORCA':
+            stimulus_data = OrcaDataSet(stimulus_path)
+        else:
+            stimulus_data = NwbDataSet(stimulus_path)
+            
         sweep_data = stimulus_data.get_sweep(sweep)
         self.stim_curr = sweep_data['stimulus'] * 1.0e9 # convert to nA for NEURON
         self.sampling_rate = 1.0e3 / sweep_data['sampling_rate'] # convert from Hz
@@ -157,7 +164,7 @@ class Utils(HocUtils):
         '''Set up output voltage recording.'''
         vec = { "v": self.h.Vector(),
                 "t": self.h.Vector() }
-    
+        
         vec["v"].record(self.h.soma[0](0.5)._ref_v)
         vec["t"].record(self.h._ref_t)
     

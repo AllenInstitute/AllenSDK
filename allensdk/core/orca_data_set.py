@@ -56,7 +56,6 @@ class OrcaDataSet( EphysDataSet ):
                 if missing_data > 0:
                     response = np.append(response, np.zeros(missing_data))
 
-
                 swp['response']['timeseries']['data'][...] = response
 
     def get_spike_times(self, sweep_number):
@@ -90,5 +89,18 @@ class OrcaDataSet( EphysDataSet ):
                 del spike_dir[sweep_name]
 
             spike_dir.create_dataset(sweep_name, data=spike_times, dtype='f8')
-            
-
+        
+        
+    def zero_sweeps(self):
+        with h5py.File(self.file_name, 'a') as f:
+            for sweep in f['epochs'].keys():
+                if sweep.startswith('Sweep_'):
+                    f['epochs'][sweep]['response']['timeseries']['data'][...] = 0
+    
+    
+    def get_sweeps(self, file_path):
+        with h5py.File(self.file_name, 'a') as f:
+            sweeps = [int(e.split('_')[1]) for e in f['epochs'].keys()
+                      if e.startswith('Sweep')]
+        
+        return sweeps

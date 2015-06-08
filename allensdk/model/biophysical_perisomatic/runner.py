@@ -18,8 +18,7 @@ from allensdk.model.biophysical_perisomatic.utils import Utils
 from allensdk.core.nwb_data_set import NwbDataSet
 from shutil import copy
 import numpy
-from allensdk.core.dat_utilities import DatUtilities
-
+from allensdk.core.orca_data_set import OrcaDataSet
 
 def run(description):
     '''Main function for running a perisomatic biophysical experiment.
@@ -52,13 +51,14 @@ def run(description):
     if stimulus_format == 'NWB' and output_format == 'NWB':
         prepare_nwb_output(manifest.get_path('stimulus_path'),
                            manifest.get_path('output'))
+    elif stimulus_format == 'ORCA' and output_format == 'ORCA':
+        prepare_orca_output(manifest.get_path('stimulus_path'),
+                            manifest.get_path('output'))
+    
     
     # run sweeps
     for sweep in sweeps:
-        if stimulus_format == 'NWB':
-            utils.setup_iclamp(stimulus_path, sweep=sweep)
-        elif stimulus_format == 'dat':
-            utils.setup_iclamp_dat(stimulus_path)
+        utils.setup_iclamp(stimulus_path, sweep=sweep, fmt=stimulus_format)
         
         vec = utils.record_values()
         
@@ -67,14 +67,13 @@ def run(description):
         
         # write to an NWB File
         output_data = (numpy.array(vec['v']) - junction_potential) * mV
-        output_times = numpy.array(vec['t'])
         
         if output_format == 'NWB':
             output_path = manifest.get_path("output")
             save_nwb(output_path, output_data, sweep)
-        elif output_format == 'dat':
-            output_path = manifest.get_path("output", sweep)
-            DatUtilities.save_voltage(output_path, output_data, output_times)
+        elif output_format == 'ORCA':
+            output_path = manifest.get_path("output")
+            save_orca(output_path, output_data, sweep)
 
 
 def prepare_nwb_output(nwb_stimulus_path,
@@ -95,6 +94,24 @@ def prepare_nwb_output(nwb_stimulus_path,
         data_set.set_spike_times(sweep, [])
 
 
+def prepare_orca_output(stimulus_path,
+                        result_path):
+    '''Copy the stimulus file, zero out the recorded voltages and spike times.
+    
+    Parameters
+    ----------
+    nwb_stimulus_path : string
+        ORCA file name
+    nwb_result_path : string
+        ORCA file name
+    '''
+    copy(stimulus_path, result_path)
+    data_set = OrcaDataSet(result_path)
+    data_set.fill_sweep_responses(0.0)
+    for sweep in data_set.get_sweep_numbers():
+        data_set.set_spike_times(sweep, [])
+
+
 def save_nwb(output_path, v, sweep):
     '''Save a single voltage output result into an existing sweep in a NWB file.
     This is intended to overwrite a recorded trace with a simulated voltage.
@@ -109,6 +126,23 @@ def save_nwb(output_path, v, sweep):
         which entry to overwrite in the file.
     '''
     output = NwbDataSet(output_path)
+    output.set_sweep(sweep, None, v)
+
+
+def save_orca(output_path, v, sweep):
+    '''Save a single voltage output result into an existing sweep in a NWB file.
+    This is intended to overwrite a recorded trace with a simulated voltage.
+    
+    Parameters
+    ----------
+    output_path : string
+        file name of a pre-existing NWB file.
+    v : numpy array
+        voltage
+    sweep : integer
+        which entry to overwrite in the file.
+    '''
+    output = OrcaDataSet(output_path)
     output.set_sweep(sweep, None, v)
 
 
