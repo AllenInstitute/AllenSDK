@@ -648,7 +648,7 @@ var _pHeaderLinks = new Object();
 //****************************************
 var _pFooterLinks = [];
 _pFooterLinks["pPrivacyPolicy"] = "http://www.alleninstitute.org/Media/policies/privacy_policy_content.html";
-_pFooterLinks["pTermsOfUse"] = "http://www.alleninstitute.org/Media/policies/terms_of_use_content.html";
+_pFooterLinks["pTermsOfUse"] = "https://github.com/AllenInstitute/AllenSDK/blob/master/COPYING";
 _pFooterLinks["pCitationPolicy"] = "http://www.alleninstitute.org/Media/policies/citation_policy_content.html";
 _pFooterLinks["pAbout"] = "http://www.alleninstitute.org/about_us/overview.html";
 _pFooterLinks["pContactUs"] = "http://www.alleninstitute.org/contact_us/index.html";

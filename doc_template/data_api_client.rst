@@ -25,7 +25,7 @@ For example, to download gene metadata from the API, first create gene_acronym_q
 
     from allensdk.api.api import Api
     
-    def GeneAcronymQuery(Api):
+    class GeneAcronymQuery(Api):
         def __init__(self):
             super(GeneAcronymQuery, self).__init__()
             
