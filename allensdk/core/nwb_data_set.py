@@ -84,8 +84,8 @@ class NwbDataSet(object):
             
             # only return data up to the end of the experiment -- ignore everything else
             return  {
-                'stimulus': stimulus[sweep_index_range[0]:experiment_index_range[1]+1],
-                'response': response[sweep_index_range[0]:experiment_index_range[1]+1],
+                'stimulus': stimulus,
+                'response': response,
                 'index_range': experiment_index_range,
                 'sampling_rate': 1.0 * swp['stimulus']['timeseries']['starting_time'].attrs['rate']
             }
