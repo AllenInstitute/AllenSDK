@@ -287,8 +287,8 @@ class MouseConnectivityApi(Api):
             The coordinates of a point in 3-D SectionDataSet space.
         transgenic_lines : list of integers or strings, optional
             Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
-        section_data_set : integer, optional
-            Id to filter the results.
+        section_data_sets : list of integers, optional
+            Ids to filter the results.
         injection_structures : list of integers or strings, optional
             Integer Structure.id or String Structure.acronym.
         primary_structure_only : boolean, optional
@@ -604,10 +604,40 @@ class MouseConnectivityApi(Api):
             save_file_path = str(data_set_id) + '.zip'
             
         self.retrieve_file_over_http(well_known_file_url, save_file_path)
-
-
-
-
+    
+    
+    def get_projection_grid(self, **kwargs):
+        data = self.do_query(self.build_projection_grid_search_url,
+                             self.read_response,
+                             **kwargs)
+        
+        return data
+    
+    
+    def get_projection_grid_spatial(self, **kwargs):
+        data = self.do_query(self.build_projection_grid_spatial_search_url,
+                             self.read_response,
+                             **kwargs)
+        
+        return data
+    
+    
+    def get_projection_grid_injection_coordinate(self, **kwargs):
+        data = self.do_query(self.build_projection_grid_injection_coordinate_search_url,
+                             self.read_response,
+                             **kwargs)
+        
+        return data
+    
+    
+    def get_projection_grid_injection_correlation(self, **kwargs):
+        data = self.do_query(self.build_projection_grid_injection_correlation_search_url,
+                             self.read_response,
+                             **kwargs)
+        
+        return data
+    
+    
 if __name__ == '__main__':
     import nrrd
     import numpy as np
