@@ -89,17 +89,21 @@ class OntologiesApi(Api):
     def build_structure_query(self, graph_id):
         rma = RmaApi()
         
+        tabular_string = ','.join(['structures.id',
+                                   'structures.parent_structure_id',
+                                   'structures.acronym',
+                                   'structures.graph_order',
+                                   'structures.color_hex_triplet',
+                                   'structures.structure_id_path',
+                                   'structures.name'])
+        
         # q = 'model::Structure[graph_id$eq1],rma::options[order$eqstructures.graph_order]&tabular=structures.id,structures.acronym,structures.graph_order,structures.color_hex_triplet,structures.structure_id_path,structures.name&start_row=0&num_rows=all'
         structure_model_stage = rma.model_stage('Structure',
                                                 include=['[graph_id$eq%d]' % (graph_id)],
                                                 order=['structures.graph_order'],
-                                                tabular=['structures.id',
-                                                         'structures.acronym',
-                                                         'structures.graph_order',
-                                                         'structures.color_hex_triplet',
-                                                         'structures.structure_id_path',
-                                                         'structures.name'],
-                                                num_rows='all')
+                                                tabular=[tabular_string],
+                                                num_rows='all',
+                                                count=False)
         
         return rma.build_query_url(structure_model_stage)
 
