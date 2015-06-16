@@ -53,9 +53,9 @@ class OntologiesApi(Api):
         associations = []
         
         if atlas_id != None:
-            associations.append('[id$eq%d]' % (atlas_id))
+            associations.append('[id$eq%d],' % (atlas_id))
         
-        associations.extend([',structure_graph(ontology),',
+        associations.extend(['structure_graph(ontology),',
                              'graphic_group_labels'])
         
         associations_string = ''.join(associations)
@@ -85,6 +85,24 @@ class OntologiesApi(Api):
         
         return rma.build_query_url(atlas_model_stage)
     
+    
+    def build_structure_query(self, graph_id):
+        rma = RmaApi()
+        
+        # q = 'model::Structure[graph_id$eq1],rma::options[order$eqstructures.graph_order]&tabular=structures.id,structures.acronym,structures.graph_order,structures.color_hex_triplet,structures.structure_id_path,structures.name&start_row=0&num_rows=all'
+        structure_model_stage = rma.model_stage('Structure',
+                                                include=['[graph_id$eq%d]' % (graph_id)],
+                                                order=['structures.graph_order'],
+                                                tabular=['structures.id',
+                                                         'structures.acronym',
+                                                         'structures.graph_order',
+                                                         'structures.color_hex_triplet',
+                                                         'structures.structure_id_path',
+                                                         'structures.name'],
+                                                num_rows='all')
+        
+        return rma.build_query_url(structure_model_stage)
+
     
     def read_data(self, parsed_json):
         '''Return the list of cells from the parsed query.
@@ -118,12 +136,20 @@ class OntologiesApi(Api):
                             brief)
         
         return data
-
+    
     
     def get_ontology(self, structure_graph_id):
         '''Retrieve.'''
         data = self.do_query(self.build_query,
                                    self.read_data)
+        
+        return data
+    
+    
+    def get_structures(self, structure_graph_id):
+        data = self.do_query(self.build_structure_query,
+                             self.read_data,
+                             structure_graph_id)
         
         return data
 

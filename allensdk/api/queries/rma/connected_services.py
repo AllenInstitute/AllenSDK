@@ -38,7 +38,7 @@ class ConnectedServices(object):
         rma = RmaApi()
         fmt = kwargs.get('fmt', 'json')
         
-        schema_entry = ConnectedServices.schema[service_name]
+        schema_entry = ConnectedServices._schema[service_name]
         
         params = []
         

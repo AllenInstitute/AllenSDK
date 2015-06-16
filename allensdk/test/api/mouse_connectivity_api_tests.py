@@ -1,6 +1,3 @@
-from allensdk.api.queries.annotated_section_data_sets.annotated_section_data_sets_api import \
-    AnnotatedSectionDataSetsApi
-
 import unittest, json
 from mock import patch, mock_open
 from allensdk.api.queries.connectivity.mouse_connectivity_api import MouseConnectivityApi

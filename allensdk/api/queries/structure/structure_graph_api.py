@@ -20,7 +20,9 @@ class StructureGraphApi(Api):
         super(StructureGraphApi, self).__init__(base_uri)
     
     
-    def build_query(self, structure_graph_id, fmt='json'):
+    def build_structure_graph_query(self,
+                                    structure_graph_id,
+                                    fmt='json'):
         '''Build the URL that will fetch meta data for the specified structure graph.
         
         Parameters
@@ -57,6 +59,8 @@ class StructureGraphApi(Api):
     
     def get_structure_graph_by_id(self, structure_graph_id):
         '''Retrieve the structure graph data.'''
-        graph_data = self.do_query(self.build_query, self.read_graph, structure_graph_id)
+        graph_data = self.do_query(self.build_structure_graph_query,
+                                   self.read_graph,
+                                   structure_graph_id)
         
         return graph_data
