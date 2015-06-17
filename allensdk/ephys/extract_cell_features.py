@@ -83,7 +83,6 @@ def analyze_long_squares(sweep_numbers, nwb_file):
     rheo_n_spikes = 1e12
     rheo_sweep_num = -1
 
-    print sweep_numbers
     for sweep_number in sorted(sweep_numbers):
 
         sweep_info = {}
@@ -98,8 +97,6 @@ def analyze_long_squares(sweep_numbers, nwb_file):
                                   "long_square")
 
         n_spikes = features.feature_list[-1].mean['n_spikes']
-
-        print sweep_number, n_spikes
 
 
         steady_interval_start_idx = np.nonzero(t >= sweep_info['stim_start'] + sweep_info['stim_dur'] - 0.1)[0][0]
@@ -126,7 +123,6 @@ def analyze_long_squares(sweep_numbers, nwb_file):
                                           'base_vm': float(features.feature_list[-1].mean['base_v'])
                                           })
         elif sweep_info['stim_amp'] < rheo_amp:
-            print "proposing rheo sweep:",sweep_info,n_spikes
             # there are spikes, and the stimulus amplitude 
             # is lower than the current rheobase amplitude
             rheo_n_spikes = n_spikes
