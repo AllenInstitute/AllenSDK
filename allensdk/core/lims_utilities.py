@@ -62,3 +62,14 @@ def append_well_known_file(wkfs, path, wkf_type_id=None, content_type=None):
 
     wkfs.append(record)
 
+def connect(user="limsreader", host="limsdb2", database="lims2", password="limsro"):
+    import pg8000
+
+    conn = pg8000.connect(user=user, host=host, database=database, password=password)
+    return conn.cursor()
+
+def select(cursor, query):
+    cursor.execute(query)
+    columns = [ d[0] for d in cursor.description ]
+    return [ dict(zip(columns, c)) for c in cursor.fetchall() ]
+
