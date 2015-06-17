@@ -34,6 +34,8 @@ def get_well_known_files_by_name(wkfs, filename):
     if len(out) == 0:
         raise IOError("Could not find well known files with name %s." % filename)
 
+    return out
+
 def get_well_known_file_by_name(wkfs, filename):
     out = get_well_known_files_by_name(wkfs, filename)
 
