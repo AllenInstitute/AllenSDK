@@ -3,7 +3,9 @@ matplotlib.use('agg')
 
 import allensdk.core.lims_utilities as lims_utilities
 import allensdk.core.json_utilities as json_utilities
+
 from allensdk.core.nwb_data_set import NwbDataSet
+from allensdk.ephys.extract_cell_features import get_ramp_stim_characteristics, get_square_stim_characteristics, exp_curve, fit_membrane_tau
 
 import sys
 import argparse
@@ -35,7 +37,7 @@ def plot_single_ap_values(nwb_file, sweeps, features, type_name, figsize):
     cw_general = features["specimens"][0]["ephys_features"][0]
     v, i, t = load_experiment(nwb_file, int(sweeps[0]["sweep_num"]))
     if type_name == "short_square" or type_name == "long_square":
-        stim_start, stim_dur, stim_amp, start_idx, end_idx = get_step_stim_characteristics(i, t)
+        stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
     elif type_name == "ramp":
         stim_start, start_idx = get_ramp_stim_characteristics(i, t)
 
@@ -126,48 +128,6 @@ def plot_single_ap_values(nwb_file, sweeps, features, type_name, figsize):
 
     return figs
 
-def get_step_stim_characteristics(i, t):
-    # Assumes that there is a test pulse followed by the stimulus step
-    di = np.diff(i)
-    up_idx = np.flatnonzero(di > 0)
-    down_idx = np.flatnonzero(di < 0)
-    
-    # second step is the stimulus
-    if up_idx[1] < down_idx[1]: # positive step
-        start_idx = up_idx[1] + 1 # shift by one to compensate for diff()
-        end_idx = down_idx[1] + 1
-    else: # negative step
-        start_idx = down_idx[1] + 1
-        end_idx = up_idx[1] + 1
-    stim_start = float(t[start_idx])
-    stim_dur = float(t[end_idx] - t[start_idx])
-    stim_amp = float(i[start_idx])
-    return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
-
-def get_ramp_stim_characteristics(i, t):
-    # Assumes that there is a test pulse followed by the stimulus ramp
-    di = np.diff(i)
-    up_idx = np.flatnonzero(di > 0)
-    
-    start_idx = up_idx[1] + 1 # shift by one to compensate for diff()
-    return (t[start_idx], start_idx)
-    
-def fit_membrane_tau(v, t, start_idx, peak_idx):
-    # fit from 10% up to peak
-    if v[start_idx] > v[peak_idx]:
-        tenpct_idx = np.where(v[start_idx:peak_idx] <= 0.1 * (v[peak_idx] - v[start_idx]) + v[start_idx])[0][0] + start_idx
-    else:
-        tenpct_idx = np.where(v[start_idx:peak_idx] >= 0.1 * (v[peak_idx] - v[start_idx]) + v[start_idx])[0][0] + start_idx
-
-    guess = [v[tenpct_idx] - v[peak_idx], 50., v[peak_idx]]
-    try:
-        popt, pcov = curve_fit(exp_curve, t[tenpct_idx:peak_idx].astype(np.float64) - t[tenpct_idx], v[tenpct_idx:peak_idx].astype(np.float64), p0=guess)
-    except RuntimeError:
-        return (np.nan, [np.nan, np.nan, np.nan])
-    return (tenpct_idx, popt) # seconds
-
-def exp_curve(x, a, inv_tau, y0):
-    return y0 + a * np.exp(-inv_tau * x)
 
 def plot_qc_figures(nwb_file, features, image_dir, figsize, suffix):
     image_files = {}
@@ -238,7 +198,7 @@ def plot_qc_figures(nwb_file, features, image_dir, figsize, suffix):
             if max_y < ylims[1]:
                 max_y = ylims[1]
 
-        stim_start, stim_dur, stim_amp, start_idx, end_idx = get_step_stim_characteristics(i, t)
+        stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
         plt.xlim(stim_start - 0.05, stim_start + stim_dur + 0.05)
         plt.scatter([subthresh_dict[s]['peak_t']], [subthresh_dict[s]['peak']], color='red', zorder=10)
         peak_idx = subthresh_dict[s]['peak_idx']
@@ -331,7 +291,7 @@ def plot_qc_figures(nwb_file, features, image_dir, figsize, suffix):
     plt.figure(figsize=(figsize * 2, figsize))
     v, i, t = load_experiment(nwb_file, int(cw_general["thumbnail_sweep_num"]))
     plt.plot(t, v, color='black')
-    stim_start, stim_dur, stim_amp, start_idx, end_idx = get_step_stim_characteristics(i, t)
+    stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
     plt.xlim(stim_start - 0.05, stim_start + stim_dur + 0.05)
     plt.ylim(-110, 50)
     spike_times = [spk['t'] for spk in features["specimens"][0]["sweep_ephys_features"][str(cw_general["thumbnail_sweep_num"])]["mean"]["spikes"]]
@@ -397,7 +357,7 @@ def plot_qc_figures(nwb_file, features, image_dir, figsize, suffix):
     rheo_hero_x = []
     for s in rheo_hero_sweeps:
         v, i, t = load_experiment(nwb_file, s)
-        stim_start, stim_dur, stim_amp, start_idx, end_idx = get_step_stim_characteristics(i, t)
+        stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
         rheo_hero_x.append(stim_amp)
     rheo_hero_y = [len(features["specimens"][0]["sweep_ephys_features"][str(s)]["mean"]["spikes"]) for s in rheo_hero_sweeps]
     plt.scatter(rheo_hero_x, rheo_hero_y, zorder=20)
@@ -412,7 +372,7 @@ def plot_qc_figures(nwb_file, features, image_dir, figsize, suffix):
     for d in cw_detail["long_squares"]["subthresh"]:
         if d['peak'] == cw_general["vm_for_sag"]:
             v, i, t = load_experiment(nwb_file, int(d['sweep_num']))
-            stim_start, stim_dur, stim_amp, start_idx, end_idx = get_step_stim_characteristics(i, t)
+            stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
             plt.plot(t, v, color='black')
             plt.scatter(d['peak_t'], d['peak'], color='red', zorder=10)
             plt.plot([stim_start + stim_dur - 0.1, stim_start + stim_dur], [d['steady'], d['steady']], color='red', zorder=10)
