@@ -468,6 +468,10 @@ def cellwide_tau(subthresh_data):
     return taus.mean()
 
 def calculate_membrane_tau(v, t, start_idx, peak_idx):
+    tenpct_idx, popt = fit_membrane_tau(v, t, start_idx, peak_idx)
+    return 1.0 / popt[1] # seconds
+    
+def fit_membrane_tau(v, t, start_idx, peak_idx):
     try:
         # fit from 10% up to peak
         if v[start_idx] > v[peak_idx]:
@@ -479,11 +483,12 @@ def calculate_membrane_tau(v, t, start_idx, peak_idx):
         try:
             popt, pcov = curve_fit(exp_curve, t[tenpct_idx:peak_idx].astype(np.float64) - t[tenpct_idx], v[tenpct_idx:peak_idx].astype(np.float64), p0=guess)
         except RuntimeError:
-            return np.nan
-        return 1 / popt[1] # seconds
+            logging.error("Curve fit for membrane tau failed.")
+            return (np.nan, [np.nan, np.nan, np.nan])
+        return (tenpct_idx, popt)
     except IndexError:
         logging.error("Index error occurred calculating tau. Aborting calculation")
-        return np.nan
+        return (np.nan, [np.nan, np.nan, np.nan])
     
 def exp_curve(x, a, inv_tau, y0):
     return y0 + a * np.exp(-inv_tau * x)
