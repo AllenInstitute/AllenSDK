@@ -102,18 +102,12 @@ def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_
 
     logging.debug("total sweep time %f" % ( time.time() - sweep_start_time ))
 
-def simulate_neuron(neuron, sweeps, input_file_name, output_file_name, spike_cut_value):
+def simulate_neuron(neuron, sweep_numbers, input_file_name, output_file_name, spike_cut_value):
 
     start_time = time.time()
 
-    for sweep in sweeps:
-        sweep_type = sweep['stimulus_name']
-
-        if sweep_type == 'Test':
-            logging.debug("skipping sweep %d with type %s" % (sweep['sweep_number'], sweep_type))
-            continue
-
-        simulate_sweep_from_file(neuron, sweep['sweep_number'], input_file_name, output_file_name, spike_cut_value)
+    for sweep_number in sweep_numbers:
+        simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_name, spike_cut_value)
                  
     logging.debug("total elapsed time %f" % (time.time() - start_time))    
 
@@ -162,7 +156,10 @@ def main():
 
     neuron = GlifNeuron.from_dict(neuron_config)
 
-    simulate_neuron(neuron, sweeps, ephys_file, output_ephys_file, args.spike_cut_value) 
+    # filter out test sweeps
+    sweep_numbers = [ s['sweep_number'] for s in sweeps if s['stimulus_name'] != 'Test' ]
+
+    simulate_neuron(neuron, sweep_numbers, ephys_file, output_ephys_file, args.spike_cut_value) 
 
 
 
