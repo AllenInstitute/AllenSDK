@@ -16,6 +16,7 @@
 from allensdk.api.api import Api
 from allensdk.api.queries.rma.rma_api import RmaApi
 from allensdk.api.queries.rma.connected_services import ConnectedServices
+import pandas as pd
 
 class MouseConnectivityApi(Api):
     '''HTTP Client for the Allen Mouse Brain Connectivity Atlas.
@@ -66,6 +67,65 @@ class MouseConnectivityApi(Api):
                        '))'])
         
         return url
+    
+    
+    def build_manual_injection_summary_url(self, experiment_id, fmt='json'):
+        '''Construct a query for summary table for one experiment.
+        
+        Parameters
+        ----------
+        fmt : string, optional
+            json (default) or xml
+        
+        Returns
+        -------
+        url : string
+            The constructed URL
+        
+         Notes
+         -----
+         Based on the connectivity application detail page.
+        '''
+        rma = RmaApi()
+        model_stage = \
+            rma.model_stage(
+                model='SectionDataSet',
+                criteria='[id$in%d]' % (experiment_id),
+                include=['specimen(donor(transgenic_mouse(transgenic_lines)),',
+                         'injections(structure,age)),',
+                         'equalization,products'],
+                only=['id',
+                      'failed',
+                      'storage_directory',
+                      'red_lower',
+                      'red_upper',
+                      'green_lower',
+                      'green_upper',
+                      'blue_lower',
+                      'blue_upper',
+                      'products.id',
+                      'specimen_id',
+                      'structure_id',
+                      'reference_space_id',
+                      'primary_injection_structure_id',
+                      'registration_point',
+                      'coordinates_ap',
+                      'coordinates_dv',
+                      'coordinates_ml',
+                      'angle',
+                      'sex',
+                      'strain',
+                      'injection_materials',
+                      'acronym',
+                      'structures.name',
+                      'days',
+                      'transgenic_mice.name',
+                      'transgenic_lines.name',
+                      'transgenic_lines.description',
+                      'transgenic_lines.id',
+                      'donors.id'])
+    
+        return rma.build_query_url(model_stage)
     
     
     def build_detail_query(self, experiment_id, fmt='json'):
@@ -232,6 +292,8 @@ class MouseConnectivityApi(Api):
                        criteria_clause,
                        include_clause,
                        options_clause])
+        
+        return url
     
     
     def build_projection_grid_search_url(self, **kwargs):
@@ -404,8 +466,17 @@ class MouseConnectivityApi(Api):
         return data
     
     
+    def get_manual_injection_summary(self, experiment_id):
+        '''Retrieve manual injection summary.'''
+        data = self.do_query(self.build_manual_injection_summary_url,
+                             self.read_response,
+                             experiment_id)
+        
+        return data
+    
+    
     def get_experiment_detail(self, experiment_id):
-        '''Retrieve the experimants data.'''
+        '''Retrieve the experiments data.'''
         data = self.do_query(self.build_detail_query,
                              self.read_response,
                              experiment_id)
@@ -607,6 +678,37 @@ class MouseConnectivityApi(Api):
     
     
     def get_projection_grid(self, **kwargs):
+        '''Search over the whole projection signal statistics dataset
+        to find experiments with specific projection profiles.
+        
+        Parameters
+        ----------
+        injection_structures : list of integers or strings
+            Integer Structure.id or String Structure.acronym.
+        target_domain : list of integers or strings, optional
+            Integer Structure.id or String Structure.acronym.
+        injection_hemisphere : string, optional
+            'right' or 'left', Defaults to both hemispheres.
+        target_hemisphere : string, optional
+            'right' or 'left', Defaults to both hemispheres.
+        transgenic_lines : list of integers or strings, optional
+             Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
+        injection_domain : list of integers or strings, optional
+             Integer Structure.id or String Structure.acronym.
+        primary_structure_only : boolean, optional
+        start_row : integer, optional
+            For paging purposes. Defaults to 0.
+        num_rows : integer, optional
+            For paging purposes. Defaults to 2000.
+        
+        Notes
+        -----
+        See `Source Search <http://help.brain-map.org/display/mouseconnectivity/API#API-SourceSearch>`_,
+        `Target Search <http://help.brain-map.org/display/mouseconnectivity/API#API-TargetSearch>`_,
+        and 
+        `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
+        
+        '''
         data = self.do_query(self.build_projection_grid_search_url,
                              self.read_response,
                              **kwargs)

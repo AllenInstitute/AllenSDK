@@ -29,6 +29,7 @@ class RmaApi(Api):
     NUM_ROWS='num_rows'
     ALL='all'
     START_ROW='start_row'
+    COUNT='count'
     ONLY='only'
     EXCEPT='except'
     TABULAR='tabular'
@@ -155,7 +156,18 @@ class RmaApi(Api):
     
     
     def options_clause(self, **kwargs):
-        '''
+        '''build rma:: options clause.
+        
+        Parameters
+        ----------
+        only : list of strings, optional
+        except : list of strings, optional
+        tabular : list of string, optional
+        count : boolean, optional
+        debug : string, optional
+            'true', 'false' or 'preview'
+        num_rows : int or string, optional
+        start_row : int or string, optional
         '''
         clause = ''
         options_params = []

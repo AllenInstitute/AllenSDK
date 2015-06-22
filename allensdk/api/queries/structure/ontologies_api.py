@@ -15,6 +15,7 @@
 
 from allensdk.api.api import Api
 from allensdk.api.queries.rma.rma_api import RmaApi
+import pandas as pd
 
 class OntologiesApi(Api):
     '''
@@ -89,20 +90,86 @@ class OntologiesApi(Api):
     def build_structure_query(self, graph_id):
         rma = RmaApi()
         
+        only_string = ','.join(['structures.id',
+                                'structures.parent_structure_id',
+                                'structures.acronym',
+                                'structures.graph_order',
+                                'structures.color_hex_triplet',
+                                'structures.structure_id_path',
+                                'structures.name'])
+        
         # q = 'model::Structure[graph_id$eq1],rma::options[order$eqstructures.graph_order]&tabular=structures.id,structures.acronym,structures.graph_order,structures.color_hex_triplet,structures.structure_id_path,structures.name&start_row=0&num_rows=all'
         structure_model_stage = rma.model_stage('Structure',
                                                 include=['[graph_id$eq%d]' % (graph_id)],
                                                 order=['structures.graph_order'],
-                                                tabular=['structures.id',
-                                                         'structures.acronym',
-                                                         'structures.graph_order',
-                                                         'structures.color_hex_triplet',
-                                                         'structures.structure_id_path',
-                                                         'structures.name'],
-                                                num_rows='all')
+                                                only=[only_string],
+                                                num_rows='all',
+                                                count=False)
         
         return rma.build_query_url(structure_model_stage)
-
+    
+    
+    def build_structure_set_query(self, structure_set_id=None, fmt='json'):
+        '''Build the URL to structures in a particular structure set.
+        
+        Parameters
+        ----------
+        structure_set_id : integer
+        fmt : string, optional
+            json (default) or xml
+        
+        Returns
+        -------
+        url : string
+            The constructed URL
+        '''
+        rma = RmaApi()
+        
+        criteria = ['structure_sets[id$in%d]' % (structure_set_id) ]
+        
+        only_string = ','.join(['structures.id',
+                                'structures.parent_structure_id',
+                                'structures.acronym',
+                                'structures.graph_order',
+                                'structures.color_hex_triplet',
+                                'structures.structure_id_path',
+                                'structures.name'])
+        
+        model_stage = rma.model_stage('Structure',
+                                      criteria=criteria,
+                                      order=['structures.graph_order'],
+                                      num_rows='all',
+                                      only=[only_string],
+                                      count=False)
+        
+        return rma.build_query_url(model_stage)
+    
+    
+    def build_structure_graph_query(self,
+                                    structure_graph_id,
+                                    fmt='json'):
+        '''Build the URL that will fetch meta data for the specified structure graph.
+        
+        Parameters
+        ----------
+        structure_graph_id : integer
+            what to retrieve
+        fmt : string, optional
+            json (default) or xml
+        
+        Returns
+        -------
+        url : string
+            The constructed URL
+        '''
+        url = ''.join([self.structure_graph_endpoint,
+                       '/',
+                       str(structure_graph_id),
+                       '.',
+                       fmt])
+        
+        return url
+    
     
     def read_data(self, parsed_json):
         '''Return the list of cells from the parsed query.
@@ -152,6 +219,33 @@ class OntologiesApi(Api):
                              structure_graph_id)
         
         return data
+    
+    
+    def get_structure_graph_by_id(self, structure_graph_id):
+        '''Retrieve the structure graph data.'''
+        graph_data = self.do_query(self.build_structure_graph_query,
+                                   self.read_data,
+                                   structure_graph_id)
+        
+        return graph_data
+    
+    
+    def get_structure_set(self, structure_set_id):
+        '''Retrieve the structure set structures.'''
+        graph_data = self.do_query(self.build_structure_set_query,
+                                   self.read_data,
+                                   structure_set_id)
+        
+        return graph_data
+    
+    
+    def unpack_structure_set_ancestors(self, structure_dataframe):
+        ancestors = structure_dataframe['structure_id_path'].apply(
+            lambda e: [int(a) for a in e.split('/')[1:-1]])
+        structure_ancestors = [
+            [n for n in ancestors_n] for ancestors_n in ancestors
+        ]
+        structure_dataframe['structure_set_ancestor'] = structure_ancestors
 
 
 if __name__ == '__main__':
