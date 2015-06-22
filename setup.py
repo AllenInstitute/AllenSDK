@@ -26,7 +26,7 @@ setup(
     package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', 'bps'] },
     description = 'core libraries for the allensdk.',
     requires = ['h5py',
-                'argparse',
+                'pandas',
                 'six',
                 'pynrrd'],
     tests_require=['nose>=1.2.1',
