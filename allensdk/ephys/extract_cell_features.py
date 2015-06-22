@@ -83,7 +83,8 @@ def analyze_long_squares(sweep_numbers, nwb_file):
     rheo_n_spikes = 1e12
     rheo_sweep_num = -1
 
-    for sweep_number in sorted(sweep_numbers):
+    sweep_numbers = sorted(sweep_numbers)
+    for sweep_number in sweep_numbers:
 
         sweep_info = {}
         sweep_info['sweep_num'] = sweep_number
@@ -175,7 +176,7 @@ def analyze_long_squares(sweep_numbers, nwb_file):
         rheo_idx = [ i for i,sn in enumerate(sweep_numbers) if sn == rheo_sweep_num ][0]
 
         ft = features.feature_list[rheo_idx].mean
-        
+
         v, i, t = get_sweep_from_nwb(nwb_file, rheo_sweep_num)
         
         # Average all spikes
