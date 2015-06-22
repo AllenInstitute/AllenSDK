@@ -4,6 +4,7 @@ HDF5_FILE_TYPE_ID = 306905526
 NWB_FILE_TYPE_ID = 475137571
 METHOD_CONFIG_FILE_TYPE_ID = 324440685
 MODEL_PARAMETERS_FILE_TYPE_ID = 329230374
+BIOPHYS_MODEL_PARAMETERS_FILE_TYPE_ID = 329230374
 
 def get_well_known_files_by_type(wkfs, wkf_type_id):
     out = [ os.path.join( wkf['storage_directory'], wkf['filename'] )
