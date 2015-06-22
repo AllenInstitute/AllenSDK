@@ -1,0 +1,603 @@
+{
+  "TimeSeries" :
+  {
+    "TimeSeries" :
+    {
+      "_datatype" : "timeseries",
+      "_description" : "General time series object",
+      "[]" :
+      {
+        "_datatype" : "unrestricted",
+        "_description" : "Custom field",
+        "_include" : "optional",
+        "_attributes" : 
+        {
+          "neurodata_type" :
+          {
+            "_datatype" : "str",
+            "_description" : "Custom field",
+            "_value" : "Custom",
+            "_include" : "mandatory"
+          }
+        }
+      },
+      "data" :
+      {
+        "_datatype" : "unrestricted",
+        "_description" : "Array of values (inc array of arrays) for time series",
+        "_include" : "mandatory",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_description" : "Core unit (SI if possible) of values stored in 'data'",
+            "_include" : "mandatory"
+          },
+          "conversion" : 
+          {
+            "_datatype" : "f4",
+            "_description" : "Multiplicative value required to convert element in 'data' to unit described in 'units'",
+            "_include" : "mandatory"
+          },
+          "resolution" :
+          {
+            "_datatype" : "f4",
+            "_description" : "Minimum meaningful difference between possible values in 'data'. E.g., magnitude of least significant bit before AD conversion. Value in units of 'units'",
+            "_include" : "mandatory"
+          }
+        }
+      },
+      "num_samples" : 
+      {
+        "_datatype" : "int32",
+        "_description" : "Number of samples stored in the time series. This can be less than the length of 'data'",
+        "_include" : "mandatory"
+      },
+      "timestamps" : 
+      {
+        "_datatype" : "f8",
+        "_description" : "Timestamps (in seconds) for elements in 'data'",
+        "_include" : "mandatory",
+        "_alternative" : "starting_time",
+        "_attributes" : 
+        {
+          "t_interval" : 
+          {
+            "_datatype" : "int32",
+            "_description" : "Number of entries in 'data' stored between each timestamp. Presently this must be '1' (ie, there's a timestamp for each data point)",
+            "_include" : "mandatory",
+			"_value" : 1
+          }
+        }
+      },
+      "starting_time" : 
+      {
+        "_datatype" : "f8",
+        "_description" : "Starting time of data plus sampling rate",
+        "_include" : "mandatory",
+        "_alternative" : "timestamps",
+        "_attributes" : 
+        {
+          "rate" : 
+          {
+            "_datatype" : "f4",
+            "_description" : "Sampling rate (Hz) of data stored in time series",
+            "_include" : "mandatory"
+          },
+          "units" : 
+          {
+            "_datatype" : "str",
+            "_description" : "Sampling or presentation rate (Hz) of data stored in time series",
+            "_include" : "mandatory",
+            "_value" : "Seconds (all neurodata timestamps are in seconds)"
+          }
+        }
+      },
+      "sync" : 
+      {
+        "_datatype" : "group",
+        "_description" : "Storage for time (arbitrary format) coming from hardware device, before it is converted to common time base for 'timestamps' or 'starting_time'",
+        "_include" : "optional"
+      },
+      "_attributes" :
+      {
+        "neurodata_type" : 
+        {
+          "_datatype" : "str",
+          "_description" : "Label to identify this group as a time series",
+          "_include" : "mandatory",
+          "_value" : "TimeSeries"
+        },
+        "missing_fields" :
+        {
+          "_datatype" : "str",
+          "_description" : "List of required fields in time series that are missing. Only present if fields are missing",
+          "_include" : "optional"
+        },
+        "timestamps_link" :
+        {
+          "_datatype" : "str",
+          "_description" : "List of all time series (paths) that have HDF5 links to the 'timestamps' field",
+          "_include" : "optional"
+        },
+        "data_link" :
+        {
+          "_datatype" : "str",
+          "_description" : "List of all time series (paths) that have HDF5 links to the 'data' field",
+          "_include" : "optional"
+        },
+        "data_softlink" :
+        {
+          "_datatype" : "str",
+          "_description" : "List of all time series (paths) that have soft HDF5 links to the 'data' field",
+          "_include" : "optional"
+        },
+        "ancestry" : 
+        {
+          "_datatype" : "str",
+          "_description" : "List of required fields in time series that are missing. Only present if fields are missing",
+          "_include" : "mandatory"
+        },
+        "description" :
+        {
+          "_datatype" : "str",
+          "_description" : "Description of time series, preferably in human-readable str",
+          "_include" : "mandatory",
+          "_value" : ""
+        },
+        "comments" :
+        {
+          "_datatype" : "str",
+          "_description" : "Additional comments about time series, preferably in human-readable str",
+          "_include" : "mandatory",
+          "_value" : ""
+        },
+        "help" :
+        {
+          "_datatype" : "str",
+          "_description" : "Description of the time series, populated by the _description field",
+          "_include" : "mandatory"
+        },
+        "source" :
+        {
+          "_datatype" : "str",
+          "_description" : "Name (path) of the time series or module that serves as a source for the data stored here.  This can also be the name of a device",
+          "_include" : "mandatory",
+          "_value" : ""
+        }
+      }
+    },
+
+    "AnnotationSeries" : 
+    {
+      "_superclass" : "TimeSeries",
+      "_description" : "Time-stamped annotations about an experiment",
+      "data" :
+      {
+        "_datatype" : "str",
+        "_description" : "Array of annotation strings (e.g., about an experimental event)",
+		"_attributes" :
+		{
+			"units" : { "_value" : "n/a" },
+			"conversion" : { "_value" : "0" },
+			"resolution" : { "_value" : "0" }
+		}
+      }
+    },
+
+    "IntervalSeries" : 
+    {
+      "_superclass" : "TimeSeries",
+      "_description" : "Stores the start and stop times for events",
+      "data" :
+      {
+        "_datatype" : "int8",
+        "_description" : "Interval start and stop times -- positive value (+1) means interval start, negative (-1) is end)"
+      }
+    },
+
+    "PatchClampSeries" : 
+    {
+      "_superclass" : "TimeSeries",
+      "_description" : "Superclass definition for patch-clamp data (this class should not be instantiated directly)",
+      "electrode_name" :
+      {
+        "_datatype" : "str",
+        "_description" : "Name of folder in /general/intracellular_ephys containing electrode description",
+        "_include" : "mandatory",
+        "_linkto" : "/general/intracellular_ephys"
+      }
+    },
+    "VoltageClampSeries" :
+    {
+      "_superclass" : "PatchClampSeries",
+      "_description" : "Current recorded from cell during voltage-clamp recording",
+      "gain" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Volt/Amp"
+          }
+        }
+      },
+      "capacitance_fast" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Farads"
+          }
+        }
+      },
+      "capacitance_slow" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Farads"
+          }
+        }
+      },
+      "resistance_comp_bandwidth" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Hz"
+          }
+        }
+      },
+      "resistance_comp_correction" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "percent"
+          }
+        }
+      },
+      "resistance_comp_prediction" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "percent"
+          }
+        }
+      },
+      "whole_cell_capacitance_comp" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Farads"
+          }
+        }
+      },
+      "whole_cell_series_resistance_comp" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Ohms"
+          }
+        }
+      }
+    },
+    "CurrentClampSeries" :
+    {
+      "_superclass" : "PatchClampSeries",
+      "_description" : "Voltage recorded from cell during current-clamp recording",
+      "bias_current" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Amps"
+          }
+        }
+      },
+      "bridge_balance" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Ohms"
+          }
+        }
+      },
+      "capacitance_compensation" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Farads"
+          }
+        }
+      },
+      "resistance_compensation" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Ohms"
+          }
+        }
+      },
+      "gain" :
+      {
+        "_datatype" : "f4",
+        "_description" : "",
+        "_include" : "required",
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Volt/Volt"
+          }
+        }
+      }
+    },
+    "VoltageClampStimulusSeries" :
+    {
+      "_superclass" : "PatchClampSeries",
+      "_description" : "Stimulus voltage applied during voltage clamp recording"
+    },
+    "CurrentClampStimulusSeries" :
+    {
+      "_superclass" : "PatchClampSeries",
+      "_description" : "Stimulus current applied during current clamp recording"
+    },
+    "AbstractFeatureSeries" :
+    {
+        "_superclass" : "TimeSeries",
+        "_description" : "Features of an applied stimulus. This is useful when storing the raw stimulus is impractical",
+      "data" :
+      {
+      "_datatype" : "f4"
+      },
+      "features" :
+      {
+          "_datatype" : "str",
+          "_description" : "Text description of each feature",
+          "_include" : "madatory"
+      },
+      "feature_units" :
+      {
+          "_datatype" : "str",
+          "_description" : "Units of each feature",
+          "_include" : "madatory"
+      }
+    },
+    "ElectricalSeries" :
+    {
+      "_superclass" : "TimeSeries",
+      "_description" : "Stores acquired voltage data from extracellular recordings",
+      "electrode_idx" :
+      {
+        "_datatype" : "int32",
+        "_description" : "Indices to electrodes described in experiment's electrode map array (under general/extracellular_ephys",
+        "_include" : "mandatory"
+      }
+    },
+    "SpikeEventSeries" :
+    {
+      "_superclass" : "ElectricalSeries",
+      "_description" : "Snapshots of spike events from data. Source of data needs to be specified. 'data' array structure: [event_num][channel_num][sample_num]",
+      "source" : 
+      {
+        "_datatype" : "str",
+        "_include" : "mandatory",
+        "_description" : "Source of events (eg, timeseries, hardware) and description of event definition"
+      }
+    },
+    "SpatialSeries" : 
+    {
+      "_superclass" : "TimeSeries",
+      "_description" : "Stores points in space over time. The data[] array structure is [num samples][num spatial dimenstions]",
+      "reference_frame" : 
+      {
+        "_datatype" : "str",
+        "_description" : "Description of what the spatial coordinates refer to. Eg, relative position as determined by tracking video, GPS coordinates, etc",
+        "_include" : "madatory"
+      }
+    },
+    "OpticalSeries" :
+    {
+      "_superclass" : "ImageSeries",
+      "_description" : "Time-series image stack for optical recording or stimulus",
+      "field_of_view" : 
+      {
+        "_datatype" : "f4",
+        "_description" : "Width, height and dept of image, or imaged area (in meters)",
+        "_include" : "required"
+      },
+      "distance" :
+      {
+        "_datatype" : "f4",
+        "_description" : "Distance of camera/monitor from target/eye, if relevant",
+        "_include" : "required"
+      },
+      "orientation" :
+      {
+        "_datatype" : "str",
+        "_description" : "Description of image relative to some reference frame (eg, which way is up?). Must also specify frame of reference",
+        "_include" : "required"
+      }
+    },
+    "ImageSeries" :
+    {
+      "_superclass" : "TimeSeries",
+      "_description" : "Storage object for time-series 2-D image data",
+      "format" :
+      {
+        "_datatype" : "str",
+        "_description" : "Format if image. If this is 'external' then field 'external_file' contains path or URL for that file. For tiff, png, jpg, etc, the binary representation of the image is stored in data[]. For 'raw', only a single channel (eg, red) is stored",
+        "_include" : "required"
+      },
+      "external_file" : 
+      {
+        "_datatype" : "str",
+        "_description" : "Path or URL to external file if format='external'",
+        "_include" : "optional"
+      },
+      "bits_per_pixel" : 
+      {
+        "_datatype" : "int32",
+        "_description" : "Number of bits per image pixel",
+        "_include" : "required"
+      },
+      "dimension" : 
+      {
+        "_datatype" : "int32",
+        "_description" : "An array storing the number of pixels on x, y and z axes",
+        "_include" : "required"
+      }
+    },
+    "TwoPhotonSeries" :
+    {
+      "_superclass" : "ImageSeries",
+      "_description" : "Image stack recorded from 2-photon microscope",
+      "field_of_view" : 
+      {
+        "_datatype" : "f4",
+        "_description" : "Width, height and dept of image, or imaged area (in meters)",
+        "_include" : "required"
+      },
+      "pmt_gain" :
+      {
+        "_datatype" : "str",
+        "_description" : "generic field for a/d unit per photon",
+        "_include" : "required"
+      }
+    },
+    "WidefieldSeries" :
+    {
+      "_superclass" : "OpticalSeries",
+      "_description" : "Image stack recorded from wide-field imaging",
+      "indicator" :
+      {
+        "_datatype" : "str",
+        "_include" : "required"
+      },
+      "illuminatino_power" :
+      {
+        "_datatype" : "f4",
+        "_description" : "Illumination power, in watts",
+        "_include" : "required"
+      },
+      "pixel_binning" :
+      {
+        "_datatype" : "int32",
+        "_description": "Array structure [x, y, t]",
+        "_include" : "required"
+      },
+      "exposure_time" :
+      {
+        "_datatype" : "f4",
+        "_description" : "Exposure time, in seconds",
+        "_include" : "required"
+      },
+      "counts_per_bit" :
+      {
+        "_datatype" : "f4",
+        "_include" : "required"
+      }
+    },
+    "OptogeneticSeries" :
+    {
+      "_superclass" : "TimeSeries",
+      "site" :
+      {
+        "_datatype" : "str",
+        "_description" : "Pointer to description of stimulation site",
+        "_linkto" : "general/optogentics"
+      },
+      "data" : 
+      {
+        "_datatype" : "f4",
+        "_attributes" :
+        {
+          "units" : "Watts"
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,192 @@
+{
+  "Interface" :
+  {
+    "_attributes" :
+    {
+      "neurodata_type" : 
+      {
+        "_datatype" : "str",
+        "_description" : "Label to identify this group as a neurodata interface",
+        "_include" : "mandatory",
+        "_value" : "Interface"
+      }
+    },
+    "BehavioralIntervals" :
+    {
+      "_description" : "General container for storing intervals",
+      "_include" : "optional",
+      "<>" :
+      {
+        "_datatype" : "timeseries",
+        "_description" : "Time series storing interval(s). If interface is present, one or more TS are required",
+        "_subtype" : "IntervalSeries",
+        "_include" : "mandatory"
+      },
+      "[]" :
+      {
+        "_datatype" : "unrestricted",
+        "_description" : "custom field",
+        "_include" : "optional",
+        "_attributes" : 
+        {
+          "neurodata_type" :
+          {
+            "_datatype" : "str",
+            "_description" : "Custom field",
+            "_value" : "Custom",
+            "_include" : "mandatory"
+          }
+        }
+      }
+    },
+
+    "UnitTimes" :
+	{
+		"_description" : "",
+		"_include" : "optional",
+		"source" : 
+		{
+			"_datatype" : "str",
+			"_linkto" : "/"
+		}
+	},
+  
+    "ImageSegmentation" :
+    {
+      "_description" : "Stores groups of pixels that define regions of interest from one or more imaging planes",
+      "_include" : "optional",
+      "<>" :
+      {
+        "_datatype" : "group",
+        "_description" : "Folder containing all segmentation data from a particular imaging plane. Group name is identifier for imaging plane",
+        "_include" : "mandatory",
+        "_attributes" : 
+        {
+          "description" :
+          {
+            "_datatype" : "str",
+            "_description" : "Text description of imaging plane",
+            "_include" : "optional"
+          }
+        },
+        "reference_images" :
+        {
+          "_datatype" : "group",
+          "_description" : "Image stacks that the masks apply to",
+          "_include" : "mandatory",
+          "<>" :
+          {
+            "_datatype" : "timeseries",
+            "_subtype" : "ImageSeries",
+            "_description" : "One of possibly many image stacks",
+            "_include" : "mandatory"
+          },
+          "[]" :
+          {
+            "_datatype" : "unrestricted",
+            "_description" : "custom field",
+            "_include" : "optional",
+            "_attributes" : 
+            {
+              "neurodata_type" :
+              {
+                "_datatype" : "str",
+                "_description" : "Custom field",
+                "_value" : "Custom",
+                "_include" : "mandatory"
+              }
+            }
+          }
+        },
+        "manifold" :
+        {
+          "_datatype" : "f4",
+          "_description" : "3D float array with x,y,z coordinates of each pixel. Array structure: [height][width][3]",
+          "_include" : "mandatory"
+        },
+        "<>" :
+        {
+          "_datatype" : "group",
+          "_description" : "Region of interest. Folder name is identifier",
+          "_include" : "mandatory",
+          "img_mask" :
+          {
+            "_datatype" : "f4",
+            "_description" : "2D float array describing pixel mask. Values bounded on [0,1]. Array structure: [height][width]",
+            "_include" : "mandatory"
+          },
+          "pix_mask" :
+          {
+            "_datatype" : "uint16",
+            "_description" : "2D int array listing pixels (x,y) that compose mask",
+            "_include" : "mandatory",
+            "_attributes" :
+            {
+              "weight" :
+              {
+                "_datatype" : "f4",
+                "_description" : "Array listing weight of each pixel",
+                "_include" : "mandatory"
+              }
+            }
+          },
+          "roi_description" :
+          {
+            "_datatype" : "str",
+            "_description" : "Description of this ROI",
+            "_include" : "mandatory"
+          },
+          "[]" :
+          {
+            "_datatype" : "unrestricted",
+            "_description" : "custom field",
+            "_include" : "optional",
+            "_attributes" : 
+            {
+              "neurodata_type" :
+              {
+                "_datatype" : "str",
+                "_description" : "Custom field",
+                "_value" : "Custom",
+                "_include" : "mandatory"
+              }
+            }
+          }
+        },
+        "[]" :
+        {
+          "_datatype" : "unrestricted",
+          "_description" : "custom field",
+          "_include" : "optional",
+          "_attributes" : 
+          {
+            "neurodata_type" :
+            {
+              "_datatype" : "str",
+              "_description" : "Custom field",
+              "_value" : "Custom",
+              "_include" : "mandatory"
+            }
+          }
+        }
+      },
+      "[]" :
+      {
+        "_datatype" : "unrestricted",
+        "_description" : "custom field",
+        "_include" : "optional",
+        "_attributes" : 
+        {
+          "neurodata_type" :
+          {
+            "_datatype" : "str",
+            "_description" : "Custom field",
+            "_value" : "Custom",
+            "_include" : "mandatory"
+          }
+        }
+      }
+    }
+  }
+}
+
