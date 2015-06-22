@@ -512,7 +512,7 @@ def make_cell_html(small_cell_files, large_cell_files, specimen, file_name):
 
 def make_sweep_page(nwb_file, features, working_dir):
     sizes = [ { 'size': 2.0, 'suffix': '_small' },
-              { 'size': 5.0, 'suffix': '_large' } ]
+              { 'size': 6.0, 'suffix': '_large' } ]
 
     sweep_files = plot_sweep_figures(nwb_file, features, working_dir, sizes)
 
