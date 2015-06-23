@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('agg')
 
 import logging
@@ -20,7 +21,7 @@ from scipy.optimize import curve_fit
 import scipy.signal as sg
 
 import matplotlib.pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 
 def get_spikes(sweep_ephys_features, sweep_number):
     try: 
@@ -57,6 +58,7 @@ def plot_single_ap_values(nwb_file, sweeps, features, type_name):
     long_square_time_features = ["thresh_t", "peak_t", "trough_t", "fast_trough_t", "slow_trough_t"]
 
     sweep_ephys_features = features["specimens"][0]["sweep_ephys_features"]
+    cell_ephys_features = features["specimens"][0]["cell_ephys_features"]
     for s in sweeps:
         spikes = get_spikes(sweep_ephys_features, s["sweep_num"])
 
@@ -67,17 +69,21 @@ def plot_single_ap_values(nwb_file, sweeps, features, type_name):
             voltages = [spikes[0][f] for f in voltage_features]
             times = [spikes[0][f] - stim_start for f in time_features]
         else:
-            voltages = [features["specimens"][0]["cell_ephys_features"]["long_squares"]["rheo_spike_0"][f] for f in long_square_voltage_features]
-            times = [features["specimens"][0]["cell_ephys_features"]["long_squares"]["rheo_spike_0"][f] for f in long_square_time_features]
+            voltages = [cell_ephys_features["long_squares"]["rheo_spike_0"][f] for f in long_square_voltage_features]
+            times = [cell_ephys_features["long_squares"]["rheo_spike_0"][f] for f in long_square_time_features]
 
         plt.figure(figs[0].number)
         plt.scatter(range(len(voltages)), voltages, color='gray')
+        plt.tight_layout()
+
 
         plt.figure(figs[1].number)
         plt.scatter(range(len(times)), times, color='gray')
+        plt.tight_layout()
 
         plt.figure(figs[2].number)
         plt.scatter([0], [spikes[0]['upstroke'] / (-spikes[0]['downstroke'])], color='gray')
+        plt.tight_layout()
 
 
     plt.figure(figs[0].number)
@@ -118,8 +124,8 @@ def plot_single_ap_values(nwb_file, sweeps, features, type_name):
             voltages = [spikes[0][f] for f in voltage_features]
             times = [spikes[0][f] for f in time_features]
         else:
-            voltages = [features["specimens"][0]["cell_ephys_features"]["long_squares"]["rheo_spike_0"][f] for f in long_square_voltage_features]
-            times = [features["specimens"][0]["cell_ephys_features"]["long_squares"]["rheo_spike_0"][f] + stim_start for f in long_square_time_features]
+            voltages = [cell_ephys_features["long_squares"]["rheo_spike_0"][f] for f in long_square_voltage_features]
+            times = [cell_ephys_features["long_squares"]["rheo_spike_0"][f] + stim_start for f in long_square_time_features]
         plt.scatter(times, voltages, color='red', zorder=20)
         
         delta_v = 5.0
@@ -137,6 +143,9 @@ def plot_single_ap_values(nwb_file, sweeps, features, type_name):
             plt.xlim(stim_start - 0.002, stim_start + stim_dur + 0.01)
         elif type_name == "long_square":
             plt.xlim(times[0]- 0.002, times[-1] + 0.002)
+
+        plt.tight_layout()
+
 
     return figs
 
@@ -171,7 +180,7 @@ def plot_sweep_figures(nwb_file, features, image_dir, sizes):
             yTP = v_init[0:tp_steps]
             axTP.plot(xTP, yTP, linewidth=1)
             axTP.set_xlim(0, tp_len)
-            sns.despine()
+#            sns.despine()
     
             exp_fig = plt.figure()
             axDP = plt.gca()
@@ -189,7 +198,7 @@ def plot_sweep_figures(nwb_file, features, image_dir, sizes):
             axDP.plot(xDP, baselineV, linewidth=1)
             axDP.plot(xDP, yDP, linewidth=1)
             axDP.set_xlim(t_exp[0], t_exp[-1])
-            sns.despine()
+#            sns.despine()
 
             v_prev, i_prev, t_prev, r_prev = v_init, i_init, t_init, r_init
 
@@ -216,7 +225,7 @@ def plot_sweep_figures(nwb_file, features, image_dir, sizes):
             axTP.plot(xTP, yTPpN, linewidth=1)
             axTP.plot(xTP, yTPN, linewidth=1)
             axTP.set_xlim(0, tp_len)
-            sns.despine()
+#            sns.despine()
 
             exp_fig = plt.figure()
             axDP = plt.gca()
@@ -234,7 +243,7 @@ def plot_sweep_figures(nwb_file, features, image_dir, sizes):
             axDP.plot(xDP, baselineV, linewidth=1)
             axDP.plot(xDP, yDP, linewidth=1)
             axDP.set_xlim(t_exp[0], t_exp[-1])
-            sns.despine()
+#            sns.despine()
 
             v_prev, i_prev, t_prev, r_prev = v, i, t, r
 
@@ -250,7 +259,6 @@ def save_figure(fig, image_name, image_set_name, image_dir, sizes, image_sets, s
 
     for i, size in enumerate(sizes):
         fig.set_size_inches(size['size']*scalew, size['size']*scaleh)
-        plt.tight_layout()
 
         image_file = os.path.join(image_dir, "%s%s.png" % (image_name, size['suffix']))
         plt.savefig(image_file, bbox_inches="tight")
@@ -267,7 +275,8 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
     
     cell_image_files = [ {} for s in sizes ]
 
-    sns.set_style()
+    plt.style.use('ggplot')
+#    sns.set_style()
     
     cw_detail = features["specimens"][0]["cell_ephys_features"]
     cw_general = features["specimens"][0]["ephys_features"][0]
@@ -290,6 +299,8 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
     plt.xlabel("pA")
     plt.ylabel("mV")
     plt.title("ri = {:.1f}, vrest = {:.1f}".format(cw_general["ri"], cw_general["vrest"]))
+    plt.tight_layout()
+
 
     save_figure(fig, 'VI_curve', 'subthreshold_long_squares', image_dir, sizes, cell_image_files)
     
@@ -304,6 +315,8 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
     ylim = plt.ylim()
     plt.ylim(0, ylim[1])
     plt.ylabel("tau (ms)")
+    plt.tight_layout()
+
 
     save_figure(fig, 'tau_curve', 'subthreshold_long_squares', image_dir, sizes, cell_image_files)
     
@@ -342,9 +355,11 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
             logging.error("New fit tau of {:g} differs from value in JSON of {:g} for sweep {:d}".format(1 / popt[1] * 1e3, subthresh_dict[s]['tau'], s))
         plt.plot(t[tenpct_idx:peak_idx], exp_curve(t[tenpct_idx:peak_idx] - t[tenpct_idx], *popt), color='blue')
 
+
     for index, s in enumerate(tau_sweeps):
         plt.figure(tau_figs[index].number)
         plt.ylim(min_y, max_y)
+        plt.tight_layout()
 
     for index, tau_fig in enumerate(tau_figs):
         save_figure(tau_figs[index], 'tau_%d' % index, 'subthreshold_long_squares', image_dir, sizes, cell_image_files)
@@ -400,6 +415,7 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
     spike_times = [spk['t'] for spk in get_spikes(sweep_features, cw_general["thumbnail_sweep_num"])]
     isis = np.diff(np.array(spike_times))
     plt.title("thumbnail {:d}, amp = {:.1f}".format(cw_general["thumbnail_sweep_num"], stim_amp))
+    plt.tight_layout()
     
     save_figure(fig, 'thumbnail_0', 'thumbnail', image_dir, sizes, cell_image_files, scalew=2)
 
@@ -415,6 +431,7 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
         if cw_general.get(k, None) is None:
             cw_general[k] = False
 
+    plt.tight_layout()
     save_figure(fig, 'thumbnail_1', 'thumbnail', image_dir, sizes, cell_image_files)
         
     yvals = [
@@ -428,8 +445,16 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
     plt.scatter(xvals, yvals, color='red')
     plt.xticks(xvals, ['Delay', 'Burst', 'Pause'])
     plt.title("flags")
+    plt.tight_layout()
 
     save_figure(fig, 'thumbnail_2', 'thumbnail', image_dir, sizes, cell_image_files)
+
+    long_square_sweeps = cw_detail['long_squares']['sweep_info']
+    long_square_sweep_numbers = [ int(s['sweep_num']) for s in long_square_sweeps ]
+    
+    thumbnail_summary_fig = plot_sweep_set_summary(nwb_file, int(cw_general['thumbnail_sweep_num']), long_square_sweep_numbers)
+    plt.figure(thumbnail_summary_fig.number)
+    save_figure(thumbnail_summary_fig, 'ephys_summary', 'thumbnail', image_dir, sizes, cell_image_files, scalew=2)
 
     # 5 - plot fI curve and linear fit
     fig = plt.figure()
@@ -450,6 +475,7 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
         rheo_hero_x.append(stim_amp)
     rheo_hero_y = [ len(get_spikes(sweep_features, s)) for s in rheo_hero_sweeps ]
     plt.scatter(rheo_hero_x, rheo_hero_y, zorder=20)
+    plt.tight_layout()
 
     save_figure(fig, 'fi_curve', 'fi_curve', image_dir, sizes, cell_image_files, scalew=2)
 
@@ -464,10 +490,37 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
             plt.plot([stim_start + stim_dur - 0.1, stim_start + stim_dur], [d['steady'], d['steady']], color='red', zorder=10)
     plt.xlim(stim_start - 0.25, stim_start + stim_dur + 0.25)
     plt.title("sag = {:.3g}".format(cw_general['sag']))
+    plt.tight_layout()
 
     save_figure(fig, 'sag', 'sag', image_dir, sizes, cell_image_files, scalew=2)
 
     return cell_image_files
+
+def plot_sweep_set_summary(nwb_file, highlight_sweep_number, sweep_numbers,
+                           highlight_color='#0779BE', background_color='#dddddd'):
+
+    fig = plt.figure(frameon=False)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)    
+    ax.set_yticklabels([])
+    ax.set_xticklabels([])
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+
+    for sn in sweep_numbers:
+        v, i, t, r = load_experiment(nwb_file, sn)
+        ax.plot(t, v, linewidth=0.5, color=background_color)
+
+    v, i, t, r = load_experiment(nwb_file, highlight_sweep_number)
+    plt.plot(t, v, linewidth=1, color=highlight_color)
+
+    stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
+
+    ax.set_ylim(-110, 40)
+    ax.set_xlim(stim_start - 0.05, stim_start + stim_dur + 0.25)
+
+    return fig
 
 def make_sweep_html(small_sweep_files, large_sweep_files, file_name):
     html = "<html><body>"
