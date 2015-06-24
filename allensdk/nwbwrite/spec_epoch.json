@@ -89,7 +89,13 @@
               "_description" : "Object label",
               "_value" : "Epoch",
               "_include" : "mandatory"
-			}
+			},
+      "links" :
+      {
+        "_datatype" : "str",
+        "_description" : "Paths to timeseries that are in epoch",
+        "_include" : "optional"
+      }
 		}
 	}
 }

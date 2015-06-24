@@ -10,6 +10,7 @@ import copy
 import numpy as np
 import nwbts
 import nwbep
+import nwbmo
 
 VERS_MAJOR = 0
 VERS_MINOR = 5
@@ -45,7 +46,8 @@ def recursive_dictionary_merge(x, y):
     return x
 
 def load_json(fname):
-    fname = os.path.join(os.path.dirname(__file__), fname)
+    # correct the path, in case calling from remote directory
+    fname = os.path.join( os.path.dirname(__file__), fname)
     try:
         with open(fname, 'r') as f:
             jin = json.load(f)
@@ -67,12 +69,17 @@ def load_spec():
     recursive_dictionary_merge(spec, gen)
     ep = load_json("spec_epoch.json")
     recursive_dictionary_merge(spec, ep)
+    write_json("fullspec.json", spec)
     return spec
 
 def write_json(fname, js):
     with open(fname, "w") as f:
         json.dump(js, f, indent=2)
         f.close()
+
+# NOTES
+# an effort was made to convert attribute strings to np.string_, as this
+#   SOMETIMES work better for storing and retrieving strings
 
 class NWB(object):
     def __init__(self, **vargs):
@@ -82,8 +89,8 @@ class NWB(object):
         self.ts_list = []
         # list of defined epochs
         self.epoch_list = []
-        # keep track of all modules
-        self.mod_list = []
+        # module list
+        self.modules = []
         # record of all tags used in epochs
         # use a dict as it's easier to filter out dups
         self.epoch_tag_dict = {}
@@ -235,7 +242,7 @@ class NWB(object):
     def write_metadata(self):
         grp = self.file_pointer["general"]
         spec = self.spec["General"]
-        self.write_datasets(grp, "", spec, False, False)
+        self.write_datasets(grp, "", spec)
 
     def close(self):
         # finalize all time series
@@ -245,12 +252,12 @@ class NWB(object):
         # after time series are finalized, go back and document links
         for k, lst in self.ts_data_link_lists.iteritems():
             for i in range(len(lst)):
-                self.file_pointer[lst[i]].attrs["data_link"] = lst
+                self.file_pointer[lst[i]].attrs["data_link"] = np.string_(lst)
         for k, lst in self.ts_time_link_lists.iteritems():
             for i in range(len(lst)):
-                self.file_pointer[lst[i]].attrs["timestamp_link"] = lst
+                self.file_pointer[lst[i]].attrs["timestamp_link"] = np.string_(lst)
         for k, lnk in self.ts_time_softlinks.iteritems():
-            self.file_pointer[k].attrs["data_softlink"] = lnk
+            self.file_pointer[k].attrs["data_softlink"] = np.string_(lnk)
         # TODO finalize all modules
         # finalize epochs and write epoch tag list to epoch group
         for i in range(len(self.epoch_list)):
@@ -366,16 +373,13 @@ class NWB(object):
         self.epoch_list.append(epo)
         return epo
 
-    def create_timeseries(self, ts_type, name, modality):
+    def create_timeseries(self, ts_type, name, modality="other"):
         # find time series by name
-        # recursively create list of required fields
+        # recursively examine spec and create dict of required fields
         ts_defn, ancestry = self.create_timeseries_definition(ts_type, [], None)
         if "_value" not in ts_defn["_attributes"]["ancestry"]:
             ts_defn["_attributes"]["ancestry"]["_value"] = []
         ts_defn["_attributes"]["ancestry"]["_value"] = ancestry
-        with open("out.json", "w") as f:
-            json.dump(ts_defn, f, indent=2)
-            f.close()
         fp = self.file_pointer
         if ts_type == "AnnotationSeries":
             ts = nwbts.AnnotationSeries(name, modality, ts_defn, self)
@@ -408,10 +412,14 @@ class NWB(object):
         ancestry.append(str(ts_type))
         return defn, ancestry
 
-    def create_module(self):
-        pass
+    def create_module(self, name):
+        mod = nwbmo.Module(name, self, self.spec["Module"])
+        self.modules.append(mod)
+        return mod
 
     def set_metadata(self, key, value, **attrs):
+        if type(key).__name__ == "function":
+            self.fatal_error("Function passed instead of string or constant -- please see documentation for usage of '%s'" % key.__name__)
         # metadata fields are specified using hdf5 path
         # all paths relative to general/
         toks = key.split('/')
@@ -433,6 +441,7 @@ class NWB(object):
                     self.fatal_error("Unable to locate '%s' of %s in specification" % (toks[i], key))
             else:
                 spec = spec[toks[i]]
+        self.check_type(key, value, spec["_datatype"])
         spec["_value"] = value
         # handle attributes
         if "_attributes" not in spec:
@@ -441,7 +450,7 @@ class NWB(object):
             if k not in spec["_attributes"]:
                 spec["_attributes"][k] = {}
             fld = spec["_attributes"][k]
-            fld["_datatype"] = str
+            fld["_datatype"] = 'str'
             fld["_value"] = str(v)
 
     def set_metadata_from_file(self, key, filename):
@@ -477,8 +486,8 @@ class NWB(object):
             img = img_grp.create_dataset(name, data=stream)
         else:
             img = img_grp.create_dataset(name, data=stream, dtype=dtype)
-        img.attrs["format"] = fmt
-        img.attrs["description"] = desc
+        img.attrs["format"] = np.string_(fmt)
+        img.attrs["description"] = np.string_(desc)
         
 
     ####################################################################
@@ -519,9 +528,13 @@ class NWB(object):
                     self.fatal_error(m1 + m2)
             elif dtype.startswith('f'):
                 # check for type conversion error
+                if isinstance(value, (str, unicode)):
+                    raise ValueError
                 val = float(value)
             elif dtype.startswith('uint') or dtype.startswith('int'):
                 # check for type conversion error
+                if isinstance(value, (str, unicode)):
+                    raise ValueError
                 val = int(value)
             elif dtype != "unspecified":
                 self.fatal_error("unexpected type: '%s'" % dtype)
@@ -533,6 +546,8 @@ class NWB(object):
 
     # set key-value pair
     def set_value_internal(self, key, value, spec, name, dtype=None, **attrs):
+        if isinstance(value, unicode):
+            value = str(value)
         # see if in spec
         #   if so, verify type
         #   if not, use custom definition
@@ -560,12 +575,27 @@ class NWB(object):
                     field["_datatype"] = dtype
                 elif isinstance(value, (str, unicode)):
                     field["_datatype"] = "str"
-            # verify type
-            self.check_type(key, value, field["_datatype"])
+            elif dtype is not None and field["_datatype"] != dtype:
+                self.fatal_error("dtype for field '%s' changed from %s to %s" % (key, field["_datatype"], dtype))
+            # verify type, or set it if it's unrestricted and a float
+            if field["_datatype"] == "unrestricted":
+                # descend into list, if multi-dimensional
+                val = value
+                loops = 0
+                while isinstance(val, (list, np.ndarray)) and len(val)>0:
+                    val = val[0]
+                    loops += 1;
+                    if loops >= 10:
+                        self.fatal_error("Sanity check failed determining type -- please explicitly set dtype when setting this value (%s)", key)
+                # set non-dtyped float as float32
+                if isinstance(val, (float, np.float64, np.float32)):
+                    field["_datatype"] = 'f4'
+            else:
+                self.check_type(key, value, field["_datatype"])
             field["_value"] = value
         for k in attrs.keys():
             if k not in field["_attributes"]:
-                return "Error: Attribute '%s' not part of field '%s'" %(k, key)
+                self.fatal_error("Custom attributes not supported -- '%s' is not part of field '%s'" %(k, key))
             spec_type = field["_attributes"][k]["_datatype"]
             self.check_type(k, attrs[k], spec_type)
             # use numpy's handling of strings for 'str' as it's more robust
@@ -582,26 +612,15 @@ class NWB(object):
             if k == "<>" or k == "[]":
                 continue    # template
             if "_value" in attr[k]:
-                # when saving an array of string values as an attribute
-                #   we need to convert it to np.string_
-                # check for this and deal with it
-                val = attr[k]["_value"]
-                while isinstance(val, list):
-                    val = val[0]
-                if isinstance(val, (str, unicode)):
-                    attr[k]["_value"] = np.string_(attr[k]["_value"])
                 grp.attrs[k] = attr[k]["_value"]
 
-    def write_datasets(self, grp, path, spec, chunk, compress):
+    def write_datasets(self, grp, path, spec):
         """
             grp -- hdf5 group object that datasets are stored under
             spec -- specification dictionary of data to be stored
             path -- path under grp that spec applies to (nested groups
                 call write_datasets recursively -- this is the path to
                 where things are at a particular recursion round)
-            chunk -- boolean to signal if chunking should be used
-            compression -- boolean to signal if compression should be used
-
         """
         # write out all fields that have a _value
         for k in spec:
@@ -611,15 +630,15 @@ class NWB(object):
                 continue    # template
             # create dataset for fields in spec where _value* is specified
             local_spec = spec[k]
-            if "_value" in local_spec:
-                self.write_dataset_to_file(grp, path, k, local_spec, chunk, compress)
+            if local_spec["_datatype"] == "group":
+                nest = path + k + "/"
+                self.write_datasets(grp, nest, local_spec)
+            elif "_value" in local_spec:
+                self.write_dataset_to_file(grp, path, k, local_spec)
             elif "_value_softlink" in local_spec:
                 self.write_dataset_as_softlink(grp, path, k, local_spec)
             elif "_value_hardlink" in local_spec:
                 self.write_dataset_as_hardlink(grp, path, k, local_spec)
-            elif local_spec["_datatype"] == "group":
-                nest = path + k + "/"
-                self.write_datasets(grp, nest, local_spec, chunk, compress)
 
     # make sure specified path exists in group. if not, create it
     def ensure_path(self, grp, path):
@@ -651,7 +670,7 @@ class NWB(object):
         dataset_path = spec["_value_hardlink"] + "/" + field
         grp[field] = self.file_pointer[dataset_path]
 
-    def write_dataset_to_file(self, grp, path, field, spec, chunk, compress):
+    def write_dataset_to_file(self, grp, path, field, spec):
         self.ensure_path(grp, path)
         # advance group to specified location in path
         if len(path) > 0:
@@ -701,7 +720,7 @@ class NWB(object):
                         stype = "S%d" % (sz + 1)
                 varg["shape"] = (len(value),)
                 varg["dtype"] = stype
-                # ignore compression/chunking request for strings
+                # ignore compression/chunking for strings
                 dset = grp.create_dataset(**varg)
                 # space reserved for strings -- copy into place
                 for i in range(len(value)):
@@ -710,66 +729,44 @@ class NWB(object):
                 varg["data"] = np.string_(value)
                 # don't specify dtype='str' -- h5py doesn't like that
                 del varg["dtype"]
-                # ignore compression/chunking request for strings
-                dset = grp.create_dataset(**varg)
+                ## ignore compression/chunking request for strings
+                #dset = grp.create_dataset(**varg)
+                varg["compression"] = 4
+                varg["chunks"] = True
+                try:
+                    # try to use compression -- if we get a type error,
+                    #   disable and try again
+                    dset = grp.create_dataset(**varg)
+                except TypeError:
+                    del varg["compression"]
+                    del varg["chunks"]
+                    dset = grp.create_dataset(**varg)
         else:
-            # specify compression and chunking, if set (default is true)
-            # if data is scalar this will create an error, so make sure
-            #   it's a list
-            val = spec["_value"]
-            if isinstance(val, (collections.Sequence, np.ndarray)):
-                if compress:
-                    varg["compression"] = 4
-                if chunk:
-                    varg["chunks"] = True
-            varg["data"] = val
-            dset = grp.create_dataset(**varg)
+            # try to use compression -- if we get a type error, disable
+            #   and try again
+            varg["compression"] = 4
+            varg["chunks"] = True
+            varg["data"] = spec["_value"]
+            try:
+                dset = grp.create_dataset(**varg)
+            except TypeError:
+                del varg["compression"]
+                del varg["chunks"]
+                dset = grp.create_dataset(**varg)
         if "_attributes" in spec:
             for k in spec["_attributes"]:
                 if k.startswith('_'):
                     continue    # internal field -- nothing to write out
                 if k == "<>" or k == "[]":
                     continue    # template
-                if "_value" in spec["_attributes"][k]:
-                    dset.attrs[k] = spec["_attributes"][k]["_value"]
-
-########################################################################
-# TODO pull code from present API; modify as necessary
-
-class Interface(object):
-    def __init__(self):
-        pass
-
-    def set_value(self, key, value):
-        # TODO verify that it's legal to store data here
-        pass
-
-
-class ImageSegmentation(Interface):
-    def __init__(self):
-        pass
-
-    def add_roi_mask_pixels(self):
-        pass
-
-    def add_roi_mask_img(self):
-        pass
-
-    def add_default_manifold(self):
-        pass
-
-    def add_manifold(self):
-        pass
-
-class UnitTimes(Interface):
-    def __init__(self):
-        pass
-
-    def add_unit(self, unit_name, unit_times, description):
-        pass
-
-    # super + create unit list
-    def finalize(self):
-        pass
+                # make a shorthand description of dictionary block
+                block = spec["_attributes"][k]
+                if "_value" in block:
+                    val = block["_value"]
+                    if "_datatype" in block:
+                        valatt = block["_datatype"]
+                        if valatt == "str":
+                            val = np.string_(val)
+                    dset.attrs[k] = val
 
 

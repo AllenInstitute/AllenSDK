@@ -58,7 +58,7 @@ twop.set_value("field_of_view", [0.100, 0.100]) # in meters
 twop.set_value("distance", 0.1) # in meters
 twop.set_value("orientation", "Top of frame is medial boundary of M1; rostral to right")
 # fields from TwoPhotonSeries
-twop.set_value("pmt_gain", "100") # need better value
+twop.set_value("pmt_gain", 100) # need better value
 # use some obsoleted values to test adding custom fields
 twop.set_value("wavelength", 8.3e-9) # need better value
 twop.set_value("indicator", "CA-Magic, infinite emission spectrum") # need better value

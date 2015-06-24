@@ -62,12 +62,18 @@
         "_alternative" : "starting_time",
         "_attributes" : 
         {
-          "t_interval" : 
+          "interval" : 
           {
             "_datatype" : "int32",
             "_description" : "Number of entries in 'data' stored between each timestamp. Presently this must be '1' (ie, there's a timestamp for each data point)",
             "_include" : "mandatory",
 			"_value" : 1
+          },
+          "units" : 
+          {
+            "_datatype" : "str",
+            "_include" : "mandatory",
+            "_value" : "Seconds"
           }
         }
       },
@@ -90,7 +96,7 @@
             "_datatype" : "str",
             "_description" : "Sampling or presentation rate (Hz) of data stored in time series",
             "_include" : "mandatory",
-            "_value" : "Seconds (all neurodata timestamps are in seconds)"
+            "_value" : "Seconds"
           }
         }
       },
@@ -454,6 +460,20 @@
         "_datatype" : "int32",
         "_description" : "Indices to electrodes described in experiment's electrode map array (under general/extracellular_ephys",
         "_include" : "mandatory"
+      },
+      "data" : 
+      {
+        "_attributes" :
+        {
+          "units" :
+          {
+            "_value" : "Volts"
+          },
+          "conversion" : 
+          {
+            "_value" : 1.0
+          }
+        }
       }
     },
     "SpikeEventSeries" :
@@ -471,6 +491,20 @@
     {
       "_superclass" : "TimeSeries",
       "_description" : "Stores points in space over time. The data[] array structure is [num samples][num spatial dimenstions]",
+      "data" :
+      {
+        "_attributes" :
+        {
+          "units" : 
+          {
+            "_value" : "Meters"
+          },
+          "conversion" :
+          {
+            "_value" : 1.0
+          }
+        }
+      },
       "reference_frame" : 
       {
         "_datatype" : "str",
@@ -530,6 +564,32 @@
         "_include" : "required"
       }
     },
+	"ImageIndexSeries" :
+	{
+      "_superclass" : "TimeSeries",
+      "_description" : "An image sequence that is generated from an existing image stack. Frames can be presented in an arbitrary order. The data[] field stores frame number in reference stack",
+      "image_stack" : 
+      {
+        "_datatype" : "text",
+        "_description" : "Path to reference ImageSeries",
+        "_include" : "required"
+      }
+	},
+	"ImageMaskSeries" : 
+	{
+      "_superclass" : "TimeSeries",
+	  "_description" : "An alpha mask that is applied to a presented visual stimulus. The data array contains an array of mask values that are applied to the displayed image. Mask values are stored as RGBA. Mask can vary with time.  The timestamps array indicates the starting time of a mask, and that mask pattern continues until it's explicitly changed",
+	  "masked_image" : 
+	  {
+		  "_datatype" : "str",
+		  "_description" : "Path to ImageSeries that mask applies to",
+		  "_include" : "required"
+	  },
+	  "data" :
+	  {
+		  "_datatype" : "f4"
+	  }
+	},
     "TwoPhotonSeries" :
     {
       "_superclass" : "ImageSeries",
@@ -542,9 +602,16 @@
       },
       "pmt_gain" :
       {
-        "_datatype" : "str",
+        "_datatype" : "f4",
         "_description" : "generic field for a/d unit per photon",
         "_include" : "required"
+      },
+      "imaging_plane" : 
+      {
+        "_datatype" : "str",
+        "_description" : "Name of entry in general/optophysiology describing details about this imaging plane",
+        "_include" : "required",
+        "_linkto" : "general/optophysiology"
       }
     },
     "WidefieldSeries" :
@@ -583,10 +650,12 @@
     "OptogeneticSeries" :
     {
       "_superclass" : "TimeSeries",
+      "_description" : "Optogenetic stimulus",
       "site" :
       {
         "_datatype" : "str",
         "_description" : "Pointer to description of stimulation site",
+        "_include" : "mandatory",
         "_linkto" : "general/optogentics"
       },
       "data" : 
@@ -594,8 +663,32 @@
         "_datatype" : "f4",
         "_attributes" :
         {
-          "units" : "Watts"
+          "units" : 
+		  {
+			  "_value" : "Watts"
+		  }
         }
+      }
+    },
+    "RoiResponseSeries" :
+    {
+      "_superclass" : "TimeSeries",
+      "_description" : "ROI responses over an imaging plane. Each row in data[] should correspond to the signal from one ROI",
+      "segmentation_source" :
+      {
+        "_datatype" : "str",
+        "_description" : "Path to segmentation module defining ROIs",
+        "_include" : "mandatory"
+      },
+      "roi_names" :
+      {
+        "_datatype" : "str",
+        "_description" : "Array of ROI names, one for each row in data[]. Names must be the same as used in the segmentation module",
+        "_include" : "mandatory"
+      },
+      "data" : 
+      {
+        "_datatype" : "f4"
       }
     }
   }

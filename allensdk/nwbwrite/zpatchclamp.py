@@ -36,7 +36,7 @@ borg_file.set_metadata(trode_path+"device", dev_name)
 borg_file.set_metadata(trode_path+"initial_access_resistance", "<e.g., 12.345 MOhm>")
 borg_file.set_metadata(trode_path+"electrode_resistance", "<e.g., 1-3 MOhm>")
 borg_file.set_metadata(trode_path+"filtering", "<e.g., Bessel filter, 10KHz cutoff, params=...>")
-borg_file.set_metadata(trode_path+"seal", 7.7)
+borg_file.set_metadata(trode_path+"seal", "7.7 GOhm")
 
 ########################################################################
 ########################################################################

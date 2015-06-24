@@ -11,8 +11,6 @@ class TimeSeries(object):
         # make a local copy of the specification, one that can be modified
         self.spec = copy.deepcopy(spec)
         # file handling
-        self.chunk = True    # use h5py chunking by default (w/ default dim)
-        self.compress = True
         self.nwb = nwb
         self.finalized = False
         # check modality and set path
@@ -64,13 +62,17 @@ class TimeSeries(object):
 
     # have special calls for those that are common to all time series
     def set_description(self, value):
-        self.spec["_attributes"]["description"]["_value"] = value
+        self.spec["_attributes"]["description"]["_value"] = str(value)
+
+    # for backward compatibility in existing scripts
+    def set_comments(self, value):
+        self.set_comment(value)
 
     def set_comment(self, value):
-        self.spec["_attributes"]["comments"]["_value"] = value
+        self.spec["_attributes"]["comments"]["_value"] = str(value)
 
     def set_source(self, value):
-        self.spec["_attributes"]["source"]["_value"] = value
+        self.spec["_attributes"]["source"]["_value"] = str(value)
 
     def set_time(self, timearray):
         ''' Store timestamps for the time series. 
@@ -117,11 +119,11 @@ class TimeSeries(object):
         '''
         attrs = {}
         if units is not None:
-            attrs["units"] = units
+            attrs["units"] = str(units)
         if conversion is not None:
-            attrs["conversion"] = conversion
+            attrs["conversion"] = float(conversion)
         if resolution is not None:
-            attrs["resolution"] = resolution
+            attrs["resolution"] = float(resolution)
         self.set_value_with_attributes_internal("data", data, dtype, **attrs)
 
     ####################################################################
@@ -216,28 +218,6 @@ class TimeSeries(object):
     ####################################################################
     # file writing and path management
 
-    def set_compression(self, tof):
-        """Activates or deactivates compression for *TimeSeries::data* and *TimeSeries::timestamps* (default is compressed)
-
-           Args:
-               *tof* True or False
-
-           Returns:
-               *nothing*
-        """
-        self.compress = tof
-
-    def set_chunking(self, dim=True):
-        """Activates chunking for *TimeSeries::data* and *TimeSeries::timestamps*
-
-           Args:
-               *dim* (???) Array (?) specifying chunk size. If nothing specified, an appropriate size is estimated
-
-           Returns:
-               *nothing*
-        """
-        self.chunk = dim
-
     def set_path(self, path):
         if path.endswith('/'):
             self.path = path
@@ -277,6 +257,7 @@ class TimeSeries(object):
                     continue
                 if "_value_hardlink" in spec[k]:
                     continue
+                # valid alternative fields include links -- check possibilities
                 if "_alternative" in spec[k]:
                     if "_value" in spec[spec[k]["_alternative"]]:
                         continue    # alternative field exists
@@ -292,7 +273,7 @@ class TimeSeries(object):
             if spec[k]["_include"] == "required":
                 if "_value" not in spec["_attributes"]["missing_fields"]:
                     spec["_attributes"]["missing_fields"]["_value"] = []
-                spec["_attributes"]["missing_fields"]["_value"].append(k)
+                spec["_attributes"]["missing_fields"]["_value"].append(str(k))
         # add spec's _description to 'help' field
         # use asserts -- there's a problem w/ the spec if these don't exist
         assert "help" in spec["_attributes"]
@@ -319,7 +300,7 @@ class TimeSeries(object):
 
         # write content to file
         grp = self.nwb.file_pointer.create_group(self.path + self.name)
-        self.nwb.write_datasets(grp, "", spec, self.chunk, self.compress)
+        self.nwb.write_datasets(grp, "", spec)
         self.nwb.write_attributes(grp, spec)
 
         # allow freeing of memory

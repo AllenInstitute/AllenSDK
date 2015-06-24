@@ -3,168 +3,6 @@ import copy
 import numpy as np
 import traceback
 
-def ts_self_check():
-    """Debug code -- tests interval overlap detection/calculation
-    """
-    t = [ 11, 12, 13, 14, 15, 19, 20, 21, 22, 24 ]
-    #self.epoch = Epoch("self test epoch", None, 0, 0)
-    # format: (t, epoch_start, epoch_end, idx0, cnt)
-    # TS fully within epoch
-    test_set(t, 0, 30, 0, 10)
-    # TS start before epoch, end during epoch on TS point
-    test_set(t, 15, 30, 4, 6)
-    # TS start before epoch, end during epoch not on TS point
-    test_set(t, 16, 30, 5, 5)
-    # TS start within epoch, end after epoch on TS point
-    test_set(t, 0, 20, 0, 7)
-    # TS start within epoch, end after epoch not on TS point
-    test_set(t, 0, 18, 0, 5)
-    # epoch within TS
-    test_set(t, 15, 20, 4, 3)
-    # epoch within TS with no overlap
-    test_set(t, 16, 18, -1, 0)
-    # epoch within TS with start between TS points and end on point
-    test_set(t, 16, 21, 5, 3)
-    # epoch within TS with start between TS points and end not on point
-    test_set(t, 16, 23, 5, 4)
-    # epoch within TS with start on TS point and end on point
-    test_set(t, 15, 21, 4, 4)
-    # epoch within TS with start on TS point and end not on point
-    test_set(t, 15, 23, 4, 5)
-    print "EpochTS self-test OK"
-
-def test_set(t, e0, e1, i0, cnt):
-    """Debug code -- tests interval overlap detection/calculation
-    """
-    print "** Testing epoch (%d, %d)" % (e0, e1)
-    idx = find_ts_interval_start(t, e0, e1)
-    assert idx == i0, "Wanted idx %d, got %d" % (i0, idx)
-    if i0 >= 0:
-        c = find_ts_interval_overlap(i0, t, e0, e1)
-        assert c == cnt, "Wanted cnt %d, got %d" % (cnt, c)
-
-def find_ts_interval(t, epoch_start, epoch_stop):
-    """ Finds the overlapping section of array *t* with epoch start
-        and stop times.
-
-        Args:
-            *t* (double array) Timestamp array
-            *epoch_start* (double) Epoch start time
-            *epoch_stop* (double) Epoch stop time
-
-        Returns:
-            *idx* (int) Index of first element in *t* at or after *epoch_start*
-            *count* (int) Number of elements in *t* between *epoch_start* and *epoch_stop*
-    """
-    idx = find_ts_interval_start(t, epoch_start, epoch_stop)
-    if idx < 0:
-        return -1, -1
-    cnt = find_ts_interval_overlap(idx, t, epoch_start, epoch_stop)
-    return idx, cnt
-
-def find_ts_interval_start(t, epoch_start, epoch_stop):
-    """ Finds the first element in *t* that is >= *epoch_start*
-
-        Args:
-            *t* (double array) Timestamp array
-            *epoch_start* (double) Epoch start time
-            *epoch_stop* (double) Epoch stop time
-
-        Returns:
-            *idx* (int) Index of first element in *t* at or after *epoch_start*, or -1 if no overlap
-    """
-    i0 = 0
-    t0 = t[i0]
-    i1 = len(t) - 1
-    t1 = t[i1]
-    #print "Searching %d to %d" % (epoch_start, epoch_stop)
-    # make sure there's overlap between epoch and time series
-    # see if time series start is within range
-    if t0 > epoch_stop or t1 < epoch_start:
-        #print "No ts overlap"
-        return -1
-    # check edge case
-    if epoch_start == t1:
-        # epoch starts where time series ends
-        # only overlap between timeseries and epoch is last sample
-        #   of time series
-        #print "epoch start == t1"
-        return i1
-    # else, start of epoch is somewhere in time series. look for it
-    window = i1 - i0
-    # search until we're within 4 samples, then search linearly
-    while window > 4:
-        mid = i0 + (i1 - i0) / 2
-        midt = t[mid]
-    #    print "%f\t%f\t%f\t(%d)" % (t0, midt, t1, window)
-        if epoch_start == midt:
-            #print "Found at mid=%d" % mid
-            return mid
-        if epoch_start > midt:
-            # epoch start later than midpoint of window
-            # move window start to midpoint and go again
-            i0 = mid
-            t0 = midt
-        else:
-            # start < midt: epoch start beforem midpoint of window
-            #   so move window to end to midpoint and start again
-            i1 = mid
-            t1 = midt
-        window = i1 - i0
-    # sample is in narrow window. search linearly
-    #print "Searching %d-%d (%f to %f)" % (i0, i1, t0, t1)
-    for i in range(i0, i1+1):
-        #print t[i]
-        if t[i] >= epoch_start:
-            # first sample greater than epoch start. make sure
-            #   it's also before epoch end
-            if t[i] < epoch_stop:
-                #print "start<=%d<end, idx=%d" % (t[i], i)
-                return i
-            else:
-                # epoch rests entirely between two timestamp 
-                #    samples, with no overlap
-                #print "No overlap"
-                return -1
-    #print "Epoch start: %f" % start_time
-    #print "Epoch end: %f" % stop_time
-    assert False, "Unable to find start of timeseries overlap with epoch"
-
-def find_ts_interval_overlap(i0, t, epoch_start, epoch_stop):
-    """ Finds the number of elements in *t* that overlap with epoch
-        start/stop.
-
-        Args:
-            *i0* (int) Index of first element in *t* that is in [start,stop] interval
-            *t* (double array) Timestamp array
-            *epoch_start* (double) Epoch start time
-            *epoch_stop* (double) Epoch stop time
-
-        Returns:
-            *cnt* (int) Number of elements in *t* that overlap with epoch
-    """
-    assert epoch_start <= t[i0]
-    t0 = t[i0]
-    i1 = len(t) - 1
-    t1 = t[i1]
-    # if we made it here, i0 is within epoch
-    # see where timeseries ends relative to epoch end
-    if t1 <= epoch_stop:
-        # timeseries ends before or at end of epoch
-        cnt = i1 - i0 + 1
-        #print "\tA\t%d, %d -> %d" % (i0, i1, cnt)
-        return cnt
-    # time series extends beyond epoch end. find end of overlap
-    # if we've made it here then there is at least one timeseries entry
-    #   that extends beyond epoch
-    for i in range(i0, (len(t)-1)):
-        if t[i] <= epoch_stop and t[i+1] > epoch_stop:
-            cnt = i - i0 + 1
-            #print "\tB\t%d, %d -> %d" % (i0, i, cnt)
-            return cnt
-    assert False, "Failed to find overlap"
-
-
 class Epoch(object):
     """ Epoch object
         Epochs represent specific experimental intervals and store
@@ -198,16 +36,13 @@ class Epoch(object):
         self.spec["ignore_intervals"]["_value"] = []
         # list of tags associated with epoch
         self.spec["tags"]["_value"] = []
-        if nwb is not None:
-            if name in self.nwb.file_pointer["epochs"]:
-                nwb.fatal_error("Duplicate epoch names ('%s')" % name)
-        else:
-            print "** Warning: creating epoch without specifying neurodata file"
-            print "Hopefully this is because of an EpochTS self-test"
+        self.spec["_attributes"]["links"]["_value"] = []
         # go ahead and create epoch folder now
-        fp = nwb.file_pointer
-        epoch = fp["epochs"].create_group(self.name)
+        epoch = nwb.file_pointer["epochs"].create_group(self.name)
         self.finalized = False
+
+    def set_description(self, desc):
+        self.set_value("description", value)
 
     def set_value(self, key, value, **attrs):
         """Adds an annotating key-value pair (ie, dataset) to the epoch.
@@ -263,9 +98,7 @@ class Epoch(object):
         epoch_ts["timeseries"] = timeseries_path
         #print timeseries_path
         if timeseries_path not in self.nwb.file_pointer:
-            print "** Error **"
-            print "Time series '%s' not found" % timeseries_path
-            assert False
+            self.nwb.fatal_error("Time series '%s' not found" % timeseries_path)
         ts = self.nwb.file_pointer[timeseries_path]
         if "timestamps" in ts:
             t = ts["timestamps"].value
@@ -276,19 +109,14 @@ class Epoch(object):
             t = t0 + np.arange(n) / rate
         # if no overlap, don't add to timeseries
         # look for overlap between epoch and time series
-        e0 = self.start_time
-        e1 = self.stop_time
-        start_idx = find_ts_interval_start(t, e0, e1)
-        epoch_ts["start_idx"] = start_idx
-        if start_idx < 0:
-            #sys.stderr.write("\t%s has no data in %s\n" % (in_epoch_name, self.name))
+        i0, i1 = self.find_ts_overlap(t)
+        if i0 is None:
             return
-        cnt = find_ts_interval_overlap(start_idx, t, e0, e1)
-        epoch_ts["count"] = cnt
-        if cnt <= 0:
-            #sys.stderr.write("\t%s has no overlap with %s\n" % (in_epoch_name, self.name))
-            return
+        epoch_ts["start_idx"] = i0
+        epoch_ts["count"] = i1 - i0 + 1
         self.timeseries_dict[in_epoch_name] = epoch_ts
+        label = in_epoch_name + " is " + timeseries_path
+        self.spec["_attributes"]["links"]["_value"].append(label)
 
     def set_description(self, desc):
         """ This sets the epoch's description field (a required field
@@ -302,6 +130,70 @@ class Epoch(object):
         """
         self.spec["description"]["_value"] = desc
         
+    def find_ts_overlap(self, timestamps):
+        """ Finds the first element in *timestamps* that is >= *epoch_start*
+            and last element that is <= "epoch_stop"
+
+            Args:
+                *timestamps* (double array) Timestamp array
+
+            Returns:
+                *idx_0*, "idx_1" (ints) Index of first and last elements 
+                in *timestamps* that fall within specified
+                interval, or None, None if there is no overlap
+        """
+        start = self.start_time
+        stop = self.stop_time
+        # ensure there are non-nan times
+        isnan = np.isnan(timestamps)
+        if isnan.all(): 
+            return None, None   # all values are NaN -- no overlap
+        # convert all nans to a numerical value 
+        # when searching for start, use -1
+        # when searching for end, use stop+1
+        timestamps = np.nan_to_num(timestamps)
+        t_test = timestamps + isnan * -1 # make nan<0
+        # array now nan-friendly. find first index where timestamps >= start
+        i0 = np.argmax(t_test >= start)
+        # if argmax returns zero then the first timestamp is >= start or 
+        #   no timestamps are. find out which is which
+        if i0 == 0:
+            if t_test[0] < start:
+                return None, None # no timestamps > start
+        if t_test[i0] > stop:
+            return None, None # timestamps only before start and after stop
+        # if we reached here then some or all timestamps are after start
+        # search for first after end, adjusting compare array so nan>stop
+        t_test = timestamps + isnan * (stop+1)
+        # start looking after i0 -- no point looking before, plus if we
+        #   do look before and NaNs are present, it screws up the search
+        i1 = np.argmin((t_test <= stop)[i0:])
+        # if i1 is 0, either all timestamps are <= stop, or all > stop
+        if i1 == 0:
+            if t_test[0] > stop:
+                return None, None # no timestamps < stop
+            i1 = len(timestamps) - 1
+        else:
+            i1 = i0 + i1 - 1 # i1 is the first value > stop. fix that
+        # make sure adjusted i1 value is non-nan
+        while isnan[i1]:
+            i1 = i1 - 1
+            assert i1 >= 0
+        try:    # error checking 
+            assert i0 <= i1
+            assert not np.isnan(timestamps[i0])
+            assert not np.isnan(timestamps[i1])
+            assert timestamps[i0] >= start and timestamps[i0] <= stop
+            assert timestamps[i1] >= start and timestamps[i1] <= stop
+            return i0, i1
+        except AssertionError:
+            print "-------------------" + self.name
+            print "epoch: %f, %f" % (start, stop)
+            print "time: %f, %f" % (timestamps[0], timestamps[-1])
+            print "idx 0: %d\tt:%f" % (i0, timestamps[i0])
+            print "idx 1: %d\tt:%f" % (i1, timestamps[i1])
+            assert False, "Internal error"
+
     def finalize(self):
         """ Finish epoch entry and write data to the file
 
@@ -332,9 +224,7 @@ class Epoch(object):
         self.nwb.add_epoch_tags(self.spec["tags"]["_value"])
         # write content to file
         grp = self.nwb.file_pointer["epochs/" + self.name]
-        import nwb
-        nwb.write_json("out.json", self.spec)
-        self.nwb.write_datasets(grp, "", self.spec, False, False)
+        self.nwb.write_datasets(grp, "", self.spec)
         self.nwb.write_attributes(grp, self.spec)
         # flag ourself as done
         self.finalized = True

@@ -72,47 +72,51 @@
       "_description" : "Experimental protocol, if applicable (e.g., IACUC)"
 
     },
-    "subject_id" :
-    {
-      "_datatype" : "str", "_include" : "optional",
-      "_description" : "ID of animal/person used/participating in experiment (use lab naming convention)"
-
-    },
     "subject" :
     {
-      "_datatype" : "str", "_include" : "optional",
-      "_description" : "Description of subject and where subject came from (e.g., breeder, if animal)"
+      "_datatype" : "group",
+      "subject_id" :
+      {
+        "_datatype" : "str", "_include" : "optional",
+        "_description" : "ID of animal/person used/participating in experiment (use lab naming convention)"
 
-    },
-    "species" :
-    {
-      "_datatype" : "str", "_include" : "optional",
-      "_description" : "Species of subject"
+      },
+      "description" :
+      {
+        "_datatype" : "str", "_include" : "optional",
+        "_description" : "Description of subject and where subject came from (e.g., breeder, if animal)"
 
-    },
-    "genotype" :
-    {
-      "_datatype" : "str", "_include" : "optional",
-      "_description" : "Genotype of subject"
+      },
+      "genotype" :
+      {
+        "_datatype" : "str", "_include" : "optional",
+        "_description" : "Genotype of subject"
 
-    },
-    "sex" :
-    {
-      "_datatype" : "str", "_include" : "optional",
-      "_description" : "Gender of subject"
+      },
+      "species" :
+      {
+        "_datatype" : "str", "_include" : "optional",
+        "_description" : "Species of subject"
 
-    },
-    "age" :
-    {
-      "_datatype" : "str", "_include" : "optional",
-      "_description" : "Age of subject"
+      },
+      "sex" :
+      {
+        "_datatype" : "str", "_include" : "optional",
+        "_description" : "Gender of subject"
 
-    },
-    "weight" :
-    {
-      "_datatype" : "str", "_include" : "optional",
-      "_description" : "Weight at time of experiment, time of surgery, and at other important times"
+      },
+      "age" :
+      {
+        "_datatype" : "str", "_include" : "optional",
+        "_description" : "Age of subject"
 
+      },
+      "weight" :
+      {
+        "_datatype" : "str", "_include" : "optional",
+        "_description" : "Weight at time of experiment, time of surgery, and at other important times"
+
+      }
     },
     "virus" :
     {
@@ -178,11 +182,36 @@
       {
         "_datatype" : "group",
         "_include" : "optional",
-        "_description" : "One of possibly many folders describing an optical imaging instance",
+        "_description" : "One of possibly many folders describing an optical imaging plane/channel instance",
         "description" :
         {
           "_datatype" : "str", "_include" : "optional",
           "_description" : ""
+        },
+        "manifold" :
+        {
+          "_datatype" : "f4",
+          "_description" : "3D float array with x,y,z coordinates of each pixel. Array structure: [height][width][3]",
+          "_include" : "optional",
+		  "_attributes" :
+		  {
+			  "units" :
+			  {
+				  "_datatype" : "str",
+				  "_value" : "Meters"
+			  },
+			  "conversion" :
+			  {
+				  "_datatype" : "f4",
+				  "_value" : "1.0"
+			  }
+		  }
+        },
+        "reference_frame" :
+        {
+          "_datatype" : "str",
+          "_description" : "Describes position and reference frame of manifold based on position of first element in manifold. For example, text description of anotomical location or vectors needed to rotate to common anotomical axis (eg, AP/DV/ML)",
+          "_include" : "mandatory"
         },
         "indicator" :
         {
@@ -218,6 +247,12 @@
         {
           "_datatype" : "str", "_include" : "optional",
           "_description" : "location of imaged area"
+        },
+        "device" :
+        {
+          "_datatype" : "str", "_include" : "optional",
+          "_description" : "name of recording device",
+          "_linkto" : "general/devices/"
         }
       }
     },

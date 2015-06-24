@@ -15,7 +15,7 @@ borg.set_metadata_from_file("nwb.py", "nwb.py")
 
 borg.set_metadata("extracellular_ephys/shank1/device", "recording device")
 borg.set_metadata("extracellular_ephys/shank1/foo", "custom field")
-borg.set_metadata("extracellular_ephys/impedance", np.arange(10))
+borg.set_metadata("extracellular_ephys/impedance", 1.0*np.arange(10))
 
 borg.set_metadata("intracellular_ephys/foo/device", "Mary had a little lamb")
 
