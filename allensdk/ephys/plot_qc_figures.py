@@ -246,7 +246,7 @@ def plot_sweep_figures(nwb_file, features, image_dir, sizes):
 #            sns.despine()
 
             v_prev, i_prev, t_prev, r_prev = v, i, t, r
-
+        
         prev_sweep_number = sweep_number
 
         save_figure(tp_fig, 'test_pulse_%d' % sweep_number, 'test_pulses', image_dir, sizes, image_file_sets)
@@ -254,13 +254,14 @@ def plot_sweep_figures(nwb_file, features, image_dir, sizes):
 
     return image_file_sets
 
-def save_figure(fig, image_name, image_set_name, image_dir, sizes, image_sets, scalew=1, scaleh=1):
+def save_figure(fig, image_name, image_set_name, image_dir, sizes, image_sets, scalew=1, scaleh=1, ext='jpg'):
     plt.figure(fig.number)
 
     for i, size in enumerate(sizes):
         fig.set_size_inches(size['size']*scalew, size['size']*scaleh)
 
-        image_file = os.path.join(image_dir, "%s%s.png" % (image_name, size['suffix']))
+        image_file = os.path.join(image_dir, "%s%s.%s" % (image_name, size['suffix'], ext))
+
         plt.savefig(image_file, bbox_inches="tight")
 
         image_set = image_sets[i]

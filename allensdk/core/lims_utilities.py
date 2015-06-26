@@ -9,7 +9,7 @@ BIOPHYS_MODEL_PARAMETERS_FILE_TYPE_ID = 329230374
 def get_well_known_files_by_type(wkfs, wkf_type_id):
     out = [ os.path.join( wkf['storage_directory'], wkf['filename'] )
             for wkf in wkfs
-            if wkf['well_known_file_type_id'] == wkf_type_id ]
+            if wkf.get('well_known_file_type_id',None) == wkf_type_id ]
 
     if len(out) == 0:
         raise IOError("Could not find well known files with type %d." % wkf_type_id)
