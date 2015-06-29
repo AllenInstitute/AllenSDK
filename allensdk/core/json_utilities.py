@@ -33,8 +33,19 @@ def handler(obj):
         return obj.to_dict()
     elif isinstance(obj, np.ndarray):
         return obj.tolist()
-    elif isinstance(obj, np.float64) or isinstance(obj, np.float32):
+    elif ( isinstance(obj, np.float64) or 
+           isinstance(obj, np.float32) or
+           isinstance(obj, np.float16) ):
         return float(obj)
+    elif ( isinstance(obj, np.int64) or 
+           isinstance(obj, np.int32) or 
+           isinstance(obj, np.int16) or 
+           isinstance(obj, np.int8) or 
+           isinstance(obj, np.uint64) or 
+           isinstance(obj, np.uint32) or
+           isinstance(obj, np.uint16) or
+           isinstance(obj, np.uint8) ):
+        return long(obj)
     elif hasattr(obj, 'isoformat'):
         return obj.isoformat()
     else:
