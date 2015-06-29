@@ -367,14 +367,19 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
 
     # 1 - Plot the short_squares
     logging.info("saving short square figs")
-    repeat_amp = cw_detail["short_squares"]["repeat_amp"]
-    sweep_features = features["specimens"][0]["sweep_ephys_features"]
-    short_squares_sweeps = [s for s in cw_detail["short_squares"]["sweep_info"] 
-                            if s["stim_amp"] == repeat_amp and (len(get_spikes(sweep_features, s["sweep_num"])) > 0)]
-    figs = plot_single_ap_values(nwb_file, short_squares_sweeps, features, "short_square") 
-    image_file_set = []
-    for index, fig in enumerate(figs):
-        save_figure(fig, 'short_squares_%d' % index, 'short_squares', image_dir, sizes, cell_image_files)
+    repeat_amp = cw_detail["short_squares"].get("repeat_amp", None)
+
+    if repeat_amp is not None:
+        sweep_features = features["specimens"][0]["sweep_ephys_features"]
+        short_squares_sweeps = [s for s in cw_detail["short_squares"]["sweep_info"] 
+                                if s["stim_amp"] == repeat_amp and (len(get_spikes(sweep_features, s["sweep_num"])) > 0)]
+        figs = plot_single_ap_values(nwb_file, short_squares_sweeps, features, "short_square") 
+        image_file_set = []
+        for index, fig in enumerate(figs):
+            save_figure(fig, 'short_squares_%d' % index, 'short_squares', image_dir, sizes, cell_image_files)
+
+    else:
+        logging.warning("No short square figures to plot.")
 
     # 2 - plot ramps
     logging.info("saving ramps")
