@@ -16,6 +16,7 @@
 from allensdk.model.biophys_sim.config import Config
 from allensdk.model.biophysical_perisomatic.utils import Utils
 from allensdk.core.nwb_data_set import NwbDataSet
+import allensdk.ephys.extract_cell_features as extract_cell_features
 from shutil import copy
 import numpy
 from allensdk.core.orca_data_set import OrcaDataSet
@@ -127,6 +128,12 @@ def save_nwb(output_path, v, sweep):
     '''
     output = NwbDataSet(output_path)
     output.set_sweep(sweep, None, v)
+    
+    sweep_features = extract_cell_features.extract_sweep_features(output_path,
+                                                                  [sweep])
+    spikes = sweep_features[sweep]['mean']['spikes']
+    spike_times = [ s['t'] for s in spikes ]
+    output.set_spike_times(sweep, spike_times)
 
 
 def save_orca(output_path, v, sweep):

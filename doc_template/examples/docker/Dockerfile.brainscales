@@ -27,6 +27,9 @@ RUN pip install six --upgrade
 RUN pip install sphinx numpydoc
 RUN pip install ipython[notebook] --upgrade
 RUN pip install functools32
-RUN pip install |tgz_url|
-
 RUN pip install pandas
+
+RUN apt-get -yq install graphviz libgraphviz-dev pkg-config
+RUN pip install pygraphviz networkx 
+
+RUN pip install |tgz_url|
