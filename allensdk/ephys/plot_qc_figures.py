@@ -281,6 +281,7 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
     
     cw_detail = features["specimens"][0]["cell_ephys_features"]
     cw_general = features["specimens"][0]["ephys_features"][0]
+    sweep_features = features["specimens"][0]["sweep_ephys_features"]
 
     # Need to figure out maximum width of featureplot before starting
     # Plotting them as individual figures for now    
@@ -370,7 +371,6 @@ def plot_cell_figures(nwb_file, features, image_dir, sizes):
     repeat_amp = cw_detail["short_squares"].get("repeat_amp", None)
 
     if repeat_amp is not None:
-        sweep_features = features["specimens"][0]["sweep_ephys_features"]
         short_squares_sweeps = [s for s in cw_detail["short_squares"]["sweep_info"] 
                                 if s["stim_amp"] == repeat_amp and (len(get_spikes(sweep_features, s["sweep_num"])) > 0)]
         figs = plot_single_ap_values(nwb_file, short_squares_sweeps, features, "short_square") 
