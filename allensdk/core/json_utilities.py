@@ -25,7 +25,11 @@ def read(file_name):
 def write(file_name, obj):
     """ Shortcut for writing JSON to a file.  This also takes care of serializing numpy and data types. """
     with open(file_name, 'wb') as f:
-        f.write(json.dumps(obj, indent=2, default=handler))
+        f.write(write_string(obj))
+
+def write_string(obj):
+    """ Shortcut for writing JSON to a string.  This also takes care of serializing numpy and data types. """
+    return json.dumps(obj, indent=2, default=handler)
 
 def handler(obj):
     """ Used by write_json convert a few non-standard types to things that the json package can handle. """

@@ -218,6 +218,18 @@ class RmaApi(Api):
         if debug != None:
             options_params.append(self.debug_clause(debug))
         
+        cnt = kwargs.get(RmaApi.COUNT, None)
+        
+        if cnt != None:
+            if cnt == True or cnt == 'true':
+                options_params.append('[%s$eq%s]' % (RmaApi.COUNT,
+                                                     RmaApi.TRUE))
+            elif cnt == False or cnt == 'false':
+                options_params.append('[%s$eq%s]' % (RmaApi.COUNT,
+                                                     RmaApi.FALSE))
+            else:
+                pass
+        
         if len(options_params) > 0:
             clause = RmaApi.OPTIONS + ''.join(options_params)
         

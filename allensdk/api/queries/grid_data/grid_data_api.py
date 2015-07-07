@@ -15,6 +15,7 @@
 
 from allensdk.api.api import Api
 from allensdk.api.queries.rma.rma_api import RmaApi
+import zipfile
 
 class GridDataApi(Api):
     '''HTTP Client for the Allen 3-D Expression Grid Data Service.

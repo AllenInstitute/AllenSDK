@@ -25,9 +25,17 @@ class RmaSimpleApi(RmaApi):
     
     
     def model_query(self, *args, **kwargs):
+        '''
+        Parameters
+        ----------
+        model : string
+        filters :
+        criteria :
+        include :
+        '''
         return self.do_query(
             lambda *a, **k: self.build_query_url(self.model_stage(*a, **k)),
-            lambda j: j['msg'],
+            self.read_data,
             *args,
             **kwargs)
     
@@ -35,6 +43,6 @@ class RmaSimpleApi(RmaApi):
     def service_query(self, *args, **kwargs):
         return self.do_query(
             lambda *a, **k: self.build_query_url(self.service_stage(*a, **k)),
-            lambda j: j['msg'],
+            self.read_data,
             *args,
             **kwargs)

@@ -15,8 +15,10 @@
 
 import re, logging
 from json import loads
+import allensdk.core.json_utilities as ju
 from __builtin__ import classmethod
-
+import urllib2
+import json
 
 class JsonUtil(object):
     _log = logging.getLogger(__name__)
@@ -30,6 +32,69 @@ class JsonUtil(object):
                                         re.DOTALL)
     _blank_line = re.compile(r"\n?^\s*$", re.MULTILINE)
     _carriage_return = re.compile(r"\r$", re.MULTILINE)
+    
+    
+    @classmethod
+    def read_json_url(cls, url):
+        '''Transform a JSON contained in a file into an equivalent
+        nested python dict.
+        
+        Parameters
+        ----------
+        url : string
+            where to get the json.
+        
+        Returns
+        -------
+        dict
+            Python version of the input
+        
+        Note: if the input is a bare array or literal, for example,
+        the output will be of the corresponding type.
+        '''
+        handler = urllib2.HTTPHandler()
+        opener = urllib2.build_opener(handler)
+        (main_url, query) = url.split('?q=')
+        data = json.dumps({ 'q': query})
+        request = urllib2.Request(main_url, data)
+        request.add_header("Content-Type",'application/json')
+        request.get_method = lambda: 'POST'
+        
+        try:
+            response = opener.open(request)
+        except Exception, e:
+            response = e
+            
+        if response.code == 200:
+            json_string = response.read()
+        else:
+            json_string = response.read()
+        
+        return cls.read_json_string(json_string)
+    
+    
+    @classmethod
+    def read_json_url_get(cls, url):
+        '''Transform a JSON contained in a file into an equivalent
+        nested python dict.
+        
+        Parameters
+        ----------
+        url : string
+            where to get the json.
+        
+        Returns
+        -------
+        dict
+            Python version of the input
+        
+        Note: if the input is a bare array or literal, for example,
+        the output will be of the corresponding type.
+        '''
+        response = urllib2.urlopen(url)
+        json_string = response.read()
+        
+        return cls.read_json_string(json_string)
     
     
     @classmethod
@@ -57,6 +122,36 @@ class JsonUtil(object):
     
     
     @classmethod
+    def write_json_file(cls, file_name, obj):
+        '''Wrap allensdk.core.json_utilities.write()
+        
+        Parameters
+        ----------
+        file_name : string
+            path
+        obj : object
+            The input.
+        '''
+        ju.write(file_name, obj)
+    
+    
+    @classmethod
+    def write_json_string(cls, obj):
+        '''Wrap allensdk.core.json_utilities.write_string()
+        
+        Parameters
+        ----------
+        obj : object
+            The input.
+        
+        Returns
+        -------
+        string : json serialization of the object
+        '''
+        return ju.write_string(obj)
+    
+    
+    @classmethod
     def read_json_string(cls, json_string):
         '''Transform a JSON string into an equivalent nested python dict.
         
@@ -73,7 +168,9 @@ class JsonUtil(object):
         Note: if the input is a bare array or literal, for example,
         the output will be of the corresponding type.
         '''
-        return loads(cls.remove_comments(json_string))
+        #json_string_no_comments = cls.remove_comments(json_string)
+        #return loads(json_string_no_comments)
+        return loads(json_string)
     
     
     @classmethod

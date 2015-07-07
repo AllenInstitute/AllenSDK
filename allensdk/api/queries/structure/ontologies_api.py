@@ -15,7 +15,6 @@
 
 from allensdk.api.api import Api
 from allensdk.api.queries.rma.rma_api import RmaApi
-import pandas as pd
 
 class OntologiesApi(Api):
     '''
@@ -90,19 +89,20 @@ class OntologiesApi(Api):
     def build_structure_query(self, graph_id):
         rma = RmaApi()
         
-        only_string = ','.join(['structures.id',
-                                'structures.parent_structure_id',
-                                'structures.acronym',
-                                'structures.graph_order',
-                                'structures.color_hex_triplet',
-                                'structures.structure_id_path',
-                                'structures.name'])
+#         only_string = ','.join(['structures.id',
+#                                 'structures.parent_structure_id',
+#                                 'structures.acronym',
+#                                 'structures.graph_order',
+#                                 'structures.color_hex_triplet',
+#                                 'structures.structure_id_path',
+#                                 'structures.name'])
         
         # q = 'model::Structure[graph_id$eq1],rma::options[order$eqstructures.graph_order]&tabular=structures.id,structures.acronym,structures.graph_order,structures.color_hex_triplet,structures.structure_id_path,structures.name&start_row=0&num_rows=all'
         structure_model_stage = rma.model_stage('Structure',
-                                                include=['[graph_id$eq%d]' % (graph_id)],
+                                                criteria=['[graph_id$eq%d]' % (graph_id)],
+                                                include=['structure_sets'],
                                                 order=['structures.graph_order'],
-                                                only=[only_string],
+#                                                only=[only_string],
                                                 num_rows='all',
                                                 count=False)
         
@@ -246,7 +246,3 @@ class OntologiesApi(Api):
             [n for n in ancestors_n] for ancestors_n in ancestors
         ]
         structure_dataframe['structure_set_ancestor'] = structure_ancestors
-
-
-if __name__ == '__main__':
-    print(OntologiesApi().get_atlases_table(1))

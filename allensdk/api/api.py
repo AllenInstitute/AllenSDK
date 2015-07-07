@@ -14,7 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import urllib2
-from json import load
+from allensdk.config.model.formats.json_util import JsonUtil
 import logging
 
 
@@ -117,7 +117,8 @@ class Api(object):
         '''
         api_url = url_builder_fn(*args, **kwargs) 
         
-        quoted_api_url = urllib2.quote(api_url,';/?:@&=+$,')
+        #quoted_api_url = urllib2.quote(api_url,';/?:@&=+$,')
+        quoted_api_url = api_url
                            
         json_parsed_data = self.retrieve_parsed_json_over_http(quoted_api_url)
         
@@ -226,7 +227,7 @@ class Api(object):
             raise
     
     
-    def retrieve_parsed_json_over_http(self, url):
+    def retrieve_parsed_json_over_http(self, url, post=False):
         '''Get the document and put it in a Python data structure
         
         Parameters
@@ -239,10 +240,7 @@ class Api(object):
         dict
             Result document as parsed by the JSON library.
         '''
-        response = urllib2.urlopen(url)
-        json_parsed_data = load(response)
-        
-        return json_parsed_data
+        return JsonUtil.read_json_url(url)
     
     
     def retrieve_xml_over_http(self, url):

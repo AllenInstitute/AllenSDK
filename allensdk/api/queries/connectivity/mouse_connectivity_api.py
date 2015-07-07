@@ -16,7 +16,7 @@
 from allensdk.api.api import Api
 from allensdk.api.queries.rma.rma_api import RmaApi
 from allensdk.api.queries.rma.connected_services import ConnectedServices
-import pandas as pd
+
 
 class MouseConnectivityApi(Api):
     '''HTTP Client for the Allen Mouse Brain Connectivity Atlas.
@@ -57,6 +57,7 @@ class MouseConnectivityApi(Api):
                        '?q=',
                        'model::SectionDataSet',
                        ',rma::criteria,',
+                       '[failed$eqfalse],'
                        'products[id$eq%d]' % (MouseConnectivityApi.PRODUCT_ID),
                        ',rma::include,',
                        'specimen',
@@ -231,7 +232,7 @@ class MouseConnectivityApi(Api):
         include_clause = ''.join([',rma::include,',
                                   'structure'])
         options_clause = ''.join([',rma::options,',
-                                  '[num_rows$eq5000]'])
+                                  "[num_rows$eq'all']"])
         
         url = ''.join([self.rma_endpoint,
                        '/query.',
