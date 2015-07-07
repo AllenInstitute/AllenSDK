@@ -280,6 +280,8 @@ def plot_images(ephys_roi_result, image_dir, sizes, image_sets):
     
     paths = [ os.path.join(f['storage_directory'], f['filename']) for f in wkfs ]
 
+    paths = [ lims_utilities.safe_system_path(p) for p in paths ]
+
     image_set_name = "images"
     image_sets[image_set_name] = { size_name: [] for size_name in sizes }
 
@@ -322,7 +324,6 @@ def plot_subthreshold_long_square_figures(nwb_file, cell_features, lims_features
     plt.ylabel("mV")
     plt.title("ri = {:.1f}, vrest = {:.1f}".format(lims_features["ri"], lims_features["vrest"]))
     plt.tight_layout()
-
 
     save_figure(fig, 'VI_curve', 'subthreshold_long_squares', image_dir, sizes, cell_image_files)
     

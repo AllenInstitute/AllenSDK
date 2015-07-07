@@ -1,4 +1,4 @@
-import os
+import os, platform, re
 
 HDF5_FILE_TYPE_ID = 306905526
 NWB_FILE_TYPE_ID = 475137571
@@ -76,3 +76,23 @@ def select(cursor, query):
     columns = [ d[0] for d in cursor.description ]
     return [ dict(zip(columns, c)) for c in cursor.fetchall() ]
 
+def safe_system_path(file_name):
+    if platform.system() == "Windows":
+        return linux_to_windows(file_name)
+    else:
+        return file_name
+
+def linux_to_windows(file_name):
+    p = re.compile('/(.*?)/(.*?)/vol1/(.*)')
+    m = p.match(file_name)
+    
+    if m:
+        prefix = ""
+        if m.group(1) == "data":
+            prefix = "\\\\aibsdata"
+        elif m.group(1) == "projects":
+            prefix = "\\\\titan\\cns"
+        
+        return os.path.normpath(os.path.join(prefix, m.group(2), m.group(3)))
+    else:
+        return os.path.normpath(file_name)

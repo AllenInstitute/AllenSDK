@@ -305,6 +305,8 @@ def analyze_ramps(sweep_numbers, nwb_file):
                                   'ramp')
 
         n_spikes = features.feature_list[-1].mean['n_spikes']
+        
+        
         if n_spikes > 0:
             sweep_count += 1
 
