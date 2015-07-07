@@ -2,10 +2,14 @@
 import sys
 import numpy as np
 import nwb
+from nwbco import *
 
 # create a new borg file. If we don't specify a time, the present time
 #   will be used
-borg = nwb.NWB(filename="sample_abstract_feature_series.nwb", identifier="test", overwrite=True, description="test abstract feature file")
+fname = "sample_zabstract.nwb"
+borg = nwb.NWB(filename=fname, identifier="test", overwrite=True, description="test abstract feature file")
+print "Creating " + fname
+borg.set_metadata_from_file("source_script", sys.argv[0])
 
 # create an AbstractFeatureSeries
 # This will be stored in 'stimulus' as its normal use case will be to

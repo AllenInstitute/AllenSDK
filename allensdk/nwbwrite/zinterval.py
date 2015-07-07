@@ -1,10 +1,14 @@
 #!/usr/bin/python
 import sys
 import nwb
+from nwbco import *
+fname = "sample_zinterval.nwb"
 
 # create a new borg file. If we don't specify a time, the present time
 #   will be used
-borg_file = nwb.NWB(filename="sample_interval_series.nwb", identifier="test", overwrite=True, description="Test file for interval series")
+borg_file = nwb.NWB(filename=fname, identifier="test", overwrite=True, description="Test file for interval series")
+print "Creating " + fname
+borg_file.set_metadata_from_file("source_script", sys.argv[0])
 
 # create an IntervalSeries
 # This will normally be stored in processing or stimulus

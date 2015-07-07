@@ -13,7 +13,7 @@ import nwbep
 import nwbmo
 
 VERS_MAJOR = 0
-VERS_MINOR = 5
+VERS_MINOR = 9
 VERS_PATCH = 0
 
 FILE_VERSION_STR = "NWB-%d.%d.%d" % (VERS_MAJOR, VERS_MINOR, VERS_PATCH)
@@ -31,7 +31,7 @@ def get_file_vers_string():
     return FILE_VERSION_STR
 
 def create_identifier(base_string):
-    return base_string + " " + FILE_VERSION_STR + ": " + time.ctime()
+    return base_string + "; " + FILE_VERSION_STR + "; " + time.ctime()
 
 # merge dict y into dict x
 def recursive_dictionary_merge(x, y):
@@ -57,7 +57,7 @@ def load_json(fname):
         sys.exit(1)
     return jin
 
-def load_spec():
+def load_spec(custom_spec):
     spec = load_json("spec_file.json")
     ts = load_json("spec_ts.json")
     recursive_dictionary_merge(spec, ts)
@@ -69,6 +69,9 @@ def load_spec():
     recursive_dictionary_merge(spec, gen)
     ep = load_json("spec_epoch.json")
     recursive_dictionary_merge(spec, ep)
+    if len(custom_spec) > 0:
+        custom = load_json(custom_spec)
+        recursive_dictionary_merge(spec, custom)
     write_json("fullspec.json", spec)
     return spec
 
@@ -82,6 +85,42 @@ def write_json(fname, js):
 #   SOMETIMES work better for storing and retrieving strings
 
 class NWB(object):
+    """ Represents an NWB file. Calling the NWB constructor creates the file.
+        The following command-line arguments are recognized:
+
+            filename (text -- mandatory) The name of the to-be created file.
+
+            modify (boolean -- optional) Opens the file in append mode if the
+            file exists. If the file exists and this flag (or 'overwrite') is 
+            not set, an error occurs (to prevent accidentally overwriting 
+            or modifying an existing file)
+
+            overwrite (boolean -- optional) If the specified file exists,
+            it will be overwritten
+
+            keep_original (boolean) -- If true, a back-up copy of the original 
+            file will be kept, named '<filename>.prev'
+
+            start_time (text -- optional) This is the starting time of the 
+            experiment.  If this isn't provided, the start time of the 
+            experiment will default to the time that the file is created
+
+            identifier (text -- mandatory) A unique identifier for the file, to
+            differentiate it from all other files (even in other labs). A 
+            suggested way to create the identifier is to use a lab-specific
+            string and send it to nwb.create_identifier(string). This function
+            returns the supplied string appended by the present date.
+
+            description (text -- mandatory) A one or two sentence description
+            of the experiment and what the data in the file represents
+
+            auto_compress (boolean -- optional) Data is compressed automatically
+            through the API. Setting 'auto_compress=False' disables this
+            behavior
+
+            custom_spec (text -- optional) -- json file used to 
+            customize the format specification
+    """
     def __init__(self, **vargs):
         self.read_arguments(**vargs)
         self.file_pointer = None
@@ -95,7 +134,7 @@ class NWB(object):
         # use a dict as it's easier to filter out dups
         self.epoch_tag_dict = {}
         # load specification
-        self.spec = load_spec()
+        self.spec = load_spec(self.custom_spec)
         # flag to keep backup of original file, using ".prev" suffix
         self.keep_original = False 
         #
@@ -129,6 +168,7 @@ class NWB(object):
         # to track softlinks
         self.ts_time_softlinks = {}
 
+    # internal API function to process constructor arguments
     def read_arguments(self, **vargs):
         err_str = ""
         # read start time
@@ -140,6 +180,17 @@ class NWB(object):
             del vargs["starting_time"]
         else:
             self.start_time = time.ctime()
+        if "auto_compress" in vargs:
+            self.auto_compress = vargs["auto_compress"]
+        else:
+            self.auto_compress = True
+        # allow user to specify custom json specification file
+        # when the request to specify multiple files comes in, allow
+        #   multiple files to be submitted as a dictionary or list
+        if "custom_spec" in vargs:
+            self.custom_spec = vargs["custom_spec"]
+        else:
+            self.custom_spec = []
         # read identifier
         if "identifier" in vargs:
             self.file_identifier = vargs["identifier"]
@@ -170,6 +221,9 @@ class NWB(object):
         traceback.print_stack()
         sys.exit(1)
 
+    # internfal function that stores all tags that were used in epochs,
+    #   so that a global list can be appended to the epoch folder on 
+    #   file closing
     def add_epoch_tags(self, tags):
         for i in range(len(tags)):
             tag = tags[i]
@@ -180,6 +234,7 @@ class NWB(object):
     ####################################################################
     # File operations
 
+    # internal function that creates a new file, including file skeleton
     def create_file(self):
         # open file
         try:
@@ -217,6 +272,7 @@ class NWB(object):
         hana = fp.create_group("analysis")
 
 
+    # internal function to open existing file for writing
     def open_existing(self):
         # make backup copy before modifying anything
         # copy2 preserves file metadata (eg, create date)
@@ -239,12 +295,23 @@ class NWB(object):
         mod_time.append(np.string_(time.ctime()))
         create.attrs["modification_time"] = mod_time
 
+    # internal function that pushes metadata to the file on file closing
     def write_metadata(self):
         grp = self.file_pointer["general"]
         spec = self.spec["General"]
         self.write_datasets(grp, "", spec)
 
     def close(self):
+        """ Finishes and closes an NWB file. This includes writing pending
+            data to disk and adding annotations.
+            NOTE: this procedure must be called to produce a valid NWB file
+
+            Arguments:
+                None
+
+            Returns:
+                Nothing
+        """
         # finalize all time series
         # this will be a no-op for series that have already been finalized
         for i in range(len(self.ts_list)):
@@ -280,6 +347,9 @@ class NWB(object):
     ####################################################################
     # Link management
 
+    # internal API function to store a link between timeseries::data
+    #   so that a summary of all links can be produced when the file
+    #   closes
     def record_timeseries_data_link(self, src, dest):
         # make copies of values using shorter names to keep line length down
         label_map = self.ts_data_link_map
@@ -290,6 +360,9 @@ class NWB(object):
         # update label counter
         self.ts_data_link_cnt = n
 
+    # internal API function to store a link between timeseries::timestamps
+    #   so that a summary of all links can be produced when the file
+    #   closes
     def record_timeseries_time_link(self, src, dest):
         # make copies of values using shorter names to keep line length down
         label_map = self.ts_time_link_map
@@ -300,9 +373,14 @@ class NWB(object):
         # update label counter
         self.ts_time_link_cnt = n
 
+    # internal API function to store a link between timeseries::timestamps
+    #   so that a summary of all links can be produced when the file
+    #   closes
     def record_timeseries_data_soft_link(self, src, dest):
         self.ts_time_softlinks[src] = dest
 
+    # internal API function to manage timeseries link indexing
+    #
     # this function takes the source and destination paths to objects
     #   that are linked and updates a map of what is linked to what
     # it handles the case where a link is itself linked to a link, and
@@ -368,12 +446,119 @@ class NWB(object):
     # create file content
 
     def create_epoch(self, name, start, stop):
+        """ Creates a new Epoch object. Epochs are used to track intervals
+            in an experiment, such as exposure to a certain type of stimuli
+            (an interval where orientation gratings are shown, or of 
+            sparse noise) or a different paradigm (a rat exploring an 
+            enclosure versus sleeping between explorations)
+
+            Arguments:
+                *name* (text) The name of the epoch, as it will appear in
+                the file
+
+                *start* (float) The starting time of the epoch
+
+                *stop* (float) The ending time of the epoch
+
+            Returns:
+                Epoch object
+        """
         spec = self.spec["Epoch"]
         epo = nwbep.Epoch(name, self, start, stop, spec)
         self.epoch_list.append(epo)
         return epo
 
     def create_timeseries(self, ts_type, name, modality="other"):
+        """ Creates a new TimeSeries object. Timeseries are used to
+            store and associate data or events with the time the
+            data/events occur.
+
+            Arguments:
+                *ts_type* (text) The type of timeseries to be created.
+                See documentation for details. Examples can be
+
+                    TimeSeries -- simple time series
+
+                    AbstractFeatureSeries -- features of a presented
+                    stimulus. This is particularly useful when storing
+                    the raw stimulus is impractical and only certain
+                    features of the stimulus are salient. An example is
+                    the visual stimulus of orientation gratings, where
+                    the phase, spatial/temporal frequency and contrast
+                    are relevant, but the individual video frames are
+                    impractical to store, and not as useful
+
+                    AnnotationSeries -- stores strings that annotate
+                    events or actions, plus the time the annotation was made
+
+                    ElectricalSeries -- Voltage acquired during extracellular
+                    recordings
+
+                    ImageSeries -- storage object for 2D image data. An
+                    ImageSeries can represent image data within the file
+                    or can point to an image stack in an external file
+                    (eg, png or tiff)
+
+                    IndexSeries -- series that is compoesed of samples
+                    in an existing time series, for example images that
+                    are pulled from an image stack in random order
+
+                    ImageMaskSeries -- a mask that is applied to a visual
+                    stimulus
+
+                    IntervalSeries -- a list of starting and stop times
+                    of events
+
+                    OpticalSeries -- a series of image frames, such as for
+                    video stimulus or optical recording
+                    
+                    OptogeneticSeries -- optical stimulus applied during
+                    an optogentic experiment
+
+                    RoiResponseSeries -- responses of a region-of-interest
+                    during optical recordings, such as florescence or dF/F
+
+                    SpatialSeries -- storage of points in space over time
+
+                    SpikeEventSeries -- snapshots of spikes events in
+                    an extracellular recording
+
+                    TwoPhotonSeries -- Image stack recorded from a 
+                    2-photon microscope
+
+                    VoltageClampSeries, CurrentClampSeries -- current or
+                    voltage recurded during a patch clamp experiment
+
+                    VoltageClampStimulusSeries, CurrentClampStimulusSeries
+                    -- voltage or current used as stimulus during a
+                    patch clamp experiment
+
+                    WidefieldSeries -- Image stack recorded from wide-field
+                    imaging
+
+                *name* (text) the name of the TimeSeries, as it will
+                appear in the file
+
+                *modality* (text) this indicates where in the file the
+                TimeSeries will be stored. Values are:
+
+                    'acquisition' -- acquired data stored under 
+                    /acquisition/timeseries
+
+                    'stimulus' -- stimulus data stored under
+                    /stimulus/presentations
+
+                    'template' -- a template for a stimulus, useful if
+                    a stimulus will be repeated as it only has to be
+                    stored once
+
+                    'other' (DEFAULT) -- TimeSeries is to be used in a 
+                    module, in which case the module will manage its
+                    placement, or it's up to the user where to place it
+
+            Returns:
+                TimeSeries object
+        """
         # find time series by name
         # recursively examine spec and create dict of required fields
         ts_defn, ancestry = self.create_timeseries_definition(ts_type, [], None)
@@ -388,6 +573,7 @@ class NWB(object):
         self.ts_list.append(ts)
         return ts
 
+    # internal API call to get specification of time series from config file
     # read spec to create time series definition. do it recursively 
     #   if time series are subclassed
     def create_timeseries_definition(self, ts_type, ancestry, defn):
@@ -413,11 +599,41 @@ class NWB(object):
         return defn, ancestry
 
     def create_module(self, name):
+        """ Creates a Module object of the specified name. Interfaces can
+            be created by the module and will be stored inside it
+
+            Arguments:
+                *name* (text) Name of the module as it will appear in the
+                file (under /processing/)
+
+            Returns:
+                Module object
+        """
         mod = nwbmo.Module(name, self, self.spec["Module"])
         self.modules.append(mod)
         return mod
 
     def set_metadata(self, key, value, **attrs):
+        """ Creates a field under /general/ and stores the specified
+            information there. 
+            NOTE: using the constants defined in nwbco.py is strongly
+            encouraged, as this will help prevent accidental typos
+            and will not require the user to remember where a particular
+            piece of data is to be stored
+
+            Arguments:
+                *key* (text) Name of the metadata field. Please use the
+                constants and functions defined in nwbco.py
+
+                *value* Value of the data to be stored. This will be text
+                in most cases
+
+                *attrs* (dictionary, or key/value pairs) Attributes that
+                will be created on the metadata field
+
+            Returns:
+                nothing
+        """
         if type(key).__name__ == "function":
             self.fatal_error("Function passed instead of string or constant -- please see documentation for usage of '%s'" % key.__name__)
         # metadata fields are specified using hdf5 path
@@ -433,9 +649,9 @@ class NWB(object):
                 if i == n-1 and "[]" in spec:
                     spec[toks[i]] = copy.deepcopy(spec["[]"])   # custom field
                     spec = spec[toks[i]]
-                elif i < n-1 and "{}" in spec:
+                elif i < n-1 and "<>" in spec:
                     # variably named group
-                    spec[toks[i]] = copy.deepcopy(spec["{}"])
+                    spec[toks[i]] = copy.deepcopy(spec["<>"])
                     spec = spec[toks[i]]
                 else:
                     self.fatal_error("Unable to locate '%s' of %s in specification" % (toks[i], key))
@@ -453,14 +669,34 @@ class NWB(object):
             fld["_datatype"] = 'str'
             fld["_value"] = str(v)
 
-    def set_metadata_from_file(self, key, filename):
+    def set_metadata_from_file(self, key, filename, **attrs):
+        """ Creates a field under /general/ and stores the contents of
+            the specified file in that field
+            NOTE: using the constants defined in nwbco.py is strongly
+            encouraged, as this will help prevent accidental typos
+            and will not require the user to remember where a particular
+            piece of data is to be stored
+
+            Arguments:
+                *key* (text) Name of the metadata field. Please use the
+                constants and functions defined in nwbco.py
+
+                *filename* (text) Name of file containing the data to 
+                be stored
+
+                *attrs* (dictionary, or key/value pairs) Attributes that
+                will be created on the metadata field
+
+            Returns:
+                nothing
+        """
         try:
             f = open(filename, 'r')
             contents = f.read()
             f.close()
         except IOError:
             self.fatal_error("Error opening metadata file " + filename)
-        self.set_metadata(key, contents)
+        self.set_metadata(key, contents, **attrs)
 
     def create_reference_image(self, stream, name, fmt, desc, dtype=None):
         """ Adds documentation image (or movie) to file. This is stored
@@ -493,24 +729,12 @@ class NWB(object):
     ####################################################################
     # HDF5 interface
 
+    # Internal procedure to verify that value is expected type.
+    # Throws assertion if value type is unrecognized or if it's not 
+    # convertable to desired type. Procedure fails ungracefully on
+    # type error
     def check_type(self, key, value, dtype):
         # TODO verify that value is compatible w/ spec type
-        """Internal procedure to verify that value is expected type.
-           Throws assertion if value type is unrecognized or if it's not 
-           convertable to desired type. Procedure fails ungracefully on
-           type error
-           PRIVATE (this should not be called directly in the API)
-
-           Args:
-               *key* Key having value being examined
-
-               *value* Value being examined
-
-               *dtype* (string) Expected type for value
-
-           Returns:
-               *nothing*
-        """
         if dtype is None or dtype == "unrestricted":
             return  # implicit OK
         while isinstance(value, (list, np.ndarray)):
@@ -544,13 +768,14 @@ class NWB(object):
             # fail ungracefully and print stack trace
             self.fatal_error(m1 + m2)
 
-    # set key-value pair
+    # internal API function to set key-value pair structure in the 
+    #   provided specification
     def set_value_internal(self, key, value, spec, name, dtype=None, **attrs):
+        if isinstance(value, nwbts.TimeSeries):
+            value = value.full_path()
         if isinstance(value, unicode):
             value = str(value)
-        # see if in spec
-        #   if so, verify type
-        #   if not, use custom definition
+        # get field definition
         if key not in spec:
             # custom field. make sure it's acceptable
             if "[]" not in spec:
@@ -559,40 +784,51 @@ class NWB(object):
                 m3 = "\tvalue = " + str(value) + "\n"
                 self.fatal_error(m1 + m2 + m3)
             field = copy.deepcopy(spec["[]"])
-            field["_value"] = value
-            # see if type specified explicitly
-            if field["_datatype"] == "unrestricted":
-                if dtype is not None:
-                    field["_datatype"] = dtype
-                elif isinstance(value, (str, unicode)):
-                    field["_datatype"] = "str"
-            spec[key] = field
+            spec[key] = field   # add custom field to local spec
         else:
-            # standard field. check that value is OK
-            field = spec[key]
-            if field["_datatype"] == "unrestricted":
-                if dtype is not None:
-                    field["_datatype"] = dtype
-                elif isinstance(value, (str, unicode)):
-                    field["_datatype"] = "str"
-            elif dtype is not None and field["_datatype"] != dtype:
-                self.fatal_error("dtype for field '%s' changed from %s to %s" % (key, field["_datatype"], dtype))
-            # verify type, or set it if it's unrestricted and a float
-            if field["_datatype"] == "unrestricted":
-                # descend into list, if multi-dimensional
-                val = value
-                loops = 0
-                while isinstance(val, (list, np.ndarray)) and len(val)>0:
-                    val = val[0]
-                    loops += 1;
-                    if loops >= 10:
-                        self.fatal_error("Sanity check failed determining type -- please explicitly set dtype when setting this value (%s)", key)
-                # set non-dtyped float as float32
-                if isinstance(val, (float, np.float64, np.float32)):
-                    field["_datatype"] = 'f4'
+            field = spec[key]   # get known field from local spec
+        ########################################
+        # reset to dtype if specified by user
+        if dtype is not None:
+            field["_datatype"] = dtype
+        # if expected dtype is NWB object that means we need a link
+        # value must be a string (the path) or that type of object
+        # handle type checking for this contingency here
+        ftype = field["_datatype"]
+        if ftype == "interface" or ftype == "timeseries":
+            path = ""
+            if ftype == "interface" and isinstance(value, nwbmo.Interface):
+                path = value.full_path()
+            elif ftype == "timeseries" and isinstance(value, nwbts.TimeSeries):
+                path = value.full_path()
+            elif isinstance(value, (str, unicode)):
+                path = str(value)
             else:
-                self.check_type(key, value, field["_datatype"])
-            field["_value"] = value
+                self.fatal_error("Expected type %s, got %s" % (ftype, type(value)))
+            if "_value" in field:
+                self.fatal_error("Setting link after value already defined")
+            field["_value_hardlink"] = path
+            # all done here
+            return
+        if field["_datatype"] == "unrestricted":
+            if isinstance(value, (str, unicode)):
+                field["_datatype"] = "str"
+        # verify type, or set it if it's unrestricted and a float
+        if field["_datatype"] == "unrestricted":
+            # descend into list, if multi-dimensional
+            val = value
+            loops = 0
+            while isinstance(val, (list, np.ndarray)) and len(val)>0:
+                val = val[0]
+                loops += 1;
+                if loops >= 10:
+                    self.fatal_error("Sanity check failed determining type -- please explicitly set dtype when setting this value (%s)", key)
+            # set non-dtyped float as float32
+            if isinstance(val, (float, np.float64, np.float32)):
+                field["_datatype"] = 'f4'
+        else:
+            self.check_type(key, value, field["_datatype"])
+        field["_value"] = value
         for k in attrs.keys():
             if k not in field["_attributes"]:
                 self.fatal_error("Custom attributes not supported -- '%s' is not part of field '%s'" %(k, key))
@@ -604,6 +840,8 @@ class NWB(object):
             else:
                 field["_attributes"][k]["_value"] = attrs[k]
 
+    # internal function to add attributes, identified in the supplied spec,
+    #   to an existing HDF5 group
     def write_attributes(self, grp, spec):
         attr = spec["_attributes"]
         for k in attr:
@@ -614,19 +852,23 @@ class NWB(object):
             if "_value" in attr[k]:
                 grp.attrs[k] = attr[k]["_value"]
 
+    # internal API function to create a dataset in the specified path,
+    #   relative to the specified group. dataset is described in spec
+    # different cases for value, hard-link and soft-link are handled
+    #   separately
+    #
+    # grp -- hdf5 group object that datasets are stored under
+    # spec -- specification dictionary of data to be stored
+    # path -- path under grp that spec applies to (nested groups
+    #     call write_datasets recursively -- this is the path to
+    #     where things are at a particular recursion round)
     def write_datasets(self, grp, path, spec):
-        """
-            grp -- hdf5 group object that datasets are stored under
-            spec -- specification dictionary of data to be stored
-            path -- path under grp that spec applies to (nested groups
-                call write_datasets recursively -- this is the path to
-                where things are at a particular recursion round)
-        """
         # write out all fields that have a _value
         for k in spec:
             if k.startswith('_'):
                 continue    # internal field -- nothing to write out
-            if k == "<>" or k == "[]" or k == "{}":
+            if k == "<>" or k == "[]":
+            #if k == "<>" or k == "[]" or k == "{}":
                 continue    # template
             # create dataset for fields in spec where _value* is specified
             local_spec = spec[k]
@@ -660,6 +902,8 @@ class NWB(object):
         link = file_path + "::" + dataset_path
 #        spec["_attributes"][field + "_link"]["_value"] = link
         # create external link
+        if len(path) > 0:
+            grp = grp[path]
         grp[field] = h5py.ExternalLink(file_path, dataset_path)
 
     def write_dataset_as_hardlink(self, grp, path, field, spec):
@@ -667,7 +911,10 @@ class NWB(object):
         # create hard link for this field
         # kernel will manage documenting hard links, after all 
         #   are created
-        dataset_path = spec["_value_hardlink"] + "/" + field
+        dataset_path = spec["_value_hardlink"] 
+        #dataset_path = spec["_value_hardlink"] + "/" + field
+        if len(path) > 0:
+            grp = grp[path]
         grp[field] = self.file_pointer[dataset_path]
 
     def write_dataset_to_file(self, grp, path, field, spec):
@@ -731,27 +978,33 @@ class NWB(object):
                 del varg["dtype"]
                 ## ignore compression/chunking request for strings
                 #dset = grp.create_dataset(**varg)
+                if self.auto_compress:
+                    varg["compression"] = 4
+                    varg["chunks"] = True
+                    try:
+                        # try to use compression -- if we get a type error,
+                        #   disable and try again
+                        dset = grp.create_dataset(**varg)
+                    except TypeError:
+                        del varg["compression"]
+                        del varg["chunks"]
+                        dset = grp.create_dataset(**varg)
+                else:
+                    dset = grp.create_dataset(**varg)
+        else:
+            # try to use compression -- if we get a type error, disable
+            #   and try again
+            varg["data"] = spec["_value"]
+            if self.auto_compress:
                 varg["compression"] = 4
                 varg["chunks"] = True
                 try:
-                    # try to use compression -- if we get a type error,
-                    #   disable and try again
                     dset = grp.create_dataset(**varg)
                 except TypeError:
                     del varg["compression"]
                     del varg["chunks"]
                     dset = grp.create_dataset(**varg)
-        else:
-            # try to use compression -- if we get a type error, disable
-            #   and try again
-            varg["compression"] = 4
-            varg["chunks"] = True
-            varg["data"] = spec["_value"]
-            try:
-                dset = grp.create_dataset(**varg)
-            except TypeError:
-                del varg["compression"]
-                del varg["chunks"]
+            else:
                 dset = grp.create_dataset(**varg)
         if "_attributes" in spec:
             for k in spec["_attributes"]:

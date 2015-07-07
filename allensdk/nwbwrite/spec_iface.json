@@ -7,7 +7,7 @@
       {
         "_datatype" : "str",
         "_description" : "Origin of the data represented in this interface",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
 	    "_mandatory_timeseries" : [ ],
       "[]" :
@@ -22,7 +22,7 @@
             "_datatype" : "str",
             "_description" : "Custom field",
             "_value" : "Custom",
-            "_include" : "mandatory"
+            "_include" : "required"
           }
         }
       },
@@ -30,7 +30,7 @@
       {
         "neurodata_type" : 
         {
-          "_datatype" : "str", "_include" : "mandatory", "_value" : "Interface"
+          "_datatype" : "str", "_include" : "required", "_value" : "Interface"
         }
       }
     },
@@ -83,54 +83,60 @@
       "times" :
       {
         "_datatype" : "f8",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "detection_method" :
       {
         "_datatype" : "str",
         "_description" : "Description of how events were detected, such as voltage threshold, or dV/dT threshold, as well as relevant values",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "source_idx" : 
       {
         "_datatype" : "int32",
         "_description" : "Indices into source TimeSeries::data array corresponding to time of event. Module description should define what is meant by time of event (eg, .25ms before threshold crossing). Index points to each event in the raw data",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
-      "source_timeseries" :
+      "source_electricalseries" :
       {
         "_datatype" : "timeseries",
-        "_description" : "Link to ElectricalSeries that events were pulled from",
-        "_include" : "mandatory"
+        "_description" : "HDF5 link to ElectricalSeries that events were pulled from",
+        "_include" : "required"
+      },
+      "source_electricalseries_path" :
+      {
+        "_datatype" : "text",
+        "_description" : "Path to ElectricalSeries that events were pulled from",
+        "_include" : "required"
       }
     },
     "FeatureExtraction" :
     {
-      "_description" : "General container for storing event series",
+      "_description" : "Container for salient features of detected events",
       "_include" : "optional",
       "features" :
       {
         "_datatype" : "f4",
         "_description" : "Multi-dimensional array of features extracted from each event. Array structure: [event number][channel number][feature number]",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "times" :
       {
         "_datatype" : "f8",
         "_description" : "Time of events that features correspond to (can be link",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "description" :
       {
         "_datatype" : "str",
         "_description" : "Text array with description (eg, PC1) for each of the extracted features",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "electrode_idx" :
       {
         "_datatype" : "int32",
         "_description" : "Indices of each channel here to electrodes described in extracellular_ephys/electrode_map",
-        "_include" : "mandatory"
+        "_include" : "required"
       }
     },
     "Clustering" :
@@ -141,31 +147,31 @@
       {
         "_datatype" : "f8",
         "_description" : "Times of clustered events",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "num" :
       {
         "_datatype" : "int32",
         "_description" : "Cluster number for each event",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "cluster_nums" :
       {
         "_datatype" : "int32",
         "_description" : "List of cluster numbers that are part of this interface (cluster numbers can be non-continuous)",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "peak_over_rms" :
       {
         "_datatype" : "f4",
         "_description" : "Maximum ratio of waveform peak to RMS on any cahnnel in the cluster (basic clustering metric)",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "description" :
       {
         "_datatype" : "str",
         "_description" : "Description of clusters or clustering (eg, cluster 0 is electrical noise, clusters curated using Klusters, etc)",
-        "_include" : "mandatory"
+        "_include" : "required"
       }
     },
     "ClusterWaveform" :
@@ -176,25 +182,31 @@
       {
         "_datatype" : "f4",
         "_description" : "Mean waveform of each cluster, using the same indices for each wave as cluster numbers in the associated clustering module (ie, cluster 3 is array slot [3]. Slots for missing clusters should be zero-filled",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "waveform_sd" :
       {
         "_datatype" : "f4",
         "_description" : "Standard deviation of all points in waveforms for each cluster",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "waveform_filtering" :
       {
         "_datatype" : "str",
         "_description" : "Filtering applied to data before generating mean/SD",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
-      "clusterwaveform_source" :
+      "clustering_interface" :
+      {
+        "_datatype" : "interface",
+        "_description" : "HDF5 link to clustering interface that was the source of the data shown here (can be link to this module, if clustering info is published here",
+        "_include" : "required"
+      },
+      "clustering_module_path" :
       {
         "_datatype" : "str",
-        "_description" : "Path to clustering module that was the source of the data shown here (can be path to this module, if clustering info is published here",
-        "_include" : "mandatory"
+        "_description" : "Path to clustering interface",
+        "_include" : "required"
       }
     },
     "BehavioralEvents" :
@@ -205,7 +217,7 @@
     },
     "BehavioralTimeSeries" :
     {
-      "_description" : "General container for storing event series",
+      "_description" : "General container for storing time series",
       "_include" : "optional",
 	    "_mandatory_timeseries" : [ "TimeSeries" ]
     },
@@ -223,10 +235,10 @@
       "unit_list" :
       {
         "_datatype" : "str",
-        "_include" : "required",
+        "_include" : "standard",
         "_description" : "List of unit names present in interface"
       },
-      "{}" :
+      "<>" :
       {
         "_datatype" : "group",
         "_description" : "Folder storing data from one unit",
@@ -235,19 +247,19 @@
         {
           "_datatype" : "f8",
           "_description" : "Spike times for the unit (exact or estimated)",
-          "_include" : "mandatory"
+          "_include" : "required"
         },
         "unit_description" :
         {
           "_datatype" : "str",
           "_description" : "Description of the unit (eg, cell type)",
-          "_include" : "mandatory"
+          "_include" : "required"
         },
         "source" : 
         {
           "_datatype" : "str",
-          "_description" : "Name, path or description of where unit times originated",
-          "_include" : "mandatory"
+          "_description" : "Name, path or description of where unit times originated, if it varies from the interface's source field",
+          "_include" : "optional"
         },
         "[]" :
         {
@@ -261,7 +273,7 @@
               "_datatype" : "str",
               "_description" : "Custom field",
               "_value" : "Custom",
-              "_include" : "mandatory"
+              "_include" : "required"
             }
           }
         }
@@ -276,52 +288,77 @@
       {
         "_datatype" : "group",
         "_description" : "Folder containing all segmentation data from a particular imaging plane. Group name is identifier for imaging plane",
-        "_include" : "mandatory",
-        "_attributes" : 
-        {
-          "description" :
-          {
-            "_datatype" : "str",
-            "_description" : "Text description of imaging plane",
-            "_include" : "optional"
-          }
+        "_include" : "required",
+	    "description" :
+	    {
+	  	  "_datatype" : "str",
+	  	  "_description" : "Text description of imaging plane",
+	  	  "_include" : "optional"
         },
         "roi_list" : 
         {
           "_datatype" : "str",
           "_description" : "List of ROIs in this imaging plane",
-          "_include" : "mandatory"
+          "_include" : "required"
         },
-        "imaging_description_link" : 
+        "imaging_plane_name" : 
         {
           "_datatype" : "str",
-          "_description" : "Name of description of imaging data under general/optophysiology",
-          "_include" : "mandatory",
+          "_description" : "Name of imaging plane under general/optophysiology",
+          "_include" : "required",
           "_linkto" : "general/optophysiology"
         },
+		"reference_images" :
+		{
+          "_datatype" : "group",
+          "_description" : "Folder storing reference images that ROIs are based on",
+          "_include" : "required",
+		  "<>" :
+		  {
+			  "_datatype" : "timeseries",
+			  "_description" : "One or more time series storing an image that ROIs are based on",
+			  "_include" : "optional"
+		  },
+          "[]" :
+          {
+            "_datatype" : "unrestricted",
+            "_description" : "custom field",
+            "_include" : "optional",
+            "_attributes" : 
+            {
+              "neurodata_type" :
+              {
+                "_datatype" : "str",
+                "_description" : "Custom field",
+                "_value" : "Custom",
+                "_include" : "required"
+              }
+            }
+          }
+		},
         "<>" :
         {
           "_datatype" : "group",
-          "_description" : "Region of interest. Folder name is identifier",
-          "_include" : "mandatory",
+          "_description" : "Region of interest. Folder name is ROI identifier",
+          "_include" : "required",
           "img_mask" :
           {
             "_datatype" : "f4",
             "_description" : "2D float array describing pixel mask. Values bounded on [0,1]. Array structure: [height][width]",
-            "_include" : "mandatory"
+            "_include" : "required"
           },
           "pix_mask" :
           {
             "_datatype" : "uint16",
             "_description" : "2D int array listing pixels (x,y) that compose mask",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_attributes" :
             {
               "weight" :
               {
                 "_datatype" : "f4",
                 "_description" : "Array listing weight of each pixel",
-                "_include" : "mandatory"
+                "_include" : "required"
               }
             }
           },
@@ -329,7 +366,7 @@
           {
             "_datatype" : "str",
             "_description" : "Description of this ROI",
-            "_include" : "mandatory"
+            "_include" : "required"
           },
           "[]" :
           {
@@ -343,7 +380,7 @@
                 "_datatype" : "str",
                 "_description" : "Custom field",
                 "_value" : "Custom",
-                "_include" : "mandatory"
+                "_include" : "required"
               }
             }
           }
@@ -360,16 +397,16 @@
               "_datatype" : "str",
               "_description" : "Custom field",
               "_value" : "Custom",
-              "_include" : "mandatory"
+              "_include" : "required"
             }
           }
         }
       }
     },
 
-    "Florescence" :
+    "Fluorescence" :
     {
-      "_description" : "Florescence over time of one or more ROIs. TimeSeries names should correspond to imaging plane names",
+      "_description" : "Fluorescence over time of one or more ROIs. TimeSeries names should correspond to imaging plane names",
       "_include" : "optional",
 	    "_mandatory_timeseries" : [ "RoiResponseSeries" ]
     },
@@ -378,7 +415,50 @@
       "_description" : "Df/f over time of one or more ROIs. TimeSeries names should correspond to imaging plane names",
       "_include" : "optional",
 	    "_mandatory_timeseries" : [ "RoiResponseSeries" ]
-    }
+    },
+	"MotionCorrection" :
+	{
+      "_description" : "Image stacks whose frames have been shifted (registered) to account for motion",
+      "_include" : "optional",
+		"<>" :
+		{
+			"_datatype" : "group",
+			"_description" : "One of possibly many image stacks that have been registered",
+			"original" :
+			{
+				"_datatype" : "timeseries",
+				"_description" : "HDF5 link to timeseries that contains uncorrected data",
+				"_include" : "required"
+			},
+			"original_path" :
+			{
+				"_datatype" : "str",
+				"_description" : "Path to timeseries that contains uncorrected data",
+				"_include" : "required"
+			},
+			"xy_translation" :
+			{
+				"_datatype" : "timeseries",
+				"_description" : "Timeseries storing x,y delta for each frame in 'original'",
+				"_include" : "required"
+			},
+			"corrected" :
+			{
+				"_datatype" : "timeseries",
+				"_description" : "Motion corrected ImageSeries",
+				"_include" : "required"
+			},
+			"_attributes" :
+			{
+				"links" :
+				{
+					"_datatype" : "str",
+					"_description" : "Paths of linked-to objects",
+					"_include" : "standard"
+				}
+			}
+		}
+	}
   }
 }
 

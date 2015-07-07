@@ -3,10 +3,14 @@ import sys
 import sys
 import nwb
 import numpy as np
+from nwbco import *
+fname = "sample_zpatch.nwb"
 
 # create a new borg file. If we don't specify a time, the present time
 #   will be used as the experiment start time
-borg_file = nwb.NWB(filename="sample_patchclamp.nwb", identifier="test", overwrite=True, description="Test patch clamp representation")
+borg_file = nwb.NWB(filename=fname, identifier="test", overwrite=True, description="Test patch clamp representation")
+print "Creating " + fname
+borg_file.set_metadata_from_file("source_script", sys.argv[0])
 
 # this file stores data from two virtual patch clamp recordings, one
 #   current clamp and one voltage clamp. Each recording is split into

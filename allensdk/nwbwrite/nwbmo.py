@@ -6,10 +6,12 @@ import traceback
 class Module(object):
     """ Constructor for module
 
-        Args:
-            *name* (text) name of the module (must be unique for modality)
+        Arguments:
+            *name* (text) name of the module (must be unique)
 
             *nwb* (NWB object) Created nwb file
+
+            *spec* (dict) dictionary structure defining module specification
     """
     def __init__(self, name, nwb, spec):
         self.name = name
@@ -25,7 +27,71 @@ class Module(object):
         # 
         self.finalized = False
 
+    def full_path(self):
+        """ returns HDF5 path of module
+        """
+        return "processing/" + self.name
+
     def create_interface(self, iface_type):
+        """ Creates an interface within the module. 
+            Each module can have multiple interfaces.
+            Standard interface options are:
+
+                BehavioralEpochs -- general container for storing and
+                publishing intervals (IntervalSeries)
+
+                BehavioralEvents -- general container for storing and
+                publishing event series (TimeSeries)
+
+                BehavioralTimeSeries -- general container for storing and
+                publishing time series (TimeSeries)
+
+                Clustering -- clustered spike data, whether from
+                automatic clustering tools or as a result of manual
+                sorting
+
+                ClusterWaveform -- mean event waveform of clustered data
+
+                CompassDirection -- publishes 1+ SpatialSeries storing
+                direction in degrees (or radians) 
+
+                DfOverF -- publishes 1+ RoiResponseSeries showing
+                dF/F in observed ROIs
+
+                EventDetection -- information about detected events
+
+                EventWaveform -- publishes 1+ SpikeEventSeries
+                of extracellularly recorded spike events
+
+                EyeTracking -- publishes 1+ SpatialSeries storing 
+                direction of gaze
+
+                FeatureExtraction -- salient features of events
+
+                FilteredEphys -- publishes 1+ ElectricalSeries storing
+                data from digital filtering
+
+                Fluorescence -- publishes 1+ RoiResponseSeries showing
+                fluorescence of observed ROIs
+
+                ImageSegmentation -- publishes groups of pixels that
+                represent regions of interest in an image
+
+                LFP -- a special case of FilteredEphys, filtered and
+                downsampled for LFP signal
+
+                MotionCorrection -- publishes image stacks whos frames
+                have been corrected to account for motion
+
+                Position -- publishes 1+ SpatialSeries storing physical
+                position. This can be along x, xy or xyz axes
+
+                PupilTracking -- publishes 1+ standard *TimeSeries* 
+                that stores pupil size
+
+                UnitTimes -- published data about the time(s) spikes
+                were detected in an observed unit
+        """
         if iface_type not in self.nwb.spec["Interface"]:
             self.nwb.fatal_error("unrecognized interface: " + iface_type)
         if_spec = self.create_interface_definition(iface_type)
@@ -37,11 +103,14 @@ class Module(object):
             iface = Clustering(iface_type, self, if_spec)
         elif iface_type == "UnitTimes":
             iface = UnitTimes(iface_type, self, if_spec)
+        elif iface_type == "MotionCorrection":
+            iface = MotionCorrection(iface_type, self, if_spec)
         else:
             iface = Interface(iface_type, self, if_spec)
         self.ifaces[iface_type] = iface
         return iface
 
+    # internal function
     # read spec to create time series definition. do it recursively 
     #   if time series are subclassed
     def create_interface_definition(self, if_type):
@@ -53,7 +122,7 @@ class Module(object):
     def set_description(self, desc):
         """ Set description field in module
 
-            Args:
+            Arguments:
                 *desc* (text) Description of module
 
             Returns:
@@ -65,7 +134,7 @@ class Module(object):
         """Adds a custom key-value pair (ie, dataset) to the root of 
            the module.
    
-           Args:
+           Arguments:
                *key* (string) A unique identifier within the TimeSeries
 
                *value* (any) The value associated with this key
@@ -83,7 +152,7 @@ class Module(object):
     def finalize(self):
         """ Completes the module and writes changes to disk.
 
-            Args: 
+            Arguments: 
                 *none*
 
             Returns:
@@ -107,14 +176,16 @@ class Module(object):
 class Interface(object):
     """ Constructor for Interface base class
 
-        Args:
+        Arguments:
+            
+            *name* (text) name of interface (may be class name)
+            
             *module* (*Module*) Reference to parent module object that
             interface belongs to
+
+            *spec* (dict) dictionary structure defining module specification
     """
     def __init__(self, name, module, spec):
-        """ Constructor for interface base class
-            module        pointer to parent module
-        """
         self.module = module
         self.name = name
         self.nwb = module.nwb
@@ -127,19 +198,29 @@ class Interface(object):
         self.finalized = False
 
     def full_path(self):
+        """ Returns the path to this interface
+        """
         return "processing/" + self.module.name + "/" + self.name
 
     def add_timeseries(self, ts):
+        """ Adds a *TimeSeries* to the interface, setting the storage path
+            of the *TimeSeries*. When a *TimeSeries* is added to an
+            interface, the interface manages storage and finalization
+            of it
+        """
         if self.finalized:
             self.nwb.fatal_error("Added value after finalization")
         if ts.name in self.defined_timeseries:
             self.nwb.fatal_error("time series %s already defined" % ts.name)
         if ts.name in self.linked_timeseries:
             self.nwb.fatal_error("time series %s already defined" % ts.name)
-        self.defined_timeseries[ts] = ts.spec["_attributes"]["ancestry"]["_value"]
+        self.defined_timeseries[ts.name] = ts.spec["_attributes"]["ancestry"]["_value"]
         ts.set_path("processing/" + self.module.name + "/" + self.name)
+        ts.finalize()
 
     def add_timeseries_as_link(self, ts_name, path):
+        """ Add a previously-defined *TimeSeries* to the interface
+        """
         if self.finalized:
             self.nwb.fatal_error("Added value after finalization")
         if ts_name in self.defined_timeseries:
@@ -153,7 +234,7 @@ class Interface(object):
             This can be one or more other modules, or time series
             in acquisition or stimulus
 
-            Args:
+            Arguments:
                 *src* (text) Path to objects providing data that the
                 data here is based on
 
@@ -165,7 +246,7 @@ class Interface(object):
     def set_value(self, key, value, **attrs):
         """Adds a custom key-value pair (ie, dataset) to the interface
    
-           Args:
+           Arguments:
                *key* (string) A unique identifier within the TimeSeries
 
                *value* (any) The value associated with this key
@@ -187,6 +268,8 @@ class Interface(object):
         pass
 
     def finalize(self):
+        """ Finish off the interface and write changes to disk
+        """
         if self.finalized:
             return
         self.finalized = True
@@ -202,7 +285,7 @@ class Interface(object):
             for i in range(len(reqd)):
                 tstype = reqd[i]
                 match = False
-                for ts, ancestry in self.defined_timeseries.iteritems():
+                for name, ancestry in self.defined_timeseries.iteritems():
                     for j in range(len(ancestry)):
                         if tstype == ancestry[j]:
                             match = True
@@ -211,7 +294,7 @@ class Interface(object):
                         break
                 # look for linked items
                 if not match:
-                    for ts, path in self.linked_timeseries.iteritems():
+                    for name, path in self.linked_timeseries.iteritems():
                         tgt = self.nwb.file_pointer[path]
                         ancestry = tgt.attrs["ancestry"]
                         for j in range(len(ancestry)):
@@ -226,7 +309,7 @@ class Interface(object):
         for k, v in self.spec.iteritems():
             if k.startswith("_"):
                 continue
-            if k == "[]" or k == "{}" or k == "<>":
+            if k == "[]" or k == "<>":
                 continue
             if v["_datatype"] == "group":
                 continue
@@ -242,11 +325,8 @@ class Interface(object):
             if "_attributes" not in self.spec:
                 self.spec["_attributes"] = {}
             self.spec["_attributes"]["help"] = helpdict
-        # finalize all time series, if they're not already final
-        folder = "processing/" + self.module.name + "/" + self.name
-        for ts in self.defined_timeseries:
-            ts.finalize()
         # write own data
+        folder = "processing/" + self.module.name + "/" + self.name
         grp = self.nwb.file_pointer[folder]
         self.nwb.write_datasets(grp, "", self.spec)
         self.nwb.write_attributes(grp, self.spec)
@@ -269,7 +349,7 @@ class UnitTimes(Interface):
         """ Adds data about a unit to the module, including unit name,
             description and times. 
 
-            Args:
+            Arguments:
                 *unit_name* (text) Name of the unit, as it will appear in the file
 
                 *unit_times* (double array) Times that the unit spiked
@@ -282,7 +362,7 @@ class UnitTimes(Interface):
             self.iface_folder.create_group(unit_name)
         else:
             self.nwb.fatal_error("unit %s already exists" % unit_name)
-        spec = copy.deepcopy(self.spec["{}"])
+        spec = copy.deepcopy(self.spec["<>"])
         spec["unit_description"]["_value"] = description
         spec["times"]["_value"] = unit_times
         spec["source"]["_value"] = source
@@ -296,7 +376,7 @@ class UnitTimes(Interface):
             Data will be stored in the folder that contains data
             about that unit.
 
-            Args:
+            Arguments:
                 *unit_name* (text) Name of unit, as it appears in the file
 
                 *key* (text) Key under which the data is added
@@ -308,7 +388,7 @@ class UnitTimes(Interface):
         """
         if unit_name not in self.spec:
             self.nwb.fatal_error("unrecognized unit name " + unit_name)
-        spec = copy.deepcopy(self.spec["{}"]["[]"])
+        spec = copy.deepcopy(self.spec["<>"]["[]"])
         spec["_value"] = value
         self.spec[unit_name][key] = spec
         #ut.create_dataset(data_name, data=aux_data)
@@ -317,7 +397,7 @@ class UnitTimes(Interface):
         """ Extended (subclassed) finalize procedure. It creates and stores a list of all units in the module and then
             calls the superclass finalizer.
 
-            Args:
+            Arguments:
                 *none*
 
             Returns:
@@ -366,7 +446,7 @@ class ImageSegmentation(Interface):
     def add_reference_image(self, plane, name, img):
         """ Add a reference image to the segmentation interface
 
-            Args: 
+            Arguments: 
                 *plane* (text) name of imaging plane
 
                 *name* (text) name of reference image
@@ -416,8 +496,8 @@ class ImageSegmentation(Interface):
             self.spec[plane] = copy.deepcopy(self.spec["<>"])
         #self.spec[plane]["manifold"]["_value"] = manifold
         #self.spec[plane]["reference_frame"]["_value"] = reference_frame
-        self.spec[plane]["imaging_description_link"]["_value"] = plane
-        self.spec[plane]["_attributes"]["_value"] = description
+        self.spec[plane]["imaging_plane_name"]["_value"] = plane
+        self.spec[plane]["description"]["_value"] = description
         grp = self.iface_folder.create_group(plane)
         grp.create_group("reference_images")
         self.roi_list[plane] = []
@@ -425,7 +505,7 @@ class ImageSegmentation(Interface):
     def add_roi_mask_pixels(self, image_plane, roi_name, desc, pixel_list, weights, width, height):
         """ Adds an ROI to the module, with the ROI defined using a list of pixels.
 
-            Args:
+            Arguments:
                 *image_plane* (text) name of imaging plane
             
                 *roi_name* (text) name of ROI
@@ -454,7 +534,7 @@ class ImageSegmentation(Interface):
     def add_roi_mask_img(self, image_plane, roi_name, desc, img):
         """ Adds an ROI to the module, with the ROI defined within a 2D image.
 
-            Args:
+            Arguments:
                 *image_plane* (text) name of imaging plane
 
                 *roi_name* (text) name of ROI
@@ -476,6 +556,7 @@ class ImageSegmentation(Interface):
                     weights.append(row[x])
         self.add_masks(image_plane, name, pixel_list, weights, img)
 
+    # internal function
     def add_masks(self, plane, name, desc, pixel_list, weights, img):
         if plane not in self.spec:
             self.nwb.fatal_error("Imaging plane %s not defined" % plane)
@@ -496,4 +577,79 @@ class ImageSegmentation(Interface):
             self.spec[plane]["roi_list"]["_value"] = roi_list
         # continue with normal finalization
         super(ImageSegmentation, self).finalize()
+
+class MotionCorrection(Interface):
+    def add_corrected_image(self, name, orig, xy_translation, corrected):
+        """ Adds a motion-corrected image to the module, including
+            the original image stack, the x,y delta necessary to
+            shift the image frames for registration, and the corrected
+            image stack.
+            NOTE 1: All 3 timeseries use the same timestamps and so can share/
+            link timestamp arrays
+
+            NOTE 2: The timeseries passed in as 'xy_translation' and
+            'corrected' will be renamed to these names, if they are not
+            links to existing timeseries
+
+            NOTE 3: The timeseries arguments can be either TimeSeries
+            objects (new or old in case of latter 2 args) or strings.
+            If they are new TimeSeries objects, they will be stored
+            within the module. If they are existing objects, a link
+            to those objects will be created
+
+            Arguments:
+                *orig* (ImageSeries or text) ImageSeries object or
+                text path to original image time series
+
+                *xy_translation* TimeSeries storing displacements of
+                x and y direction in the data[] field
+
+                *corrected* Motion-corrected ImageSeries
+
+            Returns:
+                *nothing*
+        """
+        self.spec[name] = copy.deepcopy(self.spec["<>"])
+        # create link to original object
+        import nwbts
+        if isinstance(orig, nwbts.TimeSeries):
+            if not orig.finalized:
+                self.nwb.fatal_error("Original timeseries must already be stored and finalized")
+            orig_path = orig.full_path()
+        else:
+            orig_path = orig
+        self.spec[name]["original"]["_value_hardlink"] = orig_path
+        links = "'original' is '%s'" % orig_path
+        # finalize other time series, or create link if a string was
+        #   provided
+        # XY translation
+        if isinstance(xy_translation, (str, unicode)):
+            self.spec[name]["xy_translation"]["_value_hardlink"] = xy_translation
+            links += "; 'xy_translation' is '%s'" % xy_translation
+        else:
+            if xy_translation.finalized:
+                # timeseries exists in file -- link to it
+                self.spec[name]["xy_translation"]["_value_hardlink"] = xy_translation.full_path()
+                links += "; 'corrected' is '%s'" % xy_translation.full_path()
+            else:
+                # new timeseries -- set it's path and finalize it
+                xy_translation.set_path("processing/" + self.module.name + "/MotionCorrection/" + name + "/")
+                xy_translation.reset_name("xy_translation")
+                xy_translation.finalize()
+        # corrected series
+        if isinstance(corrected, (str, unicode)):
+            self.spec[name]["corrected"]["_value_hardlink"] = corrected
+            links += "; 'corrected' is '%s'" % corrected
+        else:
+            if corrected.finalized:
+                # timeseries exists in file -- link to it
+                self.spec[name]["corrected"]["_value_hardlink"] = corrected.full_path()
+                links += "; 'corrected' is '%s'" % corrected.full_path()
+            else:
+                corrected.set_path("processing/" + self.module.name + "/MotionCorrection/" + name + "/")
+                corrected.reset_name("corrected")
+                corrected.finalize()
+        self.spec[name]["_attributes"]["links"]["_value"] = links
+        import nwb
+        nwb.write_json("foo.json", self.spec)
 

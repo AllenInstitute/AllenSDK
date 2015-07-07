@@ -4,8 +4,13 @@ import h5py
 import copy
 import collections
 import numpy as np
+import nwbmo
 
 class TimeSeries(object):
+    """ Standard TimeSeries constructor. This is executed indirectly
+        by calls to NWB.create_timeseries(). It should not be called
+        directly.
+    """
     def __init__(self, name, modality, spec, nwb):
         self.name = name
         # make a local copy of the specification, one that can be modified
@@ -21,7 +26,7 @@ class TimeSeries(object):
         elif modality == "template":
             self.path = "/stimulus/templates/"
         elif modality == "other":
-            self.path = None
+            self.path = ""
         else:
             m = "Modality must be acquisition, stimulus, template or other"
             self.fatal_error(m)
@@ -30,6 +35,7 @@ class TimeSeries(object):
             if full_path in self.nwb.file_pointer:
                 self.fatal_error("group '%s' already exists" % full_path)
 
+    # internal function
     def fatal_error(self, msg):
         print "Error: " + msg
         print "TimeSeries: " + self.name
@@ -38,6 +44,11 @@ class TimeSeries(object):
         traceback.print_stack()
         sys.exit(1)
 
+    def reset_name(self, name):
+        """ Change the name of a *TimeSeries*
+        """
+        self.name = name
+
     ####################################################################
     # set field values
 
@@ -45,10 +56,47 @@ class TimeSeries(object):
     # it's not legal to add attributes to fields that are in the spec as
     #   there is no way to mark them as custom
     def set_value(self, key, value, dtype=None):
+        """ Set key-value pair, with optional attributes (in dtype)
+        """
         if self.finalized:
             self.fatal_error("Added value after finalization")
         name = "TimeSeries %s" % self.name
         self.nwb.set_value_internal(key, value, self.spec, name, dtype)
+
+    # add a link to another NWB object
+    def set_value_as_link(self, key, value):
+        """ Create a link to another NWB object
+        """
+        if self.finalized:
+            self.fatal_error("Added value after finalization")
+        # check type
+        path = ""
+        if isinstance(value, TimeSeries):
+            path = value.full_path()
+        elif isinstance(value, nwbmo.Interface):
+            path = value.full_path()
+        elif isinstance(value, (str, unicode)):
+            path = value
+        else:
+            self.fatal_error("Unrecognized type for setting up link -- found %s" % type(value))
+        self.set_value(key, path)
+        self.set_value(key + "_path", path)
+
+    # add a link to another NWB object
+    def set_value_as_remote_link(self, key, target_file, dataset_path):
+        """ FINISH ME
+        """
+        assert False, "FINISH ME"
+        if self.finalized:
+            self.fatal_error("Added value after finalization")
+        # check type
+        if not isinstance(target_file, (str, unicode)):
+            self.fatal_error("File name must be string, received %s", type(target_file))
+        if not isinstance(dataset_path, (str, unicode)):
+            self.fatal_error("Dataset path must be string, received %s", type(dataset_path))
+        # TODO set _value_softlink fields
+        set_value(key, "????")
+        set_value(key + "_link", target_file + "::" + dataset_path)
 
     # internal function used for setting data[] and timestamps[]
     # this method doesn't include necessary logic to manage attributes
@@ -62,16 +110,32 @@ class TimeSeries(object):
 
     # have special calls for those that are common to all time series
     def set_description(self, value):
+        """ Convenience function to set the description field of the
+            *TimeSeries*
+        """
+        if self.finalized:
+            self.fatal_error("Added value after finalization")
         self.spec["_attributes"]["description"]["_value"] = str(value)
 
-    # for backward compatibility in existing scripts
     def set_comments(self, value):
-        self.set_comment(value)
-
-    def set_comment(self, value):
+        """ Convenience function to set the comments field of the
+            *TimeSeries*
+        """
+        if self.finalized:
+            self.fatal_error("Added value after finalization")
         self.spec["_attributes"]["comments"]["_value"] = str(value)
 
+    # for backward compatibility to screwy scripts, and to be nice
+    #   in event of typo
+    def set_comment(self, value):
+        self.set_comments(value)
+
     def set_source(self, value):
+        """ Convenience function to set the source field of the
+            *TimeSeries*
+        """
+        if self.finalized:
+            self.fatal_error("Added value after finalization")
         self.spec["_attributes"]["source"]["_value"] = str(value)
 
     def set_time(self, timearray):
@@ -164,6 +228,8 @@ class TimeSeries(object):
            Returns:
                *nothing*
         '''
+        if self.finalized:
+            self.fatal_error("Added value after finalization")
         tgt_path = self.create_hardlink("data", sibling)
         # tell kernel about link so table of all links can be added to
         #   file at end
@@ -184,28 +250,41 @@ class TimeSeries(object):
            Returns:
                *nothing*
         '''
+        if self.finalized:
+            self.fatal_error("Added value after finalization")
         self.create_softlink("data", file_path, dataset_path)
         self.nwb.record_timeseries_data_soft_link(self.full_path(), file_path+"://"+dataset_path)
 
 
+    # internal function
+    # creates link to similarly named field between two groups
     def create_hardlink(self, field, target):
-        # TODO add type safety -- make sure sibling is class if not string
-        if not isinstance(target, str):
-            # assume sibling is time series
-            sib_path = target.path + target.name
-        else:
+        # type safety -- make sure sibling is class if not string
+        if self.finalized:
+            self.fatal_error("Added value after finalization")
+        if isinstance(target, str):
             sib_path = target
-        data_spec = self.spec[field]
-        if "_value" in data_spec:
+        elif isinstance(target, TimeSeries):
+            sib_path = target.full_path()
+        elif isinstance(target, nwbmo.Module):
+            sib_path = target.full_path()
+        else:
+            self.fatal_error("Unrecognized link-to object. Expected str or TimeSeries, found %s" % type(target))
+        # define link. throw error if value was already set
+        if "_value" in self.spec[field]:
             self.fatal_error("cannot specify a link after setting value")
-        elif "_value_softlink" in data_spec:
+        elif "_value_softlink" in self.spec[field]:
             self.fatal_error("cannot specify both hard and soft links")
-        self.spec[field]["_value_hardlink"] = sib_path
+        self.spec[field]["_value_hardlink"] = sib_path + "/" + field
         # return path string
         return sib_path
 
 
+    # internal function
+    # creates link to similarly named field between two groups
     def create_softlink(self, field, file_path, dataset_path):
+        if self.finalized:
+            self.fatal_error("Added value after finalization")
         if "_value" in self.spec[field]:
             self.fatal_error("cannot specify a data link after set_data()")
         elif "_value_hardlink" in self.spec[field]:
@@ -219,6 +298,13 @@ class TimeSeries(object):
     # file writing and path management
 
     def set_path(self, path):
+        """ Sets the path for where the *TimeSeries* is created. This
+            is only necessary for *TimeSeries* that were not created
+            indicating the common storage location (ie, acquisition,
+            stimulus, template) or that were not added to a module
+        """
+        if self.finalized:
+            self.fatal_error("Added value after finalization")
         if path.endswith('/'):
             self.path = path
         else:
@@ -233,6 +319,8 @@ class TimeSeries(object):
         return self.path + self.name
 
     def finalize(self):
+        """ Finish the *TimeSeries* and write changes to disk
+        """
         if self.finalized:
             return
         # verify all mandatory fields are present
@@ -251,7 +339,7 @@ class TimeSeries(object):
                 continue    # control field -- ignore
             if "_value" in spec[k]:
                 continue    # field exists
-            if spec[k]["_include"] == "mandatory":
+            if spec[k]["_include"] == "required":
                 # value is missing -- see if alternate or link exists
                 if "_value_softlink" in spec[k]:
                     continue
@@ -270,7 +358,7 @@ class TimeSeries(object):
                     miss_str += " (or '%s')" % spec[k]["_alternative"]
                 err_str.append(str(miss_str))
             # make a record of missing required fields
-            if spec[k]["_include"] == "required":
+            if spec[k]["_include"] == "standard":
                 if "_value" not in spec["_attributes"]["missing_fields"]:
                     spec["_attributes"]["missing_fields"]["_value"] = []
                 spec["_attributes"]["missing_fields"]["_value"].append(str(k))
@@ -281,7 +369,7 @@ class TimeSeries(object):
         spec["_attributes"]["help"]["_value"] = spec["_description"]
         # make sure that mandatory attributes are present
         for k in spec["_attributes"]:
-            if spec["_attributes"][k]["_include"] == "mandatory":
+            if spec["_attributes"][k]["_include"] == "required":
                 if "_value" not in spec["_attributes"][k]:
                     err_str.append("Missing attribute " + k)
         # report errors for missing mandatory data

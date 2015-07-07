@@ -1,10 +1,14 @@
 #!/usr/bin/python
 import sys
 import nwb
+from nwbco import *
+fname = "sample_ziface.nwb"
 
 # create a new borg file. If we don't specify a time, the present time
 #   will be used
-borg = nwb.NWB(filename="sample_iface.nwb", identifier="test", overwrite=True, description="Test file for behavioral interfaces")
+borg = nwb.NWB(filename=fname, identifier="test", overwrite=True, description="Test file for behavioral interfaces")
+print "Creating " + fname
+borg.set_metadata_from_file("source_script", sys.argv[0])
 
 mod = borg.create_module("spatial module")
 mod.set_description("module description")

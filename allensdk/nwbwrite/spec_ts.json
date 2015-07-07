@@ -17,7 +17,7 @@
             "_datatype" : "str",
             "_description" : "Custom field",
             "_value" : "Custom",
-            "_include" : "mandatory"
+            "_include" : "required"
           }
         }
       },
@@ -25,26 +25,26 @@
       {
         "_datatype" : "unrestricted",
         "_description" : "Array of values (inc array of arrays) for time series",
-        "_include" : "mandatory",
+        "_include" : "required",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
             "_description" : "Core unit (SI if possible) of values stored in 'data'",
-            "_include" : "mandatory"
+            "_include" : "required"
           },
           "conversion" : 
           {
             "_datatype" : "f4",
             "_description" : "Multiplicative value required to convert element in 'data' to unit described in 'units'",
-            "_include" : "mandatory"
+            "_include" : "required"
           },
           "resolution" :
           {
             "_datatype" : "f4",
             "_description" : "Minimum meaningful difference between possible values in 'data'. E.g., magnitude of least significant bit before AD conversion. Value in units of 'units'",
-            "_include" : "mandatory"
+            "_include" : "required"
           }
         }
       },
@@ -52,13 +52,13 @@
       {
         "_datatype" : "int32",
         "_description" : "Number of samples stored in the time series. This can be less than the length of 'data'",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "timestamps" : 
       {
         "_datatype" : "f8",
         "_description" : "Timestamps (in seconds) for elements in 'data'",
-        "_include" : "mandatory",
+        "_include" : "required",
         "_alternative" : "starting_time",
         "_attributes" : 
         {
@@ -66,22 +66,34 @@
           {
             "_datatype" : "int32",
             "_description" : "Number of entries in 'data' stored between each timestamp. Presently this must be '1' (ie, there's a timestamp for each data point)",
-            "_include" : "mandatory",
+            "_include" : "required",
 			"_value" : 1
           },
           "units" : 
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Seconds"
           }
         }
+      },
+      "control" : 
+      {
+        "_datatype" : "uint8",
+        "_description" : "Optional array of control values, used for interpreting samples in data[]. Length of control and data arrays should be the same",
+        "_include" : "optional"
+      },
+      "control_description" : 
+      {
+        "_datatype" : "str",
+        "_description" : "Descriptions for each used value in 'control', with the control value being the index into this array",
+        "_include" : "optional"
       },
       "starting_time" : 
       {
         "_datatype" : "f8",
         "_description" : "Starting time of data plus sampling rate",
-        "_include" : "mandatory",
+        "_include" : "required",
         "_alternative" : "timestamps",
         "_attributes" : 
         {
@@ -89,13 +101,13 @@
           {
             "_datatype" : "f4",
             "_description" : "Sampling rate (Hz) of data stored in time series",
-            "_include" : "mandatory"
+            "_include" : "required"
           },
           "units" : 
           {
             "_datatype" : "str",
             "_description" : "Sampling or presentation rate (Hz) of data stored in time series",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Seconds"
           }
         }
@@ -112,7 +124,7 @@
         {
           "_datatype" : "str",
           "_description" : "Label to identify this group as a time series",
-          "_include" : "mandatory",
+          "_include" : "required",
           "_value" : "TimeSeries"
         },
         "missing_fields" :
@@ -143,33 +155,33 @@
         {
           "_datatype" : "str",
           "_description" : "List of required fields in time series that are missing. Only present if fields are missing",
-          "_include" : "mandatory"
+          "_include" : "required"
         },
         "description" :
         {
           "_datatype" : "str",
           "_description" : "Description of time series, preferably in human-readable str",
-          "_include" : "mandatory",
+          "_include" : "required",
           "_value" : ""
         },
         "comments" :
         {
           "_datatype" : "str",
           "_description" : "Additional comments about time series, preferably in human-readable str",
-          "_include" : "mandatory",
+          "_include" : "required",
           "_value" : ""
         },
         "help" :
         {
           "_datatype" : "str",
           "_description" : "Description of the time series, populated by the _description field",
-          "_include" : "mandatory"
+          "_include" : "required"
         },
         "source" :
         {
           "_datatype" : "str",
           "_description" : "Name (path) of the time series or module that serves as a source for the data stored here.  This can also be the name of a device",
-          "_include" : "mandatory",
+          "_include" : "required",
           "_value" : ""
         }
       }
@@ -211,7 +223,7 @@
       {
         "_datatype" : "str",
         "_description" : "Name of folder in /general/intracellular_ephys containing electrode description",
-        "_include" : "mandatory",
+        "_include" : "required",
         "_linkto" : "/general/intracellular_ephys"
       }
     },
@@ -223,13 +235,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Volt/Amp"
           }
         }
@@ -238,13 +250,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Farads"
           }
         }
@@ -253,13 +265,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Farads"
           }
         }
@@ -268,13 +280,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Hz"
           }
         }
@@ -283,13 +295,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "percent"
           }
         }
@@ -298,13 +310,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "percent"
           }
         }
@@ -313,13 +325,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Farads"
           }
         }
@@ -328,13 +340,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Ohms"
           }
         }
@@ -348,13 +360,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Amps"
           }
         }
@@ -363,13 +375,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Ohms"
           }
         }
@@ -378,13 +390,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Farads"
           }
         }
@@ -393,13 +405,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Ohms"
           }
         }
@@ -408,13 +420,13 @@
       {
         "_datatype" : "f4",
         "_description" : "",
-        "_include" : "required",
+        "_include" : "standard",
         "_attributes" :
         {
           "units" :
           {
             "_datatype" : "str",
-            "_include" : "mandatory",
+            "_include" : "required",
             "_value" : "Volt/Volt"
           }
         }
@@ -459,7 +471,7 @@
       {
         "_datatype" : "int32",
         "_description" : "Indices to electrodes described in experiment's electrode map array (under general/extracellular_ephys",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "data" : 
       {
@@ -483,7 +495,7 @@
       "source" : 
       {
         "_datatype" : "str",
-        "_include" : "mandatory",
+        "_include" : "required",
         "_description" : "Source of events (eg, timeseries, hardware) and description of event definition"
       }
     },
@@ -520,19 +532,19 @@
       {
         "_datatype" : "f4",
         "_description" : "Width, height and dept of image, or imaged area (in meters)",
-        "_include" : "required"
+        "_include" : "standard"
       },
       "distance" :
       {
         "_datatype" : "f4",
         "_description" : "Distance of camera/monitor from target/eye, if relevant",
-        "_include" : "required"
+        "_include" : "standard"
       },
       "orientation" :
       {
         "_datatype" : "str",
         "_description" : "Description of image relative to some reference frame (eg, which way is up?). Must also specify frame of reference",
-        "_include" : "required"
+        "_include" : "standard"
       }
     },
     "ImageSeries" :
@@ -543,7 +555,7 @@
       {
         "_datatype" : "str",
         "_description" : "Format if image. If this is 'external' then field 'external_file' contains path or URL for that file. For tiff, png, jpg, etc, the binary representation of the image is stored in data[]. For 'raw', only a single channel (eg, red) is stored",
-        "_include" : "required"
+        "_include" : "standard"
       },
       "external_file" : 
       {
@@ -555,22 +567,28 @@
       {
         "_datatype" : "int32",
         "_description" : "Number of bits per image pixel",
-        "_include" : "required"
+        "_include" : "standard"
       },
       "dimension" : 
       {
         "_datatype" : "int32",
         "_description" : "An array storing the number of pixels on x, y and z axes",
-        "_include" : "required"
+        "_include" : "standard"
       }
     },
-	"ImageIndexSeries" :
+	"IndexSeries" :
 	{
       "_superclass" : "TimeSeries",
-      "_description" : "An image sequence that is generated from an existing image stack. Frames can be presented in an arbitrary order. The data[] field stores frame number in reference stack",
-      "image_stack" : 
+      "_description" : "A sequence that is generated from an existing image stack. Frames can be presented in an arbitrary order. The data[] field stores frame number in reference stack",
+      "base_timeseries" : 
       {
-        "_datatype" : "text",
+        "_datatype" : "timeseries",
+        "_description" : "HDF5 link to reference ImageSeries",
+        "_include" : "required"
+      },
+      "base_timeseries_path" : 
+      {
+        "_datatype" : "str",
         "_description" : "Path to reference ImageSeries",
         "_include" : "required"
       }
@@ -583,7 +601,7 @@
 	  {
 		  "_datatype" : "str",
 		  "_description" : "Path to ImageSeries that mask applies to",
-		  "_include" : "required"
+		  "_include" : "standard"
 	  },
 	  "data" :
 	  {
@@ -598,21 +616,33 @@
       {
         "_datatype" : "f4",
         "_description" : "Width, height and dept of image, or imaged area (in meters)",
-        "_include" : "required"
+        "_include" : "standard"
       },
       "pmt_gain" :
       {
         "_datatype" : "f4",
         "_description" : "generic field for a/d unit per photon",
-        "_include" : "required"
+        "_include" : "standard"
+      },
+      "scan_line_rate" :
+      {
+        "_datatype" : "f4",
+        "_include" : "standard"
       },
       "imaging_plane" : 
       {
         "_datatype" : "str",
         "_description" : "Name of entry in general/optophysiology describing details about this imaging plane",
-        "_include" : "required",
+        "_include" : "standard",
         "_linkto" : "general/optophysiology"
-      }
+      },
+	  "channel_name" : 
+	  {
+        "_datatype" : "str",
+        "_description" : "Name of entry in general/optophysiology/<imaging_plane> describing this channel",
+        "_include" : "standard",
+        "_linkto" : "general/optophysiology/<imaginge_plane>/"
+	  }
     },
     "WidefieldSeries" :
     {
@@ -621,30 +651,48 @@
       "indicator" :
       {
         "_datatype" : "str",
-        "_include" : "required"
+        "_include" : "standard"
       },
       "illuminatino_power" :
       {
         "_datatype" : "f4",
         "_description" : "Illumination power, in watts",
-        "_include" : "required"
+        "_include" : "standard",
+		"_attribute" :
+		{
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "required",
+            "_value" : "Watts"
+          }
+		}
       },
       "pixel_binning" :
       {
         "_datatype" : "int32",
         "_description": "Array structure [x, y, t]",
-        "_include" : "required"
+        "_include" : "standard"
       },
       "exposure_time" :
       {
         "_datatype" : "f4",
         "_description" : "Exposure time, in seconds",
-        "_include" : "required"
+        "_include" : "standard",
+		"_attribute" :
+		{
+          "units" :
+          {
+            "_datatype" : "str",
+            "_include" : "required",
+            "_value" : "Seconds"
+          }
+		}
       },
       "counts_per_bit" :
       {
         "_datatype" : "f4",
-        "_include" : "required"
+        "_include" : "standard"
       }
     },
     "OptogeneticSeries" :
@@ -655,7 +703,7 @@
       {
         "_datatype" : "str",
         "_description" : "Pointer to description of stimulation site",
-        "_include" : "mandatory",
+        "_include" : "required",
         "_linkto" : "general/optogentics"
       },
       "data" : 
@@ -674,17 +722,23 @@
     {
       "_superclass" : "TimeSeries",
       "_description" : "ROI responses over an imaging plane. Each row in data[] should correspond to the signal from one ROI",
-      "segmentation_source" :
+      "segmentation_interface" :
+      {
+        "_datatype" : "interface",
+        "_description" : "HDF5 link to segmentation interface defining ROIs",
+        "_include" : "required"
+      },
+      "segmentation_interface_path" :
       {
         "_datatype" : "str",
-        "_description" : "Path to segmentation module defining ROIs",
-        "_include" : "mandatory"
+        "_description" : "Path to segmentation interface defining ROIs",
+        "_include" : "required"
       },
       "roi_names" :
       {
         "_datatype" : "str",
         "_description" : "Array of ROI names, one for each row in data[]. Names must be the same as used in the segmentation module",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "data" : 
       {

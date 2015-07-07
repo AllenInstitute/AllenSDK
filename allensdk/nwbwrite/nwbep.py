@@ -11,14 +11,14 @@ class Epoch(object):
         index in the time series that overlaps with the interval, and the
         duration of that overlap.
 
-        **Constructor argumetns:**
-            **name** Name of epoch (must be unique among epochs)
+        **Constructor arguments:**
+            **name** (text) Name of epoch (must be unique among epochs)
             
             **nwb** NWB object (class)
 
-            **start** Start time of epoch, in seconds
+            **start** (float) Start time of epoch, in seconds
 
-            **stop** Stop time of epoch, in seconds
+            **stop** (float) Stop time of epoch, in seconds
     """
     def __init__(self, name, nwb, start, stop, spec):
         # dict to keep track of which time series are linked to this epoch
@@ -42,13 +42,22 @@ class Epoch(object):
         self.finalized = False
 
     def set_description(self, desc):
-        self.set_value("description", value)
+        """ Convenience function to set the value of the 'description'
+            dataset in the epoch
+
+            Arguments:
+                *desc* (text) Description of the epoch
+
+            Returns:
+                *nothing*
+        """
+        self.set_value("description", desc)
 
     def set_value(self, key, value, **attrs):
         """Adds an annotating key-value pair (ie, dataset) to the epoch.
    
-           Args:
-               *key* (string) A unique identifier within the TimeSeries
+           Arguments:
+               *key* (text) A unique identifier within the TimeSeries
 
                *value* (any) The value associated with this key
    
@@ -63,12 +72,38 @@ class Epoch(object):
         self.nwb.set_value_internal(key, value, self.spec, name, dtype, **attrs)
 
     def add_tag(self, content):
+        """ Append string annotation to epoch. This will be stored in 
+            the epoch's 'tags' dataset. Additionally, it will be added
+            to a master tag list stored as an attribute on the root
+            'epoch/' group. Each epoch can have multiple tags. The root
+            epoch keeps a list of unique tags
+
+            Arguments:
+                *content* (text) Name of the tag to add to the epoch
+
+            Returns:
+                *nothing*
+        """
         self.spec["tags"]["_value"].append(content)
 
     # limit intervals to time boundary of epoch, but don't perform 
     #   additional logic (ie, if user supplies overlapping intervals,
     #   let them do so
     def add_ignore_interval(self, start, stop):
+        """ Each epoch has a list of intervals that can be flagged to
+            be ignored, for example due electrical noise or poor behavior
+            of the subject. Intervals are trimmed to fit within epoch
+            boundaries, but no further logic is performed (eg, if overlapping
+            intervals are specified, those overlaps will be stored)
+
+            Arguments:
+                *start* (float) Start of the interval to ignore
+
+                *stop* (float) End time of the interval
+
+            Returns:
+                *nothing*
+        """
         if start > self.stop_time or stop < self.start_time:
             return  # non-overlapping
         if start < self.start_time:
@@ -82,7 +117,7 @@ class Epoch(object):
             to the specified time series within the epoch and will
             calculate its overlaps.
 
-            Args:
+            Arguments:
                 *in_epoch_name* (text) Name that time series will use 
                 in the epoch (this can be different than the actual 
                 time series name)
@@ -115,33 +150,22 @@ class Epoch(object):
         epoch_ts["start_idx"] = i0
         epoch_ts["count"] = i1 - i0 + 1
         self.timeseries_dict[in_epoch_name] = epoch_ts
-        label = in_epoch_name + " is " + timeseries_path
+        label = "'" + in_epoch_name + "' is '" + timeseries_path + "'"
         self.spec["_attributes"]["links"]["_value"].append(label)
 
-    def set_description(self, desc):
-        """ This sets the epoch's description field (a required field
-            but that can be empty)
+    # internal function
+    # Finds the first element in *timestamps* that is >= *epoch_start*
+    # and last element that is <= "epoch_stop"
 
-            Args:
-                *desc* (text) Textual description 
+    # Arguments:
+    #     *timestamps* (double array) Timestamp array
 
-            Returns:
-                *nothing*
-        """
-        self.spec["description"]["_value"] = desc
-        
+    # Returns:
+    #     *idx_0*, "idx_1" (ints) Index of first and last elements 
+    #     in *timestamps* that fall within specified
+    #     interval, or None, None if there is no overlap
+    #
     def find_ts_overlap(self, timestamps):
-        """ Finds the first element in *timestamps* that is >= *epoch_start*
-            and last element that is <= "epoch_stop"
-
-            Args:
-                *timestamps* (double array) Timestamp array
-
-            Returns:
-                *idx_0*, "idx_1" (ints) Index of first and last elements 
-                in *timestamps* that fall within specified
-                interval, or None, None if there is no overlap
-        """
         start = self.start_time
         stop = self.stop_time
         # ensure there are non-nan times
@@ -197,7 +221,7 @@ class Epoch(object):
     def finalize(self):
         """ Finish epoch entry and write data to the file
 
-            Args:
+            Arguments:
                 *none*
 
             Returns:

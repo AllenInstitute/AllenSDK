@@ -2,10 +2,14 @@
 import sys
 import numpy as np
 import nwb
+from nwbco import *
+fname = "sample_zimage.nwb"
 
 # create a new borg file. If we don't specify a time, the present time
 #   will be used
-borg = nwb.NWB(filename="sample_image_series.nwb", identifier="test", overwrite=True, description="Test file for image series")
+borg = nwb.NWB(filename=fname, identifier="test", overwrite=True, description="Test file for image series")
+print "Creating " + fname
+borg.set_metadata_from_file("source_script", sys.argv[0])
 
 borg.set_metadata("optophysiology/camera1/excitation_lambda", "1000 nm") 
 borg.set_metadata("optophysiology/camera1/indicator", "GCaMP6s") 

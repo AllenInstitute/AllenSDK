@@ -142,7 +142,7 @@
           "_datatype" : "str",
           "_description" : "Custom field",
           "_value" : "Custom",
-          "_include" : "mandatory"
+          "_include" : "required"
         }
       }
     },
@@ -174,11 +174,11 @@
             "_datatype" : "str",
             "_description" : "Custom field",
             "_value" : "Custom",
-            "_include" : "mandatory"
+            "_include" : "required"
           }
         }
       },
-      "{}" :
+      "<>" :
       {
         "_datatype" : "group",
         "_include" : "optional",
@@ -211,7 +211,7 @@
         {
           "_datatype" : "str",
           "_description" : "Describes position and reference frame of manifold based on position of first element in manifold. For example, text description of anotomical location or vectors needed to rotate to common anotomical axis (eg, AP/DV/ML)",
-          "_include" : "mandatory"
+          "_include" : "optional"
         },
         "indicator" :
         {
@@ -223,21 +223,21 @@
           "_datatype" : "str", "_include" : "optional",
           "_description" : "excitation wavelength (include units)"
         },
-        "channel_1_name" :
-        {
-          "_datatype" : "str", "_include" : "optional"
-        },
-        "channel_1_emission_lambda" :
-        {
-          "_datatype" : "str", "_include" : "optional"
-        },
-        "channel_2_name" :
-        {
-          "_datatype" : "str", "_include" : "optional"
-        },
-        "channel_2_emission_lambda" :
-        {
-          "_datatype" : "str", "_include" : "optional"
+		"<>" :
+		{
+		  "_datatype" : "group",
+          "_include" : "optional",
+          "_description" : "One of possibly many folders describing channel",
+          "description" :
+          {
+            "_datatype" : "str", "_include" : "standard",
+	  	  "_description" : "Array of names of channels, eg, '0001', or 'red'"
+          },
+          "emmision_lambda" :
+          {
+            "_datatype" : "f4", "_include" : "standard",
+	  	  "_description" : "Array of emission lambda, one for each channel"
+	  	  }
         },
         "imaging_rate" :
         {
@@ -253,8 +253,23 @@
           "_datatype" : "str", "_include" : "optional",
           "_description" : "name of recording device",
           "_linkto" : "general/devices/"
-        }
-      }
+        },
+		"<>" :
+		{
+			"_datatype" : "group",
+			"_description" : "Emission channel",
+			"emission_lambda" :
+			{
+			  "_datatype" : "str", "_include" : "optional",
+			  "_description" : "Emission lambda for channel"
+			},
+			"description" :
+			{
+			  "_datatype" : "str", "_include" : "optional",
+			  "_description" : "Any notes or comments about the channel"
+			}
+		}
+	  }
     },
     "optogenetics" :
     {
@@ -272,11 +287,11 @@
             "_datatype" : "str",
             "_description" : "Custom field",
             "_value" : "Custom",
-            "_include" : "mandatory"
+            "_include" : "required"
           }
         }
       },
-      "{}" :
+      "<>" :
       {
         "_datatype" : "group",
         "_include" : "optional",
@@ -292,10 +307,10 @@
           "_description" : "",
           "_linkto" : "general/devices"
         },
-        "lambda" :
+        "excitation_lambda" :
         {
           "_datatype" : "str", "_include" : "optional",
-          "_description" : "wavlength, in nm"
+          "_description" : "excitation wavlength, in nm"
         },
         "location" :
         {
@@ -320,11 +335,11 @@
             "_datatype" : "str",
             "_description" : "Custom field",
             "_value" : "Custom",
-            "_include" : "mandatory"
+            "_include" : "required"
           }
         }
       },
-      "{}" :
+      "<>" :
       {
         "_datatype" : "group",
         "_include" : "optional",
@@ -379,13 +394,13 @@
       "electrode_map" :
       {
         "_datatype" : "f4", 
-        "_include" : "mandatory",
+        "_include" : "required",
         "_description" : "Physical location of electrodes (x,y,z in meters) relative to one another. If an electrode is moved, it requires a new entry in the electrode map, representing its new location"
       },
       "electrode_group" :
       {
         "_datatype" : "str", 
-        "_include" : "mandatory",
+        "_include" : "required",
         "_description" : "Identification string for the probe, shanke and or tetrode that each electrode resides on.  Name should correspond to one of electrode group below. All elements in an electrode group should have a functional association, for example being on the same planar electrode array, or same shank"
       },
       "impedance" :
@@ -406,7 +421,7 @@
         "_include" : "optional",
         "_description" : "Custom dataset"
       },
-      "{}" :
+      "<>" :
       {
         "_datatype" : "group",
         "_include" : "optional",
@@ -438,11 +453,11 @@
               "_datatype" : "str",
               "_description" : "Custom field",
               "_value" : "Custom",
-              "_include" : "mandatory"
+              "_include" : "required"
             }
           }
         },
-        "{}" :
+        "<>" :
         {
           "_datatype" : "group",
           "_include" : "optional",
@@ -474,7 +489,7 @@
                 "_datatype" : "str",
                 "_description" : "Custom field",
                 "_value" : "Custom",
-                "_include" : "mandatory"
+                "_include" : "required"
               }
             }
           }

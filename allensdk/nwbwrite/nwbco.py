@@ -37,11 +37,11 @@ def EXTRA_CUSTOM(name):
 def EXTRA_SHANK_DESCRIPTION(shank):
     return "extracellular_ephys/" + shank + "/description"
 def EXTRA_SHANK_LOCATION(shank):
-    return "extracellular_ephys/" + shank + "/description"
+    return "extracellular_ephys/" + shank + "/location"
 def EXTRA_SHANK_DEVICE(shank):
     return "extracellular_ephys/" + shank + "/device"
 def EXTRA_SHANK_CUSTOM(shank, name):
-    return "extracellular_ephys/" + shank + "/device/" + name
+    return "extracellular_ephys/" + shank + "/" + name
 
 def INTRA_ELECTRODE_DESCRIPTION(name):
     return "intracellular_ephys/" + name + "/description"
@@ -68,14 +68,10 @@ def IMAGE_SITE_INDICATOR(site):
     return "optophysiology/" + site + "/indicator"
 def IMAGE_SITE_EXCITATION_LAMBDA(site):
     return "optophysiology/" + site + "/excitation_lambda"
-def IMAGE_SITE_CHANNEL_1_NAME(site):
-    return "optophysiology/" + site + "/channel_1_name"
-def IMAGE_SITE_CHANNEL_1_LAMBDA(site):
-    return "optophysiology/" + site + "/channel_1_emission_lambda"
-def IMAGE_SITE_CHANNEL_2_NAME(site):
-    return "optophysiology/" + site + "/channel_2_name"
-def IMAGE_SITE_CHANNEL_2_LAMBDA(site):
-    return "optophysiology/" + site + "/channel_2_emission_lambda"
+def IMAGE_SITE_CHANNEL_LAMBDA(site, channel):
+    return "optophysiology/" + site + "/" + channel + "/emission_lambda"
+def IMAGE_SITE_CHANNEL_DESCRIPTION(site, channel):
+    return "optophysiology/" + site + "/" + channel + "/description"
 def IMAGE_SITE_IMAGING_RATE(site):
     return "optophysiology/" + site + "/imaging_rate"
 def IMAGE_SITE_LOCATION(site):

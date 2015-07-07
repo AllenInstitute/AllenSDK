@@ -2,12 +2,14 @@
 import sys
 import nwb
 import numpy as np
+from nwbco import *
 
 # create a new borg file. If we don't specify a time, the present time
 #   will be used
-fname = "sample_file.nwb"
-print "Creating " + fname
+fname = "sample_zcam.nwb"
 borg = nwb.NWB(filename=fname, identifier="test", overwrite=True, description="Script to demo some CAM requirements")
+print "Creating " + fname
+borg.set_metadata_from_file("source_script", sys.argv[0])
 
 mod = borg.create_module("Eye tracking")    # module name is arbitrary
 mod.set_description("Module to track pupil size and gaze direction")
@@ -105,7 +107,9 @@ ts.set_description("dF/F data for imaging plane " + plane)
 ts.set_data(data)
 ts.set_time(t)
 ts.set_value("roi_names", roi_names)
-ts.set_value("segmentation_source", "This module's ImageSegmentation interface")
+#ts.set_value("segmentation_interface", iface_seg)
+#ts.set_value("segmentation_interface_path", iface_seg.full_path())
+ts.set_value_as_link("segmentation_interface", iface_seg)
 iface_dff.add_timeseries(ts)
 iface_dff.finalize()
 

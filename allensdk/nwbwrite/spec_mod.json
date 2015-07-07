@@ -9,13 +9,13 @@
       {
         "_datatype" : "text",
         "_description" : "List of all interfaces published by the module",
-        "_include" : "mandatory"
+        "_include" : "required"
       },
       "neurodata_type" : 
       {
         "_datatype" : "text",
         "_description" : "Label to identify this group as a neurodata module",
-        "_include" : "mandatory",
+        "_include" : "required",
         "_value" : "Module"
       }
     },
@@ -23,13 +23,13 @@
     {
     	"_datatype" : "text",
     	"_description" : "General description of data stored in module and the type of processing done",
-    	"_include" : "mandatory"
+    	"_include" : "required"
     },
     "source" :
     {
     	"_datatype" : "text",
     	"_description" : "Origin of the data represented here. More specific details may be stored in the module interfaces",
-    	"_include" : "mandatory"
+    	"_include" : "required"
     },
     "<>" :
     {
@@ -49,7 +49,7 @@
           "_datatype" : "text",
           "_description" : "Custom field",
           "_value" : "Custom",
-          "_include" : "mandatory"
+          "_include" : "required"
         }
       }
     }

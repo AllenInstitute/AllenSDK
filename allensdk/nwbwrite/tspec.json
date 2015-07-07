@@ -3,16 +3,16 @@
   {
     "_description" : "<description of field>",
     "_datatype" : "timeseries | module | interface | group | str | f4 | f8 | int8 | int16 | int32 | int64 | uint8 | uint16 | uint32 | uint64 | unrestricted",
-    "_subtype" : "<'class' name for time series or interface>",
     "_include" : "mandatory | required | optional",
 
-    "_alternative" : "<alt mandatory field>",
-    "_value" : "<field value -- if this field is present, the data for the field is written out>",
+    "_alternative" : "alt mandatory field (ie, if this mandatory field isn't present, another will suffice)",
+    "_value" : "field value -- if this field is present, the data for the field is written out",
     "_attributes" : "dictionary of attribute field names",
-    "_linkto" : "<path to target; field name must match name in specified target>",
+    "_linkto" : "path to target; field name must match name in specified target",
     "_superclass" : "",
-      "<>" : "standard object with arbitrary name",
-      "[]" : "custom object with arbitrary name",
+    "<>" : "standard object (eg, group or timeseries) with arbitrary name (ie, part of spec)",
+    "[]" : "custom object with arbitrary name (ie, optional user defined)",
+    "{}" :  "group with arbitrary name",
 
     "ADDITIONAL_FIELDS_USED_BY_API" : "",
     "_value_hardlink" : "",
@@ -20,6 +20,4 @@
     "_value_softlink_file" : ""
   },
 }
-
-
 

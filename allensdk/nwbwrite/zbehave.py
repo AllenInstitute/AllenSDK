@@ -1,10 +1,14 @@
 #!/usr/bin/python
 import sys
 import nwb
+from nwbco import *
 
 # create a new borg file. If we don't specify a time, the present time
 #   will be used
-borg = nwb.NWB(filename="sample_behavioral_iface.nwb", identifier="test", overwrite=True, description="Test file for behavioral interfaces")
+fname = "sample_zbehav.nwb"
+borg = nwb.NWB(filename=fname, identifier="test", overwrite=True, description="Test file for behavioral interfaces")
+print "Creating " + fname
+borg.set_metadata_from_file("source_script", sys.argv[0])
 
 mod = borg.create_module("simple behavioral module")
 mod.set_description("module description")

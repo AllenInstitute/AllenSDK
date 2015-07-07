@@ -2,10 +2,14 @@
 import sys
 import numpy as np
 import nwb
+from nwbco import *
+fname = "sample_zspatial.nwb"
 
 # create a new borg file. If we don't specify a time, the present time
 #   will be used
-borg = nwb.NWB(filename="sample_spatial_series.nwb", identifier="test", overwrite=True, description="test for spatial time series")
+borg = nwb.NWB(filename=fname, identifier="test", overwrite=True, description="test for spatial time series")
+print "Creating " + fname
+borg.set_metadata_from_file("source_script", sys.argv[0])
 
 # create an SpatialSeries
 # This will normally be stored in processing because it is derived data

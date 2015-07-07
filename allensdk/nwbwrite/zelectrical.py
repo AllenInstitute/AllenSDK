@@ -2,10 +2,14 @@
 import sys
 import nwb
 import numpy as np
+from nwbco import *
 
 # create a new borg file. If we don't specify a time, the present time
 #   will be used
-borg_file = nwb.NWB(filename="sample_electrical.nwb", identifier="test", overwrite=True, description="Electrical series test script; timeseries hard link between single and double")
+fname = "sample_zelectrical.nwb"
+borg_file = nwb.NWB(filename=fname, identifier="test", overwrite=True, description="Electrical series test script; timeseries hard link between single and double")
+print "Creating " + fname
+borg_file.set_metadata_from_file("source_script", sys.argv[0])
 
 # create two electrical series, one with a single electrode and one with many
 # then create a spike event series

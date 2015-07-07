@@ -1,10 +1,14 @@
 #!/usr/bin/python
 import sys
 import nwb
+from nwbco import *
 
 # create a new borg file. If we don't specify a time, the present time
 #   will be used
-borg = nwb.NWB(filename="sample_epoch.nwb", identifier="test", overwrite=True, description="Test file for epochs")
+fname = "sample_zepoch.nwb"
+borg = nwb.NWB(filename=fname, identifier="test", overwrite=True, description="Test file for epochs")
+print "Creating " + fname
+borg.set_metadata_from_file("source_script", sys.argv[0])
 
 # create an IntervalSeries
 # This will normally be stored in processing or stimulus
