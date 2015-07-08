@@ -305,6 +305,8 @@ def analyze_ramps(sweep_numbers, nwb_file):
                                   'ramp')
 
         n_spikes = features.feature_list[-1].mean['n_spikes']
+        
+        
         if n_spikes > 0:
             sweep_count += 1
 
@@ -484,11 +486,11 @@ def fit_membrane_tau(v, t, start_idx, peak_idx):
         try:
             popt, pcov = curve_fit(exp_curve, t[tenpct_idx:peak_idx].astype(np.float64) - t[tenpct_idx], v[tenpct_idx:peak_idx].astype(np.float64), p0=guess)
         except RuntimeError:
-            logging.error("Curve fit for membrane tau failed.")
+            logging.warning("Curve fit for membrane tau failed.")
             return (np.nan, [np.nan, np.nan, np.nan])
         return (tenpct_idx, popt)
     except IndexError:
-        logging.error("Index error occurred calculating tau. Aborting calculation")
+        logging.warning("Index error occurred calculating tau. Aborting calculation")
         return (np.nan, [np.nan, np.nan, np.nan])
     
 def exp_curve(x, a, inv_tau, y0):
