@@ -65,7 +65,7 @@ def plot_single_ap_values(nwb_file, sweep_numbers, lims_features, sweep_features
         spikes = get_spikes(sweep_features, sn)
 
         if (len(spikes) < 1):
-            logging.warning("NO SPIKES IN SWEEP %d" % sn)
+            logging.warning("no spikes in sweep %d" % sn)
             continue
 
         if type_name != "long_square":
@@ -120,28 +120,35 @@ def plot_single_ap_values(nwb_file, sweep_numbers, lims_features, sweep_features
 
         spikes = get_spikes(sweep_features, sn)
 
-        if type_name != "long_square":
-            if (len(spikes) < 1):
-                logging.warning("NO SPIKES IN SWEEP" + sn)
+        nspikes = len(spikes)
+
+        if type_name != "long_square" and nspikes:
+            if nspikes == 0:
+                logging.warning("no spikes in sweep %d" % sn)
                 continue
+
             voltages = [spikes[0][f] for f in voltage_features]
             times = [spikes[0][f] for f in time_features]
         else:
             voltages = [cell_features["long_squares"]["rheo_spike_0"][f] for f in long_square_voltage_features]
             times = [cell_features["long_squares"]["rheo_spike_0"][f] + stim_start for f in long_square_time_features]
+
         plt.scatter(times, voltages, color='red', zorder=20)
         
-        delta_v = 5.0
-        plt.plot([spikes[0]['upstroke_t'] - 1e-3 * (delta_v / spikes[0]['upstroke']),
-                  spikes[0]['upstroke_t'] + 1e-3 * (delta_v / spikes[0]['upstroke'])], 
-                 [spikes[0]['upstroke_v'] - delta_v, spikes[0]['upstroke_v'] + delta_v], color='red')
 
-        plt.plot([spikes[0]['downstroke_t'] - 1e-3 * (delta_v / spikes[0]['downstroke']),
-                  spikes[0]['downstroke_t'] + 1e-3 * (delta_v / spikes[0]['downstroke'])], 
-                 [spikes[0]['downstroke_v'] - delta_v, spikes[0]['downstroke_v'] + delta_v], color='red')
+        delta_v = 5.0
+        if nspikes:
+            plt.plot([spikes[0]['upstroke_t'] - 1e-3 * (delta_v / spikes[0]['upstroke']),
+                      spikes[0]['upstroke_t'] + 1e-3 * (delta_v / spikes[0]['upstroke'])], 
+                     [spikes[0]['upstroke_v'] - delta_v, spikes[0]['upstroke_v'] + delta_v], color='red')
+
+            plt.plot([spikes[0]['downstroke_t'] - 1e-3 * (delta_v / spikes[0]['downstroke']),
+                      spikes[0]['downstroke_t'] + 1e-3 * (delta_v / spikes[0]['downstroke'])], 
+                     [spikes[0]['downstroke_v'] - delta_v, spikes[0]['downstroke_v'] + delta_v], color='red')
 
         if type_name == "ramp":
-            plt.xlim(spikes[0]["threshold_t"] - 0.002, spikes[0]["f_slow_ahp_t"] + 0.002)
+            if nspikes:
+                plt.xlim(spikes[0]["threshold_t"] - 0.002, spikes[0]["f_slow_ahp_t"] + 0.002)
         elif type_name == "short_square":
             plt.xlim(stim_start - 0.002, stim_start + stim_dur + 0.01)
         elif type_name == "long_square":

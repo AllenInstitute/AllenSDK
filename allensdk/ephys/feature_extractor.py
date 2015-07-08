@@ -3,6 +3,7 @@ import math
 import copy
 import numpy as np
 import scipy.signal as signal 
+import logging
 
 # Design notes:
 # to generate an average feature file, all sweeps must have all features
@@ -487,13 +488,11 @@ class EphysFeatureExtractor( object ):
         peak_idx = spike["peak_idx"]
 
         if peak_idx >= next_idx:
-            print "***********"
-            print "***********"
-            print peak_idx, next_idx
-            print "***********"
-            print "***********"
+            logging.warning("next index (%d) before peak index (%d) calculating trough" % ( next_idx, peak_idx ))
+            trough_idx = next_idx
+        else:
+            trough_idx = np.argmin(v[peak_idx:next_idx]) + peak_idx
 
-        trough_idx = np.argmin(v[peak_idx:next_idx]) + peak_idx
         spike["trough_idx"] = trough_idx
         spike["f_trough"] = v[trough_idx]
         spike["trough_v"] = v[trough_idx]
@@ -507,17 +506,24 @@ class EphysFeatureExtractor( object ):
             five_ms_idx = np.where(t >= 0.005 + t[peak_idx])[0][0]  # 5ms after peak
             
         # fast AHP is minimum value occurring w/in 5ms
-        if five_ms_idx > next_idx:
+        if five_ms_idx >= next_idx:
             five_ms_idx = next_idx
-        fast_idx = np.argmin(v[peak_idx:five_ms_idx]) + peak_idx
+
+        if peak_idx == five_ms_idx:
+            fast_idx = next_idx
+        else:
+            fast_idx = np.argmin(v[peak_idx:five_ms_idx]) + peak_idx
+
         spike["f_fast_ahp"] = v[fast_idx]
         spike["f_fast_ahp_v"] = v[fast_idx]
         spike["f_fast_ahp_i"] = curr[fast_idx]
         spike["f_fast_ahp_t"] = t[fast_idx]
+
         if five_ms_idx == next_idx:
             slow_idx = fast_idx
         else:
             slow_idx = np.argmin(v[five_ms_idx:next_idx]) + five_ms_idx
+
         spike["f_slow_ahp"] = v[slow_idx]
         spike["f_slow_ahp_time"] = (t[slow_idx] - t[peak_idx]) / (t[next_idx] - t[peak_idx])
         spike["f_slow_ahp_t"] = t[slow_idx]
