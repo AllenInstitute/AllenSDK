@@ -520,29 +520,37 @@ def plot_sweep_value_figures(cell_specimen, image_dir, sizes, cell_image_files):
     sweeps = sorted(cell_specimen['ephys_sweeps'], key=lambda s: s['sweep_number'] )
     
     # plot bridge balance
-    data = np.array([ [ s['bridge_balance_mohm'], s['sweep_number'] ] for s in sweeps if s['bridge_balance_mohm'] != 0 ]).T
+    data = np.array([ [ s['bridge_balance_mohm'], s['sweep_number'] ] 
+                      for s in sweeps 
+                      if s['bridge_balance_mohm'] != 0 and s['bridge_balance_mohm'] is not None ]).T
 
     fig = plt.figure()
     plt.title('bridge balance')
-    plt.plot(data[1,:], data[0,:])
+    plt.plot(data[1,:], data[0,:], marker='.')
     
     save_figure(fig, 'bridge_balance', 'sweep_values', image_dir, sizes, cell_image_files, scalew=2)
 
-    # plot pre_vm_mv
-    data = np.array([ [ s['pre_vm_mv'], s['sweep_number'] ] for s in sweeps if s['pre_vm_mv'] != 0 ]).T
+    # plot pre_vm_mv, no blowout sweep
+    data = np.array([ [ s['pre_vm_mv'], s['sweep_number'] ] 
+                      for s in sweeps 
+                      if (s['pre_vm_mv'] != 0 and 
+                          s['pre_vm_mv'] is not None and 
+                          not s['ephys_stimulus']['description'].startswith('EXTPBLWOUT')) ]).T
 
     fig = plt.figure()
     plt.title('pre vm')
-    plt.plot(data[1,:], data[0,:])
+    plt.plot(data[1,:], data[0,:], marker='.')
     
     save_figure(fig, 'pre_vm_mv', 'sweep_values', image_dir, sizes, cell_image_files, scalew=2)
 
     # plot bias current
-    data = np.array([ [ s['leak_pa'], s['sweep_number'] ] for s in sweeps if s['leak_pa'] != 0 ]).T
+    data = np.array([ [ s['leak_pa'], s['sweep_number'] ] 
+                      for s in sweeps 
+                      if s['leak_pa'] != 0 and s['leak_pa'] is not None ]).T
 
     fig = plt.figure()
     plt.title('leak')
-    plt.plot(data[1,:], data[0,:])
+    plt.plot(data[1,:], data[0,:], marker='.')
     
     save_figure(fig, 'leak', 'sweep_values', image_dir, sizes, cell_image_files, scalew=2)
 
@@ -664,6 +672,7 @@ def make_cell_html(image_files, ephys_roi_result, file_name):
         f.write(html)
 
 def make_sweep_page(nwb_file, ephys_roi_result, working_dir):
+    return
     sizes = { 'small': 2.0, 'large': 6.0 }
 
     sweep_files = plot_sweep_figures(nwb_file, ephys_roi_result, working_dir, sizes)
