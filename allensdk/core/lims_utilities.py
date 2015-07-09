@@ -80,7 +80,7 @@ def safe_system_path(file_name):
     if platform.system() == "Windows":
         return linux_to_windows(file_name)
     else:
-        return file_name
+        return os.path.normpath(file_name)
 
 def linux_to_windows(file_name):
     p = re.compile('/(.*?)/(.*?)/vol1/(.*)')

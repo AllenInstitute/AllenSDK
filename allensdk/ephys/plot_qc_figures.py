@@ -619,7 +619,7 @@ def plot_sweep_set_summary(nwb_file, highlight_sweep_number, sweep_numbers,
 
 def make_sweep_html(sweep_files, file_name):
     html = "<html><body>"
-    html += "<a href='index.html'>back</a>"
+    html += "<a href='index.html'>Cell QC Figures</a>"
 
     html += "<p>page created at: %s</p>" % get_time_string()
 
@@ -642,14 +642,21 @@ def make_sweep_html(sweep_files, file_name):
     with open(file_name, 'w') as f:
         f.write(html)
 
-def make_cell_html(image_files, ephys_roi_result, file_name):
+def make_cell_html(image_files, ephys_roi_result, file_name, relative_sweep_link):
 
     html = "<html><body>"
 
     specimen = ephys_roi_result['specimens'][0]
+
     html += "<h3>Specimen %d: %s</h3>" % ( specimen['id'],  specimen['name'] )
     html += "<p>page created at: %s</p>" % get_time_string()
-    html += "<p><a href='sweep.html' target='_blank'>Sweep QC Figures</a></p>"
+
+    if relative_sweep_link:
+        html += "<p><a href='sweep.html' target='_blank'> Sweep QC Figures </a></p>"
+    else:
+        sweep_qc_link = '/'.join([ephys_roi_result['storage_directory'], 'qc_figures', 'sweep.html'])
+        sweep_qc_link = lims_utilities.safe_system_path(sweep_qc_link)
+        html += "<p><a href='%s' target='_blank'> Sweep QC Figures </a></p>" % sweep_qc_link
 
     fields_to_show = [ 'electrode_0_pa', 'seal_gohm', 'initial_access_resistance_mohm', 'input_resistance_mohm' ]
 
@@ -672,7 +679,6 @@ def make_cell_html(image_files, ephys_roi_result, file_name):
         f.write(html)
 
 def make_sweep_page(nwb_file, ephys_roi_result, working_dir):
-    return
     sizes = { 'small': 2.0, 'large': 6.0 }
 
     sweep_files = plot_sweep_figures(nwb_file, ephys_roi_result, working_dir, sizes)
@@ -691,8 +697,15 @@ def make_cell_page(nwb_file, ephys_roi_result, working_dir):
     logging.info("saving images")
     plot_images(ephys_roi_result, working_dir, sizes, cell_files)
 
+    sweep_page = os.path.join(working_dir, 'sweep.html')
+    relative_sweep_link = os.path.exists(sweep_page)
+
+    if not relative_sweep_link:
+        logging.info("sweep page doesn't exist, point to production sweep page")
+    
     make_cell_html(cell_files, ephys_roi_result,
-                   os.path.join(working_dir, 'index.html'))
+                   os.path.join(working_dir, 'index.html'),
+                   relative_sweep_link)
 
 def main():
     parser = argparse.ArgumentParser(description='analyze specimens for cell-wide features')
@@ -712,11 +725,11 @@ def main():
     ephys_roi_result = json_utilities.read(args.feature_json)
 
     if args.sweep_page:
-        print "***** making sweep page"
+        logging.debug("making sweep page")
         make_sweep_page(args.nwb_file, ephys_roi_result, args.output_directory)
 
     if args.cell_page:
-        print "***** making cell page"
+        logging.debug("making cell page")
         make_cell_page(args.nwb_file, ephys_roi_result, args.output_directory)
 
 
