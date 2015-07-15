@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.api import Api
-from allensdk.api.queries.rma.rma_api import RmaApi
+from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
 from allensdk.api.queries.rma.connected_services import ConnectedServices
 
 
-class MouseConnectivityApi(Api):
+class MouseConnectivityApi(RmaSimpleApi):
     '''HTTP Client for the Allen Mouse Brain Connectivity Atlas.
     
     See: `Mouse Connectivity API <http://help.brain-map.org/display/mouseconnectivity/API>`_
@@ -87,7 +86,7 @@ class MouseConnectivityApi(Api):
          -----
          Based on the connectivity application detail page.
         '''
-        rma = RmaApi()
+        rma = RmaSimpleApi()
         model_stage = \
             rma.model_stage(
                 model='SectionDataSet',
@@ -195,7 +194,7 @@ class MouseConnectivityApi(Api):
         
         return url
     
-    
+    # TODO: deprecate for fetch_volume
     def build_structure_projection_signal_statistics_url(self,
                                                          section_data_set_id,
                                                          is_injection=None,
@@ -598,7 +597,7 @@ class MouseConnectivityApi(Api):
         See: `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_ 
         for additional documentation.
         '''
-        rma = RmaApi()
+        rma = RmaSimpleApi()
         
         criteria = ['well_known_file_type',
                     "[name$eq'ImagesResampledTo25MicronARA']",
@@ -739,6 +738,60 @@ class MouseConnectivityApi(Api):
                              **kwargs)
         
         return data
+    
+    def fetch_volume(self,
+                     experiment_ids,
+                     is_injection,
+                     structure_name=None,
+                     structure_ids=None,
+                     hemisphere_ids=None,
+                     normalized_projection_volume_limit=None,
+                     include=None,
+                     debug=None,
+                     order=None):
+        experiment_filter = '[section_data_set_id$in%s]' %\
+                            ','.join(str(i) for i in experiment_ids)
+        
+        if is_injection == True:
+            is_injection_filter = '[is_injection$eqtrue]'
+        elif is_injection == False:
+            is_injection_filter = '[is_injection$eqfalse]'
+        else:
+            is_injection_filter = ''
+        
+        if normalized_projection_volume_limit != None:
+            volume_filter = '[normalized_projection_volume$gt%f]' %\
+                            (normalized_projection_volume_limit)
+        else:
+            volume_filter = ''
+        
+        if hemisphere_ids == None:
+            hemisphere_ids = [3] # both
+        
+        hemisphere_filter = '[hemisphere_id$in%s]' %\
+                            ','.join(str(h) for h in hemisphere_ids)
+        
+        if structure_name != None:
+            structure_filter = ",structure[name$eq'%s']" % (structure_name)
+        elif structure_ids != None:
+            structure_filter = '[structure_id$in%s]' %\
+                               ','.join(str(i) for i in structure_ids)
+        else:
+            structure_filter = ''
+        
+        return self.model_query(
+                'ProjectionStructureUnionize',
+                criteria=''.join([experiment_filter,
+                                  is_injection_filter,
+                                  volume_filter,
+                                  hemisphere_filter,
+                                  structure_filter]),
+                include=include,
+                order=order,
+                num_rows='all',
+                debug=debug,
+                count=False)
+
     
     
 if __name__ == '__main__':
