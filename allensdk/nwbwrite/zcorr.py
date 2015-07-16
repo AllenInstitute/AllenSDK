@@ -28,7 +28,8 @@ orig.set_value("external_file", "./foo.png")
 orig.set_value("bits_per_pixel", 16)
 orig.set_value("dimension", [640, 480])
 orig.set_time([0])  # single frame
-orig.set_data([0])
+orig.ignore_data()
+#orig.set_data([0])
 orig.finalize()
 
 xy = borg.create_timeseries("TimeSeries", "foo")
@@ -44,7 +45,8 @@ corr.set_value("external_file", "./bar.png")
 corr.set_value("bits_per_pixel", 16)
 corr.set_value("dimension", [640, 480])
 corr.set_time([0])  # single frame
-corr.set_data([0])
+corr.ignore_data()
+#corr.set_data([0])
 
 mod = borg.create_module("pipeline")
 iface = mod.create_interface("MotionCorrection")

@@ -141,7 +141,7 @@ class TimeSeries(object):
     def set_time(self, timearray):
         ''' Store timestamps for the time series. 
    
-           Args:
+           Arguments:
                *timearray* (double array) Timestamps for each element in *data*
    
            Returns:
@@ -153,7 +153,7 @@ class TimeSeries(object):
     def set_time_by_rate(self, time_zero, rate):
         '''Store time by start time and sampling rate only
    
-           Args:
+           Arguments:
                *time_zero* (double) Time of data[] start. For template stimuli, this should be zero
                *rate* (float) Cycles per second (Hz)
    
@@ -164,12 +164,30 @@ class TimeSeries(object):
         attrs["rate"] = rate
         self.set_value_with_attributes_internal("starting_time", time_zero, None, **attrs)
 
+    def ignore_time(self):
+        """ In some cases (eg, template stimuli) there is no time 
+            data available. Rather than store invalid data, it's better
+            to explicitly avoid setting the time field
+
+            Arguments:
+                *none*
+
+            Returns:
+                *nothing*
+        """
+        if self.finalized:
+            self.fatal_error("Changed timeseries after finalization")
+        # downgrade required status so file will generate w/o
+        self.spec["timestamps"]["_include"] = "standard"
+        self.spec["starting_time"]["_include"] = "standard"
+        self.spec["num_samples"]["_include"] = "standard"
+
     # if default value used, value taken from specification file
     def set_data(self, data, units=None, conversion=None, resolution=None, dtype=None):
         '''Defines the data stored in the TimeSeries. Type of data 
            depends on which class of TimeSeries is being used
 
-           Args:
+           Arguments:
                *data* (user-defined) Array of data samples stored in time series
 
                *units* (text) Base SI unit for data[] (eg, Amps, Volts)
@@ -190,6 +208,22 @@ class TimeSeries(object):
             attrs["resolution"] = float(resolution)
         self.set_value_with_attributes_internal("data", data, dtype, **attrs)
 
+    def ignore_data(self):
+        """ In some cases (eg, externally stored image files) there is no 
+            data to be stored. Rather than store invalid data, it's better
+            to explicitly avoid setting the data field
+
+            Arguments:
+                *none*
+
+            Returns:
+                *nothing*
+        """
+        if self.finalized:
+            self.fatal_error("Changed timeseries after finalization")
+        # downgrade required status so file will generate w/o
+        self.spec["data"]["_include"] = "standard"
+
     ####################################################################
     ####################################################################
     # linking code
@@ -203,7 +237,7 @@ class TimeSeries(object):
            This works by making an HDF5 hard link to the timestamps array
            in the sibling time series
    
-           Args:
+           Arguments:
                *sibling* (text) Full HDF5 path to TimeSeries containing source timestamps array, or a python TimeSeries object
    
            Returns:
@@ -222,7 +256,7 @@ class TimeSeries(object):
            This works by making an HDF5 hard link to the data array
            in the sibling time series
    
-           Args:
+           Arguments:
                *sibling* (text) Full HDF5 path to TimeSeries containing source data[] array, or a python TimeSeries object
    
            Returns:
@@ -242,7 +276,7 @@ class TimeSeries(object):
            The dataset in the external file must contain attributes required 
            for the TimeSeries::data[] element.
    
-           Args:
+           Arguments:
                *file_path* (text) File-system path to remote HDF5 file
 
                *dataset_path* (text) Full path within remote HDF5 file to dataset
@@ -422,7 +456,7 @@ class AnnotationSeries(TimeSeries):
     def add_annotation(self, what, when):
         '''Conveninece function to add annotations individually
 
-        Args:
+        Arguments:
             *what* (text) Annotation
 
             *when* (double) Timestamp for annotation
@@ -437,7 +471,7 @@ class AnnotationSeries(TimeSeries):
         '''Extends superclass call by pushing annotations onto 
         the data[] and timestamps[] fields
 
-        Args:
+        Arguments:
             *none*
 
         Returns:

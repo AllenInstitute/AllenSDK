@@ -50,17 +50,19 @@ lib.set_value("external_file", "/data/cam/image_library/foo_bar.tif")
 lib.set_value("dimension", [ 512, 512] )
 # time is irrelevant for templates but we still must provide it (w/
 #   present API)
-lib.set_time([0])   
+lib.ignore_time()
+#lib.set_time([0])   
 # data is irrelevant when an external file is referenced, but we still must
 #   provide it (w/ present API)
-lib.set_data([0])
+lib.ignore_data()
+#lib.set_data([0])
 lib.finalize()
 
 # 
 frames = borg.create_timeseries("IndexSeries", "frame-stim", "stimulus")
 frames.set_description("Images presented during experiment")
 # this should be a link, but to play nice w/ SLAPI, it's a path
-frames.set_value_as_link("base_timeseries", lib)
+frames.set_value_as_link("indexed_timeseries", lib)
 # create sample data
 frame_num = 10 * np.arange(10)
 frames.set_data(frame_num)

@@ -580,13 +580,13 @@
 	{
       "_superclass" : "TimeSeries",
       "_description" : "A sequence that is generated from an existing image stack. Frames can be presented in an arbitrary order. The data[] field stores frame number in reference stack",
-      "base_timeseries" : 
+      "indexed_timeseries" : 
       {
         "_datatype" : "timeseries",
         "_description" : "HDF5 link to reference ImageSeries",
         "_include" : "required"
       },
-      "base_timeseries_path" : 
+      "indexed_timeseries_path" : 
       {
         "_datatype" : "str",
         "_description" : "Path to reference ImageSeries",

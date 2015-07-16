@@ -46,6 +46,7 @@ def recursive_dictionary_merge(x, y):
     return x
 
 def load_json(fname):
+    import json
     # correct the path, in case calling from remote directory
     fname = os.path.join( os.path.dirname(__file__), fname)
     try:
@@ -57,20 +58,41 @@ def load_json(fname):
         sys.exit(1)
     return jin
 
+def load_yaml(fname):
+    import yaml
+    # correct the path, in case calling from remote directory
+    fname = os.path.join( os.path.dirname(__file__), fname)
+    try:
+        with open(fname, 'r') as f:
+            jin = yaml.load(f)
+            f.close()
+    except IOError:
+        print "Unable to load json file '%s'" % fname
+        sys.exit(1)
+    return jin
+
+def load_spec_file(fname):
+    if fname.endswith(".yml"):
+        return load_yaml(fname)
+    elif fname.endswith(".yaml"):
+        return load_yaml(fname)
+    else: # try json as default
+        return load_json(fname)
+
 def load_spec(custom_spec):
-    spec = load_json("spec_file.json")
-    ts = load_json("spec_ts.json")
+    spec = load_spec_file("spec_file.json")
+    ts = load_spec_file("spec_ts.json")
     recursive_dictionary_merge(spec, ts)
-    mod = load_json("spec_mod.json")
+    mod = load_spec_file("spec_mod.json")
     recursive_dictionary_merge(spec, mod)
-    iface = load_json("spec_iface.json")
+    iface = load_spec_file("spec_iface.json")
     recursive_dictionary_merge(spec, iface)
-    gen = load_json("spec_general.json")
+    gen = load_spec_file("spec_general.json")
     recursive_dictionary_merge(spec, gen)
-    ep = load_json("spec_epoch.json")
+    ep = load_spec_file("spec_epoch.json")
     recursive_dictionary_merge(spec, ep)
     if len(custom_spec) > 0:
-        custom = load_json(custom_spec)
+        custom = load_spec_file(custom_spec)
         recursive_dictionary_merge(spec, custom)
     write_json("fullspec.json", spec)
     return spec
