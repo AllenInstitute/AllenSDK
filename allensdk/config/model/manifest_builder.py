@@ -32,6 +32,8 @@ class ManifestBuilder(object):
     
     
     def write_json_file(self, path):
+        self.add_biophys_sim_config(path)
+        
         with open(path, 'wb') as f:
             f.write(self.write_json_string())
     
@@ -43,6 +45,14 @@ class ManifestBuilder(object):
         wrapper.update(self.hoc_conf)
         
         return wrapper
+
+    
+    def add_biophys_sim_config(self, path):
+        self.bps_cfg = {
+            "biophys": [{
+                "model_file": [ path ]
+                }]
+            }
     
     def write_json_string(self):
         config = self.get_config()
