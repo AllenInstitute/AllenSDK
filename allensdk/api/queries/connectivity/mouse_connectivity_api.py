@@ -642,6 +642,8 @@ class MouseConnectivityApi(RmaSimpleApi):
         ----------
         data : string
             'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
+        file_name : string
+            
         voxel_resolution : int
             10, 25, 50 or 100
         coordinate_framework : string
@@ -791,68 +793,3 @@ class MouseConnectivityApi(RmaSimpleApi):
                 num_rows='all',
                 debug=debug,
                 count=False)
-
-    
-    
-if __name__ == '__main__':
-    import nrrd
-    import numpy as np
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    from PIL import Image
-
-    a = MouseConnectivityApi()
-    a.download_reference_aligned_image_channel_volumes_url(156198187)
-#     print(a.build_projection_grid_search_url(injection_structures='Isocortex',
-#                                              primary_structure_only=True))
-#     print(a.build_projection_grid_search_url(injection_structures='Isocortex',
-#                                              transgenic_lines=RmaApi().quote_string('Syt6-Cre_KI148'),
-#                                              primary_structure_only=True))
-#     print(a.build_projection_grid_spatial_search_url(seed_point=[6900,5050,6450]))
-#     print(a.build_projection_grid_injection_coordinate_search_url(seed_point=[6900,5050,6450]))
-#     print(a.build_projection_grid_correlation_search_url(row=112670853, structures=['TH']))
-    
-    #print(json.dumps(a.get_experiments()))
-    #print(json.dumps(a.get_experiments(structure_id=385)))
-    #print(json.dumps(a.get_experiment_detail(experiment_id=126862385)))
-    #print(json.dumps(a.get_projection_image_meta_info(experiment_id=126862385,
-    #                                                  section_number=74)))
-    #a.download_volumetric_data('average_template', 'average_template_25.nrrd')
-    #a.download_volumetric_data('ara_nissl', 'ara_nissl_25.nrrd')
-    #a.download_volumetric_data('annotation/ccf_2015', 'annotation_25.nrrd')
-#     AVGT, metaAVGT = nrrd.read('average_template_25.nrrd')
-#     NISSL, metaNISSL = nrrd.read('ara_nissl_25.nrrd')
-#     ANO, metaANO = nrrd.read('annotation_25.nrrd')
-#     
-#     # Save one coronal section as PNG
-#     slice = AVGT[264,:,:].astype(float)
-#     slice /= np.max(slice)
-#     im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
-#     im.save('output/avgt_coronal.png')
-#     
-#     slice = NISSL[264,:,:].astype(float)
-#     slice /= np.max(slice)
-#     im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
-#     im.save('output/nissl_coronal.png')
-#     
-#     slice = ANO[264,:,:].astype(float)
-#     slice /= 2000
-#     im = Image.fromarray(np.uint8(plt.cm.jet(slice)*255))
-#     im.save('output/ano_coronal.png')
-#     
-#     # Save one sagittal section as PNG
-#     slice = AVGT[:,:,220].astype(float)
-#     slice /= np.max(slice)
-#     im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
-#     im.save('output/avgt_sagittal.png')
-#     
-#     slice = NISSL[:,:,220].astype(float)
-#     slice /= np.max(slice)
-#     im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
-#     im.save('output/nissl_sagittal.png')
-#     
-#     slice = ANO[:,:,220].astype(float)
-#     slice /= 2000
-#     im = Image.fromarray(np.uint8(plt.cm.jet(slice)*255))
-#     im.save('output/ano_sagittal.png')

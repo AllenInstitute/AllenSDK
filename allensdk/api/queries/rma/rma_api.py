@@ -451,22 +451,3 @@ class RmaApi(Api):
                                    clazz)
         
         return schema_data
-    
-    
-if __name__ == '__main__':
-    import json
-    from allensdk.api.queries.rma.rma_api import RmaApi
-    
-    a = RmaApi()
-    #print(json.dumps(a.get_schema()))
-    #print(json.dumps(a.get_schema('Gene')))
-    #print(a.model_stage('Gene',
-    #                    include=['organism'],
-    #                    criteria=['organism'],
-    #                    num_rows=5,
-    #                    start_row=2))
-    #print(a.build_query_url([a.model_stage('Gene',
-    #                                       filters={'id': 15})]))
-    #print(a.build_query_url([a.model_stage('Gene',
-    #                                       filters={'acronym': a.quote_string('ABAT')})]))
-    print(a.build_query_url(a.service_stage('FooBar')))

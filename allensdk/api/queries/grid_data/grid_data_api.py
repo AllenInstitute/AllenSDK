@@ -15,7 +15,8 @@
 
 from allensdk.api.api import Api
 from allensdk.api.queries.rma.rma_api import RmaApi
-import zipfile
+import numpy as np
+
 
 class GridDataApi(Api):
     '''HTTP Client for the Allen 3-D Expression Grid Data Service.
@@ -269,3 +270,23 @@ class GridDataApi(Api):
             save_file_path = str(section_data_set_id) + '.zip'
         
         self.retrieve_file_over_http(url, save_file_path)
+        
+    def calculate_centroid(self,
+                           injection_density,                           
+                           injection_fraction,
+                           resolution):
+        # find all voxels with injection_fraction > 0
+        injection_voxels = np.nonzero(injection_fraction)
+        injection_density_computed = np.multiply(injection_density[injection_voxels],
+                                                 injection_fraction[injection_voxels]) 
+        sum_density = np.sum(injection_density_computed)
+    
+        # compute centroid in CCF coordinates
+        if sum_density > 0 :
+            centroid = np.dot(injection_density_computed,
+                              zip(*injection_voxels)) / sum_density * resolution
+        else:
+            centroid = None
+        
+        return centroid
+
