@@ -120,21 +120,27 @@ class NwbDataSet(object):
                 sweep_length = swp['stimulus']['count'].value
             
             if stimulus is not None:
-                # if the data is shorter than the sweep, pad it with zeros
                 missing_data = sweep_length - len(stimulus)
-                if missing_data > 0:
-                    stimulus = np.append(stimulus, np.zeros(missing_data))
-                
-                swp['stimulus']['timeseries']['data'][...] = stimulus
+
+                if missing_data != 0:
+                    # if the data is longer or shorter than the sweep, reinitialize the array
+                    del swp['stimulus']['timeseries']['data']
+                    swp['stimulus']['timeseries']['data'] = stimulus
+                    swp['stimulus']['count'] = len(stimulus)
+                else:
+                    swp['stimulus']['timeseries']['data'][...] = stimulus
             
             if response is not None:
                 # if the data is shorter than the sweep, pad it with zeros
                 missing_data = sweep_length - len(response)
-                if missing_data > 0:
-                    response = np.append(response, np.zeros(missing_data))
-                
-                
-                swp['response']['timeseries']['data'][...] = response
+
+                if missing_data != 0:
+                    # if the data is longer or shorter than the sweep, reinitialize the array
+                    del swp['response']['timeseries']['data']
+                    swp['response']['timeseries']['data'] = response
+                    swp['response']['count'] = len(response)
+                else:
+                    swp['response']['timeseries']['data'][...] = response
     
 
     def get_spike_times(self, sweep_number):
