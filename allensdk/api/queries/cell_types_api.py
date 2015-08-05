@@ -94,30 +94,31 @@ class CellTypesApi(RmaSimpleApi):
                 cell[tag_name] = tag_value
                 
 
-    def list_ephys_features(self, require_morphology=False, require_reconstruction=False, 
-                            dataframe=False, recache=False):
+    def list_ephys_features(self, dataframe=False):
         if self.cache:
             path = self.manifest.get_path('EPHYS_FEATURES')
         else:
             path = None
 
-        if not recache and os.path.exists(path):
-            features = json_utilities.read(path)
+        if os.path.exists(path):
+            df = pd.DataFrame.from_csv(path)
             if dataframe:
-                return pd.DataFrame(features)
+                return df
             else:
-                return features
+                return df.to_dict('records')
 
         features = self.model_query('EphysFeature',
                                     num_rows='all')
 
+        df = pd.DataFrame(features)
+ 
         if self.cache:
-            json_utilities.write(path, features)
+            df.to_csv(path)
             
         if dataframe:
-            df = pd.DataFrame(features)
+            return df
         else:
-            return features
+            return df.to_dict('records')
 
 
     def load_ephys_data(self, specimen_id, save_file_name=None):
@@ -194,7 +195,7 @@ class CellTypesApi(RmaSimpleApi):
         mb.add_path('BASEDIR', '.')
         mb.add_path('CELLS', 'cells.json', typename='file', parent_key='BASEDIR')
         mb.add_path('EPHYS_DATA', 'specimen_%d/ephys.nwb', typename='file', parent_key='BASEDIR')
-        mb.add_path('EPHYS_FEATURES', 'ephys_features.json', typename='file', parent_key='BASEDIR')
+        mb.add_path('EPHYS_FEATURES', 'ephys_features.csv', typename='file', parent_key='BASEDIR')
         mb.add_path('RECONSTRUCTION', 'specimen_%d/reconstruction.swc', typename='file', parent_key='BASEDIR')
 
         mb.write_json_file(file_name)
