@@ -29,7 +29,8 @@ import allensdk.core.swc as swc
 
 
 class CellTypesApi(RmaSimpleApi):
-    def __init__(self, base_uri=None, cache=True, manifest_file='manifest.json'):
+
+    def __init__(self, base_uri=None, cache=True, manifest_file='cell_types_manifest.json'):
         super(CellTypesApi, self).__init__(base_uri)
 
         self.cache = cache
