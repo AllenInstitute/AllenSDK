@@ -21,8 +21,11 @@ import pandas as pd
 from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
 from allensdk.config.model.manifest_builder import ManifestBuilder
 from allensdk.config.model.manifest import Manifest
-from allensdk.config.model.formats.json_util import JsonUtil
+
+import allensdk.core.json_utilities as json_utilities
 from allensdk.core.nwb_data_set import NwbDataSet
+
+import allensdk.core.swc as swc
 
 
 class CellTypesApi(RmaSimpleApi):
@@ -37,7 +40,7 @@ class CellTypesApi(RmaSimpleApi):
             self.manifest = None
 
 
-    def load_cells(self, require_morphology=False, require_reconstruction=False):
+    def list_cells(self, require_morphology=False, require_reconstruction=False, recache=False):
         ''' Query the API for a list of all cells in the Cell Types Database.
 
         Parameters
@@ -59,8 +62,8 @@ class CellTypesApi(RmaSimpleApi):
         else:
             path = None
 
-        if os.path.exists(path):
-            return JsonUtil.read_json_file(path)
+        if not recache and os.path.exists(path):
+            return json_utilities.read(path)
 
         criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
 
@@ -78,7 +81,7 @@ class CellTypesApi(RmaSimpleApi):
         self.parse_tags(cells)
 
         if self.cache:
-            JsonUtil.write_json_file(path, cells)
+            json_utilities.write(path, cells)
         
         return cells
             
@@ -91,31 +94,30 @@ class CellTypesApi(RmaSimpleApi):
                 cell[tag_name] = tag_value
                 
 
-    def load_ephys_features(self, require_morphology=False, require_reconstruction=False, dataframe=False):
+    def list_ephys_features(self, require_morphology=False, require_reconstruction=False, 
+                            dataframe=False, recache=False):
         if self.cache:
             path = self.manifest.get_path('EPHYS_FEATURES')
         else:
             path = None
 
-        if os.path.exists(path):
+        if not recache and os.path.exists(path):
+            features = json_utilities.read(path)
             if dataframe:
-                return pd.DataFrame.from_csv(path)
+                return pd.DataFrame(features)
             else:
-                return list(csv.DictReader(open(path)))
+                return features
 
         features = self.model_query('EphysFeature',
                                     num_rows='all')
 
-        if self.cache or dataframe:
+        if self.cache:
+            json_utilities.write(path, features)
+            
+        if dataframe:
             df = pd.DataFrame(features)
-
-            if self.cache:
-                df.to_csv(path)
-
-            if dataframe:
-                return df
-
-        return features
+        else:
+            return features
 
 
     def load_ephys_data(self, specimen_id, save_file_name=None):
@@ -155,6 +157,11 @@ class CellTypesApi(RmaSimpleApi):
             raise Exception("Please enable caching (CellTypesApi.cache = True) or specify a save_file_name.")
 
         if not os.path.exists(path):
+            try: 
+                os.makedirs(os.path.dirname(path))
+            except:
+                pass
+
             criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
             includes = 'neuron_reconstructions(well_known_files)'
 
@@ -174,7 +181,7 @@ class CellTypesApi(RmaSimpleApi):
         if not os.path.exists(file_name):
             self.build_manifest(file_name)
 
-        manifest_json = JsonUtil.read_json_file(file_name)
+        manifest_json = json_utilities.read(file_name)
         manifest = Manifest(manifest_json['manifest'], 
                             os.path.dirname(file_name))
 
@@ -186,8 +193,9 @@ class CellTypesApi(RmaSimpleApi):
 
         mb.add_path('BASEDIR', '.')
         mb.add_path('CELLS', 'cells.json', typename='file', parent_key='BASEDIR')
-        mb.add_path('EPHYS_DATA', 'ephys/%d.nwb', typename='file', parent_key='BASEDIR')
-        mb.add_path('EPHYS_FEATURES', 'ephys_features.csv', typename='file', parent_key='BASEDIR')
+        mb.add_path('EPHYS_DATA', 'specimen_%d/ephys.nwb', typename='file', parent_key='BASEDIR')
+        mb.add_path('EPHYS_FEATURES', 'ephys_features.json', typename='file', parent_key='BASEDIR')
+        mb.add_path('RECONSTRUCTION', 'specimen_%d/reconstruction.swc', typename='file', parent_key='BASEDIR')
 
         mb.write_json_file(file_name)
 

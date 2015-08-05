@@ -14,7 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import urllib2
-from allensdk.config.model.formats.json_util import JsonUtil
+import allensdk.core.json_utilities as json_utilities
 import logging
 
 
@@ -240,7 +240,7 @@ class Api(object):
         dict
             Result document as parsed by the JSON library.
         '''
-        return JsonUtil.read_json_url(url)
+        return json_utilities.read_url(url)
     
     
     def retrieve_xml_over_http(self, url):

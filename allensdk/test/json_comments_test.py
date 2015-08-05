@@ -1,8 +1,8 @@
 import unittest
 from mock import patch, mock_open
-from allensdk.config.model.formats.json_util import JsonUtil
+from allensdk.core.json_utilities import JsonComments
 
-class JsonUtilTest(unittest.TestCase):
+class JsonCommentsTest(unittest.TestCase):
     commented_json = ("{\n"
                       "    // comment\n"
                       "    \"color\": \"blue\"\n"
@@ -39,7 +39,7 @@ class JsonUtilTest(unittest.TestCase):
     
     
     def __init__(self, *args, **kwargs):
-        super(JsonUtilTest, self).__init__(*args, **kwargs)
+        super(JsonCommentsTest, self).__init__(*args, **kwargs)
     
     
     def setUp(self):
@@ -51,31 +51,31 @@ class JsonUtilTest(unittest.TestCase):
     
     
     def testSingleLineComment(self):
-        parsed_json = JsonUtil.read_json_string(
-            JsonUtilTest.commented_json)
+        parsed_json = JsonComments.read_string(
+            JsonCommentsTest.commented_json)
         
         self.assertTrue('color' in parsed_json and
                         parsed_json['color'] == 'blue')
 
-
+        
     def testBlankLines(self):
-        parsed_json = JsonUtil.read_json_string(
-            JsonUtilTest.blank_line_json)
+        parsed_json = JsonComments.read_string(
+            JsonCommentsTest.blank_line_json)
         
         self.assertTrue('color' in parsed_json and
                         parsed_json['color'] == 'blue')
 
 
     def testMultiLineComment(self):
-        parsed_json = JsonUtil.read_json_string(
-            JsonUtilTest.multi_line_json)
+        parsed_json = JsonComments.read_string(
+            JsonCommentsTest.multi_line_json)
         
         self.assertTrue('color' in parsed_json and
                         parsed_json['color'] == 'blue')
 
     def testTwoMultiLineComments(self):
-        parsed_json = JsonUtil.read_json_string(
-            JsonUtilTest.two_multi_line_json)
+        parsed_json = JsonComments.read_string(
+            JsonCommentsTest.two_multi_line_json)
         
         self.assertTrue('colors' in parsed_json)
         self.assertTrue(len(parsed_json['colors']) == 4)
@@ -88,8 +88,8 @@ class JsonUtilTest(unittest.TestCase):
     def testSingleLineCommentFile(self):
         with patch("__builtin__.open",
                    mock_open(
-                       read_data=JsonUtilTest.commented_json)):
-            parsed_json = JsonUtil.read_json_file('mock.json')
+                       read_data=JsonCommentsTest.commented_json)):
+            parsed_json = JsonComments.read_file('mock.json')
         
         self.assertTrue('color' in parsed_json and
                         parsed_json['color'] == 'blue')
@@ -98,8 +98,8 @@ class JsonUtilTest(unittest.TestCase):
     def testBlankLinesFile(self):
         with patch("__builtin__.open",
                    mock_open(
-                       read_data=JsonUtilTest.blank_line_json)):
-            parsed_json = JsonUtil.read_json_file('mock.json')
+                       read_data=JsonCommentsTest.blank_line_json)):
+            parsed_json = JsonComments.read_file('mock.json')
         
         self.assertTrue('color' in parsed_json and
                         parsed_json['color'] == 'blue')
@@ -108,8 +108,8 @@ class JsonUtilTest(unittest.TestCase):
     def testMultiLineFile(self):
         with patch("__builtin__.open",
                    mock_open(
-                       read_data=JsonUtilTest.multi_line_json)):
-            parsed_json = JsonUtil.read_json_file('mock.json')
+                       read_data=JsonCommentsTest.multi_line_json)):
+            parsed_json = JsonComments.read_file('mock.json')
         
         self.assertTrue('color' in parsed_json and
                         parsed_json['color'] == 'blue')
@@ -118,8 +118,8 @@ class JsonUtilTest(unittest.TestCase):
     def testTwoMultiLineFile(self):
         with patch("__builtin__.open",
                    mock_open(
-                       read_data=JsonUtilTest.two_multi_line_json)):
-            parsed_json = JsonUtil.read_json_file('mock.json')
+                       read_data=JsonCommentsTest.two_multi_line_json)):
+            parsed_json = JsonComments.read_file('mock.json')
         
         self.assertTrue('colors' in parsed_json)
         self.assertTrue(len(parsed_json['colors']) == 4)
