@@ -40,7 +40,7 @@ class CellTypesApi(RmaSimpleApi):
             self.manifest = None
 
 
-    def list_cells(self, require_morphology=False, require_reconstruction=False, recache=False):
+    def list_cells(self, require_morphology=False, require_reconstruction=False):
         ''' Query the API for a list of all cells in the Cell Types Database.
 
         Parameters
@@ -58,50 +58,56 @@ class CellTypesApi(RmaSimpleApi):
         '''
 
         if self.cache:
-            path = self.manifest.get_path('CELLS')
+            file_name = self.manifest.get_path('CELLS')
         else:
-            path = None
+            file_name = None
 
-        if not recache and os.path.exists(path):
-            return json_utilities.read(path)
+        if os.path.exists(file_name):
+            cells = json_utilities.read(file_name)
+        else:
+            criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
 
-        criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
+            include = ( 'structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
+                        'ephys_features,data_sets,neuron_reconstructions' )
+
+            cells = self.model_query('Specimen', criteria=criteria, include=include, num_rows='all')
+
+            self.append_extra_cell_fields(cells)
+
+            if self.cache:
+                json_utilities.write(file_name, cells)
 
         if require_morphology:
-            criteria += ',data_sets'
-            
+            cells = [ c for c in cells if c['has_morphology'] ]
+
         if require_reconstruction:
-            criteria += ',neuron_reconstructions'
+            cells = [ c for c in cells if c['has_reconstruction'] ]
 
-        cells = self.model_query('Specimen',
-                                 criteria=criteria,
-                                 include='structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,ephys_features',
-                                 num_rows='all')
-
-        self.parse_tags(cells)
-
-        if self.cache:
-            json_utilities.write(path, cells)
-        
         return cells
             
 
-    def parse_tags(self, cells):
+    def append_extra_cell_fields(self, cells):
         for cell in cells:
+            # specimen tags
             for tag in cell['specimen_tags']:
                 tag_name, tag_value = tag['name'].split(' - ')
                 tag_name = tag_name.replace(' ','_')
                 cell[tag_name] = tag_value
+
+
+            # morphology and reconstuction
+            cell['has_reconstruction'] = len(cell['neuron_reconstructions']) > 0
+            cell['has_morphology'] = len(cell['data_sets']) > 0
                 
 
     def list_ephys_features(self, dataframe=False):
         if self.cache:
-            path = self.manifest.get_path('EPHYS_FEATURES')
+            file_name = self.manifest.get_path('EPHYS_FEATURES')
         else:
-            path = None
+            file_name = None
 
-        if os.path.exists(path):
-            df = pd.DataFrame.from_csv(path)
+        if os.path.exists(file_name):
+            df = pd.DataFrame.from_csv(file_name)
             if dataframe:
                 return df
             else:
@@ -113,7 +119,7 @@ class CellTypesApi(RmaSimpleApi):
         df = pd.DataFrame(features)
  
         if self.cache:
-            df.to_csv(path)
+            df.to_csv(file_name)
             
         if dataframe:
             return df
@@ -121,61 +127,66 @@ class CellTypesApi(RmaSimpleApi):
             return df.to_dict('records')
 
 
-    def load_ephys_data(self, specimen_id, save_file_name=None):
-        if save_file_name:
-            path = save_file_name
-        elif self.cache:
-            path = self.manifest.get_path('EPHYS_DATA', specimen_id)
+    def save_ephys_data(self, specimen_id, file_name):
+        try: 
+            os.makedirs(os.path.dirname(file_name))
+        except:
+            pass
+
+        criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eqNWB]))' % specimen_id
+        includes = 'ephys_result(well_known_files(well_known_file_type))'
+
+        results = self.model_query('Specimen',
+                                   criteria=criteria,
+                                   include=includes,
+                                   num_rows='all')
+
+        file_url = results[0]['ephys_result']['well_known_files'][0]['download_link']
+
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+        
+
+    def load_ephys_data(self, specimen_id, file_name=None):
+        if not file_name and self.cache:
+            file_name = self.manifest.get_path('EPHYS_DATA', specimen_id)
         else:
             raise Exception("Please enable caching (CellTypesApi.cache = True) or specify a save_file_name.")
 
-        if not os.path.exists(path):
-            try: 
-                os.makedirs(os.path.dirname(path))
-            except:
-                pass
+        if not os.path.exists(file_name):
+            self.save_ephys_data(specimen_id, file_name)
 
-            criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eqNWB]))' % specimen_id
-            includes = 'ephys_result(well_known_files(well_known_file_type))'
-
-            results = self.model_query('Specimen',
-                                       criteria=criteria,
-                                       include=includes,
-                                       num_rows='all')
-            file_url = results[0]['ephys_result']['well_known_files'][0]['download_link']
-
-            self.retrieve_file_over_http(self.api_url + file_url, path)
-
-        return NwbDataSet(path)
+        return NwbDataSet(file_name)
 
 
-    def load_reconstruction(self, specimen_id, save_file_name=None):
-        if save_file_name:
-            path = save_file_name
-        elif self.cache:
-            path = self.manifest.get_path('RECONSTRUCTION', specimen_id)
+    def save_reconstruction(self, specimen_id, file_name):
+        try: 
+            os.makedirs(os.path.dirname(file_name))
+        except:
+            pass
+
+        criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
+        includes = 'neuron_reconstructions(well_known_files)'
+        
+        results = self.model_query('Specimen',
+                                   criteria=criteria,
+                                   include=includes,
+                                   num_rows='all')
+        
+        file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
+        
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+
+
+    def load_reconstruction(self, specimen_id, file_name=None):
+        if not file_name and self.cache:
+            file_name = self.manifest.get_path('RECONSTRUCTION', specimen_id)
         else:
             raise Exception("Please enable caching (CellTypesApi.cache = True) or specify a save_file_name.")
 
-        if not os.path.exists(path):
-            try: 
-                os.makedirs(os.path.dirname(path))
-            except:
-                pass
+        if not os.path.exists(file_name):
+            self.save_reconstruction(specimen_id, file_name)
 
-            criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
-            includes = 'neuron_reconstructions(well_known_files)'
-
-            results = self.model_query('Specimen',
-                                       criteria=criteria,
-                                       include=includes,
-                                       num_rows='all')
-
-            file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
-
-            self.retrieve_file_over_http(self.api_url + file_url, path)
-
-        return swc.read_swc(path)
+        return swc.read_swc(file_name)
 
 
     def load_manifest(self, file_name):
