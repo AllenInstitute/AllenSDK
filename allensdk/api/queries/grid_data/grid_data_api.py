@@ -13,22 +13,99 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.api import Api
-from allensdk.api.queries.rma.rma_api import RmaApi
+from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
+from allensdk.api.cache import Cache
 import numpy as np
+import os, nrrd
 
 
-class GridDataApi(Api):
+class GridDataApi(RmaSimpleApi, Cache):
     '''HTTP Client for the Allen 3-D Expression Grid Data Service.
     
     See: `Downloading 3-D Expression Grid Data <http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data>`_
     '''
     PRODUCT_ID = 5
     
-    def __init__(self, base_uri=None):
+    def __init__(self,
+                 resolution=25,
+                 base_uri=None,
+                 cache=False):
         super(GridDataApi, self).__init__(base_uri)
+        Cache.__init__(self, cache=cache)
+        self.resolution = resolution
+
+        
+    def cache_injection_density(self,
+                                path,            
+                                eid):
+        if self.cache == True:        
+            self.download_projection_grid_data(eid,
+                                               ['injection_density'],
+                                               self.resolution,
+                                               path)
+            
+        injection_density, _ = nrrd.read(path)
+        
+        return injection_density
+
+
+    def cache_projection_density(self,
+                                 path,
+                                 eid):
+        if self.cache == True:
+            try:
+                os.makedirs(os.path.dirname(path))
+            except:
+                pass
+        
+            self.download_projection_grid_data(eid,
+                                               ['projection_density'],
+                                               self.resolution,
+                                               path)
+            
+        projection_density, _ = nrrd.read(path)
+        
+        return projection_density
+
+
+    def cache_injection_fraction(self,
+                                 path,
+                                 eid):
+        if self.cache == True:
+            try:
+                os.makedirs(os.path.dirname(path))
+            except:
+                pass
     
-    
+            self.download_projection_grid_data(eid,
+                                               ['injection_fraction'],
+                                               self.resolution,
+                                               path)
+
+        injection_fraction, _ = nrrd.read(path)
+            
+        return injection_fraction
+
+
+    def cache_data_mask(self,
+                        path,
+                        eid):
+        if self.cache == True:
+            try:
+                os.makedirs(os.path.dirname(path))
+            except:
+                pass
+            
+            self.download_projection_grid_data(eid,
+                                               ['data_mask'],
+                                               self.resolution,
+                                               path)
+            
+        data_mask, _ = nrrd.read(path)
+        
+        return data_mask
+ 
+
     def build_expression_grid_download_query(self,
                                              section_data_set_id,
                                              include=None):
@@ -109,13 +186,13 @@ class GridDataApi(Api):
         return url
     
     
-    def build_experiment_id_url(self,
-                                product_abbreviation=None,
-                                plane_of_section=None,
-                                gene_acronym=None,
-                                fmt='json'):
-        '''Build the URL to get relevant experiment ids
-        for downloading the energy volume
+    def get_experiments(self,
+                        product_abbreviation=None,
+                        plane_of_section=None,
+                        gene_acronym=None,
+                        fmt='json'):
+        '''Fetch relevant metadata
+        including ids for downloading the energy volume
         for an Atlas' experiment.
         
         Parameters
@@ -140,8 +217,6 @@ class GridDataApi(Api):
         and `Example Queries for Experiment Metadata <http://help.brain-map.org/display/api/Example+Queries+for+Experiment+Metadata#ExampleQueriesforExperimentMetadata-MouseBrain>`_
         for additional documentation.
         '''
-        rma = RmaApi()
-        
         criteria = ['[failed$eqfalse]']
         
         if product_abbreviation != None:
@@ -156,11 +231,11 @@ class GridDataApi(Api):
             criteria.append(",genes[acronym$eq'%s']" %
                             (gene_acronym))
         
-        section_data_set_stage = \
-            rma.model_stage('SectionDataSet',
-                            criteria=criteria)
+        result = \
+            self.model_query('SectionDataSet',
+                             criteria=criteria)
         
-        return rma.build_query_url(section_data_set_stage)
+        return result
     
     
     def read_response(self, parsed_json):
@@ -173,41 +248,7 @@ class GridDataApi(Api):
         '''
         return parsed_json['msg']
     
-    
-    def get_experiment_ids(self,
-                           product_abbreviation=None,
-                           plane_of_section=None,
-                           gene_acronym=None):
-        '''Build the URL to get relevant experiment ids
-        for downloading the energy volume
-        for an Atlas' experiment.
         
-        Parameters
-        ----------
-        product_abbreviation : string
-            i.e. 'Mouse'
-        plane_of_section : string, optional
-            'coronal' or 'sagittal'
-        gene_acronym : string, optional
-            i.e. 'Adora2a'
-        
-        Returns
-        -------
-        dict : the parsed json response containing experiment records.
-        
-        Notes
-        -----
-        See `Downloading 3-D Expression Grid Data <http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data#Downloading3-DExpressionGridData-DOWNLOADING3DEXPRESSIONGRIDDATA>`_
-        and `Example Queries for Experiment Metadata <http://help.brain-map.org/display/api/Example+Queries+for+Experiment+Metadata#ExampleQueriesforExperimentMetadata-MouseBrain>`_
-        for additional documentation.
-        '''
-        return self.do_query(self.build_experiment_id_url,
-                             self.read_response,
-                             product_abbreviation,
-                             plane_of_section,
-                             gene_acronym)
-    
-    
     def download_expression_grid_data(self,
                                       section_data_set_id,
                                       include=None,
@@ -273,8 +314,7 @@ class GridDataApi(Api):
         
     def calculate_centroid(self,
                            injection_density,                           
-                           injection_fraction,
-                           resolution):
+                           injection_fraction):
         # find all voxels with injection_fraction > 0
         injection_voxels = np.nonzero(injection_fraction)
         injection_density_computed = np.multiply(injection_density[injection_voxels],
@@ -284,7 +324,7 @@ class GridDataApi(Api):
         # compute centroid in CCF coordinates
         if sum_density > 0 :
             centroid = np.dot(injection_density_computed,
-                              zip(*injection_voxels)) / sum_density * resolution
+                              zip(*injection_voxels)) / sum_density * self.resolution
         else:
             centroid = None
         
