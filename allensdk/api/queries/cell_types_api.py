@@ -173,7 +173,10 @@ class CellTypesApi(RmaSimpleApi):
                                    include=includes,
                                    num_rows='all')
         
-        file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
+        try:
+            file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
+        except:
+            raise Exception("Specimen %d has no reconstruction" % specimen_id)
         
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 

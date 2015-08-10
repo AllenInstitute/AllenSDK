@@ -17,7 +17,7 @@
 import numpy as np
 import json
 import re
-import urllib2
+import urllib2, urlparse
 
 def read(file_name):
     """ Shortcut reading JSON from a file. """
@@ -33,7 +33,7 @@ def write(file_name, obj):
 
 def write_string(obj):
     """ Shortcut for writing JSON to a string.  This also takes care of serializing numpy and data types. """
-    return json.dumps(obj, indent=2, default=handler)
+    return json.dumps(obj, indent=2, default=json_handler)
 
 
 def read_url(url, method='POST'):
@@ -85,10 +85,13 @@ def read_url_post(url):
     Note: if the input is a bare array or literal, for example,
     the output will be of the corresponding type.
     '''
+    urlp = urlparse.urlparse(url)
+    main_url = urlparse.urlunsplit((urlp.scheme, urlp.netloc, urlp.path, '', ''))
+    data = json.dumps(dict(urlparse.parse_qsl(urlp.query)))
+
     handler = urllib2.HTTPHandler()
     opener = urllib2.build_opener(handler)
-    (main_url, query) = url.split('?q=')
-    data = json.dumps({ 'q': query})
+
     request = urllib2.Request(main_url, data)
     request.add_header("Content-Type",'application/json')
     request.get_method = lambda: 'POST'
@@ -106,7 +109,7 @@ def read_url_post(url):
     return json.loads(json_string)
 
 
-def handler(obj):
+def json_handler(obj):
     """ Used by write_json convert a few non-standard types to things that the json package can handle. """
     if hasattr(obj, 'to_dict'):
         return obj.to_dict()
