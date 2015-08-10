@@ -15,58 +15,46 @@
 
 from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
 from allensdk.api.queries.rma.connected_services import ConnectedServices
+from allensdk.api.cache import Cache
+import allensdk.core.json_utilities as ju
+import pandas as pd
+import pandas.io.json as pj
+import os, nrrd
 
 
-class MouseConnectivityApi(RmaSimpleApi):
+class MouseConnectivityApi(RmaSimpleApi, Cache):
     '''HTTP Client for the Allen Mouse Brain Connectivity Atlas.
     
     See: `Mouse Connectivity API <http://help.brain-map.org/display/mouseconnectivity/API>`_
     '''
-    PRODUCT_ID = 5
+    #PRODUCT_IDS = [5, 31]
+    PRODUCT_IDS = [ 5 ]
     
-    def __init__(self, base_uri=None):
+    def __init__(self,
+                 resolution=25,
+                 base_uri=None,
+                 cache=False):
         super(MouseConnectivityApi, self).__init__(base_uri)
-    
-    
-    def build_query(self, structure_id=None, fmt='json'):
-        '''Build the URL that will fetch experiments 
-        in the "Mouse Connectivity Projection" Product.
+        Cache.__init__(self, cache=cache)
+        self.resolution = resolution
+
+
+    def cache_annotation(self,
+                         path,
+                         eid):
+        if self.cache == True:
+            try:
+                os.makedirs(os.path.dirname(path))
+            except:
+                pass
+            
+        self.download_volumetric_data('annotation/ccf_2015',
+                                      'annotation_%d.nrrd' % (self.resolution),
+                                      save_file_path=path)
         
-        Parameters
-        ----------
-        structure_id : integer, optional
-            injection structure
-        fmt : string, optional
-            json (default) or xml
+        annotation, _ = nrrd.read(path)
         
-        Returns
-        -------
-        url : string
-            The constructed URL
-        '''
-        
-        if structure_id:
-            structure_filter = '[id$eq%d]' % (structure_id)
-        else:
-            structure_filter = ''
-        
-        url = ''.join([self.rma_endpoint,
-                       '/query.',
-                       fmt,
-                       '?q=',
-                       'model::SectionDataSet',
-                       ',rma::criteria,',
-                       '[failed$eqfalse],'
-                       'products[id$eq%d]' % (MouseConnectivityApi.PRODUCT_ID),
-                       ',rma::include,',
-                       'specimen',
-                       '(stereotaxic_injections',
-                       '(primary_injection_structure,',
-                       'structures',
-                       structure_filter,
-                       '))'])
-        
-        return url
+        return annotation
     
     
     def build_manual_injection_summary_url(self, experiment_id, fmt='json'):
@@ -456,13 +444,58 @@ class MouseConnectivityApi(RmaSimpleApi):
         '''
         return parsed_json['msg']
     
+
+    def cache_experiments(self,
+                          path,
+                          dataframe=True):
+        ''' Fetch all experiments from the API or cached JSON file.
+        '''
+        if self.cache == True:
+            experiments = \
+                self.get_experiments(include='specimen(donor(transgenic_lines))',
+                                    num_rows='all',
+                                    count=False) 
+                
+            ju.write(path, experiments)
+            
+        if dataframe == True:
+            experiments = pj.read_json(path, orient='records')
+            experiments.set_index(['id'], inplace=True)
+        elif self.cache == False:
+            experiments = ju.read(path)
     
-    def get_experiments(self, structure_id):
-        '''Retrieve the experimants data.'''
-        data = self.do_query(self.build_query,
-                             self.read_response,
-                             structure_id)
+        return experiments
+
+    
+    def get_experiments(self,
+                        structure_ids,
+                        **kwargs):
+        ''' Fetch experiments 
+        in the "Mouse Connectivity Projection" Product.
         
+        Parameters
+        ----------
+        structure_ids : integer or list, optional
+            injection structure
+        
+        Returns
+        -------
+        url : string
+            The constructed URL
+        '''
+        criteria_list = ['[failed$eqfalse]',
+                         'products[id$in%d]' % (','.join(str(i) for i in MouseConnectivityApi.PRODUCT_IDS))]
+            
+        if structure_ids != None:
+            if type(structure_ids) is not list:
+                structure_ids = [ structure_ids ]
+            criteria_list.append('[id$in%s]' % ','.join(str(i) for i in structure_ids))
+
+        criteria_string = ','.join(criteria_list)
+                
+        data = self.model_query('SectionDataSet',
+                                criteria=criteria_string,
+                                *kwargs)
         return data
     
     
@@ -740,6 +773,37 @@ class MouseConnectivityApi(RmaSimpleApi):
                              **kwargs)
         
         return data
+
+
+    def cache_unionizes(self,
+                        experiment_ids,
+                        structure_ids,
+                        is_injection=None,
+                        normalized_projection_volume_limit=None,
+                        hemisphere_ids=None,
+                        path=None):
+        if self.cache == True:
+            unionizes = \
+                self.fetch_volume(experiment_ids,
+                                  is_injection,
+                                  structure_ids=structure_ids,
+                                  normalized_projection_volume_limit=normalized_projection_volume_limit,
+                                  hemisphere_ids=hemisphere_ids,
+                                  order=[self.quote_string('projection_structure_unionizes.normalized_projection_volume$desc')])
+                
+            df = pd.DataFrame(unionizes)
+            # rename section_data_set_id column to experiment_id
+            df.columns = ['experiment_id'
+                          if c == 'section_data_set_id'
+                          else c
+                          for c in df.columns]
+            df.set_index(['id'], inplace=True)
+            df.to_csv(path)            
+
+        unionizes = pd.DataFrame.from_csv(path)
+    
+        return unionizes
+
     
     def fetch_volume(self,
                      experiment_ids,

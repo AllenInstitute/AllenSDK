@@ -1,7 +1,5 @@
-from allensdk.config.model.manifest import Manifest
 import allensdk.core.json_utilities as ju
-from pkg_resources import resource_filename
-import logging, os
+import logging
 
 
 class ManifestBuilder(object):
@@ -32,8 +30,6 @@ class ManifestBuilder(object):
     
     
     def write_json_file(self, path):
-        self.add_biophys_sim_config(path)
-        
         with open(path, 'wb') as f:
             f.write(self.write_json_string())
     
@@ -46,13 +42,6 @@ class ManifestBuilder(object):
         
         return wrapper
 
-    
-    def add_biophys_sim_config(self, path):
-        self.bps_cfg = {
-            "biophys": [{
-                "model_file": [ path ]
-                }]
-            }
     
     def write_json_string(self):
         config = self.get_config()
