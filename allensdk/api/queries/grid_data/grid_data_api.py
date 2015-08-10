@@ -16,7 +16,7 @@
 from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
 from allensdk.api.cache import Cache
 import numpy as np
-import os, nrrd
+import nrrd
 
 
 class GridDataApi(RmaSimpleApi, Cache):
@@ -24,168 +24,88 @@ class GridDataApi(RmaSimpleApi, Cache):
     
     See: `Downloading 3-D Expression Grid Data <http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data>`_
     '''
-    PRODUCT_ID = 5
+    DEFAULT_RESOLUTION = 25
+
+    INJECTION_DENSITY = 'injection_density'
+    PROJECTION_DENSITY = 'projection_density'
+    INJECTION_FRACTION = 'injection_fraction'
+    INJECTION_ENERGY = 'injection_energy'
+    PROJECTION_ENERGY = 'projection_energy'
+    DATA_MASK = 'DATA_MASK'
+    
+    ENERGY='energy'
+    DENSITY='density'
+    INTENSITY='intensity'
     
     def __init__(self,
-                 resolution=25,
+                 resolution=None,
                  base_uri=None,
                  cache=False):
         super(GridDataApi, self).__init__(base_uri)
         Cache.__init__(self, cache=cache)
+        
+        if resolution == None:
+            resolution = GridDataApi.DEFAULT_RESOLUTION
+            
         self.resolution = resolution
 
         
-    def cache_injection_density(self,
-                                path,            
-                                eid):
+    def cache_expression_grid_data(self,
+                                   experiment_id,
+                                   include=None,
+                                   path=None
+                                   ):
+        if type(include) is not list:
+            include = [include]
+            
         if self.cache == True:        
-            self.download_projection_grid_data(eid,
-                                               ['injection_density'],
-                                               self.resolution,
-                                               path)
-            
-        injection_density, _ = nrrd.read(path)
+            self.download_expression_grid_data(
+                experiment_id, include=include, path=path)
         
-        return injection_density
-
-
-    def cache_projection_density(self,
-                                 path,
-                                 eid):
+    
+    def cache_projection_grid_data(self,
+                                   path,
+                                   eid,
+                                   image=None,
+                                   resolution=None):
+        if type(image) is not list:
+            image = [image]
+            
+        if resolution == None:
+            resolution = self.resolution
+        
         if self.cache == True:
-            try:
-                os.makedirs(os.path.dirname(path))
-            except:
-                pass
-        
             self.download_projection_grid_data(eid,
-                                               ['projection_density'],
-                                               self.resolution,
+                                               image,
+                                               resolution,
                                                path)
+        
+        data, _ = nrrd.read(path)
+        
+        return data
             
-        projection_density, _ = nrrd.read(path)
-        
-        return projection_density
+
+    # TODO: move these methods to mouse connectivity app
+    def cache_injection_density(self, path, eid):
+        return self.cache_projection_grid_data(
+            path, eid, GridDataApi.INJECTION_DENSITY)
 
 
-    def cache_injection_fraction(self,
-                                 path,
-                                 eid):
-        if self.cache == True:
-            try:
-                os.makedirs(os.path.dirname(path))
-            except:
-                pass
-    
-            self.download_projection_grid_data(eid,
-                                               ['injection_fraction'],
-                                               self.resolution,
-                                               path)
-
-        injection_fraction, _ = nrrd.read(path)
-            
-        return injection_fraction
+    def cache_projection_density(self, path, eid):
+        return self.cache_projection_grid_data(
+            path, eid, GridDataApi.PROJECTION_DENSITY)
 
 
-    def cache_data_mask(self,
-                        path,
-                        eid):
-        if self.cache == True:
-            try:
-                os.makedirs(os.path.dirname(path))
-            except:
-                pass
-            
-            self.download_projection_grid_data(eid,
-                                               ['data_mask'],
-                                               self.resolution,
-                                               path)
-            
-        data_mask, _ = nrrd.read(path)
-        
-        return data_mask
- 
+    def cache_injection_fraction(self, path, eid):
+        return self.cache_projection_grid_data(
+            path, eid, GridDataApi.INJECTION_FRACTION)
 
-    def build_expression_grid_download_query(self,
-                                             section_data_set_id,
-                                             include=None):
-        '''Build the URL.
+
+    def cache_data_mask(self, path, eid):
+        return self.cache_projection_grid_data(
+            path, eid, GridDataApi.DATA_MASK)
+
         
-        Parameters
-        ----------
-        section_data_set_id : integer
-            What to download.
-        include : list of strings, optional
-            Image volumes. 'energy' (default), 'density', 'intensity'. 
-        
-        Returns
-        -------
-            string : The url.
-        
-        Notes
-        -----
-        See `Downloading 3-D Expression Grid Data <http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data#Downloading3-DExpressionGridData-DOWNLOADING3DEXPRESSIONGRIDDATA>`_
-        for additional documentation.
-        '''
-        if include != None:
-            include_clause = ''.join(['?include=',
-                                      ','.join(include)])
-        else:
-            include_clause = ''
-        
-        url = ''.join([self.grid_data_endpoint,
-                       '/download/',
-                       str(section_data_set_id),
-                       include_clause])
-        
-        return url
-    
-    
-    def build_projection_grid_download_query(self,
-                                             section_data_set_id,
-                                             image=None,
-                                             resolution=None):
-        '''Build the URL.
-        
-        Parameters
-        ----------
-        section_data_set_id : integer
-            What to download.
-        image : list of strings, optional
-            Image volume. 'projection_density', 'projection_energy', 'injection_fraction', 'injection_density', 'injection_energy', 'data_mask'.
-        resolution : integer, optional
-            in microns. 10, 25, 50, or 100 (default).
-        
-        Returns
-        -------
-            string : The url.
-        
-        Notes
-        -----
-        See `Downloading 3-D Projection Grid Data <http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data#name="Downloading3-DExpressionGridData-DOWNLOADING3DPROJECTIONGRIDDATA">`_
-        for additional documentation.
-        '''
-        params_list = []
-        
-        if image != None:
-            params_list.append('image=' +  ','.join(image))
-        
-        if resolution != None:
-            params_list.append('resolution=%d' % (resolution))
-        
-        if len(params_list) > 0:
-            params_clause = '?' + '&'.join(params_list)
-        else:
-            params_clause = ''
-        
-        url = ''.join([self.grid_data_endpoint,
-                       '/download_file/',
-                       str(section_data_set_id),
-                       params_clause])
-        
-        return url
-    
-    
     def get_experiments(self,
                         product_abbreviation=None,
                         plane_of_section=None,
@@ -236,23 +156,12 @@ class GridDataApi(RmaSimpleApi, Cache):
                              criteria=criteria)
         
         return result
-    
-    
-    def read_response(self, parsed_json):
-        '''Return the list of cells from the parsed query.
         
-        Parameters
-        ----------
-        parsed_json : dict
-            A python structure corresponding to the JSON data returned from the API.
-        '''
-        return parsed_json['msg']
-    
         
     def download_expression_grid_data(self,
                                       section_data_set_id,
                                       include=None,
-                                      save_file_path=None):
+                                      path=None):
         '''Download in NRRD format.
         
         Parameters
@@ -261,7 +170,7 @@ class GridDataApi(RmaSimpleApi, Cache):
             What to download.
         include : list of strings, optional
             Image volumes. 'energy' (default), 'density', 'intensity'.
-        save_file_path : string, optional
+        path : string, optional
             File name to save as.
         
         Returns
@@ -271,14 +180,22 @@ class GridDataApi(RmaSimpleApi, Cache):
         Notes
         -----
         '''
-        url = self.build_expression_grid_download_query(section_data_set_id,
-                                                        include)
+        if include != None:
+            include_clause = ''.join(['?include=',
+                                      ','.join(include)])
+        else:
+            include_clause = ''
         
-        if save_file_path == None:
-            save_file_path = str(section_data_set_id) + '.zip'
+        url = ''.join([self.grid_data_endpoint,
+                       '/download/',
+                       str(section_data_set_id),
+                       include_clause])
         
-        self.retrieve_file_over_http(url, save_file_path)
-    
+        if path == None:
+            path = str(section_data_set_id) + '.zip'
+        
+        self.retrieve_file_over_http(url, path)
+  
     
     def download_projection_grid_data(self,
                                       section_data_set_id,
@@ -303,15 +220,30 @@ class GridDataApi(RmaSimpleApi, Cache):
         See `Downloading 3-D Projection Grid Data <http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data#name="Downloading3-DExpressionGridData-DOWNLOADING3DPROJECTIONGRIDDATA">`_
         for additional documentation.
         '''
-        url = self.build_projection_grid_download_query(section_data_set_id,
-                                                        image,
-                                                        resolution)
+        params_list = []
+        
+        if image != None:
+            params_list.append('image=' +  ','.join(image))
+        
+        if resolution != None:
+            params_list.append('resolution=%d' % (resolution))
+        
+        if len(params_list) > 0:
+            params_clause = '?' + '&'.join(params_list)
+        else:
+            params_clause = ''
+        
+        url = ''.join([self.grid_data_endpoint,
+                       '/download_file/',
+                       str(section_data_set_id),
+                       params_clause])
         
         if save_file_path == None:
-            save_file_path = str(section_data_set_id) + '.zip'
+            save_file_path = str(section_data_set_id) + '.nrrd'
         
         self.retrieve_file_over_http(url, save_file_path)
-        
+    
+    
     def calculate_centroid(self,
                            injection_density,                           
                            injection_fraction):
