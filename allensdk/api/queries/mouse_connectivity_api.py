@@ -14,47 +14,40 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
+from allensdk.api.queries.grid_data.grid_data_api import GridDataApi
 from allensdk.api.queries.rma.connected_services import ConnectedServices
-from allensdk.api.cache import Cache
+
 import allensdk.core.json_utilities as ju
 import pandas as pd
 import pandas.io.json as pj
 import os, nrrd
 
 
-class MouseConnectivityApi(RmaSimpleApi, Cache):
+class MouseConnectivityApi(RmaSimpleApi):
     '''HTTP Client for the Allen Mouse Brain Connectivity Atlas.
     
     See: `Mouse Connectivity API <http://help.brain-map.org/display/mouseconnectivity/API>`_
     '''
-    #PRODUCT_IDS = [5, 31]
-    PRODUCT_IDS = [ 5 ]
+    PRODUCT_IDS = [5, 31]
     
     def __init__(self,
-                 resolution=25,
-                 base_uri=None,
-                 cache=False):
+                 base_uri=None):
         super(MouseConnectivityApi, self).__init__(base_uri)
-        Cache.__init__(self, cache=cache)
-        self.resolution = resolution
 
 
-    def cache_annotation(self,
-                         path,
-                         eid):
-        if self.cache == True:
-            try:
-                os.makedirs(os.path.dirname(path))
-            except:
-                pass
-            
+    def get_annotation_volume(self, resolution, file_name):
+        try:
+            os.makedirs(os.path.dirname(file_name))
+        except:
+            pass
+
         self.download_volumetric_data('annotation/ccf_2015',
-                                      'annotation_%d.nrrd' % (self.resolution),
-                                      save_file_path=path)
+                                      'annotation_%d.nrrd' % resolution,
+                                      save_file_path=file_name)
         
-        annotation, _ = nrrd.read(path)
+        annotation_data, annotation_image = nrrd.read(file_name)
         
-        return annotation
+        return annotation_data, annotation_image
     
     
     def build_manual_injection_summary_url(self, experiment_id, fmt='json'):
@@ -445,28 +438,6 @@ class MouseConnectivityApi(RmaSimpleApi, Cache):
         return parsed_json['msg']
     
 
-    def cache_experiments(self,
-                          path,
-                          dataframe=True):
-        ''' Fetch all experiments from the API or cached JSON file.
-        '''
-        if self.cache == True:
-            experiments = \
-                self.get_experiments(include='specimen(donor(transgenic_lines))',
-                                    num_rows='all',
-                                    count=False) 
-                
-            ju.write(path, experiments)
-            
-        if dataframe == True:
-            experiments = pj.read_json(path, orient='records')
-            experiments.set_index(['id'], inplace=True)
-        elif self.cache == False:
-            experiments = ju.read(path)
-    
-        return experiments
-
-    
     def get_experiments(self,
                         structure_ids,
                         **kwargs):
@@ -484,7 +455,7 @@ class MouseConnectivityApi(RmaSimpleApi, Cache):
             The constructed URL
         '''
         criteria_list = ['[failed$eqfalse]',
-                         'products[id$in%d]' % (','.join(str(i) for i in MouseConnectivityApi.PRODUCT_IDS))]
+                         'products[id$in%s]' % (','.join(str(i) for i in MouseConnectivityApi.PRODUCT_IDS))]
             
         if structure_ids != None:
             if type(structure_ids) is not list:
@@ -495,7 +466,7 @@ class MouseConnectivityApi(RmaSimpleApi, Cache):
                 
         data = self.model_query('SectionDataSet',
                                 criteria=criteria_string,
-                                *kwargs)
+                                **kwargs)
         return data
     
     
@@ -775,46 +746,17 @@ class MouseConnectivityApi(RmaSimpleApi, Cache):
         return data
 
 
-    def cache_unionizes(self,
-                        experiment_ids,
-                        structure_ids,
-                        is_injection=None,
-                        normalized_projection_volume_limit=None,
-                        hemisphere_ids=None,
-                        path=None):
-        if self.cache == True:
-            unionizes = \
-                self.fetch_volume(experiment_ids,
-                                  is_injection,
-                                  structure_ids=structure_ids,
-                                  normalized_projection_volume_limit=normalized_projection_volume_limit,
-                                  hemisphere_ids=hemisphere_ids,
-                                  order=[self.quote_string('projection_structure_unionizes.normalized_projection_volume$desc')])
-                
-            df = pd.DataFrame(unionizes)
-            # rename section_data_set_id column to experiment_id
-            df.columns = ['experiment_id'
-                          if c == 'section_data_set_id'
-                          else c
-                          for c in df.columns]
-            df.set_index(['id'], inplace=True)
-            df.to_csv(path)            
+    def get_structure_unionizes(self,
+                                experiment_ids,
+                                is_injection,
+                                structure_name=None,
+                                structure_ids=None,
+                                hemisphere_ids=None,
+                                normalized_projection_volume_limit=None,
+                                include=None,
+                                debug=None,
+                                order=None):
 
-        unionizes = pd.DataFrame.from_csv(path)
-    
-        return unionizes
-
-    
-    def fetch_volume(self,
-                     experiment_ids,
-                     is_injection,
-                     structure_name=None,
-                     structure_ids=None,
-                     hemisphere_ids=None,
-                     normalized_projection_volume_limit=None,
-                     include=None,
-                     debug=None,
-                     order=None):
         experiment_filter = '[section_data_set_id$in%s]' %\
                             ','.join(str(i) for i in experiment_ids)
         
@@ -857,3 +799,22 @@ class MouseConnectivityApi(RmaSimpleApi, Cache):
                 num_rows='all',
                 debug=debug,
                 count=False)
+
+    def download_injection_density(self, path, experiment_id, resolution):
+        return GridDataApi().download_projection_grid_data(
+            experiment_id, GridDataApi.INJECTION_DENSITY, resolution, path)
+
+
+    def download_projection_density(self, path, experiment_id, resolution):
+        return GridDataApi().download_projection_grid_data(
+            experiment, GridDataApi.PROJECTION_DENSITY, resolution, path)
+
+
+    def download_injection_fraction(self, path, experiment_id, resolution):
+        return GridDataApi().cache_projection_grid_data(
+            experiment_id, GridDataApi.INJECTION_FRACTION, resolution, path)
+
+
+    def download_data_mask(self, path, experiment_id, resolution):
+        return GridDataApi().cache_projection_grid_data(
+           experiment_id, GridDataApi.DATA_MASK, resolution, path)

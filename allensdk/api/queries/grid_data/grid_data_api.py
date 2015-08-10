@@ -14,24 +14,23 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
-from allensdk.api.cache import Cache
+
 import numpy as np
 import nrrd
 
 
-class GridDataApi(RmaSimpleApi, Cache):
+class GridDataApi(RmaSimpleApi):
     '''HTTP Client for the Allen 3-D Expression Grid Data Service.
     
     See: `Downloading 3-D Expression Grid Data <http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data>`_
     '''
-    DEFAULT_RESOLUTION = 25
 
     INJECTION_DENSITY = 'injection_density'
     PROJECTION_DENSITY = 'projection_density'
     INJECTION_FRACTION = 'injection_fraction'
     INJECTION_ENERGY = 'injection_energy'
     PROJECTION_ENERGY = 'projection_energy'
-    DATA_MASK = 'DATA_MASK'
+    DATA_MASK = 'data_mask'
     
     ENERGY='energy'
     DENSITY='density'
@@ -39,71 +38,9 @@ class GridDataApi(RmaSimpleApi, Cache):
     
     def __init__(self,
                  resolution=None,
-                 base_uri=None,
-                 cache=False):
+                 base_uri=None):
         super(GridDataApi, self).__init__(base_uri)
-        Cache.__init__(self, cache=cache)
         
-        if resolution == None:
-            resolution = GridDataApi.DEFAULT_RESOLUTION
-            
-        self.resolution = resolution
-
-        
-    def cache_expression_grid_data(self,
-                                   experiment_id,
-                                   include=None,
-                                   path=None
-                                   ):
-        if type(include) is not list:
-            include = [include]
-            
-        if self.cache == True:        
-            self.download_expression_grid_data(
-                experiment_id, include=include, path=path)
-        
-    
-    def cache_projection_grid_data(self,
-                                   path,
-                                   eid,
-                                   image=None,
-                                   resolution=None):
-        if type(image) is not list:
-            image = [image]
-            
-        if resolution == None:
-            resolution = self.resolution
-        
-        if self.cache == True:
-            self.download_projection_grid_data(eid,
-                                               image,
-                                               resolution,
-                                               path)
-        
-        data, _ = nrrd.read(path)
-        
-        return data
-            
-
-    # TODO: move these methods to mouse connectivity app
-    def cache_injection_density(self, path, eid):
-        return self.cache_projection_grid_data(
-            path, eid, GridDataApi.INJECTION_DENSITY)
-
-
-    def cache_projection_density(self, path, eid):
-        return self.cache_projection_grid_data(
-            path, eid, GridDataApi.PROJECTION_DENSITY)
-
-
-    def cache_injection_fraction(self, path, eid):
-        return self.cache_projection_grid_data(
-            path, eid, GridDataApi.INJECTION_FRACTION)
-
-
-    def cache_data_mask(self, path, eid):
-        return self.cache_projection_grid_data(
-            path, eid, GridDataApi.DATA_MASK)
 
         
     def get_experiments(self,
@@ -237,7 +174,7 @@ class GridDataApi(RmaSimpleApi, Cache):
                        '/download_file/',
                        str(section_data_set_id),
                        params_clause])
-        
+
         if save_file_path == None:
             save_file_path = str(section_data_set_id) + '.nrrd'
         
