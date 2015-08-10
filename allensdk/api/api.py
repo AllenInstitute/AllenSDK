@@ -90,6 +90,31 @@ class Api(object):
         self.default_working_directory = working_directory
     
     
+    def read_data(self, parsed_json):
+        '''Return the message data from the parsed query.
+        
+        Parameters
+        ----------
+        parsed_json : dict
+            A python structure corresponding to the JSON data returned from the API.
+        
+        Notes
+        -----
+        See `API Response Formats - Response Envelope <http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope>`_
+        for additional documentation.
+        '''
+        return parsed_json['msg']
+    
+    
+    def json_msg_query(self, url):
+        ''' Common case where the url is fully constructed
+            and the response data is stored in the 'msg' field.
+        '''
+        return self.do_query(
+            lambda *a, **k:  url,
+            self.read_data)    
+    
+    
     def do_query(self, url_builder_fn, json_traversal_fn, *args, **kwargs):
         '''Bundle an query url construction function
         with a corresponding response json traversal function.

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
+from allensdk.api.queries.rma.rma_api import RmaApi
 from allensdk.api.queries.rma.connected_services import ConnectedServices
 from allensdk.api.cache import Cache
 import allensdk.core.json_utilities as ju
@@ -22,7 +22,7 @@ import pandas.io.json as pj
 import os, nrrd
 
 
-class MouseConnectivityApi(RmaSimpleApi, Cache):
+class MouseConnectivityApi(RmaApi, Cache):
     '''HTTP Client for the Allen Mouse Brain Connectivity Atlas.
     
     See: `Mouse Connectivity API <http://help.brain-map.org/display/mouseconnectivity/API>`_
@@ -74,7 +74,7 @@ class MouseConnectivityApi(RmaSimpleApi, Cache):
          -----
          Based on the connectivity application detail page.
         '''
-        rma = RmaSimpleApi()
+        rma = RmaApi()
         model_stage = \
             rma.model_stage(
                 model='SectionDataSet',
@@ -630,7 +630,7 @@ class MouseConnectivityApi(RmaSimpleApi, Cache):
         See: `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_ 
         for additional documentation.
         '''
-        rma = RmaSimpleApi()
+        rma = RmaApi()
         
         criteria = ['well_known_file_type',
                     "[name$eq'ImagesResampledTo25MicronARA']",

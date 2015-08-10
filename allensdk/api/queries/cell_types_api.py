@@ -13,12 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, logging
+import os
 
-import csv
 import pandas as pd
 
-from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
+from allensdk.api.queries.rma.rma_api import RmaApi
 from allensdk.config.model.manifest_builder import ManifestBuilder
 from allensdk.config.model.manifest import Manifest
 
@@ -28,7 +27,7 @@ from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.core.swc as swc
 
 
-class CellTypesApi(RmaSimpleApi):
+class CellTypesApi(RmaApi):
 
     def __init__(self, base_uri=None, cache=True, manifest_file='cell_types_manifest.json'):
         super(CellTypesApi, self).__init__(base_uri)

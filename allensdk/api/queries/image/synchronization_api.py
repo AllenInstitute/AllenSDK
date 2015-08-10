@@ -341,7 +341,6 @@ class SynchronizationApi(Api):
 if __name__ == '__main__':
     # queries from http://help.brain-map.org/display/api/Image-to-Image+Synchronization
     import json
-    from allensdk.api.queries.image.synchronization_api import SynchronizationApi
     
     a = SynchronizationApi()
     print(json.dumps(a.get_image_to_atlas(68173101, 6208, 2368, 1),

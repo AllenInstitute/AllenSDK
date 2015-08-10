@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
+from allensdk.api.queries.rma.rma_api import RmaApi
 from allensdk.api.cache import Cache
 import pandas as pd
 
-class OntologiesApi(RmaSimpleApi, Cache):
+class OntologiesApi(RmaApi, Cache):
     '''
     See: `Atlas Drawings and Ontologies <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_
     '''
@@ -25,43 +25,6 @@ class OntologiesApi(RmaSimpleApi, Cache):
     def __init__(self, base_uri=None, cache=False):
         super(OntologiesApi, self).__init__(base_uri)
         Cache.__init__(self, cache=cache)
-    
-    
-    def build_structure_graph_query(self,
-                                    structure_graph_id,
-                                    fmt='json'):
-        '''Build the URL that will fetch meta data for the specified structure graph.
-        
-        Parameters
-        ----------
-        structure_graph_id : integer
-            what to retrieve
-        fmt : string, optional
-            json (default) or xml
-        
-        Returns
-        -------
-        url : string
-            The constructed URL
-        '''
-        url = ''.join([self.structure_graph_endpoint,
-                       '/',
-                       str(structure_graph_id),
-                       '.',
-                       fmt])
-        
-        return url
-    
-    
-    def read_data(self, parsed_json):
-        '''Return the list of cells from the parsed query.
-        
-        Parameters
-        ----------
-        parsed_json : dict
-            A python structure corresponding to the JSON data returned from the API.
-        '''
-        return parsed_json['msg']
     
     
     def get_atlases_table(self, atlas_id=None, brief=True, fmt='json'):
@@ -188,15 +151,6 @@ class OntologiesApi(RmaSimpleApi, Cache):
         return data
     
     
-    def get_structure_graph_by_id(self, structure_graph_id):
-        '''Retrieve the structure graph data.'''
-        graph_data = self.do_query(self.build_structure_graph_query,
-                                   self.read_data,
-                                   structure_graph_id)
-        
-        return graph_data
-
-
     def unpack_structure_set_ancestors(self, structure_dataframe):
         ancestors = structure_dataframe['structure_id_path'].apply(
             lambda e: [int(a) for a in e.split('/')[1:-1]])
