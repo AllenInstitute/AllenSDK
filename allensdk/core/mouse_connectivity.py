@@ -8,6 +8,7 @@ from allensdk.core.ontology import Ontology
 
 import nrrd, os
 import pandas as pd
+import numpy as np
 
 class MouseConnectivity(Cache):
     def __init__(self, resolution=25, cache=True, manifest_file='manifest.json'):
@@ -136,7 +137,7 @@ class MouseConnectivity(Cache):
 
     def get_experiment_structure_unionizes(self, experiment_id, file_name=None, is_injection=None, structure_ids=None, hemisphere_ids=None):
         file_name = self.get_cache_path(file_name, 'STRUCTURE_UNIONIZES', experiment_id)
-        
+
         if os.path.exists(file_name):
             unionizes = pd.DataFrame.from_csv(file_name)
         else:
@@ -180,6 +181,30 @@ class MouseConnectivity(Cache):
         return pd.concat(unionizes, ignore_index = True)
             
         
+    def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
+        file_name = self.get_cache_path(file_name, 'STRUCTURE_MASK', structure_id)
+        
+        if os.path.exists(file_name):
+            return nrrd.read(file_name)
+        else:
+            ont = self.get_ontology()
+            structure_ids = ont.get_descendants(structure_id)
+            annotation, _ = self.get_annotation_volume(annotation_file_name)
+            mask = self.make_structure_mask(structure_ids, annotation)
+            
+            if self.cache:
+                nrrd.write(file_name, mask)
+
+            return mask
+
+
+    def make_structure_mask(self, structure_ids, annotation):
+        m = np.zeros(annotation.shape, dtype=np.uint8)
+
+        for i,sid in enumerate(structure_ids):
+            m[annotation==sid] = 1
+        
+        return m
 
     def build_manifest(self, file_name):
         manifest_builder = ManifestBuilder()      
