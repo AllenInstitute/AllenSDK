@@ -15,11 +15,11 @@
 
 import json, logging
 
-from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
+from allensdk.api.queries.rma.rma_api import RmaApi
 
-class GlifApi(RmaSimpleApi):
+class GlifApi(RmaApi):
     def __init__(self, base_uri=None):
-        super(RmaSimpleApi, self).__init__(base_uri)
+        super(RmaApi, self).__init__(base_uri)
 
         self.neuronal_model = None
         self.ephys_sweeps = None

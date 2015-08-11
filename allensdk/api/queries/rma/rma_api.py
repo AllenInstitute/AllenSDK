@@ -153,6 +153,26 @@ class RmaApi(Api):
         stage = ''.join(clauses)
         
         return stage
+
+
+    def model_query(self, *args, **kwargs):
+        '''
+        Parameters
+        ----------
+        model : string
+        filters :
+        criteria :
+        include :
+        '''
+        return self.json_msg_query(
+            self.build_query_url(
+                self.model_stage(*args, **kwargs)))
+    
+    
+    def service_query(self, *args, **kwargs):
+        return self.do_query(
+            self.build_query_url(
+                self.service_stage(*args, **kwargs)))
     
     
     def options_clause(self, **kwargs):
@@ -426,22 +446,6 @@ class RmaApi(Api):
                        fmt])
         
         return url
-    
-    
-    def read_data(self, parsed_json):
-        '''Return the message data from the parsed query.
-        
-        Parameters
-        ----------
-        parsed_json : dict
-            A python structure corresponding to the JSON data returned from the API.
-        
-        Notes
-        -----
-        See `API Response Formats - Response Envelope <http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope>`_
-        for additional documentation.
-        '''
-        return parsed_json['msg']
     
     
     def get_schema(self, clazz=None):

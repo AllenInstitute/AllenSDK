@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
+from allensdk.api.queries.rma.rma_api import RmaApi
 from allensdk.api.queries.grid_data.grid_data_api import GridDataApi
 from allensdk.api.queries.rma.connected_services import ConnectedServices
 
@@ -23,7 +23,7 @@ import pandas.io.json as pj
 import os, nrrd
 
 
-class MouseConnectivityApi(RmaSimpleApi):
+class MouseConnectivityApi(RmaApi):
     '''HTTP Client for the Allen Mouse Brain Connectivity Atlas.
     
     See: `Mouse Connectivity API <http://help.brain-map.org/display/mouseconnectivity/API>`_
@@ -67,7 +67,7 @@ class MouseConnectivityApi(RmaSimpleApi):
          -----
          Based on the connectivity application detail page.
         '''
-        rma = RmaSimpleApi()
+        rma = RmaApi()
         model_stage = \
             rma.model_stage(
                 model='SectionDataSet',
@@ -601,7 +601,7 @@ class MouseConnectivityApi(RmaSimpleApi):
         See: `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_ 
         for additional documentation.
         '''
-        rma = RmaSimpleApi()
+        rma = RmaApi()
         
         criteria = ['well_known_file_type',
                     "[name$eq'ImagesResampledTo25MicronARA']",
@@ -802,19 +802,19 @@ class MouseConnectivityApi(RmaSimpleApi):
 
     def download_injection_density(self, path, experiment_id, resolution):
         return GridDataApi().download_projection_grid_data(
-            experiment_id, GridDataApi.INJECTION_DENSITY, resolution, path)
+            experiment_id, [ GridDataApi.INJECTION_DENSITY ], resolution, path)
 
 
     def download_projection_density(self, path, experiment_id, resolution):
         return GridDataApi().download_projection_grid_data(
-            experiment, GridDataApi.PROJECTION_DENSITY, resolution, path)
+            experiment_id, [ GridDataApi.PROJECTION_DENSITY ], resolution, path)
 
 
     def download_injection_fraction(self, path, experiment_id, resolution):
-        return GridDataApi().cache_projection_grid_data(
-            experiment_id, GridDataApi.INJECTION_FRACTION, resolution, path)
+        return GridDataApi().download_projection_grid_data(
+            experiment_id, [ GridDataApi.INJECTION_FRACTION ], resolution, path)
 
 
     def download_data_mask(self, path, experiment_id, resolution):
-        return GridDataApi().cache_projection_grid_data(
-           experiment_id, GridDataApi.DATA_MASK, resolution, path)
+        return GridDataApi().download_projection_grid_data(
+           experiment_id, [ GridDataApi.DATA_MASK ], resolution, path)

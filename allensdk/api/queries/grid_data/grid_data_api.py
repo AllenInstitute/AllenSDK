@@ -13,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.queries.rma.rma_simple_api import RmaSimpleApi
-
+from allensdk.api.queries.rma.rma_api import RmaApi
 import numpy as np
 import nrrd
 
 
-class GridDataApi(RmaSimpleApi):
+class GridDataApi(RmaApi):
     '''HTTP Client for the Allen 3-D Expression Grid Data Service.
     
     See: `Downloading 3-D Expression Grid Data <http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data>`_
@@ -40,60 +39,6 @@ class GridDataApi(RmaSimpleApi):
                  resolution=None,
                  base_uri=None):
         super(GridDataApi, self).__init__(base_uri)
-        
-
-        
-    def get_experiments(self,
-                        product_abbreviation=None,
-                        plane_of_section=None,
-                        gene_acronym=None,
-                        fmt='json'):
-        '''Fetch relevant metadata
-        including ids for downloading the energy volume
-        for an Atlas' experiment.
-        
-        Parameters
-        ----------
-        product_abbreviation : string
-            i.e. 'Mouse'
-        plane_of_section : string, optional
-            'coronal' or 'sagittal'
-        gene_acronym : string, optional
-            i.e. 'Adora2a'
-        fmt : string, optional
-            json (default) or xml
-        
-        Returns
-        -------
-        url : string
-            The constructed URL
-        
-        Notes
-        -----
-        See `Downloading 3-D Expression Grid Data <http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data#Downloading3-DExpressionGridData-DOWNLOADING3DEXPRESSIONGRIDDATA>`_
-        and `Example Queries for Experiment Metadata <http://help.brain-map.org/display/api/Example+Queries+for+Experiment+Metadata#ExampleQueriesforExperimentMetadata-MouseBrain>`_
-        for additional documentation.
-        '''
-        criteria = ['[failed$eqfalse]']
-        
-        if product_abbreviation != None:
-            criteria.append(",products[abbreviation$eq'%s']" % 
-                            (product_abbreviation))
-        
-        if plane_of_section != None:
-            criteria.append(",plane_of_section[name$eq'%s']" %
-                            (plane_of_section))
-        
-        if gene_acronym != None:
-            criteria.append(",genes[acronym$eq'%s']" %
-                            (gene_acronym))
-        
-        result = \
-            self.model_query('SectionDataSet',
-                             criteria=criteria)
-        
-        return result
-        
         
     def download_expression_grid_data(self,
                                       section_data_set_id,
