@@ -55,7 +55,14 @@ class Ontology( object ):
         child_ids = self.child_ids(structure_id)
         return self[child_ids]
 
+    def structure_descends_from(self, child_id, parent_id):
+        child = self[child_id]
 
+        if child is not None:
+            parent_str = '/%d/' % parent_id
+            return child['structure_id_path'].find(parent_str) >= 0
+        
+        return False
 
 
     @staticmethod

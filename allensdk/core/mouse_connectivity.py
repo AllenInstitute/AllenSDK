@@ -112,26 +112,47 @@ class MouseConnectivity(Cache):
         return structures
 
 
-    def get_experiments(self, dataframe=False, file_name=None):
+    def get_experiments(self, dataframe=False, file_name=None, cre=None, injection_structure_ids=None):
         file_name = self.get_cache_path(file_name, 'EXPERIMENTS')
 
         if os.path.exists(file_name):
             experiments = json_utilities.read(file_name)
         else:
-            experiments = self.api.get_experiments(None,
-                                                   include='specimen(donor(transgenic_lines))',
-                                                   num_rows='all',
-                                                   count=False) 
-            
+            experiments = self.api.experiment_source_search(injection_structures='root')            
+
             if self.cache:
                 self.safe_mkdir(os.path.dirname(file_name))
 
                 json_utilities.write(file_name, experiments)
 
+        experiments = self.filter_experiments(experiments, cre, injection_structure_ids)
+
         if dataframe:
             experiments = pd.DataFrame(experiments)
             experiments.set_index(['id'], inplace=True)
 
+        return experiments
+
+
+    def injection_in_structures(self, injection_structure_ids, query_injection_structure_ids, ontology):
+        for injection_structure_id in injection_structure_ids:
+            for query_injection_structure_id in query_injection_structure_ids:
+                if ontology.structure_descends_from(injection_structure_id, query_injection_structure_id):
+                    return True
+
+        return False
+
+
+    def filter_experiments(self, experiments, cre=None, injection_structure_ids=None):
+        if cre == True:
+            experiments = [ e for e in experiments if e['transgenic-line'] ]
+        elif cre == False:
+            experiments = [ e for e in experiments if not e['transgenic-line'] ]
+
+        if injection_structure_ids:
+            ont = self.get_ontology()
+            experiments = [ e for e in experiments if self.injection_in_structures([e['structure-id']], injection_structure_ids, ont) ]
+                
         return experiments
 
 
@@ -148,7 +169,7 @@ class MouseConnectivity(Cache):
             unionizes.columns = [ 'experiment_id' 
                                   if c == 'section_data_set_id' else c
                                   for c in unionizes.columns ]
-            unionizes.set_index(['id'], inplace=True)
+            unionizes.set_index(['id'], inplace=True, drop=False)
                 
             if self.cache:
                 self.safe_mkdir(os.path.dirname(file_name))
@@ -214,7 +235,7 @@ class MouseConnectivity(Cache):
                                   'experiments.json',
                                   parent_key='BASEDIR',
                                   typename='file')
-        
+
         manifest_builder.add_path('STRUCTURES',
                                   'structures.csv',
                                   parent_key='BASEDIR',

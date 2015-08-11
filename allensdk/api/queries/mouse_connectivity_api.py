@@ -277,7 +277,7 @@ class MouseConnectivityApi(RmaApi):
         return url
     
     
-    def build_projection_grid_search_url(self, **kwargs):
+    def build_experiment_source_search_url(self, **kwargs):
         '''Search over the whole projection signal statistics dataset
         to find experiments with specific projection profiles.
         
@@ -313,11 +313,13 @@ class MouseConnectivityApi(RmaApi):
         
         service_name = 'mouse_connectivity_injection_structure'
         url = svc.build_url(service_name, kwargs)
+
+        print url
         
         return url
     
     
-    def build_projection_grid_spatial_search_url(self, **kwargs):
+    def build_experiment_spatial_search_search_url(self, **kwargs):
         '''Displays all SectionDataSets
         with projection signal density >= 0.1 at the seed point.
         This service also returns the path
@@ -355,7 +357,7 @@ class MouseConnectivityApi(RmaApi):
         return url
     
     
-    def build_projection_grid_injection_coordinate_search_url(self, **kwargs):
+    def build_experiment_injection_coordinate_search_url(self, **kwargs):
         '''User specifies a seed location within the 3D reference space.
         The service returns a rank list of experiments
         by distance of its injection site to the specified seed location.
@@ -389,7 +391,7 @@ class MouseConnectivityApi(RmaApi):
         return url
     
     
-    def build_projection_grid_correlation_search_url(self, **kwargs):
+    def build_experiment_correlation_search_url(self, **kwargs):
         '''Select a seed experiment and a domain over
         which the similarity comparison is to be made.
         
@@ -683,7 +685,7 @@ class MouseConnectivityApi(RmaApi):
         self.retrieve_file_over_http(well_known_file_url, save_file_path)
     
     
-    def get_projection_grid(self, **kwargs):
+    def experiment_source_search(self, **kwargs):
         '''Search over the whole projection signal statistics dataset
         to find experiments with specific projection profiles.
         
@@ -715,31 +717,31 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
         
         '''
-        data = self.do_query(self.build_projection_grid_search_url,
+        data = self.do_query(self.build_experiment_source_search_url,
                              self.read_response,
                              **kwargs)
         
         return data
     
     
-    def get_projection_grid_spatial(self, **kwargs):
-        data = self.do_query(self.build_projection_grid_spatial_search_url,
+    def experiment_spatial_search(self, **kwargs):
+        data = self.do_query(self.build_experiment_spatial_search_search_url,
                              self.read_response,
                              **kwargs)
         
         return data
     
     
-    def get_projection_grid_injection_coordinate(self, **kwargs):
-        data = self.do_query(self.build_projection_grid_injection_coordinate_search_url,
+    def experiment_injection_coordinate_search(self, **kwargs):
+        data = self.do_query(self.build_experiment_injection_coordinate_search_url,
                              self.read_response,
                              **kwargs)
         
         return data
     
     
-    def get_projection_grid_injection_correlation(self, **kwargs):
-        data = self.do_query(self.build_projection_grid_injection_correlation_search_url,
+    def experiment_correlation_search(self, **kwargs):
+        data = self.do_query(self.build_experiment_correlation_search_url,
                              self.read_response,
                              **kwargs)
         
