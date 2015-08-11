@@ -33,7 +33,7 @@ class CellTypes(Cache):
 
 
     def get_ephys_features(self, dataframe=False):
-        file_name = self.manifest.get_path(None, 'EPHYS_FEATURES')
+        file_name = self.get_cache_path(None, 'EPHYS_FEATURES')
 
         if os.path.exists(file_name):
             features_df = pd.DataFrame.from_csv(file_name)
@@ -62,10 +62,10 @@ class CellTypes(Cache):
         file_name = self.get_cache_path(file_name, 'RECONSTRUCTION', specimen_id)
 
         if file_name is None:
-            raise Exception("Please enable caching (CellTypesApi.cache = True) or specify a save_file_name.")
+            raise Exception("Please enable caching (CellTypes.cache = True) or specify a save_file_name.")
 
         if not os.path.exists(file_name):
-            self.save_reconstruction(specimen_id, file_name)
+            self.api.save_reconstruction(specimen_id, file_name)
 
         return swc.read_swc(file_name)
 

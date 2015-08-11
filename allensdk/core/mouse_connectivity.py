@@ -4,6 +4,8 @@ from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.api.queries.structure.ontologies_api import OntologiesApi
 
 import allensdk.core.json_utilities as json_utilities
+from allensdk.core.ontology import Ontology
+
 import nrrd, os
 import pandas as pd
 
@@ -85,6 +87,10 @@ class MouseConnectivity(Cache):
             self.api.download_data_mask(file_name, experiment_id, self.resolution)
                                               
         return nrrd.read(file_name)
+
+
+    def get_ontology(self, file_name=None):
+        return Ontology(self.get_structures(file_name))
 
 
     def get_structures(self, file_name=None):

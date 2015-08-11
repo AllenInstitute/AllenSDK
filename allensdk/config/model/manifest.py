@@ -209,9 +209,8 @@ class Manifest(object):
         string
             Path with parent structure and substitutions applied.
         '''
-        path_spec = str(self.path_info[path_key]['spec'].encode('ascii',
-                                                                'ignore'))
-        
+        path_spec = str(self.path_info[path_key]['spec'].encode('ascii', 'ignore'))
+
         if args != None and len(args) != 0:
             path = path_spec % args
         else:
