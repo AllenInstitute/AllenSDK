@@ -748,7 +748,7 @@ class MouseConnectivityApi(RmaApi):
 
     def get_structure_unionizes(self,
                                 experiment_ids,
-                                is_injection,
+                                is_injection=None,
                                 structure_name=None,
                                 structure_ids=None,
                                 hemisphere_ids=None,
@@ -772,12 +772,13 @@ class MouseConnectivityApi(RmaApi):
                             (normalized_projection_volume_limit)
         else:
             volume_filter = ''
+
         
-        if hemisphere_ids == None:
-            hemisphere_ids = [3] # both
-        
-        hemisphere_filter = '[hemisphere_id$in%s]' %\
-                            ','.join(str(h) for h in hemisphere_ids)
+        if hemisphere_ids is not None:
+            hemisphere_filter = '[hemisphere_id$in%s]' %\
+                ','.join(str(h) for h in hemisphere_ids)
+        else:
+            hemisphere_filter = ''
         
         if structure_name != None:
             structure_filter = ",structure[name$eq'%s']" % (structure_name)

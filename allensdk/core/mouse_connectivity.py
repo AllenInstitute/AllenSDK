@@ -134,13 +134,13 @@ class MouseConnectivity(Cache):
         return experiments
 
 
-    def get_structure_unionizes(self, experiment_id, file_name=None):
+    def get_experiment_structure_unionizes(self, experiment_id, file_name=None, is_injection=None, structure_ids=None, hemisphere_ids=None):
         file_name = self.get_cache_path(file_name, 'STRUCTURE_UNIONIZES', experiment_id)
         
         if os.path.exists(file_name):
             unionizes = pd.DataFrame.from_csv(file_name)
         else:
-            unionizes = self.api.get_structure_unionizes([experiment_id], is_injection=None)
+            unionizes = self.api.get_structure_unionizes([experiment_id])
             unionizes = pd.DataFrame(unionizes)
 
             # rename section_data_set_id column to experiment_id
@@ -154,7 +154,31 @@ class MouseConnectivity(Cache):
 
                 unionizes.to_csv(file_name)
 
+        return self.filter_structure_unionizes(unionizes, is_injection, structure_ids, hemisphere_ids)
+
+
+    def filter_structure_unionizes(self, unionizes, is_injection=None, structure_ids=None, hemisphere_ids=None):
+        if is_injection is not None:
+            unionizes = unionizes[unionizes.is_injection == True]
+
+        if structure_ids is not None:
+            unionizes = unionizes[unionizes['structure_id'].isin(structure_ids)]
+                                  
+        if hemisphere_ids is not None:
+            unionizes = unionizes[unionizes['hemisphere_id'].isin(hemisphere_ids)]
+                                  
         return unionizes
+        
+
+    def get_structure_unionizes(self, experiment_ids, is_injection=None, structure_ids=None, hemisphere_ids=None):
+        unionizes = [ self.get_experiment_structure_unionizes(eid, 
+                                                              is_injection=is_injection, 
+                                                              structure_ids=structure_ids, 
+                                                              hemisphere_ids=hemisphere_ids) 
+                      for eid in experiment_ids ]
+
+        return pd.concat(unionizes, ignore_index = True)
+            
         
 
     def build_manifest(self, file_name):
