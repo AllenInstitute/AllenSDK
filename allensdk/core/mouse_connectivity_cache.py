@@ -10,9 +10,9 @@ import nrrd, os
 import pandas as pd
 import numpy as np
 
-class MouseConnectivity(Cache):
+class MouseConnectivityCache(Cache):
     def __init__(self, resolution=25, cache=True, manifest_file='manifest.json'):
-        super(MouseConnectivity, self).__init__(manifest=manifest_file, cache=cache)
+        super(MouseConnectivityCache, self).__init__(manifest=manifest_file, cache=cache)
 
         self.resolution = resolution
         self.api = MouseConnectivityApi()
@@ -30,6 +30,21 @@ class MouseConnectivity(Cache):
             self.safe_mkdir(os.path.dirname(file_name))
 
             annotation, info = self.api.get_annotation_volume(self.resolution, file_name)
+
+        return annotation, info
+
+    def get_template_volume(self, file_name=None):
+        file_name = self.get_cache_path(file_name, 'TEMPLATE', self.resolution)
+
+        if file_name is None:
+            raise Exception("No save file provided for annotation volume.")
+
+        if os.path.exists(file_name):
+            annotation, info = nrrd.read(file_name)
+        else:
+            self.safe_mkdir(os.path.dirname(file_name))
+
+            annotation, info = self.api.get_template_volume(self.resolution, file_name)
 
         return annotation, info
 
@@ -247,6 +262,11 @@ class MouseConnectivity(Cache):
         
         manifest_builder.add_path('ANNOTATION',
                                   'annotation_%d.nrrd',
+                                  parent_key='BASEDIR',
+                                  typename='file')
+
+        manifest_builder.add_path('TEMPLATE',
+                                  'average_template_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')
         

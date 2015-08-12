@@ -9,10 +9,10 @@ import allensdk.core.json_utilities as json_utilities
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.core.swc as swc
 
-class CellTypes(Cache):
+class CellTypesCache(Cache):
     def __init__(self, cache=True, manifest_file='manifest.json'):
 
-        super(CellTypes, self).__init__(manifest=manifest_file, cache=cache)
+        super(CellTypesCache, self).__init__(manifest=manifest_file, cache=cache)
 
         self.api = CellTypesApi()
 

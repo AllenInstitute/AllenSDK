@@ -48,6 +48,21 @@ class MouseConnectivityApi(RmaApi):
         annotation_data, annotation_image = nrrd.read(file_name)
         
         return annotation_data, annotation_image
+
+
+    def get_template_volume(self, resolution, file_name):
+        try:
+            os.makedirs(os.path.dirname(file_name))
+        except:
+            pass
+
+        self.download_volumetric_data('average_template',
+                                      'average_template_%d.nrrd' % resolution,
+                                      save_file_path=file_name)
+
+        annotation_data, annotation_image = nrrd.read(file_name)
+        
+        return annotation_data, annotation_image
     
     
     def build_manual_injection_summary_url(self, experiment_id, fmt='json'):
