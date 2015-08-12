@@ -46,6 +46,17 @@ class MouseConnectivityCache(Cache):
         File name of the manifest to be read.  Default is "manifest.json".
         
     """
+
+    ANNOTATION_KEY = 'ANNOTATION'
+    TEMPLATE_KEY = 'TEMPLATE'
+    PROJECTION_DENSITY_KEY = 'PROJECTION_DENSITY'
+    INJECTION_DENSITY_KEY = 'INJECTION_DENSITY'
+    INJECTION_FRACTION_KEY = 'INJECTION_FRACTION'
+    DATA_MASK_KEY = 'DATA_MASK'
+    STRUCTURE_UNIONIZES_KEY = 'STRUCTURE_UNIONIZES'
+    EXPERIMENTS_KEY = 'EXPERIMENTS'
+    STRUCTURES_KEY = 'STRUCTURES'
+    STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
     
     def __init__(self, resolution=25, cache=True, manifest_file='manifest.json'):
         super(MouseConnectivityCache, self).__init__(manifest=manifest_file, cache=cache)
@@ -68,7 +79,7 @@ class MouseConnectivityCache(Cache):
 
         """
         
-        file_name = self.get_cache_path(file_name, 'ANNOTATION', self.resolution)
+        file_name = self.get_cache_path(file_name, self.ANNOTATION_KEY, self.resolution)
 
         if file_name is None:
             raise Exception("No save file name provided for annotation volume.")
@@ -97,7 +108,7 @@ class MouseConnectivityCache(Cache):
 
         """
         
-        file_name = self.get_cache_path(file_name, 'TEMPLATE', self.resolution)
+        file_name = self.get_cache_path(file_name, self.TEMPLATE_KEY, self.resolution)
 
         if file_name is None:
             raise Exception("No save file provided for annotation volume.")
@@ -132,7 +143,7 @@ class MouseConnectivityCache(Cache):
 
         """
         
-        file_name = self.get_cache_path(file_name, 'PROJECTION_DENSITY', experiment_id, self.resolution)
+        file_name = self.get_cache_path(file_name, self.PROJECTION_DENSITY_KEY, experiment_id, self.resolution)
         
         if file_name is None:
             raise Exception("No file name to save volume.")
@@ -165,7 +176,7 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(file_name, 'INJECTION_DENSITY', experiment_id, self.resolution)
+        file_name = self.get_cache_path(file_name, self.INJECTION_DENSITY_KEY, experiment_id, self.resolution)
         
         if file_name is None:
             raise Exception("No file name to save volume.")
@@ -198,7 +209,7 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(file_name, 'INJECTION_FRACTION', experiment_id, self.resolution)
+        file_name = self.get_cache_path(file_name, self.INJECTION_FRACTION_KEY, experiment_id, self.resolution)
         
         if file_name is None:
             raise Exception("No file name to save volume.")
@@ -231,7 +242,7 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(file_name, 'DATA_MASK', experiment_id, self.resolution)
+        file_name = self.get_cache_path(file_name, self.DATA_MASK_KEY, experiment_id, self.resolution)
         
         if file_name is None:
             raise Exception("No file name to save volume.")
@@ -273,7 +284,7 @@ class MouseConnectivityCache(Cache):
             is disabled, no file will be saved. Default is None.
         """
 
-        file_name = self.get_cache_path(file_name, 'STRUCTURES')
+        file_name = self.get_cache_path(file_name, self.STRUCTURES_KEY)
         
         if os.path.exists(file_name):
             structures = pd.DataFrame.from_csv(file_name)
@@ -317,7 +328,7 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(file_name, 'EXPERIMENTS')
+        file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
 
         if os.path.exists(file_name):
             experiments = json_utilities.read(file_name)
@@ -397,7 +408,7 @@ class MouseConnectivityCache(Cache):
             
         """
 
-        file_name = self.get_cache_path(file_name, 'STRUCTURE_UNIONIZES', experiment_id)
+        file_name = self.get_cache_path(file_name, self.STRUCTURE_UNIONIZES_KEY, experiment_id)
 
         if os.path.exists(file_name):
             unionizes = pd.DataFrame.from_csv(file_name)
@@ -504,20 +515,21 @@ class MouseConnectivityCache(Cache):
             file_name will be pulled out of the manifest.  Default is None.            
         """
 
-        file_name = self.get_cache_path(file_name, 'STRUCTURE_MASK', structure_id)
+        file_name = self.get_cache_path(file_name, self.STRUCTURE_MASK_KEY, structure_id)
         
         if os.path.exists(file_name):
             return nrrd.read(file_name)
         else:
             ont = self.get_ontology()
-            structure_ids = ont.get_descendants(structure_id)
+            structure_ids = ont.get_descendant_ids(structure_id)
             annotation, _ = self.get_annotation_volume(annotation_file_name)
             mask = self.make_structure_mask(structure_ids, annotation)
             
             if self.cache:
+                self.safe_mkdir(os.path.dirname(file_name))
                 nrrd.write(file_name, mask)
 
-            return mask
+            return mask, None
 
 
     def make_structure_mask(self, structure_ids, annotation):
@@ -558,52 +570,52 @@ class MouseConnectivityCache(Cache):
         manifest_builder = ManifestBuilder()      
         manifest_builder.add_path('BASEDIR', '.')
 
-        manifest_builder.add_path('EXPERIMENTS',
+        manifest_builder.add_path(self.EXPERIMENTS_KEY,
                                   'experiments.json',
                                   parent_key='BASEDIR',
                                   typename='file')
 
-        manifest_builder.add_path('STRUCTURES',
+        manifest_builder.add_path(self.STRUCTURES_KEY,
                                   'structures.csv',
                                   parent_key='BASEDIR',
                                   typename='file')
 
-        manifest_builder.add_path('STRUCTURE_UNIONIZES',
+        manifest_builder.add_path(self.STRUCTURE_UNIONIZES_KEY,
                                   'experiment_%d/structure_unionizes.csv',
                                   parent_key='BASEDIR',
                                   typename='file')
         
-        manifest_builder.add_path('ANNOTATION',
+        manifest_builder.add_path(self.ANNOTATION_KEY,
                                   'annotation_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')
 
-        manifest_builder.add_path('TEMPLATE',
+        manifest_builder.add_path(self.TEMPLATE_KEY,
                                   'average_template_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')
         
-        manifest_builder.add_path('INJECTION_DENSITY',
+        manifest_builder.add_path(self.INJECTION_DENSITY_KEY,
                                   'experiment_%d/injection_density_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')
         
-        manifest_builder.add_path('INJECTION_FRACTION',
+        manifest_builder.add_path(self.INJECTION_FRACTION_KEY,
                                   'experiment_%d/injection_fraction_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')
         
-        manifest_builder.add_path('DATA_MASK',
+        manifest_builder.add_path(self.DATA_MASK_KEY,
                                   'experiment_%d/data_mask_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')
         
-        manifest_builder.add_path('PROJECTION_DENSITY',
+        manifest_builder.add_path(self.PROJECTION_DENSITY_KEY,
                                   'experiment_%d/projection_density_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')
         
-        manifest_builder.add_path('STRUCTURE_MASK',
+        manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
                                   'structure_masks/structure_%d.nrrd',
                                   parent_key='BASEDIR',
                                   typename='file')

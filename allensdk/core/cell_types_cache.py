@@ -35,6 +35,11 @@ class CellTypesCache(Cache):
        File name of the manifest to be read.  Default is "manifest.json".
     """
 
+    CELLS_KEY = 'CELLS'
+    EPHYS_FEATURES_KEY = 'EPHYS_FEATURES'
+    EPHYS_DATA_KEY = 'EPHYS_DATA'
+    RECONSTRUCTION_KEY = 'RECONSTRUCTION'
+    
     def __init__(self, cache=True, manifest_file='manifest.json'):
         super(CellTypesCache, self).__init__(manifest=manifest_file, cache=cache)
         self.api = CellTypesApi()
@@ -60,7 +65,7 @@ class CellTypesCache(Cache):
             Filter out cells that hve no morphological reconstructions.
         """
 
-        file_name = self.get_cache_path(file_name, 'CELLS')
+        file_name = self.get_cache_path(file_name, self.CELLS_KEY)
 
         if os.path.exists(file_name):
             cells = json_utilities.read(file_name)
@@ -92,7 +97,7 @@ class CellTypesCache(Cache):
             a list of dictionaries.
         """
 
-        file_name = self.get_cache_path(file_name, 'EPHYS_FEATURES')
+        file_name = self.get_cache_path(file_name, self.EPHYS_FEATURES_KEY)
 
         if os.path.exists(file_name):
             features_df = pd.DataFrame.from_csv(file_name)
@@ -131,7 +136,7 @@ class CellTypesCache(Cache):
             and response traces out of an NWB file.
         """
 
-        file_name = self.get_cache_path(file_name, 'EPHYS_DATA', specimen_id)
+        file_name = self.get_cache_path(file_name, self.EPHYS_DATA_KEY, specimen_id)
 
         if not os.path.exists(file_name):
             self.api.save_ephys_data(specimen_id, file_name)
@@ -161,7 +166,7 @@ class CellTypesCache(Cache):
              A class instance with methods for accessing morphology compartments.
         """
 
-        file_name = self.get_cache_path(file_name, 'RECONSTRUCTION', specimen_id)
+        file_name = self.get_cache_path(file_name, self.RECONSTRUCTION_KEY, specimen_id)
 
         if file_name is None:
             raise Exception("Please enable caching (CellTypes.cache = True) or specify a save_file_name.")
@@ -187,10 +192,10 @@ class CellTypesCache(Cache):
         mb = ManifestBuilder()
 
         mb.add_path('BASEDIR', '.')
-        mb.add_path('CELLS', 'cells.json', typename='file', parent_key='BASEDIR')
-        mb.add_path('EPHYS_DATA', 'specimen_%d/ephys.nwb', typename='file', parent_key='BASEDIR')
-        mb.add_path('EPHYS_FEATURES', 'ephys_features.csv', typename='file', parent_key='BASEDIR')
-        mb.add_path('RECONSTRUCTION', 'specimen_%d/reconstruction.swc', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.CELLS_KEY, 'cells.json', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.EPHYS_DATA_KEY, 'specimen_%d/ephys.nwb', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.EPHYS_FEATURES_KEY, 'ephys_features.csv', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.RECONSTRUCTION_KEY, 'specimen_%d/reconstruction.swc', typename='file', parent_key='BASEDIR')
 
         mb.write_json_file(file_name)
 
