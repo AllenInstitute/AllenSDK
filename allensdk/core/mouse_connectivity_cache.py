@@ -149,15 +149,6 @@ class MouseConnectivityCache(Cache):
         return experiments
 
 
-    def injection_in_structures(self, injection_structure_ids, query_injection_structure_ids, ontology):
-        for injection_structure_id in injection_structure_ids:
-            for query_injection_structure_id in query_injection_structure_ids:
-                if ontology.structure_descends_from(injection_structure_id, query_injection_structure_id):
-                    return True
-
-        return False
-
-
     def filter_experiments(self, experiments, cre=None, injection_structure_ids=None):
         if cre == True:
             experiments = [ e for e in experiments if e['transgenic-line'] ]
@@ -165,8 +156,8 @@ class MouseConnectivityCache(Cache):
             experiments = [ e for e in experiments if not e['transgenic-line'] ]
 
         if injection_structure_ids is not None:
-            ont = self.get_ontology()
-            experiments = [ e for e in experiments if self.injection_in_structures([e['structure-id']], injection_structure_ids, ont) ]
+            descendant_ids = self.get_ontology().get_descendant_ids(injection_structure_ids)
+            experiments = [ e for e in experiments if e['structure-id'] in descendant_ids ]
                 
         return experiments
 
@@ -198,7 +189,8 @@ class MouseConnectivityCache(Cache):
             unionizes = unionizes[unionizes.is_injection == is_injection]
 
         if structure_ids is not None:
-            unionizes = unionizes[unionizes['structure_id'].isin(structure_ids)]
+            descendant_ids = self.get_ontology().get_descendant_ids(structure_ids)
+            unionizes = unionizes[unionizes['structure_id'].isin(descendant_ids)]
                                   
         if hemisphere_ids is not None:
             unionizes = unionizes[unionizes['hemisphere_id'].isin(hemisphere_ids)]
