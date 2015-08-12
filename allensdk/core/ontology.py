@@ -25,26 +25,37 @@ class Ontology( object ):
         self.child_ids = dict(child_ids)
         self.descendant_ids = dict(descendant_ids)
 
+
     def __getitem__(self, *structure_ids):
         try:
             return self.df.loc[structure_ids]
         except KeyError:
             return None
 
-    def get_structure_by_acronym(self, acronym):
-        pass
 
-    def get_descendant_ids(self, structure_id=None):
-        if structure_id is None:
+    def get_structure_by_acronym(self, acronym):
+        return self.df[self.df['acronym'] == acronym]
+
+
+    def get_descendant_ids(self, *structure_ids):
+        if len(structure_ids) == 0:
             return self.descendant_ids
         else:
-            return self.descendant_ids.get(structure_id, set())
+            descendants = set()
+            for structure_id in structure_ids:
+                descendants.update(self.descendant_ids.get(int(structure_id), set()))
+            return descendants
 
-    def get_child_ids(self, structure_id=None):
-        if structure_id is None:
+
+    def get_child_ids(self, *structure_ids):
+        if len(structure_ids) == 0:
             return self.child_ids
         else:
-            return self.child_ids.get(structure_id, set())
+            children = set()
+            for structure_id in structure_ids:
+                children.update(self.child_ids.get(int(structure_id), set()))
+            return children
+                                
 
     def get_descendants(self, structure_id):
         descendant_ids = self.get_descendant_ids(structure_id)
@@ -54,6 +65,7 @@ class Ontology( object ):
     def get_children(self, structure_id):
         child_ids = self.child_ids(structure_id)
         return self[child_ids]
+
 
     def structure_descends_from(self, child_id, parent_id):
         child = self[child_id]

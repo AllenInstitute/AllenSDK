@@ -36,7 +36,8 @@ class Cache(object):
             if not os.path.exists(file_name):
                 self.build_manifest(file_name)
 
-            self.manifest = Manifest(ju.read(file_name)['manifest'])
+            
+            self.manifest = Manifest(ju.read(file_name)['manifest'], os.path.dirname(file_name))
         else:
             self.manifest = None
 

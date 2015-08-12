@@ -129,7 +129,7 @@ class MouseConnectivity(Cache):
 
         if dataframe:
             experiments = pd.DataFrame(experiments)
-            experiments.set_index(['id'], inplace=True)
+            experiments.set_index(['id'], inplace=True, drop=False)
 
         return experiments
 
@@ -149,7 +149,7 @@ class MouseConnectivity(Cache):
         elif cre == False:
             experiments = [ e for e in experiments if not e['transgenic-line'] ]
 
-        if injection_structure_ids:
+        if injection_structure_ids is not None:
             ont = self.get_ontology()
             experiments = [ e for e in experiments if self.injection_in_structures([e['structure-id']], injection_structure_ids, ont) ]
                 
@@ -169,7 +169,6 @@ class MouseConnectivity(Cache):
             unionizes.columns = [ 'experiment_id' 
                                   if c == 'section_data_set_id' else c
                                   for c in unionizes.columns ]
-            unionizes.set_index(['id'], inplace=True, drop=False)
                 
             if self.cache:
                 self.safe_mkdir(os.path.dirname(file_name))
@@ -181,7 +180,7 @@ class MouseConnectivity(Cache):
 
     def filter_structure_unionizes(self, unionizes, is_injection=None, structure_ids=None, hemisphere_ids=None):
         if is_injection is not None:
-            unionizes = unionizes[unionizes.is_injection == True]
+            unionizes = unionizes[unionizes.is_injection == is_injection]
 
         if structure_ids is not None:
             unionizes = unionizes[unionizes['structure_id'].isin(structure_ids)]
