@@ -14,7 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import urllib2
-from json import load
+import allensdk.core.json_utilities as json_utilities
 import logging
 
 
@@ -90,6 +90,31 @@ class Api(object):
         self.default_working_directory = working_directory
     
     
+    def read_data(self, parsed_json):
+        '''Return the message data from the parsed query.
+        
+        Parameters
+        ----------
+        parsed_json : dict
+            A python structure corresponding to the JSON data returned from the API.
+        
+        Notes
+        -----
+        See `API Response Formats - Response Envelope <http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope>`_
+        for additional documentation.
+        '''
+        return parsed_json['msg']
+    
+    
+    def json_msg_query(self, url):
+        ''' Common case where the url is fully constructed
+            and the response data is stored in the 'msg' field.
+        '''
+        return self.do_query(
+            lambda *a, **k:  url,
+            self.read_data)    
+    
+    
     def do_query(self, url_builder_fn, json_traversal_fn, *args, **kwargs):
         '''Bundle an query url construction function
         with a corresponding response json traversal function.
@@ -117,7 +142,8 @@ class Api(object):
         '''
         api_url = url_builder_fn(*args, **kwargs) 
         
-        quoted_api_url = urllib2.quote(api_url,';/?:@&=+$,')
+        #quoted_api_url = urllib2.quote(api_url,';/?:@&=+$,')
+        quoted_api_url = api_url
                            
         json_parsed_data = self.retrieve_parsed_json_over_http(quoted_api_url)
         
@@ -226,7 +252,7 @@ class Api(object):
             raise
     
     
-    def retrieve_parsed_json_over_http(self, url):
+    def retrieve_parsed_json_over_http(self, url, post=False):
         '''Get the document and put it in a Python data structure
         
         Parameters
@@ -239,10 +265,7 @@ class Api(object):
         dict
             Result document as parsed by the JSON library.
         '''
-        response = urllib2.urlopen(url)
-        json_parsed_data = load(response)
-        
-        return json_parsed_data
+        return json_utilities.read_url(url)
     
     
     def retrieve_xml_over_http(self, url):

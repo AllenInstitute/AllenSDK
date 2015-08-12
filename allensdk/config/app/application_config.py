@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.config.model.formats.json_util import JsonUtil
+from allensdk.core.json_utilities import JsonComments
 
 try:
     from ConfigParser import ConfigParser # Python 2
@@ -224,7 +224,7 @@ class ApplicationConfig(object):
             An application configuration in INI format
         
         '''
-        description = JsonUtil.read_json_file(json_path)
+        description = JsonComments.read_file(json_path)
         
         return self.to_config_string(description)
     
@@ -242,7 +242,7 @@ class ApplicationConfig(object):
         string
             An application configuration in INI format
         '''
-        description = JsonUtil.read_json_string(json_string)
+        description = JsonComments.read_string(json_string)
         
         return self.to_config_string(description)
     

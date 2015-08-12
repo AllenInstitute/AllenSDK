@@ -2,7 +2,7 @@ import unittest, os
 import mock
 from mock import MagicMock
 from allensdk.model.biophys_sim.config import Config
-from allensdk.config.model.formats.json_util import JsonUtil
+from allensdk.core.json_utilities import JsonComments
 
 class ConfigSingleFileJsonTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
@@ -18,9 +18,9 @@ class ConfigSingleFileJsonTests(unittest.TestCase):
             'biophys':
                 [{ 'hoc': [ 'stdgui.hoc'] }],
         }
-        
-        ju = JsonUtil
-        ju.read_json_file = MagicMock(return_value=manifest)
+
+        ju = JsonComments
+        ju.read_file = MagicMock(return_value=manifest)
     
     
     def tearDown(self):

@@ -13,60 +13,56 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.api import Api
 from allensdk.api.queries.rma.rma_api import RmaApi
+from allensdk.api.queries.grid_data.grid_data_api import GridDataApi
 from allensdk.api.queries.rma.connected_services import ConnectedServices
-import pandas as pd
 
-class MouseConnectivityApi(Api):
+import allensdk.core.json_utilities as ju
+import pandas as pd
+import pandas.io.json as pj
+import os, nrrd
+
+
+class MouseConnectivityApi(RmaApi):
     '''HTTP Client for the Allen Mouse Brain Connectivity Atlas.
     
     See: `Mouse Connectivity API <http://help.brain-map.org/display/mouseconnectivity/API>`_
     '''
-    PRODUCT_ID = 5
+    PRODUCT_IDS = [5, 31]
     
-    def __init__(self, base_uri=None):
+    def __init__(self,
+                 base_uri=None):
         super(MouseConnectivityApi, self).__init__(base_uri)
-    
-    
-    def build_query(self, structure_id=None, fmt='json'):
-        '''Build the URL that will fetch experiments 
-        in the "Mouse Connectivity Projection" Product.
+
+
+    def get_annotation_volume(self, resolution, file_name):
+        try:
+            os.makedirs(os.path.dirname(file_name))
+        except:
+            pass
+
+        self.download_volumetric_data('annotation/ccf_2015',
+                                      'annotation_%d.nrrd' % resolution,
+                                      save_file_path=file_name)
         
-        Parameters
-        ----------
-        structure_id : integer, optional
-            injection structure
-        fmt : string, optional
-            json (default) or xml
+        annotation_data, annotation_image = nrrd.read(file_name)
         
-        Returns
-        -------
-        url : string
-            The constructed URL
-        '''
+        return annotation_data, annotation_image
+
+
+    def get_template_volume(self, resolution, file_name):
+        try:
+            os.makedirs(os.path.dirname(file_name))
+        except:
+            pass
+
+        self.download_volumetric_data('average_template',
+                                      'average_template_%d.nrrd' % resolution,
+                                      save_file_path=file_name)
+
+        annotation_data, annotation_image = nrrd.read(file_name)
         
-        if structure_id:
-            structure_filter = '[id$eq%d]' % (structure_id)
-        else:
-            structure_filter = ''
-        
-        url = ''.join([self.rma_endpoint,
-                       '/query.',
-                       fmt,
-                       '?q=',
-                       'model::SectionDataSet',
-                       ',rma::criteria,',
-                       'products[id$eq%d]' % (MouseConnectivityApi.PRODUCT_ID),
-                       ',rma::include,',
-                       'specimen',
-                       '(stereotaxic_injections',
-                       '(primary_injection_structure,',
-                       'structures',
-                       structure_filter,
-                       '))'])
-        
-        return url
+        return annotation_data, annotation_image
     
     
     def build_manual_injection_summary_url(self, experiment_id, fmt='json'):
@@ -194,7 +190,7 @@ class MouseConnectivityApi(Api):
         
         return url
     
-    
+    # TODO: deprecate for fetch_volume
     def build_structure_projection_signal_statistics_url(self,
                                                          section_data_set_id,
                                                          is_injection=None,
@@ -231,7 +227,7 @@ class MouseConnectivityApi(Api):
         include_clause = ''.join([',rma::include,',
                                   'structure'])
         options_clause = ''.join([',rma::options,',
-                                  '[num_rows$eq5000]'])
+                                  "[num_rows$eq'all']"])
         
         url = ''.join([self.rma_endpoint,
                        '/query.',
@@ -296,7 +292,7 @@ class MouseConnectivityApi(Api):
         return url
     
     
-    def build_projection_grid_search_url(self, **kwargs):
+    def build_experiment_source_search_url(self, **kwargs):
         '''Search over the whole projection signal statistics dataset
         to find experiments with specific projection profiles.
         
@@ -332,11 +328,13 @@ class MouseConnectivityApi(Api):
         
         service_name = 'mouse_connectivity_injection_structure'
         url = svc.build_url(service_name, kwargs)
+
+        print url
         
         return url
     
     
-    def build_projection_grid_spatial_search_url(self, **kwargs):
+    def build_experiment_spatial_search_search_url(self, **kwargs):
         '''Displays all SectionDataSets
         with projection signal density >= 0.1 at the seed point.
         This service also returns the path
@@ -374,7 +372,7 @@ class MouseConnectivityApi(Api):
         return url
     
     
-    def build_projection_grid_injection_coordinate_search_url(self, **kwargs):
+    def build_experiment_injection_coordinate_search_url(self, **kwargs):
         '''User specifies a seed location within the 3D reference space.
         The service returns a rank list of experiments
         by distance of its injection site to the specified seed location.
@@ -408,7 +406,7 @@ class MouseConnectivityApi(Api):
         return url
     
     
-    def build_projection_grid_correlation_search_url(self, **kwargs):
+    def build_experiment_correlation_search_url(self, **kwargs):
         '''Select a seed experiment and a domain over
         which the similarity comparison is to be made.
         
@@ -456,13 +454,36 @@ class MouseConnectivityApi(Api):
         '''
         return parsed_json['msg']
     
-    
-    def get_experiments(self, structure_id):
-        '''Retrieve the experimants data.'''
-        data = self.do_query(self.build_query,
-                             self.read_response,
-                             structure_id)
+
+    def get_experiments(self,
+                        structure_ids,
+                        **kwargs):
+        ''' Fetch experiments 
+        in the "Mouse Connectivity Projection" Product.
         
+        Parameters
+        ----------
+        structure_ids : integer or list, optional
+            injection structure
+        
+        Returns
+        -------
+        url : string
+            The constructed URL
+        '''
+        criteria_list = ['[failed$eqfalse]',
+                         'products[id$in%s]' % (','.join(str(i) for i in MouseConnectivityApi.PRODUCT_IDS))]
+            
+        if structure_ids != None:
+            if type(structure_ids) is not list:
+                structure_ids = [ structure_ids ]
+            criteria_list.append('[id$in%s]' % ','.join(str(i) for i in structure_ids))
+
+        criteria_string = ','.join(criteria_list)
+                
+        data = self.model_query('SectionDataSet',
+                                criteria=criteria_string,
+                                **kwargs)
         return data
     
     
@@ -642,6 +663,8 @@ class MouseConnectivityApi(Api):
         ----------
         data : string
             'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
+        file_name : string
+            
         voxel_resolution : int
             10, 25, 50 or 100
         coordinate_framework : string
@@ -677,7 +700,7 @@ class MouseConnectivityApi(Api):
         self.retrieve_file_over_http(well_known_file_url, save_file_path)
     
     
-    def get_projection_grid(self, **kwargs):
+    def experiment_source_search(self, **kwargs):
         '''Search over the whole projection signal statistics dataset
         to find experiments with specific projection profiles.
         
@@ -709,96 +732,107 @@ class MouseConnectivityApi(Api):
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
         
         '''
-        data = self.do_query(self.build_projection_grid_search_url,
+        data = self.do_query(self.build_experiment_source_search_url,
                              self.read_response,
                              **kwargs)
         
         return data
     
     
-    def get_projection_grid_spatial(self, **kwargs):
-        data = self.do_query(self.build_projection_grid_spatial_search_url,
+    def experiment_spatial_search(self, **kwargs):
+        data = self.do_query(self.build_experiment_spatial_search_search_url,
                              self.read_response,
                              **kwargs)
         
         return data
     
     
-    def get_projection_grid_injection_coordinate(self, **kwargs):
-        data = self.do_query(self.build_projection_grid_injection_coordinate_search_url,
+    def experiment_injection_coordinate_search(self, **kwargs):
+        data = self.do_query(self.build_experiment_injection_coordinate_search_url,
                              self.read_response,
                              **kwargs)
         
         return data
     
     
-    def get_projection_grid_injection_correlation(self, **kwargs):
-        data = self.do_query(self.build_projection_grid_injection_correlation_search_url,
+    def experiment_correlation_search(self, **kwargs):
+        data = self.do_query(self.build_experiment_correlation_search_url,
                              self.read_response,
                              **kwargs)
         
         return data
-    
-    
-if __name__ == '__main__':
-    import nrrd
-    import numpy as np
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    from PIL import Image
 
-    a = MouseConnectivityApi()
-    a.download_reference_aligned_image_channel_volumes_url(156198187)
-#     print(a.build_projection_grid_search_url(injection_structures='Isocortex',
-#                                              primary_structure_only=True))
-#     print(a.build_projection_grid_search_url(injection_structures='Isocortex',
-#                                              transgenic_lines=RmaApi().quote_string('Syt6-Cre_KI148'),
-#                                              primary_structure_only=True))
-#     print(a.build_projection_grid_spatial_search_url(seed_point=[6900,5050,6450]))
-#     print(a.build_projection_grid_injection_coordinate_search_url(seed_point=[6900,5050,6450]))
-#     print(a.build_projection_grid_correlation_search_url(row=112670853, structures=['TH']))
-    
-    #print(json.dumps(a.get_experiments()))
-    #print(json.dumps(a.get_experiments(structure_id=385)))
-    #print(json.dumps(a.get_experiment_detail(experiment_id=126862385)))
-    #print(json.dumps(a.get_projection_image_meta_info(experiment_id=126862385,
-    #                                                  section_number=74)))
-    #a.download_volumetric_data('average_template', 'average_template_25.nrrd')
-    #a.download_volumetric_data('ara_nissl', 'ara_nissl_25.nrrd')
-    #a.download_volumetric_data('annotation/ccf_2015', 'annotation_25.nrrd')
-#     AVGT, metaAVGT = nrrd.read('average_template_25.nrrd')
-#     NISSL, metaNISSL = nrrd.read('ara_nissl_25.nrrd')
-#     ANO, metaANO = nrrd.read('annotation_25.nrrd')
-#     
-#     # Save one coronal section as PNG
-#     slice = AVGT[264,:,:].astype(float)
-#     slice /= np.max(slice)
-#     im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
-#     im.save('output/avgt_coronal.png')
-#     
-#     slice = NISSL[264,:,:].astype(float)
-#     slice /= np.max(slice)
-#     im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
-#     im.save('output/nissl_coronal.png')
-#     
-#     slice = ANO[264,:,:].astype(float)
-#     slice /= 2000
-#     im = Image.fromarray(np.uint8(plt.cm.jet(slice)*255))
-#     im.save('output/ano_coronal.png')
-#     
-#     # Save one sagittal section as PNG
-#     slice = AVGT[:,:,220].astype(float)
-#     slice /= np.max(slice)
-#     im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
-#     im.save('output/avgt_sagittal.png')
-#     
-#     slice = NISSL[:,:,220].astype(float)
-#     slice /= np.max(slice)
-#     im = Image.fromarray(np.uint8(plt.cm.gray(slice)*255))
-#     im.save('output/nissl_sagittal.png')
-#     
-#     slice = ANO[:,:,220].astype(float)
-#     slice /= 2000
-#     im = Image.fromarray(np.uint8(plt.cm.jet(slice)*255))
-#     im.save('output/ano_sagittal.png')
+
+    def get_structure_unionizes(self,
+                                experiment_ids,
+                                is_injection=None,
+                                structure_name=None,
+                                structure_ids=None,
+                                hemisphere_ids=None,
+                                normalized_projection_volume_limit=None,
+                                include=None,
+                                debug=None,
+                                order=None):
+
+        experiment_filter = '[section_data_set_id$in%s]' %\
+                            ','.join(str(i) for i in experiment_ids)
+        
+        if is_injection == True:
+            is_injection_filter = '[is_injection$eqtrue]'
+        elif is_injection == False:
+            is_injection_filter = '[is_injection$eqfalse]'
+        else:
+            is_injection_filter = ''
+        
+        if normalized_projection_volume_limit != None:
+            volume_filter = '[normalized_projection_volume$gt%f]' %\
+                            (normalized_projection_volume_limit)
+        else:
+            volume_filter = ''
+
+        
+        if hemisphere_ids is not None:
+            hemisphere_filter = '[hemisphere_id$in%s]' %\
+                ','.join(str(h) for h in hemisphere_ids)
+        else:
+            hemisphere_filter = ''
+        
+        if structure_name != None:
+            structure_filter = ",structure[name$eq'%s']" % (structure_name)
+        elif structure_ids != None:
+            structure_filter = '[structure_id$in%s]' %\
+                               ','.join(str(i) for i in structure_ids)
+        else:
+            structure_filter = ''
+        
+        return self.model_query(
+                'ProjectionStructureUnionize',
+                criteria=''.join([experiment_filter,
+                                  is_injection_filter,
+                                  volume_filter,
+                                  hemisphere_filter,
+                                  structure_filter]),
+                include=include,
+                order=order,
+                num_rows='all',
+                debug=debug,
+                count=False)
+
+    def download_injection_density(self, path, experiment_id, resolution):
+        return GridDataApi().download_projection_grid_data(
+            experiment_id, [ GridDataApi.INJECTION_DENSITY ], resolution, path)
+
+
+    def download_projection_density(self, path, experiment_id, resolution):
+        return GridDataApi().download_projection_grid_data(
+            experiment_id, [ GridDataApi.PROJECTION_DENSITY ], resolution, path)
+
+
+    def download_injection_fraction(self, path, experiment_id, resolution):
+        return GridDataApi().download_projection_grid_data(
+            experiment_id, [ GridDataApi.INJECTION_FRACTION ], resolution, path)
+
+
+    def download_data_mask(self, path, experiment_id, resolution):
+        return GridDataApi().download_projection_grid_data(
+           experiment_id, [ GridDataApi.DATA_MASK ], resolution, path)

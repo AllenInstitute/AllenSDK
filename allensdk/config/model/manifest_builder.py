@@ -1,6 +1,5 @@
-from allensdk.config.model.manifest import Manifest
-from pkg_resources import resource_filename
-import logging, json, os
+import allensdk.core.json_utilities as ju
+import logging
 
 
 class ManifestBuilder(object):
@@ -42,7 +41,8 @@ class ManifestBuilder(object):
         wrapper.update(self.hoc_conf)
         
         return wrapper
+
     
     def write_json_string(self):
         config = self.get_config()
-        return json.dumps(config, indent=2)
+        return ju.write_string(config)

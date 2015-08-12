@@ -153,6 +153,26 @@ class RmaApi(Api):
         stage = ''.join(clauses)
         
         return stage
+
+
+    def model_query(self, *args, **kwargs):
+        '''
+        Parameters
+        ----------
+        model : string
+        filters :
+        criteria :
+        include :
+        '''
+        return self.json_msg_query(
+            self.build_query_url(
+                self.model_stage(*args, **kwargs)))
+    
+    
+    def service_query(self, *args, **kwargs):
+        return self.do_query(
+            self.build_query_url(
+                self.service_stage(*args, **kwargs)))
     
     
     def options_clause(self, **kwargs):
@@ -217,6 +237,18 @@ class RmaApi(Api):
         
         if debug != None:
             options_params.append(self.debug_clause(debug))
+        
+        cnt = kwargs.get(RmaApi.COUNT, None)
+        
+        if cnt != None:
+            if cnt == True or cnt == 'true':
+                options_params.append('[%s$eq%s]' % (RmaApi.COUNT,
+                                                     RmaApi.TRUE))
+            elif cnt == False or cnt == 'false':
+                options_params.append('[%s$eq%s]' % (RmaApi.COUNT,
+                                                     RmaApi.FALSE))
+            else:
+                pass
         
         if len(options_params) > 0:
             clause = RmaApi.OPTIONS + ''.join(options_params)
@@ -416,22 +448,6 @@ class RmaApi(Api):
         return url
     
     
-    def read_data(self, parsed_json):
-        '''Return the message data from the parsed query.
-        
-        Parameters
-        ----------
-        parsed_json : dict
-            A python structure corresponding to the JSON data returned from the API.
-        
-        Notes
-        -----
-        See `API Response Formats - Response Envelope <http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope>`_
-        for additional documentation.
-        '''
-        return parsed_json['msg']
-    
-    
     def get_schema(self, clazz=None):
         '''Retrieve schema information.'''
         schema_data = self.do_query(self.build_schema_query,
@@ -439,22 +455,3 @@ class RmaApi(Api):
                                    clazz)
         
         return schema_data
-    
-    
-if __name__ == '__main__':
-    import json
-    from allensdk.api.queries.rma.rma_api import RmaApi
-    
-    a = RmaApi()
-    #print(json.dumps(a.get_schema()))
-    #print(json.dumps(a.get_schema('Gene')))
-    #print(a.model_stage('Gene',
-    #                    include=['organism'],
-    #                    criteria=['organism'],
-    #                    num_rows=5,
-    #                    start_row=2))
-    #print(a.build_query_url([a.model_stage('Gene',
-    #                                       filters={'id': 15})]))
-    #print(a.build_query_url([a.model_stage('Gene',
-    #                                       filters={'acronym': a.quote_string('ABAT')})]))
-    print(a.build_query_url(a.service_stage('FooBar')))

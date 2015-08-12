@@ -13,16 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.api import Api
+import os
 
-import logging
+import pandas as pd
 
-class CellTypesApi(Api):
+from allensdk.api.queries.rma.rma_simple_api import RmaApi
+import allensdk.core.json_utilities as json_utilities
+
+class CellTypesApi(RmaApi):
+
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
 
 
-    def list_cells(self, require_morphology=False, require_reconstruction=False):
+    def get_cells(self, require_morphology=False, require_reconstruction=False):
         ''' Query the API for a list of all cells in the Cell Types Database.
 
         Parameters
@@ -38,120 +42,94 @@ class CellTypesApi(Api):
         list
             Meta data for all cells.
         '''
+
         
-        return self.do_query(self.build_list_cells_rma, self.read_list_cells_json, 
-                                 require_morphology, require_reconstruction)
+
+        criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
+        
+        include = ( 'structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
+                    'ephys_features,data_sets,neuron_reconstructions' )
+
+        cells = self.model_query('Specimen', criteria=criteria, include=include, num_rows='all')
+        
+        for cell in cells:
+            # specimen tags
+            for tag in cell['specimen_tags']:
+                tag_name, tag_value = tag['name'].split(' - ')
+                tag_name = tag_name.replace(' ','_')
+                cell[tag_name] = tag_value
 
 
-    def build_list_cells_rma(self, require_morphology, require_reconstruction, fmt='json'):
-        ''' Build the RMA URL that will fetch meta data for all cells in the cell types database '''
+            # morphology and reconstuction
+            cell['has_reconstruction'] = len(cell['neuron_reconstructions']) > 0
+            cell['has_morphology'] = len(cell['data_sets']) > 0
 
-        criteria_associations = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
+        return self.filter_cells(cells, require_morphology, require_reconstruction)
 
+
+    def filter_cells(self, cells, require_morphology, require_reconstruction):
         if require_morphology:
-            criteria_associations += ",data_sets"
+            cells = [ c for c in cells if c['has_morphology'] ]
 
         if require_reconstruction:
-            criteria_associations += ",neuron_reconstructions"
+            cells = [ c for c in cells if c['has_reconstruction'] ]
 
-        include_associations = 'structure,donor(transgenic_lines),specimen_tags,cell_soma_locations'
+        return cells
+        
 
-        url = ''.join([self.rma_endpoint, 
-                       '/query.',
-                       fmt,
-                       '?q=',
-                       'model::Specimen,',
-                       'rma::criteria,',
-                       criteria_associations,
-                       ',rma::include,',
-                       include_associations,
-                       ',rma::options[num_rows$eqall]'])
+    def get_ephys_features(self, dataframe=False):
+        features = self.model_query('EphysFeature', num_rows='all')
 
-        return url
-
-
-    def read_list_cells_json(self, parsed_json):
-        ''' Return the list of cells from the parsed query. '''
-        return parsed_json['msg']
+        if dataframe:
+            return pd.DataFrame(features)
+        else:
+            return features
 
 
     def save_ephys_data(self, specimen_id, file_name):
-        ''' Find the electrophysiology data file for a specimen and save it. '''
+        try: 
+            os.makedirs(os.path.dirname(file_name))
+        except:
+            pass
 
-        
-        file_url = self.do_rma_query(self.build_ephys_data_rma, self.read_ephys_data_json, specimen_id)
-
-        if file_url is None:
-            raise Exception("Could not find electrophysiology file for specimen %d " % specimen_id)
-
-        self.retrieve_file_over_http(self.api_url + file_url, file_name)
-    
-
-    def build_ephys_data_rma(self, specimen_id, fmt='json'):
-        ''' Build the URL for the save_ephys_data command. '''
         criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eqNWB]))' % specimen_id
         includes = 'ephys_result(well_known_files(well_known_file_type))'
 
-        url = ''.join([self.rma_endpoint, 
-                       '/query.',
-                       fmt,
-                       '?q=',
-                       'model::Specimen,',
-                       'rma::criteria,',
-                       criteria,
-                       ',rma::include,',
-                       includes,
-                       ',rma::options[num_rows$eqall]'])
-
-        return url
-
-
-    def read_ephys_data_json(self, parsed_json):
-        ''' Extract the download link from the save_ephys_data RMA. '''
+        results = self.model_query('Specimen',
+                                   criteria=criteria,
+                                   include=includes,
+                                   num_rows='all')
 
         try:
-            return parsed_json['msg'][0]['ephys_result']['well_known_files'][0]['download_link']
+            file_url = results[0]['ephys_result']['well_known_files'][0]['download_link']
         except Exception, e:
-            logging.error("Error finding ephys file: %s" % e.message)
-            return None
+            raise Exception("Specimen %d has no ephys data" % specimen_id)
 
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+        
 
     def save_reconstruction(self, specimen_id, file_name):
-        ''' Find the reconstruction file for a specimen and save it. '''
+        try: 
+            os.makedirs(os.path.dirname(file_name))
+        except:
+            pass
 
-        file_url = self.do_rma_query(self.build_reconstruction_rma, self.read_reconstruction_json, specimen_id)
-
-        if file_url is None:
-            raise Exception("Could not find reconstruction file for specimen %d " % specimen_id)
-
+        criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
+        includes = 'neuron_reconstructions(well_known_files)'
+        
+        results = self.model_query('Specimen',
+                                   criteria=criteria,
+                                   include=includes,
+                                   num_rows='all')
+        
+        try:
+            file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
+        except:
+            raise Exception("Specimen %d has no reconstruction" % specimen_id)
+        
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
 
-    def build_reconstruction_rma(self, specimen_id, fmt='json'):
-        ''' Build the URL for the save_reconstruction command. '''
-        criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
-        includes = 'neuron_reconstructions(well_known_files)'
 
-        url = ''.join([self.rma_endpoint, 
-                       '/query.',
-                       fmt,
-                       '?q=',
-                       'model::Specimen,',
-                       'rma::criteria,',
-                       criteria,
-                       ',rma::include,',
-                       includes,
-                       ',rma::options[num_rows$eqall]'])
+        
 
-        return url
-
-
-    def read_reconstruction_json(self, parsed_json):
-        ''' Extract the download link from the save_ephys_file RMA. '''
-
-        try:
-            return parsed_json['msg'][0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
-        except Exception, e:
-            logging.error("Error finding reconstruction file: %s" % e.message)
-            return None
-    

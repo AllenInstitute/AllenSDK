@@ -26,9 +26,10 @@ class Manifest(object):
     DIRNAME = 'dir_name'
     log = logging.getLogger(__name__)
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, relative_base_dir='.'):
         self.path_info = {}
-        
+        self.relative_base_dir = relative_base_dir
+
         if config != None:
             self.load_config(config)
        
@@ -113,7 +114,7 @@ class Manifest(object):
         if absolute == True:
             path = os.path.abspath(path)
         else:
-            path = os.path.abspath(path)
+            path = os.path.abspath(os.path.join(self.relative_base_dir, path))
             
         if path_type == Manifest.DIRNAME:
             path = os.path.dirname(path)
@@ -208,9 +209,8 @@ class Manifest(object):
         string
             Path with parent structure and substitutions applied.
         '''
-        path_spec = str(self.path_info[path_key]['spec'].encode('ascii',
-                                                                'ignore'))
-        
+        path_spec = str(self.path_info[path_key]['spec'].encode('ascii', 'ignore'))
+
         if args != None and len(args) != 0:
             path = path_spec % args
         else:
