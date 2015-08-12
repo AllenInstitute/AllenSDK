@@ -13,7 +13,9 @@ import numpy as np
 class MouseConnectivityCache(Cache):
     """
     Cache class for storing and accessing data related to the adult mouse
-    Connectivity Atlas.  
+    Connectivity Atlas.  By default, this class will cache any downloaded 
+    metadata or files in well known locations defined in a manifest file.  
+    This behavior can be disabled.
 
     Attributes
     ----------
@@ -36,7 +38,7 @@ class MouseConnectivityCache(Cache):
 
     cache: boolean
         Whether the class should save results of API queries to locations specified
-        in the manifest file.  Queries for files (as opposed to metadata) must have
+        in the manifest file.  Queries for files (as opposed to metadata) must have a
         file location.  If caching is disabled, those locations must be specified
         in the function call (e.g. get_projection_density(file_name='file.nrrd')).
 
