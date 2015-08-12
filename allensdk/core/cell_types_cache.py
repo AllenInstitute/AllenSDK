@@ -65,7 +65,7 @@ class CellTypesCache(Cache):
         if os.path.exists(file_name):
             cells = json_utilities.read(file_name)
         else:
-            cells = self.api.get_cells(False, False)
+            cells = self.api.list_cells(False, False)
 
             if self.cache:
                 json_utilities.write(file_name, cells)

@@ -17,7 +17,7 @@ import os
 
 import pandas as pd
 
-from allensdk.api.queries.rma.rma_simple_api import RmaApi
+from allensdk.api.queries.rma.rma_api import RmaApi
 import allensdk.core.json_utilities as json_utilities
 
 class CellTypesApi(RmaApi):
@@ -26,7 +26,7 @@ class CellTypesApi(RmaApi):
         super(CellTypesApi, self).__init__(base_uri)
 
 
-    def get_cells(self, require_morphology=False, require_reconstruction=False):
+    def list_cells(self, require_morphology=False, require_reconstruction=False):
         ''' Query the API for a list of all cells in the Cell Types Database.
 
         Parameters
