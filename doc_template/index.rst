@@ -20,7 +20,7 @@ Welcome to the Allen SDK
    Github Profile <https://github.com/AllenInstitute/AllenSDK>
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
-For the initial release, the Allen SDK focuses primarily on the newly released Allen Cell Types Database.
+The Allen SDK focuses the Allen Cell Types Database and the Allen Mouse Brain Connectivity Atlas.  
 Functionality relevant to other atlases is coming in future releases.  
 
 .. image:: /_static/ccf_v3_sdk.png
@@ -45,6 +45,14 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 
     * :doc:`biophysical_perisomatic_script`
     * :doc:`glif_models`
+
+
+Allen Mouse Brain Connectivity Atlas
+------------------------------------
+
+The `Allen Mouse Brain Connectivity Atlas <http://connectivity.brain-map.org>`_ is a high-resolution map of neural connections in the mouse brain. Built on an array of transgenic mice genetically engineered to target specific cell types, the Atlas comprises a unique compendium of projections from selected neuronal populations throughout the brain.  The Allen SDK provides Python code for accessing experimental metadata along with projection signal volumes registered to a common coordinate framework.
+
+See the `mouse connectivity section <connectivity.html>`_ for more details.
 
 
 ....
