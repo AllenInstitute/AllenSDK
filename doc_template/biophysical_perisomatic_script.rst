@@ -57,20 +57,12 @@ for a cell has a neuronal model download link.  Specifically:
 This may be also be done programmatically.
 The neuronal model id can be found to the left of
 the corresponding 'Biophysical - perisomatic "download model" link.
-::
 
-    from allensdk.api.queries.biophysical_perisomatic_api import \
-        BiophysicalPerisomaticApi
-    
-    bp = BiophysicalPerisomaticApi('http://api.brain-map.org')
-    bp.cache_stimulus = True # change to False to not download the large stimulus NWB file
-    neuronal_model_id = 472451419    # get this from the web site as above
-    bp.cache_data(neuronal_model_id, working_directory='neuronal_model')
+.. literalinclude:: examples/biophysical_perisomatic_ex1.py
 
 More help can be found in the
 `online help <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_
 for the Allen Cell Types Database web application.
-
 
 Directory Structure
 -------------------
