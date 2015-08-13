@@ -222,7 +222,7 @@ class Api(object):
         --------
         retrieve_file_over_http: Can be used to retrieve the file from the url.
         '''
-        return self.well_known_file_endpoint + +'/' + str(well_known_file_id)
+        return self.well_known_file_endpoint + '/' + str(well_known_file_id)
     
     
     def retrieve_file_over_http(self, url, file_path):
