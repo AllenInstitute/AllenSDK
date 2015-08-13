@@ -12,8 +12,8 @@ This page describes how the SDK can be used to access data in the Cell Types Dat
 please visit the Cell Types `home page <http://celltypes.brain-map.org/>`_ and the 
 `documentation <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_.
 
-Cell Types API Access
----------------------
+Cell Types API
+--------------
 
 The :py:class:`~allensdk.api.queries.cell_types_api.CellTypesApi` class provides a Python interface for downloading data
 in the Allen Cell Types Database.  The following example demonstrates how to download meta data for
@@ -24,8 +24,7 @@ for one of those cells::
 
     ct = CellTypesApi()
 
-    # a list of dictionaries containing metadata for cells
-    # that have morphological reconstructions
+    # a list of dictionaries containing metadata for cells with reconstructions
     cells = ct.list_cells(require_reconstruction=True)
 
     # download the electrophysiology data for one cell
@@ -33,6 +32,29 @@ for one of those cells::
 
     # download the reconstruction for the same cell
     ct.save_reconstruction(cells[0]['id'], 'example.swc')
+    
+Cell Types Cache
+----------------
+
+The :py:class:`~allensdk.core.cell_types_cache.CellTypesCache` class saves all of the data you can download via the
+:py:class:`~allensdk.api.queries.cell_types_api.CellTypesApi` in well known locations so that you don't have to think
+about file names and directories.  It also takes care of knowing if you've already downloaded some files and reads
+them from disk instead of downloading them again.  The following example demonstrates how to download meta data for
+all cells with 3D reconstructions::
+
+    from allensdk.core.cell_types_cache import CellTypesCache
+
+    ctc = CellTypesCache()
+
+    # a list of cell metadata for cells with reconstructions, download if necessary
+    cells = ctc.get_cells(require_reconstruction=True)
+
+    # open the electrophysiology data of one cell, download if necessary
+    data_set = ctc.get_ephys_data(cells[0]['id'])
+
+    # read the reconstruction, download if necessary
+    reconstruction = ctc.get_reconstruction(cells[0]['id'])
+    
 
 File Formats
 ------------

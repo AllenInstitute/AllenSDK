@@ -8,6 +8,7 @@ come in future updates.
 .. toctree::
 
    cell_types
+   connetivity
    data_api_client 
 
 
