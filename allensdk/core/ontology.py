@@ -26,15 +26,62 @@ class Ontology( object ):
         self.descendant_ids = dict(descendant_ids)
 
 
-    def __getitem__(self, *structure_ids):
-        try:
-            return self.df.loc[structure_ids]
-        except KeyError:
-            return None
+    def __getitem__(self, structures):
+        """ 
+        Return a subset of structures by id or acronym. Duplicate values are ignored.
 
+        Parameters
+        ----------
 
-    def get_structure_by_acronym(self, acronym):
-        return self.df[self.df['acronym'] == acronym]
+        structures: tuple
+            Elements can be pandas.Series objects, which are expected to be structure ids.
+            Elements can be strings, which are expected to be acronyms.
+            All other elements must be cast-able to int, which are treated as structure ids.
+
+        Returns
+        -------
+        
+        pandas.DataFrame
+            A subset of rows from the complete ontology that match filtering criteria.
+        """
+
+        # __getitem__ always has a single argument.  If called with a single argument 
+        # (e.g. ontology[315]), that item is passed straight through.  If called with 
+        # multiple arguments (e.g. ontology[315,997]), that gets passed through as a
+        # tuple.  This normalizes the arguments so that everything is a tuple.
+        if not isinstance(structures, tuple):
+            structures = structures,
+
+        # this is the final set of structure ids used to filter
+        structure_ids = set()
+
+        string_strs = []
+        for s in structures:
+            if isinstance(s, pd.Series):
+                # if it's a pandas series, assume it's a series of structure ids
+                structure_ids.update(s.tolist())
+            elif isinstance(s, str):
+                # if it's a string, assume it's an acronym
+                string_strs.append(s)
+            else:
+                # if it's anything else, cast it to an integer and treat it like a structure id
+                structure_ids.add(int(s))
+
+        # convert the string arguments to rows
+        if len(string_strs):
+
+            # pull out the rows that match these acronyms
+            string_strs = self.df[self.df['acronym'].isin(string_strs)]
+
+            # if there are no other structure ids, just return this dataframe
+            if len(structure_ids) == 0:
+                return string_strs
+                
+            # otherwise pull out the ids and add them to the set
+            structure_ids.update(string_strs.id.tolist())
+
+        print structure_ids
+        return self.df.loc[structure_ids].dropna(axis=0,how='all')
 
 
     def get_descendant_ids(self, *structure_ids):

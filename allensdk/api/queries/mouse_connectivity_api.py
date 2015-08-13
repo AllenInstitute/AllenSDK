@@ -276,7 +276,7 @@ class MouseConnectivityApi(RmaApi):
         self.retrieve_file_over_http(well_known_file_url, save_file_path)
 
 
-        def build_reference_aligned_image_channel_volumes_url(self,
+    def build_reference_aligned_image_channel_volumes_url(self,
                                                           data_set_id):
         '''Construct url to download the red, green, and blue channels
         aligned to the 25um adult mouse brain reference space volume.
