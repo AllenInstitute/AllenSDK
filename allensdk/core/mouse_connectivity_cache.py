@@ -89,7 +89,7 @@ class MouseConnectivityCache(Cache):
         else:
             self.safe_mkdir(os.path.dirname(file_name))
 
-            annotation, info = self.api.get_annotation_volume(self.resolution, file_name)
+            annotation, info = self.api.download_annotation_volume(self.resolution, file_name)
 
         return annotation, info
 
@@ -118,7 +118,7 @@ class MouseConnectivityCache(Cache):
         else:
             self.safe_mkdir(os.path.dirname(file_name))
 
-            annotation, info = self.api.get_template_volume(self.resolution, file_name)
+            annotation, info = self.api.download_template_volume(self.resolution, file_name)
 
         return annotation, info
 

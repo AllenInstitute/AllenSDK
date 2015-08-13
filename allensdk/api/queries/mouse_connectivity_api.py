@@ -35,7 +35,7 @@ class MouseConnectivityApi(RmaApi):
         super(MouseConnectivityApi, self).__init__(base_uri)
 
 
-    def get_annotation_volume(self, resolution, file_name):
+    def download_annotation_volume(self, resolution, file_name):
         try:
             os.makedirs(os.path.dirname(file_name))
         except:
@@ -50,7 +50,7 @@ class MouseConnectivityApi(RmaApi):
         return annotation_data, annotation_image
 
 
-    def get_template_volume(self, resolution, file_name):
+    def download_template_volume(self, resolution, file_name):
         try:
             os.makedirs(os.path.dirname(file_name))
         except:
@@ -65,396 +65,6 @@ class MouseConnectivityApi(RmaApi):
         return annotation_data, annotation_image
     
     
-    def build_manual_injection_summary_url(self, experiment_id, fmt='json'):
-        '''Construct a query for summary table for one experiment.
-        
-        Parameters
-        ----------
-        fmt : string, optional
-            json (default) or xml
-        
-        Returns
-        -------
-        url : string
-            The constructed URL
-        
-         Notes
-         -----
-         Based on the connectivity application detail page.
-        '''
-        rma = RmaApi()
-        model_stage = \
-            rma.model_stage(
-                model='SectionDataSet',
-                criteria='[id$in%d]' % (experiment_id),
-                include=['specimen(donor(transgenic_mouse(transgenic_lines)),',
-                         'injections(structure,age)),',
-                         'equalization,products'],
-                only=['id',
-                      'failed',
-                      'storage_directory',
-                      'red_lower',
-                      'red_upper',
-                      'green_lower',
-                      'green_upper',
-                      'blue_lower',
-                      'blue_upper',
-                      'products.id',
-                      'specimen_id',
-                      'structure_id',
-                      'reference_space_id',
-                      'primary_injection_structure_id',
-                      'registration_point',
-                      'coordinates_ap',
-                      'coordinates_dv',
-                      'coordinates_ml',
-                      'angle',
-                      'sex',
-                      'strain',
-                      'injection_materials',
-                      'acronym',
-                      'structures.name',
-                      'days',
-                      'transgenic_mice.name',
-                      'transgenic_lines.name',
-                      'transgenic_lines.description',
-                      'transgenic_lines.id',
-                      'donors.id'])
-    
-        return rma.build_query_url(model_stage)
-    
-    
-    def build_detail_query(self, experiment_id, fmt='json'):
-        '''Construct a query for detailed metadata for one experiment.
-        
-        Parameters
-        ----------
-        fmt : string, optional
-            json (default) or xml
-        
-        Returns
-        -------
-        url : string
-            The constructed URL
-        '''
-        url = ''.join([self.rma_endpoint,
-                       '/query.',
-                       fmt,
-                       '?q=',
-                       'model::SectionDataSet',
-                       ',rma::criteria,',
-                       '[id$eq%d]' % (experiment_id),
-                       ',rma::include,',
-                       'specimen',
-                       '(stereotaxic_injections',
-                       '(primary_injection_structure,',
-                       'structures,',
-                       'stereotaxic_injection_coordinates)),',
-                       'equalization,',
-                       'sub_images',
-                       ',rma::options',
-                       "[order$eq'sub_images.section_number$asc']"])
-        
-        return url
-    
-    
-    def build_projection_image_meta_info(self,
-                                         experiment_id,
-                                         section_number,
-                                         fmt='json'):
-        '''Construct URL to fetch meta-information of one projection image.
-        
-        Parameters
-        ----------
-        experiment_id : integer
-        section_number : integer
-        fmt : string, optional
-            json (default) or xml
-        
-        Returns
-        -------
-        url : string
-            The constructed URL
-        '''
-        url = ''.join([self.rma_endpoint,
-                       '/query.',
-                       fmt,
-                       '?q=',
-                       'model::SectionDataSet',
-                       ',rma::criteria,',
-                       '[id$eq%d]' % (experiment_id),
-                       ',rma::include,',
-                       'equalization,',
-                       'sub_images',
-                       '[section_number$eq%d]' % (section_number)])
-        
-        return url
-    
-    # TODO: deprecate for fetch_volume
-    def build_structure_projection_signal_statistics_url(self,
-                                                         section_data_set_id,
-                                                         is_injection=None,
-                                                         fmt='json'):
-        '''Query for projection signal statistics for one injection experiment.
-        
-        Parameters
-        ----------
-        section_data_set_id : integer
-        is_injection : boolean, optional
-        fmt : string, optional
-            json (default) or xml
-        
-        Returns
-        -------
-        url : string
-            The constructed URL
-        
-        Notes
-        -----
-        See: examples under `Projection Structure Unionization <http://help.brain-map.org/display/mouseconnectivity/API#API-ProjectionStructureUnionization>`_.
-        
-        '''
-        criteria_params = [',rma::criteria,',
-                           '[section_data_set_id$eq%d]' % (section_data_set_id)]
-        
-        if is_injection != None:
-            if is_injection:
-                criteria_params.append('[is_injection$eqtrue]')
-            else:
-                criteria_params.append('[is_injection$eqtrue]')
-        
-        criteria_clause = ''.join(criteria_params)
-        include_clause = ''.join([',rma::include,',
-                                  'structure'])
-        options_clause = ''.join([',rma::options,',
-                                  "[num_rows$eq'all']"])
-        
-        url = ''.join([self.rma_endpoint,
-                       '/query.',
-                       fmt,
-                       '?q=',
-                       'model::ProjectionStructureUnionize',
-                       criteria_clause,
-                       include_clause,
-                       options_clause])
-        
-        return url
-    
-    
-    def build_signal_statistics_url(self,
-                                    section_data_set_id,
-                                    is_injection=None,
-                                    fmt='json'):
-        '''Query for projection signal statistics for one injection experiment.
-        
-        Parameters
-        ----------
-        section_data_set_id : integer
-        is_injection : boolean, optional
-        fmt : string, optional
-            json (default) or xml
-        
-        Returns
-        -------
-        url : string
-            The constructed URL
-        
-        Notes
-        -----
-        See: examples under `Projection Structure Unionization <http://help.brain-map.org/display/mouseconnectivity/API#API-ProjectionStructureUnionization>`_.
-        Setting is_injection to False will get the projection signal statistics exclusive of injection area.
-        Setting is_injection to True will get the injection site statistics for the experiment.
-        '''
-        criteria_params = [',rma::criteria,',
-                           '[section_data_set_id$eq%d]' % (section_data_set_id)]
-        
-        if is_injection != None:
-            if is_injection:
-                criteria_params.append('[is_injection$eqtrue]')
-            else:
-                criteria_params.append('[is_injection$eqtrue]')
-        
-        criteria_clause = ''.join(criteria_params)
-        include_clause = ''.join([',rma::include,',
-                                  'structure'])
-        options_clause = ''.join([',rma::options,',
-                                  '[num_rows$eq5000]'])
-        
-        url = ''.join([self.rma_endpoint,
-                       '/query.',
-                       fmt,
-                       '?q=',
-                       'model::ProjectionStructureUnionize',
-                       criteria_clause,
-                       include_clause,
-                       options_clause])
-        
-        return url
-    
-    
-    def build_experiment_source_search_url(self, **kwargs):
-        '''Search over the whole projection signal statistics dataset
-        to find experiments with specific projection profiles.
-        
-        Parameters
-        ----------
-        injection_structures : list of integers or strings
-            Integer Structure.id or String Structure.acronym.
-        target_domain : list of integers or strings, optional
-            Integer Structure.id or String Structure.acronym.
-        injection_hemisphere : string, optional
-            'right' or 'left', Defaults to both hemispheres.
-        target_hemisphere : string, optional
-            'right' or 'left', Defaults to both hemispheres.
-        transgenic_lines : list of integers or strings, optional
-             Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
-        injection_domain : list of integers or strings, optional
-             Integer Structure.id or String Structure.acronym.
-        primary_structure_only : boolean, optional
-        start_row : integer, optional
-            For paging purposes. Defaults to 0.
-        num_rows : integer, optional
-            For paging purposes. Defaults to 2000.
-        
-        Notes
-        -----
-        See `Source Search <http://help.brain-map.org/display/mouseconnectivity/API#API-SourceSearch>`_,
-        `Target Search <http://help.brain-map.org/display/mouseconnectivity/API#API-TargetSearch>`_,
-        and 
-        `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
-        
-        '''
-        svc = ConnectedServices()
-        
-        service_name = 'mouse_connectivity_injection_structure'
-        url = svc.build_url(service_name, kwargs)
-
-        print url
-        
-        return url
-    
-    
-    def build_experiment_spatial_search_search_url(self, **kwargs):
-        '''Displays all SectionDataSets
-        with projection signal density >= 0.1 at the seed point.
-        This service also returns the path
-        along the most dense pixels from the seed point
-        to the center of each injection site..
-        
-        Parameters
-        ----------
-        seed_point : list of floats
-            The coordinates of a point in 3-D SectionDataSet space.
-        transgenic_lines : list of integers or strings, optional
-            Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
-        section_data_sets : list of integers, optional
-            Ids to filter the results.
-        injection_structures : list of integers or strings, optional
-            Integer Structure.id or String Structure.acronym.
-        primary_structure_only : boolean, optional
-        start_row : integer, optional
-            For paging purposes. Defaults to 0.
-        num_rows : integer, optional
-            For paging purposes. Defaults to 2000.
-        
-        Notes
-        -----
-        See `Spatial Search <http://help.brain-map.org/display/mouseconnectivity/API#API-SpatialSearch>`_
-        and 
-        `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitytargetspatial>`_.
-        
-        '''
-        svc = ConnectedServices()
-        
-        service_name = 'mouse_connectivity_target_spatial'
-        url = svc.build_url(service_name, kwargs)
-        
-        return url
-    
-    
-    def build_experiment_injection_coordinate_search_url(self, **kwargs):
-        '''User specifies a seed location within the 3D reference space.
-        The service returns a rank list of experiments
-        by distance of its injection site to the specified seed location.
-        
-        Parameters
-        ----------
-        seed_point : list of floats
-            The coordinates of a point in 3-D SectionDataSet space.
-        transgenic_lines : list of integers or strings, optional
-            Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
-        injection_structures : list of integers or strings, optional
-            Integer Structure.id or String Structure.acronym.
-        primary_structure_only : boolean, optional
-        start_row : integer, optional
-            For paging purposes. Defaults to 0.
-        num_rows : integer, optional
-            For paging purposes. Defaults to 2000.
-        
-        Notes
-        -----
-        See `Injection Coordinate Search <http://help.brain-map.org/display/mouseconnectivity/API#API-InjectionCoordinateSearch>`_
-        and 
-        `service::mouse_connectivity_injection_coordinate <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate>`_.
-        
-        '''
-        svc = ConnectedServices()
-        
-        service_name = 'mouse_connectivity_injection_coordinate'
-        url = svc.build_url(service_name, kwargs)
-        
-        return url
-    
-    
-    def build_experiment_correlation_search_url(self, **kwargs):
-        '''Select a seed experiment and a domain over
-        which the similarity comparison is to be made.
-        
-        
-        Parameters
-        ----------
-        row : integer
-            SectionDataSet.id to correlate against.
-        structures : list of integers or strings, optional
-            Integer Structure.id or String Structure.acronym.
-        hemisphere : string, optional
-            Use 'right' or 'left'. Defaults to both hemispheres.
-        transgenic_lines : list of integers or strings, optional
-            Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
-        injection_structures : list of integers or strings, optional
-            Integer Structure.id or String Structure.acronym.
-        primary_structure_only : boolean, optional
-        start_row : integer, optional
-            For paging purposes. Defaults to 0.
-        num_rows : integer, optional
-            For paging purposes. Defaults to 2000.
-        
-        Notes
-        -----
-        See `Correlation Search <http://help.brain-map.org/display/mouseconnectivity/API#API-CorrelationSearch>`_
-        and 
-        `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
-        
-        '''
-        svc = ConnectedServices()
-        
-        service_name = 'mouse_connectivity_correlation'
-        url = svc.build_url(service_name, kwargs)
-        
-        return url
-    
-    
-    def read_response(self, parsed_json):
-        '''Return the list of cells from the parsed query.
-        
-        Parameters
-        ----------
-        parsed_json : dict
-            A python structure corresponding to the JSON data returned from the API.
-        '''
-        return parsed_json['msg']
-    
-
     def get_experiments(self,
                         structure_ids,
                         **kwargs):
@@ -489,25 +99,68 @@ class MouseConnectivityApi(RmaApi):
     
     def get_manual_injection_summary(self, experiment_id):
         '''Retrieve manual injection summary.'''
-        data = self.do_query(self.build_manual_injection_summary_url,
-                             self.read_response,
-                             experiment_id)
+
+        criteria = '[id$in%d]' % (experiment_id)
         
-        return data
+        include = ['specimen(donor(transgenic_mouse(transgenic_lines)),',
+                   'injections(structure,age)),',
+                   'equalization,products']
+        
+        only = ['id',
+                'failed',
+                'storage_directory',
+                'red_lower',
+                'red_upper',
+                'green_lower',
+                'green_upper',
+                'blue_lower',
+                'blue_upper',
+                'products.id',
+                'specimen_id',
+                'structure_id',
+                'reference_space_id',
+                'primary_injection_structure_id',
+                'registration_point',
+                'coordinates_ap',
+                'coordinates_dv',
+                'coordinates_ml',
+                'angle',
+                'sex',
+                'strain',
+                'injection_materials',
+                'acronym',
+                'structures.name',
+                'days',
+                'transgenic_mice.name',
+                'transgenic_lines.name',
+                'transgenic_lines.description',
+                'transgenic_lines.id',
+                'donors.id']
+        
+        return self.model_query('SectionDataSet',
+                                criteria=criteria,
+                                include=include,
+                                only=only)
     
     
     def get_experiment_detail(self, experiment_id):
         '''Retrieve the experiments data.'''
-        data = self.do_query(self.build_detail_query,
-                             self.read_response,
-                             experiment_id)
+
+        criteria = '[id$eq%d]' % (experiment_id)
+        include = [ 'specimen(stereotaxic_injections(primary_injection_structure,structures,stereotaxic_injection_coordinates)),',
+                    'equalization,',
+                    'sub_images' ]
+        order = [ "'sub_images.section_number$asc'" ]
         
-        return data
+        return self.model_query('SectionDataSet',
+                                criteria=criteria,
+                                include=include,
+                                order=order)
     
     
-    def get_projection_image_meta_info(self,
-                                       experiment_id,
-                                       section_number):
+    def get_projection_image_info(self,
+                                  experiment_id,
+                                  section_number):
         '''Fetch meta-information of one projection image.
         
         Parameters
@@ -523,39 +176,13 @@ class MouseConnectivityApi(RmaApi):
         for additional documentation.
         Download the image using :py:meth:`allensdk.api.queries.image.image_download_api.ImageDownloadApi.download_section_image`
         '''
-        data = self.do_query(self.build_projection_image_meta_info,
-                             self.read_response,
-                             experiment_id,
-                             section_number)
-        
-        return data
-    
-    
-    def get_structure_projection_signal_statistics(self,
-                                                   section_data_set_id,
-                                                   is_injection=None):
-        '''Fetch meta-information of one projection image.
-        
-        Parameters
-        ----------
-        experiment_id : integer
-        section_number : integer
-        
-        Returns
-        -------
-        data : dict
-            Parsed JSON data message.
-        
-        Notes
-        -----
-        See: examples under `Projection Structure Unionization <http://help.brain-map.org/display/mouseconnectivity/API#API-ProjectionStructureUnionization>`_.
-        '''
-        data = self.do_query(self.build_signal_statistics_url,
-                             self.read_response,
-                             section_data_set_id,
-                             is_injection)
-        
-        return data
+
+        criteria = '[id$eq%d]' % (experiment_id)
+        include = [ 'equalization,sub_images[section_number$eq%d]' % (section_number) ]
+
+        return self.model_query('SectionDataSet',
+                                criteria=criteria,
+                                include=include)
     
     
     def build_volumetric_data_download_url(self,
@@ -597,58 +224,7 @@ class MouseConnectivityApi(RmaApi):
                        file_name])
         
         return url
-    
-    
-    def read_reference_aligned_image_channel_volumes_response(self, parsed_json):
-        return parsed_json['msg']        
-    
-    
-    def build_reference_aligned_image_channel_volumes_url(self,
-                                                          data_set_id):
-        '''Construct url to download the red, green, and blue channels
-        aligned to the 25um adult mouse brain reference space volume.
         
-        Parameters
-        ----------
-        data_set_id : integer
-            aka attachable_id
-            
-        Notes
-        -----
-        See: `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_ 
-        for additional documentation.
-        '''
-        rma = RmaApi()
-        
-        criteria = ['well_known_file_type',
-                    "[name$eq'ImagesResampledTo25MicronARA']",
-                    "[attachable_id$eq%d]" % (data_set_id)]
-        
-        model_stage = rma.model_stage('WellKnownFile',
-                                      criteria=criteria)
-        
-        url = rma.build_query_url([model_stage])
-        
-        return url
-    
-    
-    def get_reference_aligned_image_channel_volumes_url(self,
-                                                        data_set_id):
-        '''Retrieve the download link for a specific data set.\
-        
-        Notes
-        -----
-        See `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_
-        for additional documentation.
-        '''
-        download_link = self.do_query(self.build_reference_aligned_image_channel_volumes_url,
-                                      lambda parsed_json: str(parsed_json['msg'][0]['download_link']),
-                                      data_set_id)
-        
-        url = self.api_url + download_link
-        
-        return url
-    
     
     def download_volumetric_data(self,
                                  data,
@@ -684,9 +260,9 @@ class MouseConnectivityApi(RmaApi):
         self.retrieve_file_over_http(url, save_file_path)
     
     
-    def download_reference_aligned_image_channel_volumes_url(self,
-                                                             data_set_id,
-                                                             save_file_path=None):
+    def download_reference_aligned_image_channel_volumes(self,
+                                                         data_set_id,
+                                                         save_file_path=None):
         '''
         Returns
         -------
@@ -698,6 +274,53 @@ class MouseConnectivityApi(RmaApi):
             save_file_path = str(data_set_id) + '.zip'
             
         self.retrieve_file_over_http(well_known_file_url, save_file_path)
+
+
+        def build_reference_aligned_image_channel_volumes_url(self,
+                                                          data_set_id):
+        '''Construct url to download the red, green, and blue channels
+        aligned to the 25um adult mouse brain reference space volume.
+        
+        Parameters
+        ----------
+        data_set_id : integer
+            aka attachable_id
+            
+        Notes
+        -----
+        See: `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_ 
+        for additional documentation.
+        '''
+        
+        criteria = ['well_known_file_type',
+                    "[name$eq'ImagesResampledTo25MicronARA']",
+                    "[attachable_id$eq%d]" % (data_set_id)]
+        
+        model_stage = self.model_stage('WellKnownFile',
+                                      criteria=criteria)
+        
+        url = self.build_query_url([model_stage])
+        
+        return url
+    
+    
+    def get_reference_aligned_image_channel_volumes_url(self,
+                                                        data_set_id):
+        '''Retrieve the download link for a specific data set.\
+        
+        Notes
+        -----
+        See `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_
+        for additional documentation.
+        '''
+        download_link = self.do_query(self.build_reference_aligned_image_channel_volumes_url,
+                                      lambda parsed_json: str(parsed_json['msg'][0]['download_link']),
+                                      data_set_id)
+        
+        url = self.api_url + download_link
+        
+        return url
+
     
     
     def experiment_source_search(self, **kwargs):
@@ -732,35 +355,107 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
         
         '''
-        data = self.do_query(self.build_experiment_source_search_url,
-                             self.read_response,
-                             **kwargs)
-        
-        return data
-    
+        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        return self.service_query('mouse_connectivity_injection_structure', parameters=tuples)
+
     
     def experiment_spatial_search(self, **kwargs):
-        data = self.do_query(self.build_experiment_spatial_search_search_url,
-                             self.read_response,
-                             **kwargs)
+        '''Displays all SectionDataSets
+        with projection signal density >= 0.1 at the seed point.
+        This service also returns the path
+        along the most dense pixels from the seed point
+        to the center of each injection site..
         
-        return data
+        Parameters
+        ----------
+        seed_point : list of floats
+            The coordinates of a point in 3-D SectionDataSet space.
+        transgenic_lines : list of integers or strings, optional
+            Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
+        section_data_sets : list of integers, optional
+            Ids to filter the results.
+        injection_structures : list of integers or strings, optional
+            Integer Structure.id or String Structure.acronym.
+        primary_structure_only : boolean, optional
+        start_row : integer, optional
+            For paging purposes. Defaults to 0.
+        num_rows : integer, optional
+            For paging purposes. Defaults to 2000.
+        
+        Notes
+        -----
+        See `Spatial Search <http://help.brain-map.org/display/mouseconnectivity/API#API-SpatialSearch>`_
+        and 
+        `service::mouse_connectivity_target_spatial <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitytargetspatial>`_.
+        
+        '''
+
+        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        return self.service_query('mouse_connectivity_target_spatial', parameters=tuples)
     
     
     def experiment_injection_coordinate_search(self, **kwargs):
-        data = self.do_query(self.build_experiment_injection_coordinate_search_url,
-                             self.read_response,
-                             **kwargs)
+        '''User specifies a seed location within the 3D reference space.
+        The service returns a rank list of experiments
+        by distance of its injection site to the specified seed location.
         
-        return data
+        Parameters
+        ----------
+        seed_point : list of floats
+            The coordinates of a point in 3-D SectionDataSet space.
+        transgenic_lines : list of integers or strings, optional
+            Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
+        injection_structures : list of integers or strings, optional
+            Integer Structure.id or String Structure.acronym.
+        primary_structure_only : boolean, optional
+        start_row : integer, optional
+            For paging purposes. Defaults to 0.
+        num_rows : integer, optional
+            For paging purposes. Defaults to 2000.
+        
+        Notes
+        -----
+        See `Injection Coordinate Search <http://help.brain-map.org/display/mouseconnectivity/API#API-InjectionCoordinateSearch>`_
+        and 
+        `service::mouse_connectivity_injection_coordinate <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate>`_.
+        
+        '''
+        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        return self.service_query('mouse_connectivity_injection_coordinate', parameters=tuples)
     
     
     def experiment_correlation_search(self, **kwargs):
-        data = self.do_query(self.build_experiment_correlation_search_url,
-                             self.read_response,
-                             **kwargs)
+        '''Select a seed experiment and a domain over
+        which the similarity comparison is to be made.
         
-        return data
+        
+        Parameters
+        ----------
+        row : integer
+            SectionDataSet.id to correlate against.
+        structures : list of integers or strings, optional
+            Integer Structure.id or String Structure.acronym.
+        hemisphere : string, optional
+            Use 'right' or 'left'. Defaults to both hemispheres.
+        transgenic_lines : list of integers or strings, optional
+            Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.
+        injection_structures : list of integers or strings, optional
+            Integer Structure.id or String Structure.acronym.
+        primary_structure_only : boolean, optional
+        start_row : integer, optional
+            For paging purposes. Defaults to 0.
+        num_rows : integer, optional
+            For paging purposes. Defaults to 2000.
+        
+        Notes
+        -----
+        See `Correlation Search <http://help.brain-map.org/display/mouseconnectivity/API#API-CorrelationSearch>`_
+        and 
+        `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
+        
+        '''
+        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        return self.service_query('mouse_connectivity_correlation', parameters=tuples)
 
 
     def get_structure_unionizes(self,

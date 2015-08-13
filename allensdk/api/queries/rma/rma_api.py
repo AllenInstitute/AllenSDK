@@ -151,7 +151,7 @@ class RmaApi(Api):
             clauses.append(self.tuple_filters(parameters))
         
         stage = ''.join(clauses)
-        
+
         return stage
 
 
@@ -170,7 +170,7 @@ class RmaApi(Api):
     
     
     def service_query(self, *args, **kwargs):
-        return self.do_query(
+        return self.json_msg_query(
             self.build_query_url(
                 self.service_stage(*args, **kwargs)))
     
@@ -399,6 +399,7 @@ class RmaApi(Api):
                 filters_builder.append("[%s%s%s]" % (filt[0],
                                                      filt[1],
                                                      str(filt[2])))
+
         
         return ''.join(filters_builder)
     
