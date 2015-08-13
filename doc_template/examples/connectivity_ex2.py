@@ -5,7 +5,7 @@ mcc = MouseConnectivityCache(resolution=25)
 
 # use the ontology class to get the id of the isocortex structure
 ontology = mcc.get_ontology()
-isocortex = ontology.get_structure_by_acronym('Isocortex')
+isocortex = ontology['Isocortex']
 
 # a list of dictionaries containing metadata for non-Cre experiments
 experiments = mcc.get_experiments(injection_structure_ids=isocortex['id'])

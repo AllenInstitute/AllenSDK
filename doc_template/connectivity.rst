@@ -33,3 +33,24 @@ all experiments with injections in the isocortex and download the projetion dens
 File Formats
 ------------
 
+This section provides a short description of the file formats used for Allen Cell Types data.
+
+NRRD Files
+++++++++++
+
+All of the volumetric data in the connectivity atlas are stored as 
+`NRRD (Nearly Raw Raster Data) <http://teem.sourceforge.net/nrrd/>`_ files. A NRRD file 
+consists of a short ASCII header followed by a binary array of data values.  
+
+To read these in Python, we recommend the `pynrrd package <https://github.com/mhe/pynrrd>`_. 
+Usage is straightforward:
+
+.. literalinclude:: examples/connectivity_ex3.py
+
+.. warning::
+    
+    The pynrrd package available on PyPI contains known issues on Windows.  If you are a Windows
+    users, please install the latest version available here: `<https://github.com/mhe/pynrrd>`_.
+
+
+
