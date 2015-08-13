@@ -50,7 +50,7 @@ Usage is straightforward:
 .. warning::
     
     The pynrrd package available on PyPI contains known issues on Windows.  If you are a Windows
-    users, please install the latest version available here: `<https://github.com/mhe/pynrrd>`_.
+    user, please install the latest version available here: `<https://github.com/mhe/pynrrd>`_.
 
 
 
