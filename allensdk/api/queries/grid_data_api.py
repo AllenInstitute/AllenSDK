@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.queries.rma.rma_api import RmaApi
+from allensdk.api.queries.rma_api import RmaApi
 import numpy as np
 import nrrd
 

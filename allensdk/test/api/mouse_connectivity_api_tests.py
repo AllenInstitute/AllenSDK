@@ -1,6 +1,6 @@
 import unittest, json
 from mock import patch, mock_open
-from allensdk.api.queries.connectivity.mouse_connectivity_api import MouseConnectivityApi
+from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 
 class MouseConnectivityApiTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):

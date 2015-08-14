@@ -17,7 +17,7 @@ import os
 
 import pandas as pd
 
-from allensdk.api.queries.rma.rma_api import RmaApi
+from allensdk.api.queries.rma_api import RmaApi
 import allensdk.core.json_utilities as json_utilities
 
 class CellTypesApi(RmaApi):

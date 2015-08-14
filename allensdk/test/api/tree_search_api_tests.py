@@ -1,4 +1,4 @@
-from allensdk.api.queries.tree_search.tree_search_api import TreeSearchApi
+from allensdk.api.queries.tree_search_api import TreeSearchApi
 
 import unittest, json
 from mock import patch, mock_open

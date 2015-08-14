@@ -406,7 +406,7 @@ This feature allows sub-networks to be described in separate files.
 The sub-networks can then be composed into a larger network with an additional
 description of the interconnections.
 
-    network1.json:
+    network1.json: 
     ::
         /* A self-contained sub-network */
         {
@@ -420,7 +420,7 @@ description of the interconnections.
             ]
         }
     
-    network2.json:
+    network2.json: 
     ::
         /* Another self-contained sub-network */
         {
@@ -435,7 +435,6 @@ description of the interconnections.
     
     interconnect.json:
     ::
-    
         {
             // the additional connections needed to
             // connect the network1 and network2

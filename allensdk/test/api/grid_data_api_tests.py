@@ -1,6 +1,6 @@
 import unittest, json
 from mock import patch, mock_open
-from allensdk.api.queries.grid_data.grid_data_api import GridDataApi
+from allensdk.api.queries.grid_data_api import GridDataApi
 
 class GridDataApiTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):

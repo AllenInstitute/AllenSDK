@@ -1,6 +1,6 @@
 import unittest, json
 from mock import patch, mock_open
-from allensdk.api.queries.image.image_download_api import ImageDownloadApi
+from allensdk.api.queries.image_download_api import ImageDownloadApi
 
 class ImageDownloadApiTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):

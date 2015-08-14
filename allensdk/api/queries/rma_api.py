@@ -269,8 +269,8 @@ class RmaApi(Api):
         
         Returns
         -------
-            clause : string
-                The query clause for inclusion in an RMA query URL.
+        clause : string
+            The query clause for inclusion in an RMA query URL.
         
         Notes
         -----
@@ -295,6 +295,7 @@ class RmaApi(Api):
     
     def order_clause(self, order_list=None):
         '''Construct a debug clause for use in an rma::options clause.
+
         Parameters
         ----------
         order_list : list of strings
@@ -302,8 +303,8 @@ class RmaApi(Api):
         
         Returns
         -------
-            clause : string
-                The query clause for inclusion in an RMA query URL.
+        clause : string
+            The query clause for inclusion in an RMA query URL.
         
         Notes
         -----
@@ -327,8 +328,8 @@ class RmaApi(Api):
         
         Returns
         -------
-            clause : string
-                The query clause for inclusion in an RMA query URL.
+        clause : string
+            The query clause for inclusion in an RMA query URL.
         
         Notes
         -----
