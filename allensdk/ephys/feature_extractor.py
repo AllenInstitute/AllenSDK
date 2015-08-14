@@ -1,15 +1,24 @@
+# Copyright 2015 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 import sys
 import math
 import copy
 import numpy as np
 import scipy.signal as signal 
 import logging
-
-# Design notes:
-# to generate an average feature file, all sweeps must have all features
-# to generate a fitness score of a sweep to a feature file,, the sweep 
-#   must have all features in the file. If one is absent, a penalty 
-#   of TODO ??? will be assessed
 
 # set of features
 class EphysFeatures( object ):
@@ -217,8 +226,7 @@ class EphysFeatureExtractor( object ):
 
             # Determine maximum upstroke of spike
             upstroke_idx = np.argmax(dvdt[spk_idx:peak_idx]) + spk_idx
-            # <KEITH> branch to process NaN differently
-            # TODO ask Nathan for review
+
             spk["upstroke"] = dvdt[upstroke_idx]
             if np.isnan(spk["upstroke"]): # sometimes dvdt will be NaN because of multiple cvode points at same time step
                 close_idx = upstroke_idx + 1
@@ -234,7 +242,6 @@ class EphysFeatureExtractor( object ):
                 spk["upstroke_v"] = v[upstroke_idx]
                 spk["upstroke_i"] = curr[upstroke_idx]
                 spk["upstroke_t"] = t[upstroke_idx]
-            # </KEITH>
 
             # Preliminarily define threshold where dvdt = 5% * max upstroke
             thresh_pct = 0.05
@@ -250,10 +257,7 @@ class EphysFeatureExtractor( object ):
             spk["threshold_i"] = curr[threshold_idx]
             spk["threshold_t"] = t[threshold_idx]
             spk["rise_time"] = spk["f_peak_t"] - spk["threshold_t"]
-            # <KEITH>
-            # get half-height width, defined as width of spike halfway between
-            #   threshold crossing and peak
-            # TODO ask Nathan to review
+
             PERIOD = t[1] - t[0]
             width_volts = (v[peak_idx] + v[threshold_idx]) / 2
             recording_width = False
@@ -264,7 +268,6 @@ class EphysFeatureExtractor( object ):
                 elif recording_width and v[i] < width_volts:
                     spk["half_height_width"] = t[i] - t[idx0]
                     break
-            # </KEITH>
 
             # Check for things that are probably not spikes:
             # if there is more than 2 ms between the detection event and the peak, don't count it
@@ -386,7 +389,7 @@ class EphysFeatureExtractor( object ):
                 self.calculate_trough(spk, v, curr, t, idx_next)
                 half_max_v = (spk["f_peak"] - spk["f_trough"]) / 2.0 + spk["f_trough"]
                 over_half_max_v_idxs = np.where(v[spk["t_idx"]:spk["trough_idx"]] > half_max_v)[0]
-                if len(over_half_max_v_idxs) > 0: # <KEITH>: fix blip crash
+                if len(over_half_max_v_idxs) > 0: 
                     spk["width"] = 1000. * (t[over_half_max_v_idxs[-1] + spk["t_idx"]] - t[over_half_max_v_idxs[0] + spk["t_idx"]])
             feature.mean["latency"] = 1000. * (spikes[0]["t"] - onset)
             feature.mean["latency_n30"] = 1000. * (spikes[0]["t_n30"] - onset)
