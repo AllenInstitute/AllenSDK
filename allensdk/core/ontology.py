@@ -49,7 +49,7 @@ class Ontology( object ):
         # (e.g. ontology[315]), that item is passed straight through.  If called with 
         # multiple arguments (e.g. ontology[315,997]), that gets passed through as a
         # tuple.  This normalizes the arguments so that everything is a tuple.
-        if not isinstance(structures, tuple):
+        if not isinstance(structures, tuple) and not isinstance(structures, list):
             structures = structures,
 
         # this is the final set of structure ids used to filter
@@ -62,7 +62,7 @@ class Ontology( object ):
                 structure_ids.update(s.tolist())
             elif isinstance(s, str):
                 # if it's a string, assume it's an acronym
-                string_strs.append(s)
+                string_strs.append(s)            
             else:
                 # if it's anything else, cast it to an integer and treat it like a structure id
                 structure_ids.add(int(s))
@@ -79,8 +79,7 @@ class Ontology( object ):
                 
             # otherwise pull out the ids and add them to the set
             structure_ids.update(string_strs.id.tolist())
-
-        print structure_ids
+        
         return self.df.loc[structure_ids].dropna(axis=0,how='all')
 
 
