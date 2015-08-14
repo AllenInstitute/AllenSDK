@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.queries.rma.rma_api import RmaApi
+from allensdk.api.queries.rma_api import RmaApi
 from allensdk.api.queries.grid_data_api import GridDataApi
-from allensdk.api.queries.rma.connected_services import ConnectedServices
+from allensdk.api.queries.connected_services import ConnectedServices
 
 import allensdk.core.json_utilities as ju
 import pandas as pd
@@ -199,7 +199,7 @@ class MouseConnectivityApi(RmaApi):
         See: image examples under 
         `Experimental Overview and Metadata <http://help.brain-map.org/display/mouseconnectivity/API##API-ExperimentalOverviewandMetadata>`_
         for additional documentation.
-        Download the image using :py:meth:`allensdk.api.queries.image.image_download_api.ImageDownloadApi.download_section_image`
+        Download the image using :py:meth:`allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image`
         '''
 
         criteria = '[id$eq%d]' % (experiment_id)

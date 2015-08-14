@@ -1,6 +1,6 @@
 import unittest, json
 from mock import patch, mock_open
-from allensdk.api.queries.image.synchronization_api import SynchronizationApi
+from allensdk.api.queries.synchronization_api import SynchronizationApi
 
 class SynchronizationApiTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):

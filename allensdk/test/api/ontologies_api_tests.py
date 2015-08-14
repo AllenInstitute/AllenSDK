@@ -1,8 +1,7 @@
-from allensdk.api.queries.structure.ontologies_api import OntologiesApi
+from allensdk.api.queries.ontologies_api import OntologiesApi
 
 import unittest, json
 from mock import patch, mock_open
-from blaze.datashape.coretypes import Null
 
 class OntologiesApiTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
@@ -14,7 +13,7 @@ class OntologiesApiTests(unittest.TestCase):
     
     
     def tearDown(self):
-        self.oa = Null
+        self.oa = None
     
     
     def test_structure_all_graphs(self):

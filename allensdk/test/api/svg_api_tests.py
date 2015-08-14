@@ -1,4 +1,4 @@
-from allensdk.api.queries.structure.svg_api import SvgApi
+from allensdk.api.queries.svg_api import SvgApi
 
 import unittest, json
 from mock import patch, mock_open

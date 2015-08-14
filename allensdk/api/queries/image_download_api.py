@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.queries.rma.rma_api import RmaApi
+from allensdk.api.queries.rma_api import RmaApi
 
 class ImageDownloadApi(RmaApi):
     '''HTTP Client to download whole or partial two-dimensional images from the Allen Institute
@@ -217,7 +217,7 @@ class ImageDownloadApi(RmaApi):
         and
         `Downloading Atlas Images and Graphics <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics>`_.
         
-        Use :py:meth:`allensdk.api.queries.structure.ontologies_api.OntologiesApi.get_atlases_table`
+        Use :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table`
         to get atlas ids programmatically.
         '''
         params = []
@@ -318,7 +318,7 @@ class ImageDownloadApi(RmaApi):
         and
         `Downloading Atlas Images and Graphics <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics>`_.
         
-        Use :py:meth:`allensdk.api.queries.structure.ontologies_api.OntologiesApi.get_atlases_table`
+        Use :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table`
         to get atlas ids programmatically.
         '''
         params = []
@@ -431,7 +431,7 @@ class ImageDownloadApi(RmaApi):
         -----
         See `Downloading Atlas Images and Graphics <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics>`_
         for additional documentation.
-        The atlas id can be found with :py:meth:`allensdk.api.queries.structure.ontologies_api.OntologiesApi.build_atlases_query`
+        The atlas id can be found with :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.build_atlases_query`
         '''
         rma = self
         
