@@ -14,7 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.queries.rma.rma_api import RmaApi
-from allensdk.api.queries.grid_data.grid_data_api import GridDataApi
+from allensdk.api.queries.grid_data_api import GridDataApi
 from allensdk.api.queries.rma.connected_services import ConnectedServices
 
 import allensdk.core.json_utilities as ju
@@ -24,18 +24,31 @@ import os, nrrd
 
 
 class MouseConnectivityApi(RmaApi):
-    '''HTTP Client for the Allen Mouse Brain Connectivity Atlas.
+    '''
+    HTTP Client for the Allen Mouse Brain Connectivity Atlas.
     
     See: `Mouse Connectivity API <http://help.brain-map.org/display/mouseconnectivity/API>`_
     '''
     PRODUCT_IDS = [5, 31]
     
-    def __init__(self,
-                 base_uri=None):
+    def __init__(self, base_uri=None):
         super(MouseConnectivityApi, self).__init__(base_uri)
 
 
     def download_annotation_volume(self, resolution, file_name):
+        '''
+        Download the annotation volume at a particular resolution.
+
+        Parameters
+        ----------
+        
+        resolution: int
+            Desired resolution to download in microns.  Must be 10, 25, 50, or 100.
+
+        file_name: string
+            Where to save the annotation volume.
+        '''
+
         try:
             os.makedirs(os.path.dirname(file_name))
         except:
@@ -51,6 +64,18 @@ class MouseConnectivityApi(RmaApi):
 
 
     def download_template_volume(self, resolution, file_name):
+        '''
+        Download the registration template volume at a particular resolution.
+
+        Parameters
+        ----------
+        
+        resolution: int
+            Desired resolution to download in microns.  Must be 10, 25, 50, or 100.
+
+        file_name: string
+            Where to save the registration template volume.
+        '''
         try:
             os.makedirs(os.path.dirname(file_name))
         except:
@@ -68,8 +93,8 @@ class MouseConnectivityApi(RmaApi):
     def get_experiments(self,
                         structure_ids,
                         **kwargs):
-        ''' Fetch experiments 
-        in the "Mouse Connectivity Projection" Product.
+        ''' 
+        Fetch experiment metadata from the Mouse Brain Connectivity Atlas.
         
         Parameters
         ----------
@@ -98,7 +123,7 @@ class MouseConnectivityApi(RmaApi):
     
     
     def get_manual_injection_summary(self, experiment_id):
-        '''Retrieve manual injection summary.'''
+        ''' Retrieve manual injection summary. '''
 
         criteria = '[id$in%d]' % (experiment_id)
         
