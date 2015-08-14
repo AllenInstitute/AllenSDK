@@ -16,7 +16,7 @@
 from allensdk.api.cache import Cache
 from allensdk.config.model.manifest_builder import ManifestBuilder
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-from allensdk.api.queries.structure.ontologies_api import OntologiesApi
+from allensdk.api.queries.ontologies_api import OntologiesApi
 
 import allensdk.core.json_utilities as json_utilities
 from allensdk.core.ontology import Ontology
