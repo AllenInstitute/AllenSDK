@@ -28,9 +28,33 @@ import logging
 from allensdk.core.nwb_data_set import NwbDataSet
 
 
-########################################################################
-
 def extract_cell_features(nwb_file, long_square_sweeps, short_square_sweeps, ramp_sweeps):
+    '''
+    Extract features of long square, short square, and ramp sweeps used for cell-wide characterization.
+    
+    Parameters
+    ----------
+
+    nwb_file: string
+        File name of NWB file.
+
+    long_square_sweeps: list
+        List of sweep numbers of long square sweeps in an NWB file.
+        
+    short_square_sweeps: list
+        List of sweep numbers of short square sweeps in an NWB file.
+
+    ramp_sweeps: list
+        List of sweep numbers of ramp sweeps in an NWB file.
+
+    Returns
+    -------
+
+    dict: dictionary of properties grouped by sweep type
+
+    
+    '''
+
     long_square_features = analyze_long_squares(long_square_sweeps, nwb_file)
 
     if ( ( "hero_sweep_num" in long_square_features ) and ( "input_resistance" in long_square_features ) ):
@@ -43,7 +67,23 @@ def extract_cell_features(nwb_file, long_square_sweeps, short_square_sweeps, ram
     else:
         return None
 
+
 def extract_sweep_features(nwb_file, sweep_numbers):
+    '''
+    Run feature extraction on a per sweep basis for a set of sweeps.  This does not
+    feature aggregation for the set of the sweeps.
+
+    Parameters
+    ----------
+
+    nwb_file: string
+        File name of an NWB file
+
+    sweep_numbers: list
+        List of sweeps numbers.
+    
+    '''
+
     features = fx.EphysFeatureExtractor()
     all_sweep_features = {}
 
@@ -54,6 +94,22 @@ def extract_sweep_features(nwb_file, sweep_numbers):
     return all_sweep_features
 
 def extract_single_sweep_features(features, nwb_file, sweep_number):
+    '''
+    Run feature extraction on a single sweep.  
+
+    Parameters
+    ----------
+    
+    features: EphysFeatureExtractor instance
+    
+    nwb_file: string
+        File name of an NWB file
+
+    sweep_numbers: int
+        Sweep number in the NWB file
+       
+    '''
+
     nwb = NwbDataSet(nwb_file)
     data = nwb.get_sweep(sweep_number)
 
@@ -80,9 +136,23 @@ def extract_single_sweep_features(features, nwb_file, sweep_number):
     return results
 
 
-########################################################################
-
 def analyze_long_squares(sweep_numbers, nwb_file):
+    '''
+    Extract features specific to long square sweeps.  From the list of sweeps, this
+    will identify the rheobase sweep (lowest-amplitude stimulus inducing a spike), 
+    a "hero" sweep (lowest-amplitude sweep 30-60pA above rheobase), and
+    a large number of aggregate spike features for the supplied set of sweep numbers.
+
+    Parameters
+    ----------
+
+    sweep_numbers: list
+        List of long square sweep numbers.
+
+    nwb_file: string
+        File name of NWB file.
+    '''
+
     analysis = {}
 
     if len(sweep_numbers) == 0:
@@ -282,7 +352,22 @@ def analyze_long_squares(sweep_numbers, nwb_file):
 
     return analysis
     
+
 def analyze_ramps(sweep_numbers, nwb_file):
+    '''
+    Extract ramp-specific features from a set of sweeps in an NWB file.  These are
+    primarily aggregate spike features.
+
+    Parameters
+    ----------
+
+    sweep_numbers: list
+        List of ramp sweep numbers.
+
+    nwb_file: string
+        File name of NWB file.
+    '''
+
     analysis = {}
     analysis['sweep_info'] = []
 
@@ -357,7 +442,22 @@ def analyze_ramps(sweep_numbers, nwb_file):
     
     return analysis
 
+
 def analyze_short_squares(sweep_numbers, nwb_file):
+    '''
+    Extract ramp-specific features from a set of sweeps in an NWB file.  Most
+    of the features come from the lowest-amplitude spike-inducing sweeps.
+
+    Parameters
+    ----------
+
+    sweep_numbers: list
+        List of short square sweep numbers.
+
+    nwb_file: string
+        File name of NWB file.
+    '''
+
     analysis = {}
     analysis['sweep_info'] = []
 
@@ -433,7 +533,11 @@ def analyze_short_squares(sweep_numbers, nwb_file):
             analysis[k] = None
     return analysis
     
+
 def get_sweep_from_nwb(nwb_file, sweep_num):
+    '''
+    Read a sweep from an NWB file and convert Volts -> mV and Amps -> pA. 
+    '''
     ds = NwbDataSet(nwb_file)
     data = ds.get_sweep(sweep_num)
 
@@ -445,7 +549,13 @@ def get_sweep_from_nwb(nwb_file, sweep_num):
     
     return (v, i, t)
         
+
 def get_square_stim_characteristics(i, t):
+    '''
+    Identify the start time, duration, amplitude, start index, and
+    end index of a square stimulus.  
+    '''
+
     # Assumes that there is a test pulse followed by the stimulus square
     di = np.diff(i)
     up_idx = np.flatnonzero(di > 0)
@@ -463,7 +573,10 @@ def get_square_stim_characteristics(i, t):
     stim_amp = float(i[start_idx])
     return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
 
+
 def get_ramp_stim_characteristics(i, t):
+    ''' Identify the start time and start index of a ramp sweep. '''
+
     # Assumes that there is a test pulse followed by the stimulus ramp
     di = np.diff(i)
     up_idx = np.flatnonzero(di > 0)
@@ -471,25 +584,71 @@ def get_ramp_stim_characteristics(i, t):
     start_idx = up_idx[1] + 1 # shift by one to compensate for diff()
     return (t[start_idx], start_idx)
     
+
 def calculate_input_resistance(subthresh_data):
-    # Calculates input resistance using the negative-going squares
-    # Doesn't use ones that exceed -100 pA since some cells start to move from linear
-    # in that regime
+    ''' 
+    Calculate the input resistance of a sweep using the output of a EphysFeatureExtractor instance 
+    applied to long square sweeps.  This only uses the negative-going squares, and ignores
+    sweeps that exceed -100 pA since some cells start to move from linear in that regime.
+    '''
+
     i = np.array([d['amp'] for d in subthresh_data if d['amp'] < 0 and d['amp'] > -100])
     v = np.array([d['peak'] for d in subthresh_data if d['amp'] < 0 and d['amp'] > -100])
     A = np.vstack([i, np.ones(len(i))]).T
     m, c = np.linalg.lstsq(A, v)[0]
     return m * 1e3 # since MOhm = 1e3 * mV / pA
 
+
 def cellwide_tau(subthresh_data):
+    ''' Return the tau of the negative-going long square sweeps above -100 pA. '''
+
     taus = np.array([d['tau'] for d in subthresh_data if d['amp'] < 0 and d['amp'] > -100 and not np.isnan(d['tau'])])
     return taus.mean()
 
+
 def calculate_membrane_tau(v, t, start_idx, peak_idx):
+    ''' 
+    Calculate membrane tau by fitting the response of the rheobase sweep.
+    
+    Parameters
+    ----------
+
+    v: np.ndarray
+        array of voltages in mV
+
+    t: np.ndarray
+        array of time stamps in seconds
+
+    start_index: int
+        index of stimulus onset
+
+    peak_idx: int
+        index of the peak of the spike
+    '''
     tenpct_idx, popt = fit_membrane_tau(v, t, start_idx, peak_idx)
     return 1.0 / popt[1] # seconds
     
+
 def fit_membrane_tau(v, t, start_idx, peak_idx):
+    ''' 
+    Calculate membrane tau by fitting the response of the rheobase sweep.
+    
+    Parameters
+    ----------
+
+    v: np.ndarray
+        array of voltages in mV
+
+    t: np.ndarray
+        array of time stamps in seconds
+
+    start_index: int
+        index of stimulus onset
+
+    peak_idx: int
+        index of the peak of the spike
+    '''
+
     try:
         # fit from 10% up to peak
         if v[start_idx] > v[peak_idx]:
@@ -508,14 +667,19 @@ def fit_membrane_tau(v, t, start_idx, peak_idx):
         logging.warning("Index error occurred calculating tau. Aborting calculation")
         return (np.nan, [np.nan, np.nan, np.nan])
     
+
 def exp_curve(x, a, inv_tau, y0):
+    ''' Function used for tau curve fitting '''
     return y0 + a * np.exp(-inv_tau * x)
 
+
 def check_for_pause(isis):
+    ''' Detect a pause given a list of inter-spike intervals. '''
     for i, isi in enumerate(isis[1:-1]):
         if isi > 3 * isis[i - 1 + 1] and isi > 3 * isis[i + 1 + 1]:
             return True
     return False
+
 
 if __name__ == "__main__": pass
 
