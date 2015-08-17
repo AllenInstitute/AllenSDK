@@ -1,22 +1,24 @@
-import allensdk.core.swc as swc
+from allensdk.api.queries.cell_types_api import CellTypesApi
+from allensdk.ephys.extract_cell_features import extract_cell_features
+from collections import defaultdict
 
-file_name = 'example.swc'
-morphology = swc.read_swc(file_name)
+# pick a cell to analyze
+specimen_id = 324257146
+nwb_file = 'ephys.nwb'
 
-# subsample the morphology 3x. root, soma, junctions, and the first child of the root are preserved.
-sparse_morphology = morphology.sparsify(3)
+# download the ephys data and sweep metadata
+cta = CellTypesApi()
+sweeps = cta.get_sweeps(specimen_id)
+cta.save_ephys_data(specimen_id, nwb_file)
 
-# compartments in the order that they were specified in the file
-compartment_list = sparse_morphology.compartment_list
+# group the sweeps by stimulus 
+sweep_numbers = defaultdict(list)
+for sweep in sweeps:
+    sweep_numbers[sweep['stimulus_name']].append(sweep['sweep_number'])
 
-# a dictionary of compartments indexed by compartment id
-compartments_by_id = sparse_morphology.compartment_index
+# calculate features
+cell_features = extract_cell_features(nwb_file,
+                                      sweep_numbers['Long Square'],
+                                      sweep_numbers['Short Square'],
+                                      sweep_numbers['Ramp'])
 
-# the root compartment (usually the soma)
-root = morphology.root
-
-# all compartments are dictionaries of compartment properties
-# compartments also keep track of ids of their children
-for child_id in root['children']:
-    child = compartments_by_id[child_id]
-    print child['x'], child['y'], child['z'], child['radius']

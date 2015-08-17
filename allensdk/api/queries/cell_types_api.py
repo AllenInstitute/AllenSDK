@@ -25,7 +25,7 @@ class CellTypesApi(RmaApi):
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
 
-
+        
     def list_cells(self, require_morphology=False, require_reconstruction=False):
         ''' Query the API for a list of all cells in the Cell Types Database.
 
@@ -42,8 +42,6 @@ class CellTypesApi(RmaApi):
         list
             Meta data for all cells.
         '''
-
-        
 
         criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
         
@@ -65,6 +63,25 @@ class CellTypesApi(RmaApi):
             cell['has_morphology'] = len(cell['data_sets']) > 0
 
         return self.filter_cells(cells, require_morphology, require_reconstruction)
+
+
+    def get_sweeps(self, specimen_id):
+        '''
+        Query the API for a list of sweeps for a particular cell in the Cell Types Database.
+
+        Parameters
+        ----------
+
+        specimen_id: int
+            Specimen ID of a cell.
+
+        Returns
+        -------
+        list: List of sweep dictionaries belonging to a cell
+        '''
+        criteria = "[specimen_id$eq%d]" % specimen_id
+        
+        return self.model_query('EphysSweep', criteria=criteria, num_rows='all')
 
 
     def filter_cells(self, cells, require_morphology, require_reconstruction):

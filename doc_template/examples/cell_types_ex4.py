@@ -1,22 +1,22 @@
-from allensdk.core.nwb_data_set import NwbDataSet
+import allensdk.core.swc as swc
 
-file_name = 'example.nwb'
-data_set = NwbDataSet(file_name)
+file_name = 'example.swc'
+morphology = swc.read_swc(file_name)
 
-sweep_number = 61
-sweep_data = data_set.get_sweep(sweep_number)
+# subsample the morphology 3x. root, soma, junctions, and the first child of the root are preserved.
+sparse_morphology = morphology.sparsify(3)
 
-# spike times are in seconds relative to the start of the sweep
-spike_times = data_set.get_spike_times(sweep_number)
+# compartments in the order that they were specified in the file
+compartment_list = sparse_morphology.compartment_list
 
-# stimulus is a numpy array in amps
-stimulus = sweep_data['stimulus']
+# a dictionary of compartments indexed by compartment id
+compartments_by_id = sparse_morphology.compartment_index
 
-# response is a numpy array in volts
-reponse = sweep_data['response']
+# the root compartment (usually the soma)
+root = morphology.root
 
-# sampling rate is in Hz
-sampling_rate = sweep_data['sampling_rate']
-
-# start/stop indices that exclude the experimental test pulse (if applicable)
-index_range = sweep_data['index_range']
+# all compartments are dictionaries of compartment properties
+# compartments also keep track of ids of their children
+for child_id in root['children']:
+    child = compartments_by_id[child_id]
+    print child['x'], child['y'], child['z'], child['radius']
