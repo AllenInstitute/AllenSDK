@@ -8,7 +8,7 @@ nwb_file = 'ephys.nwb'
 
 # download the ephys data and sweep metadata
 cta = CellTypesApi()
-sweeps = cta.get_sweeps(specimen_id)
+sweeps = cta.get_ephys_sweeps(specimen_id)
 cta.save_ephys_data(specimen_id, nwb_file)
 
 # group the sweeps by stimulus 
