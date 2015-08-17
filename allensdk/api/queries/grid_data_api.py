@@ -40,6 +40,10 @@ class GridDataApi(RmaApi):
                  base_uri=None):
         super(GridDataApi, self).__init__(base_uri)
         
+        if resolution == None:
+            resolution = 25
+        self.resolution = resolution
+        
     def download_expression_grid_data(self,
                                       section_data_set_id,
                                       include=None,
@@ -54,7 +58,7 @@ class GridDataApi(RmaApi):
             Image volumes. 'energy' (default), 'density', 'intensity'.
         path : string, optional
             File name to save as.
-        
+        i
         Returns
         -------
             file : 3-D expression grid data packaged into a compressed archive file (.zip).
