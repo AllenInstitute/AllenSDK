@@ -348,7 +348,14 @@ class MouseConnectivityCache(Cache):
         if os.path.exists(file_name):
             experiments = json_utilities.read(file_name)
         else:
-            experiments = self.api.experiment_source_search(injection_structures='root')            
+            experiments = self.api.experiment_source_search(injection_structures='root')
+            
+            # removing these elements because they are specific to a particular resolution
+            for e in experiments:
+                del e['num-voxels']
+                del e['injection-volume']
+                del e['sum']
+                del e['name']
 
             if self.cache:
                 self.safe_mkdir(os.path.dirname(file_name))
