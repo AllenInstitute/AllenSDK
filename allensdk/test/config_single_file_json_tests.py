@@ -1,5 +1,4 @@
-import unittest, os
-import mock
+import unittest
 from mock import MagicMock
 from allensdk.model.biophys_sim.config import Config
 from allensdk.core.json_utilities import JsonComments
@@ -39,22 +38,3 @@ class ConfigSingleFileJsonTests(unittest.TestCase):
     def testManifestInReservedData(self):
         config = Config().load('config.json', False)
         self.assertTrue('manifest' in config.reserved_data[0])  # huh, why [0]?
-    
-    real_abspath = os.path.abspath
-    
-    @mock.patch('allensdk.config.model.manifest.os.path')
-    def testGetPathBasedir(self, mock_os_path):
-        
-        def my_abspath(p):
-            if p == 'MOCK_DOT':
-                return '/down/this/road'
-            else:
-                r = ConfigSingleFileJsonTests.real_abspath(p)
-                print(r)
-                return r
-            
-        mock_os_path.abspath = MagicMock(side_effect=my_abspath)
-        config = Config().load('config.json', False)
-        basedir = config.manifest.get_path('BASEDIR')
-        mock_os_path.abspath.assert_called_with('MOCK_DOT')
-        self.assertEqual('/down/this/road', basedir)
