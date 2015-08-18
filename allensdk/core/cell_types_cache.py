@@ -53,6 +53,7 @@ class CellTypesCache(Cache):
     CELLS_KEY = 'CELLS'
     EPHYS_FEATURES_KEY = 'EPHYS_FEATURES'
     EPHYS_DATA_KEY = 'EPHYS_DATA'
+    EPHYS_SWEEPS_KEY = 'EPHYS_SWEEPS'
     RECONSTRUCTION_KEY = 'RECONSTRUCTION'
     
     def __init__(self, cache=True, manifest_file='manifest.json'):
@@ -77,7 +78,7 @@ class CellTypesCache(Cache):
             Filter out cells that have no morphological images.
 
         require_reconstruction: boolean
-            Filter out cells that hve no morphological reconstructions.
+            Filter out cells that have no morphological reconstructions.
         """
 
         file_name = self.get_cache_path(file_name, self.CELLS_KEY)
@@ -92,6 +93,30 @@ class CellTypesCache(Cache):
 
         # filter the cells on the way out
         return self.api.filter_cells(cells, require_morphology, require_reconstruction)
+    
+
+    def get_ephys_sweeps(self, specimen_id, file_name=None):
+        """
+        Download sweep metadata for a single cell specimen.  
+
+        Parameters
+        ----------
+        
+        specimen_id: int
+             ID of a cell.
+        """
+
+        file_name = self.get_cache_path(file_name, self.EPHYS_SWEEPS_KEY, specimen_id)
+        
+        if os.path.exists(file_name):
+            sweeps = json_utilities.read(file_name)
+        else:
+            sweeps = self.api.get_ephys_sweeps(specimen_id)
+
+            if self.cache:
+                json_utilities.write(file_name, sweeps)
+
+        return sweeps
 
 
     def get_ephys_features(self, dataframe=False, file_name=None):
@@ -211,6 +236,8 @@ class CellTypesCache(Cache):
         mb.add_path(self.EPHYS_DATA_KEY, 'specimen_%d/ephys.nwb', typename='file', parent_key='BASEDIR')
         mb.add_path(self.EPHYS_FEATURES_KEY, 'ephys_features.csv', typename='file', parent_key='BASEDIR')
         mb.add_path(self.RECONSTRUCTION_KEY, 'specimen_%d/reconstruction.swc', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.EPHYS_SWEEPS_KEY, 'specimen_%d/ephys_sweeps.json', typename='file', parent_key='BASEDIR')
+
 
         mb.write_json_file(file_name)
 

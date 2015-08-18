@@ -25,7 +25,7 @@ class CellTypesApi(RmaApi):
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
 
-
+        
     def list_cells(self, require_morphology=False, require_reconstruction=False):
         ''' Query the API for a list of all cells in the Cell Types Database.
 
@@ -42,8 +42,6 @@ class CellTypesApi(RmaApi):
         list
             Meta data for all cells.
         '''
-
-        
 
         criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
         
@@ -67,7 +65,43 @@ class CellTypesApi(RmaApi):
         return self.filter_cells(cells, require_morphology, require_reconstruction)
 
 
+    def get_ephys_sweeps(self, specimen_id):
+        '''
+        Query the API for a list of sweeps for a particular cell in the Cell Types Database.
+
+        Parameters
+        ----------
+
+        specimen_id: int
+            Specimen ID of a cell.
+
+        Returns
+        -------
+        list: List of sweep dictionaries belonging to a cell
+        '''
+        criteria = "[specimen_id$eq%d]" % specimen_id
+        
+        return self.model_query('EphysSweep', criteria=criteria, num_rows='all')
+
+
     def filter_cells(self, cells, require_morphology, require_reconstruction):
+        ''' 
+        Filter a list of cell specimens to those that optionally have morphologies
+        or have morphological reconstructions.
+
+        Parameters
+        ----------
+
+        cells: list
+            List of cell metadata dictionaries to be filtered
+
+        require_morphology: boolean
+            Filter out cells that have no morphological images.
+
+        require_reconstruction: boolean
+            Filter out cells that have no morphological reconstructions.
+        '''
+
         if require_morphology:
             cells = [ c for c in cells if c['has_morphology'] ]
 
@@ -78,6 +112,17 @@ class CellTypesApi(RmaApi):
         
 
     def get_ephys_features(self, dataframe=False):
+        '''
+        Query the API for the full table of EphysFeatures for all cells.  
+
+        Parameters
+        ----------
+        
+        dataframe: boolean
+            If true, return the results as a Pandas DataFrame.  Otherwise
+            return a list of dictionaries.
+        '''
+
         features = self.model_query('EphysFeature', num_rows='all')
 
         if dataframe:

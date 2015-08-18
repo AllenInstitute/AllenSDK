@@ -22,6 +22,7 @@ for one of those cells:
 
 .. literalinclude:: examples/cell_types_ex1.py
     
+
 Cell Types Cache
 ----------------
 
@@ -32,6 +33,17 @@ them from disk instead of downloading them again.  The following example demonst
 all cells with 3D reconstructions:
 
 .. literalinclude:: examples/cell_types_ex2.py    
+
+
+Feature Extraction
+------------------
+
+The :py:class:`~allensdk.ephys.feature_extraction.EphysFeatureExtractor` class calculates electrophysiology
+features from cell recordings.  :py:func:`~allensdk.ephys.extract_cell_features.extract_cell_features` can
+be used to extract the precise feature values available in the Cell Types Database:
+
+.. literalinclude:: examples/cell_types_ex3.py
+
 
 File Formats
 ------------
@@ -69,7 +81,7 @@ Type Description
 
 The Allen SDK comes with a :py:mod:`~allensdk.core.swc` Python module that provides helper functions and classes for manipulating SWC files.  Consider the following example:
 
-.. literalinclude:: examples/cell_types_ex3.py    
+.. literalinclude:: examples/cell_types_ex4.py    
 
 Neurodata Without Borders
 +++++++++++++++++++++++++
@@ -93,7 +105,7 @@ several experimental trials, here called "sweeps."  The following code snippet
 demonstrates how to extract a sweep's stimulus, response, sampling rate, 
 and estimated spike times:
 
-.. literalinclude:: examples/cell_types_ex4.py
+.. literalinclude:: examples/cell_types_ex5.py
 
 HDF5 Overview
 +++++++++++++
