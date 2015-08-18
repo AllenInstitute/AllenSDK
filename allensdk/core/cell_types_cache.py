@@ -16,7 +16,7 @@
 import os
 import pandas as pd
 
-from allensdk.config.model.manifest_builder import ManifestBuilder
+from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.cache import Cache
 from allensdk.api.queries.cell_types_api import CellTypesApi
 

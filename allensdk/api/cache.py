@@ -2,7 +2,7 @@
 import os
 from allensdk.core import json_utilities as ju
 import pandas as pd
-from allensdk.config.model.manifest import Manifest
+from allensdk.config.manifest import Manifest
 
 
 class Cache(object):

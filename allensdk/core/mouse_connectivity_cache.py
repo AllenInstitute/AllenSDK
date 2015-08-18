@@ -14,7 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.cache import Cache
-from allensdk.config.model.manifest_builder import ManifestBuilder
+from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.api.queries.ontologies_api import OntologiesApi
 
