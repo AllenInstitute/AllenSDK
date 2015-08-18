@@ -14,17 +14,14 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.queries.rma_api import RmaApi
-from allensdk.api.cache import Cache
-import pandas as pd
 
-class OntologiesApi(RmaApi, Cache):
+class OntologiesApi(RmaApi):
     '''
     See: `Atlas Drawings and Ontologies <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_
     '''
     
-    def __init__(self, base_uri=None, cache=False):
+    def __init__(self, base_uri=None):
         super(OntologiesApi, self).__init__(base_uri)
-        Cache.__init__(self, cache=cache)
     
     
     def get_atlases_table(self, atlas_id=None, brief=True, fmt='json'):
@@ -94,20 +91,6 @@ class OntologiesApi(RmaApi, Cache):
         return data
     
 
-    def cache_structures(self,
-                         path,
-                         *args,
-                         **kwargs):
-        if self.cache == True:
-            # fetch all structures from graph_id = 1
-            data = self.get_structures(*args, **kwargs)
-            structures = pd.DataFrame(data)
-            structures.set_index(['id'], inplace=True)                            
- 
-        all_structures = pd.DataFrame.from_csv(path)
-                 
-        return all_structures
-    
     def get_structures(self,
                        structure_graph_ids=None,
                        structure_graph_names=None,                    
