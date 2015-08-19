@@ -15,11 +15,7 @@
 
 from allensdk.api.queries.rma_api import RmaApi
 from allensdk.api.queries.grid_data_api import GridDataApi
-from allensdk.api.queries.connected_services import ConnectedServices
 
-import allensdk.core.json_utilities as ju
-import pandas as pd
-import pandas.io.json as pj
 import os, nrrd
 
 

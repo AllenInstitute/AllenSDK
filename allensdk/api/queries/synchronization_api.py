@@ -335,29 +335,3 @@ class SynchronizationApi(Api):
                                   structure_ids)
         
         return sync_data
-
-
-
-if __name__ == '__main__':
-    # queries from http://help.brain-map.org/display/api/Image-to-Image+Synchronization
-    import json
-    
-    a = SynchronizationApi()
-    print(json.dumps(a.get_image_to_atlas(68173101, 6208, 2368, 1),
-                     indent=2))
-    print(json.dumps(a.get_image_to_image_2d(68173101,
-                                             6208, 2368,
-                                             [68173103, 68173105, 68173107]),
-                     indent=2))
-    print(json.dumps(a.get_reference_to_image(10,
-                                              6085, 3670, 4883,
-                                             [68545324, 67810540]),
-                     indent=2))
-    print(json.dumps(a.get_image_to_reference(68173101,
-                                              6208, 2368),
-                     indent=2))
-    print(json.dumps(a.get_structure_to_image(68545324,
-                                              [315,698,1089,703,477,803,512,549,1097,313,771,354]),
-                     indent=2))
-    
-

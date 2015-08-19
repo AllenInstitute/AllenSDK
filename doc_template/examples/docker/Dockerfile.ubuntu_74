@@ -38,6 +38,7 @@ RUN apt-get -yq install \
 # upgrade cython and h5py
 RUN pip install cython h5py
 RUN pip install sphinx numpydoc
+RUN pip install pandas
 
 #neuron installation
 RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/nrn-7.4.tar.gz
@@ -51,8 +52,5 @@ RUN echo 'export PATH=$PATH:/opt/neuron/iv/x86_64/bin:/opt/neuron/nrn/x86_64/bin
 RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
 
 RUN pip install ipython[notebook] --upgrade
-
-RUN apt-get -yq install graphviz libgraphviz-dev pkg-config
-RUN pip install pygraphviz networkx 
 
 RUN pip install |tgz_url|

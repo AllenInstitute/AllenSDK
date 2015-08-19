@@ -13,12 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
-import pandas as pd
-
 from allensdk.api.queries.rma_api import RmaApi
-import allensdk.core.json_utilities as json_utilities
+import pandas as pd
+import os
 
 class CellTypesApi(RmaApi):
 
@@ -147,7 +144,7 @@ class CellTypesApi(RmaApi):
 
         try:
             file_url = results[0]['ephys_result']['well_known_files'][0]['download_link']
-        except Exception, e:
+        except Exception, _:
             raise Exception("Specimen %d has no ephys data" % specimen_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)

@@ -1,4 +1,4 @@
-from allensdk.api.queries.annotated_section_data_sets.annotated_section_data_sets_api import \
+from allensdk.api.queries.annotated_section_data_sets_api import \
     AnnotatedSectionDataSetsApi
 
 import unittest, json

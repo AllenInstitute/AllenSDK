@@ -1,8 +1,8 @@
-#from allensdk.api.queries.structure.ontologies_api import OntologiesApi
-import os
 from allensdk.core import json_utilities as ju
-import pandas as pd
 from allensdk.config.manifest import Manifest
+import pandas as pd
+import pandas.io.json as pj
+import os
 
 
 class Cache(object):
@@ -55,8 +55,37 @@ class Cache(object):
         data = pd.DataFrame.from_csv(path)            
 
         return data
-        
 
-if __name__ == '__main__':
-    c = Cache()
-    c.load_manifest('manifest.json')
+    @classmethod
+    def wrap(self, fn, path, cache,
+             save_as_json=False,
+             index=None,
+             rename=None,
+             **kwargs):
+        if cache == True:
+            json_data = fn(**kwargs)
+            
+            if save_as_json == True:
+                ju.write(path, json_data)
+            else:            
+                df = pd.DataFrame(json_data)
+                
+                if rename is not None:
+                    for rename_entry in rename:
+                        (new_name, old_name) = rename_entry
+                        df.columns = [new_name if c == old_name else c
+                                      for c in df.columns]                    
+                
+                if index is not None:        
+                    df.set_index([index], inplace=True)
+        
+                df.to_csv(path)            
+    
+        # read it back in
+        if save_as_json == True:
+            df = pj.read_json(path, orient='records')
+            df.set_index([index], inplace=True)
+        else:
+            df = pd.DataFrame.from_csv(path)
+        
+        return df

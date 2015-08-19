@@ -466,25 +466,3 @@ class ImageDownloadApi(RmaApi):
         
         return self.json_msg_query(
             rma.build_query_url(stages))
-
-
-if __name__ == '__main__':
-    import json
-    # queries from http://help.brain-map.org/display/api/Downloading+an+Image#DownloadinganImage-ProjectionImage%26nbsp%3BDownloadService
-    
-    a = ImageDownloadApi()
-    print json.dumps(a.atlas_image_query(138322605), indent=2)    
-    #a.download_section_image(69750516, downsample=4)
-    #a.download_section_image(69750516, downsample=4, expression=True)
-    #a.download_section_image(69750516, left=6174, top=2282, width=1000, height=1000)
-    #a.download_section_image(69750516, downsample=3, quality=50)
-    # TODO: http://api.brain-map.org/api/v2/data/SectionDataSet/100141599.xml?include=equalization,section_images
-    #a.download_section_image(102146167, range=[0, 923, 0, 987, 0, 4095], downsample=4)
-    #a.download_section_image(311175878, downsample=4, tumor_feature_annotation=True)
-    #a.download_section_image(311174547, downsample=4, tumor_feature_boundary=True)
-    #a.download_section_image(71592412)
-    #print(a.build_atlas_image_url(100883869, downsample=4, annotation=True))
-    print(a.build_atlas_image_url(100883869, downsample=4, annotation=True, atlas=2))
-    
-    
-
