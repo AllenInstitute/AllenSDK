@@ -15,7 +15,7 @@
 
 from allensdk.api.queries.rma_api import RmaApi
 from allensdk.api.queries.grid_data_api import GridDataApi
-
+import numpy as np
 import os, nrrd
 
 
@@ -556,7 +556,8 @@ class MouseConnectivityApi(RmaApi):
 
     def calculate_injection_centroid(self,
                                      injection_density,
-                                     injection_fraction):
+                                     injection_fraction,
+                                     resolution=25):
         '''
         Compute the centroid of an injection site.
         
@@ -580,7 +581,7 @@ class MouseConnectivityApi(RmaApi):
         # compute centroid in CCF coordinates
         if sum_density > 0 :
             centroid = np.dot(injection_density_computed,
-                              zip(*injection_voxels)) / sum_density * self.resolution
+                              zip(*injection_voxels)) / sum_density * resolution
         else:
             centroid = None
         

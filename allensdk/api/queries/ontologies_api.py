@@ -24,65 +24,6 @@ class OntologiesApi(RmaApi):
         super(OntologiesApi, self).__init__(base_uri)
     
     
-    def get_atlases_table(self, atlas_id=None, brief=True, fmt='json'):
-        '''List Atlases available through the API
-        with associated ontologies and structure graphs.
-        
-        Parameters
-        ----------
-        atlas_id : integer, optional
-        brief : boolean, optional
-            True (default) requests only name and id fields.
-        fmt : string, optional
-            json (default) or xml
-        
-        Returns
-        -------
-        url : string
-            The constructed URL
-        
-        Notes
-        -----
-        This query is based on the
-        `table of available Atlases <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_.
-        See also: `Class: Atlas <http://api.brain-map.org/doc/Atlas.html>`_
-        '''
-        associations = []
-        
-        if atlas_id != None:
-            associations.append('[id$eq%d],' % (atlas_id))
-        
-        associations.extend(['structure_graph(ontology),',
-                             'graphic_group_labels'])
-        
-        associations_string = ''.join(associations)
-        
-        if brief == True:
-            only_fields = ['atlases.id',
-                           'atlases.name',
-                           'atlases.image_type',
-                           'ontologies.id',
-                           'ontologies.name',
-                           'structure_graphs.id',
-                           'structure_graphs.name',
-                           'graphic_group_labels.id',
-                           'graphic_group_labels.name']
-            
-            only_string = self.quote_string(','.join(only_fields))
-        
-            atlas_data = self.model_query('Atlas',
-                                          include=[associations_string],
-                                          criteria=[associations_string],
-                                          only=[only_string])
-        
-        else:
-            atlas_data = self.model_stage('Atlas',
-                                          include=[associations_string],
-                                          criteria=[associations_string])
-        
-        return atlas_data    
-    
-    
     def get_ontology(self, structure_graph_id):
         '''Retrieve.'''
         data = self.do_query(self.build_query,
@@ -141,3 +82,62 @@ class OntologiesApi(RmaApi):
             [n for n in ancestors_n] for ancestors_n in ancestors
         ]
         structure_dataframe['structure_set_ancestor'] = structure_ancestors
+
+
+    def get_atlases_table(self, atlas_id=None, brief=True, fmt='json'):
+        '''List Atlases available through the API
+        with associated ontologies and structure graphs.
+        
+        Parameters
+        ----------
+        atlas_id : integer, optional
+        brief : boolean, optional
+            True (default) requests only name and id fields.
+        fmt : string, optional
+            json (default) or xml
+        
+        Returns
+        -------
+        url : string
+            The constructed URL
+        
+        Notes
+        -----
+        This query is based on the
+        `table of available Atlases <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_.
+        See also: `Class: Atlas <http://api.brain-map.org/doc/Atlas.html>`_
+        '''
+        associations = []
+        
+        if atlas_id != None:
+            associations.append('[id$eq%d],' % (atlas_id))
+        
+        associations.extend(['structure_graph(ontology),',
+                             'graphic_group_labels'])
+        
+        associations_string = ''.join(associations)
+        
+        if brief == True:
+            only_fields = ['atlases.id',
+                           'atlases.name',
+                           'atlases.image_type',
+                           'ontologies.id',
+                           'ontologies.name',
+                           'structure_graphs.id',
+                           'structure_graphs.name',
+                           'graphic_group_labels.id',
+                           'graphic_group_labels.name']
+            
+            only_string = self.quote_string(','.join(only_fields))
+        
+            atlas_data = self.model_query('Atlas',
+                                          include=[associations_string],
+                                          criteria=[associations_string],
+                                          only=[only_string])
+        
+        else:
+            atlas_data = self.model_query('Atlas',
+                                          include=[associations_string],
+                                          criteria=[associations_string])
+        
+        return atlas_data    

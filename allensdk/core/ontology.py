@@ -26,7 +26,7 @@ class Ontology( object ):
         child_ids = defaultdict(set)
         descendant_ids = defaultdict(set)
 
-        for i,s in df.iterrows():
+        for _,s in df.iterrows():
             parent_id = s['parent_structure_id']
             if np.isfinite(parent_id):
                 parent_id = int(parent_id)
@@ -136,17 +136,3 @@ class Ontology( object ):
             return child['structure_id_path'].find(parent_str) >= 0
         
         return False
-
-
-    @staticmethod
-    def from_csv(csv_file):
-        df = pd.DataFrame.from_csv(csv_file)
-        df.set_index(['id'], inplace=True, drop=False)
-        return Ontology(df)
-
-    @staticmethod
-    def from_json(json_file):
-        structures = json_utilities.read(json_file)
-        df = pd.DataFrame(structures)
-        df.set_index(['id'], inplace=True, drop=False)
-        return Ontology(df)

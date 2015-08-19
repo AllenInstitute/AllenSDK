@@ -1,3 +1,18 @@
+# Copyright 2015 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 from allensdk.core import json_utilities as ju
 from allensdk.config.manifest import Manifest
 import pandas as pd
@@ -49,12 +64,46 @@ class Cache(object):
     def manifest_dataframe(self):
         return pd.DataFrame.from_dict(self.manifest.path_info,
                                       orient='index')
-        
-    def load_csv(self, path):
+
+    def rename_columns(self,
+                       data,
+                       new_old_name_tuples=None):
+        if new_old_name_tuples == None:
+            new_old_name_tuples = []
+            
+        for new_name, old_name in new_old_name_tuples:
+            data.columns = [new_name if c == old_name else c
+                            for c in data.columns]                    
+    
+    
+    def load_csv(self,
+                 path,
+                 rename=None,
+                 index=None):
         # depend on external code to write this, just reload
-        data = pd.DataFrame.from_csv(path)            
+        data = pd.DataFrame.from_csv(path)
+
+        self.rename_columns(data, rename)
+
+        if index is not None:        
+            data.set_index([index], inplace=True)
 
         return data
+
+
+    def load_json(self,
+                  path,
+                  rename=None,
+                  index=None):
+        data = pj.read_json(path, orient='records')
+
+        self.rename_columns(data, rename)
+        
+        if index is not None:        
+            data.set_index([index], inplace=True)
+
+        return data
+    
 
     @classmethod
     def wrap(self, fn, path, cache,

@@ -1,4 +1,4 @@
-# Copyright 2014 Allen Institute for Brain Science
+# Copyright 2014-2015 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
