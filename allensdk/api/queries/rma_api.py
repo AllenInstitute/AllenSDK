@@ -47,6 +47,20 @@ class RmaApi(Api):
     def build_query_url(self,
                         stage_clauses,
                         fmt='json'):
+        '''Combine one or more RMA query stages into a single RMA query.
+        
+        Parameters
+        ----------
+        stage_clauses : list of strings
+            subqueries
+        fmt : string, optional
+            json (default), xml, or csv
+            
+        Returns
+        -------
+        string
+            complete RMA url
+        '''
         if not type(stage_clauses) is list:
             stage_clauses = [stage_clauses]
         
@@ -156,13 +170,27 @@ class RmaApi(Api):
 
 
     def model_query(self, *args, **kwargs):
-        '''
+        '''Build an execute a common-case RMA model query.
+        
         Parameters
         ----------
         model : string
-        filters :
-        criteria :
-        include :
+            name of the top-level class to be queried.
+        filters : dict
+            key, value comparisons applied to the top-level model to narrow the results.
+        criteria : list of strings, optional
+            nested associations and filters to determine the set of top-level result objects.
+        include : list of strings, optional
+            nested associations and filters to be included in the response data.
+
+        Notes
+        -----
+        See `RMA Path Syntax <http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-DoubleColonforAxis>`_
+        for a brief overview of the normalized RMA syntax.
+        Normalized RMA syntax differs from the legacy syntax
+        used in much of the RMA documentation.
+        Using the &debug=true option with an RMA URL will include debugging information in the
+        response, including the normalized query.
         '''
         return self.json_msg_query(
             self.build_query_url(
@@ -170,6 +198,22 @@ class RmaApi(Api):
     
     
     def service_query(self, *args, **kwargs):
+        '''Construct and Execute a single-stage RMA query
+        to send a request to a connected service.
+        
+        Parameters
+        ----------
+        service_name : string
+            Name of a documented connected service.
+        parameters : dict
+            key-value pairs as in the online documentation.
+        
+        Notes
+        -----
+        See: `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_ 
+        and
+        `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
+        '''        
         return self.json_msg_query(
             self.build_query_url(
                 self.service_stage(*args, **kwargs)))
@@ -355,6 +399,18 @@ class RmaApi(Api):
     
     # TODO: deprecate for something that can preserve order
     def filters(self, filters):
+        '''serialize RMA query filter clauses.
+        
+        Parameters
+        ----------
+        filters : dict
+            keys and values for narrowing a query.
+        
+        Returns
+        -------
+        string
+            filter clause for an RMA query string.
+        '''
         filters_builder = []
         
         for (key, value) in filters.items():
@@ -410,6 +466,20 @@ class RmaApi(Api):
     
     
     def filter(self, key, value):
+        '''serialize a single RMA query filter clause.
+        
+        Parameters
+        ----------
+        key : string
+            keys for narrowing a query.
+        value : string
+            value for narrowing a query.
+        
+        Returns
+        -------
+        string
+            a single filter clause for an RMA query string.
+        '''        
         return "".join(['[',
                         key,
                         RmaApi.EQ,

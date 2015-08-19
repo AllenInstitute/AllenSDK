@@ -43,7 +43,7 @@ class Cache(object):
             
 
     def get_cache_path(self, file_name, manifest_key, *args):
-        '''
+        '''Helper method for accessing path specs from manifest keys.
         
         Parameters
         ----------
