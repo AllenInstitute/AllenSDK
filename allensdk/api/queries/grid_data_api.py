@@ -130,21 +130,3 @@ class GridDataApi(RmaApi):
         self.retrieve_file_over_http(url, save_file_path)
     
     
-    def calculate_centroid(self,
-                           injection_density,                           
-                           injection_fraction):
-        # find all voxels with injection_fraction > 0
-        injection_voxels = np.nonzero(injection_fraction)
-        injection_density_computed = np.multiply(injection_density[injection_voxels],
-                                                 injection_fraction[injection_voxels]) 
-        sum_density = np.sum(injection_density_computed)
-    
-        # compute centroid in CCF coordinates
-        if sum_density > 0 :
-            centroid = np.dot(injection_density_computed,
-                              zip(*injection_voxels)) / sum_density * self.resolution
-        else:
-            centroid = None
-        
-        return centroid
-

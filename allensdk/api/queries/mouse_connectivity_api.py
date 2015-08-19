@@ -552,3 +552,37 @@ class MouseConnectivityApi(RmaApi):
     def download_data_mask(self, path, experiment_id, resolution):
         return GridDataApi().download_projection_grid_data(
            experiment_id, [ GridDataApi.DATA_MASK ], resolution, path)
+
+
+    def calculate_injection_centroid(self,
+                                     injection_density,
+                                     injection_fraction):
+        '''
+        Compute the centroid of an injection site.
+        
+        Parameters
+        ----------
+        
+        injection_density: np.ndarray
+            The injection density volume of an experiment
+
+        injection_fraction: np.ndarray
+            The injection fraction volume of an experiment
+
+        '''
+
+        # find all voxels with injection_fraction > 0
+        injection_voxels = np.nonzero(injection_fraction)
+        injection_density_computed = np.multiply(injection_density[injection_voxels],
+                                                 injection_fraction[injection_voxels]) 
+        sum_density = np.sum(injection_density_computed)
+    
+        # compute centroid in CCF coordinates
+        if sum_density > 0 :
+            centroid = np.dot(injection_density_computed,
+                              zip(*injection_voxels)) / sum_density * self.resolution
+        else:
+            centroid = None
+        
+        return centroid
+
