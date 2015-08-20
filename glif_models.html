@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Generalized LIF Models &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>Generalized LIF Models &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" />
     <link rel="up" title="Models" href="models.html" />
     <link rel="next" title="Perisomatic Biophysical Models" href="biophysical_perisomatic_script.html" />
     <link rel="prev" title="Models" href="models.html" /> 
@@ -785,7 +785,7 @@ these <tt class="docutils literal"><span class="pre">NaN</span></tt> values gene
 <span class="c"># pull out the stimulus for the first sweep</span>
 <span class="n">ephys_sweep</span> <span class="o">=</span> <span class="n">ephys_sweeps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">ds</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">ephys_file_name</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_sweep</span><span class="p">(</span><span class="n">ephys_sweep</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">])</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_sweep</span><span class="p">(</span><span class="n">ephys_sweep</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">])</span> 
 <span class="n">stimulus</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">]</span>
 
 <span class="c"># initialize the neuron</span>
@@ -840,10 +840,10 @@ subsampled and filtered for parameter optimization.  Be sure to overwrite the ne
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span>  <span class="n">threshold</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;threshold&#39;</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="n">grid_spike_indices</span><span class="p">:</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">interpolated_spike_times</span><span class="p">,</span> <span class="n">interpolated_spike_voltages</span><span class="p">,</span> <span class="s">&#39;x&#39;</span><span class="p">,</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">interpolated_spike_times</span><span class="p">,</span> <span class="n">interpolated_spike_voltages</span><span class="p">,</span> <span class="s">&#39;x&#39;</span><span class="p">,</span> 
              <span class="n">label</span><span class="o">=</span><span class="s">&#39;interpolated spike&#39;</span><span class="p">)</span>
 
-    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">((</span><span class="n">grid_spike_indices</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">voltage</span><span class="p">[</span><span class="n">grid_spike_indices</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39;.&#39;</span><span class="p">,</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">((</span><span class="n">grid_spike_indices</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">voltage</span><span class="p">[</span><span class="n">grid_spike_indices</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s">&#39;.&#39;</span><span class="p">,</span> 
              <span class="n">label</span><span class="o">=</span><span class="s">&#39;last step before spike&#39;</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&#39;time (s)&#39;</span><span class="p">)</span>
@@ -976,7 +976,7 @@ simulation; and three rules for updating those values when a spike is detected
 </table>
 <p>The GLIF neuron configuration files available from the Allen Brain Atlas API use built-in
 methods, however you can supply your own custom method if you like:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># define your own custom voltage reset rule</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># define your own custom voltage reset rule </span>
 <span class="c"># this one linearly scales the input voltage</span>
 <span class="k">def</span> <span class="nf">custom_voltage_reset_rule</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">custom_param_a</span><span class="p">,</span> <span class="n">custom_param_b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">custom_param_a</span> <span class="o">*</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="n">custom_param_b</span>
@@ -986,7 +986,7 @@ methods, however you can supply your own custom method if you like:</p>
 <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
 <span class="c"># configure a new method and overwrite the neuron&#39;s old method</span>
-<span class="n">method</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">configure_method</span><span class="p">(</span><span class="s">&#39;custom&#39;</span><span class="p">,</span> <span class="n">custom_voltage_reset_rule</span><span class="p">,</span>
+<span class="n">method</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">configure_method</span><span class="p">(</span><span class="s">&#39;custom&#39;</span><span class="p">,</span> <span class="n">custom_voltage_reset_rule</span><span class="p">,</span> 
                                  <span class="p">{</span> <span class="s">&#39;custom_param_a&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s">&#39;custom_param_b&#39;</span><span class="p">:</span> <span class="mf">0.0</span> <span class="p">})</span>
 <span class="n">neuron</span><span class="o">.</span><span class="n">voltage_reset_method</span> <span class="o">=</span> <span class="n">method</span>
 
@@ -1071,6 +1071,7 @@ class.  They all return an updated afterspike current array.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -1083,7 +1084,9 @@ class.  They all return an updated afterspike current array.</p>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

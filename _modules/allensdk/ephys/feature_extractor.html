@@ -1,0 +1,1361 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.ephys.feature_extractor &mdash; Allen SDK 0.10.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.10.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<style>
+
+	/* the icon font-family definition and helper classes */
+	@font-face {
+	  font-family: 'portal_icon_font';
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  font-weight: normal;
+	  font-style: normal;
+	}
+	 
+	 [class^="icon-"]:before, [class*=" icon-"]:before {
+	  font-family: "portal_icon_font";
+	  font-style: normal;
+	  font-weight: normal;
+	  speak: none;
+	 
+	  display: inline-block;
+	  text-decoration: inherit;
+	  width: 1em;
+	  margin-right: .2em;
+	  text-align: center;
+	  /* opacity: .8; */
+	 
+	  /* For safety - reset parent styles, that can break glyph codes*/
+	  font-variant: normal;
+	  text-transform: none;
+	     
+	  /* fix buttons height, for twitter bootstrap */
+	  line-height: 1em;
+	 
+	  /* Animation center compensation - margins should be symmetric */
+	  /* remove if not needed */
+	  margin-left: .2em;
+	
+	}
+	 
+	.icon-spin5:before { content: '\e806'; } /* '' */
+	.icon-left-open-1:before { content: '\e81e'; } /* '' */
+	.icon-plus-1:before { content: '\e801'; } /* '' */
+	.icon-facebook:before { content: '\e816'; } /* '' */
+	.icon-gplus:before { content: '\e818'; } /* '' */
+	.icon-linkedin-3:before { content: '\e815'; } /* '' */
+	.icon-twitter:before { content: '\e817'; } /* '' */
+	.icon-youtube-play:before { content: '\e805'; } /* '' */
+	.icon-plus-2:before { content: '\e809'; } /* '' */
+	.icon-record-1:before { content: '\e81c'; } /* '' */
+	.icon-cancel:before { content: '\e80b'; } /* '' */
+	.icon-search:before { content: '\e804'; } /* '' */
+	.icon-cancel-2:before { content: '\e80c'; } /* '' */
+	.icon-plus-4:before { content: '\e80d'; } /* '' */
+	.icon-cancel-3:before { content: '\e80e'; } /* '' */
+	.icon-plus:before { content: '\e808'; } /* '' */
+	.icon-down-open:before { content: '\e800'; } /* '' */
+	.icon-right-open:before { content: '\e802'; } /* '' */
+	.icon-up-open:before { content: '\e803'; } /* '' */
+	.icon-stop:before { content: '\e813'; } /* '' */
+	.icon-cancel-1:before { content: '\e820'; } /* '' */
+	.icon-plus-3:before { content: '\e80a'; } /* '' */
+	/* end icon font helpers */
+
+	/* icon font spin animation */
+	.animate-spin {
+	  -moz-animation: spin 2s infinite linear;
+	  -o-animation: spin 2s infinite linear;
+	  -webkit-animation: spin 2s infinite linear;
+	  animation: spin 2s infinite linear;
+	  display: inline-block;
+	}
+	@-moz-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-webkit-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-o-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-ms-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	/*  end spin animation */	
+
+	@font-face {
+	    font-family: 'bebas_neueregular';
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	/* top chrome styles */
+	#top_chrome {
+
+		width:100%;
+		height:28px;
+		background-color:#163E65;
+	}
+
+	.chrome_link_block {
+
+		color:#fff !important;	
+		display:inline-block;
+		height:100%;
+		max-height:28px;
+	}
+
+	.chrome_link_block:hover {
+
+		background-color:#eee;
+		color:#0779BE !important;	
+		cursor:pointer;
+	}
+
+	#top_chrome a {
+
+		color:inherit !important;	
+		text-decoration:none;
+	}
+
+	#top_chrome a:hover {
+
+		color:inherit !important;	
+	}
+
+	#top_chrome_buttons {
+
+		float:right;
+		margin-right:50px;
+	}
+
+	.chrome_button {
+
+		font-family:arial,sans-serif;
+		font-weight:bold;
+		display:inline-block;
+		font-size:9px;
+		text-align:left;
+		text-decoration:none;
+		margin:9px 20px 10px 20px;
+	}
+
+	.chrome_active {
+
+		background-color:#1b7abd;
+		color:#fff;
+	}
+
+
+	/* header element styles*/
+	#header_content {
+
+		font-family: bebas_neueregular, arial, sans-serif;
+		font-size:22px;
+		color:#0779be;		
+		letter-spacing:0.03em;
+
+		position:relative;
+		width:calc(100% - 112px);
+		min-width:800px;
+		height:76px;
+		border-bottom:2px solid #A5A8AB;
+		margin-left:50px;
+		margin-right:50px;
+        z-index:9999; /* IT-9508 */
+	}
+
+	#portal_logo {
+
+		position:absolute;
+		top:20px;
+		left:0px;
+		width:236px;
+	}
+
+	#portal_tabs {
+
+		position: absolute;
+		bottom: 12px;
+		left: 0px;
+		margin-bottom: -12px;
+		display: block;
+	}
+
+	.horizontal_list
+	{
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		display: inline; 		
+	}
+
+	.horizontal_list li { 
+
+		display: inline; 	
+	}	
+
+	#portal_tab_menu_container {
+
+		display:none;
+	}
+
+	#portal_search_input_group {
+
+		position:absolute;
+		margin: 0;
+		padding: 0;
+		bottom:12px;
+		right:0px;
+		border:1px solid #DAD9D3;
+		color:#DAD9D3;
+	}
+
+	#portal_search_input_group input {
+
+		margin: 0;
+		padding: 0;
+		border:none;
+		width:110px;
+		color:#DAD9D3;
+		font-family:Helvetica,sans-serif;
+		font-size:12px;
+		height:28px;
+		margin-left:10px;
+
+		outline:none;
+	}
+
+	input::-ms-clear {
+		display: none;
+	}
+
+	#portal_search_input_group i {
+
+		font-size:0.8em;
+		cursor:pointer;
+	}
+
+	#pSiteSearchTextInput:focus {
+
+		color:#000;
+	}
+
+	.icon_menu_down {
+
+		font-size: 12px;
+		margin-left: 4px;
+		vertical-align: text-top;
+		padding-top: 4px;
+		display: inline-block;
+	}
+
+	.portal_tab_item {
+
+		background-color: #fff;
+		padding: 12px;
+		padding-left:20px;
+		padding-right:20px;
+		display: inline-block !important;		
+	}
+
+	.portal_tab_item a:hover {
+
+		color:#fbe300;	
+	}
+
+	.portal_tab_item:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}	
+
+
+	.portal_menu_active {
+
+		background-color: #EEEEEE;
+	}	
+
+	.portal_menu_item_active {
+
+		color:#fbe300 !important;	
+	}
+
+	.portal_tab_active {
+
+		color:#a5a8ab !important;
+	}
+
+	#header_content a {		
+
+		color:inherit !important;
+	}
+
+	#header_content a:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}
+
+	#header_content ul {
+
+		list-style: none;
+		position: relative;
+		top: 58px;
+		display: inline-table;
+	}
+
+	#header_content ul ul {
+		
+		display:none;
+		opacity:0;
+	}
+
+	/* the fly out menus */
+	#header_content ul li:hover > ul,
+	#header_content ul li.hover > ul {
+
+		position: absolute;
+		top: 48px;
+		z-index:999;
+
+		display: block;
+		width: 152px;
+		padding:0px;
+		padding-top:20px;
+		padding-bottom:10px;
+		font-size: 12px;
+		font-family: Arial,Sans-Serif;
+		font-weight: bold;
+		text-transform: uppercase;
+
+		background-color: rgba(8,122,191,0.98);
+		color: #fff !important;
+		opacity: 1;
+
+		-webkit-animation: fade 0.25s;
+		animation: fade 0.25s;
+	}
+
+	@-webkit-keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}
+	@keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}	
+
+	#header_content ul li:hover > ul li {
+
+		padding: 10px;
+		padding-top: 0px;
+		padding-left: 20px;
+		display: block;
+		opacity:1;
+	}
+
+	#header_content ul li:hover > ul a {
+
+		display: block;
+		opacity:1;
+		white-space:nowrap;
+	}
+
+	#portal_menu_start_list {
+
+		left: 81px;
+
+		/* IE sauce */
+		left:85px\9;
+
+		/* Safari sauce */
+		(;left:79px;);
+	}
+
+	#portal_menu_atlases_list {
+
+		left: 290px;
+		width: 210px !important;
+        height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 303px\9;
+        height: 225px\9;
+
+		/* Safari sauce */
+		(;left:279px;);
+	}
+
+	#portal_menu_tools_list {
+
+		left: 500px;
+		width: 172px !important;
+		height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 513px\9;
+		height:225px\9;
+
+		/* Safari sauce */
+		(;left:489px;);
+		(;height:227px;);
+	}
+
+	/* mozilla sauce */
+	@-moz-document url-prefix() {
+
+		#header_content {
+
+			height:107px;
+		}
+
+		#portal_menu_start_list {
+
+			left:85px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 302px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 512px;
+			height:236px;
+		}
+	}
+
+
+	/* make it look OK on iPad also */
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}  
+	}
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}	  
+	}
+
+	.portal_menu_list_heading {
+
+		color:#9ccae5;
+		border-bottom:1px solid #9ccae5;
+		padding-bottom:5px !important;
+	}
+
+	.portal_menu_list_heading + li {
+
+		padding-top:10px !important;
+	}
+
+	.portal_menu_list_heading li {
+
+		padding-bottom:0px;
+	}	
+
+	#portal_menu_atlases_list li:last-of-type {
+
+		padding-bottom:15px !important;
+	}
+
+	.icon-spin5 {
+
+		color:#000;
+	}
+</style>
+<div id="pHeader">
+<div id="top_chrome">
+	<div id="top_chrome_buttons">
+		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
+		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
+	</div>
+</div>
+
+<div id="header_content">
+
+	<a href="http://AllenInstitute.github.io/AllenSDK">
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+	</a>
+</div>
+</div>
+
+<script>
+
+jQuery('#portal_tab_menu').bind('touchstart', function() {
+
+	if(window.console)
+		console.log("touchstart");
+});
+</script>
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for allensdk.ephys.feature_extractor</h1><div class="highlight"><pre>
+<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># This file is part of Allen SDK.</span>
+<span class="c">#</span>
+<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c"># it under the terms of the GNU General Public License as published by</span>
+<span class="c"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c">#</span>
+<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c"># GNU General Public License for more details.</span>
+<span class="c">#</span>
+<span class="c"># You should have received a copy of the GNU General Public License</span>
+<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="kn">as</span> <span class="nn">signal</span> 
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="c"># set of features</span>
+<div class="viewcode-block" id="EphysFeatures"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatures">[docs]</a><span class="k">class</span> <span class="nc">EphysFeatures</span><span class="p">(</span> <span class="nb">object</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c"># feature mean and standard deviations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c"># human-readable names for features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c"># table indicating how to score feature</span>
+        <span class="c">#    &#39;hit&#39;    feature exists:</span>
+        <span class="c">#        &#39;ignore&#39;        do nothing</span>
+        <span class="c">#        &#39;stdev&#39;            score is # stdevs from target mean</span>
+        <span class="c">#    &#39;miss&#39;    feature absent:</span>
+        <span class="c">#        &#39;constant&#39;        score = scoring[&#39;constant&#39;]</span>
+        <span class="c">#        &#39;mean_mult&#39;        score = mean * scoring[&#39;mean_mult&#39;]</span>
+        <span class="c"># </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+                <span class="c">################################################################</span>
+        <span class="c"># ignore scores</span>
+        <span class="n">ignore_score</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;hit&quot;</span><span class="p">:</span> <span class="s">&quot;ignore&quot;</span> <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;n_spikes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Number of spikes&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;n_spikes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_score</span>
+
+        <span class="c">################################################################</span>
+        <span class="c"># ignore misses</span>
+        <span class="n">ignore_miss</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;hit&quot;</span><span class="p">:</span><span class="s">&quot;stdev&quot;</span><span class="p">,</span> <span class="s">&quot;miss&quot;</span><span class="p">:</span><span class="s">&quot;const&quot;</span><span class="p">,</span> <span class="s">&quot;const&quot;</span><span class="p">:</span><span class="mi">0</span> <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;adapt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Adaptation index&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;adapt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_miss</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;latency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Time to first spike (ms)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;latency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_miss</span>
+
+        <span class="c">################################################################</span>
+        <span class="c"># base miss off mean</span>
+        <span class="n">mean_score</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;hit&quot;</span><span class="p">:</span><span class="s">&quot;stdev&quot;</span><span class="p">,</span> <span class="s">&quot;miss&quot;</span><span class="p">:</span><span class="s">&quot;mean_mult&quot;</span><span class="p">,</span> <span class="s">&quot;mean_mult&quot;</span><span class="p">:</span><span class="mi">2</span> <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;ISICV&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;ISI-CV&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;ISICV&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_score</span>
+
+        <span class="c">################################################################</span>
+        <span class="c"># normal scoring</span>
+        <span class="n">normal_score</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;hit&quot;</span><span class="p">:</span><span class="s">&quot;stdev&quot;</span><span class="p">,</span> <span class="s">&quot;miss&quot;</span><span class="p">:</span><span class="s">&quot;const&quot;</span><span class="p">,</span> <span class="s">&quot;const&quot;</span><span class="p">:</span><span class="mi">20</span> <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;isi_avg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Average ISI (ms)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;isi_avg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ignore_score</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;doublet&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Doublet ISI (ms)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;doublet&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_score</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;f_fast_ahp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Fast AHP (mV)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;f_fast_ahp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_score</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;f_slow_ahp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Slow AHP (mV)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;f_slow_ahp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_score</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;f_slow_ahp_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Slow AHP time&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;f_slow_ahp_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_score</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;base_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Baseline voltage (mV)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;base_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_score</span>
+        <span class="c">#self.glossary[&quot;base_v2&quot;] = &quot;Baseline voltage 2 (mV)&quot;</span>
+        <span class="c">#self.scoring[&quot;base_v2&quot;] = normal_score</span>
+        <span class="c">#self.glossary[&quot;base_v3&quot;] = &quot;Baseline voltage 3 (mV)&quot;</span>
+        <span class="c">#self.scoring[&quot;base_v3&quot;] = normal_score</span>
+        <span class="c">################################################################</span>
+        <span class="c"># per spike scoring</span>
+        <span class="n">perspike_score</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;hit&quot;</span><span class="p">:</span><span class="s">&quot;perspike&quot;</span><span class="p">,</span> <span class="s">&quot;miss&quot;</span><span class="p">:</span><span class="s">&quot;const&quot;</span><span class="p">,</span> <span class="s">&quot;const&quot;</span><span class="p">:</span><span class="mi">20</span><span class="p">,</span> <span class="s">&quot;skip_last_n&quot;</span><span class="p">:</span><span class="mi">0</span> <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;f_peak&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Spike height (mV)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;f_peak&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;f_trough&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Spike depth (mV)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;f_trough&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;f_trough&quot;</span><span class="p">][</span><span class="s">&quot;skip_last_n&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c"># self.glossary[&quot;f_w&quot;] = &quot;Spike width at -30 mV (ms)&quot;</span>
+        <span class="c"># self.scoring[&quot;f_w&quot;] = perspike_score.copy()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Peak upstroke (mV/ms)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;upstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Vm of peak upstroke (mV)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;upstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;downstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Peak downstroke (mV/ms)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;downstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;downstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Vm of peak downstroke (mV)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;downstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Threshold voltage (mV)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Spike width at half-max (ms)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;width&quot;</span><span class="p">][</span><span class="s">&quot;skip_last_n&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;thresh_ramp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Change in dv/dt over first 5 mV past threshold (mV/ms)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;thresh_ramp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+
+        <span class="c">################################################################</span>
+        <span class="c"># heavily penalize when there are no spikes</span>
+        <span class="n">spike_score</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;hit&quot;</span><span class="p">:</span><span class="s">&quot;stdev&quot;</span><span class="p">,</span> <span class="s">&quot;miss&quot;</span><span class="p">:</span><span class="s">&quot;const&quot;</span><span class="p">,</span> <span class="s">&quot;const&quot;</span><span class="p">:</span><span class="mi">250</span> <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Firing rate (Hz)&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spike_score</span>
+
+<div class="viewcode-block" id="EphysFeatures.print_out"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatures.print_out">[docs]</a>    <span class="k">def</span> <span class="nf">print_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Features from &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">:</span>
+                <span class="nb">str</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%30s</span><span class="s"> = &quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="nb">str</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">str</span> <span class="o">+=</span> <span class="s">&quot;--------&quot;</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="nb">str</span> <span class="o">+=</span> <span class="s">&quot; +/- </span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">print</span> <span class="nb">str</span>
+
+    <span class="c"># initialize summary feature set from file</span></div>
+<div class="viewcode-block" id="EphysFeatures.clone"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatures.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">param_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s">&quot;mean&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s">&quot;stdev&quot;</span><span class="p">]</span>
+</div></div>
+<div class="viewcode-block" id="EphysFeatureExtractor"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">EphysFeatureExtractor</span><span class="p">(</span> <span class="nb">object</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># list of feature set instances</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c"># names of each element in feature list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_source</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c"># feature set object representing combination of all instances</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="c"># adds new feature set instance to feature_list</span>
+<div class="viewcode-block" id="EphysFeatureExtractor.process_instance"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.process_instance">[docs]</a>    <span class="k">def</span> <span class="nf">process_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">curr</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">onset</span><span class="p">,</span> <span class="n">dur</span><span class="p">,</span> <span class="n">stim_name</span><span class="p">):</span>
+        <span class="n">feature</span> <span class="o">=</span> <span class="n">EphysFeatures</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c">################################################################</span>
+        <span class="c"># set stop time -- run until end of stimulus or end of sweep</span>
+        <span class="c"># comment-out the one of the two approaches</span>
+        <span class="c"># detect spikes only during stimulus</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">onset</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="n">onset</span> <span class="o">+</span> <span class="n">dur</span>
+        <span class="c"># detect spikes for all of sweep</span>
+        <span class="c">#start = 0</span>
+        <span class="c">#stop = t[-1]</span>
+        <span class="c">################################################################</span>
+        <span class="c"># pull out spike times</span>
+
+        <span class="c"># calculate the derivative only within target window</span>
+        <span class="c"># otherwise get spurious detection at ends of stimuli</span>
+        <span class="c"># filter with 10kHz cutoff if constant 200kHz sample rate (ie experimental trace)</span>
+        <span class="n">start_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">stop_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">stop</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">v_target</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:</span><span class="n">stop_idx</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">5e-6</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-7</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+            <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">bessel</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s">&quot;low&quot;</span><span class="p">)</span>
+            <span class="n">smooth_v</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">v_target</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">dv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">smooth_v</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">v_target</span><span class="p">)</span>
+        <span class="n">dvdt</span> <span class="o">=</span> <span class="n">dv</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:</span><span class="n">stop_idx</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span> <span class="c"># in mV/ms</span>
+
+        <span class="n">dv_cutoff</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="n">thresh_pct</span> <span class="o">=</span> <span class="mf">0.05</span>
+        <span class="n">spikes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">temp_spk_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">greater_equal</span><span class="p">(</span><span class="n">dvdt</span><span class="p">,</span> <span class="n">dv_cutoff</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c"># find positive-going crossings of 100 mV/ms</span>
+        <span class="n">spk_idxs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">temp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">temp_spk_idxs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">spk_idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">temp_spk_idxs</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="n">temp</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span> 
+                <span class="c"># check if the dvdt has gone back down below zero between presumed spike times</span>
+                <span class="c"># sometimes the dvdt bobbles around detection threshold and produces spurious guesses at spike times</span>
+                <span class="n">spk_idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+        <span class="n">spk_idxs</span> <span class="o">+=</span> <span class="n">start_idx</span> <span class="c"># set back to the &quot;index space&quot; of the original trace</span>
+
+        <span class="c"># recalculate full dv/dt for feature analysis (vs spike detection)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">5e-6</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-7</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">:</span>
+            <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">bessel</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s">&quot;low&quot;</span><span class="p">)</span>
+            <span class="n">smooth_v</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">dv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">smooth_v</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">dvdt</span> <span class="o">=</span> <span class="n">dv</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span> <span class="c"># in mV/ms</span>
+
+        <span class="c"># First time through, accumulate upstrokes to calculate average threshold target</span>
+        <span class="k">for</span> <span class="n">spk_n</span><span class="p">,</span> <span class="n">spk_idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spk_idxs</span><span class="p">):</span>
+            <span class="c"># Etay defines spike as time of threshold crossing</span>
+            <span class="n">spk</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">if</span> <span class="n">spk_n</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">spk_idxs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">next_idx</span> <span class="o">=</span> <span class="n">spk_idxs</span><span class="p">[</span><span class="n">spk_n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">next_idx</span> <span class="o">=</span> <span class="n">stop_idx</span>
+
+            <span class="k">if</span> <span class="n">spk_n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">prev_idx</span> <span class="o">=</span> <span class="n">spk_idxs</span><span class="p">[</span><span class="n">spk_n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prev_idx</span> <span class="o">=</span> <span class="n">start_idx</span>
+            
+            <span class="c"># Find the peak</span>
+            <span class="n">peak_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">spk_idx</span><span class="p">:</span><span class="n">next_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">spk_idx</span>
+
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;peak_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">peak_idx</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span>
+
+            <span class="c"># Check if end of stimulus interval cuts off spike - if so, don&#39;t process spike</span>
+            <span class="k">if</span> <span class="n">spk_n</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">spk_idxs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">peak_idx</span> <span class="o">==</span> <span class="n">next_idx</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">spk_idx</span> <span class="o">==</span> <span class="n">peak_idx</span><span class="p">:</span>
+                <span class="k">continue</span>    <span class="c"># this was bugfix, but why? ramp?</span>
+
+            <span class="c"># Determine maximum upstroke of spike</span>
+            <span class="n">upstroke_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">spk_idx</span><span class="p">:</span><span class="n">peak_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">spk_idx</span>
+
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]):</span> <span class="c"># sometimes dvdt will be NaN because of multiple cvode points at same time step</span>
+                <span class="n">close_idx</span> <span class="o">=</span> <span class="n">upstroke_idx</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">while</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">close_idx</span><span class="p">])):</span>
+                    <span class="n">close_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">close_idx</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">close_idx</span><span class="p">]</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">close_idx</span><span class="p">]</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">close_idx</span><span class="p">]</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">close_idx</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">upstroke_idx</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
+
+            <span class="c"># Preliminarily define threshold where dvdt = 5% * max upstroke</span>
+            <span class="n">thresh_pct</span> <span class="o">=</span> <span class="mf">0.05</span>
+            <span class="n">find_thresh_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">prev_idx</span><span class="p">:</span><span class="n">upstroke_idx</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">thresh_pct</span> <span class="o">*</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">find_thresh_idxs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># Can&#39;t find a good threshold value - probably a bad simulation case</span>
+                <span class="c"># Fall back to the upstroke value</span>
+                <span class="n">threshold_idx</span> <span class="o">=</span> <span class="n">upstroke_idx</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">threshold_idx</span> <span class="o">=</span> <span class="n">find_thresh_idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">prev_idx</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold_idx</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;rise_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak_t&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold_t&quot;</span><span class="p">]</span>
+
+            <span class="n">PERIOD</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">width_volts</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">recording_width</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">threshold_idx</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">threshold_idx</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.001</span> <span class="o">/</span> <span class="n">PERIOD</span><span class="p">))):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">recording_width</span> <span class="ow">and</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">width_volts</span><span class="p">:</span>
+                    <span class="n">recording_width</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">idx0</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">elif</span> <span class="n">recording_width</span> <span class="ow">and</span> <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">width_volts</span><span class="p">:</span>
+                    <span class="n">spk</span><span class="p">[</span><span class="s">&quot;half_height_width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">idx0</span><span class="p">]</span>
+                    <span class="k">break</span>
+
+            <span class="c"># Check for things that are probably not spikes:</span>
+            <span class="c"># if there is more than 2 ms between the detection event and the peak, don&#39;t count it</span>
+            <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.002</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c"># if the &quot;spike&quot; is less than 2 mV, don&#39;t count it</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">:</span>
+                <span class="k">continue</span> 
+            <span class="c"># if the absolute value of the peak is less than -30 mV, don&#39;t count it</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spk</span><span class="p">)</span>
+
+        <span class="c"># Refine threshold target based on average of all spikes</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">threshold_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">spk</span> <span class="ow">in</span> <span class="n">spikes</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="n">thresh_pct</span>
+
+        <span class="k">for</span> <span class="n">spk_n</span><span class="p">,</span> <span class="n">spk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spikes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">spk_n</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">next_idx</span> <span class="o">=</span> <span class="n">spikes</span><span class="p">[</span><span class="n">spk_n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="s">&quot;threshold_idx&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">next_idx</span> <span class="o">=</span> <span class="n">stop_idx</span>
+
+            <span class="k">if</span> <span class="n">spk_n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">prev_idx</span> <span class="o">=</span> <span class="n">spikes</span><span class="p">[</span><span class="n">spk_n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s">&quot;peak_idx&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prev_idx</span> <span class="o">=</span> <span class="n">start_idx</span>
+            
+            <span class="c"># Restore variables from before</span>
+            <span class="c"># peak_idx = spk[&#39;peak_idx&#39;]</span>
+            <span class="n">peak_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">spk</span><span class="p">[</span><span class="s">&#39;threshold_idx&#39;</span><span class="p">]:</span><span class="n">next_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">spk</span><span class="p">[</span><span class="s">&#39;threshold_idx&#39;</span><span class="p">]</span>
+                
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;peak_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">peak_idx</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span>
+
+            <span class="c"># Determine maximum upstroke of spike</span>
+            <span class="c"># upstroke_idx = spk[&#39;upstroke_idx&#39;]</span>
+            <span class="n">upstroke_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">spk</span><span class="p">[</span><span class="s">&#39;threshold_idx&#39;</span><span class="p">]:</span><span class="n">peak_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">spk</span><span class="p">[</span><span class="s">&#39;threshold_idx&#39;</span><span class="p">]</span>
+            
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]):</span> <span class="c"># sometimes dvdt will be NaN because of multiple cvode points at same time step</span>
+                <span class="n">close_idx</span> <span class="o">=</span> <span class="n">upstroke_idx</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">while</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">close_idx</span><span class="p">])):</span>
+                    <span class="n">close_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">close_idx</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">close_idx</span><span class="p">]</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">close_idx</span><span class="p">]</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">close_idx</span><span class="p">]</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">close_idx</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">upstroke_idx</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
+            
+            <span class="c"># Find threshold based on average target</span>
+            <span class="n">find_thresh_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">prev_idx</span><span class="p">:</span><span class="n">upstroke_idx</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">threshold_target</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">find_thresh_idxs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># Can&#39;t find a good threshold value - probably a bad simulation case</span>
+                <span class="c"># Fall back to the upstroke value</span>
+                <span class="n">threshold_idx</span> <span class="o">=</span> <span class="n">upstroke_idx</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">threshold_idx</span> <span class="o">=</span> <span class="n">find_thresh_idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">prev_idx</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold_idx</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+
+            <span class="c"># Define the spike time as threshold time</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold_idx</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+
+            <span class="c"># Save the -30 mV crossing time for backward compatibility with Etay code</span>
+            <span class="n">overn30_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">:</span><span class="n">peak_idx</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mi">30</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">overn30_idxs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_idx_n30&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overn30_idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">threshold_idx</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c"># fall back to threshold definition if spike doesn&#39;t cross -30 mV</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_idx_n30&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold_idx</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_n30&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_idx_n30&quot;</span><span class="p">]]</span>
+
+            <span class="c"># Figure out initial &quot;slope&quot; of phase plot post-threshold</span>
+            <span class="n">plus_5_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">:</span><span class="n">upstroke_idx</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;threshold&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">plus_5_vec</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">thresh_plus_5_idx</span> <span class="o">=</span> <span class="n">plus_5_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">threshold_idx</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;thresh_ramp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">thresh_plus_5_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;thresh_ramp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span>
+
+            <span class="c"># go forward to determine peak downstroke of spike</span>
+            <span class="n">downstroke_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">:</span><span class="n">next_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">peak_idx</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;downstroke_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">downstroke_idx</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;downstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">downstroke_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;downstroke_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">downstroke_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;downstroke_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">downstroke_idx</span><span class="p">]</span>
+            <span class="n">spk</span><span class="p">[</span><span class="s">&quot;downstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">downstroke_idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;downstroke&quot;</span><span class="p">]):</span> <span class="c"># sometimes dvdt will be NaN because of multiple cvode points at same time step</span>
+                <span class="n">close_idx</span> <span class="o">=</span> <span class="n">downstroke_idx</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="k">while</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">close_idx</span><span class="p">])):</span>
+                    <span class="n">close_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">spk</span><span class="p">[</span><span class="s">&quot;downstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">close_idx</span><span class="p">]</span>
+
+        <span class="n">features</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;base_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">t</span> <span class="o">&gt;</span> <span class="n">onset</span> <span class="o">-</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">onset</span> <span class="o">-</span> <span class="mf">0.001</span><span class="p">))]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="c"># baseline voltage, 100ms before stim</span>
+        <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;spikes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spikes</span>
+        <span class="n">isi_cv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isicv</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">isi_cv</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;ISICV&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">isi_cv</span>
+        <span class="n">n_spikes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span>
+        <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;n_spikes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_spikes</span>
+        <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">n_spikes</span> <span class="o">/</span> <span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">);</span>
+        <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;adapt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_index</span><span class="p">(</span><span class="n">spikes</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;doublet&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="p">(</span><span class="n">spikes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">spikes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">spk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spikes</span><span class="p">):</span>
+                <span class="n">idx_next</span> <span class="o">=</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="s">&quot;t_idx&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">stop_idx</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">calculate_trough</span><span class="p">(</span><span class="n">spk</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">curr</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">idx_next</span><span class="p">)</span>
+                <span class="n">half_max_v</span> <span class="o">=</span> <span class="p">(</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_trough&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_trough&quot;</span><span class="p">]</span>
+                <span class="n">over_half_max_v_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_idx&quot;</span><span class="p">]:</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;trough_idx&quot;</span><span class="p">]]</span> <span class="o">&gt;</span> <span class="n">half_max_v</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">over_half_max_v_idxs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+                    <span class="n">spk</span><span class="p">[</span><span class="s">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">over_half_max_v_idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_idx&quot;</span><span class="p">]]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">over_half_max_v_idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_idx&quot;</span><span class="p">]])</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;latency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">*</span> <span class="p">(</span><span class="n">spikes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">onset</span><span class="p">)</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;latency_n30&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">*</span> <span class="p">(</span><span class="n">spikes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;t_n30&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">onset</span><span class="p">)</span>
+            <span class="c"># extract properties for each spike</span>
+            <span class="n">isicnt</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">isitot</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">spk</span> <span class="o">=</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">idx_next</span> <span class="o">=</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="s">&quot;t_idx&quot;</span><span class="p">]</span>
+                <span class="n">isitot</span> <span class="o">+=</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">]</span>
+                <span class="n">isicnt</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">isicnt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;isi_avg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">isitot</span> <span class="o">/</span> <span class="n">isicnt</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;isi_avg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="c"># average feature data from individual spikes</span>
+        <span class="c"># build superset dictionary of possible features</span>
+        <span class="n">superset</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">superset</span><span class="p">:</span>
+                    <span class="n">superset</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">superset</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="n">mean</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+                <span class="n">cnt</span> <span class="o">+=</span> <span class="mf">1.0</span>
+            <span class="c"># this shouldn&#39;t be possible, but it may be in future version</span>
+            <span class="c">#   so might as well trap for it</span>
+            <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>    
+                <span class="k">continue</span>
+            <span class="n">mean</span> <span class="o">/=</span> <span class="n">cnt</span>
+            <span class="n">stdev</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="n">dif</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+                <span class="n">stdev</span> <span class="o">+=</span> <span class="n">dif</span> <span class="o">*</span> <span class="n">dif</span>
+            <span class="n">stdev</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">stdev</span> <span class="o">/</span> <span class="n">cnt</span><span class="p">)</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean</span>
+            <span class="n">feature</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">stdev</span>
+        <span class="c">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_source</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EphysFeatureExtractor.isicv"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.isicv">[docs]</a>    <span class="k">def</span> <span class="nf">isicv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spikes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="n">isi_mean</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">isi</span> <span class="o">=</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">]</span>
+            <span class="c">#print &quot;\t%g&quot; % isi</span>
+            <span class="n">isi_mean</span> <span class="o">+=</span> <span class="n">isi</span>
+            <span class="n">lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">isi</span><span class="p">)</span>
+        <span class="n">isi_mean</span> <span class="o">/=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+        <span class="c">#print isi_mean</span>
+        <span class="n">var</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)):</span>
+            <span class="n">dif</span> <span class="o">=</span> <span class="n">isi_mean</span> <span class="o">-</span> <span class="n">lst</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">var</span> <span class="o">+=</span> <span class="n">dif</span> <span class="o">*</span> <span class="n">dif</span>
+        <span class="n">var</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+        <span class="c">#var /= len(lst) - 1</span>
+        <span class="c">#print math.sqrt(var)</span>
+        <span class="k">if</span> <span class="n">isi_mean</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">/</span> <span class="n">isi_mean</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="EphysFeatureExtractor.adaptation_index"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.adaptation_index">[docs]</a>    <span class="k">def</span> <span class="nf">adaptation_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">stim_end</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span> 
+        <span class="n">adi</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">isi</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">isi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">])</span>
+        <span class="c"># act as though time between last spike and stim end is another ISI per Etay&#39;s code</span>
+        <span class="c"># l = stim_end - spikes[-1][&quot;t&quot;]</span>
+        <span class="c"># if l &gt; 0 and l &gt; isi[-1]:</span>
+        <span class="c">#     isi.append(l)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">isi</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">adi</span> <span class="o">+=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">isi</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">isi</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">isi</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">isi</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">adi</span> <span class="o">/=</span> <span class="n">cnt</span>
+        <span class="k">return</span> <span class="n">adi</span>
+
+    <span class="c">##----------------------------------------------------------------------</span>
+
+    <span class="c"># trough (AHP) is presently defined as the minimum voltage level</span>
+    <span class="c">#   observed between successive spikes in a burst</span>
+    <span class="c"># there&#39;s too much data to cleanly return it on the stack</span>
+    <span class="c"># instead, spike table is passed in instead</span></div>
+<div class="viewcode-block" id="EphysFeatureExtractor.calculate_trough"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.calculate_trough">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_trough</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">curr</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">next_idx</span><span class="p">):</span>
+        <span class="c"># dt = t[1] - t[0]</span>
+        <span class="n">peak_idx</span> <span class="o">=</span> <span class="n">spike</span><span class="p">[</span><span class="s">&quot;peak_idx&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">peak_idx</span> <span class="o">&gt;=</span> <span class="n">next_idx</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;next index (</span><span class="si">%d</span><span class="s">) before peak index (</span><span class="si">%d</span><span class="s">) calculating trough&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">next_idx</span><span class="p">,</span> <span class="n">peak_idx</span> <span class="p">))</span>
+            <span class="n">trough_idx</span> <span class="o">=</span> <span class="n">next_idx</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">trough_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">:</span><span class="n">next_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">peak_idx</span>
+
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;trough_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trough_idx</span>
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;f_trough&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">trough_idx</span><span class="p">]</span>
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;trough_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">trough_idx</span><span class="p">]</span>
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;trough_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">trough_idx</span><span class="p">]</span>
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;trough_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">trough_idx</span><span class="p">]</span>
+
+        <span class="c"># calculate etay&#39;s &#39;fast&#39; and &#39;slow&#39; ahp here</span>
+        <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.005</span> <span class="o">&gt;=</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">five_ms_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>        
+            <span class="n">five_ms_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="mf">0.005</span> <span class="o">+</span> <span class="n">t</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c"># 5ms after peak</span>
+            
+        <span class="c"># fast AHP is minimum value occurring w/in 5ms</span>
+        <span class="k">if</span> <span class="n">five_ms_idx</span> <span class="o">&gt;=</span> <span class="n">next_idx</span><span class="p">:</span>
+            <span class="n">five_ms_idx</span> <span class="o">=</span> <span class="n">next_idx</span>
+
+        <span class="k">if</span> <span class="n">peak_idx</span> <span class="o">==</span> <span class="n">five_ms_idx</span><span class="p">:</span>
+            <span class="n">fast_idx</span> <span class="o">=</span> <span class="n">next_idx</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fast_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">:</span><span class="n">five_ms_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">peak_idx</span>
+
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;f_fast_ahp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">fast_idx</span><span class="p">]</span>
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;f_fast_ahp_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">fast_idx</span><span class="p">]</span>
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;f_fast_ahp_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">fast_idx</span><span class="p">]</span>
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;f_fast_ahp_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">fast_idx</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">five_ms_idx</span> <span class="o">==</span> <span class="n">next_idx</span><span class="p">:</span>
+            <span class="n">slow_idx</span> <span class="o">=</span> <span class="n">fast_idx</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slow_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">five_ms_idx</span><span class="p">:</span><span class="n">next_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">five_ms_idx</span>
+
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;f_slow_ahp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">slow_idx</span><span class="p">]</span>
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;f_slow_ahp_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">slow_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">next_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">])</span>
+        <span class="n">spike</span><span class="p">[</span><span class="s">&quot;f_slow_ahp_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">slow_idx</span><span class="p">]</span>
+
+    <span class="c"># initialize summary feature set from file</span></div>
+<div class="viewcode-block" id="EphysFeatureExtractor.push_summary"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.push_summary">[docs]</a>    <span class="k">def</span> <span class="nf">push_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_summary</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="n">new_summary</span>
+
+    <span class="c"># calculate nearness score for feature set X relative to summary</span>
+    <span class="c"># the nearness score is the sum of squares the features are from</span>
+    <span class="c">#   their target values, in units of standard deviations</span>
+    <span class="c"># when a feature is absent, the algorithm to determine the </span>
+    <span class="c">#   penalty is stored in the feature itself, and this value</span>
+    <span class="c">#   is calculated then added to the sum</span></div>
+<div class="viewcode-block" id="EphysFeatureExtractor.score_feature_set"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.score_feature_set">[docs]</a>    <span class="k">def</span> <span class="nf">score_feature_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_num</span><span class="p">):</span>
+        <span class="n">cand</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">[</span><span class="n">set_num</span><span class="p">]</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">glossary</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s">&quot;hit&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">response</span> <span class="o">==</span> <span class="s">&quot;ignore&quot;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="n">response</span> <span class="o">==</span> <span class="s">&quot;stdev&quot;</span><span class="p">:</span>
+                    <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">stdev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="k">assert</span> <span class="n">stdev</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span> <span class="ow">and</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                        <span class="n">inc</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">mean</span> <span class="o">-</span> <span class="n">val</span><span class="p">)</span> <span class="o">/</span> <span class="n">stdev</span>
+                        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span>
+<span class="c">#                        print &quot;Hit %s, %g+/-%g (%g) = %g&quot; % (k, mean, stdev, val, inc)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">resp</span> <span class="o">=</span> <span class="n">cand</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s">&quot;miss&quot;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">resp</span> <span class="o">==</span> <span class="s">&quot;const&quot;</span><span class="p">:</span>
+                            <span class="n">miss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cand</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">resp</span><span class="p">])</span>
+                        <span class="k">elif</span> <span class="n">resp</span> <span class="o">==</span> <span class="s">&quot;mean_mult&quot;</span><span class="p">:</span>
+                            <span class="n">miss</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">cand</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">resp</span><span class="p">])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">assert</span> <span class="bp">False</span>
+                        <span class="n">miss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">miss</span><span class="p">)</span>
+                        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">miss</span><span class="p">)</span>
+<span class="c">#                        print &quot;Missed %s, penalty = %g&quot; % (k, miss)</span>
+                <span class="k">elif</span> <span class="n">response</span> <span class="o">==</span> <span class="s">&quot;perspike&quot;</span><span class="p">:</span>
+                    <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">stdev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="k">assert</span> <span class="n">stdev</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span> <span class="ow">and</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="n">n_spikes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;spikes&quot;</span><span class="p">])</span>
+                        <span class="n">skip_last_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s">&quot;skip_last_n&quot;</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">spike</span> <span class="ow">in</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;spikes&quot;</span><span class="p">][:</span><span class="n">n_spikes</span><span class="o">-</span><span class="n">skip_last_n</span><span class="p">]:</span>
+                            <span class="n">val</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">spike</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span>
+                        <span class="n">val</span> <span class="o">/=</span> <span class="n">n_spikes</span> <span class="o">-</span> <span class="n">skip_last_n</span>
+                        <span class="n">inc</span> <span class="o">=</span> <span class="n">val</span> <span class="o">/</span> <span class="n">stdev</span>
+                        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">resp</span> <span class="o">=</span> <span class="n">cand</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s">&quot;miss&quot;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">resp</span> <span class="o">==</span> <span class="s">&quot;const&quot;</span><span class="p">:</span>
+                            <span class="n">miss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cand</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">resp</span><span class="p">])</span>
+                        <span class="k">elif</span> <span class="n">resp</span> <span class="o">==</span> <span class="s">&quot;mean_mult&quot;</span><span class="p">:</span>
+                            <span class="n">miss</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">cand</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">resp</span><span class="p">])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">assert</span> <span class="bp">False</span>
+                        <span class="n">miss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">miss</span><span class="p">)</span>
+                        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">miss</span><span class="p">)</span>
+<span class="c">#                        print &quot;Missed %s, penalty = %g&quot; % (k, miss)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="bp">False</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">scores</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mf">1e10</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="n">k</span>
+                    <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">scoring</span>
+                    <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span>
+                    <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span>
+                    <span class="k">print</span> <span class="n">cand</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">scoring</span>
+                    <span class="k">print</span> <span class="n">cand</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span>
+                    <span class="k">print</span> <span class="n">cand</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span>
+                    <span class="k">assert</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="n">scores</span>
+
+    <span class="c"># create summary of feature instances</span>
+    <span class="c">#   &#39;summary&#39; is an empty feature object. this must be the same </span>
+    <span class="c">#     class as the other feature objects that are being summarized</span></div>
+<div class="viewcode-block" id="EphysFeatureExtractor.summarize"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.summarize">[docs]</a>    <span class="k">def</span> <span class="nf">summarize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">summary</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Error -- no features were extracted. Summary impossible&quot;</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+        <span class="c"># make dummy dict to verify that all feature instances have</span>
+        <span class="c">#   identical features</span>
+        <span class="c"># only copy features that are in the glossary. some are for </span>
+        <span class="c">#   internal use (eg, t_idx -- time index) and aren&#39;t important</span>
+        <span class="c">#   here</span>
+        <span class="n">superset</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">)):</span>
+            <span class="n">fx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fx</span><span class="o">.</span><span class="n">mean</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fx</span><span class="o">.</span><span class="n">glossary</span><span class="p">:</span>
+                    <span class="n">superset</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">superset</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">)):</span>
+                <span class="n">fx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fx</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&quot;Error - feature &#39;</span><span class="si">%s</span><span class="s">&#39; not in all data sets&quot;</span> <span class="o">%</span> <span class="n">k</span>
+                    <span class="n">err</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">err</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="c"># all features must be of the same type</span>
+        <span class="c"># to ensure this, make programmer specify the type being summarized</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="n">summary</span>
+        <span class="c"># now set summary means to zero</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fx</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c"># now calculate the average of all features</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">)):</span>
+            <span class="n">fx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fx</span><span class="o">.</span><span class="n">mean</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fx</span><span class="o">.</span><span class="n">glossary</span> <span class="ow">and</span> <span class="n">fx</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">fx</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="c"># divide out n to get actual mean</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fx</span><span class="o">.</span><span class="n">mean</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">/=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">)</span>
+        <span class="c"># calculate standard deviation</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">)):</span>
+            <span class="n">fx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fx</span><span class="o">.</span><span class="n">mean</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fx</span><span class="o">.</span><span class="n">glossary</span> <span class="ow">and</span> <span class="n">fx</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">dif</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">-</span> <span class="n">fx</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dif</span> <span class="o">*</span> <span class="n">dif</span>
+        <span class="c"># divide out n and take sqrt to get actual stdev</span>
+        <span class="n">fx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fx</span><span class="o">.</span><span class="n">mean</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fx</span><span class="o">.</span><span class="n">glossary</span> <span class="ow">and</span> <span class="n">fx</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">val</span> <span class="o">/=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test.html">allensdk.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer">
+    </div>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+
+  </body>
+</html>

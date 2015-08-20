@@ -4,6 +4,14 @@ allensdk.core package
 Submodules
 ----------
 
+allensdk.core.cell_types_cache module
+-------------------------------------
+
+.. automodule:: allensdk.core.cell_types_cache
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.core.dat_utilities module
 ----------------------------------
 
@@ -20,10 +28,26 @@ allensdk.core.json_utilities module
     :undoc-members:
     :show-inheritance:
 
+allensdk.core.mouse_connectivity_cache module
+---------------------------------------------
+
+.. automodule:: allensdk.core.mouse_connectivity_cache
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.core.nwb_data_set module
 ---------------------------------
 
 .. automodule:: allensdk.core.nwb_data_set
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.core.ontology module
+-----------------------------
+
+.. automodule:: allensdk.core.ontology
     :members:
     :undoc-members:
     :show-inheritance:

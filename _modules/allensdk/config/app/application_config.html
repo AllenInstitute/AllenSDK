@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.config.app.application_config &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>allensdk.config.app.application_config &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -646,7 +646,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.config.model.formats.json_util</span> <span class="kn">import</span> <span class="n">JsonUtil</span>
+<span class="kn">from</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">import</span> <span class="n">JsonComments</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="kn">import</span> <span class="n">ConfigParser</span> <span class="c"># Python 2</span>
@@ -857,7 +857,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            An application configuration in INI format</span>
 <span class="sd">        </span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">description</span> <span class="o">=</span> <span class="n">JsonUtil</span><span class="o">.</span><span class="n">read_json_file</span><span class="p">(</span><span class="n">json_path</span><span class="p">)</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">json_path</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_config_string</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
     
@@ -875,7 +875,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        string</span>
 <span class="sd">            An application configuration in INI format</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">description</span> <span class="o">=</span> <span class="n">JsonUtil</span><span class="o">.</span><span class="n">read_json_string</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">read_string</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_config_string</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
     
@@ -983,6 +983,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -995,7 +996,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

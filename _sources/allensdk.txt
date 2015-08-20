@@ -9,7 +9,9 @@ Subpackages
     allensdk.api
     allensdk.config
     allensdk.core
+    allensdk.ephys
     allensdk.model
+    allensdk.test
 
 Module contents
 ---------------

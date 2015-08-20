@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core package &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>allensdk.core package &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" /> 
   </head>
   <body>
@@ -635,6 +635,280 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-allensdk.core.cell_types_cache">
+<span id="allensdk-core-cell-types-cache-module"></span><h2>allensdk.core.cell_types_cache module<a class="headerlink" href="#module-allensdk.core.cell_types_cache" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache">
+<em class="property">class </em><tt class="descclassname">allensdk.core.cell_types_cache.</tt><tt class="descname">CellTypesCache</tt><big>(</big><em>cache=True</em>, <em>manifest_file='manifest.json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.cache.Cache" title="allensdk.api.cache.Cache"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.cache.Cache</span></tt></a></p>
+<p>Cache class for storing and accessing data from the Cell Types Database.
+By default, this class will cache any downloaded metadata or files in 
+well known locations defined in a manifest file.  This behavior can be
+disabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cache: boolean</strong></p>
+<blockquote>
+<div><p>Whether the class should save results of API queries to locations specified
+in the manifest file.  Queries for files (as opposed to metadata) must have a
+file location.  If caching is disabled, those locations must be specified
+in the function call (e.g. get_ephys_data(file_name=&#8217;file.nwb&#8217;)).</p>
+</div></blockquote>
+<p><strong>manifest_file: string</strong></p>
+<blockquote class="last">
+<div><p>File name of the manifest to be read.  Default is &#8220;manifest.json&#8221;.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="74%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>api: CellTypesApi instance</td>
+<td>The object used for making API queries related to the Cell Types Database</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.cell_types_cache.CellTypesCache.build_manifest" title="allensdk.core.cell_types_cache.CellTypesCache.build_manifest"><tt class="xref py py-obj docutils literal"><span class="pre">build_manifest</span></tt></a>(file_name)</td>
+<td>Construct a manifest for this Cache class and save it in a file.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_cache_path</span></tt>(file_name,&nbsp;manifest_key,&nbsp;*args)</td>
+<td>Helper method for accessing path specs from manifest keys.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.cell_types_cache.CellTypesCache.get_cells" title="allensdk.core.cell_types_cache.CellTypesCache.get_cells"><tt class="xref py py-obj docutils literal"><span class="pre">get_cells</span></tt></a>([file_name,&nbsp;require_morphology,&nbsp;...])</td>
+<td>Download metadata for all cells in the database and optionally return a subset filtered by whether or not they have a morphology or reconstruction.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_data" title="allensdk.core.cell_types_cache.CellTypesCache.get_ephys_data"><tt class="xref py py-obj docutils literal"><span class="pre">get_ephys_data</span></tt></a>(specimen_id[,&nbsp;file_name])</td>
+<td>Download electrophysiology traces for a single cell in the database.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_features" title="allensdk.core.cell_types_cache.CellTypesCache.get_ephys_features"><tt class="xref py py-obj docutils literal"><span class="pre">get_ephys_features</span></tt></a>([dataframe,&nbsp;file_name])</td>
+<td>Download electrophysiology features for all cells in the database.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_sweeps" title="allensdk.core.cell_types_cache.CellTypesCache.get_ephys_sweeps"><tt class="xref py py-obj docutils literal"><span class="pre">get_ephys_sweeps</span></tt></a>(specimen_id[,&nbsp;file_name])</td>
+<td>Download sweep metadata for a single cell specimen.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.cell_types_cache.CellTypesCache.get_reconstruction" title="allensdk.core.cell_types_cache.CellTypesCache.get_reconstruction"><tt class="xref py py-obj docutils literal"><span class="pre">get_reconstruction</span></tt></a>(specimen_id[,&nbsp;file_name])</td>
+<td>Download and open a reconstruction for a single cell in the database.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_csv</span></tt>(path[,&nbsp;rename,&nbsp;index])</td>
+<td>Read a csv file as a pandas dataframe.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_json</span></tt>(path[,&nbsp;rename,&nbsp;index])</td>
+<td>Read a json file as a pandas dataframe.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_manifest</span></tt>(file_name)</td>
+<td>Read a keyed collection of path specifications.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">manifest_dataframe</span></tt>()</td>
+<td>Convenience method to view manifest as a pandas dataframe.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">rename_columns</span></tt>(data[,&nbsp;new_old_name_tuples])</td>
+<td>Convenience method to rename columns in a pandas dataframe.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">safe_mkdir</span></tt>(directory)</td>
+<td>Create path if not already there.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">wrap</span></tt>(fn,&nbsp;path,&nbsp;cache[,&nbsp;save_as_json,&nbsp;index,&nbsp;...])</td>
+<td>make an rma query, save it and return the dataframe.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.CELLS_KEY">
+<tt class="descname">CELLS_KEY</tt><em class="property"> = 'CELLS'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.CELLS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.EPHYS_DATA_KEY">
+<tt class="descname">EPHYS_DATA_KEY</tt><em class="property"> = 'EPHYS_DATA'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.EPHYS_DATA_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.EPHYS_FEATURES_KEY">
+<tt class="descname">EPHYS_FEATURES_KEY</tt><em class="property"> = 'EPHYS_FEATURES'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.EPHYS_FEATURES_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.EPHYS_SWEEPS_KEY">
+<tt class="descname">EPHYS_SWEEPS_KEY</tt><em class="property"> = 'EPHYS_SWEEPS'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.EPHYS_SWEEPS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.RECONSTRUCTION_KEY">
+<tt class="descname">RECONSTRUCTION_KEY</tt><em class="property"> = 'RECONSTRUCTION'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.RECONSTRUCTION_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.build_manifest">
+<tt class="descname">build_manifest</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.build_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.build_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a manifest for this Cache class and save it in a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote class="last">
+<div><p>File location to save the manifest.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_cells">
+<tt class="descname">get_cells</tt><big>(</big><em>file_name=None</em>, <em>require_morphology=False</em>, <em>require_reconstruction=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_cells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download metadata for all cells in the database and optionally return a
+subset filtered by whether or not they have a morphology or reconstruction.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to save/read the cell metadata as JSON.  If file_name is None, 
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</div></blockquote>
+<p><strong>require_morphology: boolean</strong></p>
+<blockquote>
+<div><p>Filter out cells that have no morphological images.</p>
+</div></blockquote>
+<p><strong>require_reconstruction: boolean</strong></p>
+<blockquote class="last">
+<div><p>Filter out cells that have no morphological reconstructions.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_ephys_data">
+<tt class="descname">get_ephys_data</tt><big>(</big><em>specimen_id</em>, <em>file_name=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_ephys_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download electrophysiology traces for a single cell in the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>specimen_id: int</strong></p>
+<blockquote>
+<div><p>The ID of a cell specimen to download.</p>
+</div></blockquote>
+<p><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to save/read the ephys features metadata as CSV.  
+If file_name is None, the file_name will be pulled out of the 
+manifest.  If caching is disabled, no file will be saved. 
+Default is None.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">NwbDataSet</p>
+<blockquote class="last">
+<div><p>A class instance with helper methods for retrieving stimulus
+and response traces out of an NWB file.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_ephys_features">
+<tt class="descname">get_ephys_features</tt><big>(</big><em>dataframe=False</em>, <em>file_name=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_ephys_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download electrophysiology features for all cells in the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to save/read the ephys features metadata as CSV.  
+If file_name is None, the file_name will be pulled out of the 
+manifest.  If caching is disabled, no file will be saved. 
+Default is None.</p>
+</div></blockquote>
+<p><strong>dataframe: boolean</strong></p>
+<blockquote class="last">
+<div><p>Return the output as a Pandas DataFrame.  If False, return 
+a list of dictionaries.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_ephys_sweeps">
+<tt class="descname">get_ephys_sweeps</tt><big>(</big><em>specimen_id</em>, <em>file_name=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_ephys_sweeps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_sweeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download sweep metadata for a single cell specimen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>specimen_id: int</strong></p>
+<blockquote class="last">
+<div><p>ID of a cell.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.get_reconstruction">
+<tt class="descname">get_reconstruction</tt><big>(</big><em>specimen_id</em>, <em>file_name=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/cell_types_cache.html#CellTypesCache.get_reconstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.get_reconstruction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download and open a reconstruction for a single cell in the database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>specimen_id: int</strong></p>
+<blockquote>
+<div><p>The ID of a cell specimen to download.</p>
+</div></blockquote>
+<p><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to save/read the ephys features metadata as CSV.  
+If file_name is None, the file_name will be pulled out of the 
+manifest.  If caching is disabled, no file will be saved. 
+Default is None.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Morphology</p>
+<blockquote class="last">
+<div><p>A class instance with methods for accessing morphology compartments.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-allensdk.core.dat_utilities">
 <span id="allensdk-core-dat-utilities-module"></span><h2>allensdk.core.dat_utilities module<a class="headerlink" href="#module-allensdk.core.dat_utilities" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -685,9 +959,95 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </div>
 <div class="section" id="module-allensdk.core.json_utilities">
 <span id="allensdk-core-json-utilities-module"></span><h2>allensdk.core.json_utilities module<a class="headerlink" href="#module-allensdk.core.json_utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.core.json_utilities.JsonComments">
+<em class="property">class </em><tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">JsonComments</tt><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#JsonComments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.JsonComments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.json_utilities.JsonComments.read_file" title="allensdk.core.json_utilities.JsonComments.read_file"><tt class="xref py py-obj docutils literal"><span class="pre">read_file</span></tt></a>(file_name)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.json_utilities.JsonComments.read_string" title="allensdk.core.json_utilities.JsonComments.read_string"><tt class="xref py py-obj docutils literal"><span class="pre">read_string</span></tt></a>(json_string)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.json_utilities.JsonComments.remove_comments" title="allensdk.core.json_utilities.JsonComments.remove_comments"><tt class="xref py py-obj docutils literal"><span class="pre">remove_comments</span></tt></a>(json_string)</td>
+<td>Strip single and multiline javascript-style comments.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.json_utilities.JsonComments.remove_multiline_comments" title="allensdk.core.json_utilities.JsonComments.remove_multiline_comments"><tt class="xref py py-obj docutils literal"><span class="pre">remove_multiline_comments</span></tt></a>(json_string)</td>
+<td>Rebuild input without substrings matching /<em>...</em>/.</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="allensdk.core.json_utilities.JsonComments.read_file">
+<em class="property">classmethod </em><tt class="descname">read_file</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#JsonComments.read_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.JsonComments.read_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="allensdk.core.json_utilities.JsonComments.read_string">
+<em class="property">classmethod </em><tt class="descname">read_string</tt><big>(</big><em>json_string</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#JsonComments.read_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.JsonComments.read_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="allensdk.core.json_utilities.JsonComments.remove_comments">
+<em class="property">classmethod </em><tt class="descname">remove_comments</tt><big>(</big><em>json_string</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#JsonComments.remove_comments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.JsonComments.remove_comments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Strip single and multiline javascript-style comments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json</strong> : string</p>
+<blockquote>
+<div><p>Json string with javascript-style comments.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
+<blockquote>
+<div><p>Copy of the input with comments removed.</p>
+</div></blockquote>
+<p class="last">Note: A JSON decoder MAY accept and ignore comments.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="allensdk.core.json_utilities.JsonComments.remove_multiline_comments">
+<em class="property">classmethod </em><tt class="descname">remove_multiline_comments</tt><big>(</big><em>json_string</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#JsonComments.remove_multiline_comments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.JsonComments.remove_multiline_comments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rebuild input without substrings matching /<em>...</em>/.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json_string</strong> : string</p>
+<blockquote>
+<div><p>may or may not contain multiline comments.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
+<blockquote class="last">
+<div><p>Copy of the input without the comments.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
-<dt id="allensdk.core.json_utilities.handler">
-<tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">handler</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.handler" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.core.json_utilities.json_handler">
+<tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">json_handler</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#json_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.json_handler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Used by write_json convert a few non-standard types to things that the json package can handle.</p>
 </dd></dl>
 
@@ -698,11 +1058,71 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </dd></dl>
 
 <dl class="function">
+<dt id="allensdk.core.json_utilities.read_url">
+<tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">read_url</tt><big>(</big><em>url</em>, <em>method='POST'</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#read_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.read_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.json_utilities.read_url_get">
+<tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">read_url_get</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#read_url_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.read_url_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a JSON contained in a file into an equivalent
+nested python dict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url</strong> : string</p>
+<p><strong>where to get the json.</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<p>Python version of the input</p>
+<p>Note: if the input is a bare array or literal, for example,</p>
+<p class="last">the output will be of the corresponding type.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.json_utilities.read_url_post">
+<tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">read_url_post</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#read_url_post"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.read_url_post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform a JSON contained in a file into an equivalent
+nested python dict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url</strong> : string</p>
+<p><strong>where to get the json.</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<p>Python version of the input</p>
+<p>Note: if the input is a bare array or literal, for example,</p>
+<p class="last">the output will be of the corresponding type.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="allensdk.core.json_utilities.write">
 <tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">write</tt><big>(</big><em>file_name</em>, <em>obj</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Shortcut for writing JSON to a file.  This also takes care of serializing numpy and data types.</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="allensdk.core.json_utilities.write_string">
+<tt class="descclassname">allensdk.core.json_utilities.</tt><tt class="descname">write_string</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/json_utilities.html#write_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.json_utilities.write_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shortcut for writing JSON to a string.  This also takes care of serializing numpy and data types.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="allensdk-core-mouse-connectivity-cache-module">
+<h2>allensdk.core.mouse_connectivity_cache module<a class="headerlink" href="#allensdk-core-mouse-connectivity-cache-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-allensdk.core.nwb_data_set">
 <span id="allensdk-core-nwb-data-set-module"></span><h2>allensdk.core.nwb_data_set module<a class="headerlink" href="#module-allensdk.core.nwb_data_set" title="Permalink to this headline">¶</a></h2>
@@ -731,13 +1151,16 @@ from an NWB file.</p>
 <tr class="row-even"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep" title="allensdk.core.nwb_data_set.NwbDataSet.get_sweep"><tt class="xref py py-obj docutils literal"><span class="pre">get_sweep</span></tt></a>(sweep_number)</td>
 <td>Retrieve the stimulus, response, index_range, and sampling rate for a particular sweep.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers" title="allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers"><tt class="xref py py-obj docutils literal"><span class="pre">get_sweep_numbers</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_metadata" title="allensdk.core.nwb_data_set.NwbDataSet.get_sweep_metadata"><tt class="xref py py-obj docutils literal"><span class="pre">get_sweep_metadata</span></tt></a>(sweep_number)</td>
+<td>Retrieve the sweep level metadata associated with each sweep.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers" title="allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers"><tt class="xref py py-obj docutils literal"><span class="pre">get_sweep_numbers</span></tt></a>()</td>
 <td>Get all of the sweep numbers in the file, including test sweeps.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.set_spike_times" title="allensdk.core.nwb_data_set.NwbDataSet.set_spike_times"><tt class="xref py py-obj docutils literal"><span class="pre">set_spike_times</span></tt></a>(sweep_number,&nbsp;spike_times)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.set_spike_times" title="allensdk.core.nwb_data_set.NwbDataSet.set_spike_times"><tt class="xref py py-obj docutils literal"><span class="pre">set_spike_times</span></tt></a>(sweep_number,&nbsp;spike_times)</td>
 <td>Set or overwrite the spikes times for a sweep.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.set_sweep" title="allensdk.core.nwb_data_set.NwbDataSet.set_sweep"><tt class="xref py py-obj docutils literal"><span class="pre">set_sweep</span></tt></a>(sweep_number,&nbsp;stimulus,&nbsp;response)</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.nwb_data_set.NwbDataSet.set_sweep" title="allensdk.core.nwb_data_set.NwbDataSet.set_sweep"><tt class="xref py py-obj docutils literal"><span class="pre">set_sweep</span></tt></a>(sweep_number,&nbsp;stimulus,&nbsp;response)</td>
 <td>Overwrite the stimulus or response of an NWB file.</td>
 </tr>
 </tbody>
@@ -825,6 +1248,25 @@ second index is the end of valid response data.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="allensdk.core.nwb_data_set.NwbDataSet.get_sweep_metadata">
+<tt class="descname">get_sweep_metadata</tt><big>(</big><em>sweep_number</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_sweep_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the sweep level metadata associated with each sweep.
+Includes information on stimulus parameters like its name and amplitude 
+as well as recording quality metadata, like access resistance and 
+seal quality.
+Parameters
+&#8212;&#8212;&#8212;-
+sweep_number: int
+Returns
+&#8212;&#8212;-
+dict</p>
+<blockquote>
+<div>A dictionary with &#8216;aibs_stimulus_amplitude_pa&#8217;, &#8216;aibs_stimulus_name&#8217;, 
+&#8216;gain&#8217;, &#8216;initial_access_resistance&#8217;, &#8216;seal&#8217; elements.  These specific
+fields are ones encoded in the original AIBS in vitro .nwb files.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
 <dt id="allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers">
 <tt class="descname">get_sweep_numbers</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/nwb_data_set.html#NwbDataSet.get_sweep_numbers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get all of the sweep numbers in the file, including test sweeps.</p>
@@ -874,6 +1316,64 @@ size.</p>
 </tbody>
 </table>
 </dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.core.ontology">
+<span id="allensdk-core-ontology-module"></span><h2>allensdk.core.ontology module<a class="headerlink" href="#module-allensdk.core.ontology" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.core.ontology.Ontology">
+<em class="property">class </em><tt class="descclassname">allensdk.core.ontology.</tt><tt class="descname">Ontology</tt><big>(</big><em>df</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/ontology.html#Ontology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.ontology.Ontology" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.ontology.Ontology.get_child_ids" title="allensdk.core.ontology.Ontology.get_child_ids"><tt class="xref py py-obj docutils literal"><span class="pre">get_child_ids</span></tt></a>(*structure_ids)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.ontology.Ontology.get_children" title="allensdk.core.ontology.Ontology.get_children"><tt class="xref py py-obj docutils literal"><span class="pre">get_children</span></tt></a>(structure_id)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.ontology.Ontology.get_descendant_ids" title="allensdk.core.ontology.Ontology.get_descendant_ids"><tt class="xref py py-obj docutils literal"><span class="pre">get_descendant_ids</span></tt></a>(*structure_ids)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.core.ontology.Ontology.get_descendants" title="allensdk.core.ontology.Ontology.get_descendants"><tt class="xref py py-obj docutils literal"><span class="pre">get_descendants</span></tt></a>(structure_id)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.core.ontology.Ontology.structure_descends_from" title="allensdk.core.ontology.Ontology.structure_descends_from"><tt class="xref py py-obj docutils literal"><span class="pre">structure_descends_from</span></tt></a>(child_id,&nbsp;parent_id)</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.core.ontology.Ontology.get_child_ids">
+<tt class="descname">get_child_ids</tt><big>(</big><em>*structure_ids</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/ontology.html#Ontology.get_child_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.ontology.Ontology.get_child_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.ontology.Ontology.get_children">
+<tt class="descname">get_children</tt><big>(</big><em>structure_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/ontology.html#Ontology.get_children"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.ontology.Ontology.get_children" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.ontology.Ontology.get_descendant_ids">
+<tt class="descname">get_descendant_ids</tt><big>(</big><em>*structure_ids</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/ontology.html#Ontology.get_descendant_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.ontology.Ontology.get_descendant_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.ontology.Ontology.get_descendants">
+<tt class="descname">get_descendants</tt><big>(</big><em>structure_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/ontology.html#Ontology.get_descendants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.ontology.Ontology.get_descendants" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.ontology.Ontology.structure_descends_from">
+<tt class="descname">structure_descends_from</tt><big>(</big><em>child_id</em>, <em>parent_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/ontology.html#Ontology.structure_descends_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.ontology.Ontology.structure_descends_from" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -1165,6 +1665,7 @@ columns are numeric.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -1177,7 +1678,9 @@ columns are numeric.</p>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

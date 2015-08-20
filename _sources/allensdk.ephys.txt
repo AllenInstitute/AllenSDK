@@ -1,0 +1,30 @@
+allensdk.ephys package
+======================
+
+Submodules
+----------
+
+allensdk.ephys.extract_cell_features module
+-------------------------------------------
+
+.. automodule:: allensdk.ephys.extract_cell_features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.ephys.feature_extractor module
+---------------------------------------
+
+.. automodule:: allensdk.ephys.feature_extractor
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.ephys
+    :members:
+    :undoc-members:
+    :show-inheritance:

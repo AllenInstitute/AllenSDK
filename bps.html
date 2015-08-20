@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>BPS Utility &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>BPS Utility &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="index.html" /> 
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" /> 
   </head>
   <body>
 <script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
@@ -648,7 +648,7 @@ whether to connect to a debugger, the locations of the model file(s) relative to
 and the location of the run configuration.</p>
 <p>Several model files can be specified on the model_file line, separated by commas.
 The model files and run file are combined
-into a single <tt class="xref doc docutils literal"><span class="pre">model</span> <span class="pre">description</span></tt>.
+into a single <cite>model description &lt;biophysical_perisomatic_script.html#model-description-files&gt;</cite>.
 By convention, the model structure should be specified in the model_file line.
 The run_file is used for other experimental conditions including the stimulus.</p>
 <p>The logging config file is also in &#8220;INI&#8221; format.
@@ -657,10 +657,10 @@ It is a standard Python logging configuration file.</p>
 <div class="section" id="embedding-application-configuration-in-a-model-description-file">
 <h2>Embedding Application Configuration in a Model Description File<a class="headerlink" href="#embedding-application-configuration-in-a-model-description-file" title="Permalink to this headline">¶</a></h2>
 <p>Rather than using a .conf file, it is possible to embed application configuration
-in a <tt class="xref doc docutils literal"><span class="pre">model</span> <span class="pre">description</span></tt> file in a &#8220;biophys&#8221; section.
-Note that the model_file value is an array rather than a comma-separated string.
-An application configuration section embedded in the same file as model description sections
-would reference itself in the model_file entry.</p>
+in a <cite>model description &lt;biophysical_perisomatic_script.html#model-description-files&gt;</cite>
+file in a &#8220;biophys&#8221; section. Note that the model_file value is an array rather than a
+comma-separated string. An application configuration section embedded in the same file as
+model description sections would reference itself in the model_file entry.</p>
 <p>model.json:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
     <span class="s">&quot;biophys&quot;</span><span class="p">:</span> <span class="p">[{</span>
@@ -725,6 +725,7 @@ It does not actually run the job.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -737,7 +738,9 @@ It does not actually run the job.</p>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

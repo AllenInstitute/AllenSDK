@@ -1,0 +1,54 @@
+allensdk.test.api package
+=========================
+
+Submodules
+----------
+
+allensdk.test.api.annotated_section_data_set_api_tests module
+-------------------------------------------------------------
+
+.. automodule:: allensdk.test.api.annotated_section_data_set_api_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.grid_data_api_tests module
+--------------------------------------------
+
+.. automodule:: allensdk.test.api.grid_data_api_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.image_download_api_tests module
+-------------------------------------------------
+
+.. automodule:: allensdk.test.api.image_download_api_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.ontologies_api_tests module
+---------------------------------------------
+
+.. automodule:: allensdk.test.api.ontologies_api_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.synchronization_api_tests module
+--------------------------------------------------
+
+.. automodule:: allensdk.test.api.synchronization_api_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.test.api
+    :members:
+    :undoc-members:
+    :show-inheritance:

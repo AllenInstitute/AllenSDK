@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.model.glif.simulate_neuron &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>allensdk.model.glif.simulate_neuron &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -735,18 +735,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;total sweep time </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">sweep_start_time</span> <span class="p">))</span>
 </div>
-<div class="viewcode-block" id="simulate_neuron"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.simulate_neuron">[docs]</a><span class="k">def</span> <span class="nf">simulate_neuron</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweeps</span><span class="p">,</span> <span class="n">input_file_name</span><span class="p">,</span> <span class="n">output_file_name</span><span class="p">,</span> <span class="n">spike_cut_value</span><span class="p">):</span>
+<div class="viewcode-block" id="simulate_neuron"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.simulate_neuron">[docs]</a><span class="k">def</span> <span class="nf">simulate_neuron</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">,</span> <span class="n">input_file_name</span><span class="p">,</span> <span class="n">output_file_name</span><span class="p">,</span> <span class="n">spike_cut_value</span><span class="p">):</span>
 
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-    <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">sweeps</span><span class="p">:</span>
-        <span class="n">sweep_type</span> <span class="o">=</span> <span class="n">sweep</span><span class="p">[</span><span class="s">&#39;stimulus_name&#39;</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">sweep_type</span> <span class="o">==</span> <span class="s">&#39;Test&#39;</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;skipping sweep </span><span class="si">%d</span><span class="s"> with type </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">],</span> <span class="n">sweep_type</span><span class="p">))</span>
-            <span class="k">continue</span>
-
-        <span class="n">simulate_sweep_from_file</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">],</span> <span class="n">input_file_name</span><span class="p">,</span> <span class="n">output_file_name</span><span class="p">,</span> <span class="n">spike_cut_value</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">sweep_number</span> <span class="ow">in</span> <span class="n">sweep_numbers</span><span class="p">:</span>
+        <span class="n">simulate_sweep_from_file</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">input_file_name</span><span class="p">,</span> <span class="n">output_file_name</span><span class="p">,</span> <span class="n">spike_cut_value</span><span class="p">)</span>
                  
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;total elapsed time </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>    
 </div>
@@ -795,7 +789,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
-    <span class="n">simulate_neuron</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweeps</span><span class="p">,</span> <span class="n">ephys_file</span><span class="p">,</span> <span class="n">output_ephys_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">spike_cut_value</span><span class="p">)</span> 
+    <span class="c"># filter out test sweeps</span>
+    <span class="n">sweep_numbers</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sweeps</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;stimulus_name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;Test&#39;</span> <span class="p">]</span>
+
+    <span class="n">simulate_neuron</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">,</span> <span class="n">ephys_file</span><span class="p">,</span> <span class="n">output_ephys_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">spike_cut_value</span><span class="p">)</span> 
 
 
 </div>
@@ -814,6 +811,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -826,7 +824,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

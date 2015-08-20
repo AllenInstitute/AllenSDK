@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.glif_api &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>allensdk.api.queries.glif_api &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -646,13 +646,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.api.api</span> <span class="kn">import</span> <span class="n">Api</span>
+<span class="kn">import</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">logging</span>
 
-<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
 
-<div class="viewcode-block" id="GlifApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi">[docs]</a><span class="k">class</span> <span class="nc">GlifApi</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
+<div class="viewcode-block" id="GlifApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi">[docs]</a><span class="k">class</span> <span class="nc">GlifApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GlifApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">neuronal_model</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="bp">None</span>
@@ -667,28 +667,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        list</span>
 <span class="sd">            Meta data for all GLIF neuronal models.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_rma_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_neuronal_model_list_rma_url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_neuronal_model_list_json</span><span class="p">)</span>
 
-</div>
-<div class="viewcode-block" id="GlifApi.build_neuronal_model_list_rma_url"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_list_rma_url">[docs]</a>    <span class="k">def</span> <span class="nf">build_neuronal_model_list_rma_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
-        <span class="n">include_associations</span> <span class="o">=</span> <span class="s">&quot;specimen(ephys_result),neuronal_model_template[name$il&#39;*LIF*&#39;]&quot;</span>
+        <span class="n">include</span> <span class="o">=</span> <span class="s">&quot;specimen(ephys_result),neuronal_model_template[name$il&#39;*LIF*&#39;]&quot;</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span> 
-                       <span class="s">&#39;/query.&#39;</span><span class="p">,</span>
-                       <span class="n">fmt</span><span class="p">,</span>
-                       <span class="s">&#39;?q=&#39;</span><span class="p">,</span>
-                       <span class="s">&#39;model::NeuronalModel,&#39;</span><span class="p">,</span>
-                       <span class="s">&#39;rma::include,&#39;</span><span class="p">,</span>
-                       <span class="n">include_associations</span><span class="p">,</span>
-                       <span class="s">&#39;,rma::options[num_rows$eq2000]&#39;</span><span class="p">])</span>
-
-        <span class="k">return</span> <span class="n">url</span>
-        
-</div>
-<div class="viewcode-block" id="GlifApi.read_neuronal_model_list_json"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_list_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_neuronal_model_list_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_parsed_data</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Return basic meta data for all neuronal models&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">json_parsed_data</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;NeuronalModel&#39;</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
 
 </div>
 <div class="viewcode-block" id="GlifApi.get_neuronal_model"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_neuronal_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuronal_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">):</span>
@@ -700,115 +682,27 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        dict</span>
 <span class="sd">            A dictionary containing </span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_rma_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_neuronal_model_rma_url</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_neuronal_model_json</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span>
+        <span class="n">include</span> <span class="o">=</span> <span class="p">(</span> <span class="s">&#39;neuronal_model_template(well_known_files(well_known_file_type)),&#39;</span> <span class="o">+</span>
+                    <span class="s">&#39;specimen(ephys_sweeps,ephys_result(well_known_files(well_known_file_type))),&#39;</span> <span class="o">+</span>
+                    <span class="s">&#39;well_known_files(well_known_file_type)&#39;</span> <span class="p">)</span>
 
-</div>
-<div class="viewcode-block" id="GlifApi.get_ephys_sweeps"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps">[docs]</a>    <span class="k">def</span> <span class="nf">get_ephys_sweeps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Retrieve ephys sweep information out of downloaded metadata for a neuronal model </span>
-<span class="sd">        </span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        list</span>
-<span class="sd">            A list of sweeps metadata dictionaries</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span>
-
-</div>
-<div class="viewcode-block" id="GlifApi.get_neuron_config"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_neuron_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Retrieve a model configuration file from the API, optionally save it to disk, and </span>
-<span class="sd">        return the contents of that file as a dictionary.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        output_file_name: string</span>
-<span class="sd">            File name to store the neuron configuration (optional).</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;URL for neuron config file is empty.&quot;</span><span class="p">)</span>
-
-        <span class="n">neuron_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_parsed_json_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">output_file_name</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file_name</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-        
-        <span class="k">return</span> <span class="n">neuron_config</span>
-</div>
-<div class="viewcode-block" id="GlifApi.cache_stimulus_file"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file">[docs]</a>    <span class="k">def</span> <span class="nf">cache_stimulus_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Download the NWB file for the current neuronal model and save it to a file.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        output_file_name: string</span>
-<span class="sd">            File name to store the NWB file.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;URL for stimulus file is empty.&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;stimulus_url&#39;</span><span class="p">],</span> <span class="n">output_file_name</span><span class="p">)</span>
-
-</div>
-<div class="viewcode-block" id="GlifApi.build_neuronal_model_rma_url"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.build_neuronal_model_rma_url">[docs]</a>    <span class="k">def</span> <span class="nf">build_neuronal_model_rma_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Construct a query to find all files related to a GLIF neuronal model.</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        neuronal_model_id : integer or string representation</span>
-<span class="sd">            key of experiment to retrieve.</span>
-<span class="sd">            </span>
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        string</span>
-<span class="sd">            RMA query url.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="n">include_associations</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
-                <span class="s">&#39;neuronal_model_template(well_known_files(well_known_file_type)),&#39;</span><span class="p">,</span>
-                <span class="s">&#39;specimen(ephys_sweeps,ephys_result(well_known_files(well_known_file_type))),&#39;</span><span class="p">,</span>
-                <span class="s">&#39;well_known_files(well_known_file_type)&#39;</span><span class="p">])</span>
-                
-        <span class="n">criteria_associations</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
-                <span class="p">(</span><span class="s">&quot;[id$eq</span><span class="si">%d</span><span class="s">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">))])</span>
-        
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span> 
-                       <span class="s">&#39;/query.&#39;</span><span class="p">,</span>
-                       <span class="n">fmt</span><span class="p">,</span>
-                       <span class="s">&#39;?q=&#39;</span><span class="p">,</span>
-                       <span class="s">&#39;model::NeuronalModel,&#39;</span><span class="p">,</span>
-                       <span class="s">&#39;rma::criteria,&#39;</span><span class="p">,</span>
-                       <span class="n">criteria_associations</span><span class="p">,</span>
-                       <span class="s">&#39;,rma::include,&#39;</span><span class="p">,</span>
-                       <span class="n">include_associations</span><span class="p">])</span>
-
-        <span class="k">return</span> <span class="n">url</span>
-
-</div>
-<div class="viewcode-block" id="GlifApi.read_neuronal_model_json"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.read_neuronal_model_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_neuronal_model_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_parsed_data</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Reformat the RMA query results into a more usable dictionary</span>
-<span class="sd">        </span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        json_parsed_data: dict</span>
-<span class="sd">            the json response from the Allen Institute API RMA.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        hash</span>
-<span class="sd">            a dictionary containing fields necessary to run a GLIF model</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&quot;[id$eq</span><span class="si">%d</span><span class="s">]&quot;</span> <span class="o">%</span> <span class="n">neuronal_model_id</span>
+ 
+        <span class="bp">self</span><span class="o">.</span><span class="n">neuronal_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;NeuronalModel&#39;</span><span class="p">,</span>
+                                               <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
+                                               <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span>
+                                               <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_url</span> <span class="o">=</span> <span class="bp">None</span>            
-        <span class="bp">self</span><span class="o">.</span><span class="n">neuronal_model</span> <span class="o">=</span> <span class="n">json_parsed_data</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="c"># sweeps come from the specimen</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">specimen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuronal_model</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="n">specimen</span><span class="p">[</span><span class="s">&#39;ephys_sweeps&#39;</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="bp">None</span>
             
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -841,20 +735,63 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Could not find stimulus well_known_file for this model (</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuronal_model</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
 
 
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s">&#39;neuron_config_url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span><span class="p">,</span>
             <span class="s">&#39;stimulus_url&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_url</span><span class="p">,</span>
             <span class="s">&#39;ephys_sweeps&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span><span class="p">,</span>
             <span class="s">&#39;neuronal_model&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuronal_model</span>
             <span class="p">}</span>
 
-        <span class="k">return</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span>
 
+</div>
+<div class="viewcode-block" id="GlifApi.get_ephys_sweeps"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps">[docs]</a>    <span class="k">def</span> <span class="nf">get_ephys_sweeps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Retrieve ephys sweep information out of downloaded metadata for a neuronal model </span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of sweeps metadata dictionaries</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span>
 
+</div>
+<div class="viewcode-block" id="GlifApi.get_neuron_config"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_neuron_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Retrieve a model configuration file from the API, optionally save it to disk, and </span>
+<span class="sd">        return the contents of that file as a dictionary.</span>
 
-    
-        </div></div>
-</pre></div>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output_file_name: string</span>
+<span class="sd">            File name to store the neuron configuration (optional).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;URL for neuron config file is empty.&quot;</span><span class="p">)</span>
+
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span>
+
+        <span class="n">neuron_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_parsed_json_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output_file_name</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file_name</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+        
+        <span class="k">return</span> <span class="n">neuron_config</span>
+
+</div>
+<div class="viewcode-block" id="GlifApi.cache_stimulus_file"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file">[docs]</a>    <span class="k">def</span> <span class="nf">cache_stimulus_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file_name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Download the NWB file for the current neuronal model and save it to a file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output_file_name: string</span>
+<span class="sd">            File name to store the NWB file.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;URL for stimulus file is empty.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s">&#39;stimulus_url&#39;</span><span class="p">],</span> <span class="n">output_file_name</span><span class="p">)</span>
+</pre></div></div></div>
 
           </div>
         </div>
@@ -868,6 +805,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -880,7 +818,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

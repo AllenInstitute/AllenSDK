@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>API Access &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>API Access &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,10 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" />
     <link rel="up" title="Data Resources" href="data_resources.html" />
     <link rel="next" title="Models" href="models.html" />
-    <link rel="prev" title="Cell Types" href="cell_types.html" /> 
+    <link rel="prev" title="Mouse Connectivity" href="connectivity.html" /> 
   </head>
   <body>
 <script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
@@ -656,7 +656,7 @@ The new class uses <a class="reference internal" href="allensdk.api.html#allensd
 <p>For example, to download gene metadata from the API, first create gene_acronym_query.py:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.api</span> <span class="kn">import</span> <span class="n">Api</span>
 
-<span class="k">def</span> <span class="nf">GeneAcronymQuery</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">GeneAcronymQuery</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">GeneAcronymQuery</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
 
@@ -712,6 +712,7 @@ The new class uses <a class="reference internal" href="allensdk.api.html#allensd
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="data_resources.html">Data Resources</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="">API Access</a></li>
 </ul>
 </li>
@@ -724,7 +725,9 @@ The new class uses <a class="reference internal" href="allensdk.api.html#allensd
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

@@ -21,46 +21,13 @@ in order to generate new queries and read data from the structure of
 the response json.
 The new class uses :py:meth:`~allensdk.api.api.Api.do_rma_query` to execute the query.
 
-For example, to download gene metadata from the API, first create gene_acronym_query.py::
+For example, to download gene metadata from the API, first create gene_acronym_query.py:
 
-    from allensdk.api.api import Api
-    
-    def GeneAcronymQuery(Api):
-        def __init__(self):
-            super(GeneAcronymQuery, self).__init__()
-            
-        def build_rma(self, acronym):
-            '''Compose a query url'''
-            
-            return ''.join([self.rma_endpoint,
-                           "/Gene/query.json",
-                           "?criteria=",
-                           "[acronym$il'%s']" % (acronym),
-                           "&include=organism",
-                           ])
-        
-        def read_json(self, json_parsed_data):
-            '''read data from the result message'''
-            
-            if 'msg' in json_parsed_data:
-                return json_parsed_data['msg']
-            else:
-                raise Exception("no message!")
-        
-        def get_data(self, acronym):
-            '''Use do_rma_query() from the Api class to execute the query.'''
-            return self.do_rma_query(self.build_rma,
-                                     self.read_json,
-                                     acronym)
+.. literalinclude:: examples/data_api_client_ex1.py
 
-The query class is then simple to use in a script.  Create main.py::
+The query class is then simple to use in a script.  Create main.py:
 
-    from gene_acronym_query import GeneAcronymQuery
-    
-    query = GeneAcronymQuery()
-    gene_info = query.get_data('ABAT')
-    for gene in gene_info:
-        print "%s (%s)" % (gene['name'], gene['organism']['name'])
+.. literalinclude:: examples/data_api_client_ex2.py
 
 Additional documentation is available to help with
 `constructing an RMA query <http://help.brain-map.org/display/api/RESTful+Model+Access+%28RMA%29>`_.

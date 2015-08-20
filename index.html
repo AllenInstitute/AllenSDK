@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="#" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="#" />
     <link rel="next" title="Install Guide" href="install.html" /> 
   </head>
   <body>
@@ -635,7 +635,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="toctree-wrapper compound">
 </div>
 <p>The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.
-For the initial release, the Allen SDK focuses primarily on the newly released Allen Cell Types Database.
+The Allen SDK focuses the Allen Cell Types Database and the Allen Mouse Brain Connectivity Atlas.
 Functionality relevant to other atlases is coming in future releases.</p>
 <img alt="_images/ccf_v3_sdk.png" class="align-right" src="_images/ccf_v3_sdk.png" />
 <div class="section" id="allen-cell-types-database">
@@ -656,6 +656,14 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 <li><a class="reference internal" href="glif_models.html"><em>Generalized LIF Models</em></a></li>
 </ul>
 </div></blockquote>
+<hr class="docutils" />
+<img alt="_images/connectivity.png" class="align-right" src="_images/connectivity.png" />
+</div>
+<div class="section" id="allen-mouse-brain-connectivity-atlas">
+<h2>Allen Mouse Brain Connectivity Atlas<a class="headerlink" href="#allen-mouse-brain-connectivity-atlas" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="http://connectivity.brain-map.org">Allen Mouse Brain Connectivity Atlas</a> is a high-resolution map of neural connections in the mouse brain. Built on an array of transgenic mice genetically engineered to target specific cell types, the Atlas comprises a unique compendium of projections from selected neuronal populations throughout the brain.  The primary data of the Atlas consists of high-resolution images of axonal projections targeting different anatomic regions or various cell types using Cre-dependent specimens. Each data set is processed through an informatics data analysis pipeline to obtain spatially mapped quantified projection information.</p>
+<p>The Allen SDK provides Python code for accessing experimental metadata along with projection signal volumes registered to a common coordinate framework.  This framework has structural annotations, which allows users to compute structure-level signal statistics.</p>
+<p>See the <a class="reference external" href="connectivity.html">mouse connectivity section</a> for more details.</p>
 </div>
 <hr class="docutils" />
 <div class="section" id="developer-documentation">
@@ -677,6 +685,7 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -689,7 +698,9 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

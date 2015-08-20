@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.nwb_data_set &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>allensdk.core.nwb_data_set &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
@@ -786,7 +786,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">sweep_name</span> <span class="o">=</span> <span class="s">&quot;Sweep_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
             
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">spikes</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">][</span><span class="s">&quot;aibs_spike_times&quot;</span><span class="p">][</span><span class="n">sweep_name</span><span class="p">]</span>
+                <span class="n">spikes</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">][</span><span class="s">&quot;spike_times&quot;</span><span class="p">][</span><span class="n">sweep_name</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">[]</span>
             
@@ -809,10 +809,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&quot;analysis&quot;</span><span class="p">)</span>
             
             <span class="n">analysis_dir</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s">&quot;aibs_spike_times&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analysis_dir</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">analysis_dir</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&quot;aibs_spike_times&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s">&quot;spike_times&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analysis_dir</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">analysis_dir</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&quot;spike_times&quot;</span><span class="p">)</span>
             
-            <span class="n">spike_dir</span> <span class="o">=</span> <span class="n">analysis_dir</span><span class="p">[</span><span class="s">&quot;aibs_spike_times&quot;</span><span class="p">]</span>
+            <span class="n">spike_dir</span> <span class="o">=</span> <span class="n">analysis_dir</span><span class="p">[</span><span class="s">&quot;spike_times&quot;</span><span class="p">]</span>
             
             <span class="c"># see if desired dataset already exists</span>
             <span class="n">sweep_name</span> <span class="o">=</span> <span class="s">&quot;Sweep_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
@@ -861,7 +861,43 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
             <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">epochs</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">]:</span>
-                    <span class="n">f</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">][</span><span class="n">epoch</span><span class="p">][</span><span class="s">&#39;response&#39;</span><span class="p">][</span><span class="s">&#39;timeseries&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill_value</span></div></div>
+                    <span class="n">f</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">][</span><span class="n">epoch</span><span class="p">][</span><span class="s">&#39;response&#39;</span><span class="p">][</span><span class="s">&#39;timeseries&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill_value</span>
+</div>
+<div class="viewcode-block" id="NwbDataSet.get_sweep_metadata"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweep_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Retrieve the sweep level metadata associated with each sweep.</span>
+<span class="sd">        Includes information on stimulus parameters like its name and amplitude </span>
+<span class="sd">        as well as recording quality metadata, like access resistance and </span>
+<span class="sd">        seal quality.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sweep_number: int</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            A dictionary with &#39;aibs_stimulus_amplitude_pa&#39;, &#39;aibs_stimulus_name&#39;, </span>
+<span class="sd">            &#39;gain&#39;, &#39;initial_access_resistance&#39;, &#39;seal&#39; elements.  These specific</span>
+<span class="sd">            fields are ones encoded in the original AIBS in vitro .nwb files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            
+            <span class="n">sweep_metadata</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="c"># the sweep level metadata is stored in stimulus/presentation/Sweep_XX in the .nwb file</span>
+
+            <span class="c"># indicates which metadata fields to return</span>
+            <span class="n">metadata_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;aibs_stimulus_amplitude_pa&#39;</span><span class="p">,</span> <span class="s">&#39;aibs_stimulus_name&#39;</span><span class="p">,</span> 
+                               <span class="s">&#39;gain&#39;</span><span class="p">,</span> <span class="s">&#39;initial_access_resistance&#39;</span><span class="p">,</span> <span class="s">&#39;seal&#39;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">stim_details</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;presentation&#39;</span><span class="p">][</span><span class="s">&#39;Sweep_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">metadata_fields</span><span class="p">:</span>
+                	<span class="c"># check if sweep contains the specific metadata field</span>
+                	<span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">stim_details</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                		<span class="n">sweep_metadata</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">stim_details</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span>
+                <span class="n">sweep_metadata</span> <span class="o">=</span> <span class="p">{}</span>
+            
+            <span class="k">return</span> <span class="n">sweep_metadata</span></div></div>
 </pre></div>
 
           </div>
@@ -876,6 +912,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -888,7 +925,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

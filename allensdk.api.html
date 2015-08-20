@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api package &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>allensdk.api package &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.api.queries package" href="allensdk.api.queries.html" />
     <link rel="prev" title="allensdk package" href="allensdk.html" /> 
@@ -640,13 +640,41 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.api.queries.html">allensdk.api.queries package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.annotated_section_data_sets_api">allensdk.api.queries.annotated_section_data_sets_api module</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.biophysical_perisomatic_api">allensdk.api.queries.biophysical_perisomatic_api module</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.cell_types_api">allensdk.api.queries.cell_types_api module</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#allensdk-api-queries-connected-services-module">allensdk.api.queries.connected_services module</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.glif_api">allensdk.api.queries.glif_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.grid_data_api">allensdk.api.queries.grid_data_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.image_download_api">allensdk.api.queries.image_download_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#allensdk-api-queries-mouse-connectivity-api-module">allensdk.api.queries.mouse_connectivity_api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.ontologies_api">allensdk.api.queries.ontologies_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.rma_api">allensdk.api.queries.rma_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.svg_api">allensdk.api.queries.svg_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.synchronization_api">allensdk.api.queries.synchronization_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.tree_search_api">allensdk.api.queries.tree_search_api module</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries">Module contents</a></li>
@@ -674,16 +702,28 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.api.Api.construct_well_known_file_download_url" title="allensdk.api.api.Api.construct_well_known_file_download_url"><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt></a>(...)</td>
 <td>Join data api endpoint and id.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.api.Api.do_rma_query" title="allensdk.api.api.Api.do_rma_query"><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt></a>(rma_builder_fn,&nbsp;...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.api.Api.do_query" title="allensdk.api.api.Api.do_query"><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt></a>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
+<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.api.Api.do_rma_query" title="allensdk.api.api.Api.do_rma_query"><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt></a>(rma_builder_fn,&nbsp;...)</td>
 <td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.api.Api.json_msg_query" title="allensdk.api.api.Api.json_msg_query"><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt></a>(url)</td>
+<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.api.Api.load_api_schema" title="allensdk.api.api.Api.load_api_schema"><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt></a>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.api.Api.retrieve_file_over_http" title="allensdk.api.api.Api.retrieve_file_over_http"><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt></a>(url,&nbsp;file_path)</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.api.Api.read_data" title="allensdk.api.api.Api.read_data"><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt></a>(parsed_json)</td>
+<td>Return the message data from the parsed query.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.api.Api.retrieve_file_over_http" title="allensdk.api.api.Api.retrieve_file_over_http"><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt></a>(url,&nbsp;file_path)</td>
 <td>Get a file from the data api and save it.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.api.Api.retrieve_parsed_json_over_http" title="allensdk.api.api.Api.retrieve_parsed_json_over_http"><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt></a>(rma_url)</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.api.Api.retrieve_parsed_json_over_http" title="allensdk.api.api.Api.retrieve_parsed_json_over_http"><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt></a>(url[,&nbsp;post])</td>
+<td>Get the document and put it in a Python data structure</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.api.Api.retrieve_xml_over_http" title="allensdk.api.api.Api.retrieve_xml_over_http"><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt></a>(url)</td>
 <td>Get the document and put it in a Python data structure</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#allensdk.api.api.Api.set_api_urls" title="allensdk.api.api.Api.set_api_urls"><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt></a>(api_base_url_string)</td>
@@ -731,10 +771,54 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="allensdk.api.api.Api.do_query">
+<tt class="descname">do_query</tt><big>(</big><em>url_builder_fn</em>, <em>json_traversal_fn</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/api.html#Api.do_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.do_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bundle an query url construction function
+with a corresponding response json traversal function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url_builder_fn</strong> : function</p>
+<blockquote>
+<div><p>A function that takes parameters and returns an rma url.</p>
+</div></blockquote>
+<p><strong>json_traversal_fn</strong> : function</p>
+<blockquote>
+<div><p>A function that takes a json-parsed python data structure and returns data from it.</p>
+</div></blockquote>
+<p><strong>args</strong> : arguments</p>
+<blockquote>
+<div><p>Arguments to be passed to the url builder function.</p>
+</div></blockquote>
+<p><strong>kwargs</strong> : keyword arguments</p>
+<blockquote>
+<div><p>Keyword arguments to be passed to the rma builder function.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">any type</p>
+<blockquote class="last">
+<div><p>The data extracted from the json response.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p><a class="reference external" href="data_api_client.html#creating-new-api-query-classes">A simple Api subclass example</a>.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="allensdk.api.api.Api.do_rma_query">
 <tt class="descname">do_rma_query</tt><big>(</big><em>rma_builder_fn</em>, <em>json_traversal_fn</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/api.html#Api.do_rma_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.do_rma_query" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bundle an RMA query url construction function
 with a corresponding response json traversal function.</p>
+<dl class="docutils">
+<dt>..note:: Deprecated in AllenSDK 0.9.2</dt>
+<dd><cite>do_rma_query</cite> will be removed in AllenSDK 1.0, it is replaced by
+<cite>do_query</cite> because the latter is more general.</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -769,6 +853,18 @@ with a corresponding response json traversal function.</p>
 <p><a class="reference external" href="data_api_client.html#creating-new-api-query-classes">A simple Api subclass example</a>.</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="allensdk.api.api.Api.download_url">
+<tt class="descname">download_url</tt><em class="property"> = 'http://download.alleninstitute.org'</em><a class="headerlink" href="#allensdk.api.api.Api.download_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.json_msg_query">
+<tt class="descname">json_msg_query</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/api.html#Api.json_msg_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.json_msg_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Common case where the url is fully constructed
+and the response data is stored in the &#8216;msg&#8217; field.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="allensdk.api.api.Api.load_api_schema">
 <tt class="descname">load_api_schema</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/api/api.html#Api.load_api_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.load_api_schema" title="Permalink to this definition">¶</a></dt>
@@ -791,6 +887,27 @@ with a corresponding response json traversal function.</p>
 documentation is also available as a
 <a class="reference external" href="http://api.brain-map.org/class_hierarchy">Class Hierarchy</a>
 and <a class="reference external" href="http://api.brain-map.org/class_hierarchy">Class List</a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.read_data">
+<tt class="descname">read_data</tt><big>(</big><em>parsed_json</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/api.html#Api.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.read_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the message data from the parsed query.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>parsed_json</strong> : dict</p>
+<blockquote class="last">
+<div><p>A python structure corresponding to the JSON data returned from the API.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope">API Response Formats - Response Envelope</a>
+for additional documentation.</p>
 </dd></dl>
 
 <dl class="method">
@@ -824,28 +941,52 @@ and <a class="reference external" href="http://api.brain-map.org/class_hierarchy
 <table class="docutils citation" frame="void" id="r1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[R1]</a></td><td>Allen Brain Atlas Data Portal: <a class="reference external" href="http://help.brain-map.org/display/api/Downloading+a+WellKnownFile">Downloading a WellKnownFile</a>.</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id2">[R1]</a></td><td>Allen Brain Atlas Data Portal: <a class="reference external" href="http://help.brain-map.org/display/api/Downloading+a+WellKnownFile">Downloading a WellKnownFile</a>.</td></tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
 <dt id="allensdk.api.api.Api.retrieve_parsed_json_over_http">
-<tt class="descname">retrieve_parsed_json_over_http</tt><big>(</big><em>rma_url</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/api.html#Api.retrieve_parsed_json_over_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.retrieve_parsed_json_over_http" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">retrieve_parsed_json_over_http</tt><big>(</big><em>url</em>, <em>post=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/api.html#Api.retrieve_parsed_json_over_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.retrieve_parsed_json_over_http" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the document and put it in a Python data structure</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rma_url</strong> : string</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url</strong> : string</p>
 <blockquote>
-<div><p>Full RMA query url.</p>
+<div><p>Full API query url.</p>
 </div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
 <blockquote class="last">
 <div><p>Result document as parsed by the JSON library.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.api.Api.retrieve_xml_over_http">
+<tt class="descname">retrieve_xml_over_http</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/api.html#Api.retrieve_xml_over_http"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.retrieve_xml_over_http" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the document and put it in a Python data structure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url</strong> : string</p>
+<blockquote>
+<div><p>Full API query url.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
+<blockquote class="last">
+<div><p>Unparsed xml string.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -893,6 +1034,244 @@ based on a api server endpoint.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-allensdk.api.cache">
+<span id="allensdk-api-cache-module"></span><h2>allensdk.api.cache module<a class="headerlink" href="#module-allensdk.api.cache" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.api.cache.Cache">
+<em class="property">class </em><tt class="descclassname">allensdk.api.cache.</tt><tt class="descname">Cache</tt><big>(</big><em>manifest=None</em>, <em>cache=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.cache.Cache.build_manifest" title="allensdk.api.cache.Cache.build_manifest"><tt class="xref py py-obj docutils literal"><span class="pre">build_manifest</span></tt></a>(file_name)</td>
+<td>Creation of default path speifications.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.cache.Cache.get_cache_path" title="allensdk.api.cache.Cache.get_cache_path"><tt class="xref py py-obj docutils literal"><span class="pre">get_cache_path</span></tt></a>(file_name,&nbsp;manifest_key,&nbsp;*args)</td>
+<td>Helper method for accessing path specs from manifest keys.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.cache.Cache.load_csv" title="allensdk.api.cache.Cache.load_csv"><tt class="xref py py-obj docutils literal"><span class="pre">load_csv</span></tt></a>(path[,&nbsp;rename,&nbsp;index])</td>
+<td>Read a csv file as a pandas dataframe.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.cache.Cache.load_json" title="allensdk.api.cache.Cache.load_json"><tt class="xref py py-obj docutils literal"><span class="pre">load_json</span></tt></a>(path[,&nbsp;rename,&nbsp;index])</td>
+<td>Read a json file as a pandas dataframe.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.cache.Cache.load_manifest" title="allensdk.api.cache.Cache.load_manifest"><tt class="xref py py-obj docutils literal"><span class="pre">load_manifest</span></tt></a>(file_name)</td>
+<td>Read a keyed collection of path specifications.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.cache.Cache.manifest_dataframe" title="allensdk.api.cache.Cache.manifest_dataframe"><tt class="xref py py-obj docutils literal"><span class="pre">manifest_dataframe</span></tt></a>()</td>
+<td>Convenience method to view manifest as a pandas dataframe.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.cache.Cache.rename_columns" title="allensdk.api.cache.Cache.rename_columns"><tt class="xref py py-obj docutils literal"><span class="pre">rename_columns</span></tt></a>(data[,&nbsp;new_old_name_tuples])</td>
+<td>Convenience method to rename columns in a pandas dataframe.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.cache.Cache.safe_mkdir" title="allensdk.api.cache.Cache.safe_mkdir"><tt class="xref py py-obj docutils literal"><span class="pre">safe_mkdir</span></tt></a>(directory)</td>
+<td>Create path if not already there.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.cache.Cache.wrap" title="allensdk.api.cache.Cache.wrap"><tt class="xref py py-obj docutils literal"><span class="pre">wrap</span></tt></a>(fn,&nbsp;path,&nbsp;cache[,&nbsp;save_as_json,&nbsp;index,&nbsp;...])</td>
+<td>make an rma query, save it and return the dataframe.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.api.cache.Cache.build_manifest">
+<tt class="descname">build_manifest</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.build_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.build_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creation of default path speifications.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name</strong> : string</p>
+<blockquote class="last">
+<div><p>where to save it</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.cache.Cache.get_cache_path">
+<tt class="descname">get_cache_path</tt><big>(</big><em>file_name</em>, <em>manifest_key</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.get_cache_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.get_cache_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method for accessing path specs from manifest keys.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name</strong> : string</p>
+<p><strong>manifest_key</strong> : string</p>
+<p><strong>args</strong> : ordered parameters</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string or None</p>
+<blockquote class="last">
+<div><p>path</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.cache.Cache.load_csv">
+<tt class="descname">load_csv</tt><big>(</big><em>path</em>, <em>rename=None</em>, <em>index=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.load_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.load_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a csv file as a pandas dataframe.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rename</strong> : list of string tuples (new old), optional</p>
+<blockquote>
+<div><p>columns to rename</p>
+</div></blockquote>
+<p><strong>index</strong> : string, optional</p>
+<blockquote class="last">
+<div><p>post-rename column to use as the row label.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.cache.Cache.load_json">
+<tt class="descname">load_json</tt><big>(</big><em>path</em>, <em>rename=None</em>, <em>index=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.load_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.load_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a json file as a pandas dataframe.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>rename</strong> : list of string tuples (new old), optional</p>
+<blockquote>
+<div><p>columns to rename</p>
+</div></blockquote>
+<p><strong>index</strong> : string, optional</p>
+<blockquote class="last">
+<div><p>post-rename column to use as the row label.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.cache.Cache.load_manifest">
+<tt class="descname">load_manifest</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.load_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.load_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a keyed collection of path specifications.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name</strong> : string</p>
+<blockquote>
+<div><p>path to the manifest file</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Manifest</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.cache.Cache.manifest_dataframe">
+<tt class="descname">manifest_dataframe</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.manifest_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.manifest_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method to view manifest as a pandas dataframe.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.cache.Cache.rename_columns">
+<tt class="descname">rename_columns</tt><big>(</big><em>data</em>, <em>new_old_name_tuples=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.rename_columns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.rename_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method to rename columns in a pandas dataframe.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : dataframe</p>
+<blockquote>
+<div><p>edited in place.</p>
+</div></blockquote>
+<p class="last"><strong>new_old_name_tuples</strong> : list of string tuples (new, old)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.cache.Cache.safe_mkdir">
+<tt class="descname">safe_mkdir</tt><big>(</big><em>directory</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.safe_mkdir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.safe_mkdir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create path if not already there.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>directory</strong> : string</p>
+<blockquote class="last">
+<div><p>create it if it doesn&#8217;t exist</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.cache.Cache.wrap">
+<tt class="descname">wrap</tt><big>(</big><em>fn</em>, <em>path</em>, <em>cache</em>, <em>save_as_json=False</em>, <em>index=None</em>, <em>rename=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.wrap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.wrap" title="Permalink to this definition">¶</a></dt>
+<dd><p>make an rma query, save it and return the dataframe.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>fn</strong> : function reference</p>
+<blockquote>
+<div><p>makes the actual query using kwargs.</p>
+</div></blockquote>
+<p><strong>path</strong> : string</p>
+<blockquote>
+<div><p>where to save the data</p>
+</div></blockquote>
+<p><strong>cache</strong> : boolean</p>
+<blockquote>
+<div><p>true will make the query, false just loads from disk</p>
+</div></blockquote>
+<p><strong>save_as_json</strong> : boolean, optional</p>
+<blockquote>
+<div><p>true will save data as json, false as csv</p>
+</div></blockquote>
+<p><strong>index</strong> : string, optional</p>
+<blockquote>
+<div><p>column to use as the pandas index</p>
+</div></blockquote>
+<p><strong>rename</strong> : list of string tuples, optional</p>
+<blockquote>
+<div><p>(new, old) columns to rename</p>
+</div></blockquote>
+<p><strong>kwargs</strong> : objects</p>
+<blockquote class="last">
+<div><p>passed through to the query function</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>Renaming happens after the file is reloaded for json</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-allensdk.api">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-allensdk.api" title="Permalink to this headline">¶</a></h2>
 <p>Subclasses of allensdk.api.api.Api to implement specific queries to the
@@ -913,6 +1292,7 @@ based on a api server endpoint.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -925,7 +1305,9 @@ based on a api server endpoint.</p>
 <li class="toctree-l2 current"><a class="current reference internal" href="">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

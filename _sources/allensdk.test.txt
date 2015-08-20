@@ -1,0 +1,61 @@
+allensdk.test package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    allensdk.test.api
+
+Submodules
+----------
+
+allensdk.test.config_single_file_json_tests module
+--------------------------------------------------
+
+.. automodule:: allensdk.test.config_single_file_json_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.json_comments_test module
+---------------------------------------
+
+.. automodule:: allensdk.test.json_comments_test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.multi_file_config_tests module
+--------------------------------------------
+
+.. automodule:: allensdk.test.multi_file_config_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.nwb_data_set_tests module
+---------------------------------------
+
+.. automodule:: allensdk.test.nwb_data_set_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.pyconfig_parser_tests module
+------------------------------------------
+
+.. automodule:: allensdk.test.pyconfig_parser_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.test
+    :members:
+    :undoc-members:
+    :show-inheritance:

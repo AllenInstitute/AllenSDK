@@ -4,6 +4,14 @@ allensdk.api.queries package
 Submodules
 ----------
 
+allensdk.api.queries.annotated_section_data_sets_api module
+-----------------------------------------------------------
+
+.. automodule:: allensdk.api.queries.annotated_section_data_sets_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.api.queries.biophysical_perisomatic_api module
 -------------------------------------------------------
 
@@ -20,10 +28,82 @@ allensdk.api.queries.cell_types_api module
     :undoc-members:
     :show-inheritance:
 
+allensdk.api.queries.connected_services module
+----------------------------------------------
+
+.. automodule:: allensdk.api.queries.connected_services
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.api.queries.glif_api module
 ------------------------------------
 
 .. automodule:: allensdk.api.queries.glif_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.api.queries.grid_data_api module
+-----------------------------------------
+
+.. automodule:: allensdk.api.queries.grid_data_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.api.queries.image_download_api module
+----------------------------------------------
+
+.. automodule:: allensdk.api.queries.image_download_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.api.queries.mouse_connectivity_api module
+--------------------------------------------------
+
+.. automodule:: allensdk.api.queries.mouse_connectivity_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.api.queries.ontologies_api module
+------------------------------------------
+
+.. automodule:: allensdk.api.queries.ontologies_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.api.queries.rma_api module
+-----------------------------------
+
+.. automodule:: allensdk.api.queries.rma_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.api.queries.svg_api module
+-----------------------------------
+
+.. automodule:: allensdk.api.queries.svg_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.api.queries.synchronization_api module
+-----------------------------------------------
+
+.. automodule:: allensdk.api.queries.synchronization_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.api.queries.tree_search_api module
+-------------------------------------------
+
+.. automodule:: allensdk.api.queries.tree_search_api
     :members:
     :undoc-members:
     :show-inheritance:

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk package &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>allensdk package &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" />
     <link rel="next" title="allensdk.api package" href="allensdk.api.html" />
     <link rel="prev" title="Perisomatic Biophysical Models" href="biophysical_perisomatic_script.html" /> 
   </head>
@@ -641,13 +641,41 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="allensdk.api.queries.html">allensdk.api.queries package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.annotated_section_data_sets_api">allensdk.api.queries.annotated_section_data_sets_api module</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.biophysical_perisomatic_api">allensdk.api.queries.biophysical_perisomatic_api module</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.cell_types_api">allensdk.api.queries.cell_types_api module</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#allensdk-api-queries-connected-services-module">allensdk.api.queries.connected_services module</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.glif_api">allensdk.api.queries.glif_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.grid_data_api">allensdk.api.queries.grid_data_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.image_download_api">allensdk.api.queries.image_download_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#allensdk-api-queries-mouse-connectivity-api-module">allensdk.api.queries.mouse_connectivity_api module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.ontologies_api">allensdk.api.queries.ontologies_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.rma_api">allensdk.api.queries.rma_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.svg_api">allensdk.api.queries.svg_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.synchronization_api">allensdk.api.queries.synchronization_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.tree_search_api">allensdk.api.queries.tree_search_api module</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries">Module contents</a></li>
@@ -657,6 +685,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html#module-allensdk.api.api">allensdk.api.api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html#module-allensdk.api.cache">allensdk.api.cache module</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html#module-allensdk.api">Module contents</a></li>
@@ -676,6 +707,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l4"><a class="reference internal" href="allensdk.config.model.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="allensdk.config.model.formats.html">allensdk.config.model.formats package</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="allensdk.config.model.formats.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.hdf5_util">allensdk.config.model.formats.hdf5_util module</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l6"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_description_parser">allensdk.config.model.formats.json_description_parser module</a><ul class="simple">
 </ul>
 </li>
@@ -705,22 +739,47 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html#module-allensdk.config.manifest">allensdk.config.manifest module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html#module-allensdk.config.manifest_builder">allensdk.config.manifest_builder module</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html#module-allensdk.config">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html#module-allensdk.core.cell_types_cache">allensdk.core.cell_types_cache module</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html#module-allensdk.core.dat_utilities">allensdk.core.dat_utilities module</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html#module-allensdk.core.json_utilities">allensdk.core.json_utilities module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html#module-allensdk.core.json_utilities">allensdk.core.json_utilities module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html#allensdk-core-mouse-connectivity-cache-module">allensdk.core.mouse_connectivity_cache module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html#module-allensdk.core.nwb_data_set">allensdk.core.nwb_data_set module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html#module-allensdk.core.ontology">allensdk.core.ontology module</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html#module-allensdk.core.swc">allensdk.core.swc module</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html#module-allensdk.core">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html#module-allensdk.ephys.extract_cell_features">allensdk.ephys.extract_cell_features module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html#module-allensdk.ephys.feature_extractor">allensdk.ephys.feature_extractor module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html#module-allensdk.ephys">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a><ul>
@@ -771,6 +830,49 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html#module-allensdk.model">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="allensdk.test.api.html">allensdk.test.api package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.test.api.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.annotated_section_data_set_api_tests">allensdk.test.api.annotated_section_data_set_api_tests module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.grid_data_api_tests">allensdk.test.api.grid_data_api_tests module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.image_download_api_tests">allensdk.test.api.image_download_api_tests module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.ontologies_api_tests">allensdk.test.api.ontologies_api_tests module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.synchronization_api_tests">allensdk.test.api.synchronization_api_tests module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html#module-allensdk.test.config_single_file_json_tests">allensdk.test.config_single_file_json_tests module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html#module-allensdk.test.json_comments_test">allensdk.test.json_comments_test module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html#module-allensdk.test.multi_file_config_tests">allensdk.test.multi_file_config_tests module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html#module-allensdk.test.nwb_data_set_tests">allensdk.test.nwb_data_set_tests module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html#module-allensdk.test.pyconfig_parser_tests">allensdk.test.pyconfig_parser_tests module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html#module-allensdk.test">Module contents</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -792,6 +894,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -804,7 +907,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

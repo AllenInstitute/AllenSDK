@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.cell_types_api &mdash; Allen SDK 0.9.1 documentation</title>
+    <title>allensdk.api.queries.cell_types_api &mdash; Allen SDK 0.10.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.9.1',
+        VERSION:     '0.10.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.9.1 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -646,15 +646,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.api.api</span> <span class="kn">import</span> <span class="n">Api</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">urllib</span>
+<div class="viewcode-block" id="CellTypesApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi">[docs]</a><span class="k">class</span> <span class="nc">CellTypesApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
 
-<div class="viewcode-block" id="CellTypesApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi">[docs]</a><span class="k">class</span> <span class="nc">CellTypesApi</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CellTypesApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
 
-
+        
 <div class="viewcode-block" id="CellTypesApi.list_cells"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells">[docs]</a>    <span class="k">def</span> <span class="nf">list_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">require_morphology</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Query the API for a list of all cells in the Cell Types Database.</span>
 
@@ -671,124 +672,142 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        list</span>
 <span class="sd">            Meta data for all cells.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&quot;[is_cell_specimen$eq&#39;true&#39;],products[name$eq&#39;Mouse Cell Types&#39;]&quot;</span>
         
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_rma_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_list_cells_rma</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_list_cells_json</span><span class="p">,</span> 
-                                 <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">)</span>
+        <span class="n">include</span> <span class="o">=</span> <span class="p">(</span> <span class="s">&#39;structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,&#39;</span> <span class="o">+</span>
+                    <span class="s">&#39;ephys_features,data_sets,neuron_reconstructions&#39;</span> <span class="p">)</span>
+
+        <span class="n">cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Specimen&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">cells</span><span class="p">:</span>
+            <span class="c"># specimen tags</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">cell</span><span class="p">[</span><span class="s">&#39;specimen_tags&#39;</span><span class="p">]:</span>
+                <span class="n">tag_name</span><span class="p">,</span> <span class="n">tag_value</span> <span class="o">=</span> <span class="n">tag</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39; - &#39;</span><span class="p">)</span>
+                <span class="n">tag_name</span> <span class="o">=</span> <span class="n">tag_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;_&#39;</span><span class="p">)</span>
+                <span class="n">cell</span><span class="p">[</span><span class="n">tag_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_value</span>
+
+
+            <span class="c"># morphology and reconstuction</span>
+            <span class="n">cell</span><span class="p">[</span><span class="s">&#39;has_reconstruction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">[</span><span class="s">&#39;neuron_reconstructions&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="n">cell</span><span class="p">[</span><span class="s">&#39;has_morphology&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">[</span><span class="s">&#39;data_sets&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_cells</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="CellTypesApi.build_list_cells_rma"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.build_list_cells_rma">[docs]</a>    <span class="k">def</span> <span class="nf">build_list_cells_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Build the RMA URL that will fetch meta data for all cells in the cell types database &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="CellTypesApi.get_ephys_sweeps"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_sweeps">[docs]</a>    <span class="k">def</span> <span class="nf">get_ephys_sweeps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Query the API for a list of sweeps for a particular cell in the Cell Types Database.</span>
 
-        <span class="n">criteria_associations</span> <span class="o">=</span> <span class="s">&quot;[is_cell_specimen$eq&#39;true&#39;],products[name$eq&#39;Mouse Cell Types&#39;]&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        specimen_id: int</span>
+<span class="sd">            Specimen ID of a cell.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list: List of sweep dictionaries belonging to a cell</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&quot;[specimen_id$eq</span><span class="si">%d</span><span class="s">]&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;EphysSweep&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="CellTypesApi.filter_cells"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells">[docs]</a>    <span class="k">def</span> <span class="nf">filter_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; </span>
+<span class="sd">        Filter a list of cell specimens to those that optionally have morphologies</span>
+<span class="sd">        or have morphological reconstructions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        cells: list</span>
+<span class="sd">            List of cell metadata dictionaries to be filtered</span>
+
+<span class="sd">        require_morphology: boolean</span>
+<span class="sd">            Filter out cells that have no morphological images.</span>
+
+<span class="sd">        require_reconstruction: boolean</span>
+<span class="sd">            Filter out cells that have no morphological reconstructions.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">require_morphology</span><span class="p">:</span>
-            <span class="n">criteria_associations</span> <span class="o">+=</span> <span class="s">&quot;,data_sets&quot;</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="p">[</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cells</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;has_morphology&#39;</span><span class="p">]</span> <span class="p">]</span>
 
         <span class="k">if</span> <span class="n">require_reconstruction</span><span class="p">:</span>
-            <span class="n">criteria_associations</span> <span class="o">+=</span> <span class="s">&quot;,neuron_reconstructions&quot;</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="p">[</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cells</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;has_reconstruction&#39;</span><span class="p">]</span> <span class="p">]</span>
 
-        <span class="n">include_associations</span> <span class="o">=</span> <span class="s">&#39;structure,donor(transgenic_lines),specimen_tags,cell_soma_locations&#39;</span>
-
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span> 
-                       <span class="s">&#39;/query.&#39;</span><span class="p">,</span>
-                       <span class="n">fmt</span><span class="p">,</span>
-                       <span class="s">&#39;?q=&#39;</span><span class="p">,</span>
-                       <span class="s">&#39;model::Specimen,&#39;</span><span class="p">,</span>
-                       <span class="s">&#39;rma::criteria,&#39;</span><span class="p">,</span>
-                       <span class="n">criteria_associations</span><span class="p">,</span>
-                       <span class="s">&#39;,rma::include,&#39;</span><span class="p">,</span>
-                       <span class="n">include_associations</span><span class="p">,</span>
-                       <span class="s">&#39;,rma::options[num_rows$eqall]&#39;</span><span class="p">])</span>
-
-        <span class="k">return</span> <span class="n">url</span>
-
+        <span class="k">return</span> <span class="n">cells</span>
+        
 </div>
-<div class="viewcode-block" id="CellTypesApi.read_list_cells_json"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.read_list_cells_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_list_cells_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_json</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Return the list of cells from the parsed query. &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">parsed_json</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">]</span>
+<div class="viewcode-block" id="CellTypesApi.get_ephys_features"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_ephys_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Query the API for the full table of EphysFeatures for all cells.  </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        </span>
+<span class="sd">        dataframe: boolean</span>
+<span class="sd">            If true, return the results as a Pandas DataFrame.  Otherwise</span>
+<span class="sd">            return a list of dictionaries.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;EphysFeature&#39;</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dataframe</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">features</span>
 
 </div>
 <div class="viewcode-block" id="CellTypesApi.save_ephys_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data">[docs]</a>    <span class="k">def</span> <span class="nf">save_ephys_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Find the electrophysiology data file for a specimen and save it. &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
 
-        
-        <span class="n">file_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_rma_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_ephys_data_rma</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_ephys_data_json</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">file_url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Could not find electrophysiology file for specimen </span><span class="si">%d</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">specimen_id</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="n">file_url</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
-    
-</div>
-<div class="viewcode-block" id="CellTypesApi.build_ephys_data_rma"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.build_ephys_data_rma">[docs]</a>    <span class="k">def</span> <span class="nf">build_ephys_data_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Build the URL for the save_ephys_data command. &#39;&#39;&#39;</span>
         <span class="n">criteria</span> <span class="o">=</span> <span class="s">&#39;[id$eq</span><span class="si">%d</span><span class="s">],ephys_result(well_known_files(well_known_file_type[name$eqNWB]))&#39;</span> <span class="o">%</span> <span class="n">specimen_id</span>
         <span class="n">includes</span> <span class="o">=</span> <span class="s">&#39;ephys_result(well_known_files(well_known_file_type))&#39;</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span> 
-                       <span class="s">&#39;/query.&#39;</span><span class="p">,</span>
-                       <span class="n">fmt</span><span class="p">,</span>
-                       <span class="s">&#39;?q=&#39;</span><span class="p">,</span>
-                       <span class="s">&#39;model::Specimen,&#39;</span><span class="p">,</span>
-                       <span class="s">&#39;rma::criteria,&#39;</span><span class="p">,</span>
-                       <span class="n">criteria</span><span class="p">,</span>
-                       <span class="s">&#39;,rma::include,&#39;</span><span class="p">,</span>
-                       <span class="n">includes</span><span class="p">,</span>
-                       <span class="s">&#39;,rma::options[num_rows$eqall]&#39;</span><span class="p">])</span>
-
-        <span class="k">return</span> <span class="n">url</span>
-
-</div>
-<div class="viewcode-block" id="CellTypesApi.read_ephys_data_json"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.read_ephys_data_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_ephys_data_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_json</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Extract the download link from the save_ephys_data RMA. &#39;&#39;&#39;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Specimen&#39;</span><span class="p">,</span>
+                                   <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
+                                   <span class="n">include</span><span class="o">=</span><span class="n">includes</span><span class="p">,</span>
+                                   <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">parsed_json</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;ephys_result&#39;</span><span class="p">][</span><span class="s">&#39;well_known_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;download_link&#39;</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Error finding ephys file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">None</span>
-
-</div>
-<div class="viewcode-block" id="CellTypesApi.save_reconstruction"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction">[docs]</a>    <span class="k">def</span> <span class="nf">save_reconstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Find the reconstruction file for a specimen and save it. &#39;&#39;&#39;</span>
-
-        <span class="n">file_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_rma_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_reconstruction_rma</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_reconstruction_json</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">file_url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Could not find reconstruction file for specimen </span><span class="si">%d</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">specimen_id</span><span class="p">)</span>
+            <span class="n">file_url</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;ephys_result&#39;</span><span class="p">][</span><span class="s">&#39;well_known_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;download_link&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Specimen </span><span class="si">%d</span><span class="s"> has no ephys data&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="n">file_url</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
-
+        
 </div>
-<div class="viewcode-block" id="CellTypesApi.build_reconstruction_rma"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.build_reconstruction_rma">[docs]</a>    <span class="k">def</span> <span class="nf">build_reconstruction_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Build the URL for the save_reconstruction command. &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="CellTypesApi.save_reconstruction"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction">[docs]</a>    <span class="k">def</span> <span class="nf">save_reconstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
         <span class="n">criteria</span> <span class="o">=</span> <span class="s">&#39;[id$eq</span><span class="si">%d</span><span class="s">],neuron_reconstructions(well_known_files)&#39;</span> <span class="o">%</span> <span class="n">specimen_id</span>
         <span class="n">includes</span> <span class="o">=</span> <span class="s">&#39;neuron_reconstructions(well_known_files)&#39;</span>
-
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span> 
-                       <span class="s">&#39;/query.&#39;</span><span class="p">,</span>
-                       <span class="n">fmt</span><span class="p">,</span>
-                       <span class="s">&#39;?q=&#39;</span><span class="p">,</span>
-                       <span class="s">&#39;model::Specimen,&#39;</span><span class="p">,</span>
-                       <span class="s">&#39;rma::criteria,&#39;</span><span class="p">,</span>
-                       <span class="n">criteria</span><span class="p">,</span>
-                       <span class="s">&#39;,rma::include,&#39;</span><span class="p">,</span>
-                       <span class="n">includes</span><span class="p">,</span>
-                       <span class="s">&#39;,rma::options[num_rows$eqall]&#39;</span><span class="p">])</span>
-
-        <span class="k">return</span> <span class="n">url</span>
-
-</div>
-<div class="viewcode-block" id="CellTypesApi.read_reconstruction_json"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.read_reconstruction_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_reconstruction_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_json</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Extract the download link from the save_ephys_file RMA. &#39;&#39;&#39;</span>
-
+        
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Specimen&#39;</span><span class="p">,</span>
+                                   <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
+                                   <span class="n">include</span><span class="o">=</span><span class="n">includes</span><span class="p">,</span>
+                                   <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+        
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">parsed_json</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;neuron_reconstructions&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;well_known_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;download_link&#39;</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Error finding reconstruction file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">None</span>
-    </div></div>
-</pre></div>
+            <span class="n">file_url</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;neuron_reconstructions&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;well_known_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;download_link&#39;</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Specimen </span><span class="si">%d</span><span class="s"> has no reconstruction&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="n">file_url</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+
+
+
+        
+</pre></div></div></div>
 
           </div>
         </div>
@@ -802,6 +821,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -814,7 +834,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test.html">allensdk.test package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
