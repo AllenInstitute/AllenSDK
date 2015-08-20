@@ -462,6 +462,18 @@ class RmaApi(Api):
     
     
     def quote_string(self, the_string):
+        '''Wrap a clause in single quotes.
+        
+        Parameters
+        ----------
+        the_string : string
+            a clause to be included in an rma query that needs to be quoted
+        
+        Returns
+        -------
+        string
+            input wrapped in single quotes
+        '''
         return ''.join(["'", the_string, "'"])
     
     

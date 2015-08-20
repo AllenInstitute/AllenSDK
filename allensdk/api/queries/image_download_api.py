@@ -369,20 +369,25 @@ class ImageDownloadApi(RmaApi):
                                section_image_id,
                                file_path=None,
                                **kwargs):
-        '''
+        '''Download a section image.
+        
         Parameters
         ----------
         section_image_id : integer
             What to download.
         file_path : string, optional
             Where to put it.  <section_image_id>.jpg (default).
+            
+        Returns
+        -------
+        None
+            the file is downloaded and saved to the path.
         '''
         if file_path == None:
             file_path = '%d.jpg' % (section_image_id)
         
         image_url = self.build_section_image_url(section_image_id,
                                                  **kwargs)
-        print(image_url)
         self.retrieve_file_over_http(image_url, file_path)
     
     
@@ -390,12 +395,26 @@ class ImageDownloadApi(RmaApi):
                              atlas_image_id,
                              file_path=None,
                              **kwargs):
+        '''Download an atlas image.
+        
+        Parameters
+        ----------
+        
+        atlas_image_id : integer
+            database key
+        file_path : string, optional
+            where to put it
+        
+        Returns
+        -------
+        None
+            the file is downloaded and saved to the path.
+        '''
         if file_path == None:
             file_path = '%d.jpg' % (atlas_image_id)
         
         image_url = self.build_atlas_image_url(atlas_image_id,
                                                **kwargs)
-        print(image_url)
         self.retrieve_file_over_http(image_url, file_path)
     
     
@@ -403,12 +422,26 @@ class ImageDownloadApi(RmaApi):
                                   projection_image_id,
                                   file_path=None,
                                   **kwargs):
+        '''Download a projection image.
+        
+        Parameters
+        ----------
+        
+        projection_image_id : integer
+            database key
+        file_path : string, optional
+            where to put it.  default is id.jpg
+        
+        Returns
+        -------
+        None
+            the file is downloaded and saved to the path.
+        '''
         if file_path == None:
             file_path = '%d.jpg' % (projection_image_id)
         
         image_url = self.build_projection_image_url(projection_image_id,
                                                     **kwargs)
-        print(image_url)
         self.retrieve_file_over_http(image_url, file_path)
     
     

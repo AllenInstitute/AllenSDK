@@ -22,15 +22,7 @@ class OntologiesApi(RmaApi):
     
     def __init__(self, base_uri=None):
         super(OntologiesApi, self).__init__(base_uri)
-    
-    
-    def get_ontology(self, structure_graph_id):
-        '''Retrieve.'''
-        data = self.do_query(self.build_query,
-                                   self.read_data)
         
-        return data
-    
 
     def get_structures(self,
                        structure_graph_ids=None,
@@ -40,6 +32,32 @@ class OntologiesApi(RmaApi):
                        order = ['structures.graph_order'],
                        num_rows='all',
                        count=False):
+        '''Retrieve data about anatomical structures.
+        
+        Parameters
+        ----------
+        structure_graph_ids : int or list of ints, optional
+            database keys to get all structures in particular graphs
+        structure_graph_names : string or list of strings, optional
+            list of graph names to narrow the query
+        structure_set_ids : int or list of ints, optional
+            database keys to get all structures in a particular set
+        structure_set_names : string or list of strings, optional
+            list of set names to narrow the query.
+        order : list of strings
+            list of RMA order clauses for sorting
+        num_rows : int
+            how many records to retrieve
+            
+        Returns
+        -------
+        dict
+            the parsed json response containing data from the API
+            
+        Notes
+        -----
+        Only one of the methods of limiting the query should be used at a time.
+        '''
         criteria_list = []
         
         if structure_graph_ids != None:
@@ -76,6 +94,18 @@ class OntologiesApi(RmaApi):
     
     
     def unpack_structure_set_ancestors(self, structure_dataframe):
+        '''Convert a slash-separated structure_id_path field to a list.
+        
+        Parameters
+        ----------
+        structure_dataframe : DataFrame
+            structure data from the API
+        
+        Returns
+        -------
+        None
+            A new column is added to the dataframe containing the ancestor list.
+        '''
         ancestors = structure_dataframe['structure_id_path'].apply(
             lambda e: [int(a) for a in e.split('/')[1:-1]])
         structure_ancestors = [

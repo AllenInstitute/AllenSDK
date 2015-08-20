@@ -14,8 +14,6 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.queries.rma_api import RmaApi
-import numpy as np
-import nrrd
 
 
 class GridDataApi(RmaApi):
@@ -128,5 +126,3 @@ class GridDataApi(RmaApi):
             save_file_path = str(section_data_set_id) + '.nrrd'
         
         self.retrieve_file_over_http(url, save_file_path)
-    
-    

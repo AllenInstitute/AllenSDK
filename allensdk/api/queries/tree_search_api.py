@@ -16,12 +16,22 @@
 from allensdk.api.api import Api
 
 class TreeSearchApi(Api):
+    '''
+    
+    See `Searching a Specimen or Structure Tree <http://help.brain-map.org/display/api/Image-to-Image+Synchronization>`_
+    for additional documentation.
+    '''
+    
     def __init__(self, base_uri=None):
-        super(TreeSearchApi, self).__init__(base_uri)
+        super(TreeSearchApi, self).__init__(base_uri)    
+        
     
-    
-    def build_query(self, kind, db_id, fmt='json', ancestors=None, descendants=None):
-        '''Build the URL that will fetch meta data for the specified structure.
+    def get_tree(self,
+                 kind,
+                 db_id,
+                 ancestors=None,
+                 descendants=None):
+        '''Fetch meta data for the specified structure or specimen.
         
         Parameters
         ----------
@@ -29,8 +39,6 @@ class TreeSearchApi(Api):
             'Structure' or 'Specimen'
         db_id : integer
             The id of the structure or specimen to search.
-        fmt : string, optional
-            json (default) or xml
         ancestors : boolean, optional
             whether to include ancestors in the response (defaults to False)
         descendants : boolean, optional
@@ -38,8 +46,8 @@ class TreeSearchApi(Api):
         
         Returns
         -------
-        url : string
-            The constructed URL
+        dict
+            parsed json response data
         '''
         params = []
         url_params = ''
@@ -64,44 +72,7 @@ class TreeSearchApi(Api):
                        kind,
                        '/',
                        str(db_id),
-                       '.',
-                       fmt,
+                       '.json',
                        url_params])
         
-        return url
-    
-    
-    def read_result(self, parsed_json):
-        '''Return the list of cells from the parsed query.
-        
-        Parameters
-        ----------
-        parsed_json : dict
-            A python structure corresponding to the JSON data returned from the API.
-        '''
-        return parsed_json['msg']
-    
-    
-    def get_structure_tree_by_id(self, structure_id, ancestors=None, descendants=None):
-        '''Retrieve the structure tree data.'''
-        tree_data = self.do_query(self.build_query,
-                                  self.read_result,
-                                  'Structure',
-                                  structure_id,
-                                  ancestors=ancestors,
-                                  descendants=descendants)
-        
-        return tree_data
-    
-    
-    def get_specimen_tree_by_id(self, specimen_id, ancestors=None, descendants=None):
-        '''Retrieve the specimen tree data.'''
-        tree_data = self.do_rma_query(self.build_query,
-                                       self.read_result,
-                                       'Specimen',
-                                       specimen_id,
-                                       ancestors=ancestors,
-                                       descendants=descendants)
-        
-        return tree_data
-
+        return self.json_msg_query(url)
