@@ -25,7 +25,7 @@ and the location of the run configuration.
 
 Several model files can be specified on the model_file line, separated by commas.
 The model files and run file are combined
-into a single :doc:`model description </model_description>`.
+into a single `model description <biophysical_perisomatic_script.html#model-description-files>`.
 By convention, the model structure should be specified in the model_file line.
 The run_file is used for other experimental conditions including the stimulus.
 
@@ -37,10 +37,10 @@ Embedding Application Configuration in a Model Description File
 ---------------------------------------------------------------
 
 Rather than using a .conf file, it is possible to embed application configuration
-in a :doc:`model description </model_description>` file in a "biophys" section.
-Note that the model_file value is an array rather than a comma-separated string.
-An application configuration section embedded in the same file as model description sections
-would reference itself in the model_file entry.
+in a `model description <biophysical_perisomatic_script.html#model-description-files>` 
+file in a "biophys" section. Note that the model_file value is an array rather than a 
+comma-separated string. An application configuration section embedded in the same file as 
+model description sections would reference itself in the model_file entry.
 
 
 model.json:
