@@ -17,7 +17,8 @@ from allensdk.api.queries.rma_api import RmaApi
 
 class OntologiesApi(RmaApi):
     '''
-    See: `Atlas Drawings and Ontologies <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_
+    See: `Atlas Drawings and Ontologies
+    <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_
     '''
     
     def __init__(self, base_uri=None):
@@ -74,7 +75,7 @@ class OntologiesApi(RmaApi):
         if structure_set_ids != None:
             if type(structure_set_ids) is not list:
                 structure_set_ids = [ structure_set_ids ]
-            criteria_list.append('[graph_id$in%s]' % ','.join(str(i) for i in structure_graph_ids))
+            criteria_list.append('[graph_id$in%s]' % ','.join(str(i) for i in structure_set_ids))
 
         if structure_set_names != None:
             if type(structure_set_names) is not list:
@@ -171,3 +172,20 @@ class OntologiesApi(RmaApi):
                                           criteria=[associations_string])
         
         return atlas_data    
+
+
+    def get_atlases(self):
+        return self.model_query('Atlas',
+                                num_rows='all',
+                                count=False)
+    
+    
+    def get_structure_graphs(self):
+        return self.model_query('StructureGraph',
+                                num_rows='all',
+                                count=False)
+        
+    def get_structure_sets(self):
+        return self.model_query('StructureSet',
+                                num_rows='all',
+                                count=False)        

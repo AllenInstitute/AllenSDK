@@ -26,9 +26,10 @@ class ImageDownloadApi(RmaApi):
         super(ImageDownloadApi, self).__init__(base_uri)
     
     
-    def build_section_image_url(self,
-                                section_image_id,
-                                **kwargs):
+    def download_section_image(self,
+                               section_image_id,
+                               file_path=None,
+                               **kwargs):
         ''' Download whole or partial two-dimensional images
         from the Allen Institute with the SectionImage service.
         
@@ -36,6 +37,8 @@ class ImageDownloadApi(RmaApi):
         ----------
         section_image_id : integer
             Image to download.
+        file_path : string, optional
+            where to put it            
         downsample : int, optional
             Number of times to downsample the original image.
         quality : int, optional
@@ -56,10 +59,11 @@ class ImageDownloadApi(RmaApi):
             True to retrieve the color block image for a Glioblastoma SectionImage.
         tumor_feature_boundary : boolean, optional
             True to retrieve the color boundary image for a Glioblastoma SectionImage.
+
         Returns
         -------
-        url : string
-            The constructed URL
+        None
+            the file is downloaded and saved to the path.
             
         Notes
         -----
@@ -148,17 +152,21 @@ class ImageDownloadApi(RmaApi):
         else:
             url_params = ''
         
-        url = ''.join([self.section_image_download_endpoint,
-                       '/',
-                       str(section_image_id),
-                       url_params])
+        image_url = ''.join([self.section_image_download_endpoint,
+                             '/',
+                             str(section_image_id),
+                             url_params])
         
-        return url
+        if file_path == None:
+            file_path = '%d.jpg' % (section_image_id)
+        
+        self.retrieve_file_over_http(image_url, file_path)
     
     
-    def build_atlas_image_url(self,
-                              atlas_image_id,
-                              **kwargs):
+    def download_atlas_image(self,
+                             atlas_image_id,
+                             file_path=None,
+                             **kwargs):
         ''' Download whole or partial two-dimensional images
         from the Allen Institute with the AtlasImage service.
         
@@ -166,6 +174,8 @@ class ImageDownloadApi(RmaApi):
         ----------
         atlas_image_id : integer
             Image to download.
+        file_path : string, optional
+            where to put it            
         annotation : boolean, optional
             True to retrieve the specified AtlasImage with annotations.
         atlas : integer, optional
@@ -182,11 +192,11 @@ class ImageDownloadApi(RmaApi):
             Number of columns in the output image.
         height : int, optional
             Number of rows in the output image.
-        
+                
         Returns
         -------
-        url : string
-            The constructed URL
+        None
+            the file is downloaded and saved to the path.
             
         Notes
         -----
@@ -256,12 +266,16 @@ class ImageDownloadApi(RmaApi):
                        str(atlas_image_id),
                        url_params])
         
-        return url
+        if file_path == None:
+            file_path = '%d.jpg' % (atlas_image_id)
+        
+        self.retrieve_file_over_http(url, file_path)
     
     
-    def build_projection_image_url(self,
-                                   projection_image_id,
-                                   **kwargs):
+    def download_projection_image(self,
+                                  projection_image_id,
+                                  file_path=None,
+                                  **kwargs):
         ''' Download whole or partial two-dimensional images
         from the Allen Institute with the AtlasImage service.
         
@@ -269,6 +283,8 @@ class ImageDownloadApi(RmaApi):
         ----------
         atlas_image_id : integer
             Image to download.
+        file_path : string, optional
+            where to put it.  default is id.jpg            
         projection : boolean, optional
             True to retrieve the specified SectionImage with projection.
         downsample : int, optional
@@ -283,11 +299,11 @@ class ImageDownloadApi(RmaApi):
             Number of columns in the output image.
         height : int, optional
             Number of rows in the output image.
-            
+        
         Returns
         -------
-        url : string
-            The constructed URL
+        None
+            the file is downloaded and saved to the path.
             
         Notes
         -----
@@ -361,88 +377,11 @@ class ImageDownloadApi(RmaApi):
                        '/',
                        str(projection_image_id),
                        url_params])
-        
-        return url
-    
-    
-    def download_section_image(self,
-                               section_image_id,
-                               file_path=None,
-                               **kwargs):
-        '''Download a section image.
-        
-        Parameters
-        ----------
-        section_image_id : integer
-            What to download.
-        file_path : string, optional
-            Where to put it.  <section_image_id>.jpg (default).
-            
-        Returns
-        -------
-        None
-            the file is downloaded and saved to the path.
-        '''
-        if file_path == None:
-            file_path = '%d.jpg' % (section_image_id)
-        
-        image_url = self.build_section_image_url(section_image_id,
-                                                 **kwargs)
-        self.retrieve_file_over_http(image_url, file_path)
-    
-    
-    def download_atlas_image(self,
-                             atlas_image_id,
-                             file_path=None,
-                             **kwargs):
-        '''Download an atlas image.
-        
-        Parameters
-        ----------
-        
-        atlas_image_id : integer
-            database key
-        file_path : string, optional
-            where to put it
-        
-        Returns
-        -------
-        None
-            the file is downloaded and saved to the path.
-        '''
-        if file_path == None:
-            file_path = '%d.jpg' % (atlas_image_id)
-        
-        image_url = self.build_atlas_image_url(atlas_image_id,
-                                               **kwargs)
-        self.retrieve_file_over_http(image_url, file_path)
-    
-    
-    def download_projection_image(self,
-                                  projection_image_id,
-                                  file_path=None,
-                                  **kwargs):
-        '''Download a projection image.
-        
-        Parameters
-        ----------
-        
-        projection_image_id : integer
-            database key
-        file_path : string, optional
-            where to put it.  default is id.jpg
-        
-        Returns
-        -------
-        None
-            the file is downloaded and saved to the path.
-        '''
+                    
         if file_path == None:
             file_path = '%d.jpg' % (projection_image_id)
         
-        image_url = self.build_projection_image_url(projection_image_id,
-                                                    **kwargs)
-        self.retrieve_file_over_http(image_url, file_path)
+        self.retrieve_file_over_http(url, file_path)
     
     
     def atlas_image_query(self, atlas_id, image_type_name=None):

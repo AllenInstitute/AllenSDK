@@ -93,11 +93,7 @@ class SynchronizationApi(Api):
                        '&section_data_set_ids=',
                        ','.join(str(i) for i in section_data_set_ids)])
         
-        return self.json_msg_query(url,
-                                   self.read_data,
-                                   section_image_id,
-                                   x, y,
-                                   section_data_set_ids)
+        return self.json_msg_query(url)
     
     
     def get_image_to_image_2d(self,

@@ -23,55 +23,6 @@ class AnnotatedSectionDataSetsApi(RmaApi):
         super(AnnotatedSectionDataSetsApi, self).__init__(base_uri)
         
     
-    def build_compound_query(self, queries, fmt='json'):
-        '''Specify the SectionDataSet and several annotated_section_data_sets queries
-        linked together with a Boolean 'and' or 'or'.
-        
-        Parameters
-        ----------
-        queries : array of dicts
-            dicts with args like build_query
-        fmt : string, optional
-            'json' or 'xml'
-        
-        Returns
-        -------
-        url : string
-            The constructed URL
-        '''
-        url_strings = ['?query=']
-        
-        for query in queries:
-            url_strings.append('[')
-            
-            params = ['structures $in ' +
-                      ','.join((str(s) for s in query['structures']))]
-            
-            for key in ['intensity_values', 'density_values', 'pattern_values', 'age_names']:
-                if key in query and len(query[key]) > 0:
-                    params.append('%s $in %s' %
-                                  (key,
-                                   ','.join(("'%s'" % (v) for v in query['intensity_values']))))
-            
-            url_strings.append(' : '.join(params))
-            
-            url_strings.append(']')
-            
-            if 'link' in query and query['link'] == 'or':
-                url_strings.append(' or ')
-            if 'link' in query and query['link'] == 'and':
-                url_strings.append(' and ')
-        
-        url_params = ''.join(url_strings)
-        
-        url = ''.join([self.compound_annotated_section_data_sets_endpoint,
-                       '.',
-                       fmt,
-                       url_params])
-        
-        return url
-        
-    
     def get_annotated_section_data_sets(self,
                                         structures,
                                         intensity_values=None,
@@ -127,15 +78,7 @@ class AnnotatedSectionDataSetsApi(RmaApi):
                        '.json',
                        url_params])
         
-        data = self.do_query(url,
-                             self.read_data,
-                             structures,
-                             intensity_values,
-                             density_values,
-                             pattern_values,
-                             age_names)
-        
-        return data
+        return self.json_msg_query(url)
     
     
     def get_annotated_section_data_sets_via_rma(self,
@@ -220,7 +163,8 @@ class AnnotatedSectionDataSetsApi(RmaApi):
     
     
     def get_compound_annotated_section_data_sets(self,
-                                                 queries):
+                                                 queries,
+                                                 fmt='json'):
         '''Find the SectionDataSet that matches several annotated_section_data_sets queries
         linked together with a Boolean 'and' or 'or'.
         
@@ -228,15 +172,42 @@ class AnnotatedSectionDataSetsApi(RmaApi):
         ----------
         queries : array of dicts
             dicts with args like build_query
+        fmt : string, optional
+            'json' or 'xml'
         
         Returns
         -------
         data : dict
             The parsed JSON repsonse message.
         '''
-        data = self.do_query(self.build_compound_query,
-                             self.read_data,
-                             queries)
+        url_strings = ['?query=']
         
-        return data
-
+        for query in queries:
+            url_strings.append('[')
+            
+            params = ['structures $in ' +
+                      ','.join((str(s) for s in query['structures']))]
+            
+            for key in ['intensity_values', 'density_values', 'pattern_values', 'age_names']:
+                if key in query and len(query[key]) > 0:
+                    params.append('%s $in %s' %
+                                  (key,
+                                   ','.join(("'%s'" % (v) for v in query['intensity_values']))))
+            
+            url_strings.append(' : '.join(params))
+            
+            url_strings.append(']')
+            
+            if 'link' in query and query['link'] == 'or':
+                url_strings.append(' or ')
+            if 'link' in query and query['link'] == 'and':
+                url_strings.append(' and ')
+        
+        url_params = ''.join(url_strings)
+        
+        url = ''.join([self.compound_annotated_section_data_sets_endpoint,
+                       '.',
+                       fmt,
+                       url_params])
+        
+        return self.json_msg_query(url)
