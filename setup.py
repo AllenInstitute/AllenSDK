@@ -30,9 +30,9 @@ setup(
                         'pandas>=0.16.2',
                         'numpy>=1.9.2',
                         'six>=1.9.0',
-                        'pynrrd<=0.2'],
+                        'pynrrd >= 0.1.0.dev, <= 0.2.0.dev'],
     dependency_links = [
-        'git+git://github.com/mhe/pynrrd.git@9e09b24ff1#egg=pynrrd-0.2'
+        'git+git://github.com/mhe/pynrrd.git@9e09b24ff1#egg=pynrrd-0.1.999.dev'
     ],
     tests_require=['nose>=1.2.1',
                    'coverage>=3.7.1',
