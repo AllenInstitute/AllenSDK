@@ -44,7 +44,8 @@ Optional Dependencies
  * `coverage <http://nedbatchelder.com/code/coverage>`_
  * `matplotlib <http://matplotlib.org/>`_
  * `h5py <http://www.h5py.org>`_
-
+ * `pandas <http://pandas.pydata.org>`_
+ * `pynrrd <http://pypi.python.org/pypi/pynrrd>`_
 
 Installation with Docker (Optional)
 -----------------------------------
