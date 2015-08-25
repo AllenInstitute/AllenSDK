@@ -27,6 +27,5 @@ RUN pip install six --upgrade
 RUN pip install sphinx numpydoc
 RUN pip install ipython[notebook] --upgrade
 RUN pip install functools32
-RUN pip install pandas
 
 RUN pip install |tgz_url|

@@ -35,8 +35,8 @@ RUN apt-get -yq install \
     libopenmpi-dev
 
 
-# upgrade cython and h5py
-RUN pip install cython h5py
+# upgrade cython
+RUN pip install cython
 RUN pip install sphinx numpydoc
 
 #neuron installation
@@ -51,6 +51,5 @@ RUN echo 'export PATH=$PATH:/opt/neuron/iv/x86_64/bin:/opt/neuron/nrn/x86_64/bin
 RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
 
 RUN pip install ipython[notebook] --upgrade
-RUN pip install pandas
 
 RUN pip install |tgz_url|
