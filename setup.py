@@ -32,7 +32,7 @@ setup(
                         'six>=1.9.0',
                         'pynrrd <= 0.2.0.dev'],
     dependency_links = [
-        'git+git://github.com/mhe/pynrrd.git@9e09b24ff1#egg=pynrrd-0.1.999.dev'
+        'git+https://github.com/mhe/pynrrd.git@9e09b24ff1#egg=pynrrd-0.1.999.dev'
     ],
     tests_require=['nose>=1.2.1',
                    'coverage>=3.7.1',
