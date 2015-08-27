@@ -16,8 +16,15 @@ from allensdk.api.queries.rma_api import RmaApi
 
 class ConnectedServices(object):
     '''
+    A class representing a schema of informatics web services.
+    
     Notes
     -----
+    See `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
+    for a human-readable list of services and parameters.
+    
+    The URL format is documented at
+    `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_.
     
     Connected Services only include API services that are accessed
     via the RMA endpoint using an rma::services stage. 

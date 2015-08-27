@@ -17,6 +17,13 @@ To install the Allen SDK for a single user::
     pip install |tgz_url| --user
 
 
+.. note::
+
+    On Windows use the options '--process-dependency-links --trusted-host github.com'
+    to install the correct version of the pynrrd dependency. 
+
+
+
 Uninstalling the SDK is simple with pip::
 
     pip uninstall allensdk
