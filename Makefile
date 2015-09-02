@@ -39,7 +39,10 @@ doc: FORCE
 	sed -ie "s/|zip_url|/${ZIP_URL}/g" doc/links.rst
 	sed -ie "s/|tgz_filename|/${TGZ_FILENAME}/g" doc/links.rst
 	sed -ie "s/|zip_filename|/${ZIP_FILENAME}/g" doc/links.rst
-	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.brainscales
+	sed -ie "s/|tgz_filename|/${TGZ_FILENAME}/g" doc/examples/docker/Dockerfile.neuralensemble
+	sed -ie "s/|tgz_filename|/${TGZ_FILENAME}/g" doc/examples/docker/Dockerfile.neuralensemblex
+	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.neuralensemble
+	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.neuralensemblex
 	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.ubuntu
 	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html	
 	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html

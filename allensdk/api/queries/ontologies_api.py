@@ -27,7 +27,7 @@ class OntologiesApi(RmaApi):
 
     def get_structures(self,
                        structure_graph_ids=None,
-                       structure_graph_names=None,                    
+                       structure_graph_names=None,
                        structure_set_ids=None,
                        structure_set_names=None,
                        order = ['structures.graph_order'],
@@ -182,10 +182,10 @@ class OntologiesApi(RmaApi):
     
     def get_structure_graphs(self):
         return self.model_query('StructureGraph',
-                                num_rows='all',
+                                    num_rows='all',
                                 count=False)
         
     def get_structure_sets(self):
         return self.model_query('StructureSet',
                                 num_rows='all',
-                                count=False)        
+                                count=False)

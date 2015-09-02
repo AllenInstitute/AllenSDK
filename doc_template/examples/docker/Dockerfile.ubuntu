@@ -1,7 +1,7 @@
 # DOCKER-VERSION 0.3.4
 #
 # docker build --tag alleninstitute/allensdk_ubuntu .
-# docker run -it -v /docker_share:/docker_share alleninstitute/allensdk_ubuntu /bin/bash
+# docker run -it alleninstitute/allensdk_ubuntu /bin/bash
 #
 FROM ubuntu:trusty
 
@@ -33,7 +33,6 @@ RUN apt-get -yq install \
 RUN apt-get -yq install \
     openmpi-bin \
     libopenmpi-dev
-
 
 # upgrade cython
 RUN pip install cython

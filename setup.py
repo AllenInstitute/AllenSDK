@@ -23,13 +23,13 @@ setup(
     author = 'David Feng',
     author_email = 'davidf@alleninstitute.org',
     packages = prepend_find_packages('allensdk'),
-    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', 'bps'] },
+    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', 'bps', 'Makefile', 'COPYING'] },
     description = 'core libraries for the allensdk.',
-    install_requires = ['h5py>=2.5.0',
-                        'matplotlib>=1.4.3',
+    install_requires = ['h5py>=2.2.1',
+                        'matplotlib>=1.4.2',
                         'pandas>=0.16.2',
-                        'numpy>=1.9.2',
-                        'six>=1.9.0',
+                        'numpy>=1.8.2',
+                        'six>=1.8.0',
                         'pynrrd <= 0.2.0.dev'],
     dependency_links = [
         'git+https://github.com/mhe/pynrrd.git@9e09b24ff1#egg=pynrrd-0.1.999.dev'
