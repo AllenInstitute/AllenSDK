@@ -27,7 +27,7 @@ class OntologiesApi(RmaApi):
 
     def get_structures(self,
                        structure_graph_ids=None,
-                       structure_graph_names=None,                    
+                       structure_graph_names=None,
                        structure_set_ids=None,
                        structure_set_names=None,
                        order = ['structures.graph_order'],
@@ -75,7 +75,7 @@ class OntologiesApi(RmaApi):
         if structure_set_ids != None:
             if type(structure_set_ids) is not list:
                 structure_set_ids = [ structure_set_ids ]
-            criteria_list.append('[graph_id$in%s]' % ','.join(str(i) for i in structure_set_ids))
+            criteria_list.append('[structure_set_id$in%s]' % ','.join(str(i) for i in structure_set_ids))
 
         if structure_set_names != None:
             if type(structure_set_names) is not list:
@@ -188,4 +188,4 @@ class OntologiesApi(RmaApi):
     def get_structure_sets(self):
         return self.model_query('StructureSet',
                                 num_rows='all',
-                                count=False)        
+                                count=False)
