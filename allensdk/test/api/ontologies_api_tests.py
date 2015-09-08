@@ -20,15 +20,15 @@ class OntologiesApiTests(unittest.TestCase):
         expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,[graph_id$in1],rma::options[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
         
         structure_graph_id = 1
-
+        
         self.oa.json_msg_query = \
             MagicMock(name='json_msg_query')
-               
+        
         self.oa.get_structures(structure_graph_id)
         
         self.oa.json_msg_query.assert_called_once_with(expected)
-
-
+    
+    
     def test_list_structure_graphs(self):
         expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::StructureGraph,rma::options[num_rows$eq'all'][count$eqfalse]"
         
@@ -39,7 +39,7 @@ class OntologiesApiTests(unittest.TestCase):
         
         self.oa.json_msg_query.assert_called_once_with(expected)
         
-
+    
     def test_list_structure_sets(self):
         expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::StructureSet,rma::options[num_rows$eq'all'][count$eqfalse]"
         
@@ -63,12 +63,12 @@ class OntologiesApiTests(unittest.TestCase):
 
         
     def test_structure_graph_by_name(self):
-        expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,graph[structure_graphs.name$in'Mouse Brain Atlas'],rma::options[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+        expected = u"http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,graph[structure_graphs.name$in'Mouse Brain Atlas'],rma::options[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
         
         self.oa.json_msg_query = \
             MagicMock(name='json_msg_query')
         
-        self.oa.get_structures(structure_graph_names='Mouse Brain Atlas')
+        self.oa.get_structures(structure_graph_names="'Mouse Brain Atlas'")
         
         self.oa.json_msg_query.assert_called_once_with(expected)
 
@@ -79,14 +79,14 @@ class OntologiesApiTests(unittest.TestCase):
         self.oa.json_msg_query = \
             MagicMock(name='json_msg_query')
         
-        self.oa.get_structures(structure_graph_names=['Mouse Brain Atlas',
-                                                      'Human Brain Atlas'])
+        self.oa.get_structures(structure_graph_names=["'Mouse Brain Atlas'",
+                                                      "'Human Brain Atlas'"])
         
         self.oa.json_msg_query.assert_called_once_with(expected)
 
     
     def test_structure_set_by_id(self):
-        expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,[graph_id$in8],rma::options[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+        expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,[structure_set_id$in8],rma::options[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
         
         self.oa.json_msg_query = \
             MagicMock(name='json_msg_query')
@@ -97,7 +97,7 @@ class OntologiesApiTests(unittest.TestCase):
         
         
     def test_structure_sets_by_ids(self):
-        expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,[graph_id$in7,8],rma::options[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+        expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,[structure_set_id$in7,8],rma::options[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
         
         self.oa.json_msg_query = \
             MagicMock(name='json_msg_query')
@@ -113,7 +113,7 @@ class OntologiesApiTests(unittest.TestCase):
         self.oa.json_msg_query = \
             MagicMock(name='json_msg_query')
         
-        self.oa.get_structures(structure_set_names='Mouse Connectivity - Summary')
+        self.oa.get_structures(structure_set_names="'Mouse Connectivity - Summary'")
         
         self.oa.json_msg_query.assert_called_once_with(expected)
 
@@ -124,8 +124,8 @@ class OntologiesApiTests(unittest.TestCase):
         self.oa.json_msg_query = \
             MagicMock(name='json_msg_query')
         
-        self.oa.get_structures(structure_set_names=['NHP - Coarse',
-                                                    'Mouse Connectivity - Summary'])
+        self.oa.get_structures(structure_set_names=["'NHP - Coarse'",
+                                                    "'Mouse Connectivity - Summary'"])
         
         self.oa.json_msg_query.assert_called_once_with(expected)
 
@@ -142,7 +142,7 @@ class OntologiesApiTests(unittest.TestCase):
 
 
     def test_atlas_1(self):
-        expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::criteria,[id$eq1],structure_graph(ontology),graphic_group_labels,rma::include,[id$eq1],structure_graph(ontology),graphic_group_labels,rma::options[only$eq'atlases.id,atlases.name,atlases.image_type,ontologies.id,ontologies.name,structure_graphs.id,structure_graphs.name,graphic_group_labels.id,graphic_group_labels.name']"
+        expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::criteria,[id$in1],structure_graph(ontology),graphic_group_labels,rma::include,structure_graph(ontology),graphic_group_labels,rma::options[only$eq'atlases.id,atlases.name,atlases.image_type,ontologies.id,ontologies.name,structure_graphs.id,structure_graphs.name,graphic_group_labels.id,graphic_group_labels.name'][num_rows$eq'all'][count$eqfalse]"
         
         atlas_id = 1
         
@@ -152,4 +152,15 @@ class OntologiesApiTests(unittest.TestCase):
         self.oa.get_atlases_table(atlas_id)
         
         self.oa.json_msg_query.assert_called_once_with(expected)
+    
+    
+    def test_atlas_verbose(self):
+        expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::criteria,structure_graph(ontology),graphic_group_labels,rma::include,structure_graph(ontology),graphic_group_labels,rma::options[num_rows$eq'all'][count$eqfalse]"
         
+        self.oa.json_msg_query = \
+            MagicMock(name='json_msg_query')
+        
+        self.oa.get_atlases_table(brief=False)
+        
+        self.oa.json_msg_query.assert_called_once_with(expected)
+
