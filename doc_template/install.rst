@@ -67,7 +67,8 @@ example Dockerfiles are available.
 
  #. Download one of the example Docker files:
      * :download:`Ubuntu Standalone <./examples/docker/Dockerfile.ubuntu>`.
-     * :download:`BrainScales combined Neural-Networks <./examples/docker/Dockerfile.brainscales>`.
+     * :download:`Neural Ensemble combined simulators <./examples/docker/Dockerfile.neuralensemble>`.
+     * :download:`Neural Ensemble combined simulators with X11 <./examples/docker/Dockerfile.neuralensemblex>`.
 
  #. Use Docker to build the image::
  

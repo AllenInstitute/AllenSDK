@@ -196,23 +196,34 @@ class RmaApi(Api):
 
 
     def model_query(self, *args, **kwargs):
-        '''Build an execute a common-case RMA model query.
+        '''Construct and execute a model stage of an RMA query string.
         
         Parameters
         ----------
         model : string
-            name of the top-level class to be queried.
+            The top level data type
         filters : dict
-            key, value comparisons applied to the top-level model to narrow the results.
-        criteria : list of strings, optional
-            nested associations and filters to determine the set of top-level result objects.
-        include : list of strings, optional
-            nested associations and filters to be included in the response data.
-
-        Returns
-        -------
+            key, value comparisons applied to the top-level model to narrow the results.            
+        criteria : string
+            raw RMA criteria clause to choose what object are returned
+        include : string
+            raw RMA include clause to return associated objects
+        only : list of strings, optional
+            to be joined into an rma::options only filter to limit what data is returned
+        except : list of strings, optional
+            to be joined into an rma::options except filter to limit what data is returned            
+        tabular : list of string, optional
+            return columns as a tabular data structure rather than a nested tree.                    
+        count : boolean, optional
+            False to skip the extra database count query.                    
+        debug : string, optional
+            'true', 'false' or 'preview'
+        num_rows : int or string, optional
+            how many database rows are returned (may not correspond directly to JSON tree structure) 
+        start_row : int or string, optional
+            which database row is start of returned data  (may not correspond directly to JSON tree structure)
         
-
+        
         Notes
         -----
         See `RMA Path Syntax <http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-DoubleColonforAxis>`_

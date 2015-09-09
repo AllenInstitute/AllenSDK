@@ -13,18 +13,96 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.queries.rma_api import RmaApi
+from allensdk.api.queries.rma_template import RmaTemplate
 
-class OntologiesApi(RmaApi):
+class OntologiesApi(RmaTemplate):
     '''
     See: `Atlas Drawings and Ontologies
     <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_
     '''
     
+    rma_templates = \
+        {"ontology_queries": [
+            {'name': 'structures_by_graph_ids',
+             'description': 'see name',
+             'model': 'Structure',
+             'criteria': '[graph_id$in{{ graph_ids }}]',
+             'order': ['structures.graph_order'],
+             'num_rows': 'all',
+             'count': False,
+             'criteria_params': ['graph_ids']
+            },
+            {'name': 'structures_by_graph_names',
+             'description': 'see name',
+             'model': 'Structure',
+             'criteria': 'graph[structure_graphs.name$in{{ graph_names }}]',
+             'order': ['structures.graph_order'],
+             'num_rows': 'all',
+             'count': False,
+             'criteria_params': ['graph_names']
+            },
+            {'name': 'structures_by_set_ids',
+             'description': 'see name',
+             'model': 'Structure',
+             'criteria': '[structure_set_id$in{{ set_ids }}]',
+             'order': ['structures.graph_order'],
+             'num_rows': 'all',
+             'count': False,
+             'criteria_params': ['set_ids']
+            },
+            {'name': 'structures_by_set_names',
+             'description': 'see name',
+             'model': 'Structure',
+             'criteria': 'structure_sets[name$in{{ set_names }}]',
+             'order': ['structures.graph_order'],
+             'num_rows': 'all',
+             'count': False,
+             'criteria_params': ['set_names']
+            },
+            {'name': 'structure_graphs_list',
+             'description': 'see name',
+             'model': 'StructureGraph',
+             'num_rows': 'all',
+             'count': False
+            },
+            {'name': 'structure_sets_list',
+             'description': 'see name',
+             'model': 'StructureSet',
+             'num_rows': 'all',
+             'count': False
+            },
+            {'name': 'atlases_list',
+             'description': 'see name',
+             'model': 'Atlas',
+             'num_rows': 'all',
+             'count': False
+            },
+            {'name': 'atlases_table',
+             'description': 'see name',
+             'model': 'Atlas',
+             'criteria': '{% if atlas_ids is defined %}[id$in{{ atlas_ids }}],{%endif%}structure_graph(ontology),graphic_group_labels',
+             'include': 'structure_graph(ontology),graphic_group_labels',
+             'only': ['atlases.id',
+                      'atlases.name',
+                      'atlases.image_type',
+                      'ontologies.id',
+                      'ontologies.name',
+                      'structure_graphs.id',
+                      'structure_graphs.name',
+                      'graphic_group_labels.id',
+                      'graphic_group_labels.name'],
+             'num_rows': 'all',
+             'count': False,
+             'criteria_params': ['atlas_ids']
+            }
+        ]}
+    
+    
     def __init__(self, base_uri=None):
-        super(OntologiesApi, self).__init__(base_uri)
-        
-
+        super(OntologiesApi, self).__init__(base_uri,
+                                            query_manifest=OntologiesApi.rma_templates)
+    
+    
     def get_structures(self,
                        structure_graph_ids=None,
                        structure_graph_names=None,
@@ -59,37 +137,34 @@ class OntologiesApi(RmaApi):
         -----
         Only one of the methods of limiting the query should be used at a time.
         '''
-        criteria_list = []
-        
         if structure_graph_ids != None:
-            if type(structure_graph_ids) is not list:
-                structure_graph_ids = [ structure_graph_ids ]
-            criteria_list.append('[graph_id$in%s]' % ','.join(str(i) for i in structure_graph_ids))
-        
-        if structure_graph_names != None:
-            if type(structure_graph_names) is not list:
-                structure_graph_names = [ structure_graph_names ]
-            structure_graph_names = [self.quote_string(n) for n in structure_graph_names]
-            criteria_list.append('graph[structure_graphs.name$in%s]' % (','.join(structure_graph_names)))
-        
-        if structure_set_ids != None:
-            if type(structure_set_ids) is not list:
-                structure_set_ids = [ structure_set_ids ]
-            criteria_list.append('[graph_id$in%s]' % ','.join(str(i) for i in structure_set_ids))
-
-        if structure_set_names != None:
-            if type(structure_set_names) is not list:
-                structure_set_names = [ structure_set_names ]
-            structure_set_names = [self.quote_string(n) for n in structure_set_names]
-            criteria_list.append('structure_sets[name$in%s]' % (','.join(structure_set_names)))
-            
-        criteria_string = ','.join(criteria_list)
-        
-        data = self.model_query('Structure',
-                                criteria=criteria_string,
-                                order=order,
-                                num_rows=num_rows,
-                                count=count)
+            data = self.template_query('ontology_queries',
+                                       'structures_by_graph_ids',
+                                       graph_ids=structure_graph_ids,
+                                       order=order,
+                                       num_rows=num_rows,
+                                       count=count)
+        elif structure_graph_names != None:
+            data = self.template_query('ontology_queries',
+                                       'structures_by_graph_names',
+                                       graph_names=structure_graph_names,
+                                       order=order,
+                                       num_rows=num_rows,
+                                       count=count)
+        elif structure_set_ids != None:
+            data = self.template_query('ontology_queries',
+                                       'structures_by_set_ids',
+                                       set_ids=structure_set_ids,
+                                       order=order,
+                                       num_rows=num_rows,
+                                       count=count)
+        elif structure_set_names != None:
+            data = self.template_query('ontology_queries',
+                                       'structures_by_set_names',
+                                       set_names=structure_set_names,
+                                       order=order,
+                                       num_rows=num_rows,
+                                       count=count)
         
         return data
     
@@ -115,22 +190,20 @@ class OntologiesApi(RmaApi):
         structure_dataframe['structure_set_ancestor'] = structure_ancestors
 
 
-    def get_atlases_table(self, atlas_id=None, brief=True, fmt='json'):
+    def get_atlases_table(self, atlas_ids=None, brief=True):
         '''List Atlases available through the API
         with associated ontologies and structure graphs.
         
         Parameters
         ----------
-        atlas_id : integer, optional
+        atlas_ids : integer or list of integers, optional
+            only select specific atlases
         brief : boolean, optional
             True (default) requests only name and id fields.
-        fmt : string, optional
-            json (default) or xml
         
         Returns
         -------
-        url : string
-            The constructed URL
+        dict : atlas metadata
         
         Notes
         -----
@@ -138,54 +211,28 @@ class OntologiesApi(RmaApi):
         `table of available Atlases <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_.
         See also: `Class: Atlas <http://api.brain-map.org/doc/Atlas.html>`_
         '''
-        associations = []
-        
-        if atlas_id != None:
-            associations.append('[id$eq%d],' % (atlas_id))
-        
-        associations.extend(['structure_graph(ontology),',
-                             'graphic_group_labels'])
-        
-        associations_string = ''.join(associations)
-        
         if brief == True:
-            only_fields = ['atlases.id',
-                           'atlases.name',
-                           'atlases.image_type',
-                           'ontologies.id',
-                           'ontologies.name',
-                           'structure_graphs.id',
-                           'structure_graphs.name',
-                           'graphic_group_labels.id',
-                           'graphic_group_labels.name']
-            
-            only_string = self.quote_string(','.join(only_fields))
-        
-            atlas_data = self.model_query('Atlas',
-                                          include=[associations_string],
-                                          criteria=[associations_string],
-                                          only=[only_string])
-        
+            data = self.template_query('ontology_queries',
+                                       'atlases_table',
+                                       atlas_ids=atlas_ids)
         else:
-            atlas_data = self.model_query('Atlas',
-                                          include=[associations_string],
-                                          criteria=[associations_string])
+            data = self.template_query('ontology_queries',
+                                       'atlases_table',
+                                       atlas_ids=atlas_ids,
+                                       only=None)
         
-        return atlas_data    
-
-
+        return data
+    
+    
     def get_atlases(self):
-        return self.model_query('Atlas',
-                                num_rows='all',
-                                count=False)
+        return self.template_query('ontology_queries',
+                                   'atlases_list')
     
     
     def get_structure_graphs(self):
-        return self.model_query('StructureGraph',
-                                    num_rows='all',
-                                count=False)
+        return self.template_query('ontology_queries',
+                                   'structure_graphs_list')
         
     def get_structure_sets(self):
-        return self.model_query('StructureSet',
-                                num_rows='all',
-                                count=False)
+        return self.template_query('ontology_queries',
+                                   'structure_sets_list')
