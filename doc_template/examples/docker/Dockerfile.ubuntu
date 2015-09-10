@@ -15,6 +15,8 @@ RUN apt-get -yq install \
     libtool \
     bison \
     flex
+
+RUN apt-get -yq build-dep python-matplotlib
     
 RUN apt-get -yq install \
     python \
@@ -29,8 +31,6 @@ RUN apt-get -yq install \
     libncurses-dev \
     libhdf5-dev \
     wget
-
-RUN apt-get -yq install freetype*
 
 RUN apt-get -yq install \
     openmpi-bin \
@@ -50,7 +50,5 @@ RUN cd /opt/neuron; tar xzf nrn-7.3.ansi-1078.tar.gz; rm nrn-7.3.ansi-1078.tar.g
 RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --with-paranrn --with-nrnpython --with-mpi && make && make install
 RUN echo 'export PATH=$PATH:/opt/neuron/iv/x86_64/bin:/opt/neuron/nrn/x86_64/bin' >> /etc/bash.bashrc
 RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
-
-RUN pip install ipython[notebook] --upgrade
 
 RUN pip install |tgz_url|
