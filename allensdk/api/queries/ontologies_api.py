@@ -53,7 +53,7 @@ class OntologiesApi(RmaTemplate):
             {'name': 'structures_by_set_names',
              'description': 'see name',
              'model': 'Structure',
-             'criteria': 'structure_sets[name$in{{ set_names }}]',
+             'criteria': 'structure_sets[name$in\'{{ set_names }}\']',
              'order': ['structures.graph_order'],
              'num_rows': 'all',
              'count': False,
