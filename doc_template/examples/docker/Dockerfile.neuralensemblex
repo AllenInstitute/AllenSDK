@@ -21,10 +21,12 @@ RUN apt-get install -yq \
 USER docker
 
 ENV ALLENSDK=|tgz_filename|
+WORKDIR /home/docker/packages
 
 RUN wget |tgz_url|
 
 WORKDIR $VENV/build
+RUN tar xvzf /home/docker/packages/${ALLENSDK}
 RUN $VENV/bin/pip install /home/docker/packages/${ALLENSDK}
 
 RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv

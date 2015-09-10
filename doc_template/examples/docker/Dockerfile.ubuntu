@@ -30,6 +30,8 @@ RUN apt-get -yq install \
     libhdf5-dev \
     wget
 
+RUN apt-get -yq install freetype*
+
 RUN apt-get -yq install \
     openmpi-bin \
     libopenmpi-dev
