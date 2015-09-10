@@ -333,9 +333,10 @@ class MouseConnectivityCache(Cache):
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
 
-        cre: boolean
+        cre: boolean or list
             If True, return only cre-positive experiments.  If False, return only
-            cre-negative experiments.  If None, return all experients. Default None.
+            cre-negative experiments.  If None, return all experients. If list, return
+            all experiments with cre line names in the supplied list. Default None.
 
         injection_structure_ids: list
             Only return experiments that were injected in the structures provided here.
@@ -376,9 +377,10 @@ class MouseConnectivityCache(Cache):
         """ 
         Take a list of experiments and filter them by cre status and injection structure.
 
-        cre: boolean
+        cre: boolean or list
             If True, return only cre-positive experiments.  If False, return only
-            cre-negative experiments.  If None, return all experients. Default None.
+            cre-negative experiments.  If None, return all experients. If list, return
+            all experiments with cre line names in the supplied list. Default None.
 
         injection_structure_ids: list
             Only return experiments that were injected in the structures provided here.
@@ -389,6 +391,8 @@ class MouseConnectivityCache(Cache):
             experiments = [ e for e in experiments if e['transgenic-line'] ]
         elif cre == False:
             experiments = [ e for e in experiments if not e['transgenic-line'] ]
+        elif cre is not None:
+            experiments = [ e for e in experiments if e['transgenic-line'] in cre ]
 
         if injection_structure_ids is not None:
             descendant_ids = self.get_ontology().get_descendant_ids(injection_structure_ids)
@@ -513,8 +517,63 @@ class MouseConnectivityCache(Cache):
                       for eid in experiment_ids ]
 
         return pd.concat(unionizes, ignore_index = True)
-            
+
+    
+    def get_projection_matrix(self, experiment_ids, projection_structure_ids, 
+                              hemisphere_ids=None, parameter='projection_volume', dataframe=False):
         
+        unionizes = self.get_structure_unionizes(experiment_ids,
+                                                 is_injection=False,
+                                                 hemisphere_ids=hemisphere_ids)
+
+        unionizes = unionizes[unionizes.structure_id.isin(projection_structure_ids)]
+
+        projection_structure_ids = set(unionizes['structure_id'].values.tolist())
+        hemisphere_ids = set(unionizes['hemisphere_id'].values.tolist())
+
+        nrows = len(experiment_ids)
+        ncolumns = len(projection_structure_ids) * len(hemisphere_ids)
+
+        matrix = np.empty((nrows, ncolumns))
+        matrix[:] = np.NAN
+
+        row_lookup = {}
+        for idx,e in enumerate(experiment_ids):
+            row_lookup[e] = idx
+
+        column_lookup = {}
+        columns = []
+
+        cidx = 0
+        hlabel = { 1: '-L', 2: '-R', 3: '' }
+
+        o = self.get_ontology()
+
+        for hid in hemisphere_ids:
+            for sid in projection_structure_ids:
+                column_lookup[(hid,sid)] = cidx
+                label = o[sid].iloc[0]['acronym'] + hlabel[hid]
+                columns.append({ 'hemisphere_id': hid, 'structure_id': sid, 'label': label })
+                cidx += 1
+
+        for row_index, row in unionizes.iterrows():
+            ridx = row_lookup[row['experiment_id']]
+            k = (row['hemisphere_id'], row['structure_id'])
+            cidx = column_lookup[k]
+            matrix[ridx, cidx] = row[parameter]
+
+        if dataframe:
+            all_experiments = self.get_experiments(dataframe=True)
+            
+            rows_df = all_experiments.loc[experiment_ids]
+            
+            cols_df = pd.DataFrame(columns)
+            
+            return { 'matrix': matrix, 'rows': rows_df, 'columns': cols_df }
+        else:
+            return { 'matrix': matrix, 'rows': experiment_ids, 'columns': columns }
+
+
     def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
         """
         Read a 3D numpy array shaped like the annotation volume that has non-zero values where 

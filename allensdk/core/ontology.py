@@ -63,8 +63,8 @@ class Ontology( object ):
         # __getitem__ always has a single argument.  If called with a single argument 
         # (e.g. ontology[315]), that item is passed straight through.  If called with 
         # multiple arguments (e.g. ontology[315,997]), that gets passed through as a
-        # tuple.  This normalizes the arguments so that everything is a tuple.
-        if not isinstance(structures, tuple) and not isinstance(structures, list):
+        # tuple.  This normalizes the arguments so that everything is iterable.
+        if not isinstance(structures, tuple) and not isinstance(structures, list) and not isinstance(structures, set):
             structures = structures,
 
         # this is the final set of structure ids used to filter
@@ -98,7 +98,22 @@ class Ontology( object ):
         return self.df.loc[structure_ids].dropna(axis=0,how='all')
 
 
-    def get_descendant_ids(self, *structure_ids):
+    def get_descendant_ids(self, structure_ids):
+        """
+        Find the set of the ids of structures that are descendants of one or more structures.  
+        The returned set will include the input structure ids.
+
+        Parameters
+        ----------
+        structure_ids: iterable
+            Any iterable type that contains structure ids that can be cast to integers.
+
+        Returns
+        -------
+        set
+            Set of descendant structure ids.
+        """
+
         if len(structure_ids) == 0:
             return self.descendant_ids
         else:
@@ -108,7 +123,21 @@ class Ontology( object ):
             return descendants
 
 
-    def get_child_ids(self, *structure_ids):
+    def get_child_ids(self, structure_ids):
+        """
+        Find the set of ids that are immediate children of one or more structures.
+        
+        Parameters
+        ----------
+        structure_ids: iterable
+            Any iterable type that contains structure ids that can be cast to integers.
+
+        Returns
+        -------
+        set
+            Set of child structure ids
+        """
+
         if len(structure_ids) == 0:
             return self.child_ids
         else:
@@ -118,17 +147,49 @@ class Ontology( object ):
             return children
                                 
 
-    def get_descendants(self, structure_id):
-        descendant_ids = self.get_descendant_ids(structure_id)
+    def get_descendants(self, structure_ids):
+        """
+        Find the set of structures that are descendants of one or more structures.  
+        The returned set will include the input structures.
+
+        Parameters
+        ----------
+        structure_ids: iterable
+            Any iterable type that contains structure ids that can be cast to integers.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Set of descendant structures.
+        """
+
+        descendant_ids = self.get_descendant_ids(structure_ids)
         return self[descendant_ids]
 
 
-    def get_children(self, structure_id):
-        child_ids = self.child_ids(structure_id)
+    def get_children(self, structure_ids):
+        """
+        Find the set of structures that are immediate children of one or more structures.
+        
+        Parameters
+        ----------
+        structure_ids: iterable
+            Any iterable type that contains structure ids that can be cast to integers.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Set of child structures
+        """
+
+        child_ids = self.get_child_ids(structure_ids)
         return self[child_ids]
 
 
     def structure_descends_from(self, child_id, parent_id):
+        """
+        Return whether one structure id is a descendant of another structure id.
+        """
         child = self[child_id]
 
         if child is not None:

@@ -128,6 +128,30 @@ class CellTypesApi(RmaApi):
             return features
 
 
+    def get_morphology_features(self, dataframe=False):
+        '''
+        Query the API for the full table of morphology features for all cells
+        
+        Parameters
+        ----------
+        
+        dataframe: boolean
+            If true, return the results as a Pandas DataFrame.  Otherwise
+            return a list of dictionaries.
+        '''
+
+        features = self.model_query('NeuronReconstruction', criteria="specimen", num_rows='all')
+
+        # the tags column isn't useful
+        for f in features:
+            del f['tags']
+
+        if dataframe:
+            return pd.DataFrame(features)
+        else:
+            return features
+
+
     def save_ephys_data(self, specimen_id, file_name):
         try: 
             os.makedirs(os.path.dirname(file_name))
