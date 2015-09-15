@@ -124,7 +124,7 @@ html_theme_path = ['../doc_template']
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static', 'examples/nb']
+html_static_path = ['_static', 'examples']
 
 html_extra_path = ['../doc_template/.nojekyll']
 

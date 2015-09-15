@@ -27,29 +27,26 @@ setversion:
 sdist: distutils_build
 	python setup.py sdist
 
+EXAMPLES=doc/_static/examples
 
 doc: FORCE
 	sphinx-apidoc -d 4 -H "Allen SDK" -A "Allen Institute for Brain Science" -V $(VERSION) -R $(VERSION).dev$(RELEASE) --full -o doc $(PROJECTNAME)
 	cp doc_template/*.rst doc_template/conf.py doc
-	cp -R doc_template/examples doc
+	cp -R doc_template/examples $(EXAMPLES)
 	sed -ie "s/|version|/${VERSION}/g" doc/conf.py
 	cp -R doc_template/aibs_sphinx/static/* doc/_static
 	cp -R doc_template/aibs_sphinx/templates/* doc/_templates
-	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/install.rst
-	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/links.rst
-	sed -ie "s/|zip_url|/${ZIP_URL}/g" doc/links.rst
-	sed -ie "s/|tgz_filename|/${TGZ_FILENAME}/g" doc/links.rst
-	sed -ie "s/|zip_filename|/${ZIP_FILENAME}/g" doc/links.rst
-	sed -ie "s/|tgz_filename|/${TGZ_FILENAME}/g" doc/examples/docker/Dockerfile.neuralensemble
-	sed -ie "s/|tgz_filename|/${TGZ_FILENAME}/g" doc/examples/docker/Dockerfile.neuralensemblex
-	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.neuralensemble
-	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.neuralensemblex
-	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.ubuntu
+	cd doc && find . -name '*.rst' -exec sed -ie "s/|tgz_url|/${TGZ_URL}/g" {} \;
+	cd doc && find . -name '*.rst' -exec sed -ie "s/|zip_url|/${ZIP_URL}/g" {} \;	
+	cd doc && find . -name '*.rst' -exec sed -ie "s/|tgz_filename|/${TGZ_FILENAME}/g" {} \;
+	cd doc && find . -name '*.rst' -exec sed -ie "s/|zip_filename|/${ZIP_FILENAME}/g" {} \;
+	cd $(EXAMPLES)/docker && find . -name 'Dockerfile.*' -exec sed -ie "s/|tgz_filename|/${TGZ_FILENAME}/g" {} \;
+	cd $(EXAMPLES)/docker && find . -name 'Dockerfile.*' -exec sed -ie "s/|tgz_url|/${TGZ_URL}/g" {} \;
 	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html
 	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
 	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_static/external_assets/javascript/portal.js
 	cd doc && make html || true
-	cd doc/examples/nb && find . -name '*.ipynb' -exec ipython nbconvert --to html {} \;
+	cd $(EXAMPLES)/nb && find . -name '*.ipynb' -exec ipython nbconvert --to html {} \;
 
 FORCE:
 
