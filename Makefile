@@ -45,8 +45,9 @@ doc: FORCE
 	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html
 	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
 	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_static/external_assets/javascript/portal.js
+	cd $(EXAMPLES)/nb && find . -maxdepth 1 -name '*.ipynb' -exec ipython nbconvert --to html {} \;
+	cd $(EXAMPLES)/nb/friday_harbor && find . -maxdepth 1 -name '*.ipynb' -exec ipython nbconvert --to html {} \;
 	cd doc && make html || true
-	cd $(EXAMPLES)/nb && find . -name '*.ipynb' -exec ipython nbconvert --to html {} \;
 
 FORCE:
 
