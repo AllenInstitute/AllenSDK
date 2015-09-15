@@ -27,6 +27,7 @@ setversion:
 sdist: distutils_build
 	python setup.py sdist
 
+
 doc: FORCE
 	sphinx-apidoc -d 4 -H "Allen SDK" -A "Allen Institute for Brain Science" -V $(VERSION) -R $(VERSION).dev$(RELEASE) --full -o doc $(PROJECTNAME)
 	cp doc_template/*.rst doc_template/conf.py doc
@@ -44,11 +45,11 @@ doc: FORCE
 	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.neuralensemble
 	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.neuralensemblex
 	sed -ie "s/|tgz_url|/${TGZ_URL}/g" doc/examples/docker/Dockerfile.ubuntu
-	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html	
+	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html
 	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
 	sed -ie "s/\/external_assets/${STATIC}\/external_assets/g" doc/_static/external_assets/javascript/portal.js
 	cd doc && make html || true
-	cp doc_template/.nojekyll doc/_build/html
+	cd doc/examples/nb && find . -name '*.ipynb' -exec ipython nbconvert --to html {} \;
 
 FORCE:
 
