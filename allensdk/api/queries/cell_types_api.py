@@ -59,6 +59,12 @@ class CellTypesApi(RmaApi):
             cell['has_reconstruction'] = len(cell['neuron_reconstructions']) > 0
             cell['has_morphology'] = len(cell['data_sets']) > 0
 
+            # transgenic line
+            cell['transgenic_line'] = None
+            for tl in cell['donor']['transgenic_lines']:
+                if tl['transgenic_line_type_name'] == 'driver':
+                    cell['transgenic_line'] = tl['name']
+
         return self.filter_cells(cells, require_morphology, require_reconstruction)
 
 
