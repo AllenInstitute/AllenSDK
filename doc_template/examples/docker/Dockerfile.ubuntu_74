@@ -1,7 +1,7 @@
 # DOCKER-VERSION 0.3.4
 #
 # docker build --tag alleninstitute/allensdk_ubuntu .
-# docker run -it -v /docker_share:/docker_share alleninstitute/allensdk_ubuntu /bin/bash
+# docker run -it alleninstitute/allensdk_ubuntu /bin/bash
 #
 FROM ubuntu:trusty
 
@@ -9,7 +9,7 @@ MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
 RUN apt-get update
 RUN apt-get upgrade -yq
-RUN apt-get -yq install \ 
+RUN apt-get -yq install \
     build-essential \
     automake \
     libtool \
@@ -35,8 +35,8 @@ RUN apt-get -yq install \
     libopenmpi-dev
 
 
-# upgrade cython and h5py
-RUN pip install cython h5py
+# upgrade cython
+RUN pip install cython
 RUN pip install sphinx numpydoc
 
 #neuron installation
@@ -50,9 +50,6 @@ RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --wi
 RUN echo 'export PATH=$PATH:/opt/neuron/iv/x86_64/bin:/opt/neuron/nrn/x86_64/bin' >> /etc/bash.bashrc
 RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
 
-RUN pip install ipython[notebook] --upgrade
-
-RUN apt-get -yq install graphviz libgraphviz-dev pkg-config
-RUN pip install pygraphviz networkx 
+RUN pip install jupyter
 
 RUN pip install |tgz_url|

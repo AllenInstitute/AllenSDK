@@ -21,7 +21,7 @@ from shutil import copy
 import numpy
 from allensdk.core.orca_data_set import OrcaDataSet
 
-def run(description):
+def run(description, sweeps=None):
     '''Main function for running a perisomatic biophysical experiment.
     
     Parameters
@@ -42,7 +42,8 @@ def run(description):
     # configure stimulus and recording
     stimulus_path = description.manifest.get_path('stimulus_path')
     run_params = description.data['runs'][0]
-    sweeps = run_params['sweeps']
+    if sweeps == None:
+        sweeps = run_params['sweeps']
     junction_potential = description.data['fitting'][0]['junction_potential']
     mV = 1.0e-3
     

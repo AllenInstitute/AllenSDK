@@ -17,7 +17,7 @@ import logging
 from json import dump, dumps
 from allensdk.config.model.description_parser import DescriptionParser
 from allensdk.config.model.description import Description
-from allensdk.config.model.formats.json_util import JsonUtil
+from allensdk.core.json_utilities import JsonComments
 
 
 class JsonDescriptionParser(DescriptionParser):
@@ -50,7 +50,7 @@ class JsonDescriptionParser(DescriptionParser):
         if description == None:
             description = Description()
             
-        data = JsonUtil.read_json_file(file_path)
+        data = JsonComments.read_file(file_path)
         description.unpack(data, section)
         
         return description
@@ -78,7 +78,7 @@ class JsonDescriptionParser(DescriptionParser):
         if description == None:
             description = Description()
         
-        data = JsonUtil.read_json_string(json_string)
+        data = JsonComments.read_string(json_string)
         
         description.unpack(data, section)
         
