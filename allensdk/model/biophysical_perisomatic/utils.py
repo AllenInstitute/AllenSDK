@@ -16,7 +16,6 @@
 import logging
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
-from allensdk.core.orca_data_set import OrcaDataSet
 
 
 class Utils(HocUtils):
@@ -150,11 +149,8 @@ class Utils(HocUtils):
         Utils._log.info("reading stimulus path: %s, sweep %s" %
                         (stimulus_path, sweep))
         
-        if fmt == 'ORCA':
-            stimulus_data = OrcaDataSet(stimulus_path)
-        else:
-            stimulus_data = NwbDataSet(stimulus_path)
-            
+        stimulus_data = NwbDataSet(stimulus_path)
+        
         sweep_data = stimulus_data.get_sweep(sweep)
         self.stim_curr = sweep_data['stimulus'] * 1.0e9 # convert to nA for NEURON
         self.sampling_rate = 1.0e3 / sweep_data['sampling_rate'] # convert from Hz
