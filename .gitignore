@@ -5,3 +5,5 @@ build
 *.pyc
 doc/
 /.settings/
+/.project
+/.pydevproject

@@ -88,6 +88,7 @@ def extract_sweep_features(nwb_file, sweep_numbers):
     all_sweep_features = {}
 
     for sweep_number in sweep_numbers:
+        logging.debug("extracting features for sweep %d" % sweep_number)
         sweep_features = extract_single_sweep_features(features, nwb_file, sweep_number)
         all_sweep_features[sweep_number] = sweep_features
 
