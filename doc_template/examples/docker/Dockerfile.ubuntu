@@ -9,7 +9,7 @@ MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
 RUN apt-get update
 RUN apt-get upgrade -yq
-RUN apt-get -yq install \ 
+RUN apt-get -yq install \
     build-essential \
     automake \
     libtool \
@@ -20,7 +20,7 @@ RUN apt-get -yq build-dep python-matplotlib
     
 RUN apt-get -yq install \
     python \
-    python-pip \
+    python-pip \	
     python-scipy \
     python-matplotlib \
     ipython \
@@ -50,5 +50,7 @@ RUN cd /opt/neuron; tar xzf nrn-7.3.ansi-1078.tar.gz; rm nrn-7.3.ansi-1078.tar.g
 RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --with-paranrn --with-nrnpython --with-mpi && make && make install
 RUN echo 'export PATH=$PATH:/opt/neuron/iv/x86_64/bin:/opt/neuron/nrn/x86_64/bin' >> /etc/bash.bashrc
 RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
+
+RUN pip install jupyter
 
 RUN pip install |tgz_url|
