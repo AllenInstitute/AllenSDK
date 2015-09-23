@@ -112,8 +112,7 @@ class Utils(HocUtils):
     
     def setup_iclamp(self,
                      stimulus_path,
-                     sweep=0,
-                     fmt='NWB'):
+                     sweep=0):
         '''Assign a current waveform as input stimulus.
         
         Parameters
@@ -126,7 +125,7 @@ class Utils(HocUtils):
         self.stim.delay = 0
         self.stim.dur = 1e12 # just set to be really big; doesn't need to match the waveform
         
-        self.read_stimulus(stimulus_path, sweep=sweep, fmt=fmt)
+        self.read_stimulus(stimulus_path, sweep=sweep)
         self.h.dt = self.sampling_rate
         stim_vec = self.h.Vector(self.stim_curr)
         stim_vec.play(self.stim._ref_amp, self.sampling_rate)

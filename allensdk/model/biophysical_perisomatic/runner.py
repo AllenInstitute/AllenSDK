@@ -46,14 +46,12 @@ def run(description, sweeps=None):
     junction_potential = description.data['fitting'][0]['junction_potential']
     mV = 1.0e-3
     
-    stimulus_format = manifest.get_format('stimulus_path')
-    
     prepare_nwb_output(manifest.get_path('stimulus_path'),
                        manifest.get_path('output'))
     
     # run sweeps
     for sweep in sweeps:
-        utils.setup_iclamp(stimulus_path, sweep=sweep, fmt=stimulus_format)
+        utils.setup_iclamp(stimulus_path, sweep=sweep)
         
         vec = utils.record_values()
         
