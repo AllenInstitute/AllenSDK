@@ -25,7 +25,7 @@ from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.core.swc as swc
 
 class CellTypesCache(Cache):
-    """
+    '''
     Cache class for storing and accessing data from the Cell Types Database.
     By default, this class will cache any downloaded metadata or files in 
     well known locations defined in a manifest file.  This behavior can be
@@ -48,10 +48,11 @@ class CellTypesCache(Cache):
 
     manifest_file: string
        File name of the manifest to be read.  Default is "manifest.json".
-    """
+    '''
 
     CELLS_KEY = 'CELLS'
     EPHYS_FEATURES_KEY = 'EPHYS_FEATURES'
+    MORPHOLOGY_FEATURES_KEY = 'MORPHOLOGY_FEATURES'
     EPHYS_DATA_KEY = 'EPHYS_DATA'
     EPHYS_SWEEPS_KEY = 'EPHYS_SWEEPS'
     RECONSTRUCTION_KEY = 'RECONSTRUCTION'
@@ -62,7 +63,7 @@ class CellTypesCache(Cache):
 
 
     def get_cells(self, file_name=None, require_morphology=False, require_reconstruction=False):
-        """
+        '''
         Download metadata for all cells in the database and optionally return a
         subset filtered by whether or not they have a morphology or reconstruction.
 
@@ -79,7 +80,7 @@ class CellTypesCache(Cache):
 
         require_reconstruction: boolean
             Filter out cells that have no morphological reconstructions.
-        """
+        '''
 
         file_name = self.get_cache_path(file_name, self.CELLS_KEY)
 
@@ -96,7 +97,7 @@ class CellTypesCache(Cache):
     
 
     def get_ephys_sweeps(self, specimen_id, file_name=None):
-        """
+        '''
         Download sweep metadata for a single cell specimen.  
 
         Parameters
@@ -104,7 +105,7 @@ class CellTypesCache(Cache):
         
         specimen_id: int
              ID of a cell.
-        """
+        '''
 
         file_name = self.get_cache_path(file_name, self.EPHYS_SWEEPS_KEY, specimen_id)
         
@@ -118,9 +119,9 @@ class CellTypesCache(Cache):
 
         return sweeps
 
-
+    
     def get_ephys_features(self, dataframe=False, file_name=None):
-        """
+        '''
         Download electrophysiology features for all cells in the database.
 
         Parameters
@@ -135,7 +136,7 @@ class CellTypesCache(Cache):
         dataframe: boolean
             Return the output as a Pandas DataFrame.  If False, return 
             a list of dictionaries.
-        """
+        '''
 
         file_name = self.get_cache_path(file_name, self.EPHYS_FEATURES_KEY)
 
@@ -153,8 +154,74 @@ class CellTypesCache(Cache):
             return features_df.to_dict('records')
 
 
+    def get_morphology_features(self, dataframe=False, file_name=None):
+        '''
+        Download morphology features for all cells with reconstructions in the database.
+
+        Parameters
+        ----------
+        
+        file_name: string
+            File name to save/read the ephys features metadata as CSV.  
+            If file_name is None, the file_name will be pulled out of the 
+            manifest.  If caching is disabled, no file will be saved. 
+            Default is None.
+
+        dataframe: boolean
+            Return the output as a Pandas DataFrame.  If False, return 
+            a list of dictionaries.
+        '''
+        
+        file_name = self.get_cache_path(file_name, self.MORPHOLOGY_FEATURES_KEY)
+        
+        if os.path.exists(file_name):
+            features_df = pd.DataFrame.from_csv(file_name)
+        else:
+            features_df = self.api.get_morphology_features(dataframe=True)
+            
+            if self.cache:
+                features_df.to_csv(file_name)
+
+        if dataframe:
+            return features_df
+        else:
+            return features_df.to_dict('records')
+
+    
+    def get_all_features(self, dataframe=False, require_reconstruction=True):
+        '''
+        Download morphology and electrophysiology features for all cells and merge them
+        into a single table.
+
+        Parameters
+        ----------
+
+        dataframe: boolean
+            Return the output as a Pandas DataFrame.  If False, return 
+            a list of dictionaries.
+
+        require_reconstruction: boolean
+            Only return ephys and morphology features for cells that have 
+            reconstructions. Default True.
+        '''
+
+        ephys_features = self.get_ephys_features(dataframe=True)
+        morphology_features = self.get_morphology_features(dataframe=True)
+
+        how = 'inner' if require_reconstruction else 'outer'
+
+        all_features = ephys_features.merge(morphology_features, 
+                                            how=how,
+                                            on='specimen_id')
+        
+        if dataframe:
+            return all_features
+        else:
+            return all_features.to_dict('records')
+        
+
     def get_ephys_data(self, specimen_id, file_name=None):
-        """
+        '''
         Download electrophysiology traces for a single cell in the database.
 
         Parameters
@@ -174,7 +241,7 @@ class CellTypesCache(Cache):
         NwbDataSet
             A class instance with helper methods for retrieving stimulus
             and response traces out of an NWB file.
-        """
+        '''
 
         file_name = self.get_cache_path(file_name, self.EPHYS_DATA_KEY, specimen_id)
 
@@ -185,7 +252,7 @@ class CellTypesCache(Cache):
 
 
     def get_reconstruction(self, specimen_id, file_name=None):
-        """
+        '''
         Download and open a reconstruction for a single cell in the database.
 
         Parameters
@@ -204,7 +271,7 @@ class CellTypesCache(Cache):
         -------
         Morphology
              A class instance with methods for accessing morphology compartments.
-        """
+        '''
 
         file_name = self.get_cache_path(file_name, self.RECONSTRUCTION_KEY, specimen_id)
 
@@ -218,7 +285,7 @@ class CellTypesCache(Cache):
 
 
     def build_manifest(self, file_name):
-        """
+        '''
         Construct a manifest for this Cache class and save it in a file.
         
         Parameters
@@ -227,7 +294,7 @@ class CellTypesCache(Cache):
         file_name: string
             File location to save the manifest.
 
-        """
+        '''
 
         mb = ManifestBuilder()
 
@@ -235,6 +302,7 @@ class CellTypesCache(Cache):
         mb.add_path(self.CELLS_KEY, 'cells.json', typename='file', parent_key='BASEDIR')
         mb.add_path(self.EPHYS_DATA_KEY, 'specimen_%d/ephys.nwb', typename='file', parent_key='BASEDIR')
         mb.add_path(self.EPHYS_FEATURES_KEY, 'ephys_features.csv', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.MORPHOLOGY_FEATURES_KEY, 'morphology_features.csv', typename='file', parent_key='BASEDIR')
         mb.add_path(self.RECONSTRUCTION_KEY, 'specimen_%d/reconstruction.swc', typename='file', parent_key='BASEDIR')
         mb.add_path(self.EPHYS_SWEEPS_KEY, 'specimen_%d/ephys_sweeps.json', typename='file', parent_key='BASEDIR')
 

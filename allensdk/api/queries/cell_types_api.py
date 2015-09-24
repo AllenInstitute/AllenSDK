@@ -59,6 +59,12 @@ class CellTypesApi(RmaApi):
             cell['has_reconstruction'] = len(cell['neuron_reconstructions']) > 0
             cell['has_morphology'] = len(cell['data_sets']) > 0
 
+            # transgenic line
+            cell['transgenic_line'] = None
+            for tl in cell['donor']['transgenic_lines']:
+                if tl['transgenic_line_type_name'] == 'driver':
+                    cell['transgenic_line'] = tl['name']
+
         return self.filter_cells(cells, require_morphology, require_reconstruction)
 
 
@@ -121,6 +127,30 @@ class CellTypesApi(RmaApi):
         '''
 
         features = self.model_query('EphysFeature', num_rows='all')
+
+        if dataframe:
+            return pd.DataFrame(features)
+        else:
+            return features
+
+
+    def get_morphology_features(self, dataframe=False):
+        '''
+        Query the API for the full table of morphology features for all cells
+        
+        Parameters
+        ----------
+        
+        dataframe: boolean
+            If true, return the results as a Pandas DataFrame.  Otherwise
+            return a list of dictionaries.
+        '''
+
+        features = self.model_query('NeuronReconstruction', criteria="specimen", num_rows='all')
+
+        # the tags column isn't useful
+        for f in features:
+            del f['tags']
 
         if dataframe:
             return pd.DataFrame(features)

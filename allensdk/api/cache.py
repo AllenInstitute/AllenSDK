@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.core import json_utilities as ju
 from allensdk.config.manifest import Manifest
+import allensdk.core.json_utilities as ju
 import pandas as pd
 import pandas.io.json as pj
 import os
@@ -24,7 +24,7 @@ class Cache(object):
     def __init__(self,
                  manifest=None,
                  cache=True):
-        self.cache = cache        
+        self.cache = cache
         self.load_manifest(manifest)
     
 
@@ -170,7 +170,8 @@ class Cache(object):
     
 
     def wrap(self, fn, path, cache,
-             save_as_json=False,
+             save_as_json=True,
+             return_dataframe=False,
              index=None,
              rename=None,
              **kwargs):
@@ -183,41 +184,53 @@ class Cache(object):
         path : string
             where to save the data
         cache : boolean
-            true will make the query, false just loads from disk
+            True will make the query, False just loads from disk
         save_as_json : boolean, optional
-            true will save data as json, false as csv
+            True (default) will save data as json, False as csv
+        return_dataframe : boolean, optional
+            True will cast the return value to a pandas dataframe, False (default) will not 
         index : string, optional
             column to use as the pandas index
         rename : list of string tuples, optional
             (new, old) columns to rename
         kwargs : objects
             passed through to the query function
-            
+        
+        Returns
+        -------
+        dict or DataFrame
+            data type depends on return_dataframe option.
+        
         Notes
         -----
-        
-        Renaming happens after the file is reloaded for json
+        Column renaming happens after the file is reloaded for json
         '''
         if cache == True:
             json_data = fn(**kwargs)
             
             if save_as_json == True:
                 ju.write(path, json_data)
-            else:            
+            else:
                 df = pd.DataFrame(json_data)
                 self.rename_columns(df, rename)
                 
-                if index is not None:        
+                if index is not None:
                     df.set_index([index], inplace=True)
         
-                df.to_csv(path)            
+                df.to_csv(path)
     
         # read it back in
         if save_as_json == True:
-            df = pj.read_json(path, orient='records')
-            self.rename_columns(df, rename)
-            df.set_index([index], inplace=True)
+            if return_dataframe == True:
+                data = pj.read_json(path, orient='records')
+                self.rename_columns(data, rename)
+                if index != None:
+                    data.set_index([index], inplace=True)
+            else:
+                data = ju.read(path)
+        elif return_dataframe == True:
+            data = pd.DataFrame.from_csv(path)
         else:
-            df = pd.DataFrame.from_csv(path)
+            raise ValueError('save_as_json=False cannot be used with return_dataframe=False')
         
-        return df
+        return data

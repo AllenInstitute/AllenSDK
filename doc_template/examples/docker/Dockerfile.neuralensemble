@@ -1,0 +1,33 @@
+# DOCKER-VERSION 0.3.4
+#
+# https://hub.docker.com/r/neuralensemble/simulation/
+#
+# docker build --tag alleninstitute/allensdk:neuralensemble .
+# docker run -it alleninstitute/allensdk:neuralensemble /bin/bash
+# source ~/env/simulation/bin/activate
+#
+FROM neuralensemble/simulation
+
+MAINTAINER Tim Fliss <timf@alleninstitute.org>
+
+USER root
+
+# http://micro.stanford.edu/wiki/Install_HDF5
+RUN apt-get install -yq \
+    pkg-config \
+    libhdf5-dev \
+    hdf5-tools
+    
+USER docker
+
+ENV ALLENSDK=|tgz_filename|
+WORKDIR /home/docker/packages
+
+RUN wget |tgz_url|
+
+WORKDIR $VENV/build
+RUN tar xvzf /home/docker/packages/${ALLENSDK}
+RUN $VENV/bin/pip install /home/docker/packages/${ALLENSDK}
+
+RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv
+

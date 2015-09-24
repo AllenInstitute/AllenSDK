@@ -12,6 +12,20 @@ This page describes how the SDK can be used to access data in the Cell Types Dat
 please visit the Cell Types Database `home page <http://celltypes.brain-map.org/>`_ and the 
 `API documentation <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_.
 
+
+Examples
+--------
+
+The Cell Types `Jupyter notebook <_static/examples/nb/cell_types.html>`_ has many code samples to help get
+started with analysis:
+
+    - `Download and plot stimuli and responses from an NWB file for a cell <_static/examples/nb/cell_types.html#Cell-Types-Database>`_
+    - `Download and plot a cell's morphological reconstruction <_static/examples/nb/cell_types.html#Cell-Morphology-Reconstructions>`_
+    - `Download and plot precomputed electrophysiology features <_static/examples/nb/cell_types.html#Electrophysiology-Features>`_
+    - `Download precomputed morphology features to a table <_static/examples/nb/cell_types.html#Morphology-Features>`_
+    - `Compute electrophysiology features for a single sweep <_static/examples/nb/cell_types.html#Computing-Electrophysiology-Features>`_
+      
+
 Cell Types API
 --------------
 
@@ -20,7 +34,7 @@ in the Allen Cell Types Database.  The following example demonstrates how to dow
 all cells with 3D reconstructions, then download the reconstruction and electrophysiology recordings
 for one of those cells:
 
-.. literalinclude:: examples/cell_types_ex1.py
+.. literalinclude:: _static/examples/cell_types_ex1.py
     
 
 Cell Types Cache
@@ -32,7 +46,7 @@ about file names and directories.  It also takes care of knowing if you've alrea
 them from disk instead of downloading them again.  The following example demonstrates how to download meta data for
 all cells with 3D reconstructions:
 
-.. literalinclude:: examples/cell_types_ex2.py    
+.. literalinclude:: _static/examples/cell_types_ex2.py    
 
 
 Feature Extraction
@@ -42,7 +56,7 @@ The :py:class:`~allensdk.ephys.feature_extraction.EphysFeatureExtractor` class c
 features from cell recordings.  :py:func:`~allensdk.ephys.extract_cell_features.extract_cell_features` can
 be used to extract the precise feature values available in the Cell Types Database:
 
-.. literalinclude:: examples/cell_types_ex3.py
+.. literalinclude:: _static/examples/cell_types_ex3.py
 
 
 File Formats
@@ -81,7 +95,7 @@ Type Description
 
 The Allen SDK comes with a :py:mod:`~allensdk.core.swc` Python module that provides helper functions and classes for manipulating SWC files.  Consider the following example:
 
-.. literalinclude:: examples/cell_types_ex4.py    
+.. literalinclude:: _static/examples/cell_types_ex4.py    
 
 Neurodata Without Borders
 +++++++++++++++++++++++++
@@ -105,7 +119,7 @@ several experimental trials, here called "sweeps."  The following code snippet
 demonstrates how to extract a sweep's stimulus, response, sampling rate, 
 and estimated spike times:
 
-.. literalinclude:: examples/cell_types_ex5.py
+.. literalinclude:: _static/examples/cell_types_ex5.py
 
 HDF5 Overview
 +++++++++++++
