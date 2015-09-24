@@ -20,7 +20,7 @@ class NwbDataSet(object):
     """ A very simple interface for exracting electrophysiology data
     from an NWB file.
     """
-    SPIKE_TIMES = "aibs_spike_time"
+    SPIKE_TIMES = "aibs_spike_times"
     
     def __init__(self, file_name, spike_time_key=None):
         """ Initialize the NwbDataSet instance with a file name
