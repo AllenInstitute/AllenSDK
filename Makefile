@@ -46,7 +46,7 @@ doc: FORCE
 	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
 	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_static/external_assets/javascript/portal.js
 	cd $(EXAMPLES)/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter nbconvert --to html {} \;
-	cd $(EXAMPLES)/nb/friday_harbor && find . -maxdepth 1 -name '*.ipynb' -exec jupyter nbconvert --to html {} \;
+	cd $(EXAMPLES)/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter nbconvert --to html {} \;
 	cd doc && make html || true
 
 FORCE:
