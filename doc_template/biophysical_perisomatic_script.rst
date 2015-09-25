@@ -214,8 +214,8 @@ The output from your simulation and any intermediate files will go in the work d
 Examples
 --------
 
-A :download:`minimal example (simple_example.tgz)<./examples/simple_example.tgz>`
-and a :download:`multicell example (multicell_example.tgz)<./examples/multicell_example.tgz>`
+A :download:`minimal example (simple_example.tgz)<./_static/examples/simple_example.tgz>`
+and a :download:`multicell example (multicell_example.tgz)<./_static/examples/multicell_example.tgz>`
 are available to download as a starting point for your own projects.
 
 Each example provides its own utils.py file along with a main script

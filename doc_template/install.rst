@@ -66,15 +66,16 @@ example Dockerfiles are available.
  #. Ensure you have Docker installed.
 
  #. Download one of the example Docker files:
-     * :download:`Ubuntu Standalone <./examples/docker/Dockerfile.ubuntu>`.
-     * :download:`Neural Ensemble combined simulators <./examples/docker/Dockerfile.neuralensemble>`.
-     * :download:`Neural Ensemble combined simulators with X11 <./examples/docker/Dockerfile.neuralensemblex>`.
+     * :download:`Ubuntu Standalone <./_static/examples/docker/Dockerfile.ubuntu>`.
+     * :download:`Neural Ensemble combined simulators <./_static/examples/docker/Dockerfile.neuralensemble>`.
+     * :download:`Neural Ensemble combined simulators with X11 <./_static/examples/docker/Dockerfile.neuralensemblex>`.
 
  #. Use Docker to build the image::
  
-     cd examples/docker
-     cp Dockerfile.ubuntu Dockerfile
-     docker build --tag alleninstitute/allensdk:ubuntu  .
+     mkdir docker_build
+     cp Dockerfile.ubuntu docker_build/Dockerfile
+     cd docker_build
+     docker build --tag alleninstitute/allensdk:ubuntu .
      
  #. Run the docker image::
  

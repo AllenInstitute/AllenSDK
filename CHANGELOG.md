@@ -25,6 +25,18 @@ All notable changes to this projection will be documented in this file.
 - Replaced brainscales Dockerfile with neuralenseble Dockerfiles.
 
 
+## [0.10.1] - 2015-x-x
+
+### Added
+
+- MouseConnectivityCache.get_projection_matrix, method for building a signal matrix from injection structure to projection structure.
+- CellTypesCache.get_morphology_features, method for retrieving morphology features for all cells
+- CellTypesCache.get_all_features, method for retrieving both morphology and ephys features for all cells in a single table
+
+### Changed
+
+- Ontology.get_child_ids and Ontology.get_descendant_ids accept a list of ids instead of a variable length argument list.
+
 ## [0.10.0] - 2015-8-20
 
 ### Added
