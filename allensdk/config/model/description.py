@@ -15,7 +15,7 @@
 
 import logging
 
-from allensdk.config.model.manifest import Manifest
+from allensdk.config.manifest import Manifest
 
 
 class Description(object):

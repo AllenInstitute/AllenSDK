@@ -16,7 +16,6 @@
 import logging
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
-from allensdk.core.orca_data_set import OrcaDataSet
 
 
 class Utils(HocUtils):
@@ -113,8 +112,7 @@ class Utils(HocUtils):
     
     def setup_iclamp(self,
                      stimulus_path,
-                     sweep=0,
-                     fmt='NWB'):
+                     sweep=0):
         '''Assign a current waveform as input stimulus.
         
         Parameters
@@ -127,7 +125,7 @@ class Utils(HocUtils):
         self.stim.delay = 0
         self.stim.dur = 1e12 # just set to be really big; doesn't need to match the waveform
         
-        self.read_stimulus(stimulus_path, sweep=sweep, fmt=fmt)
+        self.read_stimulus(stimulus_path, sweep=sweep)
         self.h.dt = self.sampling_rate
         stim_vec = self.h.Vector(self.stim_curr)
         stim_vec.play(self.stim._ref_amp, self.sampling_rate)
@@ -150,11 +148,8 @@ class Utils(HocUtils):
         Utils._log.info("reading stimulus path: %s, sweep %s" %
                         (stimulus_path, sweep))
         
-        if fmt == 'ORCA':
-            stimulus_data = OrcaDataSet(stimulus_path)
-        else:
-            stimulus_data = NwbDataSet(stimulus_path)
-            
+        stimulus_data = NwbDataSet(stimulus_path)
+        
         sweep_data = stimulus_data.get_sweep(sweep)
         self.stim_curr = sweep_data['stimulus'] * 1.0e9 # convert to nA for NEURON
         self.sampling_rate = 1.0e3 / sweep_data['sampling_rate'] # convert from Hz

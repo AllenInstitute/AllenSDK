@@ -14,7 +14,8 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import urllib2
-from json import load
+import allensdk.core.json_utilities as json_utilities
+import pandas as pd
 import logging
 
 
@@ -90,6 +91,48 @@ class Api(object):
         self.default_working_directory = working_directory
     
     
+    def read_data(self, parsed_json):
+        '''Return the message data from the parsed query.
+        
+        Parameters
+        ----------
+        parsed_json : dict
+            A python structure corresponding to the JSON data returned from the API.
+        
+        Notes
+        -----
+        See `API Response Formats - Response Envelope <http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope>`_
+        for additional documentation.
+        '''
+        return parsed_json['msg']
+    
+    
+    def json_msg_query(self, url, dataframe=False):
+        ''' Common case where the url is fully constructed
+            and the response data is stored in the 'msg' field.
+        
+        Parameters
+        ----------
+        url : string
+            Where to get the data in json form
+        dataframe : boolean
+            True converts to a pandas dataframe, False (default) doesn't
+        
+        Returns
+        -------
+        dict or DataFrame
+            returned data; type depends on dataframe option
+        '''
+        
+        data = self.do_query(lambda *a, **k:  url,
+                             self.read_data)
+        
+        if dataframe == True:
+            data = pd.DataFrame(data)
+        
+        return data
+    
+    
     def do_query(self, url_builder_fn, json_traversal_fn, *args, **kwargs):
         '''Bundle an query url construction function
         with a corresponding response json traversal function.
@@ -100,6 +143,8 @@ class Api(object):
             A function that takes parameters and returns an rma url.
         json_traversal_fn : function
             A function that takes a json-parsed python data structure and returns data from it.
+        post : boolean, optional kwarg
+            True does an HTTP POST, False (default) does a GET
         args : arguments
             Arguments to be passed to the url builder function.
         kwargs : keyword arguments
@@ -115,11 +160,11 @@ class Api(object):
         `A simple Api subclass example
         <data_api_client.html#creating-new-api-query-classes>`_.
         '''
-        api_url = url_builder_fn(*args, **kwargs) 
+        api_url = url_builder_fn(*args, **kwargs)
         
-        quoted_api_url = urllib2.quote(api_url,';/?:@&=+$,')
-                           
-        json_parsed_data = self.retrieve_parsed_json_over_http(quoted_api_url)
+        post = kwargs.get('post', False)
+        
+        json_parsed_data = self.retrieve_parsed_json_over_http(api_url, post)
         
         return json_traversal_fn(json_parsed_data)
     
@@ -196,7 +241,7 @@ class Api(object):
         --------
         retrieve_file_over_http: Can be used to retrieve the file from the url.
         '''
-        return self.well_known_file_endpoint + str(well_known_file_id)
+        return self.well_known_file_endpoint + '/' + str(well_known_file_id)
     
     
     def retrieve_file_over_http(self, url, file_path):
@@ -226,23 +271,29 @@ class Api(object):
             raise
     
     
-    def retrieve_parsed_json_over_http(self, url):
+    def retrieve_parsed_json_over_http(self, url, post=False):
         '''Get the document and put it in a Python data structure
         
         Parameters
         ----------
         url : string
             Full API query url.
+        post : boolean
+            True does an HTTP POST, False (default) encodes the URL and does a GET
         
         Returns
         -------
         dict
             Result document as parsed by the JSON library.
         '''
-        response = urllib2.urlopen(url)
-        json_parsed_data = load(response)
         
-        return json_parsed_data
+        if post == False:
+            data = json_utilities.read_url(urllib2.quote(url,';/?:@&=+$,'),
+                                           'GET')
+        else:
+            data = json_utilities.read_url(url, 'POST')
+        
+        return data
     
     
     def retrieve_xml_over_http(self, url):
