@@ -264,6 +264,10 @@ class ApplicationConfig(object):
         -----
         The Python configparser library natively supports this functionality in Python 3.
         '''
+        if not 'biophys' in description:
+            bps_config_string = '[biophys]\n\n'
+            return bps_config_string
+        
         bps_config = description['biophys'][0]
         
         cfg_array = ['[biophys]']
