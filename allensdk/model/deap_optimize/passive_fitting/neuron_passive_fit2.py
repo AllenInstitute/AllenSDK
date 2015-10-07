@@ -1,14 +1,12 @@
 #!/usr/bin/env python
 
-#import allensdk.model.deap_optimize.lims_utils as lims_utils
 from neuron import h
 import numpy as np
 import os
 import neuron_utils
 from neuron_utils import read_neuron_fit_stdout
-#import json
 
-import neuron_passive_fit as npf
+#import neuron_passive_fit as npf
 import allensdk.core.json_utilities as json_utilities
 from allensdk.model.biophys_sim.config import Config
 
@@ -89,27 +87,22 @@ def neuron_passive_fit2(up_data, down_data, swc_path, limit):
 
 def main():
     import sys
-    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.3.0.201508182223/pysrc')
-    #import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
     
     manifest_path = sys.argv[-1]
     limit = float(sys.argv[-2])
     os.chdir(os.path.dirname(manifest_path))
     app_config = Config()
     description = app_config.load(manifest_path)
-    #parser = npf.arg_parser()
-
-    #args, up_data, down_data, swc_path = npf.process_inputs(parser)
+    
     upfile = description.manifest.get_path('upfile')
     up_data =  np.loadtxt(upfile)
     downfile = description.manifest.get_path('downfile')
     down_data = np.loadtxt(downfile)
     swc_path = description.manifest.get_path('MORPHOLOGY')
     output_file = description.manifest.get_path('fit_2_file')
-
+    
     data = neuron_passive_fit2(up_data, down_data, swc_path, limit)
-    print data
-
+    
     json_utilities.write(output_file, data)
 
 if __name__ == "__main__": main()

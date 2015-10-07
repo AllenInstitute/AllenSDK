@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 from collections import Counter
 import subprocess
-#import argparse
 
 from allensdk.ephys.feature_extractor import EphysFeatureExtractor, EphysFeatures
 import allensdk.core.json_utilities as ju
@@ -147,9 +146,10 @@ def collect_target_features(ft):
 
 def prepare_stage_1(description, passive_fit_data):
     output_directory = description.manifest.get_path('WORKDIR')
-    specimen_data = ju.read(description.manifest.get_path('specimen_data'))
+    neuronal_model_data = ju.read(description.manifest.get_path('neuronal_model_data'))
+    specimen_data = neuronal_model_data['specimen']
     is_spiny = specimen_data['dendrite type'] != 'aspiny'
-    all_sweeps = specimen_data['sweeps'] # TODO: this should probably just be in the lims input file
+    all_sweeps = specimen_data['ephys_sweeps']
     data_set = NwbDataSet(description.manifest.get_path('stimulus_path'))
     swc_path = description.manifest.get_path('MORPHOLOGY')
     
@@ -292,24 +292,3 @@ def run_stage_1(jobs):
         print args
         with open(job['log'], "w") as outfile:
             subprocess.call(args, stdout=outfile)
-
-# def main():
-#     parser = argparse.ArgumentParser(description='Set up DEAP-style fit')
-#     parser.add_argument('--passive_fit_file', required=True)
-#     parser.add_argument('--output_dir', required=True)
-#     parser.add_argument('specimen_id', type=int)
-#     args = parser.parse_args()
-#     
-#     output_directory = os.path.join(args.output_dir, 'specimen_%d' % args.specimen_id)
-# 
-#     data = lims_utils.get_specimen_info(args.specimen_id)
-#     is_spiny = data['dendrite type'] != 'aspiny'
-#     data_set = NwbDataSet(data['nwb_path'])
-# 
-#     passive_fit_data = json_utilities.read(args.passive_fit_file)
-# 
-#     jobs = prepare_stage_1(data_set, data['sweeps'], data['swc_path'],
-#                            passive_fit_data, is_spiny, output_directory)
-#     run_stage_1(jobs)
-# 
-# if __name__ == "__main__": main()

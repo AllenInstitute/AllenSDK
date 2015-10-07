@@ -133,8 +133,6 @@ def process_inputs(parser):
 
 def main():
     import sys
-    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.3.0.201508182223/pysrc')
-    #import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
     
     manifest_path = sys.argv[-1]
     limit = float(sys.argv[-2])

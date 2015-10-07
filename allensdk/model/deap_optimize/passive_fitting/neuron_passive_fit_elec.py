@@ -6,18 +6,21 @@ import numpy as np
 import os
 import neuron_utils
 from neuron_utils import read_neuron_fit_stdout
-#import json
 
-import neuron_passive_fit as npf
 import allensdk.core.json_utilities as json_utilities
 from allensdk.model.biophys_sim.config import Config
 
 # Load the morphology
 
-BASEDIR = os.path.dirname(__file__)#BASEDIR = "/data/mat/nathang/deap_optimize/passive_fitting"
+BASEDIR = os.path.dirname(__file__)
 
 @read_neuron_fit_stdout
-def neuron_passive_fit_elec(up_data, down_data, swc_path, limit, bridge, elec_cap):
+def neuron_passive_fit_elec(up_data,
+                            down_data,
+                            swc_path,
+                            limit,
+                            bridge,
+                            elec_cap):
     h.load_file("stdgui.hoc")
     h.load_file("import3d.hoc")
     neuron_utils.load_morphology(swc_path)
@@ -72,7 +75,7 @@ def neuron_passive_fit_elec(up_data, down_data, swc_path, limit, bridge, elec_ca
     fit1.set_w()
 
     minerr = 1e12
-    for i in range(3):
+    for _ in range(3):
         # Need to re-initialize the internal MRF variables, not top-level proxies
         # for randomize() to work
         mrf.p.pf.parmlist.object(0).val = 100
@@ -96,12 +99,7 @@ def neuron_passive_fit_elec(up_data, down_data, swc_path, limit, bridge, elec_ca
         }
 
 def main():
-    #parser = npf.arg_parser()
-    #parser.add_argument("--bridge", type=float, required=True)
-    #parser.add_argument("--elec_cap", type=float, required=True)
     import sys
-    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.3.0.201508182223/pysrc')
-    #import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
     
     manifest_path = sys.argv[-1]
     elec_cap = float(sys.argv[-2])
@@ -117,11 +115,7 @@ def main():
     down_data = np.loadtxt(downfile)
     swc_path = description.manifest.get_path('MORPHOLOGY')
 
-#    args, up_data, down_data, swc_path = npf.process_inputs(parser)
-
     data = neuron_passive_fit_elec(up_data, down_data, swc_path, limit, bridge, elec_cap)
 
     output_file = description.manifest.get_path('fit_3_file')
     json_utilities.write(output_file, data)
-
-if __name__ == "__main__": main()

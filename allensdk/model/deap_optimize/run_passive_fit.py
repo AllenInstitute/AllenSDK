@@ -1,5 +1,4 @@
 import os, sys
-#import argparse
 import subprocess
 
 import numpy as np
@@ -10,20 +9,15 @@ import passive_fitting.preprocess as passive_prep
 import allensdk.core.json_utilities as ju
 from allensdk.model.biophys_sim.config import Config
 from allensdk.core.nwb_data_set import NwbDataSet
-#from allensdk.core.nwb_data_set import NwbDataSet
 
 PASSIVE_FITTING_DIR = os.path.join(os.path.dirname(__file__), "passive_fitting")
 
 def run_passive_fit(description):
-    import sys
-    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.3.0.201508182223/pysrc')
-    #import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
-
-    #specimen_id, data_set, is_spiny, all_sweeps, swc_path, output_directory):
     output_directory = description.manifest.get_path('WORKDIR')
-    specimen_data = ju.read(description.manifest.get_path('specimen_data'))
+    neuronal_model = ju.read(description.manifest.get_path('neuronal_model_data'))
+    specimen_data = neuronal_model['specimen']
     is_spiny = specimen_data['dendrite type'] != 'aspiny'
-    all_sweeps = specimen_data['sweeps'] # TODO: this should probably just be in the lims input file
+    all_sweeps = specimen_data['ephys_sweeps'] # TODO: this should probably just be in the lims input file
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
 
@@ -46,40 +40,20 @@ def run_passive_fit(description):
         passive_fit_data["bridge"] = d['bridge_avg']
         passive_fit_data["escape_time"] = d['escape_t']
 
-        #fit_1_script = os.path.join(PASSIVE_FITTING_DIR, "neuron_passive_fit.py")
         fit_1_file = description.manifest.get_path('fit_1_file')
-        try:
-            fit_1_data = subprocess.check_output([ sys.executable,
-                                                   '-m', 'allensdk.model.deap_optimize.passive_fitting.neuron_passive_fit', 
-                                                   str(d['escape_t']),
-                                                   os.path.realpath(description.manifest.get_path('manifest')) ])
-    #                                               '--specimen_id', str(specimen_id), 
-    #                                               '--up_file', grand_up_file, 
-    #                                               '--down_file', grand_down_file, 
-    #                                               '--swc_path', swc_path, 
-    #                                               '--limit', str(d['escape_t']),
-    #                                               '--output_file', fit_1_file ])
-            passive_fit_data['fit_1'] = ju.read(fit_1_file)
-        except:
-            print('oh well.')
+        fit_1_data = subprocess.check_output([ sys.executable,
+                                               '-m', 'allensdk.model.deap_optimize.passive_fitting.neuron_passive_fit', 
+                                               str(d['escape_t']),
+                                               os.path.realpath(description.manifest.get_path('manifest')) ])
+        passive_fit_data['fit_1'] = ju.read(fit_1_file)
 
         fit_2_file = description.manifest.get_path('fit_2_file')
         fit_2_data = subprocess.check_output([ sys.executable,
                                               '-m', 'allensdk.model.deap_optimize.passive_fitting.neuron_passive_fit2',
                                                str(d['escape_t']),
                                                os.path.realpath(description.manifest.get_path('manifest')) ])
-
-#                                               fit_2_script, 
-#                                                '--specimen_id', str(specimen_id), 
-#                                                '--up_file', grand_up_file, 
-#                                                '--down_file', grand_down_file, 
-#                                                '--swc_path', swc_path, 
-#                                                '--limit', str(d['escape_t']),
-#                                                '--output_file', fit_2_file ],
-#                                              env={'PYTHONPATH': '/home/timf/git/allensdk:/local1/anaconda/bin:/home/timf/.local/lib/python2.7/site-packages:/home/timf/nrn/nrn/lib/python'})
         passive_fit_data['fit_2'] = ju.read(fit_2_file)
 
-        #fit_3_script = os.path.join(PASSIVE_FITTING_DIR, "neuron_passive_fit_elec.py")
         fit_3_file = os.path.join(output_directory, 'fit_3_data.json')
         fit_3_data = subprocess.check_output([ sys.executable,
                                               '-m', 'allensdk.model.deap_optimize.passive_fitting.neuron_passive_fit_elec',
@@ -87,14 +61,6 @@ def run_passive_fit(description):
                                                str(d['bridge_avg']),
                                                str(1.0),
                                                os.path.realpath(description.manifest.get_path('manifest')) ])
-#                                                '--specimen_id', str(specimen_id), 
-#                                                '--up_file', grand_up_file, 
-#                                                '--down_file', grand_down_file, 
-#                                                '--swc_path', swc_path, 
-#                                                '--limit', str(d['escape_t']),
-#                                                '--bridge', str(d['bridge_avg']),
-#                                                '--elec_cap', str(1.0),
-#                                                '--output_file', fit_3_file ])
         passive_fit_data['fit_3'] = ju.read(fit_3_file)
         
         # Check for potentially problematic outcomes
@@ -148,23 +114,9 @@ def run_passive_fit(description):
 def main(limit, manifest_path):
     app_config = Config()
     description = app_config.load(manifest_path)
-
-#     parser = argparse.ArgumentParser(description='Set up DEAP-style fit')
-#     parser.add_argument('--output_dir', required=True)
-#     parser.add_argument('specimen_id', type=int)
-#     args = parser.parse_args()
-# 
-#     data = lims_utils.get_specimen_info(args.specimen_id)
-#     output_directory = os.path.join(args.output_dir, 'specimen_%d' % args.specimen_id)
-# 
-#     is_spiny = data['dendrite type'] != 'aspiny'
-# 
-#     data_set = NwbDataSet(data['nwb_path'])
-# 
-#passive_fit_data = run_passive_fit(data['id'], data_set, is_spiny, data['sweeps'], data['swc_path'], output_directory)
+    
     run_passive_fit(description)
-#     json_utilities.write(os.path.join(output_directory, 'passive_fit_data.json'), passive_fit_data)
-# 
+
 if __name__ == "__main__":
     import sys
     sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.3.0.201508182223/pysrc')

@@ -78,7 +78,7 @@ def main():
     print "Setting up GA"
     random.seed(seed)
 
-    ngen = 500
+    ngen = 500 
     mu = 1200
     cxpb = 0.1
     mtpb = 0.35
