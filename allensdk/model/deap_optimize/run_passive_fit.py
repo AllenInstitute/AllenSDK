@@ -119,8 +119,6 @@ def main(limit, manifest_path):
 
 if __name__ == "__main__":
     import sys
-    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.3.0.201508182223/pysrc')
-    import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
     
     limit = sys.argv[-2]
     manifest_path = sys.argv[-1]
