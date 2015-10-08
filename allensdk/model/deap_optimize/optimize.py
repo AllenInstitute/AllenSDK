@@ -1,4 +1,3 @@
-from mpi4py import MPI
 from allensdk.model.biophys_sim.config import Config
 from utils import Utils
 import neuron_parallel

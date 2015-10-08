@@ -1,20 +1,13 @@
 #!/usr/bin/env python
 
-#import allensdk.model.deap_optimize.lims_utils as lims_utils
 from neuron import h
 import numpy as np
 import argparse
-#import matplotlib.pyplot as plt
 import os
 import neuron_utils
 from neuron_utils import read_neuron_fit_stdout
-#import json
 import allensdk.core.json_utilities as json_utilities
 from allensdk.model.biophys_sim.config import Config
-#from allensdk.core.nwb_data_set import NwbDataSet
-
-#import allensdk.model.deap_optimize.passive_fitting.preprocess as passive_prep
-#import allensdk.model.deap_optimize.ephys_utils as ephys_utils
 
 # Load the morphology
 
@@ -109,27 +102,12 @@ def arg_parser():
 
 def process_inputs(parser):
     args = parser.parse_args()
-
-#     specimen_info = None
-
-#     if not args.swc_path:
-#         specimen_info = lims_utils.get_specimen_info(args.specimen_id)
-#         swc_path = specimen_info['swc_path']
-#     else:
     swc_path = args.swc_path
-
-#     if not args.up_file or not args.down_file:
-#         if not specimen_info:
-#             specimen_info = lims_utils.get_specimen_info(args.specimen_id)
-#         cap_check_sweeps, _, _ = ephys_utils.get_sweeps_of_type('C1SQCAPCHK', specimen_info['sweeps'])
-# 
-#         d = passive_prep.get_passive_fit_data(cap_check_sweeps, NwbDataSet(specimen_info['nwb_path']))
-#         up_data, down_data = d['grand_up'], d['grand_down']
-#     else:
     up_data = np.loadtxt(args.up_file)
     down_data = np.loadtxt(args.down_file)
-
+    
     return args, up_data, down_data, swc_path
+
 
 def main():
     import sys
@@ -140,19 +118,15 @@ def main():
     app_config = Config()
     description = app_config.load(manifest_path)
     
-#    parser = arg_parser()
-
     upfile = description.manifest.get_path('upfile')
     up_data =  np.loadtxt(upfile)
     downfile = description.manifest.get_path('downfile')
     down_data = np.loadtxt(downfile)
     swc_path = description.manifest.get_path('MORPHOLOGY')
-    #args, up_data, down_data, swc_path = process_inputs(parser)
-
+    
     data = neuron_passive_fit(up_data, down_data, swc_path, limit)
     output_file = description.manifest.get_path('fit_1_file')
-    #limit = description.data['runs'][0]['passive_fit_limit']
-
+    
     json_utilities.write(output_file, data)
 
 if __name__ == "__main__": main()

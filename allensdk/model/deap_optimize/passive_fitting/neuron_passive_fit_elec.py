@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-#import allensdk.model.deap_optimize.lims_utils
 from neuron import h
 import numpy as np
 import os
@@ -119,3 +118,6 @@ def main():
 
     output_file = description.manifest.get_path('fit_3_file')
     json_utilities.write(output_file, data)
+
+
+if __name__ == '__main__': main()

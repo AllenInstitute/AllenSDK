@@ -6,13 +6,12 @@ import os
 import neuron_utils
 from neuron_utils import read_neuron_fit_stdout
 
-#import neuron_passive_fit as npf
 import allensdk.core.json_utilities as json_utilities
 from allensdk.model.biophys_sim.config import Config
 
 # Load the morphology
 
-BASEDIR = os.path.dirname(__file__)#BASEDIR = "/data/mat/nathang/deap_optimize/passive_fitting"
+BASEDIR = os.path.dirname(__file__)
 
 @read_neuron_fit_stdout
 def neuron_passive_fit2(up_data, down_data, swc_path, limit):

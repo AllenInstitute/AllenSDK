@@ -54,7 +54,7 @@ def run_passive_fit(description):
                                                os.path.realpath(description.manifest.get_path('manifest')) ])
         passive_fit_data['fit_2'] = ju.read(fit_2_file)
 
-        fit_3_file = os.path.join(output_directory, 'fit_3_data.json')
+        fit_3_file = description.manifest.get_path('fit_3_file')
         fit_3_data = subprocess.check_output([ sys.executable,
                                               '-m', 'allensdk.model.deap_optimize.passive_fitting.neuron_passive_fit_elec',
                                                str(d['escape_t']),
