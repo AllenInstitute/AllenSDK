@@ -21,9 +21,7 @@ class ManifestBuilder(object):
     def __init__(self):
         self._log = logging.getLogger(__name__)
         self.path_info = []
-        self.bps_cfg = {}
-        self.stimulus_conf = {}
-        self.hoc_conf = {}
+        self.sections = {}
     
     
     def add_path(self, key, spec,
@@ -44,6 +42,10 @@ class ManifestBuilder(object):
         self.path_info.append(entry)
     
     
+    def add_section(self, name, contents):
+        self.sections[name] = contents
+    
+    
     def write_json_file(self, path):
         with open(path, 'wb') as f:
             f.write(self.write_json_string())
@@ -51,12 +53,11 @@ class ManifestBuilder(object):
     
     def get_config(self):
         wrapper = { "manifest": self.path_info }
-        wrapper.update(self.bps_cfg)
-        wrapper.update(self.stimulus_conf)
-        wrapper.update(self.hoc_conf)
+        for section in self.sections.values():
+            wrapper.update(section)
         
         return wrapper
-
+    
     
     def write_json_string(self):
         config = self.get_config()
