@@ -58,7 +58,7 @@ This may be also be done programmatically.
 The neuronal model id can be found to the left of
 the corresponding 'Biophysical - perisomatic "download model" link.
 
-.. literalinclude:: examples/biophysical_perisomatic_ex1.py
+.. literalinclude:: _static/examples/biophysical_perisomatic_ex1.py
 
 More help can be found in the
 `online help <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_
@@ -214,8 +214,8 @@ The output from your simulation and any intermediate files will go in the work d
 Examples
 --------
 
-A :download:`minimal example (simple_example.tgz)<./examples/simple_example.tgz>`
-and a :download:`multicell example (multicell_example.tgz)<./examples/multicell_example.tgz>`
+A :download:`minimal example (simple_example.tgz)<./_static/examples/simple_example.tgz>`
+and a :download:`multicell example (multicell_example.tgz)<./_static/examples/multicell_example.tgz>`
 are available to download as a starting point for your own projects.
 
 Each example provides its own utils.py file along with a main script

@@ -17,6 +17,13 @@ To install the Allen SDK for a single user::
     pip install |tgz_url| --user
 
 
+.. note::
+
+    On Windows use the options '--process-dependency-links --trusted-host github.com'
+    to install the correct version of the pynrrd dependency. 
+
+
+
 Uninstalling the SDK is simple with pip::
 
     pip uninstall allensdk
@@ -44,7 +51,8 @@ Optional Dependencies
  * `coverage <http://nedbatchelder.com/code/coverage>`_
  * `matplotlib <http://matplotlib.org/>`_
  * `h5py <http://www.h5py.org>`_
-
+ * `pandas <http://pandas.pydata.org>`_
+ * `pynrrd <http://pypi.python.org/pypi/pynrrd>`_
 
 Installation with Docker (Optional)
 -----------------------------------
@@ -58,14 +66,16 @@ example Dockerfiles are available.
  #. Ensure you have Docker installed.
 
  #. Download one of the example Docker files:
-     * :download:`Ubuntu Standalone <./examples/docker/Dockerfile.ubuntu>`.
-     * :download:`BrainScales combined Neural-Networks <./examples/docker/Dockerfile.brainscales>`.
+     * :download:`Ubuntu Standalone <./_static/examples/docker/Dockerfile.ubuntu>`.
+     * :download:`Neural Ensemble combined simulators <./_static/examples/docker/Dockerfile.neuralensemble>`.
+     * :download:`Neural Ensemble combined simulators with X11 <./_static/examples/docker/Dockerfile.neuralensemblex>`.
 
  #. Use Docker to build the image::
  
-     cd examples/docker
-     cp Dockerfile.ubuntu Dockerfile
-     docker build --tag alleninstitute/allensdk:ubuntu  .
+     mkdir docker_build
+     cp Dockerfile.ubuntu docker_build/Dockerfile
+     cd docker_build
+     docker build --tag alleninstitute/allensdk:ubuntu .
      
  #. Run the docker image::
  

@@ -20,8 +20,9 @@ class NwbDataSet(object):
     """ A very simple interface for exracting electrophysiology data
     from an NWB file.
     """
-
-    def __init__(self, file_name):
+    SPIKE_TIMES = "aibs_spike_times"
+    
+    def __init__(self, file_name, spike_time_key=None):
         """ Initialize the NwbDataSet instance with a file name
 
         Parameters
@@ -30,6 +31,11 @@ class NwbDataSet(object):
            NWB file name
         """
         self.file_name = file_name
+        if spike_time_key == None:
+            self.spike_time_key = NwbDataSet.SPIKE_TIMES
+        else:
+            self.spike_time_key = spike_time_key
+    
     
     def get_sweep(self, sweep_number):
         """ Retrieve the stimulus, response, index_range, and sampling rate
@@ -82,10 +88,9 @@ class NwbDataSet(object):
             
             assert sweep_index_range[0] == 0, Exception("index range of the full sweep does not start at 0.")
             
-            # only return data up to the end of the experiment -- ignore everything else
             return  {
-                'stimulus': stimulus[sweep_index_range[0]:experiment_index_range[1]+1],
-                'response': response[sweep_index_range[0]:experiment_index_range[1]+1],
+                'stimulus': stimulus,
+                'response': response,
                 'index_range': experiment_index_range,
                 'sampling_rate': 1.0 * swp['stimulus']['timeseries']['starting_time'].attrs['rate']
             }
@@ -133,53 +138,66 @@ class NwbDataSet(object):
                 if missing_data > 0:
                     response = np.append(response, np.zeros(missing_data))
                 
-                
                 swp['response']['timeseries']['data'][...] = response
     
 
-    def get_spike_times(self, sweep_number):
+    def get_spike_times(self, sweep_number, key=None):
         """ Return any spike times stored in the NWB file for a sweep.
 
         Parameters
         ----------
         sweep_number: int
+            index to access
+        key : string
+            label where the spike times are stored (default NwbDataSet.SPIKE_TIMES)
 
         Returns
         -------
         list
            list of spike times in seconds relative to the start of the sweep
         """
+        
+        if key == None:
+            key = self.spike_time_key
+        
         with h5py.File(self.file_name,'r') as f:
             sweep_name = "Sweep_%d" % sweep_number
             
             try:
-                spikes = f["analysis"]["spike_times"][sweep_name]
+                spikes = f["analysis"][key][sweep_name]
             except KeyError:
                 return []
             
             return spikes.value
     
     
-    def set_spike_times(self, sweep_number, spike_times):
+    def set_spike_times(self, sweep_number, spike_times, key=None):
         """ Set or overwrite the spikes times for a sweep.
         
         Parameters
         ----------
-        sweep_number: int
+        sweep_number : int
+            index to access
+        key : string
+            where the times are stored (default NwbDataSet.SPIKE_TIME)
         
         spike_times: np.array
            array of spike times in seconds
         """
+        
+        if key == None:
+            key = self.spike_time_key
+        
         with h5py.File(self.file_name,'r+') as f:
             # make sure expected directory structure is in place
             if "analysis" not in f.keys():
                 f.create_group("analysis")
             
             analysis_dir = f["analysis"]
-            if "spike_times" not in analysis_dir.keys():
-                analysis_dir.create_group("spike_times")
+            if NwbDataSet.SPIKE_TIMES not in analysis_dir.keys():
+                analysis_dir.create_group(NwbDataSet.SPIKE_TIMES)
             
-            spike_dir = analysis_dir["spike_times"]
+            spike_dir = analysis_dir[NwbDataSet.SPIKE_TIMES]
             
             # see if desired dataset already exists
             sweep_name = "Sweep_%d" % sweep_number
