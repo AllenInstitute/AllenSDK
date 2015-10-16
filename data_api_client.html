@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>API Access &mdash; Allen SDK 0.10.0 documentation</title>
+    <title>API Access &mdash; Allen SDK 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
     <link rel="up" title="Data Resources" href="data_resources.html" />
     <link rel="next" title="Models" href="models.html" />
     <link rel="prev" title="Mouse Connectivity" href="connectivity.html" /> 
@@ -638,64 +638,174 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <a class="reference external" href="http://help.brain-map.org/display/api/Allen+Brain+Atlas+API">Allen Brain Atlas API</a>. <a class="reference internal" href="allensdk.api.html#module-allensdk.api" title="allensdk.api"><tt class="xref py py-mod docutils literal"><span class="pre">api</span></tt></a>
 contains methods to help formulate API queries and parse the returned results.  There are several
 pre-made subclasses available that provide pre-made queries specific to certain data sets. Currently there
-are three subclasses in Allen SDK:</p>
+are several subclasses in Allen SDK:</p>
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi" title="allensdk.api.queries.cell_types_api.CellTypesApi"><tt class="xref py py-class docutils literal"><span class="pre">CellTypesApi</span></tt></a>: data related to the Allen Cell Types Database</li>
 <li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi"><tt class="xref py py-class docutils literal"><span class="pre">BiophysicalPerisomaticApi</span></tt></a>: data related to perisomatic biophysical models</li>
 <li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi" title="allensdk.api.queries.glif_api.GlifApi"><tt class="xref py py-class docutils literal"><span class="pre">GlifApi</span></tt></a>: data related to GLIF models</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi" title="allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi"><tt class="xref py py-class docutils literal"><span class="pre">AnnotatedSectionDataSetsApi</span></tt></a>: search for experiments by intensity, density, pattern, and age</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.grid_data_api.GridDataApi" title="allensdk.api.queries.grid_data_api.GridDataApi"><tt class="xref py py-class docutils literal"><span class="pre">GridDataApi</span></tt></a>: used to download 3-D expression grid data</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi" title="allensdk.api.queries.image_download_api.ImageDownloadApi"><tt class="xref py py-class docutils literal"><span class="pre">ImageDownloadApi</span></tt></a>: download whole or partial two-dimensional images</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi"><tt class="xref py py-class docutils literal"><span class="pre">MouseConnectivityApi</span></tt></a>: common operations for accessing the Allen Mouse Brain Connectivity Atlas</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi" title="allensdk.api.queries.ontologies_api.OntologiesApi"><tt class="xref py py-class docutils literal"><span class="pre">OntologiesApi</span></tt></a>: data about neuroanatomical regions of interest</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.connected_services.ConnectedServices" title="allensdk.api.queries.connected_services.ConnectedServices"><tt class="xref py py-class docutils literal"><span class="pre">ConnectedServices</span></tt></a>: schema of Allen Institute Informatics Pipeline services available through the RmaApi</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><tt class="xref py py-class docutils literal"><span class="pre">RmaApi</span></tt></a>: general-purpose HTTP interface to the Allen Institute API data model and services</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi" title="allensdk.api.queries.svg_api.SvgApi"><tt class="xref py py-class docutils literal"><span class="pre">SvgApi</span></tt></a>:  annotations associated with images as scalable vector graphics (SVG)</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.synchronization_api.SynchronizationApi" title="allensdk.api.queries.synchronization_api.SynchronizationApi"><tt class="xref py py-class docutils literal"><span class="pre">SynchronizationApi</span></tt></a>: data about image alignment</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.tree_search_api.TreeSearchApi" title="allensdk.api.queries.tree_search_api.TreeSearchApi"><tt class="xref py py-class docutils literal"><span class="pre">TreeSearchApi</span></tt></a>: list ancestors or descendents of structure and specimen trees</li>
 </ul>
 </div></blockquote>
-<div class="section" id="creating-new-api-query-classes">
-<h2>Creating New API Query Classes<a class="headerlink" href="#creating-new-api-query-classes" title="Permalink to this headline">¶</a></h2>
-<p>The following example demonstrates how to create a subclass of the generic
-<a class="reference internal" href="allensdk.api.html#allensdk.api.api.Api" title="allensdk.api.api.Api"><tt class="xref py py-class docutils literal"><span class="pre">Api</span></tt></a> class
-in order to generate new queries and read data from the structure of
-the response json.
-The new class uses <a class="reference internal" href="allensdk.api.html#allensdk.api.api.Api.do_rma_query" title="allensdk.api.api.Api.do_rma_query"><tt class="xref py py-meth docutils literal"><span class="pre">do_rma_query()</span></tt></a> to execute the query.</p>
-<p>For example, to download gene metadata from the API, first create gene_acronym_query.py:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.api</span> <span class="kn">import</span> <span class="n">Api</span>
-
-<span class="k">class</span> <span class="nc">GeneAcronymQuery</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GeneAcronymQuery</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">build_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acronym</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Compose a query url&#39;&#39;&#39;</span>
-
-        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span>
-                       <span class="s">&quot;/Gene/query.json&quot;</span><span class="p">,</span>
-                       <span class="s">&quot;?criteria=&quot;</span><span class="p">,</span>
-                       <span class="s">&quot;[acronym$il&#39;</span><span class="si">%s</span><span class="s">&#39;]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">acronym</span><span class="p">),</span>
-                       <span class="s">&quot;&amp;include=organism&quot;</span><span class="p">,</span>
-                       <span class="p">])</span>
-
-    <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_parsed_data</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;read data from the result message&#39;&#39;&#39;</span>
-
-        <span class="k">if</span> <span class="s">&#39;msg&#39;</span> <span class="ow">in</span> <span class="n">json_parsed_data</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">json_parsed_data</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;no message!&quot;</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acronym</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Use do_rma_query() from the Api class to execute the query.&#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_rma_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_rma</span><span class="p">,</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">read_json</span><span class="p">,</span>
-                                 <span class="n">acronym</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The query class is then simple to use in a script.  Create main.py:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">gene_acronym_query</span> <span class="kn">import</span> <span class="n">GeneAcronymQuery</span>
-
-<span class="n">query</span> <span class="o">=</span> <span class="n">GeneAcronymQuery</span><span class="p">()</span>
-<span class="n">gene_info</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="s">&#39;ABAT&#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">gene</span> <span class="ow">in</span> <span class="n">gene_info</span><span class="p">:</span>
-    <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gene</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">gene</span><span class="p">[</span><span class="s">&#39;organism&#39;</span><span class="p">][</span><span class="s">&#39;name&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-<p>Additional documentation is available to help with
+<div class="section" id="rma-database-and-service-api">
+<h2>RMA Database and Service API<a class="headerlink" href="#rma-database-and-service-api" title="Permalink to this headline">¶</a></h2>
+<p>One API subclass is the <a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><tt class="xref py py-class docutils literal"><span class="pre">RmaApi</span></tt></a> class.
+It is intended to simplify
 <a class="reference external" href="http://help.brain-map.org/display/api/RESTful+Model+Access+%28RMA%29">constructing an RMA query</a>.</p>
+<p>The RmaApi is a base class for much of the allensdk.api.queries
+package, but it may be used directly to customize queries or to
+build queries from scratch.</p>
+<p>Often a query will simply request a table of data of one type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
+
+<span class="n">rma</span> <span class="o">=</span> <span class="n">RmaApi</span><span class="p">()</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Atlas&#39;</span><span class="p">,</span>
+                       <span class="n">criteria</span><span class="o">=</span><span class="s">&quot;[name$il&#39;*Mouse*&#39;]&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will construct the RMA query url, make the query and parse the resulting JSON
+into an array of Python dicts with the names, ids and other information about the atlases
+that can be accessed via the API.</p>
+<p>Using the criteria, include and other parameter, specific data can be requested.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">associations</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;[id$eq1]&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;structure_graph(ontology),&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;graphic_group_labels&#39;</span><span class="p">])</span>
+
+<span class="n">atlas_data</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Atlas&#39;</span><span class="p">,</span>
+                             <span class="n">include</span><span class="o">=</span><span class="n">associations</span><span class="p">,</span>
+                             <span class="n">criteria</span><span class="o">=</span><span class="n">associations</span><span class="p">,</span>
+                             <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;atlases.id&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;atlases.name&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;atlases.image_type&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;ontologies.id&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;ontologies.name&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;structure_graphs.id&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;structure_graphs.name&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;graphic_group_labels.id&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;graphic_group_labels.name&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Note that a &#8216;class&#8217; name is used for the first parameter.
+&#8216;Association&#8217; names are used to construct the include and criteria
+parameters nested using parentheses and commas.
+In the only clause, the &#8216;table&#8217; form is used,
+which is generally a plural lower-case version of the class name.
+The only clause selects specific &#8216;fields&#8217; to be returned.
+The schema that includes the classes, fields, associations and tables
+can be accessed in JSON form using:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># http://api.brain-map.org/api/v2/data.json</span>
+<span class="n">schema</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
+    <span class="n">data_description</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s">&#39;DataDescription&#39;</span><span class="p">]</span>
+    <span class="n">clz</span> <span class="o">=</span> <span class="n">data_description</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">data_description</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;fields&#39;</span><span class="p">]</span>
+    <span class="n">associations</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;associations&#39;</span><span class="p">]</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;table&#39;</span><span class="p">]</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;class: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">clz</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;fields: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">)))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;associations: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">associations</span><span class="p">)))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;table: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">table</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-pandas-to-process-query-results">
+<h2>Using Pandas to Process Query Results<a class="headerlink" href="#using-pandas-to-process-query-results" title="Permalink to this headline">¶</a></h2>
+<p>When it is difficult to get data in exactly the required form
+using only an RMA query, it may be helpful to perform additional
+operations on the client side.  The pandas library can be useful
+for this.</p>
+<p>Data from the API can be read directly into a pandas
+<a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">Dataframe</a> object.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">structures</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Structure&#39;</span><span class="p">,</span>
+                    <span class="n">criteria</span><span class="o">=</span><span class="s">&#39;[graph_id$eq1]&#39;</span><span class="p">,</span>
+                    <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/indexing.html">Indexing</a>
+subsets of the data (certain columns, certain rows) is one use of pandas:
+specifically <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/indexing.html#selection-by-label">.loc</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">names_and_acromyms</span> <span class="o">=</span> <span class="n">structures</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;acronym&#39;</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>and <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/indexing.html#boolean-indexing">Boolean indexing</a></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">mea</span> <span class="o">=</span> <span class="n">structures</span><span class="p">[</span><span class="n">structures</span><span class="o">.</span><span class="n">acronym</span> <span class="o">==</span> <span class="s">&#39;MEA&#39;</span><span class="p">]</span>
+<span class="n">mea_id</span> <span class="o">=</span> <span class="n">mea</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">.</span><span class="n">id</span>
+<span class="n">mea_children</span> <span class="o">=</span> <span class="n">structures</span><span class="p">[</span><span class="n">structures</span><span class="o">.</span><span class="n">parent_structure_id</span> <span class="o">==</span> <span class="n">mea_id</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mea_children</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/merging.html">Concatenate, merge and join</a>
+are used to add columns or rows:</p>
+<p>When an RMA call contains an include clause, the associated data will be represented
+as a python dict in a single column.  The column may be converted
+to a proper Dataframe and optionally dropped.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">criteria_string</span> <span class="o">=</span> <span class="s">&quot;structure_sets[name$eq&#39;Mouse Connectivity - Summary&#39;]&quot;</span>
+<span class="n">include_string</span> <span class="o">=</span> <span class="s">&quot;ontology&quot;</span>
+<span class="n">summary_structures</span> <span class="o">=</span> \
+    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Structure&#39;</span><span class="p">,</span>
+                        <span class="n">criteria</span><span class="o">=</span><span class="n">criteria_string</span><span class="p">,</span>
+                        <span class="n">include</span><span class="o">=</span><span class="n">include_string</span><span class="p">,</span>
+                        <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">))</span>
+<span class="n">ontologies</span> <span class="o">=</span> \
+    <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">summary_structures</span><span class="o">.</span><span class="n">ontology</span><span class="p">))</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
+<span class="n">flat_structures_dataframe</span> <span class="o">=</span> <span class="n">summary_structures</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">&#39;ontology&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Alternatively, it can be accessed using normal python dict and list operations.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="n">summary_structures</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s">&#39;ontology&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Pandas Dataframes can be written to a CSV file using to_csv and read using load_csv.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">summary_structures</span><span class="p">[[</span><span class="s">&#39;id&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;parent_structure_id&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;acronym&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s">&#39;summary_structures.csv&#39;</span><span class="p">,</span>
+                                       <span class="n">index_label</span><span class="o">=</span><span class="s">&#39;structure_id&#39;</span><span class="p">)</span>
+<span class="n">reread</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s">&#39;summary_structures.csv&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Iteration over a Dataframe of API data can be done in several ways.
+The .itertuples method is one way to do it.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent_structure_id</span> <span class="ow">in</span> <span class="n">summary_structures</span><span class="p">[[</span><span class="s">&#39;name&#39;</span><span class="p">,</span>
+                                                         <span class="s">&#39;parent_structure_id&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%d</span><span class="s"> </span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent_structure_id</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="caching-queries-on-disk">
+<h2>Caching Queries on Disk<a class="headerlink" href="#caching-queries-on-disk" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="allensdk.api.html#allensdk.api.cache.Cache.wrap" title="allensdk.api.cache.Cache.wrap"><tt class="xref py py-meth docutils literal"><span class="pre">wrap()</span></tt></a> has several parameters for querying the API,
+saving the results as CSV or JSON and reading the results as a pandas dataframe.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">Cache</span>
+
+<span class="n">cache_writer</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">()</span>
+<span class="n">do_cache</span><span class="o">=</span><span class="bp">True</span>
+<span class="n">structures_from_api</span> <span class="o">=</span> \
+    <span class="n">cache_writer</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">,</span>
+                      <span class="n">path</span><span class="o">=</span><span class="s">&#39;summary.csv&#39;</span><span class="p">,</span>
+                      <span class="n">cache</span><span class="o">=</span><span class="n">do_cache</span><span class="p">,</span>
+                      <span class="n">model</span><span class="o">=</span><span class="s">&#39;Structure&#39;</span><span class="p">,</span>
+                      <span class="n">criteria</span><span class="o">=</span><span class="s">&#39;[graph_id$eq1]&#39;</span><span class="p">,</span>
+                      <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you change to_cache to False and run the code again it will read the data
+from disk rather than executing the query.</p>
 </div>
 </div>
 
@@ -721,6 +831,7 @@ The new class uses <a class="reference internal" href="allensdk.api.html#allensd
 <li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>

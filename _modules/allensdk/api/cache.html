@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.cache &mdash; Allen SDK 0.10.0 documentation</title>
+    <title>allensdk.api.cache &mdash; Allen SDK 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.10.1 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
@@ -646,8 +646,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.core</span> <span class="kn">import</span> <span class="n">json_utilities</span> <span class="k">as</span> <span class="n">ju</span>
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
+<span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">ju</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pandas.io.json</span> <span class="kn">as</span> <span class="nn">pj</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -657,7 +657,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">manifest</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">cache</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">cache</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_manifest</span><span class="p">(</span><span class="n">manifest</span><span class="p">)</span>
     
 
@@ -803,7 +803,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     
 </div>
 <div class="viewcode-block" id="Cache.wrap"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.wrap">[docs]</a>    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span>
-             <span class="n">save_as_json</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+             <span class="n">save_as_json</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+             <span class="n">return_dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
              <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
              <span class="n">rename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -816,44 +817,56 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        path : string</span>
 <span class="sd">            where to save the data</span>
 <span class="sd">        cache : boolean</span>
-<span class="sd">            true will make the query, false just loads from disk</span>
+<span class="sd">            True will make the query, False just loads from disk</span>
 <span class="sd">        save_as_json : boolean, optional</span>
-<span class="sd">            true will save data as json, false as csv</span>
+<span class="sd">            True (default) will save data as json, False as csv</span>
+<span class="sd">        return_dataframe : boolean, optional</span>
+<span class="sd">            True will cast the return value to a pandas dataframe, False (default) will not </span>
 <span class="sd">        index : string, optional</span>
 <span class="sd">            column to use as the pandas index</span>
 <span class="sd">        rename : list of string tuples, optional</span>
 <span class="sd">            (new, old) columns to rename</span>
 <span class="sd">        kwargs : objects</span>
 <span class="sd">            passed through to the query function</span>
-<span class="sd">            </span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict or DataFrame</span>
+<span class="sd">            data type depends on return_dataframe option.</span>
+<span class="sd">        </span>
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        </span>
-<span class="sd">        Renaming happens after the file is reloaded for json</span>
+<span class="sd">        Column renaming happens after the file is reloaded for json</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">cache</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
             <span class="n">json_data</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             
             <span class="k">if</span> <span class="n">save_as_json</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
                 <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">json_data</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>            
+            <span class="k">else</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
                 
-                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>        
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                     <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         
-                <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>            
+                <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     
         <span class="c"># read it back in</span>
         <span class="k">if</span> <span class="n">save_as_json</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">pj</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">return_dataframe</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">pj</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">return_dataframe</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;save_as_json=False cannot be used with return_dataframe=False&#39;</span><span class="p">)</span>
         
-        <span class="k">return</span> <span class="n">df</span></div></div>
+        <span class="k">return</span> <span class="n">data</span></div></div>
 </pre></div>
 
           </div>
@@ -877,6 +890,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.config.html">allensdk.config package</a></li>

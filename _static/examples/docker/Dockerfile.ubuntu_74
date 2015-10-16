@@ -1,0 +1,55 @@
+# DOCKER-VERSION 0.3.4
+#
+# docker build --tag alleninstitute/allensdk_ubuntu .
+# docker run -it alleninstitute/allensdk_ubuntu /bin/bash
+#
+FROM ubuntu:trusty
+
+MAINTAINER Tim Fliss <timf@alleninstitute.org>
+
+RUN apt-get update
+RUN apt-get upgrade -yq
+RUN apt-get -yq install \
+    build-essential \
+    automake \
+    libtool \
+    bison \
+    flex
+    
+RUN apt-get -yq install \
+    python \
+    python-pip \
+    python-scipy \
+    python-matplotlib \
+    ipython \
+    python-dev
+    
+RUN apt-get -yq install \
+    libxext-dev \
+    libncurses-dev \
+    libhdf5-dev \
+    wget
+
+RUN apt-get -yq install \
+    openmpi-bin \
+    libopenmpi-dev
+
+
+# upgrade cython
+RUN pip install cython
+RUN pip install sphinx numpydoc
+
+#neuron installation
+RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/nrn-7.4.tar.gz
+RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/iv-19.tar.gz
+RUN cd /opt; mkdir neuron; mv /root/nrn-7.4.tar.gz /root/iv-19.tar.gz neuron/
+RUN cd /opt/neuron; tar xzf iv-19.tar.gz; rm iv-19.tar.gz; mv iv-19 iv
+RUN cd /opt/neuron/iv; ./configure --prefix=`pwd` && make && make install
+RUN cd /opt/neuron; tar xzf nrn-7.4.tar.gz; rm nrn-7.4.tar.gz; mv nrn-7.4 nrn
+RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --with-paranrn --with-nrnpython --with-mpi && make && make install
+RUN echo 'export PATH=$PATH:/opt/neuron/iv/x86_64/bin:/opt/neuron/nrn/x86_64/bin' >> /etc/bash.bashrc
+RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
+
+RUN pip install jupyter
+
+RUN pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.10.1.tar.gz

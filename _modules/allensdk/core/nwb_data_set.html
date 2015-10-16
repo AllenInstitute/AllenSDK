@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.nwb_data_set &mdash; Allen SDK 0.10.0 documentation</title>
+    <title>allensdk.core.nwb_data_set &mdash; Allen SDK 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.10.1 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
@@ -653,8 +653,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="sd">&quot;&quot;&quot; A very simple interface for exracting electrophysiology data</span>
 <span class="sd">    from an NWB file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+    <span class="n">SPIKE_TIMES</span> <span class="o">=</span> <span class="s">&quot;aibs_spike_times&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">spike_time_key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize the NwbDataSet instance with a file name</span>
 
 <span class="sd">        Parameters</span>
@@ -663,6 +664,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">           NWB file name</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span>
+        <span class="k">if</span> <span class="n">spike_time_key</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spike_time_key</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="o">.</span><span class="n">SPIKE_TIMES</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spike_time_key</span> <span class="o">=</span> <span class="n">spike_time_key</span>
+    
     
 <div class="viewcode-block" id="NwbDataSet.get_sweep"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_sweep">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Retrieve the stimulus, response, index_range, and sampling rate</span>
@@ -715,10 +721,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             
             <span class="k">assert</span> <span class="n">sweep_index_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;index range of the full sweep does not start at 0.&quot;</span><span class="p">)</span>
             
-            <span class="c"># only return data up to the end of the experiment -- ignore everything else</span>
             <span class="k">return</span>  <span class="p">{</span>
-                <span class="s">&#39;stimulus&#39;</span><span class="p">:</span> <span class="n">stimulus</span><span class="p">[</span><span class="n">sweep_index_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">experiment_index_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
-                <span class="s">&#39;response&#39;</span><span class="p">:</span> <span class="n">response</span><span class="p">[</span><span class="n">sweep_index_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">experiment_index_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s">&#39;stimulus&#39;</span><span class="p">:</span> <span class="n">stimulus</span><span class="p">,</span>
+                <span class="s">&#39;response&#39;</span><span class="p">:</span> <span class="n">response</span><span class="p">,</span>
                 <span class="s">&#39;index_range&#39;</span><span class="p">:</span> <span class="n">experiment_index_range</span><span class="p">,</span>
                 <span class="s">&#39;sampling_rate&#39;</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">swp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;timeseries&#39;</span><span class="p">][</span><span class="s">&#39;starting_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;rate&#39;</span><span class="p">]</span>
             <span class="p">}</span>
@@ -766,53 +771,66 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="k">if</span> <span class="n">missing_data</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">response</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">missing_data</span><span class="p">))</span>
                 
-                
                 <span class="n">swp</span><span class="p">[</span><span class="s">&#39;response&#39;</span><span class="p">][</span><span class="s">&#39;timeseries&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span>
     
 </div>
-<div class="viewcode-block" id="NwbDataSet.get_spike_times"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_spike_times">[docs]</a>    <span class="k">def</span> <span class="nf">get_spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">):</span>
+<div class="viewcode-block" id="NwbDataSet.get_spike_times"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_spike_times">[docs]</a>    <span class="k">def</span> <span class="nf">get_spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return any spike times stored in the NWB file for a sweep.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        sweep_number: int</span>
+<span class="sd">            index to access</span>
+<span class="sd">        key : string</span>
+<span class="sd">            label where the spike times are stored (default NwbDataSet.SPIKE_TIMES)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list</span>
 <span class="sd">           list of spike times in seconds relative to the start of the sweep</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spike_time_key</span>
+        
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">sweep_name</span> <span class="o">=</span> <span class="s">&quot;Sweep_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
             
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">spikes</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">][</span><span class="s">&quot;spike_times&quot;</span><span class="p">][</span><span class="n">sweep_name</span><span class="p">]</span>
+                <span class="n">spikes</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="n">sweep_name</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">[]</span>
             
             <span class="k">return</span> <span class="n">spikes</span><span class="o">.</span><span class="n">value</span>
     
     </div>
-<div class="viewcode-block" id="NwbDataSet.set_spike_times"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.set_spike_times">[docs]</a>    <span class="k">def</span> <span class="nf">set_spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
+<div class="viewcode-block" id="NwbDataSet.set_spike_times"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.set_spike_times">[docs]</a>    <span class="k">def</span> <span class="nf">set_spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set or overwrite the spikes times for a sweep.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        sweep_number: int</span>
+<span class="sd">        sweep_number : int</span>
+<span class="sd">            index to access</span>
+<span class="sd">        key : string</span>
+<span class="sd">            where the times are stored (default NwbDataSet.SPIKE_TIME)</span>
 <span class="sd">        </span>
 <span class="sd">        spike_times: np.array</span>
 <span class="sd">           array of spike times in seconds</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spike_time_key</span>
+        
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span><span class="s">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="c"># make sure expected directory structure is in place</span>
             <span class="k">if</span> <span class="s">&quot;analysis&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&quot;analysis&quot;</span><span class="p">)</span>
             
             <span class="n">analysis_dir</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s">&quot;spike_times&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analysis_dir</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">analysis_dir</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&quot;spike_times&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">NwbDataSet</span><span class="o">.</span><span class="n">SPIKE_TIMES</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analysis_dir</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">analysis_dir</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">NwbDataSet</span><span class="o">.</span><span class="n">SPIKE_TIMES</span><span class="p">)</span>
             
-            <span class="n">spike_dir</span> <span class="o">=</span> <span class="n">analysis_dir</span><span class="p">[</span><span class="s">&quot;spike_times&quot;</span><span class="p">]</span>
+            <span class="n">spike_dir</span> <span class="o">=</span> <span class="n">analysis_dir</span><span class="p">[</span><span class="n">NwbDataSet</span><span class="o">.</span><span class="n">SPIKE_TIMES</span><span class="p">]</span>
             
             <span class="c"># see if desired dataset already exists</span>
             <span class="n">sweep_name</span> <span class="o">=</span> <span class="s">&quot;Sweep_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
@@ -921,6 +939,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.config.html">allensdk.config package</a></li>

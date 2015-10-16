@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.ontologies_api &mdash; Allen SDK 0.10.0 documentation</title>
+    <title>allensdk.api.queries.ontologies_api &mdash; Allen SDK 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.10.1 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -646,21 +646,99 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_template</span> <span class="kn">import</span> <span class="n">RmaTemplate</span>
 
-<div class="viewcode-block" id="OntologiesApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi">[docs]</a><span class="k">class</span> <span class="nc">OntologiesApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
+<div class="viewcode-block" id="OntologiesApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi">[docs]</a><span class="k">class</span> <span class="nc">OntologiesApi</span><span class="p">(</span><span class="n">RmaTemplate</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    See: `Atlas Drawings and Ontologies</span>
 <span class="sd">    &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies&gt;`_</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
+    <span class="n">rma_templates</span> <span class="o">=</span> \
+        <span class="p">{</span><span class="s">&quot;ontology_queries&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;structures_by_graph_ids&#39;</span><span class="p">,</span>
+             <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="s">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s">&#39;model&#39;</span><span class="p">:</span> <span class="s">&#39;Structure&#39;</span><span class="p">,</span>
+             <span class="s">&#39;criteria&#39;</span><span class="p">:</span> <span class="s">&#39;[graph_id$in{{ graph_ids }}]&#39;</span><span class="p">,</span>
+             <span class="s">&#39;order&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;structures.graph_order&#39;</span><span class="p">],</span>
+             <span class="s">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;graph_ids&#39;</span><span class="p">]</span>
+            <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;structures_by_graph_names&#39;</span><span class="p">,</span>
+             <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="s">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s">&#39;model&#39;</span><span class="p">:</span> <span class="s">&#39;Structure&#39;</span><span class="p">,</span>
+             <span class="s">&#39;criteria&#39;</span><span class="p">:</span> <span class="s">&#39;graph[structure_graphs.name$in{{ graph_names }}]&#39;</span><span class="p">,</span>
+             <span class="s">&#39;order&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;structures.graph_order&#39;</span><span class="p">],</span>
+             <span class="s">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;graph_names&#39;</span><span class="p">]</span>
+            <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;structures_by_set_ids&#39;</span><span class="p">,</span>
+             <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="s">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s">&#39;model&#39;</span><span class="p">:</span> <span class="s">&#39;Structure&#39;</span><span class="p">,</span>
+             <span class="s">&#39;criteria&#39;</span><span class="p">:</span> <span class="s">&#39;[structure_set_id$in{{ set_ids }}]&#39;</span><span class="p">,</span>
+             <span class="s">&#39;order&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;structures.graph_order&#39;</span><span class="p">],</span>
+             <span class="s">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;set_ids&#39;</span><span class="p">]</span>
+            <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;structures_by_set_names&#39;</span><span class="p">,</span>
+             <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="s">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s">&#39;model&#39;</span><span class="p">:</span> <span class="s">&#39;Structure&#39;</span><span class="p">,</span>
+             <span class="s">&#39;criteria&#39;</span><span class="p">:</span> <span class="s">&#39;structure_sets[name$in</span><span class="se">\&#39;</span><span class="s">{{ set_names }}</span><span class="se">\&#39;</span><span class="s">]&#39;</span><span class="p">,</span>
+             <span class="s">&#39;order&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;structures.graph_order&#39;</span><span class="p">],</span>
+             <span class="s">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;set_names&#39;</span><span class="p">]</span>
+            <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;structure_graphs_list&#39;</span><span class="p">,</span>
+             <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="s">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s">&#39;model&#39;</span><span class="p">:</span> <span class="s">&#39;StructureGraph&#39;</span><span class="p">,</span>
+             <span class="s">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span>
+            <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;structure_sets_list&#39;</span><span class="p">,</span>
+             <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="s">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s">&#39;model&#39;</span><span class="p">:</span> <span class="s">&#39;StructureSet&#39;</span><span class="p">,</span>
+             <span class="s">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span>
+            <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;atlases_list&#39;</span><span class="p">,</span>
+             <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="s">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s">&#39;model&#39;</span><span class="p">:</span> <span class="s">&#39;Atlas&#39;</span><span class="p">,</span>
+             <span class="s">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span>
+            <span class="p">},</span>
+            <span class="p">{</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;atlases_table&#39;</span><span class="p">,</span>
+             <span class="s">&#39;description&#39;</span><span class="p">:</span> <span class="s">&#39;see name&#39;</span><span class="p">,</span>
+             <span class="s">&#39;model&#39;</span><span class="p">:</span> <span class="s">&#39;Atlas&#39;</span><span class="p">,</span>
+             <span class="s">&#39;criteria&#39;</span><span class="p">:</span> <span class="s">&#39;{</span><span class="si">% i</span><span class="s">f atlas_ids is defined %}[id$in{{ atlas_ids }}],{</span><span class="si">%e</span><span class="s">ndif%}structure_graph(ontology),graphic_group_labels&#39;</span><span class="p">,</span>
+             <span class="s">&#39;include&#39;</span><span class="p">:</span> <span class="s">&#39;structure_graph(ontology),graphic_group_labels&#39;</span><span class="p">,</span>
+             <span class="s">&#39;only&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;atlases.id&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;atlases.name&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;atlases.image_type&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;ontologies.id&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;ontologies.name&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;structure_graphs.id&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;structure_graphs.name&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;graphic_group_labels.id&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;graphic_group_labels.name&#39;</span><span class="p">],</span>
+             <span class="s">&#39;num_rows&#39;</span><span class="p">:</span> <span class="s">&#39;all&#39;</span><span class="p">,</span>
+             <span class="s">&#39;count&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+             <span class="s">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;atlas_ids&#39;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">]}</span>
+    
+    
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">OntologiesApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
-        
-
+        <span class="nb">super</span><span class="p">(</span><span class="n">OntologiesApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">,</span>
+                                            <span class="n">query_manifest</span><span class="o">=</span><span class="n">OntologiesApi</span><span class="o">.</span><span class="n">rma_templates</span><span class="p">)</span>
+    
+    
 <div class="viewcode-block" id="OntologiesApi.get_structures"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures">[docs]</a>    <span class="k">def</span> <span class="nf">get_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                        <span class="n">structure_graph_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                       <span class="n">structure_graph_names</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>                    
+                       <span class="n">structure_graph_names</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                        <span class="n">structure_set_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                        <span class="n">structure_set_names</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                        <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;structures.graph_order&#39;</span><span class="p">],</span>
@@ -692,37 +770,34 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        -----</span>
 <span class="sd">        Only one of the methods of limiting the query should be used at a time.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">criteria_list</span> <span class="o">=</span> <span class="p">[]</span>
-        
         <span class="k">if</span> <span class="n">structure_graph_ids</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">structure_graph_ids</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
-                <span class="n">structure_graph_ids</span> <span class="o">=</span> <span class="p">[</span> <span class="n">structure_graph_ids</span> <span class="p">]</span>
-            <span class="n">criteria_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[graph_id$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">structure_graph_ids</span><span class="p">))</span>
-        
-        <span class="k">if</span> <span class="n">structure_graph_names</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">structure_graph_names</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
-                <span class="n">structure_graph_names</span> <span class="o">=</span> <span class="p">[</span> <span class="n">structure_graph_names</span> <span class="p">]</span>
-            <span class="n">structure_graph_names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">structure_graph_names</span><span class="p">]</span>
-            <span class="n">criteria_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;graph[structure_graphs.name$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">structure_graph_names</span><span class="p">)))</span>
-        
-        <span class="k">if</span> <span class="n">structure_set_ids</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">structure_set_ids</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
-                <span class="n">structure_set_ids</span> <span class="o">=</span> <span class="p">[</span> <span class="n">structure_set_ids</span> <span class="p">]</span>
-            <span class="n">criteria_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[graph_id$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">structure_set_ids</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="n">structure_set_names</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">structure_set_names</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
-                <span class="n">structure_set_names</span> <span class="o">=</span> <span class="p">[</span> <span class="n">structure_set_names</span> <span class="p">]</span>
-            <span class="n">structure_set_names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">structure_set_names</span><span class="p">]</span>
-            <span class="n">criteria_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;structure_sets[name$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">structure_set_names</span><span class="p">)))</span>
-            
-        <span class="n">criteria_string</span> <span class="o">=</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">criteria_list</span><span class="p">)</span>
-        
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Structure&#39;</span><span class="p">,</span>
-                                <span class="n">criteria</span><span class="o">=</span><span class="n">criteria_string</span><span class="p">,</span>
-                                <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
-                                <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span>
-                                <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s">&#39;ontology_queries&#39;</span><span class="p">,</span>
+                                       <span class="s">&#39;structures_by_graph_ids&#39;</span><span class="p">,</span>
+                                       <span class="n">graph_ids</span><span class="o">=</span><span class="n">structure_graph_ids</span><span class="p">,</span>
+                                       <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                                       <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span>
+                                       <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">structure_graph_names</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s">&#39;ontology_queries&#39;</span><span class="p">,</span>
+                                       <span class="s">&#39;structures_by_graph_names&#39;</span><span class="p">,</span>
+                                       <span class="n">graph_names</span><span class="o">=</span><span class="n">structure_graph_names</span><span class="p">,</span>
+                                       <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                                       <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span>
+                                       <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">structure_set_ids</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s">&#39;ontology_queries&#39;</span><span class="p">,</span>
+                                       <span class="s">&#39;structures_by_set_ids&#39;</span><span class="p">,</span>
+                                       <span class="n">set_ids</span><span class="o">=</span><span class="n">structure_set_ids</span><span class="p">,</span>
+                                       <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                                       <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span>
+                                       <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">structure_set_names</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s">&#39;ontology_queries&#39;</span><span class="p">,</span>
+                                       <span class="s">&#39;structures_by_set_names&#39;</span><span class="p">,</span>
+                                       <span class="n">set_names</span><span class="o">=</span><span class="n">structure_set_names</span><span class="p">,</span>
+                                       <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
+                                       <span class="n">num_rows</span><span class="o">=</span><span class="n">num_rows</span><span class="p">,</span>
+                                       <span class="n">count</span><span class="o">=</span><span class="n">count</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="n">data</span>
     
@@ -748,22 +823,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">structure_dataframe</span><span class="p">[</span><span class="s">&#39;structure_set_ancestor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">structure_ancestors</span>
 
 </div>
-<div class="viewcode-block" id="OntologiesApi.get_atlases_table"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_atlases_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atlas_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">brief</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="OntologiesApi.get_atlases_table"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_atlases_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atlas_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">brief</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;List Atlases available through the API</span>
 <span class="sd">        with associated ontologies and structure graphs.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        atlas_id : integer, optional</span>
+<span class="sd">        atlas_ids : integer or list of integers, optional</span>
+<span class="sd">            only select specific atlases</span>
 <span class="sd">        brief : boolean, optional</span>
 <span class="sd">            True (default) requests only name and id fields.</span>
-<span class="sd">        fmt : string, optional</span>
-<span class="sd">            json (default) or xml</span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        url : string</span>
-<span class="sd">            The constructed URL</span>
+<span class="sd">        dict : atlas metadata</span>
 <span class="sd">        </span>
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -771,57 +844,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        `table of available Atlases &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies&gt;`_.</span>
 <span class="sd">        See also: `Class: Atlas &lt;http://api.brain-map.org/doc/Atlas.html&gt;`_</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">associations</span> <span class="o">=</span> <span class="p">[]</span>
-        
-        <span class="k">if</span> <span class="n">atlas_id</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">associations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[id$eq</span><span class="si">%d</span><span class="s">],&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atlas_id</span><span class="p">))</span>
-        
-        <span class="n">associations</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s">&#39;structure_graph(ontology),&#39;</span><span class="p">,</span>
-                             <span class="s">&#39;graphic_group_labels&#39;</span><span class="p">])</span>
-        
-        <span class="n">associations_string</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">associations</span><span class="p">)</span>
-        
         <span class="k">if</span> <span class="n">brief</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">only_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;atlases.id&#39;</span><span class="p">,</span>
-                           <span class="s">&#39;atlases.name&#39;</span><span class="p">,</span>
-                           <span class="s">&#39;atlases.image_type&#39;</span><span class="p">,</span>
-                           <span class="s">&#39;ontologies.id&#39;</span><span class="p">,</span>
-                           <span class="s">&#39;ontologies.name&#39;</span><span class="p">,</span>
-                           <span class="s">&#39;structure_graphs.id&#39;</span><span class="p">,</span>
-                           <span class="s">&#39;structure_graphs.name&#39;</span><span class="p">,</span>
-                           <span class="s">&#39;graphic_group_labels.id&#39;</span><span class="p">,</span>
-                           <span class="s">&#39;graphic_group_labels.name&#39;</span><span class="p">]</span>
-            
-            <span class="n">only_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">only_fields</span><span class="p">))</span>
-        
-            <span class="n">atlas_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Atlas&#39;</span><span class="p">,</span>
-                                          <span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="n">associations_string</span><span class="p">],</span>
-                                          <span class="n">criteria</span><span class="o">=</span><span class="p">[</span><span class="n">associations_string</span><span class="p">],</span>
-                                          <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="n">only_string</span><span class="p">])</span>
-        
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s">&#39;ontology_queries&#39;</span><span class="p">,</span>
+                                       <span class="s">&#39;atlases_table&#39;</span><span class="p">,</span>
+                                       <span class="n">atlas_ids</span><span class="o">=</span><span class="n">atlas_ids</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">atlas_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Atlas&#39;</span><span class="p">,</span>
-                                          <span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="n">associations_string</span><span class="p">],</span>
-                                          <span class="n">criteria</span><span class="o">=</span><span class="p">[</span><span class="n">associations_string</span><span class="p">])</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s">&#39;ontology_queries&#39;</span><span class="p">,</span>
+                                       <span class="s">&#39;atlases_table&#39;</span><span class="p">,</span>
+                                       <span class="n">atlas_ids</span><span class="o">=</span><span class="n">atlas_ids</span><span class="p">,</span>
+                                       <span class="n">only</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
         
-        <span class="k">return</span> <span class="n">atlas_data</span>    
-
-</div>
+        <span class="k">return</span> <span class="n">data</span>
+    
+    </div>
 <div class="viewcode-block" id="OntologiesApi.get_atlases"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases">[docs]</a>    <span class="k">def</span> <span class="nf">get_atlases</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Atlas&#39;</span><span class="p">,</span>
-                                <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span>
-                                <span class="n">count</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s">&#39;ontology_queries&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;atlases_list&#39;</span><span class="p">)</span>
     
     </div>
 <div class="viewcode-block" id="OntologiesApi.get_structure_graphs"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_graphs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;StructureGraph&#39;</span><span class="p">,</span>
-                                <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span>
-                                <span class="n">count</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s">&#39;ontology_queries&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;structure_graphs_list&#39;</span><span class="p">)</span>
         </div>
 <div class="viewcode-block" id="OntologiesApi.get_structure_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;StructureSet&#39;</span><span class="p">,</span>
-                                <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span>
-                                <span class="n">count</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>        </div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s">&#39;ontology_queries&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;structure_sets_list&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>
@@ -845,6 +892,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../../biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>

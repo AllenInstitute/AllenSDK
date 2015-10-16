@@ -16,6 +16,7 @@ Welcome to the Allen SDK
    install
    data_resources
    models
+   examples
    Source Documentation <allensdk>
    Github Profile <https://github.com/AllenInstitute/AllenSDK>
 

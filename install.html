@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Install Guide &mdash; Allen SDK 0.10.0 documentation</title>
+    <title>Install Guide &mdash; Allen SDK 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
     <link rel="next" title="Data Resources" href="data_resources.html" />
     <link rel="prev" title="Welcome to the Allen SDK" href="index.html" /> 
   </head>
@@ -643,8 +643,13 @@ consistent behavior with other Python versions.</p>
 <h2>Quick Start Using Pip<a class="headerlink" href="#quick-start-using-pip" title="Permalink to this headline">¶</a></h2>
 <p>First ensure you have <a class="reference external" href="http://pypi.python.org/pypi/pip">pip</a> installed.
 To install the Allen SDK for a single user:</p>
-<div class="highlight-python"><div class="highlight"><pre>pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.10.0.tar.gz --user
+<div class="highlight-python"><div class="highlight"><pre>pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.10.1.tar.gz --user
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">On Windows use the options &#8216;&#8211;process-dependency-links &#8211;trusted-host github.com&#8217;
+to install the correct version of the pynrrd dependency.</p>
 </div>
 <p>Uninstalling the SDK is simple with pip:</p>
 <div class="highlight-python"><div class="highlight"><pre>pip uninstall allensdk
@@ -658,8 +663,8 @@ The package can also be <a class="reference external" href="https://packaging.py
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">GitHub Source Repository</a></li>
-<li><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK/archive/v0.10.0.tar.gz">AllenSDK-v0.10.0.tar.gz</a></li>
-<li><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK/archive/v0.10.0.zip">AllenSDK-v0.10.0.zip</a></li>
+<li><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK/archive/v0.10.1.tar.gz">AllenSDK-v0.10.1.tar.gz</a></li>
+<li><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK/archive/v0.10.1.zip">AllenSDK-v0.10.1.zip</a></li>
 </ul>
 </div></blockquote>
 </div>
@@ -680,6 +685,8 @@ The package can also be <a class="reference external" href="https://packaging.py
 <li><a class="reference external" href="http://nedbatchelder.com/code/coverage">coverage</a></li>
 <li><a class="reference external" href="http://matplotlib.org/">matplotlib</a></li>
 <li><a class="reference external" href="http://www.h5py.org">h5py</a></li>
+<li><a class="reference external" href="http://pandas.pydata.org">pandas</a></li>
+<li><a class="reference external" href="http://pypi.python.org/pypi/pynrrd">pynrrd</a></li>
 </ul>
 </div></blockquote>
 </div>
@@ -698,15 +705,17 @@ example Dockerfiles are available.</p>
 <dt>Download one of the example Docker files:</dt>
 <dd><ul class="first last simple">
 <li><a class="reference download internal" href="_downloads/Dockerfile.ubuntu"><tt class="xref download docutils literal"><span class="pre">Ubuntu</span> <span class="pre">Standalone</span></tt></a>.</li>
-<li><a class="reference download internal" href="_downloads/Dockerfile.brainscales"><tt class="xref download docutils literal"><span class="pre">BrainScales</span> <span class="pre">combined</span> <span class="pre">Neural-Networks</span></tt></a>.</li>
+<li><a class="reference download internal" href="_downloads/Dockerfile.neuralensemble"><tt class="xref download docutils literal"><span class="pre">Neural</span> <span class="pre">Ensemble</span> <span class="pre">combined</span> <span class="pre">simulators</span></tt></a>.</li>
+<li><a class="reference download internal" href="_downloads/Dockerfile.neuralensemblex"><tt class="xref download docutils literal"><span class="pre">Neural</span> <span class="pre">Ensemble</span> <span class="pre">combined</span> <span class="pre">simulators</span> <span class="pre">with</span> <span class="pre">X11</span></tt></a>.</li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><p class="first">Use Docker to build the image:</p>
-<div class="highlight-python"><div class="highlight"><pre>cd examples/docker
-cp Dockerfile.ubuntu Dockerfile
-docker build --tag alleninstitute/allensdk:ubuntu  .
+<div class="highlight-python"><div class="highlight"><pre>mkdir docker_build
+cp Dockerfile.ubuntu docker_build/Dockerfile
+cd docker_build
+docker build --tag alleninstitute/allensdk:ubuntu .
 </pre></div>
 </div>
 </li>
@@ -742,6 +751,7 @@ docker build --tag alleninstitute/allensdk:ubuntu  .
 <li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>

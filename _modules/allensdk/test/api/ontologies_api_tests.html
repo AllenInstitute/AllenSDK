@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.test.api.ontologies_api_tests &mdash; Allen SDK 0.10.0 documentation</title>
+    <title>allensdk.test.api.ontologies_api_tests &mdash; Allen SDK 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.10.1 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -653,15 +653,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,[graph_id$in1],rma::options[num_rows$eq&#39;all&#39;][order$eqstructures.graph_order][count$eqfalse]&quot;</span>
         
         <span class="n">structure_graph_id</span> <span class="o">=</span> <span class="mi">1</span>
-
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span> <span class="o">=</span> \
             <span class="n">MagicMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;json_msg_query&#39;</span><span class="p">)</span>
-               
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_graph_id</span><span class="p">)</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
-
-</div>
+    
+    </div>
 <div class="viewcode-block" id="OntologiesApiTests.test_list_structure_graphs"><a class="viewcode-back" href="../../../../allensdk.test.api.html#allensdk.test.api.ontologies_api_tests.OntologiesApiTests.test_list_structure_graphs">[docs]</a>    <span class="k">def</span> <span class="nf">test_list_structure_graphs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::StructureGraph,rma::options[num_rows$eq&#39;all&#39;][count$eqfalse]&quot;</span>
         
@@ -672,7 +672,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
         
-</div>
+    </div>
 <div class="viewcode-block" id="OntologiesApiTests.test_list_structure_sets"><a class="viewcode-back" href="../../../../allensdk.test.api.html#allensdk.test.api.ontologies_api_tests.OntologiesApiTests.test_list_structure_sets">[docs]</a>    <span class="k">def</span> <span class="nf">test_list_structure_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::StructureSet,rma::options[num_rows$eq&#39;all&#39;][count$eqfalse]&quot;</span>
         
@@ -696,12 +696,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         </div>
 <div class="viewcode-block" id="OntologiesApiTests.test_structure_graph_by_name"><a class="viewcode-back" href="../../../../allensdk.test.api.html#allensdk.test.api.ontologies_api_tests.OntologiesApiTests.test_structure_graph_by_name">[docs]</a>    <span class="k">def</span> <span class="nf">test_structure_graph_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,graph[structure_graphs.name$in&#39;Mouse Brain Atlas&#39;],rma::options[num_rows$eq&#39;all&#39;][order$eqstructures.graph_order][count$eqfalse]&quot;</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="s">u&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,graph[structure_graphs.name$in&#39;Mouse Brain Atlas&#39;],rma::options[num_rows$eq&#39;all&#39;][order$eqstructures.graph_order][count$eqfalse]&quot;</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span> <span class="o">=</span> \
             <span class="n">MagicMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;json_msg_query&#39;</span><span class="p">)</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_graph_names</span><span class="o">=</span><span class="s">&#39;Mouse Brain Atlas&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_graph_names</span><span class="o">=</span><span class="s">&quot;&#39;Mouse Brain Atlas&#39;&quot;</span><span class="p">)</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
 
@@ -712,14 +712,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span> <span class="o">=</span> \
             <span class="n">MagicMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;json_msg_query&#39;</span><span class="p">)</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_graph_names</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Mouse Brain Atlas&#39;</span><span class="p">,</span>
-                                                      <span class="s">&#39;Human Brain Atlas&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_graph_names</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;&#39;Mouse Brain Atlas&#39;&quot;</span><span class="p">,</span>
+                                                      <span class="s">&quot;&#39;Human Brain Atlas&#39;&quot;</span><span class="p">])</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
 
     </div>
 <div class="viewcode-block" id="OntologiesApiTests.test_structure_set_by_id"><a class="viewcode-back" href="../../../../allensdk.test.api.html#allensdk.test.api.ontologies_api_tests.OntologiesApiTests.test_structure_set_by_id">[docs]</a>    <span class="k">def</span> <span class="nf">test_structure_set_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,[graph_id$in8],rma::options[num_rows$eq&#39;all&#39;][order$eqstructures.graph_order][count$eqfalse]&quot;</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,[structure_set_id$in8],rma::options[num_rows$eq&#39;all&#39;][order$eqstructures.graph_order][count$eqfalse]&quot;</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span> <span class="o">=</span> \
             <span class="n">MagicMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;json_msg_query&#39;</span><span class="p">)</span>
@@ -730,7 +730,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         
         </div>
 <div class="viewcode-block" id="OntologiesApiTests.test_structure_sets_by_ids"><a class="viewcode-back" href="../../../../allensdk.test.api.html#allensdk.test.api.ontologies_api_tests.OntologiesApiTests.test_structure_sets_by_ids">[docs]</a>    <span class="k">def</span> <span class="nf">test_structure_sets_by_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,[graph_id$in7,8],rma::options[num_rows$eq&#39;all&#39;][order$eqstructures.graph_order][count$eqfalse]&quot;</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,[structure_set_id$in7,8],rma::options[num_rows$eq&#39;all&#39;][order$eqstructures.graph_order][count$eqfalse]&quot;</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span> <span class="o">=</span> \
             <span class="n">MagicMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;json_msg_query&#39;</span><span class="p">)</span>
@@ -746,7 +746,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span> <span class="o">=</span> \
             <span class="n">MagicMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;json_msg_query&#39;</span><span class="p">)</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_set_names</span><span class="o">=</span><span class="s">&#39;Mouse Connectivity - Summary&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_set_names</span><span class="o">=</span><span class="s">&quot;&#39;Mouse Connectivity - Summary&#39;&quot;</span><span class="p">)</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
 
@@ -757,8 +757,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span> <span class="o">=</span> \
             <span class="n">MagicMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;json_msg_query&#39;</span><span class="p">)</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_set_names</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;NHP - Coarse&#39;</span><span class="p">,</span>
-                                                    <span class="s">&#39;Mouse Connectivity - Summary&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_set_names</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;&#39;NHP - Coarse&#39;&quot;</span><span class="p">,</span>
+                                                    <span class="s">&quot;&#39;Mouse Connectivity - Summary&#39;&quot;</span><span class="p">])</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
 
@@ -775,7 +775,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 </div>
 <div class="viewcode-block" id="OntologiesApiTests.test_atlas_1"><a class="viewcode-back" href="../../../../allensdk.test.api.html#allensdk.test.api.ontologies_api_tests.OntologiesApiTests.test_atlas_1">[docs]</a>    <span class="k">def</span> <span class="nf">test_atlas_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::criteria,[id$eq1],structure_graph(ontology),graphic_group_labels,rma::include,[id$eq1],structure_graph(ontology),graphic_group_labels,rma::options[only$eq&#39;atlases.id,atlases.name,atlases.image_type,ontologies.id,ontologies.name,structure_graphs.id,structure_graphs.name,graphic_group_labels.id,graphic_group_labels.name&#39;]&quot;</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::criteria,[id$in1],structure_graph(ontology),graphic_group_labels,rma::include,structure_graph(ontology),graphic_group_labels,rma::options[only$eq&#39;atlases.id,atlases.name,atlases.image_type,ontologies.id,ontologies.name,structure_graphs.id,structure_graphs.name,graphic_group_labels.id,graphic_group_labels.name&#39;][num_rows$eq&#39;all&#39;][count$eqfalse]&quot;</span>
         
         <span class="n">atlas_id</span> <span class="o">=</span> <span class="mi">1</span>
         
@@ -785,8 +785,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_atlases_table</span><span class="p">(</span><span class="n">atlas_id</span><span class="p">)</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
-        </div></div>
-</pre></div>
+    
+    </div>
+<div class="viewcode-block" id="OntologiesApiTests.test_atlas_verbose"><a class="viewcode-back" href="../../../../allensdk.test.api.html#allensdk.test.api.ontologies_api_tests.OntologiesApiTests.test_atlas_verbose">[docs]</a>    <span class="k">def</span> <span class="nf">test_atlas_verbose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::criteria,structure_graph(ontology),graphic_group_labels,rma::include,structure_graph(ontology),graphic_group_labels,rma::options[num_rows$eq&#39;all&#39;][count$eqfalse]&quot;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span> <span class="o">=</span> \
+            <span class="n">MagicMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;json_msg_query&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">get_atlases_table</span><span class="p">(</span><span class="n">brief</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">oa</span><span class="o">.</span><span class="n">json_msg_query</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">expected</span><span class="p">)</span>
+</pre></div></div></div>
 
           </div>
         </div>
@@ -809,6 +819,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../../biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>

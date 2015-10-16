@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries package &mdash; Allen SDK 0.10.0 documentation</title>
+    <title>allensdk.api.queries package &mdash; Allen SDK 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
     <link rel="up" title="allensdk.api package" href="allensdk.api.html" />
     <link rel="prev" title="allensdk.api package" href="allensdk.api.html" /> 
   </head>
@@ -687,14 +687,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
 <td>Retrieve schema information.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Build an execute a common-case RMA model query.</td>
+<td>Construct and execute a model stage of an RMA query string.</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
 <td>Construct a model stage of an RMA query string.</td>
@@ -898,8 +898,8 @@ linked together with a Boolean &#8216;and&#8217; or &#8216;or&#8217;.</p>
 <tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type"><tt class="xref py py-obj docutils literal"><span class="pre">is_well_known_file_type</span></tt></a>(wkf,&nbsp;name)</td>
 <td>Check if a structure has the expected name.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
@@ -1131,70 +1131,73 @@ containing nested sample,microarray_slides,well_known_files.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_sweeps" title="allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_sweeps"><tt class="xref py py-obj docutils literal"><span class="pre">get_ephys_sweeps</span></tt></a>(specimen_id)</td>
 <td>Query the API for a list of sweeps for a particular cell in the Cell Types Database.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.get_morphology_features" title="allensdk.api.queries.cell_types_api.CellTypesApi.get_morphology_features"><tt class="xref py py-obj docutils literal"><span class="pre">get_morphology_features</span></tt></a>([dataframe])</td>
+<td>Query the API for the full table of morphology features for all cells</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
 <td>Retrieve schema information.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="allensdk.api.queries.cell_types_api.CellTypesApi.list_cells"><tt class="xref py py-obj docutils literal"><span class="pre">list_cells</span></tt></a>([require_morphology,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="allensdk.api.queries.cell_types_api.CellTypesApi.list_cells"><tt class="xref py py-obj docutils literal"><span class="pre">list_cells</span></tt></a>([require_morphology,&nbsp;...])</td>
 <td>Query the API for a list of all cells in the Cell Types Database.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Build an execute a common-case RMA model query.</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
+<td>Construct and execute a model stage of an RMA query string.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
 <td>Construct a model stage of an RMA query string.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
 <td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
 <td>build rma:: options clause.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
 <td>Construct a debug clause for use in an rma::options clause.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
 <td>Connect model and service stages via their JSON responses.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
 <td>Wrap a clause in single quotes.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
 <td>Return the message data from the parsed query.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
 <td>Get a file from the data api and save it.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
 <td>Get the document and put it in a Python data structure</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
 <td>Get the document and put it in a Python data structure</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data" title="allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data"><tt class="xref py py-obj docutils literal"><span class="pre">save_ephys_data</span></tt></a>(specimen_id,&nbsp;file_name)</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data" title="allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data"><tt class="xref py py-obj docutils literal"><span class="pre">save_ephys_data</span></tt></a>(specimen_id,&nbsp;file_name)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction" title="allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction"><tt class="xref py py-obj docutils literal"><span class="pre">save_reconstruction</span></tt></a>(specimen_id,&nbsp;file_name)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction" title="allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction"><tt class="xref py py-obj docutils literal"><span class="pre">save_reconstruction</span></tt></a>(specimen_id,&nbsp;file_name)</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
 <td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
 <td>Construct an RMA query fragment to send a request to a connected service.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
 <td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
 <td>Set the working directory where files will be saved.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
 <td>Construct an RMA filter clause.</td>
 </tr>
 </tbody>
@@ -1267,6 +1270,25 @@ return a list of dictionaries.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.get_morphology_features">
+<tt class="descname">get_morphology_features</tt><big>(</big><em>dataframe=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.get_morphology_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.get_morphology_features" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the API for the full table of morphology features for all cells</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dataframe: boolean</strong></p>
+<blockquote class="last">
+<div><p>If true, return the results as a Pandas DataFrame.  Otherwise
+return a list of dictionaries.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi.list_cells">
 <tt class="descname">list_cells</tt><big>(</big><em>require_morphology=False</em>, <em>require_reconstruction=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.list_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query the API for a list of all cells in the Cell Types Database.</p>
@@ -1313,7 +1335,12 @@ return a list of dictionaries.</p>
 <dt id="allensdk.api.queries.connected_services.ConnectedServices">
 <em class="property">class </em><tt class="descclassname">allensdk.api.queries.connected_services.</tt><tt class="descname">ConnectedServices</tt><a class="reference internal" href="_modules/allensdk/api/queries/connected_services.html#ConnectedServices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.connected_services.ConnectedServices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A class representing a schema of informatics web services.</p>
 <p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/api/Connected+Services+and+Pipes">Connected Services and Pipes</a>
+for a human-readable list of services and parameters.</p>
+<p>The URL format is documented at
+<a class="reference external" href="http://help.brain-map.org/display/api/Service+Pipelines">Service Pipelines</a>.</p>
 <p>Connected Services only include API services that are accessed
 via the RMA endpoint using an rma::services stage.</p>
 <p class="rubric">Methods</p>
@@ -1426,8 +1453,8 @@ for a human-readable list of connected services and their parameters.</p>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
 <td>Retrieve schema information.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.list_neuronal_models" title="allensdk.api.queries.glif_api.GlifApi.list_neuronal_models"><tt class="xref py py-obj docutils literal"><span class="pre">list_neuronal_models</span></tt></a>()</td>
 <td>Query the API for a list of all GLIF neuronal models.</td>
@@ -1436,7 +1463,7 @@ for a human-readable list of connected services and their parameters.</p>
 <td>Download the RMA schema from the current RMA endpoint</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Build an execute a common-case RMA model query.</td>
+<td>Construct and execute a model stage of an RMA query string.</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
 <td>Construct a model stage of an RMA query string.</td>
@@ -1628,14 +1655,14 @@ to get the corresponding well known files and meta data.</p>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
 <td>Retrieve schema information.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Build an execute a common-case RMA model query.</td>
+<td>Construct and execute a model stage of an RMA query string.</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
 <td>Construct a model stage of an RMA query string.</td>
@@ -1853,14 +1880,14 @@ for more documentation.</p>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
 <td>Retrieve schema information.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Build an execute a common-case RMA model query.</td>
+<td>Construct and execute a model stage of an RMA query string.</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
 <td>Construct a model stage of an RMA query string.</td>
@@ -2201,16 +2228,14 @@ help topic.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="allensdk-api-queries-mouse-connectivity-api-module">
-<h2>allensdk.api.queries.mouse_connectivity_api module<a class="headerlink" href="#allensdk-api-queries-mouse-connectivity-api-module" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-allensdk.api.queries.ontologies_api">
-<span id="allensdk-api-queries-ontologies-api-module"></span><h2>allensdk.api.queries.ontologies_api module<a class="headerlink" href="#module-allensdk.api.queries.ontologies_api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-allensdk.api.queries.mouse_connectivity_api">
+<span id="allensdk-api-queries-mouse-connectivity-api-module"></span><h2>allensdk.api.queries.mouse_connectivity_api module<a class="headerlink" href="#module-allensdk.api.queries.mouse_connectivity_api" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="allensdk.api.queries.ontologies_api.OntologiesApi">
-<em class="property">class </em><tt class="descclassname">allensdk.api.queries.ontologies_api.</tt><tt class="descname">OntologiesApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi">
+<em class="property">class </em><tt class="descclassname">allensdk.api.queries.mouse_connectivity_api.</tt><tt class="descname">MouseConnectivityApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></tt></a></p>
-<p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies">Atlas Drawings and Ontologies</a></p>
+<p>HTTP Client for the Allen Mouse Brain Connectivity Atlas.</p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API">Mouse Connectivity API</a></p>
 <p class="rubric">Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -2221,53 +2246,109 @@ help topic.</p>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
 <td>Combine one or more RMA query stages into a single RMA query.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_reference_aligned_image_channel_volumes_url" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_reference_aligned_image_channel_volumes_url"><tt class="xref py py-obj docutils literal"><span class="pre">build_reference_aligned_image_channel_volumes_url</span></tt></a>(...)</td>
+<td>Construct url to download the red, green, and blue channels aligned to the 25um adult mouse brain reference space volume.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
 <td>Build the URL that will fetch the data schema.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_volumetric_data_download_url" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_volumetric_data_download_url"><tt class="xref py py-obj docutils literal"><span class="pre">build_volumetric_data_download_url</span></tt></a>(data,&nbsp;...)</td>
+<td>Construct url to download 3D reference model in NRRD format.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.calculate_injection_centroid" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.calculate_injection_centroid"><tt class="xref py py-obj docutils literal"><span class="pre">calculate_injection_centroid</span></tt></a>(...[,&nbsp;resolution])</td>
+<td>Compute the centroid of an injection site.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
 <td>Join data api endpoint and id.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
 <td>Construct a debug clause for use in an rma::options clause.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
 <td>Bundle an query url construction function with a corresponding response json traversal function.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
 <td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
-<td>serialize a single RMA query filter clause.</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_annotation_volume" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_annotation_volume"><tt class="xref py py-obj docutils literal"><span class="pre">download_annotation_volume</span></tt></a>(resolution,&nbsp;file_name)</td>
+<td>Download the annotation volume at a particular resolution.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
-<td>serialize RMA query filter clauses.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases"><tt class="xref py py-obj docutils literal"><span class="pre">get_atlases</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_data_mask" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_data_mask"><tt class="xref py py-obj docutils literal"><span class="pre">download_data_mask</span></tt></a>(path,&nbsp;experiment_id,&nbsp;...)</td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table"><tt class="xref py py-obj docutils literal"><span class="pre">get_atlases_table</span></tt></a>([atlas_id,&nbsp;brief,&nbsp;fmt])</td>
-<td>List Atlases available through the API with associated ontologies and structure graphs.</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_density" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_density"><tt class="xref py py-obj docutils literal"><span class="pre">download_injection_density</span></tt></a>(path,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_fraction" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_fraction"><tt class="xref py py-obj docutils literal"><span class="pre">download_injection_fraction</span></tt></a>(path,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_projection_density" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_projection_density"><tt class="xref py py-obj docutils literal"><span class="pre">download_projection_density</span></tt></a>(path,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_reference_aligned_image_channel_volumes" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_reference_aligned_image_channel_volumes"><tt class="xref py py-obj docutils literal"><span class="pre">download_reference_aligned_image_channel_volumes</span></tt></a>(...)</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_template_volume" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_template_volume"><tt class="xref py py-obj docutils literal"><span class="pre">download_template_volume</span></tt></a>(resolution,&nbsp;file_name)</td>
+<td>Download the registration template volume at a particular resolution.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_volumetric_data" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_volumetric_data"><tt class="xref py py-obj docutils literal"><span class="pre">download_volumetric_data</span></tt></a>(data,&nbsp;file_name[,&nbsp;...])</td>
+<td>Download 3D reference model in NRRD format.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_correlation_search" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_correlation_search"><tt class="xref py py-obj docutils literal"><span class="pre">experiment_correlation_search</span></tt></a>(**kwargs)</td>
+<td>Select a seed experiment and a domain over which the similarity comparison is to be made.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_injection_coordinate_search" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_injection_coordinate_search"><tt class="xref py py-obj docutils literal"><span class="pre">experiment_injection_coordinate_search</span></tt></a>(**kwargs)</td>
+<td>User specifies a seed location within the 3D reference space.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_source_search" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_source_search"><tt class="xref py py-obj docutils literal"><span class="pre">experiment_source_search</span></tt></a>(**kwargs)</td>
+<td>Search over the whole projection signal statistics dataset to find experiments with specific projection profiles.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_spatial_search" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_spatial_search"><tt class="xref py py-obj docutils literal"><span class="pre">experiment_spatial_search</span></tt></a>(**kwargs)</td>
+<td>Displays all SectionDataSets with projection signal density &gt;= 0.1 at the seed point.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
+<td>serialize a single RMA query filter clause.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
+<td>serialize RMA query filter clauses.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiment_detail" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiment_detail"><tt class="xref py py-obj docutils literal"><span class="pre">get_experiment_detail</span></tt></a>(experiment_id)</td>
+<td>Retrieve the experiments data.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiments" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiments"><tt class="xref py py-obj docutils literal"><span class="pre">get_experiments</span></tt></a>(structure_ids,&nbsp;**kwargs)</td>
+<td>Fetch experiment metadata from the Mouse Brain Connectivity Atlas.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_manual_injection_summary" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_manual_injection_summary"><tt class="xref py py-obj docutils literal"><span class="pre">get_manual_injection_summary</span></tt></a>(experiment_id)</td>
+<td>Retrieve manual injection summary.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_projection_image_info" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_projection_image_info"><tt class="xref py py-obj docutils literal"><span class="pre">get_projection_image_info</span></tt></a>(experiment_id,&nbsp;...)</td>
+<td>Fetch meta-information of one projection image.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_reference_aligned_image_channel_volumes_url" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_reference_aligned_image_channel_volumes_url"><tt class="xref py py-obj docutils literal"><span class="pre">get_reference_aligned_image_channel_volumes_url</span></tt></a>(...)</td>
+<td>Retrieve the download link for a specific data set.</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
 <td>Retrieve schema information.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs"><tt class="xref py py-obj docutils literal"><span class="pre">get_structure_graphs</span></tt></a>()</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_structure_unionizes" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_structure_unionizes"><tt class="xref py py-obj docutils literal"><span class="pre">get_structure_unionizes</span></tt></a>(experiment_ids[,&nbsp;...])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets"><tt class="xref py py-obj docutils literal"><span class="pre">get_structure_sets</span></tt></a>()</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_structures"><tt class="xref py py-obj docutils literal"><span class="pre">get_structures</span></tt></a>([structure_graph_ids,&nbsp;...])</td>
-<td>Retrieve data about anatomical structures.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Build an execute a common-case RMA model query.</td>
+<td>Construct and execute a model stage of an RMA query string.</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
 <td>Construct a model stage of an RMA query string.</td>
@@ -2314,6 +2395,573 @@ help topic.</p>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
 <td>Construct an RMA filter clause.</td>
 </tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.PRODUCT_IDS">
+<tt class="descname">PRODUCT_IDS</tt><em class="property"> = [5, 31]</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.PRODUCT_IDS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_reference_aligned_image_channel_volumes_url">
+<tt class="descname">build_reference_aligned_image_channel_volumes_url</tt><big>(</big><em>data_set_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.build_reference_aligned_image_channel_volumes_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_reference_aligned_image_channel_volumes_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct url to download the red, green, and blue channels
+aligned to the 25um adult mouse brain reference space volume.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data_set_id</strong> : integer</p>
+<blockquote class="last">
+<div><p>aka attachable_id</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes">Reference-aligned Image Channel Volumes</a> 
+for additional documentation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_volumetric_data_download_url">
+<tt class="descname">build_volumetric_data_download_url</tt><big>(</big><em>data</em>, <em>file_name</em>, <em>voxel_resolution=None</em>, <em>release=None</em>, <em>coordinate_framework=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.build_volumetric_data_download_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_volumetric_data_download_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct url to download 3D reference model in NRRD format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : string</p>
+<blockquote>
+<div><p>&#8216;average_template&#8217;, &#8216;ara_nissl&#8217;, &#8216;annotation/ccf_2015&#8217;, &#8216;annotation/mouse_2011&#8217;, or &#8216;annotation/devmouse_2012&#8217;</p>
+</div></blockquote>
+<p><strong>voxel_resolution</strong> : int</p>
+<blockquote>
+<div><p>10, 25, 50 or 100</p>
+</div></blockquote>
+<p><strong>coordinate_framework</strong> : string</p>
+<blockquote class="last">
+<div><p>&#8216;mouse_ccf&#8217; (default) or &#8216;mouse_annotation&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels">3-D Reference Models</a> 
+for additional documentation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.calculate_injection_centroid">
+<tt class="descname">calculate_injection_centroid</tt><big>(</big><em>injection_density</em>, <em>injection_fraction</em>, <em>resolution=25</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.calculate_injection_centroid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.calculate_injection_centroid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the centroid of an injection site.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>injection_density: np.ndarray</strong></p>
+<blockquote>
+<div><p>The injection density volume of an experiment</p>
+</div></blockquote>
+<p><strong>injection_fraction: np.ndarray</strong></p>
+<blockquote class="last">
+<div><p>The injection fraction volume of an experiment</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_annotation_volume">
+<tt class="descname">download_annotation_volume</tt><big>(</big><em>resolution</em>, <em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_annotation_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_annotation_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the annotation volume at a particular resolution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>resolution: int</strong></p>
+<blockquote>
+<div><p>Desired resolution to download in microns.  Must be 10, 25, 50, or 100.</p>
+</div></blockquote>
+<p><strong>file_name: string</strong></p>
+<blockquote class="last">
+<div><p>Where to save the annotation volume.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_data_mask">
+<tt class="descname">download_data_mask</tt><big>(</big><em>path</em>, <em>experiment_id</em>, <em>resolution</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_data_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_data_mask" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_density">
+<tt class="descname">download_injection_density</tt><big>(</big><em>path</em>, <em>experiment_id</em>, <em>resolution</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_injection_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_fraction">
+<tt class="descname">download_injection_fraction</tt><big>(</big><em>path</em>, <em>experiment_id</em>, <em>resolution</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_injection_fraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_fraction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_projection_density">
+<tt class="descname">download_projection_density</tt><big>(</big><em>path</em>, <em>experiment_id</em>, <em>resolution</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_projection_density"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_projection_density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_reference_aligned_image_channel_volumes">
+<tt class="descname">download_reference_aligned_image_channel_volumes</tt><big>(</big><em>data_set_id</em>, <em>save_file_path=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_reference_aligned_image_channel_volumes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_reference_aligned_image_channel_volumes" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The well known file is downloaded</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_template_volume">
+<tt class="descname">download_template_volume</tt><big>(</big><em>resolution</em>, <em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_template_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_template_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the registration template volume at a particular resolution.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>resolution: int</strong></p>
+<blockquote>
+<div><p>Desired resolution to download in microns.  Must be 10, 25, 50, or 100.</p>
+</div></blockquote>
+<p><strong>file_name: string</strong></p>
+<blockquote class="last">
+<div><p>Where to save the registration template volume.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_volumetric_data">
+<tt class="descname">download_volumetric_data</tt><big>(</big><em>data</em>, <em>file_name</em>, <em>voxel_resolution=None</em>, <em>save_file_path=None</em>, <em>release=None</em>, <em>coordinate_framework=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.download_volumetric_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_volumetric_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download 3D reference model in NRRD format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>data</strong> : string</p>
+<blockquote>
+<div><p>&#8216;average_template&#8217;, &#8216;ara_nissl&#8217;, &#8216;annotation/ccf_2015&#8217;, &#8216;annotation/mouse_2011&#8217;, or &#8216;annotation/devmouse_2012&#8217;</p>
+</div></blockquote>
+<p><strong>file_name</strong> : string</p>
+<p><strong>voxel_resolution</strong> : int</p>
+<blockquote>
+<div><p>10, 25, 50 or 100</p>
+</div></blockquote>
+<p><strong>coordinate_framework</strong> : string</p>
+<blockquote class="last">
+<div><p>&#8216;mouse_ccf&#8217; (default) or &#8216;mouse_annotation&#8217;</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels">3-D Reference Models</a> 
+for additional documentation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_correlation_search">
+<tt class="descname">experiment_correlation_search</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.experiment_correlation_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_correlation_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a seed experiment and a domain over
+which the similarity comparison is to be made.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>row</strong> : integer</p>
+<blockquote>
+<div><p>SectionDataSet.id to correlate against.</p>
+</div></blockquote>
+<p><strong>structures</strong> : list of integers or strings, optional</p>
+<blockquote>
+<div><p>Integer Structure.id or String Structure.acronym.</p>
+</div></blockquote>
+<p><strong>hemisphere</strong> : string, optional</p>
+<blockquote>
+<div><p>Use &#8216;right&#8217; or &#8216;left&#8217;. Defaults to both hemispheres.</p>
+</div></blockquote>
+<p><strong>transgenic_lines</strong> : list of integers or strings, optional</p>
+<blockquote>
+<div><p>Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.</p>
+</div></blockquote>
+<p><strong>injection_structures</strong> : list of integers or strings, optional</p>
+<blockquote>
+<div><p>Integer Structure.id or String Structure.acronym.</p>
+</div></blockquote>
+<p><strong>primary_structure_only</strong> : boolean, optional</p>
+<p><strong>start_row</strong> : integer, optional</p>
+<blockquote>
+<div><p>For paging purposes. Defaults to 0.</p>
+</div></blockquote>
+<p><strong>num_rows</strong> : integer, optional</p>
+<blockquote class="last">
+<div><p>For paging purposes. Defaults to 2000.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-CorrelationSearch">Correlation Search</a>
+and 
+<a class="reference external" href="http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation">service::mouse_connectivity_correlation</a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_injection_coordinate_search">
+<tt class="descname">experiment_injection_coordinate_search</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.experiment_injection_coordinate_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_injection_coordinate_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>User specifies a seed location within the 3D reference space.
+The service returns a rank list of experiments
+by distance of its injection site to the specified seed location.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>seed_point</strong> : list of floats</p>
+<blockquote>
+<div><p>The coordinates of a point in 3-D SectionDataSet space.</p>
+</div></blockquote>
+<p><strong>transgenic_lines</strong> : list of integers or strings, optional</p>
+<blockquote>
+<div><p>Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.</p>
+</div></blockquote>
+<p><strong>injection_structures</strong> : list of integers or strings, optional</p>
+<blockquote>
+<div><p>Integer Structure.id or String Structure.acronym.</p>
+</div></blockquote>
+<p><strong>primary_structure_only</strong> : boolean, optional</p>
+<p><strong>start_row</strong> : integer, optional</p>
+<blockquote>
+<div><p>For paging purposes. Defaults to 0.</p>
+</div></blockquote>
+<p><strong>num_rows</strong> : integer, optional</p>
+<blockquote class="last">
+<div><p>For paging purposes. Defaults to 2000.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-InjectionCoordinateSearch">Injection Coordinate Search</a>
+and 
+<a class="reference external" href="http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate">service::mouse_connectivity_injection_coordinate</a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_source_search">
+<tt class="descname">experiment_source_search</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.experiment_source_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_source_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search over the whole projection signal statistics dataset
+to find experiments with specific projection profiles.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>injection_structures</strong> : list of integers or strings</p>
+<blockquote>
+<div><p>Integer Structure.id or String Structure.acronym.</p>
+</div></blockquote>
+<p><strong>target_domain</strong> : list of integers or strings, optional</p>
+<blockquote>
+<div><p>Integer Structure.id or String Structure.acronym.</p>
+</div></blockquote>
+<p><strong>injection_hemisphere</strong> : string, optional</p>
+<blockquote>
+<div><p>&#8216;right&#8217; or &#8216;left&#8217;, Defaults to both hemispheres.</p>
+</div></blockquote>
+<p><strong>target_hemisphere</strong> : string, optional</p>
+<blockquote>
+<div><p>&#8216;right&#8217; or &#8216;left&#8217;, Defaults to both hemispheres.</p>
+</div></blockquote>
+<p><strong>transgenic_lines</strong> : list of integers or strings, optional</p>
+<blockquote>
+<div><p>Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.</p>
+</div></blockquote>
+<p><strong>injection_domain</strong> : list of integers or strings, optional</p>
+<blockquote>
+<div><p>Integer Structure.id or String Structure.acronym.</p>
+</div></blockquote>
+<p><strong>primary_structure_only</strong> : boolean, optional</p>
+<p><strong>start_row</strong> : integer, optional</p>
+<blockquote>
+<div><p>For paging purposes. Defaults to 0.</p>
+</div></blockquote>
+<p><strong>num_rows</strong> : integer, optional</p>
+<blockquote class="last">
+<div><p>For paging purposes. Defaults to 2000.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-SourceSearch">Source Search</a>,
+<a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-TargetSearch">Target Search</a>,
+and 
+<a class="reference external" href="http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure">service::mouse_connectivity_injection_structure</a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_spatial_search">
+<tt class="descname">experiment_spatial_search</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.experiment_spatial_search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_spatial_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays all SectionDataSets
+with projection signal density &gt;= 0.1 at the seed point.
+This service also returns the path
+along the most dense pixels from the seed point
+to the center of each injection site..</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>seed_point</strong> : list of floats</p>
+<blockquote>
+<div><p>The coordinates of a point in 3-D SectionDataSet space.</p>
+</div></blockquote>
+<p><strong>transgenic_lines</strong> : list of integers or strings, optional</p>
+<blockquote>
+<div><p>Integer TransgenicLine.id or String TransgenicLine.name. Specify ID 0 to exclude all TransgenicLines.</p>
+</div></blockquote>
+<p><strong>section_data_sets</strong> : list of integers, optional</p>
+<blockquote>
+<div><p>Ids to filter the results.</p>
+</div></blockquote>
+<p><strong>injection_structures</strong> : list of integers or strings, optional</p>
+<blockquote>
+<div><p>Integer Structure.id or String Structure.acronym.</p>
+</div></blockquote>
+<p><strong>primary_structure_only</strong> : boolean, optional</p>
+<p><strong>start_row</strong> : integer, optional</p>
+<blockquote>
+<div><p>For paging purposes. Defaults to 0.</p>
+</div></blockquote>
+<p><strong>num_rows</strong> : integer, optional</p>
+<blockquote class="last">
+<div><p>For paging purposes. Defaults to 2000.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-SpatialSearch">Spatial Search</a>
+and 
+<a class="reference external" href="http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitytargetspatial">service::mouse_connectivity_target_spatial</a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiment_detail">
+<tt class="descname">get_experiment_detail</tt><big>(</big><em>experiment_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.get_experiment_detail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiment_detail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the experiments data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiments">
+<tt class="descname">get_experiments</tt><big>(</big><em>structure_ids</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.get_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch experiment metadata from the Mouse Brain Connectivity Atlas.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>structure_ids</strong> : integer or list, optional</p>
+<blockquote>
+<div><p>injection structure</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>url</strong> : string</p>
+<blockquote class="last">
+<div><p>The constructed URL</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_manual_injection_summary">
+<tt class="descname">get_manual_injection_summary</tt><big>(</big><em>experiment_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.get_manual_injection_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_manual_injection_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve manual injection summary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_projection_image_info">
+<tt class="descname">get_projection_image_info</tt><big>(</big><em>experiment_id</em>, <em>section_number</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.get_projection_image_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_projection_image_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch meta-information of one projection image.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>experiment_id</strong> : integer</p>
+<p class="last"><strong>section_number</strong> : integer</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<p>See: image examples under 
+<a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API##API-ExperimentalOverviewandMetadata">Experimental Overview and Metadata</a>
+for additional documentation.
+Download the image using <a class="reference internal" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image" title="allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_reference_aligned_image_channel_volumes_url">
+<tt class="descname">get_reference_aligned_image_channel_volumes_url</tt><big>(</big><em>data_set_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.get_reference_aligned_image_channel_volumes_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_reference_aligned_image_channel_volumes_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the download link for a specific data set.        
+Notes
+&#8212;&#8211;
+See <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes">Reference-aligned Image Channel Volumes</a>
+for additional documentation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_structure_unionizes">
+<tt class="descname">get_structure_unionizes</tt><big>(</big><em>experiment_ids</em>, <em>is_injection=None</em>, <em>structure_name=None</em>, <em>structure_ids=None</em>, <em>hemisphere_ids=None</em>, <em>normalized_projection_volume_limit=None</em>, <em>include=None</em>, <em>debug=None</em>, <em>order=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/mouse_connectivity_api.html#MouseConnectivityApi.get_structure_unionizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_structure_unionizes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.api.queries.ontologies_api">
+<span id="allensdk-api-queries-ontologies-api-module"></span><h2>allensdk.api.queries.ontologies_api module<a class="headerlink" href="#module-allensdk.api.queries.ontologies_api" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi">
+<em class="property">class </em><tt class="descclassname">allensdk.api.queries.ontologies_api.</tt><tt class="descname">OntologiesApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_template.RmaTemplate" title="allensdk.api.queries.rma_template.RmaTemplate"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_template.RmaTemplate</span></tt></a></p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies">Atlas Drawings and Ontologies</a></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
+<td>Combine one or more RMA query stages into a single RMA query.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
+<td>Build the URL that will fetch the data schema.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
+<td>Join data api endpoint and id.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
+<td>Construct a debug clause for use in an rma::options clause.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
+<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
+<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
+<td>serialize a single RMA query filter clause.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
+<td>serialize RMA query filter clauses.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases"><tt class="xref py py-obj docutils literal"><span class="pre">get_atlases</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table"><tt class="xref py py-obj docutils literal"><span class="pre">get_atlases_table</span></tt></a>([atlas_ids,&nbsp;brief])</td>
+<td>List Atlases available through the API with associated ontologies and structure graphs.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
+<td>Retrieve schema information.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs"><tt class="xref py py-obj docutils literal"><span class="pre">get_structure_graphs</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets"><tt class="xref py py-obj docutils literal"><span class="pre">get_structure_sets</span></tt></a>()</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_structures"><tt class="xref py py-obj docutils literal"><span class="pre">get_structures</span></tt></a>([structure_graph_ids,&nbsp;...])</td>
+<td>Retrieve data about anatomical structures.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
+<td>Download the RMA schema from the current RMA endpoint</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
+<td>Construct and execute a model stage of an RMA query string.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
+<td>Construct a model stage of an RMA query string.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
+<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
+<td>build rma:: options clause.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
+<td>Construct a debug clause for use in an rma::options clause.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
+<td>Connect model and service stages via their JSON responses.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
+<td>Wrap a clause in single quotes.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
+<td>Return the message data from the parsed query.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
+<td>Get a file from the data api and save it.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
+<td>Get the document and put it in a Python data structure</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
+<td>Get the document and put it in a Python data structure</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
+<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
+<td>Construct an RMA query fragment to send a request to a connected service.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
+<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
+<td>Set the working directory where files will be saved.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">template_query</span></tt>(template_name,&nbsp;entry_name,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">to_filter_rhs</span></tt>(rhs)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
+<td>Construct an RMA filter clause.</td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.unpack_structure_set_ancestors" title="allensdk.api.queries.ontologies_api.OntologiesApi.unpack_structure_set_ancestors"><tt class="xref py py-obj docutils literal"><span class="pre">unpack_structure_set_ancestors</span></tt></a>(...)</td>
 <td>Convert a slash-separated structure_id_path field to a list.</td>
 </tr>
@@ -2326,28 +2974,24 @@ help topic.</p>
 
 <dl class="method">
 <dt id="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table">
-<tt class="descname">get_atlases_table</tt><big>(</big><em>atlas_id=None</em>, <em>brief=True</em>, <em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi.get_atlases_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_atlases_table</tt><big>(</big><em>atlas_ids=None</em>, <em>brief=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi.get_atlases_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table" title="Permalink to this definition">¶</a></dt>
 <dd><p>List Atlases available through the API
 with associated ontologies and structure graphs.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atlas_id</strong> : integer, optional</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>atlas_ids</strong> : integer or list of integers, optional</p>
+<blockquote>
+<div><p>only select specific atlases</p>
+</div></blockquote>
 <p><strong>brief</strong> : boolean, optional</p>
 <blockquote>
 <div><p>True (default) requests only name and id fields.</p>
 </div></blockquote>
-<p><strong>fmt</strong> : string, optional</p>
-<blockquote>
-<div><p>json (default) or xml</p>
-</div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>url</strong> : string</p>
-<blockquote class="last">
-<div><p>The constructed URL</p>
-</div></blockquote>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>dict</strong> : atlas metadata</p>
 </td>
 </tr>
 </tbody>
@@ -2413,6 +3057,11 @@ See also: <a class="reference external" href="http://api.brain-map.org/doc/Atlas
 <p class="rubric">Notes</p>
 <p>Only one of the methods of limiting the query should be used at a time.</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.ontologies_api.OntologiesApi.rma_templates">
+<tt class="descname">rma_templates</tt><em class="property"> = {'ontology_queries': [{'count': False, 'name': 'structures_by_graph_ids', 'criteria': '[graph_id$in{{ graph_ids }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['graph_ids'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_graph_names', 'criteria': 'graph[structure_graphs.name$in{{ graph_names }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['graph_names'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_set_ids', 'criteria': '[structure_set_id$in{{ set_ids }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['set_ids'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_set_names', 'criteria': &quot;structure_sets[name$in'{{ set_names }}']&quot;, 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['set_names'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'StructureGraph', 'name': 'structure_graphs_list', 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'StructureSet', 'name': 'structure_sets_list', 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'Atlas', 'name': 'atlases_list', 'description': 'see name'}, {'count': False, 'only': ['atlases.id', 'atlases.name', 'atlases.image_type', 'ontologies.id', 'ontologies.name', 'structure_graphs.id', 'structure_graphs.name', 'graphic_group_labels.id', 'graphic_group_labels.name'], 'criteria_params': ['atlas_ids'], 'name': 'atlases_table', 'criteria': '{% if atlas_ids is defined %}[id$in{{ atlas_ids }}],{%endif%}structure_graph(ontology),graphic_group_labels', 'num_rows': 'all', 'model': 'Atlas', 'include': 'structure_graph(ontology),graphic_group_labels', 'description': 'see name'}]}</em><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.rma_templates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="allensdk.api.queries.ontologies_api.OntologiesApi.unpack_structure_set_ancestors">
@@ -2482,14 +3131,14 @@ See also: <a class="reference external" href="http://api.brain-map.org/doc/Atlas
 <tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.get_schema" title="allensdk.api.queries.rma_api.RmaApi.get_schema"><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt></a>([clazz])</td>
 <td>Retrieve schema information.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.model_query" title="allensdk.api.queries.rma_api.RmaApi.model_query"><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Build an execute a common-case RMA model query.</td>
+<td>Construct and execute a model stage of an RMA query string.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.model_stage" title="allensdk.api.queries.rma_api.RmaApi.model_stage"><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt></a>(model,&nbsp;**kwargs)</td>
 <td>Construct a model stage of an RMA query string.</td>
@@ -2786,26 +3435,54 @@ None will return an empty clause.
 <dl class="method">
 <dt id="allensdk.api.queries.rma_api.RmaApi.model_query">
 <tt class="descname">model_query</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.model_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.model_query" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build an execute a common-case RMA model query.</p>
+<dd><p>Construct and execute a model stage of an RMA query string.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>model</strong> : string</p>
 <blockquote>
-<div><p>name of the top-level class to be queried.</p>
+<div><p>The top level data type</p>
 </div></blockquote>
 <p><strong>filters</strong> : dict</p>
 <blockquote>
 <div><p>key, value comparisons applied to the top-level model to narrow the results.</p>
 </div></blockquote>
-<p><strong>criteria</strong> : list of strings, optional</p>
+<p><strong>criteria</strong> : string</p>
 <blockquote>
-<div><p>nested associations and filters to determine the set of top-level result objects.</p>
+<div><p>raw RMA criteria clause to choose what object are returned</p>
 </div></blockquote>
-<p><strong>include</strong> : list of strings, optional</p>
+<p><strong>include</strong> : string</p>
+<blockquote>
+<div><p>raw RMA include clause to return associated objects</p>
+</div></blockquote>
+<p><strong>only</strong> : list of strings, optional</p>
+<blockquote>
+<div><p>to be joined into an rma::options only filter to limit what data is returned</p>
+</div></blockquote>
+<p><strong>except</strong> : list of strings, optional</p>
+<blockquote>
+<div><p>to be joined into an rma::options except filter to limit what data is returned</p>
+</div></blockquote>
+<p><strong>tabular</strong> : list of string, optional</p>
+<blockquote>
+<div><p>return columns as a tabular data structure rather than a nested tree.</p>
+</div></blockquote>
+<p><strong>count</strong> : boolean, optional</p>
+<blockquote>
+<div><p>False to skip the extra database count query.</p>
+</div></blockquote>
+<p><strong>debug</strong> : string, optional</p>
+<blockquote>
+<div><p>&#8216;true&#8217;, &#8216;false&#8217; or &#8216;preview&#8217;</p>
+</div></blockquote>
+<p><strong>num_rows</strong> : int or string, optional</p>
+<blockquote>
+<div><p>how many database rows are returned (may not correspond directly to JSON tree structure)</p>
+</div></blockquote>
+<p><strong>start_row</strong> : int or string, optional</p>
 <blockquote class="last">
-<div><p>nested associations and filters to be included in the response data.</p>
+<div><p>which database row is start of returned data  (may not correspond directly to JSON tree structure)</p>
 </div></blockquote>
 </td>
 </tr>
@@ -2824,6 +3501,58 @@ response, including the normalized query.</p>
 <dt id="allensdk.api.queries.rma_api.RmaApi.model_stage">
 <tt class="descname">model_stage</tt><big>(</big><em>model</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi.model_stage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.model_stage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a model stage of an RMA query string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>model</strong> : string</p>
+<blockquote>
+<div><p>The top level data type</p>
+</div></blockquote>
+<p><strong>filters</strong> : dict</p>
+<blockquote>
+<div><p>key, value comparisons applied to the top-level model to narrow the results.</p>
+</div></blockquote>
+<p><strong>criteria</strong> : string</p>
+<blockquote>
+<div><p>raw RMA criteria clause to choose what object are returned</p>
+</div></blockquote>
+<p><strong>include</strong> : string</p>
+<blockquote>
+<div><p>raw RMA include clause to return associated objects</p>
+</div></blockquote>
+<p><strong>only</strong> : list of strings, optional</p>
+<blockquote>
+<div><p>to be joined into an rma::options only filter to limit what data is returned</p>
+</div></blockquote>
+<p><strong>except</strong> : list of strings, optional</p>
+<blockquote>
+<div><p>to be joined into an rma::options except filter to limit what data is returned</p>
+</div></blockquote>
+<p><strong>tabular</strong> : list of string, optional</p>
+<blockquote>
+<div><p>return columns as a tabular data structure rather than a nested tree.</p>
+</div></blockquote>
+<p><strong>count</strong> : boolean, optional</p>
+<blockquote>
+<div><p>False to skip the extra database count query.</p>
+</div></blockquote>
+<p><strong>debug</strong> : string, optional</p>
+<blockquote>
+<div><p>&#8216;true&#8217;, &#8216;false&#8217; or &#8216;preview&#8217;</p>
+</div></blockquote>
+<p><strong>num_rows</strong> : int or string, optional</p>
+<blockquote>
+<div><p>how many database rows are returned (may not correspond directly to JSON tree structure)</p>
+</div></blockquote>
+<p><strong>start_row</strong> : int or string, optional</p>
+<blockquote class="last">
+<div><p>which database row is start of returned data  (may not correspond directly to JSON tree structure)</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Notes</p>
 <p>See <a class="reference external" href="http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-DoubleColonforAxis">RMA Path Syntax</a>
 for a brief overview of the normalized RMA syntax.
@@ -3021,6 +3750,122 @@ and
 </dd></dl>
 
 </div>
+<div class="section" id="module-allensdk.api.queries.rma_template">
+<span id="allensdk-api-queries-rma-template-module"></span><h2>allensdk.api.queries.rma_template module<a class="headerlink" href="#module-allensdk.api.queries.rma_template" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.api.queries.rma_template.RmaTemplate">
+<em class="property">class </em><tt class="descclassname">allensdk.api.queries.rma_template.</tt><tt class="descname">RmaTemplate</tt><big>(</big><em>base_uri=None</em>, <em>query_manifest=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/rma_template.html#RmaTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_template.RmaTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></tt></a></p>
+<p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies">Atlas Drawings and Ontologies</a></p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
+<td>Combine one or more RMA query stages into a single RMA query.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
+<td>Build the URL that will fetch the data schema.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
+<td>Join data api endpoint and id.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
+<td>Construct a debug clause for use in an rma::options clause.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
+<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
+<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
+<td>serialize a single RMA query filter clause.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
+<td>serialize RMA query filter clauses.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
+<td>Retrieve schema information.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
+<td>Download the RMA schema from the current RMA endpoint</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
+<td>Construct and execute a model stage of an RMA query string.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
+<td>Construct a model stage of an RMA query string.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
+<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
+<td>build rma:: options clause.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
+<td>Construct a debug clause for use in an rma::options clause.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
+<td>Connect model and service stages via their JSON responses.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
+<td>Wrap a clause in single quotes.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
+<td>Return the message data from the parsed query.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
+<td>Get a file from the data api and save it.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
+<td>Get the document and put it in a Python data structure</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
+<td>Get the document and put it in a Python data structure</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
+<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
+<td>Construct an RMA query fragment to send a request to a connected service.</td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
+<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
+</tr>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
+<td>Set the working directory where files will be saved.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_template.RmaTemplate.template_query" title="allensdk.api.queries.rma_template.RmaTemplate.template_query"><tt class="xref py py-obj docutils literal"><span class="pre">template_query</span></tt></a>(template_name,&nbsp;entry_name,&nbsp;...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_template.RmaTemplate.to_filter_rhs" title="allensdk.api.queries.rma_template.RmaTemplate.to_filter_rhs"><tt class="xref py py-obj docutils literal"><span class="pre">to_filter_rhs</span></tt></a>(rhs)</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
+<td>Construct an RMA filter clause.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="allensdk.api.queries.rma_template.RmaTemplate.template_query">
+<tt class="descname">template_query</tt><big>(</big><em>template_name</em>, <em>entry_name</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/rma_template.html#RmaTemplate.template_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_template.RmaTemplate.template_query" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.rma_template.RmaTemplate.to_filter_rhs">
+<tt class="descname">to_filter_rhs</tt><big>(</big><em>rhs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/rma_template.html#RmaTemplate.to_filter_rhs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_template.RmaTemplate.to_filter_rhs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-allensdk.api.queries.svg_api">
 <span id="allensdk-api-queries-svg-api-module"></span><h2>allensdk.api.queries.svg_api module<a class="headerlink" href="#module-allensdk.api.queries.svg_api" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -3052,8 +3897,8 @@ and
 <tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.svg_api.SvgApi.get_svg" title="allensdk.api.queries.svg_api.SvgApi.get_svg"><tt class="xref py py-obj docutils literal"><span class="pre">get_svg</span></tt></a>(section_image_id[,&nbsp;groups])</td>
 <td>Get the svg document.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
@@ -3167,8 +4012,8 @@ for additional documentation.</p>
 <tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.synchronization_api.SynchronizationApi.get_structure_to_image" title="allensdk.api.queries.synchronization_api.SynchronizationApi.get_structure_to_image"><tt class="xref py py-obj docutils literal"><span class="pre">get_structure_to_image</span></tt></a>(section_data_set_id,&nbsp;...)</td>
 <td>For a list of target structures, find the closest SectionImage  and (x,y) location as defined by the centroid of each Structure.</td>
 </tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
@@ -3437,8 +4282,8 @@ for additional documentation.</p>
 <tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.tree_search_api.TreeSearchApi.get_tree" title="allensdk.api.queries.tree_search_api.TreeSearchApi.get_tree"><tt class="xref py py-obj docutils literal"><span class="pre">get_tree</span></tt></a>(kind,&nbsp;db_id[,&nbsp;ancestors,&nbsp;descendants])</td>
 <td>Fetch meta data for the specified structure or specimen.</td>
 </tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
@@ -3529,6 +4374,7 @@ for additional documentation.</p>
 <li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>

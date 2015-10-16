@@ -84,6 +84,14 @@ allensdk.api.queries.rma_api module
     :undoc-members:
     :show-inheritance:
 
+allensdk.api.queries.rma_template module
+----------------------------------------
+
+.. automodule:: allensdk.api.queries.rma_template
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.api.queries.svg_api module
 -----------------------------------
 

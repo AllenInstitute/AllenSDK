@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.model.biophysical_perisomatic.runner &mdash; Allen SDK 0.10.0 documentation</title>
+    <title>allensdk.model.biophysical_perisomatic.runner &mdash; Allen SDK 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.0 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.10.1 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -652,10 +652,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">import</span> <span class="nn">allensdk.ephys.extract_cell_features</span> <span class="kn">as</span> <span class="nn">extract_cell_features</span>
 <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">allensdk.core.dat_utilities</span> <span class="kn">import</span> <span class="n">DatUtilities</span>
 
-
-<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../../../allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../../../allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">sweeps</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Main function for running a perisomatic biophysical experiment.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
@@ -676,23 +674,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="c"># configure stimulus and recording</span>
     <span class="n">stimulus_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;stimulus_path&#39;</span><span class="p">)</span>
     <span class="n">run_params</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;runs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">sweeps</span> <span class="o">=</span> <span class="n">run_params</span><span class="p">[</span><span class="s">&#39;sweeps&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">sweeps</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">sweeps</span> <span class="o">=</span> <span class="n">run_params</span><span class="p">[</span><span class="s">&#39;sweeps&#39;</span><span class="p">]</span>
     <span class="n">junction_potential</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;fitting&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;junction_potential&#39;</span><span class="p">]</span>
     <span class="n">mV</span> <span class="o">=</span> <span class="mf">1.0e-3</span>
     
-    <span class="n">stimulus_format</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get_format</span><span class="p">(</span><span class="s">&#39;stimulus_path&#39;</span><span class="p">)</span>
-    <span class="n">output_format</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get_format</span><span class="p">(</span><span class="s">&#39;output&#39;</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">stimulus_format</span> <span class="o">==</span> <span class="s">&#39;NWB&#39;</span> <span class="ow">and</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s">&#39;NWB&#39;</span><span class="p">:</span>
-        <span class="n">prepare_nwb_output</span><span class="p">(</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;stimulus_path&#39;</span><span class="p">),</span>
-                           <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;output&#39;</span><span class="p">))</span>
+    <span class="n">prepare_nwb_output</span><span class="p">(</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;stimulus_path&#39;</span><span class="p">),</span>
+                       <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;output&#39;</span><span class="p">))</span>
     
     <span class="c"># run sweeps</span>
     <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">sweeps</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">stimulus_format</span> <span class="o">==</span> <span class="s">&#39;NWB&#39;</span><span class="p">:</span>
-            <span class="n">utils</span><span class="o">.</span><span class="n">setup_iclamp</span><span class="p">(</span><span class="n">stimulus_path</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=</span><span class="n">sweep</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">stimulus_format</span> <span class="o">==</span> <span class="s">&#39;dat&#39;</span><span class="p">:</span>
-            <span class="n">utils</span><span class="o">.</span><span class="n">setup_iclamp_dat</span><span class="p">(</span><span class="n">stimulus_path</span><span class="p">)</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">setup_iclamp</span><span class="p">(</span><span class="n">stimulus_path</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=</span><span class="n">sweep</span><span class="p">)</span>
         
         <span class="n">vec</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">record_values</span><span class="p">()</span>
         
@@ -701,14 +693,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         
         <span class="c"># write to an NWB File</span>
         <span class="n">output_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="n">junction_potential</span><span class="p">)</span> <span class="o">*</span> <span class="n">mV</span>
-        <span class="n">output_times</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="s">&#39;t&#39;</span><span class="p">])</span>
         
-        <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s">&#39;NWB&#39;</span><span class="p">:</span>
-            <span class="n">output_path</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">)</span>
-            <span class="n">save_nwb</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">output_data</span><span class="p">,</span> <span class="n">sweep</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s">&#39;dat&#39;</span><span class="p">:</span>
-            <span class="n">output_path</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">,</span> <span class="n">sweep</span><span class="p">)</span>
-            <span class="n">DatUtilities</span><span class="o">.</span><span class="n">save_voltage</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">output_data</span><span class="p">,</span> <span class="n">output_times</span><span class="p">)</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">)</span>
+        <span class="n">save_nwb</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">output_data</span><span class="p">,</span> <span class="n">sweep</span><span class="p">)</span>
 
 </div>
 <div class="viewcode-block" id="prepare_nwb_output"><a class="viewcode-back" href="../../../../allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.prepare_nwb_output">[docs]</a><span class="k">def</span> <span class="nf">prepare_nwb_output</span><span class="p">(</span><span class="n">nwb_stimulus_path</span><span class="p">,</span>
@@ -803,6 +790,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../../biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>

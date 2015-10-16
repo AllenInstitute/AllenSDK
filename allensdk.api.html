@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api package &mdash; Allen SDK 0.10.0 documentation</title>
+    <title>allensdk.api package &mdash; Allen SDK 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.api.queries package" href="allensdk.api.queries.html" />
     <link rel="prev" title="allensdk package" href="allensdk.html" /> 
@@ -661,11 +661,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.image_download_api">allensdk.api.queries.image_download_api module</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#allensdk-api-queries-mouse-connectivity-api-module">allensdk.api.queries.mouse_connectivity_api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.mouse_connectivity_api">allensdk.api.queries.mouse_connectivity_api module</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.ontologies_api">allensdk.api.queries.ontologies_api module</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.rma_api">allensdk.api.queries.rma_api module</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.rma_template">allensdk.api.queries.rma_template module</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.svg_api">allensdk.api.queries.svg_api module</a><ul class="simple">
@@ -708,8 +713,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.api.Api.do_rma_query" title="allensdk.api.api.Api.do_rma_query"><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt></a>(rma_builder_fn,&nbsp;...)</td>
 <td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.api.Api.json_msg_query" title="allensdk.api.api.Api.json_msg_query"><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt></a>(url)</td>
-<td>Common case where the url is fully constructed and the response data is stored in the &#8216;msg&#8217; field.</td>
+<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.api.Api.json_msg_query" title="allensdk.api.api.Api.json_msg_query"><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt></a>(url[,&nbsp;dataframe])</td>
+<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.api.Api.load_api_schema" title="allensdk.api.api.Api.load_api_schema"><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt></a>()</td>
 <td>Download the RMA schema from the current RMA endpoint</td>
@@ -787,6 +792,10 @@ with a corresponding response json traversal function.</p>
 <blockquote>
 <div><p>A function that takes a json-parsed python data structure and returns data from it.</p>
 </div></blockquote>
+<p><strong>post</strong> : boolean, optional kwarg</p>
+<blockquote>
+<div><p>True does an HTTP POST, False (default) does a GET</p>
+</div></blockquote>
 <p><strong>args</strong> : arguments</p>
 <blockquote>
 <div><p>Arguments to be passed to the url builder function.</p>
@@ -860,9 +869,33 @@ with a corresponding response json traversal function.</p>
 
 <dl class="method">
 <dt id="allensdk.api.api.Api.json_msg_query">
-<tt class="descname">json_msg_query</tt><big>(</big><em>url</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/api.html#Api.json_msg_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.json_msg_query" title="Permalink to this definition">¶</a></dt>
-<dd><p>Common case where the url is fully constructed
-and the response data is stored in the &#8216;msg&#8217; field.</p>
+<tt class="descname">json_msg_query</tt><big>(</big><em>url</em>, <em>dataframe=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/api.html#Api.json_msg_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.api.Api.json_msg_query" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Common case where the url is fully constructed</dt>
+<dd>and the response data is stored in the &#8216;msg&#8217; field.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url</strong> : string</p>
+<blockquote>
+<div><p>Where to get the data in json form</p>
+</div></blockquote>
+<p><strong>dataframe</strong> : boolean</p>
+<blockquote>
+<div><p>True converts to a pandas dataframe, False (default) doesn&#8217;t</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict or DataFrame</p>
+<blockquote class="last">
+<div><p>returned data; type depends on dataframe option</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -957,6 +990,10 @@ for additional documentation.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>url</strong> : string</p>
 <blockquote>
 <div><p>Full API query url.</p>
+</div></blockquote>
+<p><strong>post</strong> : boolean</p>
+<blockquote>
+<div><p>True does an HTTP POST, False (default) encodes the URL and does a GET</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1071,7 +1108,7 @@ based on a api server endpoint.</p>
 <tr class="row-even"><td><a class="reference internal" href="#allensdk.api.cache.Cache.safe_mkdir" title="allensdk.api.cache.Cache.safe_mkdir"><tt class="xref py py-obj docutils literal"><span class="pre">safe_mkdir</span></tt></a>(directory)</td>
 <td>Create path if not already there.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.cache.Cache.wrap" title="allensdk.api.cache.Cache.wrap"><tt class="xref py py-obj docutils literal"><span class="pre">wrap</span></tt></a>(fn,&nbsp;path,&nbsp;cache[,&nbsp;save_as_json,&nbsp;index,&nbsp;...])</td>
+<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.cache.Cache.wrap" title="allensdk.api.cache.Cache.wrap"><tt class="xref py py-obj docutils literal"><span class="pre">wrap</span></tt></a>(fn,&nbsp;path,&nbsp;cache[,&nbsp;save_as_json,&nbsp;...])</td>
 <td>make an rma query, save it and return the dataframe.</td>
 </tr>
 </tbody>
@@ -1227,7 +1264,7 @@ based on a api server endpoint.</p>
 
 <dl class="method">
 <dt id="allensdk.api.cache.Cache.wrap">
-<tt class="descname">wrap</tt><big>(</big><em>fn</em>, <em>path</em>, <em>cache</em>, <em>save_as_json=False</em>, <em>index=None</em>, <em>rename=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.wrap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.wrap" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">wrap</tt><big>(</big><em>fn</em>, <em>path</em>, <em>cache</em>, <em>save_as_json=True</em>, <em>return_dataframe=False</em>, <em>index=None</em>, <em>rename=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.wrap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.wrap" title="Permalink to this definition">¶</a></dt>
 <dd><p>make an rma query, save it and return the dataframe.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1243,11 +1280,15 @@ based on a api server endpoint.</p>
 </div></blockquote>
 <p><strong>cache</strong> : boolean</p>
 <blockquote>
-<div><p>true will make the query, false just loads from disk</p>
+<div><p>True will make the query, False just loads from disk</p>
 </div></blockquote>
 <p><strong>save_as_json</strong> : boolean, optional</p>
 <blockquote>
-<div><p>true will save data as json, false as csv</p>
+<div><p>True (default) will save data as json, False as csv</p>
+</div></blockquote>
+<p><strong>return_dataframe</strong> : boolean, optional</p>
+<blockquote>
+<div><p>True will cast the return value to a pandas dataframe, False (default) will not</p>
 </div></blockquote>
 <p><strong>index</strong> : string, optional</p>
 <blockquote>
@@ -1258,15 +1299,21 @@ based on a api server endpoint.</p>
 <div><p>(new, old) columns to rename</p>
 </div></blockquote>
 <p><strong>kwargs</strong> : objects</p>
-<blockquote class="last">
+<blockquote>
 <div><p>passed through to the query function</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict or DataFrame</p>
+<blockquote class="last">
+<div><p>data type depends on return_dataframe option.</p>
 </div></blockquote>
 </td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Renaming happens after the file is reloaded for json</p>
+<p>Column renaming happens after the file is reloaded for json</p>
 </dd></dl>
 
 </dd></dl>
@@ -1301,6 +1348,7 @@ based on a api server endpoint.</p>
 <li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>

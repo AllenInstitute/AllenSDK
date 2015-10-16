@@ -12,6 +12,30 @@ allensdk.test.api.annotated_section_data_set_api_tests module
     :undoc-members:
     :show-inheritance:
 
+allensdk.test.api.api_tests module
+----------------------------------
+
+.. automodule:: allensdk.test.api.api_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.biophysical_tests module
+------------------------------------------
+
+.. automodule:: allensdk.test.api.biophysical_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.cache_tests module
+------------------------------------
+
+.. automodule:: allensdk.test.api.cache_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.test.api.grid_data_api_tests module
 --------------------------------------------
 
@@ -32,6 +56,14 @@ allensdk.test.api.ontologies_api_tests module
 ---------------------------------------------
 
 .. automodule:: allensdk.test.api.ontologies_api_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.rma_template_tests module
+-------------------------------------------
+
+.. automodule:: allensdk.test.api.rma_template_tests
     :members:
     :undoc-members:
     :show-inheritance:

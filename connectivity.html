@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Mouse Connectivity &mdash; Allen SDK 0.10.0 documentation</title>
+    <title>Mouse Connectivity &mdash; Allen SDK 0.10.1 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.0',
+        VERSION:     '0.10.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
     <link rel="up" title="Data Resources" href="data_resources.html" />
     <link rel="next" title="API Access" href="data_api_client.html" />
     <link rel="prev" title="Cell Types" href="cell_types.html" /> 
@@ -638,9 +638,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <p>This page describes how to use the SDK to access experimental projection data and metadata.  For more information,
 please visit the Connectivity Atlas <a class="reference external" href="http://connectivity.brain-map.org/">home page</a> and the
 <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/ALLEN+Mouse+Brain+Connectivity+Atlas">API documentation</a></p>
+<div class="section" id="code-examples">
+<h2>Code Examples<a class="headerlink" href="#code-examples" title="Permalink to this headline">¶</a></h2>
+<p>The Mouse Connectivity <a class="reference external" href="_static/examples/nb/mouse_connectivity.html">Jupyter notebook</a> has many code samples to help get
+started with analysis:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Mouse-Connectivity">Download experimental metadata by injection structure and transgenic line</a></li>
+<li><a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Structure-Signal-Unionization">Download projection signal statistics at a structure level</a></li>
+<li><a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Generating-a-Projection-Matrix">Build a structure-to-structure matrix of projection signal values</a></li>
+<li><a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Manipulating-Grid-Data">Download and visualized gridded projection signal volumes</a></li>
+</ul>
+</div></blockquote>
+</div>
 <div class="section" id="mouse-connectivity-api">
 <h2>Mouse Connectivity API<a class="headerlink" href="#mouse-connectivity-api" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="xref py py-class docutils literal"><span class="pre">MouseConnectivityApi</span></tt> class provides a Python interface
+<p>The <a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi"><tt class="xref py py-class docutils literal"><span class="pre">MouseConnectivityApi</span></tt></a> class provides a Python interface
 for downloading data in the Allen Mouse Brain Connectivity Atlas.  The following example demonstrates how to download
 meta data for all wild-type mice and the projection signal density for one cell:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.mouse_connectivity_api</span> <span class="kn">import</span> <span class="n">MouseConnectivityApi</span>
@@ -657,7 +670,7 @@ meta data for all wild-type mice and the projection signal density for one cell:
 </div>
 <div class="section" id="mouse-connectivity-cache">
 <h2>Mouse Connectivity Cache<a class="headerlink" href="#mouse-connectivity-cache" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></tt> class saves all of the data you can download
+<p>The <a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache"><tt class="xref py py-class docutils literal"><span class="pre">MouseConnectivityCache</span></tt></a> class saves all of the data you can download
 via the <tt class="xref py py-class docutils literal"><span class="pre">MouseConenctivityApi</span></tt> in well known locations so that you
 don&#8217;t have to think about file names and directories.  It also takes care of knowing if you&#8217;ve already downloaded some files
 and reads them from disk instead of downloading them again.  The following example demonstrates how to download meta data for
@@ -726,6 +739,7 @@ user, please install the latest version available here: <a class="reference exte
 <li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
