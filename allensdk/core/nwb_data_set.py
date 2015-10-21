@@ -21,7 +21,7 @@ class NwbDataSet(object):
     from an NWB file.
     """
     SPIKE_TIMES = "aibs_spike_times"
-    
+
     def __init__(self, file_name, spike_time_key=None):
         """ Initialize the NwbDataSet instance with a file name
 
@@ -35,20 +35,20 @@ class NwbDataSet(object):
             self.spike_time_key = NwbDataSet.SPIKE_TIMES
         else:
             self.spike_time_key = spike_time_key
-    
-    
+
+
     def get_sweep(self, sweep_number):
         """ Retrieve the stimulus, response, index_range, and sampling rate
-        for a particular sweep.  This method hides the NWB file's distinction 
+        for a particular sweep.  This method hides the NWB file's distinction
         between a "Sweep" and an "Experiment".  An experiment is a subset of
-        of a sweep that excludes the initial test pulse.  It also excludes 
+        of a sweep that excludes the initial test pulse.  It also excludes
         any erroneous response data at the end of the sweep (usually for
-        ramp sweeps, where recording was terminated mid-stimulus).  
+        ramp sweeps, where recording was terminated mid-stimulus).
 
-        Some sweeps do not have an experiment, so full data arrays are 
+        Some sweeps do not have an experiment, so full data arrays are
         returned.  Sweeps that have an experiment return full data arrays
-        (include the test pulse) with any erroneous data trimmed from the 
-        back of the sweep.  
+        (include the test pulse) with any erroneous data trimmed from the
+        back of the sweep.
 
         Parameters
         ----------
@@ -57,18 +57,19 @@ class NwbDataSet(object):
         Returns
         -------
         dict
-            A dictionary with 'stimulus', 'response', 'index_range', and
-            'sampling_rate' elements.  The index range is a 2-tuple where
+            A dictionary with 'stimulus', 'response', 'index_range',
+            'sampling_rate', and 'bias_current' elements. The index range
+            is a 2-tuple where
             the first element indicates the end of the test pulse and the
             second index is the end of valid response data.
         """
         with h5py.File(self.file_name,'r') as f:
-            
+
             swp = f['epochs']['Sweep_%d' % sweep_number]
-            
+
             stimulus = swp['stimulus']['timeseries']['data'].value
             response = swp['response']['timeseries']['data'].value
-            
+
             swp_idx_start = swp['stimulus']['idx_start'].value
             swp_length = swp['stimulus']['count'].value
 
@@ -85,21 +86,30 @@ class NwbDataSet(object):
             except KeyError, _:
                 # this sweep has no experiment.  return the index range of the entire sweep.
                 experiment_index_range = sweep_index_range
-            
+
             assert sweep_index_range[0] == 0, Exception("index range of the full sweep does not start at 0.")
-            
+
+            try:
+                bias_current = \
+			f["acquisition"]["timeseries"]['Sweep_%d' % \
+                                sweep_number]["bias_current"].value
+            except KeyError:
+                bias_current = None
+
+
             return  {
                 'stimulus': stimulus,
                 'response': response,
                 'index_range': experiment_index_range,
-                'sampling_rate': 1.0 * swp['stimulus']['timeseries']['starting_time'].attrs['rate']
+                'sampling_rate': 1.0 * swp['stimulus']['timeseries']['starting_time'].attrs['rate'],
+                'bias_current' : bias_current
             }
-    
-    
+
+
     def set_sweep(self, sweep_number, stimulus, response):
-        """ Overwrite the stimulus or response of an NWB file.  
+        """ Overwrite the stimulus or response of an NWB file.
         If the supplied arrays are shorter than stored arrays,
-        they are padded with zeros to match the original data 
+        they are padded with zeros to match the original data
         size.
 
         Parameters
@@ -115,31 +125,31 @@ class NwbDataSet(object):
 
         with h5py.File(self.file_name,'r+') as f:
             swp = f['epochs']['Sweep_%d' % sweep_number]
-            
-            # this is the length of the entire sweep data, including test pulse and 
+
+            # this is the length of the entire sweep data, including test pulse and
             # whatever might be in front of it
             # TODO: remove deprecated 'idx_stop'
             if 'idx_stop' in swp['stimulus']:
                 sweep_length = swp['stimulus']['idx_stop'].value + 1
             else:
                 sweep_length = swp['stimulus']['count'].value
-            
+
             if stimulus is not None:
                 # if the data is shorter than the sweep, pad it with zeros
                 missing_data = sweep_length - len(stimulus)
                 if missing_data > 0:
                     stimulus = np.append(stimulus, np.zeros(missing_data))
-                
+
                 swp['stimulus']['timeseries']['data'][...] = stimulus
-            
+
             if response is not None:
                 # if the data is shorter than the sweep, pad it with zeros
                 missing_data = sweep_length - len(response)
                 if missing_data > 0:
                     response = np.append(response, np.zeros(missing_data))
-                
+
                 swp['response']['timeseries']['data'][...] = response
-    
+
 
     def get_spike_times(self, sweep_number, key=None):
         """ Return any spike times stored in the NWB file for a sweep.
@@ -156,61 +166,61 @@ class NwbDataSet(object):
         list
            list of spike times in seconds relative to the start of the sweep
         """
-        
+
         if key == None:
             key = self.spike_time_key
-        
+
         with h5py.File(self.file_name,'r') as f:
             sweep_name = "Sweep_%d" % sweep_number
-            
+
             try:
                 spikes = f["analysis"][key][sweep_name]
             except KeyError:
                 return []
-            
+
             return spikes.value
-    
-    
+
+
     def set_spike_times(self, sweep_number, spike_times, key=None):
         """ Set or overwrite the spikes times for a sweep.
-        
+
         Parameters
         ----------
         sweep_number : int
             index to access
         key : string
             where the times are stored (default NwbDataSet.SPIKE_TIME)
-        
+
         spike_times: np.array
            array of spike times in seconds
         """
-        
+
         if key == None:
             key = self.spike_time_key
-        
+
         with h5py.File(self.file_name,'r+') as f:
             # make sure expected directory structure is in place
             if "analysis" not in f.keys():
                 f.create_group("analysis")
-            
+
             analysis_dir = f["analysis"]
             if NwbDataSet.SPIKE_TIMES not in analysis_dir.keys():
                 analysis_dir.create_group(NwbDataSet.SPIKE_TIMES)
-            
+
             spike_dir = analysis_dir[NwbDataSet.SPIKE_TIMES]
-            
+
             # see if desired dataset already exists
             sweep_name = "Sweep_%d" % sweep_number
             if sweep_name in spike_dir.keys():
                 # rewriting data -- delete old dataset
                 del spike_dir[sweep_name]
-            
+
             spike_dir.create_dataset(sweep_name, data=spike_times, dtype='f8')
 
 
     def get_sweep_numbers(self):
         """ Get all of the sweep numbers in the file, including test sweeps. """
-        
+
         with h5py.File(self.file_name, 'r') as f:
             sweeps = [int(e.split('_')[1]) for e in f['epochs'].keys() if e.startswith('Sweep_')]
             return sweeps
@@ -218,11 +228,11 @@ class NwbDataSet(object):
 
     def get_experiment_sweep_numbers(self):
         """ Get all of the sweep numbers for experiment epochs in the file, not including test sweeps. """
-        
+
         with h5py.File(self.file_name, 'r') as f:
             sweeps = [int(e.split('_')[1]) for e in f['epochs'].keys() if e.startswith('Experiment_')]
             return sweeps
-        
+
 
     def fill_sweep_responses(self, fill_value=0.0, sweep_numbers=None):
         """ Fill sweep response arrays with a single value.
@@ -231,10 +241,10 @@ class NwbDataSet(object):
         ----------
         fill_value: float
             Value used to fill sweep response array
-        
+
         sweep_numbers: list
             List of integer sweep numbers to be filled (default all sweeps)
-            
+
         """
 
         with h5py.File(self.file_name, 'a') as f:
@@ -250,8 +260,8 @@ class NwbDataSet(object):
 
     def get_sweep_metadata(self, sweep_number):
         """ Retrieve the sweep level metadata associated with each sweep.
-        Includes information on stimulus parameters like its name and amplitude 
-        as well as recording quality metadata, like access resistance and 
+        Includes information on stimulus parameters like its name and amplitude
+        as well as recording quality metadata, like access resistance and
         seal quality.
         Parameters
         ----------
@@ -259,18 +269,18 @@ class NwbDataSet(object):
         Returns
         -------
         dict
-            A dictionary with 'aibs_stimulus_amplitude_pa', 'aibs_stimulus_name', 
+            A dictionary with 'aibs_stimulus_amplitude_pa', 'aibs_stimulus_name',
             'gain', 'initial_access_resistance', 'seal' elements.  These specific
             fields are ones encoded in the original AIBS in vitro .nwb files.
         """
         with h5py.File(self.file_name,'r') as f:
-            
+
             sweep_metadata = {}
 
             # the sweep level metadata is stored in stimulus/presentation/Sweep_XX in the .nwb file
 
             # indicates which metadata fields to return
-            metadata_fields = ['aibs_stimulus_amplitude_pa', 'aibs_stimulus_name', 
+            metadata_fields = ['aibs_stimulus_amplitude_pa', 'aibs_stimulus_name',
                                'gain', 'initial_access_resistance', 'seal']
             try:
                 stim_details = f['stimulus']['presentation']['Sweep_%d' % sweep_number]
@@ -281,5 +291,5 @@ class NwbDataSet(object):
 
             except KeyError, _:
                 sweep_metadata = {}
-            
+
             return sweep_metadata
