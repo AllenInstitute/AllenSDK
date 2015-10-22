@@ -398,15 +398,58 @@ def plot_short_square_figures(nwb_file, cell_features, lims_features, sweep_feat
     repeat_amp = cell_features["short_squares"].get("repeat_amp", None)
 
     if repeat_amp is not None:
-        short_squares_sweeps = [ s['sweep_num'] for s in cell_features["short_squares"]["sweep_info"] 
-                                 if s["stim_amp"] == repeat_amp and (len(get_spikes(sweep_features, s["sweep_num"])) > 0) ]
+        short_square_sweep_nums = [ s['sweep_num'] for s in cell_features["short_squares"]["sweep_info"] 
+                                    if s["stim_amp"] == repeat_amp and (len(get_spikes(sweep_features, s["sweep_num"])) > 0) ]
 
-        figs = plot_single_ap_values(nwb_file, short_squares_sweeps, lims_features, sweep_features, cell_features, "short_square") 
+        figs = plot_single_ap_values(nwb_file, short_square_sweep_nums, 
+                                     lims_features, sweep_features, cell_features, 
+                                     "short_square") 
+
         for index, fig in enumerate(figs):
             save_figure(fig, 'short_squares_%d' % index, 'short_squares', image_dir, sizes, cell_image_files)
 
+        fig = plot_instantaneous_threshold_thumbnail(nwb_file, short_square_sweep_nums, 
+                                                     cell_features, lims_features, sweep_features)
+
+        save_figure(fig, 'instantaneous_threshold_thumbnail', 'short_squares', image_dir, sizes, cell_image_files)
+                                                     
+
     else:
         logging.warning("No short square figures to plot.")
+
+
+def plot_instantaneous_threshold_thumbnail(nwb_file, sweep_numbers, cell_features, lims_features, sweep_features, color='red'):
+    min_sweep_number = None
+    for sn in sorted(sweep_numbers):
+        spikes = get_spikes(sweep_features, sn)
+
+        if len(spikes) > 0:
+            min_sweep_number = sn if min_sweep_number is None else min(min_sweep_number, sn)
+
+    fig = plt.figure(frameon=False)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)    
+    ax.set_yticklabels([])
+    ax.set_xticklabels([])
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+
+    v, i, t, r = load_experiment(nwb_file, sn)
+    stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
+
+    tstart = stim_start - 0.002
+    tend = stim_start + stim_dur + 0.005
+    tscale = 0.005
+
+    plt.plot(t, v, linewidth=1, color=color)
+    plt.plot([ tstart, tstart, tstart + tscale ], [ 10, 0, 0 ], linewidth=1, color='#dddddd')
+    
+    plt.ylim(-90, 70)
+    plt.xlim(tstart, tend)
+
+    return fig
+
 
 def plot_ramp_figures(nwb_file, cell_specimen, cell_features, lims_features, sweep_features, image_dir, sizes, cell_image_files):
     sweeps = cell_specimen['ephys_sweeps']
@@ -471,12 +514,19 @@ def plot_hero_figures(nwb_file, cell_features, lims_features, sweep_features, im
 
     save_figure(fig, 'thumbnail_2', 'thumbnail', image_dir, sizes, cell_image_files)
 
+    summary_fig = plot_long_square_summary(nwb_file, cell_features, lims_features, sweep_features)
+    save_figure(summary_fig, 'ephys_summary', 'thumbnail', image_dir, sizes, cell_image_files, scalew=2)
+
+
+def plot_long_square_summary(nwb_file, cell_features, lims_features, sweep_features):
     long_square_sweeps = cell_features['long_squares']['sweep_info']
     long_square_sweep_numbers = [ int(s['sweep_num']) for s in long_square_sweeps ]
     
     thumbnail_summary_fig = plot_sweep_set_summary(nwb_file, int(lims_features['thumbnail_sweep_num']), long_square_sweep_numbers)
     plt.figure(thumbnail_summary_fig.number)
-    save_figure(thumbnail_summary_fig, 'ephys_summary', 'thumbnail', image_dir, sizes, cell_image_files, scalew=2)
+
+    return thumbnail_summary_fig
+
 
 def plot_fi_curve_figures(nwb_file, cell_features, lims_features, sweep_features, image_dir, sizes, cell_image_files):
     fig = plt.figure()
@@ -611,9 +661,15 @@ def plot_sweep_set_summary(nwb_file, highlight_sweep_number, sweep_numbers,
     plt.plot(t, v, linewidth=1, color=highlight_color)
 
     stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
+    
+    tstart = stim_start - 0.05
+    tend = stim_start + stim_dur + 0.25
+    tscale = 0.005
+
+    plt.plot( [tstart, tstart, tstart + tscale], [10, 0, 0], linewidth=1, color='#dddddd')
 
     ax.set_ylim(-110, 40)
-    ax.set_xlim(stim_start - 0.05, stim_start + stim_dur + 0.25)
+    ax.set_xlim(tstart, tend)
 
     return fig
 
