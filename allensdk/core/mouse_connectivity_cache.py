@@ -602,7 +602,7 @@ class MouseConnectivityCache(Cache):
             return nrrd.read(file_name)
         else:
             ont = self.get_ontology()
-            structure_ids = ont.get_descendant_ids(structure_id)
+            structure_ids = ont.get_descendant_ids([structure_id])
             annotation, _ = self.get_annotation_volume(annotation_file_name)
             mask = self.make_structure_mask(structure_ids, annotation)
             

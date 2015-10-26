@@ -75,7 +75,7 @@ class Ontology( object ):
             if isinstance(s, pd.Series):
                 # if it's a pandas series, assume it's a series of structure ids
                 structure_ids.update(s.tolist())
-            elif isinstance(s, str):
+            elif isinstance(s, str) or isinstance(s, unicode):
                 # if it's a string, assume it's an acronym
                 string_strs.append(s)            
             else:
@@ -194,6 +194,6 @@ class Ontology( object ):
 
         if child is not None:
             parent_str = '/%d/' % parent_id
-            return child['structure_id_path'].find(parent_str) >= 0
+            return child['structure_id_path'].values[0].find(parent_str) >= 0
         
         return False
