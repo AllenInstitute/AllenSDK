@@ -26,7 +26,7 @@ RMA Database and Service API
 
 One API subclass is the :py:class:`~allensdk.api.queries.rma_api.RmaApi` class.
 It is intended to simplify
-`constructing an RMA query <http://help.brain-map.org/display/api/RESTful+Model+Access+%28RMA%29>`_..
+`constructing an RMA query <http://help.brain-map.org/display/api/RESTful+Model+Access+%28RMA%29>`_.
 
 The RmaApi is a base class for much of the allensdk.api.queries
 package, but it may be used directly to customize queries or to
