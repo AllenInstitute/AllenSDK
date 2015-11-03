@@ -115,8 +115,8 @@ class EphysFeatures( object ):
         self.scoring["rate"] = spike_score
 
     def print_out(self):
-        print "Features from " + self.name
-        for k in self.mean.keys():
+        print("Features from " + self.name)
+        for k in list(self.mean.keys()):
             if k in self.glossary:
                 str = "%30s = " % self.glossary[k]
                 if self.mean[k] != None:
@@ -125,11 +125,11 @@ class EphysFeatures( object ):
                     str += "--------"
                 if k in self.stdev and self.stdev[k] != None:
                     str += " +/- %g" % self.stdev[k]
-                print str
+                print(str)
 
     # initialize summary feature set from file
     def clone(self, param_dict):
-        for k in param_dict.keys():
+        for k in list(param_dict.keys()):
             self.mean[k] = param_dict[k]["mean"]
             self.stdev[k] = param_dict[k]["stdev"]
 
@@ -409,11 +409,11 @@ class EphysFeatureExtractor( object ):
         # build superset dictionary of possible features
         superset = {}
         for i in range(len(spikes)):
-            for k in spikes[i].keys():
+            for k in list(spikes[i].keys()):
                 if k not in superset:
                     superset[k] = k
 
-        for k in superset.keys():
+        for k in list(superset.keys()):
             cnt = 0
             mean = 0
             for i in range(len(spikes)):
@@ -596,13 +596,13 @@ class EphysFeatureExtractor( object ):
                 else:
                     assert False
                 if abs(sum(scores)) > 1e10:
-                    print k
-                    print self.summary.scoring
-                    print self.summary.mean
-                    print self.summary.stdev
-                    print cand.summary.scoring
-                    print cand.summary.mean
-                    print cand.summary.stdev
+                    print(k)
+                    print(self.summary.scoring)
+                    print(self.summary.mean)
+                    print(self.summary.stdev)
+                    print(cand.summary.scoring)
+                    print(cand.summary.mean)
+                    print(cand.summary.stdev)
                     assert False
         return scores
 
@@ -611,7 +611,7 @@ class EphysFeatureExtractor( object ):
     #     class as the other feature objects that are being summarized
     def summarize(self, summary):
         if len(self.feature_list) == 0:
-            print "Error -- no features were extracted. Summary impossible"
+            print("Error -- no features were extracted. Summary impossible")
             sys.exit()
         # make dummy dict to verify that all feature instances have
         #   identical features
@@ -621,15 +621,15 @@ class EphysFeatureExtractor( object ):
         superset = {}
         for i in range(len(self.feature_list)):
             fx = self.feature_list[i]
-            for k in fx.mean.keys():
+            for k in list(fx.mean.keys()):
                 if k in fx.glossary:
                     superset[k] = k
         err = 0
-        for k in superset.keys():
+        for k in list(superset.keys()):
             for i in range(len(self.feature_list)):
                 fx = self.feature_list[i].mean
                 if k not in fx:
-                    print "Error - feature '%s' not in all data sets" % k
+                    print("Error - feature '%s' not in all data sets" % k)
                     err += 1
         if err > 0:
             return None
@@ -637,29 +637,29 @@ class EphysFeatureExtractor( object ):
         # to ensure this, make programmer specify the type being summarized
         self.summary = summary
         # now set summary means to zero
-        for k in fx.keys():
+        for k in list(fx.keys()):
             self.summary.mean[k] = 0
         # now calculate the average of all features
         for i in range(len(self.feature_list)):
             fx = self.feature_list[i]
-            for k in fx.mean.keys():
+            for k in list(fx.mean.keys()):
                 if k in fx.glossary and fx.mean[k] is not None:
                     self.summary.mean[k] += fx.mean[k]
                     self.summary.stdev[k] = 0.0
         # divide out n to get actual mean
-        for k in fx.mean.keys():
+        for k in list(fx.mean.keys()):
             self.summary.mean[k] /= 1.0 * len(self.feature_list)
         # calculate standard deviation
         for i in range(len(self.feature_list)):
             fx = self.feature_list[i]
-            for k in fx.mean.keys():
+            for k in list(fx.mean.keys()):
                 if k in fx.glossary and fx.mean[k] is not None:
                     mean = self.summary.mean[k]
                     dif = mean - fx.mean[k]
                     self.summary.stdev[k] += dif * dif
         # divide out n and take sqrt to get actual stdev
         fx = self.feature_list[0]
-        for k in fx.mean.keys():
+        for k in list(fx.mean.keys()):
             if k in fx.glossary and fx.mean[k] is not None:
                 val = self.summary.stdev[k]
                 val /= 1.0 * len(self.feature_list)

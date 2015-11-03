@@ -15,7 +15,7 @@
 
 import re, logging
 from json import loads
-from __builtin__ import classmethod
+from builtins import classmethod
 
 
 class JsonUtil(object):

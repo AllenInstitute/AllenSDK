@@ -132,7 +132,7 @@ class Manifest(object):
             path_info : dict
                 Information about the new paths
         '''
-        for path_key, path_data in path_info.items():
+        for path_key, path_data in list(path_info.items()):
             path_format = None
             
             if 'format' in path_data:
@@ -287,7 +287,7 @@ class Manifest(object):
         '''
         key_pattern =  re.compile('(.*)%s$' % (suffix))
         
-        for description_key, manifest_key in description_dict.items():
+        for description_key, manifest_key in list(description_dict.items()):
             m = key_pattern.match(description_key)
             if m:
                 real_key = m.group(1)  # i.e. job_dir_key -> job_dir

@@ -186,14 +186,14 @@ class Morphology( object ):
     def compartment_index(self, compartment_index):
         """ Update the compartment index.  Update the compartment list. """
         self._compartment_index = compartment_index
-        self._compartment_list = compartment_index.values()
+        self._compartment_list = list(compartment_index.values())
         self.update_children()
 
 
     @property
     def root(self):
         """ Search through the compartment index for the root compartment """
-        for cid,c in self.compartment_index.iteritems():
+        for cid,c in self.compartment_index.items():
             if c['parent'] == '-1':
                 return c
         return None
@@ -238,7 +238,7 @@ class Morphology( object ):
         """ Make sure that the parents and children are assigned properly. """
         compartments = self._compartment_index
 
-        for cid, c in self.compartment_index.iteritems():
+        for cid, c in self.compartment_index.items():
             if c['parent'] != "-1":
                 assert c['parent'] in compartments, "bad parent id: %s" % (c['parent'] )
                 
@@ -250,10 +250,10 @@ class Morphology( object ):
         """ Fill each compartment's array of children """
         compartments = self._compartment_index
 
-        for i,compartment in compartments.iteritems():
+        for i,compartment in compartments.items():
             compartment['children'] = []
 
-        for i,compartment in compartments.iteritems():
+        for i,compartment in compartments.items():
             pi = compartment['parent']
     
             if pi not in compartments:
@@ -289,7 +289,7 @@ class Morphology( object ):
 
         # figure out which compartments to toss
         ct = 0
-        for i, c in compartments.iteritems():
+        for i, c in compartments.items():
             pid = c['parent']
             cid = c['id']
             ctype = c['type']
@@ -303,7 +303,7 @@ class Morphology( object ):
             ct += 1
 
         # hook children up to their new parents
-        for i, c in compartments.iteritems():
+        for i, c in compartments.items():
             comp_id = c['id']
 
             if keep[comp_id] is False:
@@ -315,16 +315,16 @@ class Morphology( object ):
                     compartments[child_id]['parent'] = parent_id
 
         # filter out the orphans
-        sparsified_compartments = { k:v for k,v in compartments.iteritems() if keep[k] }
+        sparsified_compartments = { k:v for k,v in compartments.items() if keep[k] }
 
         if compress_ids:
-            ids = sorted(sparsified_compartments.keys(), key=lambda x: int(x))
+            ids = sorted(list(sparsified_compartments.keys()), key=lambda x: int(x))
             id_hash = { fid:str(i+1) for i,fid in enumerate(ids) }
             id_hash["-1"] = "-1"
 
             # build the final compartment index
             out_compartments = {}
-            for cid, compartment in sparsified_compartments.iteritems():
+            for cid, compartment in sparsified_compartments.items():
                 compartment['id'] = id_hash[cid]
                 compartment['parent'] = id_hash[compartment['parent']]
                 out_compartments[compartment['id']] = compartment

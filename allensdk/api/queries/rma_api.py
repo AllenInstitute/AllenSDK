@@ -454,7 +454,7 @@ class RmaApi(Api):
         '''
         filters_builder = []
         
-        for (key, value) in filters.items():
+        for (key, value) in list(filters.items()):
             filters_builder.append(self.filter(key, value))
         
         return ''.join(filters_builder)

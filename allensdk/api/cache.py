@@ -38,8 +38,8 @@ class Cache(object):
         '''
         try:
             os.makedirs(directory)
-        except Exception, e:
-            print e.message
+        except Exception as e:
+            print(e.message)
             
 
     def get_cache_path(self, file_name, manifest_key, *args):

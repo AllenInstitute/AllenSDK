@@ -16,7 +16,7 @@
 from allensdk.core.json_utilities import JsonComments
 
 try:
-    from ConfigParser import ConfigParser # Python 2
+    from configparser import ConfigParser # Python 2
 except:
     from configparser import ConfigParser # Python 3 #@UnresolvedImport
 
@@ -65,7 +65,7 @@ class ApplicationConfig(object):
         
         self.argparser = self.create_argparser()
                 
-        for key, value in self.defaults.items():
+        for key, value in list(self.defaults.items()):
             setattr(self, key, value['default'])
     
     
@@ -146,7 +146,7 @@ class ApplicationConfig(object):
         '''
         parser = argparse.ArgumentParser(prog=self.application_name,
                                          description=self.help)
-        for key, value in self.defaults.items():
+        for key, value in list(self.defaults.items()):
             if key == 'config_file_path':
                 parser.add_argument("%s" % (key), default=None, help=value['help'])
             else:
