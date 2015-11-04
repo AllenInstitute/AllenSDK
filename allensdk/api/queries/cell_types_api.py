@@ -51,7 +51,6 @@ class CellTypesApi(RmaApi):
         include = ( 'structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
                     'ephys_features,data_sets,neuron_reconstructions' )
 
-        print(criteria,include)
         cells = self.model_query('Specimen', criteria=criteria, include=include, num_rows='all')
         
         for cell in cells:
