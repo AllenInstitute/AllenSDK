@@ -22,6 +22,8 @@ def read(file_name):
     """ Shortcut reading JSON from a file. """
     with open(file_name, 'rb') as f:
         string = f.read().decode('utf-8')
+        if len(string)==0:
+            string = "{}"
         return json.loads(string)
 
 
