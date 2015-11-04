@@ -21,7 +21,8 @@ import urllib.request, urllib.error, urllib.parse, urllib.parse
 def read(file_name):
     """ Shortcut reading JSON from a file. """
     with open(file_name, 'rb') as f:
-        return json.loads(f.read())
+        string = f.read().decode('utf-8')
+        return json.loads(string)
 
 
 def write(file_name, obj):
