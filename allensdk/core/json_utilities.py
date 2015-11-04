@@ -21,9 +21,12 @@ import urllib2, urlparse
 def read(file_name):
     """ Shortcut reading JSON from a file. """
     with open(file_name, 'rb') as f:
-        return json.loads(f.read())
+        string = f.read()
+        if len(string)==0:
+            string = "{}" # Still empty, but doesn't throw a JSON error.  
+        return json.loads(string)
 
-
+    
 def write(file_name, obj):
     """ Shortcut for writing JSON to a file.  This also takes care of serializing numpy and data types. """
     with open(file_name, 'wb') as f:
