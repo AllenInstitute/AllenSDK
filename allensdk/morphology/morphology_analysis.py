@@ -336,7 +336,8 @@ def computeFeature(nt):
         par = nt.obj_list[i].pn
         if par >= 0:
             pnum = nt.obj_hash[par]
-            while len(childs) <= pnum:
+            # +1 is necessary to replicate behavior of QVector
+            while len(childs) <= pnum + 1:
                 childs.append([])
             childs[pnum].append(i)
 
@@ -380,6 +381,29 @@ def computeFeature(nt):
     features[18] = Pd_ratio     # feature # 18: Average Parent-daughter Ratio
     features[19] = BifA_local   # feature # 19: Average Bifurcation Angle Local
     features[20] = BifA_remote  # feature # 20: Average Bifurcation Angle Remote
+
+    #feature_dict = {}
+    #feature_dict["num_nodes"]           = features[0]
+    #feature_dict["soma_surface"]        = features[1]
+    #feature_dict["num_stems"]           = features[2]
+    #feature_dict["num_bifurcation"]     = features[3]
+    #feature_dict["num_branches"]        = features[4]
+    #feature_dict["num_of_tips"]         = features[5]
+    #feature_dict["overall_width"]       = features[6]
+    #feature_dict["overall_height"]      = features[7]
+    #feature_dict["overall_depth"]       = features[8]
+    #feature_dict["average_diameter"]    = features[9]
+    #feature_dict["total_length"]        = features[10]
+    #feature_dict["total_surface"]       = features[11]
+    #feature_dict["total_volume"]        = features[12]
+    #feature_dict["max_eux"]             = features[13]
+    #feature_dict["max_path"]            = features[14]
+    #feature_dict["max_order"]           = features[15]
+    #feature_dict["contraction"]         = features[16]
+    #feature_dict["fragmentation"]       = features[17]
+    #feature_dict["Pd_ratio"]            = features[18]
+    #feature_dict["BifA_local"]          = features[19]
+    #feature_dict["BifA_remote"]         = features[20]
 
     feature_desc = []
     feature_desc.append("num_nodes")
