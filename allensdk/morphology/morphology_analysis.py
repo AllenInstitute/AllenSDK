@@ -302,7 +302,6 @@ def computeFeature(nt):
     global childs, rootidx
     # v3d returns a vector of 21 features. this is returned to the calling
     #   functin
-    features = np.zeros(21)
     Width=0.0
     Height=0.0
     Depth=0.0
@@ -346,8 +345,9 @@ def computeFeature(nt):
     lst = nt.obj_list
     for i in range(len(lst)):
         if lst[i].pn == -1:
+            if rootidx != VOID:
+                print "WARNING - two roots are specified. Using the latter"
             rootidx = i
-            break
     if rootidx == VOID:
         print "the input neuron tree does not have a root, please check your data"
         return
@@ -359,13 +359,14 @@ def computeFeature(nt):
     computeLinear(nt)
     computeTree(nt)
 
+    features = np.zeros(22)
     features[0] = N_node        # feature # 0: Number of Nodes          OK
     features[1] = Soma_surface  # feature # 1: Soma Surface             OK
     features[2] = N_stem        # feature # 2: Number of Stems          OK
     features[3] = N_bifs        # feature # 3: Number of Bifurcations   OK
     features[4] = N_branch      # feature # 4: Number of Branches       OK
     features[5] = N_tips        # feature # 5: Number of Tips           OK
-    # Width, Height, Depth re-ordered
+    # Width, Height, Depth re-ordered relative to Xiaoxiao's data
     features[6] = Width         # feature # 6: Overall Width            ?
     features[7] = Height        # feature # 7: Overall Height           ?
     features[8] = Depth         # feature # 8: Overall Depth            ?
@@ -381,37 +382,15 @@ def computeFeature(nt):
     features[18] = Pd_ratio     # feature # 18: Average Parent-daughter Ratio
     features[19] = BifA_local   # feature # 19: Average Bifurcation Angle Local
     features[20] = BifA_remote  # feature # 20: Average Bifurcation Angle Remote
-
-    #feature_dict = {}
-    #feature_dict["num_nodes"]           = features[0]
-    #feature_dict["soma_surface"]        = features[1]
-    #feature_dict["num_stems"]           = features[2]
-    #feature_dict["num_bifurcation"]     = features[3]
-    #feature_dict["num_branches"]        = features[4]
-    #feature_dict["num_of_tips"]         = features[5]
-    #feature_dict["overall_width"]       = features[6]
-    #feature_dict["overall_height"]      = features[7]
-    #feature_dict["overall_depth"]       = features[8]
-    #feature_dict["average_diameter"]    = features[9]
-    #feature_dict["total_length"]        = features[10]
-    #feature_dict["total_surface"]       = features[11]
-    #feature_dict["total_volume"]        = features[12]
-    #feature_dict["max_eux"]             = features[13]
-    #feature_dict["max_path"]            = features[14]
-    #feature_dict["max_order"]           = features[15]
-    #feature_dict["contraction"]         = features[16]
-    #feature_dict["fragmentation"]       = features[17]
-    #feature_dict["Pd_ratio"]            = features[18]
-    #feature_dict["BifA_local"]          = features[19]
-    #feature_dict["BifA_remote"]         = features[20]
+    features[21] = N_node / N_branch
 
     feature_desc = []
-    feature_desc.append("num_nodes")
+    feature_desc.append("number_of_nodes")
     feature_desc.append("soma_surface")
-    feature_desc.append("num_stems")
-    feature_desc.append("num_bifurcation")
-    feature_desc.append("num_branches")
-    feature_desc.append("num_of_tips")
+    feature_desc.append("number_of_stems")
+    feature_desc.append("number_of_bifurcations")
+    feature_desc.append("number_of_branches")
+    feature_desc.append("number_of_tips")
     feature_desc.append("overall_width")
     feature_desc.append("overall_height")
     feature_desc.append("overall_depth")
@@ -419,16 +398,15 @@ def computeFeature(nt):
     feature_desc.append("total_length")
     feature_desc.append("total_surface")
     feature_desc.append("total_volume")
-    feature_desc.append("max_eux")
-    feature_desc.append("max_path")
-    feature_desc.append("max_order")
-    feature_desc.append("contraction")
-    feature_desc.append("fragmentation")
-    feature_desc.append("Pd_ratio")
-    feature_desc.append("BifA_local")
-    feature_desc.append("BifA_remote")
-    #for i in range(len(features)):
-    #    print "%s\t%f" % (feature_desc[i], features[i])
+    feature_desc.append("max_euclidean_distance")
+    feature_desc.append("max_path_distance")
+    feature_desc.append("max_branch_order")
+    feature_desc.append("average_contraction")
+    feature_desc.append("average_fragmentation")
+    feature_desc.append("average_parent_daughter_ratio")
+    feature_desc.append("average_bifurcation_angle_local")
+    feature_desc.append("average_bifurcation_angle_remote")
+    feature_desc.append("nodes_over_branches")
     
     return features, feature_desc
 
