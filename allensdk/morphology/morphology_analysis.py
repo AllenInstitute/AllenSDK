@@ -56,11 +56,6 @@ def computeGMI(nt):
 
     for i in range(siz):
         b[i] = np.zeros(4)
-
-        # to reproduce output of v3d, must recast as float32
-        #b[i][0] = np.float32(lst[i].x)
-        #b[i][1] = np.float32(lst[i].y)
-        #b[i][2] = np.float32(lst[i].z)
         b[i][0] = lst[i].x
         b[i][1] = lst[i].y
         b[i][2] = lst[i].z
@@ -346,7 +341,7 @@ def computeFeature(nt):
     for i in range(len(lst)):
         if lst[i].pn == -1:
             if rootidx != VOID:
-                print "WARNING - two roots are specified. Using the latter"
+                print "WARNING - multiple roots are specified. Using the latter"
             rootidx = i
     if rootidx == VOID:
         print "the input neuron tree does not have a root, please check your data"
@@ -382,7 +377,7 @@ def computeFeature(nt):
     features[18] = Pd_ratio     # feature # 18: Average Parent-daughter Ratio
     features[19] = BifA_local   # feature # 19: Average Bifurcation Angle Local
     features[20] = BifA_remote  # feature # 20: Average Bifurcation Angle Remote
-    features[21] = N_node / N_branch
+    features[21] = 1.0 * N_node / N_branch
 
     feature_desc = []
     feature_desc.append("number_of_nodes")
