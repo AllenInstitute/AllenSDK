@@ -9,6 +9,6 @@ expected = np.loadtxt('multicell_expected.dat',
                              'formats': ('f4', 'f4', 'f4', 'f4')})
 
 for trace in ['v0', 'v1', 'v2']:
-    print("%s matches expected values: %s" % (trace,
+    print(("%s matches expected values: %s" % (trace,
                                               np.allclose(result[trace],
-                                                          expected[trace])))
+                                                          expected[trace]))))

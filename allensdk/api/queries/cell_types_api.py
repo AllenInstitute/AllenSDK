@@ -23,11 +23,14 @@ class CellTypesApi(RmaApi):
         super(CellTypesApi, self).__init__(base_uri)
 
         
-    def list_cells(self, require_morphology=False, require_reconstruction=False):
+    def list_cells(self, id=None, require_morphology=False, require_reconstruction=False):
         ''' Query the API for a list of all cells in the Cell Types Database.
 
         Parameters
         ----------
+        id: int
+            ID of a cell.  If not provided returns all matching cells.  
+
         require_morphology: boolean
             Only return cells that have morphology images.
 
@@ -40,7 +43,10 @@ class CellTypesApi(RmaApi):
             Meta data for all cells.
         '''
 
-        criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
+        if id:
+            criteria = "[id$eq'%d']" % id
+        else:
+            criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
         
         include = ( 'structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
                     'ephys_features,data_sets,neuron_reconstructions' )
@@ -65,7 +71,25 @@ class CellTypesApi(RmaApi):
                 if tl['transgenic_line_type_name'] == 'driver':
                     cell['transgenic_line'] = tl['name']
 
-        return self.filter_cells(cells, require_morphology, require_reconstruction)
+        result = self.filter_cells(cells, require_morphology, require_reconstruction)
+        if id:
+            return result[0]
+        else:
+            return result
+
+
+    def get_cell(self, id):
+        '''
+        Query the API for a one cells in the Cell Types Database.
+
+        
+        Returns
+        -------
+        list
+            Meta data for one cell.
+        '''
+
+        return self.list_cells(id=id)
 
 
     def get_ephys_sweeps(self, specimen_id):
@@ -74,7 +98,6 @@ class CellTypesApi(RmaApi):
 
         Parameters
         ----------
-
         specimen_id: int
             Specimen ID of a cell.
 
@@ -174,7 +197,7 @@ class CellTypesApi(RmaApi):
 
         try:
             file_url = results[0]['ephys_result']['well_known_files'][0]['download_link']
-        except Exception, _:
+        except Exception as _:
             raise Exception("Specimen %d has no ephys data" % specimen_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)

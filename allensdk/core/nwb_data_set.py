@@ -82,7 +82,7 @@ class NwbDataSet(object):
                 exp_length = exp['stimulus']['count'].value
                 exp_idx_stop = exp_idx_start + exp_length - 1
                 experiment_index_range = ( exp_idx_start, exp_idx_stop )
-            except KeyError, _:
+            except KeyError as _:
                 # this sweep has no experiment.  return the index range of the entire sweep.
                 experiment_index_range = sweep_index_range
             
@@ -190,18 +190,18 @@ class NwbDataSet(object):
         
         with h5py.File(self.file_name,'r+') as f:
             # make sure expected directory structure is in place
-            if "analysis" not in f.keys():
+            if "analysis" not in list(f.keys()):
                 f.create_group("analysis")
             
             analysis_dir = f["analysis"]
-            if NwbDataSet.SPIKE_TIMES not in analysis_dir.keys():
+            if NwbDataSet.SPIKE_TIMES not in list(analysis_dir.keys()):
                 analysis_dir.create_group(NwbDataSet.SPIKE_TIMES)
             
             spike_dir = analysis_dir[NwbDataSet.SPIKE_TIMES]
             
             # see if desired dataset already exists
             sweep_name = "Sweep_%d" % sweep_number
-            if sweep_name in spike_dir.keys():
+            if sweep_name in list(spike_dir.keys()):
                 # rewriting data -- delete old dataset
                 del spike_dir[sweep_name]
             
@@ -212,7 +212,7 @@ class NwbDataSet(object):
         """ Get all of the sweep numbers in the file, including test sweeps. """
         
         with h5py.File(self.file_name, 'r') as f:
-            sweeps = [int(e.split('_')[1]) for e in f['epochs'].keys() if e.startswith('Sweep_')]
+            sweeps = [int(e.split('_')[1]) for e in list(f['epochs'].keys()) if e.startswith('Sweep_')]
             return sweeps
 
 
@@ -220,7 +220,7 @@ class NwbDataSet(object):
         """ Get all of the sweep numbers for experiment epochs in the file, not including test sweeps. """
         
         with h5py.File(self.file_name, 'r') as f:
-            sweeps = [int(e.split('_')[1]) for e in f['epochs'].keys() if e.startswith('Experiment_')]
+            sweeps = [int(e.split('_')[1]) for e in list(f['epochs'].keys()) if e.startswith('Experiment_')]
             return sweeps
         
 
@@ -240,7 +240,7 @@ class NwbDataSet(object):
         with h5py.File(self.file_name, 'a') as f:
             if sweep_numbers is None:
                 # no sweep numbers given, grab all of them
-                epochs = [ k for k in f['epochs'].keys() if k.startswith('Sweep_') ]
+                epochs = [ k for k in list(f['epochs'].keys()) if k.startswith('Sweep_') ]
             else:
                 epochs = [ 'Sweep_%d' % sweep_number for sweep_number in sweep_numbers ]
 
@@ -276,10 +276,10 @@ class NwbDataSet(object):
                 stim_details = f['stimulus']['presentation']['Sweep_%d' % sweep_number]
                 for field in metadata_fields:
                 	# check if sweep contains the specific metadata field
-                	if field in stim_details.keys():
+                	if field in list(stim_details.keys()):
                 		sweep_metadata[field] = stim_details[field].value
 
-            except KeyError, _:
+            except KeyError as _:
                 sweep_metadata = {}
             
             return sweep_metadata

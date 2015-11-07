@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import allensdk.core.json_utilities as ju
 import logging
 
@@ -45,7 +46,11 @@ class ManifestBuilder(object):
     
     
     def write_json_file(self, path):
-        with open(path, 'wb') as f:
+        if sys.version[0]=='3':
+            code = 'w'
+        else:
+            code = 'wb'
+        with open(path, code) as f:
             f.write(self.write_json_string())
     
     

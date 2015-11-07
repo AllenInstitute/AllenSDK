@@ -41,8 +41,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Allen SDK'
-copyright = u'2015, Allen Institute for Brain Science'
+project = 'Allen SDK'
+copyright = '2015, Allen Institute for Brain Science'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -190,8 +190,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Allen SDK.tex', u'Allen SDK Documentation',
-   u'Allen Institute for Brain Science', 'manual'),
+  ('index', 'Allen SDK.tex', 'Allen SDK Documentation',
+   'Allen Institute for Brain Science', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -220,8 +220,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'Allen SDK', u'Allen SDK Documentation',
-     [u'Allen Institute for Brain Science'], 1)
+    ('index', 'Allen SDK', 'Allen SDK Documentation',
+     ['Allen Institute for Brain Science'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -234,8 +234,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Allen SDK', u'Allen SDK Documentation',
-   u'Allen Institute for Brain Science', 'Allen SDK', 'One line description of project.',
+  ('index', 'Allen SDK', 'Allen SDK Documentation',
+   'Allen Institute for Brain Science', 'Allen SDK', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -252,10 +252,10 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'Allen SDK'
-epub_author = u'Allen Institute for Brain Science'
-epub_publisher = u'Allen Institute for Brain Science'
-epub_copyright = u'2015, Allen Institute for Brain Science'
+epub_title = 'Allen SDK'
+epub_author = 'Allen Institute for Brain Science'
+epub_publisher = 'Allen Institute for Brain Science'
+epub_copyright = '2015, Allen Institute for Brain Science'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

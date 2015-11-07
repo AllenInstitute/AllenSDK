@@ -21,7 +21,7 @@ import copy
 
 import allensdk.core.json_utilities as json_utilities
 
-from glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
+from .glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
 
 class GlifBadResetException( Exception ):
     """ Exception raised when voltage is still above threshold after a reset rule is applied. """

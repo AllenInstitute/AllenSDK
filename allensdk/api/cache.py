@@ -38,8 +38,8 @@ class Cache(object):
         '''
         try:
             os.makedirs(directory)
-        except Exception, e:
-            print e.message
+        except Exception as e:
+            print(e.message)
             
 
     def get_cache_path(self, file_name, manifest_key, *args):
@@ -81,8 +81,13 @@ class Cache(object):
             if not os.path.exists(file_name):
                 self.build_manifest(file_name)
 
-            
-            self.manifest = Manifest(ju.read(file_name)['manifest'], os.path.dirname(file_name))
+            retry = True
+            while retry:
+                try:
+                    self.manifest = Manifest(ju.read(file_name)['manifest'], os.path.dirname(file_name))
+                except KeyError: # Possibly corrupted or empty manifest.
+                    self.build_manifest(file_name)
+                retry = False
         else:
             self.manifest = None
 

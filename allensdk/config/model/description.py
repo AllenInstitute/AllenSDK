@@ -38,7 +38,7 @@ class Description(object):
             What configuration section to read it into if the file does not specify.
         '''
         if section == None:
-            for (section, entries) in data.items():
+            for (section, entries) in list(data.items()):
                 if not section in self.data:
                     self.data[section] = entries
                 else:

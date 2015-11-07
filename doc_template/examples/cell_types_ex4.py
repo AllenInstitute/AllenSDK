@@ -19,4 +19,4 @@ root = morphology.root
 # compartments also keep track of ids of their children
 for child_id in root['children']:
     child = compartments_by_id[child_id]
-    print child['x'], child['y'], child['z'], child['radius']
+    print(child['x'], child['y'], child['z'], child['radius'])

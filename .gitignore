@@ -7,3 +7,5 @@ doc/
 /.settings/
 .project
 .pydevproject
+*.bak
+*.egg

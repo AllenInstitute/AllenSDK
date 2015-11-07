@@ -78,7 +78,7 @@ class MultiFileConfigTests(unittest.TestCase):
         self.assertTrue('section_A' in self.description.data and
                         'section_B' in self.description.data and
                         'section_C' in self.description.data)
-        self.assertTrue(len(self.description.data.keys()) == 3)
+        self.assertTrue(len(list(self.description.data.keys())) == 3)
     
     
     def testSectionA(self):

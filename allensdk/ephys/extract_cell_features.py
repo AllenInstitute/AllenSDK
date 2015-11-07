@@ -22,7 +22,7 @@ import json
 import numpy as np
 from scipy.optimize import curve_fit
 from collections import Counter
-import feature_extractor as fx
+from . import feature_extractor as fx
 import logging
 
 from allensdk.core.nwb_data_set import NwbDataSet

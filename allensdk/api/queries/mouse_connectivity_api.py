@@ -376,7 +376,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
         
         '''
-        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        tuples = [ (k,v) for k,v in kwargs.items() ]
         return self.service_query('mouse_connectivity_injection_structure', parameters=tuples)
 
     
@@ -411,7 +411,7 @@ class MouseConnectivityApi(RmaApi):
         
         '''
 
-        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        tuples = [ (k,v) for k,v in kwargs.items() ]
         return self.service_query('mouse_connectivity_target_spatial', parameters=tuples)
     
     
@@ -441,7 +441,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_injection_coordinate <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate>`_.
         
         '''
-        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        tuples = [ (k,v) for k,v in kwargs.items() ]
         return self.service_query('mouse_connectivity_injection_coordinate', parameters=tuples)
     
     
@@ -475,7 +475,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
         
         '''
-        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        tuples = [ (k,v) for k,v in kwargs.items() ]
         return self.service_query('mouse_connectivity_correlation', parameters=tuples)
 
 
@@ -581,7 +581,7 @@ class MouseConnectivityApi(RmaApi):
         # compute centroid in CCF coordinates
         if sum_density > 0 :
             centroid = np.dot(injection_density_computed,
-                              zip(*injection_voxels)) / sum_density * resolution
+                              list(zip(*injection_voxels))) / sum_density * resolution
         else:
             centroid = None
         

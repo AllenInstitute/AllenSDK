@@ -63,7 +63,7 @@ class OntologiesApiTests(unittest.TestCase):
 
         
     def test_structure_graph_by_name(self):
-        expected = u"http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,graph[structure_graphs.name$in'Mouse Brain Atlas'],rma::options[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
+        expected = "http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,graph[structure_graphs.name$in'Mouse Brain Atlas'],rma::options[num_rows$eq'all'][order$eqstructures.graph_order][count$eqfalse]"
         
         self.oa.json_msg_query = \
             MagicMock(name='json_msg_query')
