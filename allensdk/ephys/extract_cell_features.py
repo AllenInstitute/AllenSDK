@@ -57,15 +57,27 @@ def extract_cell_features(nwb_file, long_square_sweeps, short_square_sweeps, ram
 
     long_square_features = analyze_long_squares(long_square_sweeps, nwb_file)
 
-    if ( ( "hero_sweep_num" in long_square_features ) and ( "input_resistance" in long_square_features ) ):
-        return {
-            'long_squares': long_square_features,
-            'ramps': analyze_ramps(ramp_sweeps, nwb_file),
-            'short_squares': analyze_short_squares(short_square_sweeps, nwb_file)
-            }
-
-    else:
+    if "hero_sweep_num" not in long_square_features:
+        logging.error("could not identify a hero sweep")
         return None
+
+    if "input_resistance" not in long_square_features:
+        logging.error("could not compute input resistance")
+        return None
+
+    short_square_features = analyze_short_squares(short_square_sweeps, nwb_file)
+
+    if short_square_features.get("up_down_ratio",None) is None:
+        logging.error("could not compute short square up/down ratio: most likely short square stimuli did not trigger a spike")
+        return None
+
+    ramp_features = analyze_ramps(ramp_sweeps, nwb_file)
+
+    return {
+        'long_squares': long_square_features,
+        'ramps': ramp_features,
+        'short_squares': short_square_features
+        }
 
 
 def extract_sweep_features(nwb_file, sweep_numbers):
@@ -88,6 +100,7 @@ def extract_sweep_features(nwb_file, sweep_numbers):
     all_sweep_features = {}
 
     for sweep_number in sweep_numbers:
+        logging.debug("extracting features for sweep %d" % sweep_number)
         sweep_features = extract_single_sweep_features(features, nwb_file, sweep_number)
         all_sweep_features[sweep_number] = sweep_features
 
