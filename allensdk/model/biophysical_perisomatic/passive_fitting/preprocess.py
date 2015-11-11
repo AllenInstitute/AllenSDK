@@ -1,4 +1,4 @@
-import allensdk.model.deap_optimize.ephys_utils as ephys_utils
+import allensdk.model.biophysical_perisomatic.ephys_utils as ephys_utils
 import numpy as np
 import pandas as pd
 

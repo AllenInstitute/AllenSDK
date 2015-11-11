@@ -81,7 +81,7 @@ def prepare_stage_2(output_directory):
 
 def run_stage_2(jobs):
     for job in jobs:
-        args = [MPIEXEC, '-np', '240', sys.executable, OPTIMIZE_SCRIPT, str(job['seed']), job['config_path']]
+        args = [MPIEXEC, '-np', '24', sys.executable, OPTIMIZE_SCRIPT, str(job['seed']), job['config_path']]
         print args
         with open(job['log'], "w") as outfile:
             subprocess.call(args, stdout=outfile)
@@ -102,5 +102,15 @@ def main():
     jobs = prepare_stage_2(output_directory)
     run_stage_2(jobs)
 
-if __name__ == "__main__": main()
+if __name__ == "__main__": 
+    import sys
+    
+    #try:
+    #    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.4.0.201510052309/pysrc')
+    #    import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
+    #except:
+    #    print('could not connect to debugger')
+    #    pass
+        
+    main()
 

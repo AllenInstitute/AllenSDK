@@ -9,15 +9,16 @@ import passive_fitting.preprocess as passive_prep
 import allensdk.core.json_utilities as ju
 from allensdk.model.biophys_sim.config import Config
 from allensdk.core.nwb_data_set import NwbDataSet
-
-PASSIVE_FITTING_DIR = os.path.join(os.path.dirname(__file__), "passive_fitting")
+import allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit
 
 def run_passive_fit(description):
     output_directory = description.manifest.get_path('WORKDIR')
     neuronal_model = ju.read(description.manifest.get_path('neuronal_model_data'))
     specimen_data = neuronal_model['specimen']
-    is_spiny = specimen_data['dendrite type'] != 'aspiny'
-    all_sweeps = specimen_data['ephys_sweeps'] # TODO: this should probably just be in the lims input file
+    
+    is_spiny = not any(t['name'] == u'dendrite type - aspiny' for t in specimen_data['specimen_tags'])
+    
+    all_sweeps = specimen_data['ephys_sweeps']
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
 
@@ -42,21 +43,21 @@ def run_passive_fit(description):
 
         fit_1_file = description.manifest.get_path('fit_1_file')
         fit_1_data = subprocess.check_output([ sys.executable,
-                                               '-m', 'allensdk.model.deap_optimize.passive_fitting.neuron_passive_fit', 
+                                               '-m', allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit.__name__, 
                                                str(d['escape_t']),
                                                os.path.realpath(description.manifest.get_path('manifest')) ])
         passive_fit_data['fit_1'] = ju.read(fit_1_file)
 
         fit_2_file = description.manifest.get_path('fit_2_file')
         fit_2_data = subprocess.check_output([ sys.executable,
-                                              '-m', 'allensdk.model.deap_optimize.passive_fitting.neuron_passive_fit2',
+                                              '-m', 'allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit2',
                                                str(d['escape_t']),
                                                os.path.realpath(description.manifest.get_path('manifest')) ])
         passive_fit_data['fit_2'] = ju.read(fit_2_file)
 
         fit_3_file = description.manifest.get_path('fit_3_file')
         fit_3_data = subprocess.check_output([ sys.executable,
-                                              '-m', 'allensdk.model.deap_optimize.passive_fitting.neuron_passive_fit_elec',
+                                              '-m', 'allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit_elec',
                                                str(d['escape_t']),
                                                str(d['bridge_avg']),
                                                str(1.0),
@@ -119,6 +120,13 @@ def main(limit, manifest_path):
 
 if __name__ == "__main__":
     import sys
+    
+    #try:
+    #    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.4.0.201510052309/pysrc')
+    #    import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
+    #except:
+    #    print('could not connect to debugger')
+    #    pass
     
     limit = sys.argv[-2]
     manifest_path = sys.argv[-1]

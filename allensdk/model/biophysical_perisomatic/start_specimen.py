@@ -22,7 +22,7 @@ def start_specimen(specimen_id, output_directory):
     data = lims_utils.get_specimen_info(specimen_id)
     #output_directory = os.path.join(output_dir, 'specimen_%d' % specimen_id)
 
-    is_spiny = data['dendrite type'] != 'aspiny'
+    is_spiny = not any(t['name'] == u'dendrite type - aspiny' for t in specimen_data['specimen_tags'])
 
     data_set = NwbDataSet(data['nwb_path'])
 
@@ -37,4 +37,4 @@ def start_specimen(specimen_id, output_directory):
     stage_2_jobs = fit_stage_2.prepare_stage_2(output_directory)
     fit_stage_2.run_stage_2(stage_2_jobs)
 
-if __name__ == "__main__": main()
+if __name__ == "__main__": start_specimen()

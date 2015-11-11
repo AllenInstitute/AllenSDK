@@ -9,6 +9,7 @@ import subprocess
 from allensdk.ephys.feature_extractor import EphysFeatureExtractor, EphysFeatures
 import allensdk.core.json_utilities as ju
 from allensdk.core.nwb_data_set import NwbDataSet
+import allensdk.model.biophysical_perisomatic.optimize
 
 #from allensdk.core.nwb_data_set import NwbDataSet
 
@@ -16,7 +17,8 @@ SEEDS = [1234, 1001, 4321, 1024, 2048]
 FIT_BASE_DIR = os.path.join(os.path.dirname(__file__), "fits")
 APICAL_DENDRITE_TYPE = 4
 OPTIMIZE_SCRIPT = os.path.abspath(os.path.join(os.path.dirname(__file__), 'optimize.py'))
-MPIEXEC = '/shared/utils.x86_64/hydra/bin/mpiexec'
+#MPIEXEC = '/shared/utils.x86_64/hydra/bin/mpiexec'
+MPIEXEC = 'mpiexec'
 
 def find_core1_trace(data_set, all_sweeps):
     sweep_type = "C1LSCOARSE"
@@ -148,7 +150,7 @@ def prepare_stage_1(description, passive_fit_data):
     output_directory = description.manifest.get_path('WORKDIR')
     neuronal_model_data = ju.read(description.manifest.get_path('neuronal_model_data'))
     specimen_data = neuronal_model_data['specimen']
-    is_spiny = specimen_data['dendrite type'] != 'aspiny'
+    is_spiny = not any(t['name'] == u'dendrite type - aspiny' for t in specimen_data['specimen_tags'])
     all_sweeps = specimen_data['ephys_sweeps']
     data_set = NwbDataSet(description.manifest.get_path('stimulus_path'))
     swc_path = description.manifest.get_path('MORPHOLOGY')
@@ -288,7 +290,14 @@ def prepare_stage_1(description, passive_fit_data):
 
 def run_stage_1(jobs):
     for job in jobs:
-        args = [MPIEXEC, '-np', '240', sys.executable, OPTIMIZE_SCRIPT, str(job['seed']), job['config_path']]
+        args = [MPIEXEC,
+                '-np',
+                '24',
+                sys.executable,
+                '-m',
+                allensdk.model.biophysical_perisomatic.optimize.__name__,
+                str(job['seed']),
+                job['config_path']]
         print args
         with open(job['log'], "w") as outfile:
             subprocess.call(args, stdout=outfile)

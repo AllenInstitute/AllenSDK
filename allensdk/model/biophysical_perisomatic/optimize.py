@@ -1,5 +1,5 @@
 from allensdk.model.biophys_sim.config import Config
-from utils import Utils
+from allensdk.model.biophysical_perisomatic.deap_utils import Utils
 import neuron_parallel
 
 import argparse
@@ -11,6 +11,7 @@ from deap import algorithms
 from deap import base
 from deap import creator
 from deap import tools
+import traceback
 
 BOUND_LOWER, BOUND_UPPER = 0.0, 1.0
 
@@ -77,8 +78,8 @@ def main():
     print "Setting up GA"
     random.seed(seed)
 
-    ngen = 500 
-    mu = 1200
+    ngen = 5 
+    mu = 12
     cxpb = 0.1
     mtpb = 0.35
     eta = 10.0
@@ -157,4 +158,20 @@ def main():
     neuron_parallel.done()
     UTILS.h.quit()
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    import sys
+    
+    #try:
+    #    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.4.0.201510052309/pysrc')
+    #    import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
+    #except:
+    #    print('could not connect to debugger')
+    #    pass
+    
+    try:
+        main()
+        print('success')
+    except Exception as e:
+        print(traceback.format_exc())
+        print('fail;')        
+        exit(1)    
