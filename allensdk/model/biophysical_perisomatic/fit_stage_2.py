@@ -16,9 +16,10 @@ def prepare_stage_2(output_directory):
 
     jobs = []
 
-    best_error = 1e12
-    best_seed = 0
     for fit_type in FIT_TYPES:
+        best_error = 1e12
+        best_seed = 0
+        
         fit_type_dir = os.path.join(output_directory, fit_type)
 
         if not os.path.exists(fit_type_dir):
