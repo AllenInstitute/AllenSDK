@@ -122,7 +122,7 @@ class Report:
 
 
 def main(description_path):
-    fit_types = ["f6", "f9", "f12", "f13"]
+    fit_types = ["f9", "f13"]
     
     reader = DescriptionParser()
     description = reader.read(description_path)
