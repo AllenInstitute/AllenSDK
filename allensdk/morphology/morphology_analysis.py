@@ -1,6 +1,5 @@
 import math
 import numpy as np
-import sys
 import allensdk.core.swc as allen_swc
 
 # The code below is an almost literal c++->python port from the v3d 
@@ -258,8 +257,16 @@ def getParent(n,nt):
     else:
         return nt.obj_hash[nt.obj_list[n].pn]
 
-def angle(a,b,c): 
-    return(math.acos((((b).x-(a).x)*((c).x-(a).x)+((b).y-(a).y)*((c).y-(a).y)+((b).z-(a).z)*((c).z-(a).z))/(dist(a,b)*dist(a,c)))*180.0/math.pi)
+def angle(a,b,c):
+    dist_ab = dist(a, b)
+    dist_ac = dist(a, c)
+    if dist_ab == 0 or dist_ac == 0:        
+        print ("Warning. Parent and child SWC nodes have same coordinates. No bifurcation angle to compute.")
+        print ("Parent at  %f,%f,%f" % (a.x, a.y, a.z))
+        print ("Child 0 at %f,%f,%f" % (b.x, b.y, b.z))
+        print ("Child 1 at %f,%f,%f" % (c.x, c.y, c.z))
+        return float('nan')
+    return(math.acos((((b).x-(a).x)*((c).x-(a).x)+((b).y-(a).y)*((c).y-(a).y)+((b).z-(a).z)*((c).z-(a).z))/(dist_ab*dist_ac))*180.0/math.pi)
 
 Width=0.0
 Height=0.0
@@ -324,16 +331,16 @@ def computeFeature(nt):
     #
     rootidx=0
 
-    neuronNum = len(nt.obj_list)
     childs = []
     for i in range(len(nt.obj_list)):
         par = nt.obj_list[i].pn
         if par >= 0:
             pnum = nt.obj_hash[par]
-            # +1 is necessary to replicate behavior of QVector
-            while len(childs) <= pnum + 1:
+            while len(childs) <= pnum:
                 childs.append([])
             childs[pnum].append(i)
+    while len(childs) < len(nt.obj_list):
+        childs.append([])
 
     #find the root
     rootidx = VOID;
@@ -476,7 +483,6 @@ def computeTree(nt):
     global Pd_ratio, Contraction, Max_Eux, Max_Path, BifA_local, BifA_remote, Soma_surface, Fragmentation
     global childs, rootidx
     lst = nt.obj_list
-    soma = nt.obj_list[rootidx];
 
     pathTotal = np.zeros(len(lst))
     depth = np.zeros(len(lst))

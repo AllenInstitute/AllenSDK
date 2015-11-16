@@ -122,10 +122,10 @@ def get_number_of_branches(nrn):
         dend_pk = apical_pk
         dend_tot = apical_tot
     else:
-        dend_med = np.median(np.concatenate(basal, apical))
-        dend_mean = np.mean(np.concatenate(basal, apical))
-        dend_pk = max(np.concatenate(basal, apical))
-        dend_tot = np.sum(np.concatenate(basal, apical))
+        dend_med = np.median(np.concatenate((basal, apical)))
+        dend_mean = np.mean(np.concatenate((basal, apical)))
+        dend_pk = max(np.concatenate((basal, apical)))
+        dend_tot = np.sum(np.concatenate((basal, apical)))
     #
     med = [ axon_med, basal_med, apical_med, dend_med ]
     mean = [ axon_mean, basal_mean, apical_mean, dend_mean ]
@@ -166,13 +166,13 @@ def update_bounds(bounds, tree):
 # returns [xmin, ymin, zmin, xmax, ymax, zmax]
 def get_bounding_box_by_type(nrn, tp):
     trees = nrn.neurites
-    xmin = 1.0e100
-    ymin = 1.0e100
-    zmin = 1.0e100
-    xmax = -1.0e100
-    ymax = -1.0e100
-    zmax = -1.0e100
     bounds = np.zeros(6)
+    bounds[0] = 1.0e100
+    bounds[1] = 1.0e100
+    bounds[2] = 1.0e100
+    bounds[3] = -1.0e100
+    bounds[4] = -1.0e100
+    bounds[5] = -1.0e100
     for i in range(len(trees)):
         tree = trees[i]
         if tree.value[COLS.TYPE] == tp:
@@ -232,7 +232,7 @@ def get_diameter(nrn):
     elif len(basal) == 0:
         dia_dend = dia_ap
     else:
-        dia_dend = 2.0 * np.mean(np.concatenate(basal, apical))
+        dia_dend = 2.0 * np.mean(np.concatenate((basal, apical)))
     #
     return [ dia_ax, dia_ba, dia_ap, dia_dend ]
 
@@ -400,9 +400,9 @@ def get_trunk_diameter(nrn):
         dend_mean = apical_mean
         dend_pk = apical_pk
     else:
-        dend_med = 2.0 * np.median(np.concatenate(basal, apical))
-        dend_mean = 2.0 * np.mean(np.concatenate(basal, apical))
-        dend_pk = 2.0 * max(np.concatenate(basal, apical))
+        dend_med = 2.0 * np.median(np.concatenate((basal, apical)))
+        dend_mean = 2.0 * np.mean(np.concatenate((basal, apical)))
+        dend_pk = 2.0 * max(np.concatenate((basal, apical)))
     #
     med = [ axon_med, basal_med, apical_med, dend_med ]
     mean = [ axon_mean, basal_mean, apical_mean, dend_mean ]
@@ -450,9 +450,9 @@ def get_trunk_length(nrn):
         dend_mean = apical_mean
         dend_pk = apical_pk
     else:
-        dend_med = 2.0 * np.median(np.concatenate(basal, apical))
-        dend_mean = 2.0 * np.mean(np.concatenate(basal, apical))
-        dend_pk = 2.0 * max(np.concatenate(basal, apical))
+        dend_med = 2.0 * np.median(np.concatenate((basal, apical)))
+        dend_mean = 2.0 * np.mean(np.concatenate((basal, apical)))
+        dend_pk = 2.0 * max(np.concatenate((basal, apical)))
     #
     med = [ axon_med, basal_med, apical_med, dend_med ]
     mean = [ axon_mean, basal_mean, apical_mean, dend_mean ]
@@ -483,7 +483,7 @@ def bifurcation_angle_local(nrn):
     elif len(basal) == 0:
         dend = num_ax
     else:
-        dend = 180.0 * np.mean(np.concatenate(apical, basal)) / math.pi
+        dend = 180.0 * np.mean(np.concatenate((apical, basal))) / math.pi
     return [ num_ax, num_ba, num_ap, dend ]
 
 #########################################################################
@@ -510,7 +510,7 @@ def bifurcation_angle_remote(nrn):
     elif len(basal) == 0:
         dend = num_ax
     else:
-        dend = 180.0 * np.mean(np.concatenate(apical, basal)) / math.pi
+        dend = 180.0 * np.mean(np.concatenate((apical, basal))) / math.pi
     return [ num_ax, num_ba, num_ap, dend ]
 
 #########################################################################
@@ -538,21 +538,22 @@ def make_swc_consecutive(swc_file):
         f = open(swc_file, "r")
         line = f.readline()
         while len(line) > 0:
-            toks = line.split(' ')
-            obj = Node()
-            obj.n = int(toks[0])
-            obj.t = int(toks[1])
-            obj.x = float(toks[2])
-            obj.y = float(toks[3])
-            obj.z = float(toks[4])
-            obj.r = float(toks[5])
-            obj.pn = int(toks[6].strip('\r'))
-            obj_list.append(obj)
-            obj_hash[obj.n] = obj
+            if not line.startswith('#'):
+                toks = line.split(' ')
+                obj = Node()
+                obj.n = int(toks[0])
+                obj.t = int(toks[1])
+                obj.x = float(toks[2])
+                obj.y = float(toks[3])
+                obj.z = float(toks[4])
+                obj.r = float(toks[5])
+                obj.pn = int(toks[6].strip('\r'))
+                obj_list.append(obj)
+                obj_hash[obj.n] = obj
             line = f.readline()
         f.close()
     except IOError:
-        print("Error opening '%d'", fname)
+        print("Error opening '%d'", swc_file)
         sys.exit(1)
     # construct tree
     for j in range(len(obj_list)):
@@ -583,7 +584,7 @@ def make_swc_consecutive(swc_file):
             f.write("%d %d %g %g %g %g %d\n" % (obj.n, obj.t, obj.x, obj.y, obj.z, obj.r, obj.pn))
         f.close()
     except IOError:
-        print("Error creating '%d'", fname)
+        print("Error creating '%d'", swc_file)
         sys.exit(1)
     return tmp_name
 
