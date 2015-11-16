@@ -35,18 +35,32 @@ def find_core1_trace(data_set, all_sweeps):
             continue
         stim_start, stim_dur, stim_amp, start_idx, end_idx = ephys_utils.get_step_stim_characteristics(i, t)
         features.process_instance(s, v, i, t, stim_start, stim_dur, "")
-        sweep_info[s] = {"amp": stim_amp, "n_spikes": features.feature_list[-1].mean["n_spikes"], "quality": is_trace_good_quality(v, i, t)}
-
+        if "ISICV" in features.feature_list[-1].mean.keys():
+            isi_cv = features.feature_list[-1].mean["ISICV"]
+        else:
+            isi_cv = np.nan
+        sweep_info[s] = {"amp": stim_amp, "n_spikes": features.feature_list[-1].mean["n_spikes"], "quality": is_trace_good_quality(v, i, t), "isi_cv": isi_cv }
+    
     rheobase_amp = 1e12
     for s in sweep_info:
         if sweep_info[s]["amp"] < rheobase_amp and sweep_info[s]["n_spikes"] > 0:
             rheobase_amp = sweep_info[s]["amp"]
     sweep_to_use_amp = 1e12
+    sweep_to_use_isi_cv = 1e121    
     sweep_to_use = -1
     for s in sweep_info:
-        if sweep_info[s]["amp"] < sweep_to_use_amp and sweep_info[s]["quality"] and sweep_info[s]["amp"] > 40.0 + rheobase_amp:
-            sweep_to_use = s
-            sweep_to_use_amp = sweep_info[s]["amp"]
+        if sweep_info[s]["quality"] and sweep_info[s]["amp"] >= 39.0 + rheobase_amp and sweep_info[s]["isi_cv"] < 1.2 * sweep_to_use_isi_cv:
+            use_new_sweep = False
+            if sweep_to_use_isi_cv > 0.3 and ((sweep_to_use_isi_cv - sweep_info[s]["isi_cv"]) / sweep_to_use_isi_cv) >= 0.2:
+                use_new_sweep = True
+            elif sweep_info[s]["amp"] < sweep_to_use_amp:
+                use_new_sweep = True
+            if use_new_sweep:
+                print "now using sweep", str(s)
+                sweep_to_use = s
+                sweep_to_use_amp = sweep_info[s]["amp"]
+                sweep_to_use_isi_cv = sweep_info[s]["isi_cv"]
+            
     if sweep_to_use == -1:
         print "Could not find appropriate core 1 sweep!"
         return []
@@ -106,12 +120,27 @@ def is_trace_good_quality(v, i, t):
         return False
 
     time_to_end = stim_start + stim_dur - spikes[-1]["t"]
-    last_isi = spikes[-1]["t"] - spikes[-2]["t"]
+    avg_end_isi = ((spikes[-1]["t"] - spikes[-2]["t"]) + (spikes[-2]["t"] - spikes[-3]["t"])) / 2.0
 
-    if time_to_end > 2 * last_isi:
+    if time_to_end > 2 * avg_end_isi:
+        return False
+
+    isis = np.diff([spk["t"] for spk in spikes])
+    if check_for_pause(isis):
         return False
 
     return True
+
+
+def check_for_pause(isis):
+    if len(isis) <= 2:
+        return False
+    
+    for i, isi in enumerate(isis[1:-1]):
+        if isi > 3 * isis[i + 1 - 1] and isi > 3 * isis[i + 1 + 1]:
+            return True
+    return False
+
 
 def collect_target_features(ft):
     min_std_dict = {
@@ -123,7 +152,7 @@ def collect_target_features(ft):
         'f_slow_ahp': 2.0,
         'f_slow_ahp_time': 0.05,
         'latency': 5.0,
-        'ISICV': 0.01,
+        'ISICV': 0.1,
         'isi_avg': 0.5,
         'doublet': 1.0,
         'time_to_end': 50.0,
@@ -150,6 +179,7 @@ def prepare_stage_1(description, passive_fit_data):
     output_directory = description.manifest.get_path('WORKDIR')
     neuronal_model_data = ju.read(description.manifest.get_path('neuronal_model_data'))
     specimen_data = neuronal_model_data['specimen']
+    specimen_id = neuronal_model_data['specimen_id']
     is_spiny = not any(t['name'] == u'dendrite type - aspiny' for t in specimen_data['specimen_tags'])
     all_sweeps = specimen_data['ephys_sweeps']
     data_set = NwbDataSet(description.manifest.get_path('stimulus_path'))
@@ -197,6 +227,23 @@ def prepare_stage_1(description, passive_fit_data):
             pair["stdev"] = features.summary.stdev[k]
             ft[k] = pair
 
+
+    # Determine highest step to check for depolarization block
+    noise_1_sweeps, _, _ = ephys_utils.get_sweeps_of_type("C1NSSEED_1", all_sweeps)
+    noise_2_sweeps, _, _ = ephys_utils.get_sweeps_of_type("C1NSSEED_2", all_sweeps)
+    step_sweeps, _, _ = ephys_utils.get_sweeps_of_type("C1LSCOARSE", all_sweeps)
+    all_sweeps = noise_1_sweeps + noise_2_sweeps + step_sweeps
+    max_i = 0
+    for s in all_sweeps:
+        try:
+            v, i, t = ephys_utils.get_sweep_v_i_t_from_set(data_set, s['sweep_number'])
+        except:
+            pass
+        if np.max(i) > max_i:
+            max_i = np.max(i)
+    max_i += 10 # add 10 pA
+    max_i *= 1e-3 # convert to nA
+
     # ----------- Generate output and submit jobs ---------------
 
     # Set up directories
@@ -239,7 +286,8 @@ def prepare_stage_1(description, passive_fit_data):
     target_dict["fitting"] = [{
         "junction_potential": jxn,
         "sweeps": sweeps_to_fit,
-        "passive_fit_info": passive_fit_data
+        "passive_fit_info": passive_fit_data,
+        "max_stim_test_na": max_i,        
     }]
 
     target_dict["stimulus"] = [{

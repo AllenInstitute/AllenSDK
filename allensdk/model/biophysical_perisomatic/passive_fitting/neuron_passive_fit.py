@@ -131,10 +131,4 @@ def main():
     json_utilities.write(output_file, data)
 
 if __name__ == "__main__":
-    #try:
-    #    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.4.0.201510052309/pysrc')
-    #    import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
-    #except:
-    #    pass
-      
     main()

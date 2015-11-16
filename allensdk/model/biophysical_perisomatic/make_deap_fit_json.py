@@ -6,6 +6,7 @@ from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.model.biophysical_perisomatic.fits.fit_styles
 from pkg_resources import resource_filename #@UnresolvedImport
 from allensdk.model.biophys_sim.config import DescriptionParser
+from allensdk.model.biophysical_perisomatic import ephys_utils
 
 
 class Report:
@@ -119,6 +120,73 @@ class Report:
         self.all_hof_fits = all_hof_fits
         self.all_hof_fit_errors = all_hof_fit_errors
         self.sorted_indexes = np.argsort(self.all_hof_fit_errors)
+
+    
+    def check_org_selections_for_noise_block(self):
+        h = self.utils.h
+        v_vec, i_vec, t_vec = self.utils.record_values()
+
+        depol_block_threshold = -50.0 # mV
+        block_min_duration = 50.0 # ms
+
+        h.cvode_active(0)
+        noise_i_stim = []
+        for sweep_type in ["C1NSSEED_1", "C1NSSEED_2"]:
+            sweeps = ephys_utils.get_sweeps_of_type(sweep_type, self.specimen_id)
+            _, expt_i, expt_t = ephys_utils.get_sweep_v_i_t_from_set(self.data_set, sweeps[0])
+            noise_i_stim.append(expt_i)
+        dt = (expt_t[1] - expt_t[0]) * 1e3
+        h.dt = dt
+        h.tstop = expt_t[-1] * 1e3
+        self.utils.stim.dur = 1e12
+
+        for ii, org_ind in enumerate(self.sorted_indexes):
+            print "Testing org ", ii, org_ind
+            self.utils.set_actual_parameters(self.all_hof_fits[org_ind, :])
+            depol_okay = True
+            use_ii = -1
+            for expt_i in noise_i_stim:
+                print "Running some noise"
+                i_stim_vec = h.Vector(expt_i * 1e-3)
+                i_stim_vec.play(self.utils.stim._ref_amp, dt)
+                h.finitialize()
+                h.run()
+                i_stim_vec.play_remove()
+
+                v = v_vec.as_numpy()
+                t = t_vec.as_numpy()
+                i = i_vec.as_numpy()
+                stim_start_idx = 0
+                stim_end_idx = len(t) - 1
+                bool_v = np.array(v > depol_block_threshold, dtype=int)
+                up_indexes = np.flatnonzero(np.diff(bool_v) == 1)
+                down_indexes = np.flatnonzero(np.diff(bool_v) == -1)
+                if len(up_indexes) > len(down_indexes):
+                    down_indexes = np.append(down_indexes, [stim_end_idx])
+
+                if len(up_indexes) != 0:
+                    max_depol_duration = np.max([t[down_indexes[k]] - t[up_idx] for k, up_idx in enumerate(up_indexes)])
+                    if max_depol_duration > block_min_duration:
+                        print "Encountered depolarization block"
+                        depol_okay = False
+#                         plt.figure()
+#                         plt.plot(t, v)
+#                         plt.show(block=True)
+                        break
+            if depol_okay:
+                print "Did not detect depolarization block on noise traces"
+                use_ii = ii
+                break
+        h.cvode_active(1)
+        self.utils.set_iclamp_params(self.stim_params["amplitude"], self.stim_params["delay"],
+            self.stim_params["duration"])
+        self.utils.h.tstop = self.stim_params["delay"] * 2.0 + self.stim_params["duration"]
+
+        if use_ii == -1:
+            print "Could not find an organism without depolarization block on noise."
+        else:
+            self.org_selections = [o + use_ii for o in self.org_selections]
+
 
 
 def main(description_path):

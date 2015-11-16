@@ -104,14 +104,5 @@ def main():
     run_stage_2(jobs)
 
 if __name__ == "__main__": 
-    import sys
-    
-    #try:
-    #    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.4.0.201510052309/pysrc')
-    #    import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
-    #except:
-    #    print('could not connect to debugger')
-    #    pass
-        
     main()
 

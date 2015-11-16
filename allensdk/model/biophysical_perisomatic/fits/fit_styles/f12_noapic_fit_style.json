@@ -14,11 +14,11 @@
     { "mechanism": "NaV", "section": "soma", "parameter": "gbar", "min": 0, "max": 15 },
     { "mechanism": "Kd", "section": "soma", "parameter": "gbar", "min": 0, "max": 1.0 },
     { "mechanism": "Kv2like", "section": "soma", "parameter": "gbar", "min": 0, "max": 1.0 },
-    { "mechanism": "Kv3_1", "section": "soma", "parameter": "gbar", "min": 0, "max": 2.0 },
+    { "mechanism": "Kv3_1", "section": "soma", "parameter": "gbar", "min": 0, "max": 3.0 },
     { "mechanism": "K_T", "section": "soma", "parameter": "gbar", "min": 0, "max": 1.0 },
     { "mechanism": "Im_v2", "section": "soma", "parameter": "gbar", "min": 0, "max": 1e-1 },
     { "mechanism": "SK", "section": "soma", "parameter": "gbar", "min": 0, "max": 1.0 },
-    { "mechanism": "Ca_HVA", "section": "soma", "parameter": "gbar", "min": 0, "max": 1e-3 },
+    { "mechanism": "Ca_HVA", "section": "soma", "parameter": "gbar", "min": 0, "max": 1e-3},
     { "mechanism": "Ca_LVA", "section": "soma", "parameter": "gbar", "min": 0, "max": 1e-2 }
   ],
   "addl_params": [

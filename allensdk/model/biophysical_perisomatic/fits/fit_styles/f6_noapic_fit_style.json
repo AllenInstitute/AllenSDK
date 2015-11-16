@@ -51,7 +51,7 @@
       "min": 0
     }, 
     {
-      "max": 2.0, 
+      "max": 3.0, 
       "section": "soma", 
       "parameter": "gbar", 
       "mechanism": "Kv3_1", 

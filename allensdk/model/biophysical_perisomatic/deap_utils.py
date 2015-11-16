@@ -19,6 +19,7 @@ class Utils(HocUtils):
         cell = self.cell
 
         swc = self.h.Import3d_SWC_read()
+        swc.quiet = 1
         swc.input(morph_filename)
         imprt = self.h.Import3d_GUI(swc, 0)
         imprt.instantiate(cell)
@@ -149,11 +150,19 @@ class Utils(HocUtils):
             if prefeat_fx.feature_list[0].mean['n_spikes'] > 0:
                 fail_trace = True
 
+        target_features = self.description.data['target_features']
+        target_features_dict = {f["name"]: {"mean": f["mean"], "stdev": f["stdev"]} for f in target_features}
+
         if not fail_trace:
             fx = EphysFeatureExtractor()
             fx.process_instance("", v, i, t, delay, duration, "")
-            if fx.feature_list[0].mean['n_spikes'] < minimum_num_spikes:
+            if fx.feature_list[0].mean['n_spikes'] < minimum_num_spikes: # Enough spikes?
                 fail_trace = True
+            else:
+                avg_per_spike_peak_error = np.mean([abs(spk["f_peak"] - target_features_dict["f_peak"]["mean"]) for spk in fx.feature_list[0].mean["spikes"]])
+                avg_overall_error = abs(target_features_dict["f_peak"]["mean"] - fx.feature_list[0].mean["f_peak"])
+                if avg_per_spike_peak_error > 3.0 * avg_overall_error: # Weird bi-modality of spikes; 3.0 is arbitrary
+                    fail_trace = True
 
         if fail_trace:
             variance_start = np.flatnonzero(t >= delay - 0.1)[0]
@@ -162,8 +171,6 @@ class Utils(HocUtils):
             error_value = max(max_fail_penalty - trace_variance * variance_factor, min_fail_penalty)
             errs = np.ones(len(feature_names)) * error_value
         else:
-            target_features = self.description.data['target_features']
-            target_features_dict = {f["name"]: {"mean": f["mean"], "stdev": f["stdev"]} for f in target_features}
             errs = []
             for f in feature_names:
                 if f in fx.feature_list[0].mean and fx.feature_list[0].mean[f] is not None:

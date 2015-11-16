@@ -42,26 +42,26 @@ def run_passive_fit(description):
         passive_fit_data["escape_time"] = d['escape_t']
 
         fit_1_file = description.manifest.get_path('fit_1_file')
-        fit_1_data = subprocess.check_output([ sys.executable,
-                                               '-m', allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit.__name__, 
-                                               str(d['escape_t']),
-                                               os.path.realpath(description.manifest.get_path('manifest')) ])
+        fit_1_params = subprocess.check_output([sys.executable,
+                                                '-m', allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit.__name__, 
+                                                str(d['escape_t']),
+                                                os.path.realpath(description.manifest.get_path('manifest')) ])
         passive_fit_data['fit_1'] = ju.read(fit_1_file)
 
         fit_2_file = description.manifest.get_path('fit_2_file')
-        fit_2_data = subprocess.check_output([ sys.executable,
-                                              '-m', 'allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit2',
-                                               str(d['escape_t']),
-                                               os.path.realpath(description.manifest.get_path('manifest')) ])
+        fit_2_params = subprocess.check_output([sys.executable,
+                                                '-m', 'allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit2',
+                                                str(d['escape_t']),
+                                                os.path.realpath(description.manifest.get_path('manifest')) ])
         passive_fit_data['fit_2'] = ju.read(fit_2_file)
 
         fit_3_file = description.manifest.get_path('fit_3_file')
-        fit_3_data = subprocess.check_output([ sys.executable,
-                                              '-m', 'allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit_elec',
-                                               str(d['escape_t']),
-                                               str(d['bridge_avg']),
-                                               str(1.0),
-                                               os.path.realpath(description.manifest.get_path('manifest')) ])
+        fit_3_params = subprocess.check_output([sys.executable,
+                                                '-m', 'allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit_elec',
+                                                str(d['escape_t']),
+                                                str(d['bridge_avg']),
+                                                str(1.0),
+                                                os.path.realpath(description.manifest.get_path('manifest')) ])
         passive_fit_data['fit_3'] = ju.read(fit_3_file)
         
         # Check for potentially problematic outcomes

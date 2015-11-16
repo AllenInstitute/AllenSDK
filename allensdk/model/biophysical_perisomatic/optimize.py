@@ -15,17 +15,68 @@ import traceback
 
 BOUND_LOWER, BOUND_UPPER = 0.0, 1.0
 
-UTILS = None
-T_VEC = None
-V_VEC = None
-I_VEC = None
+utils = None
+h = None
+do_block_check = None
+t_vec = None
+v_ved = None
+i_vec = None
 
 def eval_param_set(params):
-    UTILS.set_normalized_parameters(params)
-    UTILS.h.finitialize()
-    UTILS.h.run()
-    feature_errors = UTILS.calculate_feature_errors(T_VEC.as_numpy(), V_VEC.as_numpy(), I_VEC.as_numpy())
+    utils.set_normalized_parameters(params)
+    h.finitialize()
+    h.run()
+    feature_errors = utils.calculate_feature_errors(t_vec.as_numpy(), v_vec.as_numpy(), i_vec.as_numpy())
+    min_fail_penalty = 75.0
+    if do_block_check and np.sum(feature_errors) < min_fail_penalty * len(feature_errors):
+        if check_for_block():
+            feature_errors = min_fail_penalty * np.ones_like(feature_errors)
+        # Reset the stimulus back
+        utils.set_iclamp_params(stim_params["amplitude"], stim_params["delay"],
+            stim_params["duration"])
+
     return [np.sum(feature_errors)]
+
+def check_for_block():
+    utils.set_iclamp_params(max_stim_amp, stim_params["delay"],
+        stim_params["duration"])
+    h.finitialize()
+    h.run()
+
+    v = v_vec.as_numpy()
+    t = t_vec.as_numpy()
+    stim_start_idx = np.flatnonzero(t >= utils.stim.delay)[0]
+    stim_end_idx = np.flatnonzero(t >= utils.stim.delay + utils.stim.dur)[0]
+    depol_block_threshold = -50.0 # mV
+    block_min_duration = 50.0 # ms
+    long_hyperpol_threshold = -75.0 # mV
+
+    bool_v = np.array(v > depol_block_threshold, dtype=int)
+    up_indexes = np.flatnonzero(np.diff(bool_v) == 1)
+    down_indexes = np.flatnonzero(np.diff(bool_v) == -1)
+    if len(up_indexes) > len(down_indexes):
+        down_indexes = np.append(down_indexes, [stim_end_idx])
+
+    if len(up_indexes) == 0:
+        # if it never gets high enough, that's not a good sign (meaning no spikes)
+        return True
+    else:
+        max_depol_duration = np.max([t[down_indexes[k]] - t[up_idx] for k, up_idx in enumerate(up_indexes)])
+        if max_depol_duration > block_min_duration:
+            return True
+
+    bool_v = np.array(v > long_hyperpol_threshold, dtype=int)
+    up_indexes = np.flatnonzero(np.diff(bool_v) == 1)
+    down_indexes = np.flatnonzero(np.diff(bool_v) == -1)
+    down_indexes = down_indexes[(down_indexes > stim_start_idx) & (down_indexes < stim_end_idx)]
+    if len(down_indexes) != 0:
+        up_indexes = up_indexes[(up_indexes > stim_start_idx) & (up_indexes < stim_end_idx) & (up_indexes > down_indexes[0])]
+        if len(up_indexes) < len(down_indexes):
+            up_indexes = np.append(up_indexes, [stim_end_idx])
+        max_hyperpol_duration = np.max([t[up_indexes[k]] - t[down_idx] for k, down_idx in enumerate(down_indexes)])
+        if max_hyperpol_duration > block_min_duration:
+            return True
+    return False
 
 def uniform(lower, upper, size=None):
     if size is None:
@@ -38,12 +89,11 @@ def best_sum(d):
 
 def initPopulation(pcls, ind_init, popfile):
     popdata = np.loadtxt(popfile)
-    return pcls(ind_init(UTILS.normalize_actual_parameters(line)) for line in popdata.tolist())
+    return pcls(ind_init(utils.normalize_actual_parameters(line)) for line in popdata.tolist())
 
 
 def main():
-    global UTILS, V_VEC, I_VEC, T_VEC
-
+    global utils, h, v_vec, i_vec, t_vec, do_block_check
     parser = argparse.ArgumentParser(description='Start a DEAP testing run.')
     parser.add_argument('seed', type=int)
     parser.add_argument('config_path')
@@ -52,24 +102,33 @@ def main():
 
     # Set up NEURON
     config = Config().load(args.config_path)
+    stim_params = config.data["stimulus"][0]
 
-    UTILS = Utils(config)
+    block_check_fit_types = ["f9", "f13"]
+    do_block_check = False
+    if config.data["fit_name"] in block_check_fit_types:
+        max_stim_amp = config.data["fitting"][0]["max_stim_test_na"]
+        if max_stim_amp > stim_params["amplitude"]:
+            print "Will check for blocks"
+            do_block_check = True
+
+    utils = Utils(config)
+    h = utils.h
 
     manifest = config.manifest
     morphology_path = manifest.get_path('MORPHOLOGY')
-    UTILS.generate_morphology(morphology_path.encode('ascii', 'ignore'))
-    UTILS.load_cell_parameters()
-    UTILS.insert_iclamp()
-    stim_params = config.data["stimulus"][0]
-    UTILS.set_iclamp_params(stim_params["amplitude"], stim_params["delay"],
+    utils.generate_morphology(morphology_path.encode('ascii', 'ignore'))
+    utils.load_cell_parameters()
+    utils.insert_iclamp()
+    utils.set_iclamp_params(stim_params["amplitude"], stim_params["delay"],
         stim_params["duration"])
 
-    UTILS.h.tstop = stim_params["delay"] * 2.0 + stim_params["duration"]
-    UTILS.h.cvode_active(1)
-    UTILS.h.cvode.atolscale("cai", 1e-4)
-    UTILS.h.cvode.maxstep(10)
+    h.tstop = stim_params["delay"] * 2.0 + stim_params["duration"]
+    h.cvode_active(1)
+    h.cvode.atolscale("cai", 1e-4)
+    h.cvode.maxstep(10)
 
-    V_VEC, I_VEC, T_VEC = UTILS.record_values()
+    v_vec, i_vec, t_vec = utils.record_values()
 
     neuron_parallel.runworker()
 
@@ -78,8 +137,8 @@ def main():
     print "Setting up GA"
     random.seed(seed)
 
-    ngen = 5 
-    mu = 12
+    ngen = 500 
+    mu = 1200
     cxpb = 0.1
     mtpb = 0.35
     eta = 10.0
@@ -151,27 +210,12 @@ def main():
 
     fit_dir = config.manifest.get_path("FITDIR")
     seed_dir = fit_dir + "/s{:d}/".format(seed)
-    np.savetxt(seed_dir + "final_pop.txt", np.array(map(UTILS.actual_parameters_from_normalized, pop)))
+    np.savetxt(seed_dir + "final_pop.txt", np.array(map(utils.actual_parameters_from_normalized, pop)))
     np.savetxt(seed_dir + "final_pop_fit.txt", np.array([ind.fitness.values for ind in pop]))
-    np.savetxt(seed_dir + "final_hof.txt", np.array(map(UTILS.actual_parameters_from_normalized, hof)))
+    np.savetxt(seed_dir + "final_hof.txt", np.array(map(utils.actual_parameters_from_normalized, hof)))
     np.savetxt(seed_dir + "final_hof_fit.txt", np.array([ind.fitness.values for ind in hof]))
     neuron_parallel.done()
-    UTILS.h.quit()
+    h.quit()
 
 if __name__ == "__main__":
-    import sys
-    
-    #try:
-    #    sys.path.append(r'/local1/eclipse/plugins/org.python.pydev_4.4.0.201510052309/pysrc')
-    #    import pydevd; pydevd.settrace(stdoutToServer=True, stderrToServer=True)
-    #except:
-    #    print('could not connect to debugger')
-    #    pass
-    
-    try:
-        main()
-        print('success')
-    except Exception as e:
-        print(traceback.format_exc())
-        print('fail;')        
-        exit(1)    
+    main()
