@@ -10,10 +10,11 @@ def validate_swc(swc_file):
         3) immediate children of the soma cannot branch
     """
 
+    soma_id = swc.Morphology.SOMA
     morphology = swc.read_swc(swc_file)
 
     # verify that there is a single root node
-    num_soma_nodes = sum([ (c['parent'] == '-1') for c in morphology.compartment_list ])
+    num_soma_nodes = sum([ (int(c['type']) == soma_id) for c in morphology.compartment_list ])
 
     if num_soma_nodes != 1:
         raise Exception("SWC must have single soma compartment.  Found: %d" % num_soma_nodes)
