@@ -50,6 +50,10 @@ class Report:
         self.data_set = NwbDataSet(nwb_path)
     
     
+    def best_fit_value(self):
+        return self.all_hof_fit_errors[self.sorted_indexes[self.org_selections[0]]]
+    
+    
     def generate_fit_file(self):
         self.gather_from_seeds()
         self.make_fit_json_file()

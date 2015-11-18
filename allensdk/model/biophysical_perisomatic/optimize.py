@@ -11,7 +11,6 @@ from deap import algorithms
 from deap import base
 from deap import creator
 from deap import tools
-import traceback
 
 BOUND_LOWER, BOUND_UPPER = 0.0, 1.0
 
@@ -93,7 +92,7 @@ def initPopulation(pcls, ind_init, popfile):
 
 
 def main():
-    global utils, h, v_vec, i_vec, t_vec, do_block_check
+    global utils, h, v_vec, i_vec, t_vec, do_block_check, max_stim_amp, max_stim_params
     parser = argparse.ArgumentParser(description='Start a DEAP testing run.')
     parser.add_argument('seed', type=int)
     parser.add_argument('config_path')
