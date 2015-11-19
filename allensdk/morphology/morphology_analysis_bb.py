@@ -163,16 +163,20 @@ def update_bounds(bounds, tree):
     bounds[4] = max(bounds[4], mx[1])
     bounds[5] = max(bounds[5], mx[2])
 
+LOW_VAL = -1.0e100
+BIG_VAL = 1.0e100
+
 # returns [xmin, ymin, zmin, xmax, ymax, zmax]
 def get_bounding_box_by_type(nrn, tp):
+    global LOW_VAL, BIG_VAL
     trees = nrn.neurites
     bounds = np.zeros(6)
-    bounds[0] = 1.0e100
-    bounds[1] = 1.0e100
-    bounds[2] = 1.0e100
-    bounds[3] = -1.0e100
-    bounds[4] = -1.0e100
-    bounds[5] = -1.0e100
+    bounds[0] = BIG_VAL
+    bounds[1] = BIG_VAL
+    bounds[2] = BIG_VAL
+    bounds[3] = LOW_VAL
+    bounds[4] = LOW_VAL
+    bounds[5] = LOW_VAL
     for i in range(len(trees)):
         tree = trees[i]
         if tree.value[COLS.TYPE] == tp:
@@ -180,6 +184,7 @@ def get_bounding_box_by_type(nrn, tp):
     return bounds
 
 def get_bounding_box(nrn):
+    global LOW_VAL, BIG_VAL
     ax = get_bounding_box_by_type(nrn, 2)
     ba = get_bounding_box_by_type(nrn, 3)
     ap = get_bounding_box_by_type(nrn, 4)
@@ -190,16 +195,16 @@ def get_bounding_box(nrn):
     dend[3] = max(ba[3], ap[3])
     dend[4] = max(ba[4], ap[4])
     dend[5] = max(ba[5], ap[5])
-    if max(ax) == 0 and min(ax) == 0:
+    if min(ax) == LOW_VAL or max(ax) == BIG_VAL:
         for i in range(len(ax)):
             ax[i] = float('nan')
-    if max(ba) == 0 and min(ba) == 0:
+    if min(ba) == LOW_VAL or max(ba) == BIG_VAL:
         for i in range(len(ba)):
             ba[i] = float('nan')
-    if max(ap) == 0 and min(ap) == 0:
+    if min(ap) == LOW_VAL or max(ap) == BIG_VAL:
         for i in range(len(ap)):
             ap[i] = float('nan')
-    if max(dend) == 0 and min(dend) == 0:
+    if min(dend) == LOW_VAL or max(dend) == BIG_VAL:
         for i in range(len(dend)):
             dend[i] = float('nan')
     return [ ax, ba, ap, dend ]
@@ -233,6 +238,64 @@ def get_diameter(nrn):
         dia_dend = dia_ap
     else:
         dia_dend = 2.0 * np.mean(np.concatenate((basal, apical)))
+    #
+    return [ dia_ax, dia_ba, dia_ap, dia_dend ]
+
+def get_min_diameter(nrn):
+    # axon diameter, or NaN if no axon found
+    axon = [v for v in nrn.iter_segments(mm.segment_radius, TreeType.axon)]
+    if len(axon) > 0:
+        dia_ax = 2.0 * min(axon)
+    else:
+        dia_ax = float('nan')
+    # basal dendrite diameter, or NaN
+    basal = [v for v in nrn.iter_segments(mm.segment_radius, TreeType.basal_dendrite)]
+    if len(basal) > 0:
+        dia_ba = 2.0 * min(basal)
+    else:
+        dia_ba = float('nan')
+    # apical dendrite diameter, or NaN
+    apical = [v for v in nrn.iter_segments(mm.segment_radius, TreeType.apical_dendrite)]
+    if len(apical) > 0:
+        dia_ap = 2.0 * min(apical)
+    else:
+        dia_ap = float('nan')
+    # average dendrite diameter, or NaN if no dendrite
+    if len(apical) == 0:
+        dia_dend = dia_ba
+    elif len(basal) == 0:
+        dia_dend = dia_ap
+    else:
+        dia_dend = 2.0 * min(np.concatenate((basal, apical)))
+    #
+    return [ dia_ax, dia_ba, dia_ap, dia_dend ]
+
+def get_max_diameter(nrn):
+    # axon diameter, or NaN if no axon found
+    axon = [v for v in nrn.iter_segments(mm.segment_radius, TreeType.axon)]
+    if len(axon) > 0:
+        dia_ax = 2.0 * max(axon)
+    else:
+        dia_ax = float('nan')
+    # basal dendrite diameter, or NaN
+    basal = [v for v in nrn.iter_segments(mm.segment_radius, TreeType.basal_dendrite)]
+    if len(basal) > 0:
+        dia_ba = 2.0 * max(basal)
+    else:
+        dia_ba = float('nan')
+    # apical dendrite diameter, or NaN
+    apical = [v for v in nrn.iter_segments(mm.segment_radius, TreeType.apical_dendrite)]
+    if len(apical) > 0:
+        dia_ap = 2.0 * max(apical)
+    else:
+        dia_ap = float('nan')
+    # average dendrite diameter, or NaN if no dendrite
+    if len(apical) == 0:
+        dia_dend = dia_ba
+    elif len(basal) == 0:
+        dia_dend = dia_ap
+    else:
+        dia_dend = 2.0 * max(np.concatenate((basal, apical)))
     #
     return [ dia_ax, dia_ba, dia_ap, dia_dend ]
 
@@ -473,8 +536,8 @@ def bifurcation_angle_local(nrn):
     else:
         num_ba = float('nan')
     apical = nrn.get_local_bifurcation_angles(TreeType.apical_dendrite)
-    if len(basal) > 0:
-        num_ap = 180.0 * np.mean(basal) / math.pi
+    if len(apical) > 0:
+        num_ap = 180.0 * np.mean(apical) / math.pi
     else:
         num_ap = float('nan')
     # merge basal and apical
@@ -500,8 +563,8 @@ def bifurcation_angle_remote(nrn):
     else:
         num_ba = float('nan')
     apical = nrn.get_remote_bifurcation_angles(TreeType.apical_dendrite)
-    if len(basal) > 0:
-        num_ap = 180.0 * np.mean(basal) / math.pi
+    if len(apical) > 0:
+        num_ap = 180.0 * np.mean(apical) / math.pi
     else:
         num_ap = float('nan')
     # merge basal and apical
@@ -639,6 +702,8 @@ def compute_features(swc_file):
     record(feat, desc, "overall_%s_depth", depth)
     #
     record(feat, desc, "mean_%s_diameter", get_diameter(nrn))
+    record(feat, desc, "min_%s_diameter", get_min_diameter(nrn))
+    record(feat, desc, "max_%s_diameter", get_max_diameter(nrn))
     record(feat, desc, "total_%s_length", get_length(nrn))
     record(feat, desc, "total_%s_surface", get_surface(nrn))
     record(feat, desc, "total_%s_volume", get_volume(nrn))
