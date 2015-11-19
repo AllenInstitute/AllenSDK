@@ -110,7 +110,7 @@ class Report:
                                                     self.fit_type,
                                                     s)
             if not os.path.exists(final_hof_fit_path):
-                print "Could not find output file for seed {:d}".format(s)
+                print "Could not find output file %s for seed %d" % (final_hof_fit_path, s)
                 continue
             hof_fit_errors = np.loadtxt(final_hof_fit_path)
             hof_fits = np.loadtxt(final_hof_path)

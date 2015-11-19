@@ -86,10 +86,6 @@ def run_stage_2(jobs):
         print args
         with open(job['log'], "w") as outfile:
             subprocess.call(args, stdout=outfile)
-        #subprocess.call(["/data/mat/nathang/deap_optimize/qsub_run.sh", "10", "24",
-        #                 "{:s}_{:s}_{:s}_{:d}".format("eaf", cp[0], specimen_id, s), str(s), cp[1]],
-        #                cwd="/data/mat/nathang/deap_optimize")
-
 
 
 def main():

@@ -1,3 +1,4 @@
+from mpi4py import MPI #@UnusedImport
 from allensdk.model.biophys_sim.config import Config
 from allensdk.model.biophysical_perisomatic.deap_utils import Utils
 import neuron_parallel
