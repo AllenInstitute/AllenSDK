@@ -2,6 +2,7 @@ from mpi4py import MPI #@UnusedImport
 from allensdk.model.biophys_sim.config import Config
 from allensdk.model.biophysical_perisomatic.deap_utils import Utils
 import neuron_parallel
+import logging
 
 import argparse
 
@@ -21,6 +22,8 @@ do_block_check = None
 t_vec = None
 v_ved = None
 i_vec = None
+stim_params = None
+max_stim_amp = None
 
 def eval_param_set(params):
     utils.set_normalized_parameters(params)
@@ -91,9 +94,19 @@ def initPopulation(pcls, ind_init, popfile):
     popdata = np.loadtxt(popfile)
     return pcls(ind_init(utils.normalize_actual_parameters(line)) for line in popdata.tolist())
 
+def config_logging():
+    Config._log.setLevel(logging.DEBUG)
+    fh = logging.FileHandler('optimize.log')
+    Config._log.addHandler(fh)
+    Config._log.debug("Creating log file")
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+
 
 def main():
-    global utils, h, v_vec, i_vec, t_vec, do_block_check, max_stim_amp, max_stim_params
+    config_logging()
+    
+    global utils, h, v_vec, i_vec, t_vec, do_block_check, max_stim_amp, stim_params
     parser = argparse.ArgumentParser(description='Start a DEAP testing run.')
     parser.add_argument('seed', type=int)
     parser.add_argument('config_path')
@@ -109,6 +122,7 @@ def main():
     if config.data["fit_name"] in block_check_fit_types:
         max_stim_amp = config.data["fitting"][0]["max_stim_test_na"]
         if max_stim_amp > stim_params["amplitude"]:
+            Config._log.debug("Will check for blocks")
             print "Will check for blocks"
             do_block_check = True
 
@@ -134,11 +148,12 @@ def main():
 
     # Set up genetic algorithm
 
+    Config._log.debug("Setting up genetic algorithm")
     print "Setting up GA"
     random.seed(seed)
 
-    ngen = 500 
-    mu = 1200
+    ngen = 5 
+    mu = 12
     cxpb = 0.1
     mtpb = 0.35
     eta = 10.0
@@ -172,6 +187,7 @@ def main():
     logbook.header = "gen", "nevals", "min", "max", "best"
 
     if "STARTPOP" in manifest.path_info:
+        Config._log.debug("Using a pre-defined starting population")
         print "Using a pre-defined starting population"
         start_pop_path = config.manifest.get_path("STARTPOP")
         toolbox.register("population_start", initPopulation, list, creator.Individual)
@@ -190,6 +206,7 @@ def main():
 
     record = stats.compile(pop)
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
+    Config._log.debug(logbook.stream)
     print logbook.stream
 
     for gen in range(1, ngen + 1):
@@ -206,6 +223,7 @@ def main():
 
         record = stats.compile(pop)
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
+        Config._log.debug(logbook.stream)
         print logbook.stream
 
     fit_dir = config.manifest.get_path("FITDIR")

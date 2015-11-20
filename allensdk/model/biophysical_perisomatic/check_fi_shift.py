@@ -2,12 +2,10 @@
 import numpy as np
 from collections import Counter
 import argparse
-
 from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.ephys.feature_extractor import EphysFeatureExtractor
-
+from allensdk.model.biophys_sim.config import Config
 import ephys_utils
-#import lims_utils
 
 def calculate_fi_curves(data_set, sweeps):
 
@@ -101,6 +99,7 @@ def main():
     sweeps = specimen['sweeps']
 
     x_shift, n = estimate_fi_shift(data_set, sweeps)
+    Config._log.debug("{:d}, {:f}, {:d}".format(args.specimen_id, x_shift, n))
     print "{:d}, {:f}, {:d}".format(args.specimen_id, x_shift, n)
 
 if __name__ == "__main__": main()
