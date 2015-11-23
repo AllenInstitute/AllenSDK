@@ -125,28 +125,20 @@ class NwbDataSet(object):
                 sweep_length = swp['stimulus']['count'].value
             
             if stimulus is not None:
+                # if the data is shorter than the sweep, pad it with zeros
                 missing_data = sweep_length - len(stimulus)
-
-                if missing_data != 0:
-                    # if the data is longer or shorter than the sweep, reinitialize the array
-                    del swp['stimulus']['timeseries']['data']
-                    swp['stimulus']['timeseries']['data'] = stimulus
-                    swp['stimulus']['count'] = len(stimulus)
-                else:
-                    swp['stimulus']['timeseries']['data'][...] = stimulus
+                if missing_data > 0:
+                    stimulus = np.append(stimulus, np.zeros(missing_data))
+                
+                swp['stimulus']['timeseries']['data'][...] = stimulus
             
             if response is not None:
                 # if the data is shorter than the sweep, pad it with zeros
                 missing_data = sweep_length - len(response)
-
-                if missing_data != 0:
-                    # if the data is longer or shorter than the sweep, reinitialize the array
-                    del swp['response']['timeseries']['data']
-                    swp['response']['timeseries']['data'] = response
-                    swp['response']['count'] = len(response)
-                else:
-                    swp['response']['timeseries']['data'][...] = response
-
+                if missing_data > 0:
+                    response = np.append(response, np.zeros(missing_data))
+                
+                swp['response']['timeseries']['data'][...] = response
     
 
     def get_spike_times(self, sweep_number, key=None):
@@ -255,3 +247,39 @@ class NwbDataSet(object):
             for epoch in epochs:
                 if epoch in f['epochs']:
                     f['epochs'][epoch]['response']['timeseries']['data'][...] = fill_value
+
+    def get_sweep_metadata(self, sweep_number):
+        """ Retrieve the sweep level metadata associated with each sweep.
+        Includes information on stimulus parameters like its name and amplitude 
+        as well as recording quality metadata, like access resistance and 
+        seal quality.
+        Parameters
+        ----------
+        sweep_number: int
+        Returns
+        -------
+        dict
+            A dictionary with 'aibs_stimulus_amplitude_pa', 'aibs_stimulus_name', 
+            'gain', 'initial_access_resistance', 'seal' elements.  These specific
+            fields are ones encoded in the original AIBS in vitro .nwb files.
+        """
+        with h5py.File(self.file_name,'r') as f:
+            
+            sweep_metadata = {}
+
+            # the sweep level metadata is stored in stimulus/presentation/Sweep_XX in the .nwb file
+
+            # indicates which metadata fields to return
+            metadata_fields = ['aibs_stimulus_amplitude_pa', 'aibs_stimulus_name', 
+                               'gain', 'initial_access_resistance', 'seal']
+            try:
+                stim_details = f['stimulus']['presentation']['Sweep_%d' % sweep_number]
+                for field in metadata_fields:
+                	# check if sweep contains the specific metadata field
+                	if field in stim_details.keys():
+                		sweep_metadata[field] = stim_details[field].value
+
+            except KeyError, _:
+                sweep_metadata = {}
+            
+            return sweep_metadata
