@@ -1,9 +1,19 @@
-from neuron import h
+# in place of global from neuron import h
+
+def get_h():   
+    if get_h.h == None:
+        from neuron import h
+        get_h.h = h
+    return get_h.h
+    
+get_h.h = None
+
 import sys, os
 from cStringIO import StringIO
 from output_grabber import OutputGrabber
 
 def load_morphology(filename):
+    h = get_h()
     swc = h.Import3d_SWC_read()
     swc.input(str(filename))
     imprt = h.Import3d_GUI(swc, 0)

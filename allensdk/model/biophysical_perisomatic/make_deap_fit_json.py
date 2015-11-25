@@ -1,53 +1,51 @@
-import argparse
 import os.path
 import numpy as np
 import json
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.model.biophysical_perisomatic.fits.fit_styles
 from pkg_resources import resource_filename #@UnresolvedImport
-from allensdk.model.biophys_sim.config import DescriptionParser
+import allensdk.core.json_utilities as ju
+from allensdk.model.biophys_sim.config import Config
 from allensdk.model.biophysical_perisomatic import ephys_utils
+from allensdk.model.biophysical_perisomatic.deap_utils import Utils
 
 
 class Report:
 
     def __init__(self,
-                 description,
-                 fit_type,
-                 manifest_file_name='optimize_manifest_local.json'):
-        self.description = description
-        self.manifest = self.description.manifest
-        self.specimen_id = str(description.data['runs'][0]['specimen_id'])
+                 top_level_description,
+                 fit_type):
+        self.utils = None
+        self.top_level_description = top_level_description
+        self.description = None
+        self.manifest = None
+        self.specimen_id = str(self.top_level_description.data['runs'][0]['specimen_id'])
         self.fit_type = fit_type
-        self.fit_directory = self.manifest.get_path('WORKDIR')
-        self.target_path = self.manifest.get_path('target_path')
-    
-        with open(self.target_path, "r") as f:
-            self.target = json.load(f)  # TODO: replace this w/ json utils
+        self.target_path = self.top_level_description.manifest.get_path('target_path')
+        self.target = ju.read(self.target_path)
     
         self.seeds = [1234, 1001, 4321, 1024, 2048]
         self.org_selections = [0, 100, 500, 1000] # Picks thek best, 100th best, etc. organisms as examples
         self.trace_colors = ["#1b9e77", "#d95f02", "#7570b3", "#e7298a"]
         
-        self.config_path = self.manifest.get_path('fit_config_json',
-                                                   self.fit_type)
-         
-        with open(self.config_path, "r") as f:
-            self.fit_config = json.load(f)     # TODO: replace this w/ json utils
+        self.config_path = self.top_level_description.manifest.get_path('fit_config_json',
+                                                                        self.fit_type)
+        self.fit_config = Config().load(self.config_path)
         
-        fit_style_json = os.path.basename(self.fit_config["biophys"][0]["model_file"][-1])
+        fit_style_path = self.fit_config.data["biophys"][0]["model_file"][-1]
         
-        fit_style_path = \
-            resource_filename(allensdk.model.biophysical_perisomatic.fits.fit_styles.__name__,
-                              fit_style_json)
-        
-        with open(fit_style_path, "r") as f:
-            self.fit_style_info = json.load(f)
+        self.fit_style_info = ju.read(fit_style_path)
+
         self.used_features = self.fit_style_info["features"]
         self.all_params = self.fit_style_info["channels"] + self.fit_style_info["addl_params"]
         
-        nwb_path = self.manifest.get_path('output')
+        nwb_path = self.top_level_description.manifest.get_path('stimulus_path')        
         self.data_set = NwbDataSet(nwb_path)
+        
+        self.neuronal_model_data = ju.read(self.top_level_description.manifest.get_path('neuronal_model_data'))
+        self.specimen_data = self.neuronal_model_data['specimen']
+        self.all_sweeps = self.specimen_data['ephys_sweeps']
+        
     
     
     def best_fit_value(self):
@@ -56,6 +54,8 @@ class Report:
     
     def generate_fit_file(self):
         self.gather_from_seeds()
+        self.setup_model()
+        self.check_org_selections_for_noise_block()
         self.make_fit_json_file()
     
     
@@ -94,21 +94,41 @@ class Report:
                                         })
         
         # write out file
-        with open(self.manifest.get_path('output_fit_file',
-                                         self.specimen_id,
-                                         self.fit_type), "w") as f:
+        with open(self.top_level_description.manifest.get_path('output_fit_file',
+                                                               self.specimen_id,
+                                                               self.fit_type), "w") as f:
             json.dump(json_data, f, indent=2)
-
-
+    
+            
+    def setup_model(self):
+        morphology_path = os.path.realpath(self.top_level_description.manifest.get_path('MORPHOLOGY'))
+        cwd = os.path.realpath(os.curdir)
+        self.utils = Utils(self.fit_config)
+        h = self.utils.h
+        self.utils.generate_morphology(morphology_path)
+        self.utils.load_cell_parameters()
+        self.utils.insert_iclamp()
+        self.stim_params = self.fit_config.data["stimulus"][0]
+        self.utils.set_iclamp_params(self.stim_params["amplitude"],
+                                     self.stim_params["delay"],
+                                     self.stim_params["duration"])
+        h.tstop = self.stim_params["delay"] * 2.0 + self.stim_params["duration"]
+        h.cvode_active(1)
+        h.cvode.atolscale("cai", 1e-4)
+        h.cvode.maxstep(10)
+    
+    
     def gather_from_seeds(self):
         first_created = False
         for s in self.seeds:
-            final_hof_fit_path = self.manifest.get_path('final_hof_fit',
-                                                        self.fit_type,
-                                                        s)
-            final_hof_path = self.manifest.get_path('final_hof',
-                                                    self.fit_type,
-                                                    s)
+            final_hof_fit_path = \
+                self.top_level_description.manifest.get_path('final_hof_fit',
+                                                             self.fit_type,
+                                                             s)
+            final_hof_path = \
+                self.top_level_description.manifest.get_path('final_hof',
+                                                             self.fit_type,
+                                                             s)
             if not os.path.exists(final_hof_fit_path):
                 print "Could not find output file %s for seed %d" % (final_hof_fit_path, s)
                 continue
@@ -136,8 +156,8 @@ class Report:
         h.cvode_active(0)
         noise_i_stim = []
         for sweep_type in ["C1NSSEED_1", "C1NSSEED_2"]:
-            sweeps = ephys_utils.get_sweeps_of_type(sweep_type, self.specimen_id)
-            _, expt_i, expt_t = ephys_utils.get_sweep_v_i_t_from_set(self.data_set, sweeps[0])
+            sweeps, sweep_numbers, statuses = ephys_utils.get_sweeps_of_type(sweep_type, self.all_sweeps)
+            _, expt_i, expt_t = ephys_utils.get_sweep_v_i_t_from_set(self.data_set, sweep_numbers[0])
             noise_i_stim.append(expt_i)
         dt = (expt_t[1] - expt_t[0]) * 1e3
         h.dt = dt
@@ -173,9 +193,6 @@ class Report:
                     if max_depol_duration > block_min_duration:
                         print "Encountered depolarization block"
                         depol_okay = False
-#                         plt.figure()
-#                         plt.plot(t, v)
-#                         plt.show(block=True)
                         break
             if depol_okay:
                 print "Did not detect depolarization block on noise traces"
@@ -190,31 +207,3 @@ class Report:
             print "Could not find an organism without depolarization block on noise."
         else:
             self.org_selections = [o + use_ii for o in self.org_selections]
-
-
-
-def main(description_path):
-    fit_types = ["f9", "f13"]
-    
-    reader = DescriptionParser()
-    description = reader.read(description_path)
-    
-    for fit_type in fit_types:
-        fit_type_dir = description.manifest.get_path('fit_type_path', fit_type)
-        
-        if os.path.exists(fit_type_dir):
-            report = Report(description,
-                            fit_type)
-            
-            report.generate_fit_file()
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='generate report on DEAP optimization run')
-    parser.add_argument('manifest_json')
-    args = parser.parse_args()
-#    sns.set_style("white")
-
-    main(args.manifest_json)
-
-

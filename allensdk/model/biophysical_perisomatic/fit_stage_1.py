@@ -210,7 +210,7 @@ def prepare_stage_1(description, passive_fit_data):
             print "Not enough good Core 2 traces; using Core 1"
             sweeps_to_fit = find_core1_trace(data_set, all_sweeps)
 
-    Config._log.debug("will use sweeps: ", sweeps_to_fit)
+    Config._log.debug("will use sweeps: " + str(sweeps_to_fit))
     print "will use sweeps: ", sweeps_to_fit
 
     jxn = -14.0
@@ -345,7 +345,7 @@ def run_stage_1(jobs):
     for job in jobs:
         args = [MPIEXEC,
                 '-np',
-                '24',
+                '240',
                 sys.executable,
                 '-m',
                 allensdk.model.biophysical_perisomatic.optimize.__name__,

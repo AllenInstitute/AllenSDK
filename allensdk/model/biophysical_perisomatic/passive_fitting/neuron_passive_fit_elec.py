@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
-from neuron import h
+import allensdk.model.biophysical_perisomatic.passive_fitting.neuron_utils as neuron_utils
 import numpy as np
 import os
-import neuron_utils
-from neuron_utils import read_neuron_fit_stdout
-
 import allensdk.core.json_utilities as json_utilities
 from allensdk.model.biophys_sim.config import Config
 
@@ -13,13 +10,14 @@ from allensdk.model.biophys_sim.config import Config
 
 BASEDIR = os.path.dirname(__file__)
 
-@read_neuron_fit_stdout
+@neuron_utils.read_neuron_fit_stdout
 def neuron_passive_fit_elec(up_data,
                             down_data,
                             swc_path,
                             limit,
                             bridge,
                             elec_cap):
+    h = neuron_utils.get_h()
     h.load_file("stdgui.hoc")
     h.load_file("import3d.hoc")
     neuron_utils.load_morphology(swc_path)

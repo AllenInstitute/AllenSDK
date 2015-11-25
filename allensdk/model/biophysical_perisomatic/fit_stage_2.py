@@ -84,7 +84,7 @@ def prepare_stage_2(output_directory):
 
 def run_stage_2(jobs):
     for job in jobs:
-        args = [MPIEXEC, '-np', '24', sys.executable, OPTIMIZE_SCRIPT, str(job['seed']), job['config_path']]
+        args = [MPIEXEC, '-np', '240', sys.executable, OPTIMIZE_SCRIPT, str(job['seed']), job['config_path']]
         Config._log.debug(args)
         print args
         with open(job['log'], "w") as outfile:

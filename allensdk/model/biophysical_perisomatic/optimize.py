@@ -2,7 +2,7 @@ from mpi4py import MPI #@UnusedImport
 from allensdk.model.biophys_sim.config import Config
 from allensdk.model.biophysical_perisomatic.deap_utils import Utils
 import neuron_parallel
-import logging
+import logging, os
 
 import argparse
 
@@ -13,6 +13,7 @@ from deap import algorithms
 from deap import base
 from deap import creator
 from deap import tools
+from allensdk.model.biophysical_perisomatic.passive_fitting import neuron_utils
 
 BOUND_LOWER, BOUND_UPPER = 0.0, 1.0
 
@@ -24,6 +25,8 @@ v_ved = None
 i_vec = None
 stim_params = None
 max_stim_amp = None
+config = None
+seed = None
 
 def eval_param_set(params):
     utils.set_normalized_parameters(params)
@@ -94,19 +97,17 @@ def initPopulation(pcls, ind_init, popfile):
     popdata = np.loadtxt(popfile)
     return pcls(ind_init(utils.normalize_actual_parameters(line)) for line in popdata.tolist())
 
-def config_logging():
-    Config._log.setLevel(logging.DEBUG)
-    fh = logging.FileHandler('optimize.log')
+def config_logging(file_name='optimize.log'):
+    Config._log.setLevel(logging.ERROR)
+    fh = logging.FileHandler(file_name)
     Config._log.addHandler(fh)
-    Config._log.debug("Creating log file")
+    Config._log.debug("Creating log file %s" % (file_name))
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
 
 
 def main():
-    config_logging()
-    
-    global utils, h, v_vec, i_vec, t_vec, do_block_check, max_stim_amp, stim_params
+    global utils, h, v_vec, i_vec, t_vec, do_block_check, max_stim_amp, stim_params, config, seed
     parser = argparse.ArgumentParser(description='Start a DEAP testing run.')
     parser.add_argument('seed', type=int)
     parser.add_argument('config_path')
@@ -152,8 +153,8 @@ def main():
     print "Setting up GA"
     random.seed(seed)
 
-    ngen = 5 
-    mu = 12
+    ngen = 500 
+    mu = 1200
     cxpb = 0.1
     mtpb = 0.35
     eta = 10.0
@@ -206,7 +207,7 @@ def main():
 
     record = stats.compile(pop)
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
-    Config._log.debug(logbook.stream)
+    #Config._log.debug(logbook.stream)
     print logbook.stream
 
     for gen in range(1, ngen + 1):
@@ -223,7 +224,7 @@ def main():
 
         record = stats.compile(pop)
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
-        Config._log.debug(logbook.stream)
+        #Config._log.debug(logbook.stream)
         print logbook.stream
 
     fit_dir = config.manifest.get_path("FITDIR")
