@@ -19,7 +19,7 @@ OPTIMIZE_SCRIPT = os.path.abspath(os.path.join(os.path.dirname(__file__), 'optim
 #MPIEXEC = '/shared/utils.x86_64/hydra/bin/mpiexec'
 MPIEXEC = 'mpiexec'
 
-def find_core1_trace(data_set, all_sweeps):
+def find_core1_trace(sweeps_to_fit, data_set, all_sweeps):
     sweep_type = "C1LSCOARSE"
     _, sweeps, statuses = ephys_utils.get_sweeps_of_type(sweep_type, all_sweeps)
     sweep_status = dict(zip(sweeps, statuses))
@@ -68,7 +68,7 @@ def find_core1_trace(data_set, all_sweeps):
     else:
         return [sweep_to_use]
 
-def find_core2_trace(data_set, all_sweeps):
+def find_core2_trace(sweeps_to_fit, data_set, all_sweeps):
     sweep_type = "C2SQRHELNG"
     _, sweeps, statuses = ephys_utils.get_sweeps_of_type(sweep_type, all_sweeps)
     sweep_status = dict(zip(sweeps, statuses))
@@ -90,7 +90,7 @@ def find_core2_trace(data_set, all_sweeps):
     common_amps = core2_amp_counter.most_common(3)
     best_amp = 0
     best_n_good = -1
-    for amp, count in common_amps:
+    for amp, _ in common_amps:
         n_good = 0
         for k in core2_amps:
             if core2_amps[k] == amp and sweep_status[k][-6:] == "passed":
@@ -103,11 +103,12 @@ def find_core2_trace(data_set, all_sweeps):
         elif n_good == best_n_good and amp < best_amp:
             best_amp = amp
     if best_n_good <= 1:
-        return []
+        pass
     else:
         for k in core2_amps:
             if core2_amps[k] == best_amp and sweep_status[k][-6:] == "passed":
                 sweeps_to_fit.append(k)
+
 
 def is_trace_good_quality(v, i, t):
     stim_start, stim_dur, stim_amp, start_idx, end_idx = ephys_utils.get_step_stim_characteristics(i, t)
@@ -201,14 +202,14 @@ def prepare_stage_1(description, passive_fit_data):
     sweeps_to_fit = []
     if abs(fi_shift) > fi_shift_threshold:
         print "FI curve shifted; using Core 1"
-        sweeps_to_fit = find_core1_trace(data_set, all_sweeps)
+        find_core1_trace(sweeps_to_fit, data_set, all_sweeps)
     else:
-        sweeps_to_fit = find_core2_trace(data_set, all_sweeps)
+        find_core2_trace(sweeps_to_fit, data_set, all_sweeps)
 
         if len(sweeps_to_fit) == 0:
-            Config._log.info("Not enough good Core 2 traces; using Core 1")
-            print "Not enough good Core 2 traces; using Core 1"
-            sweeps_to_fit = find_core1_trace(data_set, all_sweeps)
+            Config._log.info("No good Core 2 traces; using Core 1")
+            print "No good Core 2 traces; using Core 1"
+            find_core1_trace(sweeps_to_fit, data_set, all_sweeps)
 
     Config._log.debug("will use sweeps: " + str(sweeps_to_fit))
     print "will use sweeps: ", sweeps_to_fit
@@ -322,9 +323,9 @@ def prepare_stage_1(description, passive_fit_data):
 
         config["biophys"][0]["model_file"] = [ target_file, config_path]
         if has_apic:
-            fit_style_file = os.path.join(FIT_BASE_DIR, 'fit_styles', '%s_fit_style.json' + fit_type)
+            fit_style_file = os.path.join(FIT_BASE_DIR, 'fit_styles', '%s_fit_style.json' % (fit_type))
         else:
-            fit_style_file = os.path.join(FIT_BASE_DIR, "fit_styles", "%s_noapic_fit_style.json" % fit_type)
+            fit_style_file = os.path.join(FIT_BASE_DIR, "fit_styles", "%s_noapic_fit_style.json" % (fit_type))
 
         config["biophys"][0]["model_file"].append(fit_style_file)
         config["manifest"].append({"type": "dir", "spec": fit_type_dir, "key": "FITDIR"})
