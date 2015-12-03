@@ -19,7 +19,7 @@ OPTIMIZE_SCRIPT = os.path.abspath(os.path.join(os.path.dirname(__file__), 'optim
 #MPIEXEC = '/shared/utils.x86_64/hydra/bin/mpiexec'
 MPIEXEC = 'mpiexec'
 
-def find_core1_trace(sweeps_to_fit, data_set, all_sweeps):
+def find_core1_trace(data_set, all_sweeps):
     sweep_type = "C1LSCOARSE"
     _, sweeps, statuses = ephys_utils.get_sweeps_of_type(sweep_type, all_sweeps)
     sweep_status = dict(zip(sweeps, statuses))
@@ -68,7 +68,7 @@ def find_core1_trace(sweeps_to_fit, data_set, all_sweeps):
     else:
         return [sweep_to_use]
 
-def find_core2_trace(sweeps_to_fit, data_set, all_sweeps):
+def find_core2_trace(data_set, all_sweeps):
     sweep_type = "C2SQRHELNG"
     _, sweeps, statuses = ephys_utils.get_sweeps_of_type(sweep_type, all_sweeps)
     sweep_status = dict(zip(sweeps, statuses))
@@ -103,12 +103,13 @@ def find_core2_trace(sweeps_to_fit, data_set, all_sweeps):
         elif n_good == best_n_good and amp < best_amp:
             best_amp = amp
     if best_n_good <= 1:
-        pass
+        return []
     else:
+        sweeps_to_fit = []
         for k in core2_amps:
             if core2_amps[k] == best_amp and sweep_status[k][-6:] == "passed":
                 sweeps_to_fit.append(k)
-
+        return sweeps_to_fit
 
 def is_trace_good_quality(v, i, t):
     stim_start, stim_dur, stim_amp, start_idx, end_idx = ephys_utils.get_step_stim_characteristics(i, t)
@@ -194,22 +195,20 @@ def prepare_stage_1(description, passive_fit_data):
     cm1 = passive_fit_data['cm1']
     cm2 = passive_fit_data['cm2']
 
-    cap_check_sweeps, _, _ = ephys_utils.get_sweeps_of_type('C1SQCAPCHK', all_sweeps)
-    
     # Check for fi curve shift to decide to use core1 or core2
-    fi_shift, n_core2 = check_fi_shift.estimate_fi_shift(data_set, cap_check_sweeps)
+    fi_shift, n_core2 = check_fi_shift.estimate_fi_shift(data_set, all_sweeps)
     fi_shift_threshold = 30.0
     sweeps_to_fit = []
     if abs(fi_shift) > fi_shift_threshold:
         print "FI curve shifted; using Core 1"
-        find_core1_trace(sweeps_to_fit, data_set, all_sweeps)
+        sweeps_to_fit = find_core1_trace(data_set, all_sweeps)
     else:
-        find_core2_trace(sweeps_to_fit, data_set, all_sweeps)
+        sweeps_to_fit = find_core2_trace(data_set, all_sweeps)
 
-        if len(sweeps_to_fit) == 0:
-            Config._log.info("No good Core 2 traces; using Core 1")
-            print "No good Core 2 traces; using Core 1"
-            find_core1_trace(sweeps_to_fit, data_set, all_sweeps)
+        if sweeps_to_fit == []:
+            Config._log.info("Not enough good Core 2 traces; using Core 1")
+            print "Not enough good Core 2 traces; using Core 1"
+            sweeps_to_fit = find_core1_trace(data_set, all_sweeps)
 
     Config._log.debug("will use sweeps: " + str(sweeps_to_fit))
     print "will use sweeps: ", sweeps_to_fit
