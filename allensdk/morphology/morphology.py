@@ -5,97 +5,94 @@ import sys
 
 def usage():
     print("This script generates feature data from neuron morphology data")
-    print("Input to the script is one or more .swc files plus the name of")
-    print("    the desired output file. Presently, the output formats of")
-    print("    .csv and .json are supported")
-    print("")
     if sys.argv[0].startswith("./"):
         name = sys.argv[0][2:]
     else:
         name = sys.argv[0]
-    print("Usage: %s <output file> <file1.swc> [file2.swc [file3.swc [...]]]" % name)
+    print("Usage: %s <input.json> <output.json>" % name)
     sys.exit(1)
 
 # minimum input to script is script name, output file name and one swc file
 # if we don't have at least this, abort
-if len(sys.argv) < 3:
+if len(sys.argv) != 3:
     usage()
 
-# make sure desired output file is of supported type
-if not sys.argv[1].endswith('json') and not sys.argv[1].endswith('csv'):
-    usage()
+infile = sys.argv[1]
+try:
+    jin = json.load(open(infile, "r"))
+except:
+    print("Unable to open/read file '%s' as json" % infile)
+    sys.exit(1)
 
-# array storing a dictionary of feature data. one array entry per file
-morph_data = []
+# find swc file in jin[well_known_files]
+wkf = jin["well_known_files"]
+swc_file = None
+for i in range(len(wkf)):
+    if "filename" in wkf[i] and wkf[i]["filename"].endswith(".swc"):
+        if swc_file is not None:
+            print("Error -- multiple .swc files specified in %s" % infile)
+            print("Don't know which one to process")
+            sys.exit(1)
+        swc_file = wkf[i]["storage_directory"] + wkf[i]["filename"]
+
+
+# dictionary of feature data
+morph_data = {}
 
 # description of what features are being extracted
 # presently there are two categories -- physical features and geometric moments
 feature_desc = None
 gmi_desc = None
 
-# calculate features and load into memory
-for i in range(2,len(sys.argv)):
-    print("Processing '%s'" % sys.argv[i])
-    nrn_data = {}
-    nrn_data["filename"] = sys.argv[i]
-    #
-    nrn = morphology.SWC(sys.argv[i])
-    gmi, gmi_desc = morphology.computeGMI(nrn)
-    gmi_out = {}
-    for i in range(len(gmi)):
-        gmi_out[gmi_desc[i]] = gmi[i]
-    nrn_data["gmi"] = gmi_out
-    #
-    features, feature_desc = morphology.computeFeature(nrn)
-    feat_out = {}
-    for i in range(len(features)):
-        feat_out[feature_desc[i]] =  features[i]
-    nrn_data["features"] = feat_out
-    #
-    morph_data.append(nrn_data)
+# load segment data into memory
+print("Processing '%s'" % swc_file)
+nrn = morphology.SWC(swc_file)
 
-# feature_desc and gmi_desc is defined from the previous analysis
-#   loops. those values are used below
-# make sure nothing bad happened in that analysis
+# apply pia transform
+# algorithm inferred from v3d:apply_transform_func.cpp:apply_transform()
+#   and Xiaoxiao's script to run v3d
+# foreach segment:
+#   x = x*tvr_00 + y*tvr_01 + z*tvr_02 + tvr_09
+#   y = x*tvr_03 + y*tvr_04 + z*tvr_05 + tvr_10
+#   z = x*tvr_06 + y*tvr_07 + z*tvr_08 + tvr_11
+xf = jin["pia_transform"]
+for i in range(len(nrn.obj_list)):
+    seg = nrn.obj_list[i]
+    x = seg.x
+    y = seg.y
+    z = seg.z
+    seg.x = x*xf["tvr_00"] + y*xf["tvr_01"] + z*xf["tvr_02"] + xf["tvr_09"]
+    seg.y = x*xf["tvr_03"] + y*xf["tvr_04"] + z*xf["tvr_05"] + xf["tvr_10"]
+    seg.z = x*xf["tvr_06"] + y*xf["tvr_07"] + z*xf["tvr_08"] + xf["tvr_11"]
+
+# calculate features
+gmi, gmi_desc = morphology.computeGMI(nrn)
+gmi_out = {}
+for i in range(len(gmi)):
+    gmi_out[gmi_desc[i]] = gmi[i]
+morph_data["gmi"] = gmi_out
+#
+features, feature_desc = morphology.computeFeature(nrn)
+feat_out = {}
+for i in range(len(features)):
+    feat_out[feature_desc[i]] =  features[i]
+morph_data["features"] = feat_out
+
+# make sure nothing bad happened in analysis
 if feature_desc is None or gmi_desc is None:
     print("Internal error -- bailing out")
     sys.exit(1)
 
-# prepare output for specified format
-if sys.argv[1].endswith('csv'):
-    try:
-        f = open(sys.argv[1], "w")
-    except IOError:
-        print("Unable to open input file '%s'" % sys.argv[1])
-        sys.exit(1)
-    # write CSV header row
-    f.write("filename,")
-    for j in range(len(feature_desc)):
-        f.write(feature_desc[j])
-        f.write(",")
-    for j in range(len(gmi_desc)-1):
-        f.write(gmi_desc[j])
-        f.write(",")
-    f.write(gmi_desc[-1] + "\n")
-    # write one row for each file
-    for i in range(len(morph_data)):
-        # reload feature and gmi data
-        # the existing feature_desc and gmi_desc still applies to it
-        gmi = morph_data[i]["gmi"]
-        features = morph_data[i]["features"]
-        f.write(morph_data[i]["filename"] + ",")
-        for j in range(len(feature_desc)):
-            f.write(str(features[feature_desc[j]]))
-            f.write(",")
-        for j in range(len(gmi_desc)):
-            f.write(str(gmi[gmi_desc[j]]))
-            f.write(",")
-        f.write("\n")
-    f.close()
-elif sys.argv[1].endswith('json'):
-    output = {}
-    output["morphology_data"] = morph_data
-    with open(sys.argv[1], "w") as f:
-        json.dump(output, f, indent=2)
+jout = jin
+if "morphology_data" in jout:
+    del jout["morphology_data"]
+jout["morphology_data"] = morph_data
+try:
+    with open(sys.argv[2], "w") as f:
+        json.dump(jout, f, indent=2)
         f.close()
+except:
+    print("Error writing output json file %s" % sys.argv[2])
+    sys.exit(1)
+
 
