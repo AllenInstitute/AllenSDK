@@ -1,6 +1,5 @@
 import logging
 
-from scipy import *
 import numpy as np
 
 import time
@@ -9,10 +8,12 @@ from scipy.optimize import fminbound, fmin
 from scipy.optimize import minimize
 
 import json
-import error_functions
 
 from uuid import uuid4
 
+import allensdk.model.glif.error_functions as error_functions
+
+# TODO: clean up
 # TODO: license
 # TODO: document
 
@@ -20,31 +21,41 @@ class GlifOptimizer(object):
     def __init__(self, experiment, dt, 
                  outer_iterations, inner_iterations, 
                  sigma_outer, sigma_inner,
-                 param_fit_names, stim, 
-                 error_function_name, 
-                 error_function_data,
+                 param_fit_names, stim,                 
                  xtol, ftol, 
-                 internal_iterations, init_params=None):
+                 internal_iterations, 
+                 error_function = None,
+                 error_function_data = None,
+                 init_params = None):
 
+        self.start_time = None
         self.rng = np.random.RandomState()
+
         self.experiment = experiment
         self.dt = dt
         self.outer_iterations = outer_iterations
         self.inner_iterations = inner_iterations
-        self.start_time = None
         self.init_params = init_params
         self.sigma_outer = sigma_outer
         self.sigma_inner = sigma_inner
         self.param_fit_names = param_fit_names
         self.stim = stim
-        self.error_function = error_functions.get_error_function_by_name(error_function_name)
+
+        # use MLIN by default
+        if error_function is None:
+            error_function = error_functions.MLIN_list_error
+
+        self.error_function = error_function
         self.error_function_data = error_function_data
+
         self.xtol = xtol
         self.ftol = ftol
+
         self.internal_iterations = internal_iterations
-        logging.critical('internal_iterations: %s' % internal_iterations)
-        logging.critical('outer_iterations: %s' % outer_iterations)
-        logging.critical('inner_iterations: %s' % inner_iterations)
+
+        logging.info('internal_iterations: %s' % internal_iterations)
+        logging.info('outer_iterations: %s' % outer_iterations)
+        logging.info('inner_iterations: %s' % inner_iterations)
 
         self.iteration_info = [];
 
@@ -267,6 +278,7 @@ class GlifOptimizer(object):
 #
 #        print xopt
 #         return xopt, fopt
+
 
 
     
