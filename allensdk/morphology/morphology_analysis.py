@@ -18,6 +18,9 @@ class SWC_Obj(object):
         self.z = float(obj["z"])
         self.radius = float(obj["radius"])
         self.pn = int(obj["parent"])
+        # create index-agnostic links between objects
+        self.parent = None
+        self.children = []
 
 class SWC(object):
     def __init__(self, fname):
@@ -29,6 +32,29 @@ class SWC(object):
             obj = SWC_Obj(lst[i])
             self.obj_list.append(obj)
             self.obj_hash[obj.n] = len(self.obj_list) - 1
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            if obj.pn >= 0:
+                obj.parent = self.obj_hash[obj.pn]
+                obj.parent.children.append(obj)
+    
+    # remove blank entries from obj_list and regenerate obj_hash
+    def clean_up(self):
+        # assign consecutive job IDs
+        tmp_list = []
+        n = 1
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            if obj is not None:
+                obj.n = n
+                n += 1
+                tmp_list.append(obj)
+        self.obj_list = tmp_list
+        # re-link objects with parents
+        for i in range(len(obj_list)):
+            obj = self.obj_list[i]
+            if obj.pn >= 0:
+                obj.pn = obj.parent.n
 
 ########################################################################
 ########################################################################
