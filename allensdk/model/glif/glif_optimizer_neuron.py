@@ -20,7 +20,7 @@ class GlifBadInitializationException( Exception ):
         self.dv = dv
         self.step=step
 
-class GlifOptimizerNeuron( neuron.GlifNeuron ):
+class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
     
     TYPE = "GLIF"
     
@@ -747,14 +747,14 @@ def extrapolate_model_spike_from_endpoints_single_tau(neuron, voltage, threshold
 def extrapolate_spike_time(dt, num_time_steps, threshold_t0, threshold_t1, voltage_t0, voltage_t1):
     """ Given two voltage and threshold values and an interval between them, extrapolate a spike time
     by intersecting lines the thresholds and voltages. """
-    return neuron.line_crossing_x(dt * num_time_steps, voltage_t0, voltage_t1, threshold_t0, threshold_t1)
+    return glif_neuron.line_crossing_x(dt * num_time_steps, voltage_t0, voltage_t1, threshold_t0, threshold_t1)
 
 def extrapolate_spike_voltage(dt, num_time_steps, threshold_t0, threshold_t1, voltage_t0, voltage_t1):
     """ Given two voltage and threshold values and an interval between them, extrapolate a spike time
     by intersecting lines the thresholds and voltages. """
-    return neuron.line_crossing_y(dt * num_time_steps, voltage_t0, voltage_t1, threshold_t0, threshold_t1)
+    return glif_neuron.line_crossing_y(dt * num_time_steps, voltage_t0, voltage_t1, threshold_t0, threshold_t1)
     
 def interpolate_spike_voltage(dt, time_step, threshold_t0, threshold_t1, voltage_t0, voltage_t1):
     """ Given two voltage and threshold values, the dt between them and the initial time step, interpolate
     a spike time within the dt interval by intersecting the two lines. """
-    return time_step*dt + neuron.line_crossing_y(dt, voltage_t0, voltage_t1, threshold_t0, threshold_t1)
+    return time_step*dt + glif_neuron.line_crossing_y(dt, voltage_t0, voltage_t1, threshold_t0, threshold_t1)
