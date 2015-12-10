@@ -1,0 +1,13 @@
+{
+  "voltage_dynamics_method": "forward_euler_piecewise", 
+  "threshold_dynamics_method": "inf", 
+  "name": "LIF_ASC_PWL", 
+  "threshold_reset_method": "inf", 
+  "AScurrent_reset_method": "sum", 
+  "AScurrent_dynamics_method": "exp", 
+  "param_fit_names": [
+    "th_inf"
+  ], 
+  "voltage_reset_method": "zero", 
+  "error_function": "MLIN"
+}

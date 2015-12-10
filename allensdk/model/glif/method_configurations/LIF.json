@@ -1,0 +1,13 @@
+{
+  "voltage_dynamics_method": "forward_euler_linear", 
+  "threshold_dynamics_method": "inf", 
+  "name": "LIF", 
+  "threshold_reset_method": "inf", 
+  "AScurrent_reset_method": "none", 
+  "AScurrent_dynamics_method": "none", 
+  "param_fit_names": [
+    "th_inf"
+  ], 
+  "voltage_reset_method": "zero", 
+  "error_function": "MLIN"
+}
