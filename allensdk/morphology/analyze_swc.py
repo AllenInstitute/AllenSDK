@@ -86,14 +86,17 @@ def read_input_file(fname):
         content = f.readlines()
         for i in range(len(content)):
             line = content[i].rstrip()
+            if len(line) == 0 or line[0] == '#':
+                continue
             # try to guess if this is a specimen id or a specimen name
             try:
                 specimen_id = int(line)
                 specimen_ids.append(specimen_id)
             except:
-                specimen_name.append(line)
+                specimen_names.append(line)
     except:
         print("Error reading/parsing input file '%s'" % fname)
+        raise
         sys.exit(1)
     f.close()
     return specimen_ids, specimen_names
@@ -106,18 +109,28 @@ name_sql += "SELECT cell.id, cell.name, wkf.filename, wkf.storage_directory "
 name_sql += "FROM specimens cell "
 name_sql += "JOIN neuron_reconstructions nr ON cell.id = nr.specimen_id "
 name_sql += "JOIN well_known_files wkf ON nr.id = wkf.attachable_id "
-name_sql += "AND wkf.attachable_type = 'NeuronReconstruction' "
-name_sql += "WHERE cell.name='%s' "
-name_sql += "AND nr.superseded = false; "
+name_sql += "  AND wkf.attachable_type = 'NeuronReconstruction' "
+name_sql += "WHERE cell.name='%s' AND nr.superseded = false; "
 
 id_sql = ""
 id_sql += "SELECT cell.id, cell.name, wkf.filename, wkf.storage_directory "
 id_sql += "FROM specimens cell "
 id_sql += "JOIN neuron_reconstructions nr ON cell.id = nr.specimen_id "
 id_sql += "JOIN well_known_files wkf ON nr.id = wkf.attachable_id "
-id_sql += "AND wkf.attachable_type = 'NeuronReconstruction' "
-id_sql += "WHERE cell.id=%d "
-id_sql += "AND nr.superseded = false; "
+id_sql += "  AND wkf.attachable_type = 'NeuronReconstruction' "
+id_sql += "WHERE cell.id=%s AND nr.superseded = false; "
+
+aff_sql = ""
+aff_sql += "SELECT "
+aff_sql += "  a3d.tvr_00, a3d.tvr_01, a3d.tvr_02, "
+aff_sql += "  a3d.tvr_03, a3d.tvr_04, a3d.tvr_05, "
+aff_sql += "  a3d.tvr_06, a3d.tvr_07, a3d.tvr_08, "
+aff_sql += "  a3d.tvr_09, a3d.tvr_10, a3d.tvr_11 "
+aff_sql += "FROM specimens spc "
+aff_sql += "JOIN neuron_reconstructions nr ON nr.specimen_id=spc.id "
+aff_sql += "  AND nr.superseded = 'f' AND nr.manual = 't' "
+aff_sql += "JOIN alignment3ds a3d ON a3d.id=spc.alignment3d_id "
+aff_sql += "WHERE spc.id = %d;"
 
 ########################################################################
 # database interface code
@@ -125,7 +138,7 @@ conn_string = "host='limsdb2' dbname='lims2' user='atlasreader' password='atlasr
 conn = psycopg2.connect(conn_string)
 cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-def fetch_record(sql):
+def fetch_specimen_record(sql):
     global cursor
     cursor.execute(sql)
     result = cursor.fetchall()
@@ -137,8 +150,32 @@ def fetch_record(sql):
     if len(result) > 0:
         record["spec_id"] = result[0][0]
         record["spec_name"] = result[0][1]
-        record["name"] = result[0][2]
+        record["filename"] = result[0][2]
         record["path"] = result[0][3]
+    return record
+
+def fetch_affine_record(sql):
+    global cursor
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    record = []
+    if len(result) > 0:
+        for i in range(12):
+            record.append(1000.0 * result[0][i])
+#        record["tvr_00"] = result[0][0]
+#        record["tvr_01"] = result[0][1]
+#        record["tvr_02"] = result[0][2]
+#        record["tvr_03"] = result[0][3]
+#        record["tvr_04"] = result[0][4]
+#        record["tvr_05"] = result[0][5]
+#        record["tvr_06"] = result[0][6]
+#        record["tvr_07"] = result[0][7]
+#        record["tvr_08"] = result[0][8]
+#        record["tvr_09"] = result[0][9]
+#        record["tvr_10"] = result[0][10]
+#        record["tvr_11"] = result[0][11]
+    print record
+    print "-----------------------------------------"
     return record
 
 ########################################################################
@@ -147,6 +184,9 @@ def fetch_record(sql):
 cmds = parse_command_line()
 if "input_file" in cmds:
     id_list, name_list = read_input_file(cmds["input_file"])
+else:
+    id_list = []
+    name_list = []
 
 # merge command-line specified IDs with those in the input file
 if "specimen_id" in cmds:
@@ -161,12 +201,18 @@ if "specimen_name" in cmds:
 # for each id/name, query database to get file, path and name/id
 records = {}
 for i in range(len(id_list)):
-    rec = fetch_record(id_sql % id_list[i])
-    records[rec["spec_name"]] = rec
+    rec = fetch_specimen_record(id_sql % id_list[i])
+    if len(rec) == 0:
+        print("** Unable to read data for specimen ID '%s'" % id_list[i])
+    else:
+        records[rec["spec_name"]] = rec
 for i in range(len(name_list)):
-    rec = fetch_record(name_sql % name_list[i])
-    # overwrite existing record if it's present
-    records[rec["spec_name"]] = rec
+    rec = fetch_specimen_record(name_sql % name_list[i])
+    if len(rec) == 0:
+        print("** Unable to read data for '%s'" % name_list[i])
+    else:
+        # overwrite existing record if it's present
+        records[rec["spec_name"]] = rec
 
 ########################################################################
 # calculate features
@@ -176,12 +222,12 @@ v3d_features = {}
 bb_features = {}
 
 # returns dictionary containing GMI and features
-def calculate_v3d_features(nrn, swc_type, label):
+def calculate_v3d_features(morph, swc_type, label):
     global v3d_features
-    morph = copy.deepcopy(nrn)
     cnt = 0
     soma_cnt = 0
     root_cnt = 0
+    # strip out everything but the soma and the specified swc type
     for i in range(len(morph.obj_list)):
         obj = morph.obj_list[i]
         if obj.t == 1:
@@ -196,9 +242,9 @@ def calculate_v3d_features(nrn, swc_type, label):
         return None
     # v3d assumes there's only one root object. calculations can be
     #   erroneous if more exist
-    if soma_cnt != 1:
-        print("** Multiple somas detected. Skipping %s analysis to avoid errors" % label)
-        return None
+#    if soma_cnt != 1:
+#        print("** Multiple somas detected. Skipping %s analysis to avoid errors" % label)
+#        return None
     if root_cnt != 1:
         print("** Non-singular root detected. Skipping %s analysis" % label)
         return None
@@ -233,18 +279,31 @@ def calculate_v3d_features(nrn, swc_type, label):
 # extract feature data
 # global dictionary to store features. one entry per specimen_id
 morph_data = {}
-for k, v in records.iteritems():
+for k, record in records.iteritems():
     # get SWC file
-    swc_file = v["path"] + v["name"]
+    swc_file = record["path"] + record["filename"]
     print("Processing '%s'" % swc_file)
     try:
         nrn = morphology.SWC(swc_file)
-    except:
+        basal = morphology.SWC(swc_file)
+        apical = morphology.SWC(swc_file)
+    except Exception, e:
+        print e
         print("Error -- unable to open specified file. Bailing out")
-        sys.exit(1)
-    # TODO apply affine transform
-    #
-    # TODO save tmp swc file for BB library, using transformed coordinates
+        print("---------------------------------------------------")
+        print("Specimen id:   %d" % record["spec_id"])
+        print("Specimen name: " + record["spec_name"])
+        print("Specimen path: " + record["path"])
+        print("Specimen file: " + record["filename"])
+        raise
+    # apply affine transform
+    aff = fetch_affine_record(aff_sql % record["spec_id"])
+    nrn.apply_affine(aff)
+    basal.apply_affine(aff)
+    #apical.apply_affine(aff)
+    # save tmp swc file for BB library, using transformed coordinates
+    tmp_swc_file = record["filename"] + ".tmp.swc"
+    success = nrn.save_to(tmp_swc_file)
     #
     ####################################################################
     # v3d feature set
@@ -255,8 +314,9 @@ for k, v in records.iteritems():
         if obj.t == 2:
             nrn.obj_list[i] = None
     nrn.clean_up()
-    basal_data = calculate_v3d_features(nrn, 3, "basal dendrite")
-    apical_data = calculate_v3d_features(nrn, 4, "apical dendrite")
+    basal_data = calculate_v3d_features(basal, 3, "basal dendrite")
+    apical_data = calculate_v3d_features(apical, 3, "orig dendrite")
+    #apical_data = calculate_v3d_features(apical, 4, "apical dendrite")
     data = {}
     if basal_data is not None:
         data["v3d_basal"] = basal_data
@@ -265,6 +325,7 @@ for k, v in records.iteritems():
     ####################################################################
     # v3d feature set
     #
+    # TODO check success value above to know what file to use
 #    try:
 #        bb_feat, bb_desc = compute_features_bb(tmp_swc_file)
 #        feat_out = {}
@@ -276,7 +337,7 @@ for k, v in records.iteritems():
 #    except:
 #        print("Error calculating BB features")
 #        raise
-    morph_data[v["spec_name"]] = data
+    morph_data[record["spec_name"]] = data
 
 ########################################################################
 # sort data for better presentation
@@ -308,13 +369,19 @@ except IOError:
 f.write("specimen_id,specimen_name,filename,")
 for i in range(len(v3d_feature_list)):
     f.write("basal_" + v3d_feature_list[i] + ",")
-for i in range(len(v3d_feature_list)-1):
+for i in range(len(v3d_feature_list)):
     f.write("apical_" + v3d_feature_list[i] + ",")
-f.write("apical_" + v3d_feature_list[-1] + "\n")
 #
-#for i in range(len(bb_feature_list)-1):
+#for i in range(len(bb_feature_list)):
 #    f.write(bb_feature_list[i] + ",")
-#f.write(bb_feature_list[-1] + "\n")
+f.write("ignore\n")
+import json
+feat = {}
+feat["feature_data"] = morph_data
+feat["v3d_feature_list"] = v3d_feature_list
+with open("out.json", "w") as jf:
+    json.dump(feat, jf, indent=2)
+    jf.close()
 
 # write data
 try:
@@ -322,34 +389,39 @@ try:
         record = records[record_list[i]]
         spec_name = record["spec_name"]
         spec_id = record["spec_id"]
-        filename = record["path"] + record["file"]
-        f.write(spec_name + "," + spec_id + "," + filename + ",")
+        filename = record["path"] + record["filename"]
+        f.write("%s,%d,%s," % (spec_name, spec_id, filename))
         data = morph_data[spec_name]
         # v3d features
+        # create an alias
+        v3d = v3d_feature_list
         # basal dendrite
-        for i in range(len(v3d_feature_list)-1):
-            if v3d_feature_list[i] in data["v3d_basal"]:
-                val = data["v3d_basal"][v3d_feature_list[i]]
-            else:
-                val = "NaN"
-            f.write(val + ",")
-        if v3d_feature_list[-1] in data["v3d_basal"]:
-            val = data["v3d_basal"][v3d_feature_list[-1]]
+        if "v3d_basal" in data:
+            for i in range(len(v3d)):
+                if v3d[i] in data["v3d_basal"]["gmi"]:
+                    val = str(data["v3d_basal"]["gmi"][v3d[i]])
+                elif v3d[i] in data["v3d_basal"]["features"]:
+                    val = str(data["v3d_basal"]["features"][v3d[i]])
+                else:
+                    val = "NaN"
+                f.write(val + ",")
         else:
-            val = "NaN"
-        f.write(val + ",")
+            for i in range(len(v3d)):
+                f.write("NaN,")
         # apical dendrite
-        for i in range(len(v3d_feature_list)-1):
-            if v3d_feature_list[i] in data["v3d_apical"]:
-                val = data["v3d_apical"][v3d_feature_list[i]]
-            else:
-                val = "NaN"
-            f.write(val + ",")
-        if v3d_feature_list[-1] in data["v3d_apical"]:
-            val = data["v3d_apical"][v3d_feature_list[-1]]
+        if "v3d_apical" in data:
+            for i in range(len(v3d)):
+                if v3d[i] in data["v3d_apical"]["gmi"]:
+                    val = str(data["v3d_apical"]["gmi"][v3d[i]])
+                elif v3d[i] in data["v3d_apical"]["features"]:
+                    val = str(data["v3d_apical"]["features"][v3d[i]])
+                else:
+                    val = "NaN"
+                f.write(val + ",")
         else:
-            val = "NaN"
-        f.write(val + "\n")
+            for i in range(len(v3d)):
+                f.write("NaN,")
+        f.write("\n")
     f.close()
 except IOError, ioe:
     print("File error encountered writing output file")

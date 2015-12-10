@@ -1,4 +1,5 @@
 import math
+import sys
 import numpy as np
 import allensdk.core.swc as allen_swc
 
@@ -12,7 +13,7 @@ import allensdk.core.swc as allen_swc
 class SWC_Obj(object):
     def __init__(self, obj):
         self.n = int(obj["id"])
-        self.obj_type = int(obj["type"])
+        self.t = int(obj["type"])
         self.x = float(obj["x"])
         self.y = float(obj["y"])
         self.z = float(obj["z"])
@@ -35,7 +36,7 @@ class SWC(object):
         for i in range(len(self.obj_list)):
             obj = self.obj_list[i]
             if obj.pn >= 0:
-                obj.parent = self.obj_hash[obj.pn]
+                obj.parent = self.obj_list[self.obj_hash[obj.pn]]
                 obj.parent.children.append(obj)
     
     # remove blank entries from obj_list and regenerate obj_hash
@@ -51,10 +52,35 @@ class SWC(object):
                 tmp_list.append(obj)
         self.obj_list = tmp_list
         # re-link objects with parents
-        for i in range(len(obj_list)):
+        for i in range(len(self.obj_list)):
             obj = self.obj_list[i]
             if obj.pn >= 0:
                 obj.pn = obj.parent.n
+
+    def apply_affine(self, aff):
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            x = obj.x*aff[0] + obj.y*aff[1] + obj.y*aff[2] + aff[9]
+            y = obj.x*aff[3] + obj.y*aff[4] + obj.y*aff[5] + aff[10]
+            z = obj.x*aff[6] + obj.y*aff[7] + obj.y*aff[8] + aff[11]
+            obj.x = x
+            obj.y = y
+            obj.z = z
+
+    # returns True on success, False on failure
+    def save_to(self, file_name):
+        try:
+            f = open(file_name, "w")
+            f.write("#n,type,x,y,z,radius,parent\n")
+            for i in range(len(self.obj_list)):
+                obj = self.obj_list[i]
+                f.write("%d %d %f " % (obj.n, obj.t, obj.x))
+                f.write("%f %f %f %d\n" % (obj.y, obj.z, obj.radius, obj.pn))
+            f.close()
+        except:
+            print("Error creating swc file '%s'" % file_name)
+            return False
+        return True
 
 ########################################################################
 ########################################################################
