@@ -110,6 +110,7 @@ def makeBasis_StimKernel_exp(kbasprs,nkt):
         kbasis[:,ii] = invnl(-ks[ii]*x0) #(1.0/ks[ii])*
     
     kbasis = np.flipud(kbasis)     
+    # TODO: corinne what's up with this
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!comment in to normalize via basis
 #    kbasis = normalizecols(kbasis)
 ########################################################
