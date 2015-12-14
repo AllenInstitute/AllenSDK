@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import morphology_analysis as morphology
 from morphology_analysis_bb import compute_features as compute_features_bb
-import copy
+import traceback
 import sys
 import psycopg2
 import psycopg2.extras
@@ -104,21 +104,44 @@ def read_input_file(fname):
 
 ########################################################################
 # possible SQL queries to use
-name_sql = ""
-name_sql += "SELECT cell.id, cell.name, wkf.filename, wkf.storage_directory "
-name_sql += "FROM specimens cell "
-name_sql += "JOIN neuron_reconstructions nr ON cell.id = nr.specimen_id "
-name_sql += "JOIN well_known_files wkf ON nr.id = wkf.attachable_id "
-name_sql += "  AND wkf.attachable_type = 'NeuronReconstruction' "
-name_sql += "WHERE cell.name='%s' AND nr.superseded = false; "
+#name_sql = ""
+#name_sql += "SELECT cell.id, cell.name, wkf.filename, wkf.storage_directory "
+#name_sql += "FROM specimens cell "
+#name_sql += "JOIN neuron_reconstructions nr ON cell.id = nr.specimen_id "
+#name_sql += "JOIN well_known_files wkf ON nr.id = wkf.attachable_id "
+#name_sql += "  AND wkf.attachable_type = 'NeuronReconstruction' "
+#name_sql += "WHERE cell.name='%s' AND nr.superseded = false; "
 
+name_sql = ""
+name_sql += "SELECT spec.id, spec.name, wkf.filename, wkf.storage_directory "
+name_sql += "FROM specimens spec "
+name_sql += "JOIN neuron_reconstructions nr ON nr.specimen_id=spec.id "
+name_sql +=   "AND nr.superseded = 'f' AND nr.manual = 't' "
+name_sql += "JOIN well_known_files wkf ON wkf.attachable_id=nr.id "
+name_sql +=   "AND wkf.attachable_type = 'NeuronReconstruction' "
+name_sql += "JOIN cell_soma_locations csl ON csl.specimen_id=spec.id "
+name_sql += "JOIN well_known_file_types wkft "
+name_sql +=   "ON wkft.id=wkf.well_known_file_type_id "
+name_sql += "WHERE spec.name='%s' AND wkft.name = '3DNeuronReconstruction'; "
+
+#id_sql = ""
+#id_sql += "SELECT cell.id, cell.name, wkf.filename, wkf.storage_directory "
+#id_sql += "FROM specimens cell "
+#id_sql += "JOIN neuron_reconstructions nr ON cell.id = nr.specimen_id "
+#id_sql += "JOIN well_known_files wkf ON nr.id = wkf.attachable_id "
+#id_sql += "  AND wkf.attachable_type = 'NeuronReconstruction' "
+#id_sql += "WHERE cell.id=%s AND nr.superseded = false; "
 id_sql = ""
-id_sql += "SELECT cell.id, cell.name, wkf.filename, wkf.storage_directory "
-id_sql += "FROM specimens cell "
-id_sql += "JOIN neuron_reconstructions nr ON cell.id = nr.specimen_id "
-id_sql += "JOIN well_known_files wkf ON nr.id = wkf.attachable_id "
-id_sql += "  AND wkf.attachable_type = 'NeuronReconstruction' "
-id_sql += "WHERE cell.id=%s AND nr.superseded = false; "
+id_sql += "SELECT spec.id, spec.name, wkf.filename, wkf.storage_directory "
+id_sql += "FROM specimens spec "
+id_sql += "JOIN neuron_reconstructions nr ON nr.specimen_id=spec.id "
+id_sql +=   "AND nr.superseded = 'f' AND nr.manual = 't' "
+id_sql += "JOIN well_known_files wkf ON wkf.attachable_id=nr.id "
+id_sql +=   "AND wkf.attachable_type = 'NeuronReconstruction' "
+id_sql += "JOIN cell_soma_locations csl ON csl.specimen_id=spec.id "
+id_sql += "JOIN well_known_file_types wkft "
+id_sql +=   "ON wkft.id=wkf.well_known_file_type_id "
+id_sql += "WHERE spec.id=%s AND wkft.name = '3DNeuronReconstruction'; "
 
 aff_sql = ""
 aff_sql += "SELECT "
@@ -174,8 +197,9 @@ def fetch_affine_record(sql):
 #        record["tvr_09"] = result[0][9]
 #        record["tvr_10"] = result[0][10]
 #        record["tvr_11"] = result[0][11]
-    print record
-    print "-----------------------------------------"
+    #print sql
+    #print record
+    #print "-----------------------------------------"
     return record
 
 ########################################################################
@@ -228,23 +252,27 @@ def calculate_v3d_features(morph, swc_type, label):
     soma_cnt = 0
     root_cnt = 0
     # strip out everything but the soma and the specified swc type
+    # keep track of number of soma roots and roots in specified type
     for i in range(len(morph.obj_list)):
         obj = morph.obj_list[i]
         if obj.t == 1:
             soma_cnt += 1
+            if obj.pn < 0:
+                root_cnt += 1
         elif obj.t != swc_type:
             morph.obj_list[i] = None
         else:
+            if obj.pn < 0:
+                root_cnt += 1
             cnt += 1
-        if obj.pn < 0:
-            root_cnt += 1
     if cnt == 0:
         return None
     # v3d assumes there's only one root object. calculations can be
     #   erroneous if more exist
-#    if soma_cnt != 1:
-#        print("** Multiple somas detected. Skipping %s analysis to avoid errors" % label)
-#        return None
+    if soma_cnt != 1:
+        print("** Multiple somas detected. Skipping %s analysis to avoid errors" % label)
+        print("***DEBUG -- Not skipping analysis***")
+        #return None
     if root_cnt != 1:
         print("** Non-singular root detected. Skipping %s analysis" % label)
         return None
@@ -253,7 +281,7 @@ def calculate_v3d_features(morph, swc_type, label):
     # calculate features
     morph_data = {}
     try:
-        gmi, gmi_desc = morphology.computeGMI(nrn)
+        gmi, gmi_desc = morphology.computeGMI(morph)
         gmi_out = {}
         for j in range(len(gmi)):
             gmi_out[gmi_desc[j]] = gmi[j]
@@ -264,7 +292,7 @@ def calculate_v3d_features(morph, swc_type, label):
         print("Error calculating GMI for " + label)
         raise
     try:
-        features, feature_desc = morphology.computeFeature(nrn)
+        features, feature_desc = morphology.computeFeature(morph)
         feat_out = {}
         for j in range(len(features)):
             feat_out[feature_desc[j]] =  features[j]
@@ -288,44 +316,50 @@ for k, record in records.iteritems():
         basal = morphology.SWC(swc_file)
         apical = morphology.SWC(swc_file)
     except Exception, e:
-        print e
-        print("Error -- unable to open specified file. Bailing out")
-        print("---------------------------------------------------")
+        #print e
+        print("")
+        print("**** Error: problem encountered open specified file ****")
         print("Specimen id:   %d" % record["spec_id"])
         print("Specimen name: " + record["spec_name"])
         print("Specimen path: " + record["path"])
         print("Specimen file: " + record["filename"])
-        raise
-    # apply affine transform
-    aff = fetch_affine_record(aff_sql % record["spec_id"])
-    nrn.apply_affine(aff)
-    basal.apply_affine(aff)
-    #apical.apply_affine(aff)
-    # save tmp swc file for BB library, using transformed coordinates
-    tmp_swc_file = record["filename"] + ".tmp.swc"
-    success = nrn.save_to(tmp_swc_file)
-    #
-    ####################################################################
-    # v3d feature set
-    #
-    # strip axons from SWC
-    for i in range(len(nrn.obj_list)):
-        obj = nrn.obj_list[i]
-        if obj.t == 2:
-            nrn.obj_list[i] = None
-    nrn.clean_up()
-    basal_data = calculate_v3d_features(basal, 3, "basal dendrite")
-    apical_data = calculate_v3d_features(apical, 3, "orig dendrite")
-    #apical_data = calculate_v3d_features(apical, 4, "apical dendrite")
-    data = {}
-    if basal_data is not None:
-        data["v3d_basal"] = basal_data
-    if apical_data is not None:
-        data["v3d_apical"] = apical_data
-    ####################################################################
-    # v3d feature set
-    #
-    # TODO check success value above to know what file to use
+        print("")
+        print(traceback.print_exc())
+        print("-----------------------------------------------------------")
+        continue
+    try:
+        # apply affine transform
+        aff = fetch_affine_record(aff_sql % record["spec_id"])
+        nrn.apply_affine(aff)
+        # save tmp swc file for BB library, using transformed coordinates
+        tmp_swc_file = record["filename"][:-4] + "_pia.swc"
+        success = nrn.save_to(tmp_swc_file)
+        # apply affine to basal and apical copies too
+        basal.apply_affine(aff)
+        apical.apply_affine(aff)
+        #
+        ####################################################################
+        # v3d feature set
+        #
+        # strip axons from SWC
+        for i in range(len(nrn.obj_list)):
+            obj = nrn.obj_list[i]
+            if obj.t == 2:
+                nrn.obj_list[i] = None
+        nrn.clean_up()
+        basal_data = calculate_v3d_features(basal, 3, "basal dendrite")
+        #print "DEBUG Overloading apical data to test affine on basal"
+        #apical_data = calculate_v3d_features(apical, 3, "orig dendrite")
+        apical_data = calculate_v3d_features(apical, 4, "apical dendrite")
+        data = {}
+        if basal_data is not None:
+            data["v3d_basal"] = basal_data
+        if apical_data is not None:
+            data["v3d_apical"] = apical_data
+        ####################################################################
+        # v3d feature set
+        #
+        # TODO check success value above to know what file to use
 #    try:
 #        bb_feat, bb_desc = compute_features_bb(tmp_swc_file)
 #        feat_out = {}
@@ -337,6 +371,17 @@ for k, record in records.iteritems():
 #    except:
 #        print("Error calculating BB features")
 #        raise
+    except Exception, e:
+        print("")
+        print("**** Error: analyzing file ****")
+        print("Specimen id:   %d" % record["spec_id"])
+        print("Specimen name: " + record["spec_name"])
+        print("Specimen path: " + record["path"])
+        print("Specimen file: " + record["filename"])
+        print("")
+        traceback.print_exc()
+        print("-----------------------------------------------------------")
+        continue
     morph_data[record["spec_name"]] = data
 
 ########################################################################
@@ -388,6 +433,8 @@ try:
     for i in range(len(record_list)):
         record = records[record_list[i]]
         spec_name = record["spec_name"]
+        if spec_name not in morph_data:
+            continue    # perhaps skipped due earlier error
         spec_id = record["spec_id"]
         filename = record["path"] + record["filename"]
         f.write("%s,%d,%s," % (spec_name, spec_id, filename))

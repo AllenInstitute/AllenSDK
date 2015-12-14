@@ -8,7 +8,8 @@ import allensdk.core.swc as allen_swc
 # The primary modification is that feature arrays are returned
 #   from the functions (as opposed to being passed in) and 
 #   a description (text) array is returned with each feature vector
-# The SWC object mimics the interface of NeuronSWC in v3d
+# The SWC object mimics the interface of NeuronSWC in v3d. It has been
+#   extended to assist in analysis tasks
 
 class SWC_Obj(object):
     def __init__(self, obj):
@@ -40,6 +41,7 @@ class SWC(object):
                 obj.parent.children.append(obj)
     
     # remove blank entries from obj_list and regenerate obj_hash
+    # BB library requires SWC files that have no 'holes' in them
     def clean_up(self):
         # assign consecutive job IDs
         tmp_list = []
@@ -58,14 +60,47 @@ class SWC(object):
                 obj.pn = obj.parent.n
 
     def apply_affine(self, aff):
+        # calculate scale. use 2 different approaches
+        #   1) assume isotropic spatial transform, use determinant^1/3
+        #   2) calculate transform of unit vector on each original axis
+        # (1)
+        # calculate the determinant
+        det0 = aff[0] * (aff[4]*aff[8] - aff[5]*aff[7])
+        det1 = aff[1] * (aff[3]*aff[8] - aff[5]*aff[6])
+        det2 = aff[2] * (aff[3]*aff[7] - aff[4]*aff[6])
+        det = det0 + det1 + det2
+        # determinant is change of volume that occurred during transform
+        # assume equal scaling along all axes. take 3rd root to get
+        #   scale factor
+        det_scale = math.pow(abs(det), 1.0/3.0)
+        # (2)
+        scale_x = abs(aff[0] + aff[3] + aff[6])
+        scale_y = abs(aff[1] + aff[4] + aff[7])
+        scale_z = abs(aff[2] + aff[5] + aff[8])
+        avg_scale = (scale_x + scale_y + scale_z) / 3.0;
+        deviance = 0.0
+        if scale_x > avg_scale:
+            deviance = max(deviance, scale_x/avg_scale-1.0)
+        else:
+            deviance = max(deviance, 1.0-scale_x/avg_scale)
+        if scale_y > avg_scale:
+            deviance = max(deviance, scale_y/avg_scale-1.0)
+        else:
+            deviance = max(deviance, 1.0-scale_y/avg_scale)
+        if scale_z > avg_scale:
+            deviance = max(deviance, scale_z/avg_scale-1.0)
+        else:
+            deviance = max(deviance, 1.0-scale_z/avg_scale)
+        # 
         for i in range(len(self.obj_list)):
             obj = self.obj_list[i]
-            x = obj.x*aff[0] + obj.y*aff[1] + obj.y*aff[2] + aff[9]
-            y = obj.x*aff[3] + obj.y*aff[4] + obj.y*aff[5] + aff[10]
-            z = obj.x*aff[6] + obj.y*aff[7] + obj.y*aff[8] + aff[11]
+            x = obj.x*aff[0] + obj.y*aff[1] + obj.z*aff[2] + aff[9]
+            y = obj.x*aff[3] + obj.y*aff[4] + obj.z*aff[5] + aff[10]
+            z = obj.x*aff[6] + obj.y*aff[7] + obj.z*aff[8] + aff[11]
             obj.x = x
             obj.y = y
             obj.z = z
+            obj.radius *= det_scale
 
     # returns True on success, False on failure
     def save_to(self, file_name):
