@@ -84,7 +84,7 @@ def test_preprocess_neuron():
         if len(errs) > 0:
             for err in errs:
                 logging.error(err)
-            raise "Preprocessor outputs did not match."
+            raise Exception("Preprocessor outputs did not match.")
             
     
 
