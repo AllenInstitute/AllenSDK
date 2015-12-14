@@ -1,11 +1,15 @@
 import numpy as np
+from allensdk.ephys.extract_cell_features import get_square_stim_characteristics
+from scipy import stats
+from scipy.optimize import curve_fit
 
 def MLIN(voltage, current, res, cap, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
     '''voltage, current
     input:
         voltage: numpy array of voltage with test pulse cut out 
         current: numpy array of stimulus with test pulse cut out '''
-    start_idx, stim_len=find_stimulus(current)
+    (_, _, _, start_idx, end_idx) = get_square_stim_characteristics(current)
+    stim_len = end_idx - start_idx + 1
 
     distribution_start_ind=start_idx + int(.5/dt)
     distribution_end_ind=start_idx + stim_len
@@ -22,16 +26,14 @@ def MLIN(voltage, current, res, cap, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK
     v_section=v_section-np.mean(v_section)  
     var_of_section=np.var(v_section)
     sv_for_expsymm=np.std(v_section)/np.sqrt(2)
-    subthreshold_long_square_voltage_distribution=norm(loc=0, scale=np.sqrt(var_of_section))
+    subthreshold_long_square_voltage_distribution=stats.norm(loc=0, scale=np.sqrt(var_of_section))
     
     #--autocorrelation
     tau_4AC=res*cap
     AC=autocorr(v_section-np.mean(v_section)) 
     ACtime=np.arange(0,len(AC))*dt
 
-    #--fit autocorrelation with decaying exponential
-    def exp_decay(time, amp, tau):
-        return amp*np.exp(-time/tau) 
+    #--fit autocorrelation with decaying exponential    
     (popt, pcov)= curve_fit(exp_decay, ACtime, AC, p0=[AC[0],tau_4AC])
     tau_from_AC=popt[1]
     
@@ -46,12 +48,7 @@ def MLIN(voltage, current, res, cap, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK
         plt.legend()
         
         #--cumulative density function
-        (h, edges)=np.histogram(v_section, bins=50)
-        def find_bin_center(edges):
-            centers=np.zeros(len(edges)-1)
-            for ii in range(0, len(edges)-1):
-                centers[ii]=np.mean([edges[ii], edges[ii+1]])
-            return centers
+        (h, edges)=np.histogram(v_section, bins=50)        
         centers=find_bin_center(edges)
 
         CDFx=centers
@@ -98,11 +95,6 @@ def MLIN(voltage, current, res, cap, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK
             
             #--cumulative density function
             (h, edges)=np.histogram(v_section, bins=50)
-            def find_bin_center(edges):
-                centers=np.zeros(len(edges)-1)
-                for ii in range(0, len(edges)-1):
-                    centers[ii]=np.mean([edges[ii], edges[ii+1]])
-                return centers
             centers=find_bin_center(edges)
 
             CDFx=centers
@@ -127,3 +119,18 @@ def MLIN(voltage, current, res, cap, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK
             plt.tight_layout()
             
     return var_of_section, sv_for_expsymm, tau_from_AC
+
+def expsymm_pdf(v, dv):
+    return 1./(2.*dv)*np.exp(-np.absolute(v)/dv)
+
+def expsymm_cdf(v, dv):
+    return 1./2.+(v*(1-np.exp(-np.absolute(v)/dv)))/(2.*np.absolute(v))
+
+def exp_decay(time, amp, tau):
+    return amp*np.exp(-time/tau) 
+
+def find_bin_center(edges):
+    centers=np.zeros(len(edges)-1)
+    for ii in range(0, len(edges)-1):
+        centers[ii]=np.mean([edges[ii], edges[ii+1]])
+    return centers
