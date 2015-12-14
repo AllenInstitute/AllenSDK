@@ -11,6 +11,8 @@ import argparse
 
 import allensdk.core.json_utilities as ju
 
+import find_sweeps as fs
+
 class ModelConfigurationException( Exception ): pass
 
 DEFAULT_NEURON_PARAMETERS = {
@@ -67,28 +69,9 @@ def update_neuron_method(method_type, arg_method_name, neuron_config):
     neuron_config[method_type] = { 'name': arg_method_name, 'params': None }
 
 
-def extract_preprocessor_parameters(preprocessor_values):
-    #TODO: do I only want to put things where there are options in here?
-    output_dict = {
-        'El_reference': preprocessor_values['El']['El_noise']['measured']['mean'],
-        'El': 0.,
-        'dt': preprocessor_values['dt_used_for_preprocessor_calculations'], 
-        'R_input': preprocessor_values['resistance']['R_lssq_Wrest']['mean'],
-        'C': preprocessor_values['capacitance']['C_lssq_Wrest']['mean'],
-        'asc_amp_array': preprocessor_values['asc']['amp'],
-        'spike_cut_length': preprocessor_values['spike_cutting']['NOdeltaV']['cut_length'],
-        'th_inf': preprocessor_values['th_inf']['via_Vmeasure']['from_zero'],
-        'th_adapt': preprocessor_values['th_adapt']['from_95percentile_noise']['deltaV'],
-        'asc_tau_array': (1./np.array(preprocessor_values['asc']['k'])).tolist(),
-        'deltaV':None,
-        'spike_cutting_intercept': preprocessor_values['spike_cutting']['NOdeltaV']['intercept'],
-        'spike_cutting_slope': preprocessor_values['spike_cutting']['NOdeltaV']['slope']
-        #TODO: NOTE CURRENTLY ALL THESE VALUES ARE NOT WITH DELTA V
-        } 
-                
-    return output_dict
+def configure_model(sweep_list, method_config, preprocessor_values):
+    sweep_index = { s["sweep_number"]:s for s in sweep_list }
 
-def configure_model(method_config, preprocessor_values):
     neuron_config = {}
     neuron_config.update(DEFAULT_NEURON_PARAMETERS)
     optimizer_config = {}
@@ -101,13 +84,9 @@ def configure_model(method_config, preprocessor_values):
     #The sweeps need to pass both the sweep properties and have a value because the computation using the 
     #available stimulus actually is able to be calculated
 
-    #Skip trace if subthreshold noise has a spike in it.
-    noise1_ind=np.array([])
-    for ii in range(len(preprocessor_values['sweep_properties']['noise1'])):
-        if preprocessor_values['sweep_properties']['noise1'][str(ii+1)]['spike_ind'] is not None:
-            noise1_ind=np.append(noise1_ind, preprocessor_values['sweep_properties']['noise1'][str(ii+1)]['spike_ind'])
-
-    if np.any(np.array(noise1_ind)*preprocessor_values['dt_used_for_preprocessor_calculations']<8.):
+    # Skip trace if subthreshold noise has a spike in it.
+    noise1_ind = np.array(preprocessor_values['spike_ind']['noise1']
+    if np.any(noise1_ind * preprocessor_values['dt'] < 8.0):
         raise ModelConfigurationException("Noise1 spikes occur too early to configure model.")
 
     # check if there is a short square triple
@@ -132,20 +111,15 @@ def configure_model(method_config, preprocessor_values):
     update_neuron_method('voltage_reset_method', method_config['voltage_reset_method'], neuron_config)
     update_neuron_method('threshold_reset_method', method_config['threshold_reset_method'], neuron_config)
 
-    #TODO: Here is where things should be converted to model frame of reference
-    #also think about when the parameters are none when levels dont exist.  I dont
-    #think I will have to do anything additonal for this because the values will be none
-    parameters = extract_preprocessor_parameters(preprocessor_values)
-
-    neuron_config['El_reference'] = parameters['El_reference']
-    neuron_config['C'] = parameters['C']           
-    neuron_config['El'] = parameters['El']  # AT THE MOMENT EVERYTHING IS BEING CALCULATED SHIFTING EL TO ZERO
-    neuron_config['spike_cut_length'] = parameters['spike_cut_length']
-    neuron_config['asc_amp_array'] = parameters['asc_amp_array']
-    neuron_config['asc_tau_array'] = parameters['asc_tau_array']
-    neuron_config['R_input'] = parameters['R_input']
-    neuron_config['th_inf'] = parameters['th_inf']
-    neuron_config['th_adapt'] = parameters['th_adapt']
+    neuron_config['El_reference'] = preprocessor_values['El_reference']
+    neuron_config['C'] = preprocessor_values['C']           
+    neuron_config['El'] = preprocessor_values['El']  
+    neuron_config['spike_cut_length'] = preprocessor_values['spike_cut_length']
+    neuron_config['asc_amp_array'] = preprocessor_values['asc_amp_array']
+    neuron_config['asc_tau_array'] = preprocessor_values['asc_tau_array']
+    neuron_config['R_input'] = preprocessor_values['R_input']
+    neuron_config['th_inf'] = preprocessor_values['th_inf']
+    neuron_config['th_adapt'] = preprocessor_values['th_adapt']
 
     neuron_config['data_config_file'] = preprocessor_values['basic_info']['data_config_file']
     neuron_config['nwb_file'] = preprocessor_values['basic_info']['nwb']
@@ -159,8 +133,8 @@ def configure_model(method_config, preprocessor_values):
     configure_method_parameters(                  
         neuron_config,
         optimizer_config,
-        parameters['spike_cutting_slope'],
-        parameters['spike_cutting_intercept'],
+        preprocessor_values['spike_cutting_slope'],
+        preprocessor_values['spike_cutting_intercept'],
         #!!!!!!!!MAKE SURE THESE ARE IMPLIMENTED CORRECTLY
         preprocessor_values['nonlinearity_parameters']['line_param_RV_all'], 
         preprocessor_values['nonlinearity_parameters']['line_param_ElV_all'],
@@ -389,15 +363,17 @@ def configure_method_parameters(neuron_config,
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('preprocessor_values_path', help='path to preprocessor values json')
+    parser.add_argument('sweep_list_path', help='path to preprocessor values json')
     parser.add_argument('method_config_path', help='path to method configuration json')
     parser.add_argument('output_path', help='path to store final model configuration')
 
     args = parser.parse_args()
 
     preprocessor_values = ju.read(args.preprocessor_values_path)
+    sweep_list = ju.read(args.sweep_list_path)
     method_config = ju.read(args.method_config_path)
 
-    out_config = configure_model(method_config, preprocessor_values)
+    out_config = configure_model(sweep_list, method_config, preprocessor_values)
 
     ju.write(out_config_path, out_config)
 
