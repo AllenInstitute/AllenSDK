@@ -7,7 +7,7 @@ import allensdk.core.json_utilities as ju
 from allensdk.core.nwb_data_set import NwbDataSet
 
 import find_sweeps as fs
-from find_optimization_sweeps import MissingSweepException
+from find_sweeps import MissingSweepException
 
 from find_spikes import find_spikes, find_spikes_list
 from spike_cutting import calc_spike_cut_and_v_reset_via_expvar_residuals
