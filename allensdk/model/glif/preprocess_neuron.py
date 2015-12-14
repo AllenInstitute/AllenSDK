@@ -79,7 +79,7 @@ def subsample_data(data, method, present_time_step, desired_time_step):
     raise Exception("unknown subsample method: %s" % (method))
 
 
-def preprocess_neuron(nwb_file, sweep_list, dt, cut, bessel):
+def preprocess_neuron(nwb_file, sweep_list, dt=None, cut=0, bessel=None):
     sweep_index = { s['sweep_number']: s for s in sweep_list }
 
     # load noise
@@ -88,6 +88,12 @@ def preprocess_neuron(nwb_file, sweep_list, dt, cut, bessel):
     noise1_sweeps = noise_config['noise1']
     logging.debug("noise1_sweeps: %s" % str(noise1_sweeps))
     noise1_data = load_sweeps(nwb_file, noise1_sweeps, dt, cut, bessel)
+
+    if len(noise1_sweeps) == 0:
+        raise MissingSweepException("No noise1 sweeps found.")
+
+    if dt is None:
+        dt = noise1_data[0]['dt']
 
     noise2_sweeps = noise_config['noise2']
     logging.debug("noise2_sweeps: %s" % str(noise2_sweeps))
@@ -110,7 +116,14 @@ def preprocess_neuron(nwb_file, sweep_list, dt, cut, bessel):
     logging.debug("suprathresh_ssq_sweeps: %s" % str(superthresh_ssq_sweeps))
     superthresh_ssq_data = load_sweeps(nwb_file, superthresh_ssq_sweeps, dt, cut, bessel)
         
-
+    # load max subthreshold lsq
+    lsq_config = fs.find_long_square_sweeps(sweep_index)    
+    subthresh_lsq_sweeps = lsq_config['maximum_subthreshold']
+    logging.debug("subthresh lsq sweeps: %s" % str(subthresh_lsq_sweeps))
+    subthresh_lsq_data = load_sweeps(nwb_file,
+                                     [ subthresh_lsq_sweeps[0] ], 
+                                     dt, 
+                                     cut = 0, bessel = False) # no cut or bessel here
     # load ssq triple
     ssq_triple_sweeps = ssq_config['triple']
     if len(ssq_triple_sweeps):
@@ -121,7 +134,6 @@ def preprocess_neuron(nwb_file, sweep_list, dt, cut, bessel):
         ssq_triple_sweeps = None
         ssq_triple_data = None
         logging.info("No short square triple")
-                     
 
     # load ramp to rheo
     R2R_config = fs.find_ramp_to_rheo_sweeps(sweep_index)
@@ -137,14 +149,6 @@ def preprocess_neuron(nwb_file, sweep_list, dt, cut, bessel):
         logging.info("No ramp to rheo")
 
 
-    # load max subthreshold lsq
-    lsq_config = fs.find_long_square_sweeps(sweep_index)    
-    subthresh_lsq_sweeps = lsq_config['maximum_subthreshold']
-    logging.debug("subthresh lsq sweeps: %s" % str(subthresh_lsq_sweeps))
-    subthresh_lsq_data = load_sweeps(nwb_file,
-                                     [ subthresh_lsq_sweeps[0] ], 
-                                     dt, 
-                                     cut = 0, bessel = False) # no cut or bessel here
 
     # compute El
     subthresh_noise_current_list=[]
@@ -323,7 +327,7 @@ def preprocess_neuron(nwb_file, sweep_list, dt, cut, bessel):
             },
         'MLIN': {
             'var_of_section': var_of_section,
-            'sv_for_expsymm': sv_for_exp_symm,
+            'sv_for_expsymm': sv_for_expsymm,
             'tau_from_AC': tau_from_AC
             }
         }

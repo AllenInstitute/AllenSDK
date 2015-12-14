@@ -19,18 +19,9 @@ DEFAULT_NEURON_PARAMETERS = {
     "type": "GLIF", 
     "dt": 5e-05, 
     "El": 0,
-    "asc_tau_array": [
-        1,
-        1
-        ],
-    "asc_amp_array":[
-    	0,
-    	0
-        ],
-    "init_AScurrents": [
-        0.0, 
-        0.0
-        ], 
+    "asc_tau_array": [ 1, 1 ],
+    "asc_amp_array": [ 0, 0 ],
+    "init_AScurrents": [ 0.0, 0.0 ],
     "init_threshold": 0.02, 
     "init_voltage": 0.0,
     "extrapolation_method_name": "endpoints",
@@ -69,9 +60,7 @@ def update_neuron_method(method_type, arg_method_name, neuron_config):
     neuron_config[method_type] = { 'name': arg_method_name, 'params': None }
 
 
-def configure_model(sweep_list, method_config, preprocessor_values):
-    sweep_index = { s["sweep_number"]:s for s in sweep_list }
-
+def configure_model(method_config, preprocessor_values):
     neuron_config = {}
     neuron_config.update(DEFAULT_NEURON_PARAMETERS)
     optimizer_config = {}
@@ -85,18 +74,18 @@ def configure_model(sweep_list, method_config, preprocessor_values):
     #available stimulus actually is able to be calculated
 
     # Skip trace if subthreshold noise has a spike in it.
-    noise1_ind = np.array(preprocessor_values['spike_ind']['noise1']
+    noise1_ind = np.concatenate(preprocessor_values['spike_inds']['noise1'])
     if np.any(noise1_ind * preprocessor_values['dt'] < 8.0):
         raise ModelConfigurationException("Noise1 spikes occur too early to configure model.")
 
     # check if there is a short square triple
-    if preprocessor_values['sweep_properties']['multi_short_square']['sweep_num'] and preprocessor_values['threshold_adaptation']['b_spike_component_of_threshold'] and preprocessor_values['threshold_adaptation']['a_spike_component_of_threshold']:
+    if preprocessor_values['threshold_adaptation']['b_spike_component_of_threshold'] and preprocessor_values['threshold_adaptation']['a_spike_component_of_threshold']:
         has_mss=True
     else:
         has_mss=False
 
     # check if there is ramp to rheo 
-    if preprocessor_values['sweep_properties']['ramp_to_rheo']['1']['sweep_num'] and preprocessor_values['nonlinearity_parameters']['line_param_ElV_all'] and preprocessor_values['nonlinearity_parameters']['line_param_RV_all']:
+    if preprocessor_values['nonlinearity_parameters']['line_param_ElV_all'] and preprocessor_values['nonlinearity_parameters']['line_param_RV_all']:
         has_rheo=True
     else: 
         has_rheo=False
@@ -121,9 +110,6 @@ def configure_model(sweep_list, method_config, preprocessor_values):
     neuron_config['th_inf'] = preprocessor_values['th_inf']
     neuron_config['th_adapt'] = preprocessor_values['th_adapt']
 
-    neuron_config['data_config_file'] = preprocessor_values['basic_info']['data_config_file']
-    neuron_config['nwb_file'] = preprocessor_values['basic_info']['nwb']
-
     optimizer_config['error_function'] = method_config['error_function']
     optimizer_config['param_fit_names'] = method_config['param_fit_names']
 
@@ -145,8 +131,7 @@ def configure_model(sweep_list, method_config, preprocessor_values):
         preprocessor_values['threshold_adaptation']['b_voltage_component_of_threshold'],
         preprocessor_values['MLIN']['var_of_section'],
         preprocessor_values['MLIN']['sv_for_expsymm'],
-        preprocessor_values['MLIN']['tau_from_AC'],
-        preprocessor_values['spike_determination_method'])
+        preprocessor_values['MLIN']['tau_from_AC'])
 
     return neuron_config, optimizer_config
 
@@ -166,8 +151,7 @@ def configure_method_parameters(neuron_config,
                                 b_voltage_component_of_threshold,
                                 var_of_section,
                                 sv_for_expsymm,
-                                tau_from_AC,
-                                spike_determination_method): #TODO: I think this variable should be coming in a different say 
+                                tau_from_AC):
     
     # initialize the generic method data 
     neuron_config['init_method_data'] = {}
@@ -363,17 +347,15 @@ def configure_method_parameters(neuron_config,
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('preprocessor_values_path', help='path to preprocessor values json')
-    parser.add_argument('sweep_list_path', help='path to preprocessor values json')
     parser.add_argument('method_config_path', help='path to method configuration json')
     parser.add_argument('output_path', help='path to store final model configuration')
 
     args = parser.parse_args()
 
     preprocessor_values = ju.read(args.preprocessor_values_path)
-    sweep_list = ju.read(args.sweep_list_path)
     method_config = ju.read(args.method_config_path)
 
-    out_config = configure_model(sweep_list, method_config, preprocessor_values)
+    out_config = configure_model(method_config, preprocessor_values)
 
     ju.write(out_config_path, out_config)
 

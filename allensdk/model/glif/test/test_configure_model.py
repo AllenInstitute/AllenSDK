@@ -1,7 +1,7 @@
 from configure_model import configure_model
 import allensdk.core.json_utilities as ju
 import numpy as np
-import re, os
+import re, os, logging
 
 MODEL_CONFIG_FILES = [    
         "/data/mat/Corinne/GLIF_subset/model_config_files/369697038Nr5a1-CrePOS/369697038Nr5a1-CrePOS_LIF_R_ASC_mlin_model_config.json",
@@ -39,6 +39,8 @@ def cmpdict(d1, d2):
         print sorted(list(k1))
         print sorted(list(k2))
         
+        print d1
+        print d2
         raise Exception("different keysets")
 
     for k in k1:
@@ -60,7 +62,7 @@ def cmpdict(d1, d2):
         except:
             raise Exception("%s: %s vs %s" % (k, str(d1[k]), str(d2[k])))
                             
-def test_configure_model():
+def test_configure_model_old():
     p = re.compile("(\d+)(.*?)_(.*)_mlin_model_config.json")
 
     for mcf in MODEL_CONFIG_FILES:
@@ -79,6 +81,32 @@ def test_configure_model():
 
         cmpdict(outd['neuron'], neuron_config)
         cmpdict(outd['optimizer'], optimizer_config)
+
+
+def test_configure_model():
+    p = re.compile("(\d+)(.*?)_(.*)_mlin_model_config.json")
+
+    for mcf in MODEL_CONFIG_FILES:
+        fname = os.path.basename(mcf)
+        m = p.match(fname)
+        
+        sid, cre, config =  m.groups()
+
+        method_config_file = "method_configurations/%s.json" % config
+        prep_file = "test/%s_preprocessed_dict.json" % sid
+
+        if os.path.exists(prep_file):
+            print prep_file
+            neuron_config, optimizer_config = configure_model(ju.read(method_config_file), 
+                                                              ju.read(prep_file))
+            
+            outd = ju.read(mcf)
+            
+            cmpdict(outd['neuron'], neuron_config)
+            cmpdict(outd['optimizer'], optimizer_config)
+
+        else:
+            logging.error("preprocessor file %s does not exist" % prep_file)
 
 
 if __name__ == "__main__": test_configure_model()

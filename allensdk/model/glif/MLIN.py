@@ -8,7 +8,8 @@ def MLIN(voltage, current, res, cap, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK
     input:
         voltage: numpy array of voltage with test pulse cut out 
         current: numpy array of stimulus with test pulse cut out '''
-    (_, _, _, start_idx, end_idx) = get_square_stim_characteristics(current)
+    t = np.arange(0, len(current)) * dt
+    (_, _, _, start_idx, end_idx) = get_square_stim_characteristics(current, t, no_test_pulse=True)
     stim_len = end_idx - start_idx + 1
 
     distribution_start_ind=start_idx + int(.5/dt)
@@ -134,3 +135,8 @@ def find_bin_center(edges):
     for ii in range(0, len(edges)-1):
         centers[ii]=np.mean([edges[ii], edges[ii+1]])
     return centers
+
+def autocorr(x):
+    result = np.correlate(x, x, mode='full')
+#    return result
+    return result[result.size/2:]
