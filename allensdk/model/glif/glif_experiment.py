@@ -7,7 +7,7 @@ import numpy as np
 class GlifExperiment( object ):
     def __init__(self, neuron, dt, stim_list, resp_list,
                  spike_time_steps, grid_spike_times, grid_spike_voltages,
-                 target_spike_mask, param_fit_names,
+                 param_fit_names,
                  **kwargs):
 
         self.neuron = neuron
@@ -17,7 +17,6 @@ class GlifExperiment( object ):
         self.spike_time_steps = spike_time_steps
         self.grid_spike_times = grid_spike_times
         self.grid_spike_voltages = grid_spike_voltages
-        self.target_spike_mask = target_spike_mask
         self.param_fit_names = param_fit_names
 
         self.spike_errors = []
@@ -33,7 +32,7 @@ class GlifExperiment( object ):
         returns:
             voltage_list: list of array of voltage values. NOTE: IF THE MODEL NEURON SPIKES BEFORE THE TARGET THE VOLTAGE WILL 
                 NOT BE CALCULATED THEREFORE THE RESULTING VECTOR WILL NOT BE AS LONG AS THE TARGET AND ALSO WILL NOT 
-                MAKE SENSE WITH THE STIMULUS UNLEtarget_spike_maskSS YOU CUT IT AND OUTPUT IT TOO.
+                MAKE SENSE WITH THE STIMULUS UNLESS YOU CUT IT AND OUTPUT IT TOO.
             grid_spike_times_list:
             interpolated_spike_time_list: an array of the actual times of the spikes. NOTE: THESE TIMES ARE CALCULATED BY ADDING THE 
                 TIME OF THE INDIVIDUAL SPIKE TO THE TIME OF THE LAST SPIKE.
@@ -83,7 +82,7 @@ class GlifExperiment( object ):
         returns:
             voltage_list: list of array of voltage values. NOTE: IF THE MODEL NEURON SPIKES BEFORE THE TARGET THE VOLTAGE WILL 
                 NOT BE CALCULATED THEREFORE THE RESULTING VECTOR WILL NOT BE AS LONG AS THE TARGET AND ALSO WILL NOT 
-                MAKE SENSE WITH THE STIMULUS UNLEtarget_spike_maskSS YOU CUT IT AND OUTPUT IT TOO.
+                MAKE SENSE WITH THE STIMULUS UNLESS YOU CUT IT AND OUTPUT IT TOO.
             gridTime_list:
             interpolatedTime_list: an array of the actual times of the spikes. NOTE: THESE TIMES ARE CALCULATED BY ADDING THE 
                 TIME OF THE INDIVIDUAL SPIKE TO THE TIME OF THE LAST SPIKE.

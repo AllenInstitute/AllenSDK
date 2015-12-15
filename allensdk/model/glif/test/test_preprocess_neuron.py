@@ -7,7 +7,7 @@ import allensdk.core.json_utilities as ju
 DATA_CONFIG_FILES = [
     "/data/mat/Corinne/GLIF_subset/data_config_files/329552531_data_config.json",
     "/data/mat/Corinne/GLIF_subset/data_config_files/476106176_data_config.json",
-    "/data/mat/Corinne/GLIF_subset/data_config_files/485455285_data_config.json",
+    "/data/mat/Corinne/GLIF_subset/data_config_files/485455285_data_config.json"
     "/data/mat/Corinne/GLIF_subset/data_config_files/369697038_data_config.json",
     "/data/mat/Corinne/GLIF_subset/data_config_files/485912047_data_config.json"
 ]
@@ -66,7 +66,10 @@ def test_preprocess_neuron():
         assert_equal(d['spike_cut_length'], dictionary['spike_cutting']['NOdeltaV']['cut_length'], 'spike_cut_length', errs)
         assert_equal(d['spike_cutting_intercept'], dictionary['spike_cutting']['NOdeltaV']['intercept'], 'spike_cutting_intercept', errs)
         assert_equal(d['spike_cutting_slope'], dictionary['spike_cutting']['NOdeltaV']['slope'], 'spike_cutting_slope', errs)
-        assert_array_equal(d['asc_amp_array'], dictionary['asc']['amp'], 'asc_amp_array', errs)
+        bloop = []
+        assert_array_equal(d['asc_amp_array'], dictionary['asc']['amp'], 'asc_amp_array', bloop)
+        if len(bloop):
+            logging.error(bloop[0])
         assert_array_equal(d['asc_tau_array'], 1./np.array(dictionary['asc']['k']), 'asc_tau_array', errs)
 
         nlp = d['nonlinearity_parameters']

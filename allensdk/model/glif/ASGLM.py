@@ -12,7 +12,7 @@ def ASGLM_pairwise(ks_int, I_stim, voltage, spike_ind, cinit, tauinit, SCL, dt, 
         '''
     if fit_phrase not in ['asc', 'ascR', 'ascREl', 'ascRElC']:
         raise Exception("The fit phrase is does not fit available fitting options")
-    
+
     #TODO; MAKE SURE CLARIFY WHETHER LIST APPENDS ARE OVER PAIRWISE K'S OR REPEATS
     #TODO: ISTIM WAS ORIGINALLY AN AMPLITUTE EPOCH
     #Initial tau and C as seed inputs for optimization

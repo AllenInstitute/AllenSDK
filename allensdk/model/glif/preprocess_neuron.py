@@ -268,7 +268,7 @@ def preprocess_neuron(nwb_file, sweep_list, dt=None, cut=0, bessel=None):
         R2R_El_list = []
         R2R_voltage_list = []
         R2R_current_list = []
-        for ss in range(R2R_sweeps):
+        for ss in range(len(R2R_sweeps)):
             R2R_voltage_list.append(R2R_data['voltage'][ss][R2R_data['start_idx'][ss]:])
             R2R_current_list.append(R2R_data['current'][ss][R2R_data['start_idx'][ss]:])
             R2R_El_list.append(sweep_index[R2R_sweeps[ss]][RESTING_POTENTIAL]*1e-3)  
@@ -329,7 +329,8 @@ def preprocess_neuron(nwb_file, sweep_list, dt=None, cut=0, bessel=None):
             'var_of_section': var_of_section,
             'sv_for_expsymm': sv_for_expsymm,
             'tau_from_AC': tau_from_AC
-            }
+            },
+        'nwb_file': nwb_file
         }
 
     return values

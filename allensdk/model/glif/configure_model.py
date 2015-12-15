@@ -112,6 +112,7 @@ def configure_model(method_config, preprocessor_values):
 
     optimizer_config['error_function'] = method_config['error_function']
     optimizer_config['param_fit_names'] = method_config['param_fit_names']
+    optimizer_config['nwb_file'] = preprocessor_values['nwb_file']
 
     #b) choose the sets want from the preprocessor_values 
     #TODO: currently the model configuration just alters things in the neuron config which is kind of annoying
@@ -133,7 +134,10 @@ def configure_model(method_config, preprocessor_values):
         preprocessor_values['MLIN']['sv_for_expsymm'],
         preprocessor_values['MLIN']['tau_from_AC'])
 
-    return neuron_config, optimizer_config
+    return {
+        'neuron': neuron_config,
+        'optimizer': optimizer_config
+        }
 
 #The idea here should be to put in things that are needed
 #rename things as appropriate
@@ -343,6 +347,7 @@ def configure_method_parameters(neuron_config,
     
     if spike_cut_length < 0:
         raise ModelConfigurationException("Spike cut length must be non-negative.")
+
 
 def main():
     parser = argparse.ArgumentParser()

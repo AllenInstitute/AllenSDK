@@ -74,13 +74,13 @@ def test_configure_model_old():
         method_config_file = "method_configurations/%s.json" % config
         prep_file = "/data/mat/Corinne/GLIF_subset/preprocessed_dicts/dictionaries/%s_preprocessed_dict.json" % sid
 
-        neuron_config, optimizer_config = configure_model(ju.read(method_config_file), 
-                                                          ju.read(prep_file))
+        out_config = configure_model(ju.read(method_config_file), 
+                                     ju.read(prep_file))
 
         outd = ju.read(mcf)
 
-        cmpdict(outd['neuron'], neuron_config)
-        cmpdict(outd['optimizer'], optimizer_config)
+        cmpdict(outd['neuron'], out_config['neuron'])
+        cmpdict(outd['optimizer'], out_config['optimizer'])
 
 
 def test_configure_model():

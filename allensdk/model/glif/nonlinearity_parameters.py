@@ -1,5 +1,14 @@
 import numpy as np
 
+from find_spikes import find_spikes
+from allensdk.ephys.extract_cell_features import get_square_stim_characteristics
+
+from scipy.optimize import curve_fit
+
+from rc import least_squares_simple_circuit_fit_REl
+
+from glif_neuron_methods import max_of_line_and_const, min_of_line_and_zero
+
 def R2R_subthresh_nonlinearity(rheo_current_list, rheo_voltage_list, res, cap, El, El_R2R_list, dt, 
                                MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False):
     '''Estimates how resistance is dependent on voltage before a spike.  Fits two lines to resistance 
@@ -31,9 +40,15 @@ def R2R_subthresh_nonlinearity(rheo_current_list, rheo_voltage_list, res, cap, E
         rheo_current=np.array(rheo_current_list[ss]) 
         rheo_voltage=np.array(rheo_voltage_list[ss])  
         El_R2R=El_R2R_list[ss]
-        rheo_first_spike_ind=find_spikes.find_spikes([rheo_voltage], 'dvdt_v2', dt)[0]-20                
+
+        rheo_spikes, _ = find_spikes(rheo_voltage, dt)
+        rheo_first_spike_ind = rheo_spikes - 20                
+
         #Choose start and end timepoints for ramp
-        tst=find_stimulus(rheo_current)[0]
+        
+        t = np.arange(0, len(rheo_current)) * dt
+        (_, _, _, tst, _) = get_square_stim_characteristics(rheo_current, t, no_test_pulse=True)
+
         if rheo_first_spike_ind.any():
             tend=rheo_first_spike_ind[0]-int(.005/dt)  #choose 5 ms arbitrarily
         else:

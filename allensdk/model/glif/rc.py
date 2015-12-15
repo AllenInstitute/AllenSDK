@@ -48,3 +48,37 @@ def least_squares_simple_circuit_fit_RCEl(voltage_list, current_list, dt, no_res
     
     return resistance_list, capacitance_list, El_list
 
+
+def least_squares_simple_circuit_fit_REl(voltage_list, current_list, Cap, dt):
+    '''Calculate resistance and resting potential by performing 
+    least squares on current and voltage.
+    inputs:
+        voltage_list: list of voltage responses for several sweep repeats
+        current_list: list of current injections for several sweep repeats
+        Cap: capacitance (float) 
+        dt: time step size
+    outputs:
+        list of resistance and resting potential values for each sweep
+    '''
+    resistance_list=[]
+    El_list=[]
+    for voltage, current in zip(voltage_list, current_list):    
+        v_nplus1=voltage[1:]
+        voltage=voltage[0:-1]
+        current=current[0:-1]
+        matrix=np.ones((len(voltage), 2))
+        matrix[:,0]=voltage
+        out=np.linalg.lstsq(matrix, v_nplus1-(current*dt)/Cap)[0] 
+        
+        resistance=dt/(Cap*(1-out[0]))
+        El=(Cap*resistance*out[1])/dt        
+        
+        resistance_list.append(resistance)
+        El_list.append(El)    
+    
+#    print "R via least squares", np.mean(resistance_list)*1e-6, "Mohms"
+#    print "C via least squares", np.mean(capacitance_list)*1e12, "pF"
+#    print "El via least squares", np.mean(El_list)*1e3, "mV" 
+#    print "tau", np.mean(resistance_list)*np.mean(capacitance_list)*1e3, "ms"
+    
+    return resistance_list, El_list
