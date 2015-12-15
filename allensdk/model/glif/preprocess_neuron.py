@@ -1,6 +1,7 @@
 import argparse, logging
 
 from scipy import signal
+from scipy.optimize import fmin
 import numpy as np
 
 import allensdk.core.json_utilities as ju
@@ -227,8 +228,8 @@ def preprocess_neuron(nwb_file, sweep_list, dt=None, cut=0, bessel=None):
             th_vals_relativeto0 = np.append(th_vals_relativeto0, noise1_data['voltage'][ss][noise1_ind_wo_test_pulse_removed[ss]]-noise_El_list[ss])
             th_vals = np.append(th_vals, noise1_data['voltage'][ss][noise1_ind_wo_test_pulse_removed[ss]])
 
+    th_inf_from_5percentile_noise_from0 = np.percentile(th_vals_relativeto0,5)
     th_adapt_from_95percentile_noise_from0 = np.percentile(th_vals_relativeto0,95)   
-    th_inf_from_5percentile_noise = np.percentile(th_vals,5)
 
     if ssq_triple_data:
         (a_spike_component_of_threshold, b_spike_component_of_threshold, mean_voltage_first_spike_of_blip) = \

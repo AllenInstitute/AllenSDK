@@ -1,16 +1,15 @@
 import numpy as np
+import copy
+from scipy.interpolate import interp1d
+from scipy.optimize import curve_fit
+import logging
 
+THRESH_PCT_MULTIBLIP = 0.05
 
 def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
     '''In the multiblip there are problems with artifacts when the stimulus turns on and off 
     creating problems detecting spikes.
     '''    
-    def exp_force_c((t, const), a1, k1):
-        return a1*(np.exp(k1*t))+const
-
-    def exp_fit_c(t, a1, k1, const):
-        return a1*(np.exp(k1*t))+const
-
     multi_SS_v=multi_SS['voltage']
     multi_SS_i=multi_SS['current']
 
@@ -133,7 +132,8 @@ def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOC
         #TODO: Corinne abs is put in hastily make sure this is ok
         const_to_add_to_thresh_for_reset=abs(popt_force[0]) 
         b=abs(popt_force[1])
-    except:
+    except Exception, e:
+        logging.error(e.message)
         const_to_add_to_thresh_for_reset=None 
         b=None
         
@@ -316,3 +316,25 @@ def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
 #        plt.show()
         
     return out_spk_idxs_list
+
+def get_peaks(voltage, aboveValue=0):
+    '''This function was written by Corinne Teeter and calculates the action potential peaks of a voltage equation"
+    inputs
+        voltage: numpy array of voltages
+        aboveValue: scalar voltage value over which voltage is considered a spike.
+    outputs:    
+        peakInd: array of indicies of peaks'''
+    VshiftR=np.concatenate(([0], voltage[0:voltage.size-2]))
+    VshiftL=voltage[1:voltage.size]
+    IndShiftR=np.where(voltage[0:voltage.size-1]>VshiftR)
+    IndShiftL=np.where(voltage[0:voltage.size-1]>VshiftL)
+    greatThanThresh=np.where(voltage>aboveValue) #finds indicies greater than the value provided
+    peakInd=np.intersect1d(np.intersect1d(IndShiftL[0], IndShiftR[0]), greatThanThresh[0]) #find the indicies of the peak
+    return peakInd
+
+def exp_force_c((t, const), a1, k1):
+    return a1*(np.exp(k1*t))+const
+
+def exp_fit_c(t, a1, k1, const):
+    return a1*(np.exp(k1*t))+const
+

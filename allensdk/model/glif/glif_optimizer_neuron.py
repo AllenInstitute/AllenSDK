@@ -694,9 +694,9 @@ def find_first_model_spike(voltage, threshold, voltage_t1, threshold_t1, dt):
             grid_model_spike_time = dt * (time_step-1)
             grid_model_spike_voltage = voltage[time_step-1]
             
-            interpolated_model_spike_time = neuron.interpolate_spike_time(dt, time_step-1, 
-                                                                          threshold[time_step-1], threshold[time_step], 
-                                                                          voltage[time_step-1], voltage[time_step])
+            interpolated_model_spike_time = glif_neuron.interpolate_spike_time(dt, time_step-1, 
+                                                                               threshold[time_step-1], threshold[time_step], 
+                                                                               voltage[time_step-1], voltage[time_step])
             
             interpolated_model_spike_voltage = interpolate_spike_voltage(dt, time_step-1, 
                                                                          threshold[time_step-1], threshold[time_step], 
@@ -709,7 +709,7 @@ def find_first_model_spike(voltage, threshold, voltage_t1, threshold_t1, dt):
         grid_model_spike_time = dt * ( num_time_steps - 1 )
         grid_model_spike_voltage = voltage_t1
             
-        interpolated_model_spike_time = neuron.interpolate_spike_time(dt, num_time_steps - 1, threshold[num_time_steps-1], threshold_t1, voltage[num_time_steps-1], voltage_t1)
+        interpolated_model_spike_time = glif_neuron.interpolate_spike_time(dt, num_time_steps - 1, threshold[num_time_steps-1], threshold_t1, voltage[num_time_steps-1], voltage_t1)
         interpolated_model_spike_voltage = interpolate_spike_voltage(dt, num_time_steps, threshold[-1], threshold_t1, voltage[-1], voltage_t1)
 
         return grid_model_spike_time, grid_model_spike_voltage, interpolated_model_spike_time, interpolated_model_spike_voltage

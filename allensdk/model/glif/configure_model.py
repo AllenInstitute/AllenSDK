@@ -38,7 +38,9 @@ DEFAULT_OPTIMIZER_PARAMETERS = {
     "outer_iterations": 3, 
     "internal_iterations": 10000000,
     "iteration_info": [],
-    "param_fit_names": []
+    "param_fit_names": [],
+    "cut": 0,
+    "bessel": { 'N': 4, 'Wn': .1 }
     }
     
 

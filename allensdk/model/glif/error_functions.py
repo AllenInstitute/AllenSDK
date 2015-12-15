@@ -33,15 +33,15 @@ def MLIN_list_error(param_guess, experiment, input_data):
     try:
         run_data = experiment.run(param_guess)
 
-    except GLIFNeuronException, e:
+    except GlifNeuronException, e:
         out=e.data
         raise e
         modelSpikeISI=[e.data['interpolated_ISI']]    
         
-    except GLIFBadInitializationException, e:
+    except GlifBadInitializationException, e:
         logging.critical('voltage STARTS above threshold: setting error to be large.Difference between thresh and voltage is: %f' % e.dv)
         raise Exception()
-    except GLIFBadResetException, e:
+    except GlifBadResetException, e:
         logging.critical('THIS REALLY SHOULDNT HAPPEN WITH NEW INITIALIZATION EXCEPTION: voltage is above threshold at reset: setting error to be large.  Difference between thresh and voltage is: %f' % e.dv)
         raise Exception()
 
