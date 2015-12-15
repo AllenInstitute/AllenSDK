@@ -37,7 +37,12 @@ def test_preprocess_neuron():
 
         sid = m.groups()
 
-        test_data_file = "/data/mat/Corinne/GLIF_subset/preprocessed_dicts/dictionaries/%s_preprocessed_dict.json" % sid
+        #test_data_file = "/data/mat/Corinne/GLIF_subset/preprocessed_dicts/dictionaries/%s_preprocessed_dict.json" % sid
+        test_data_file = "/local1/stash/glif_clean/test_preprocess/dictionaries/%s_preprocessed_dict.json" % sid
+
+        if not os.path.exists(test_data_file):
+            logging.warning("no test file %s" % test_data_file)
+            continue
         out_file = "test/%s_preprocessed_dict.json" % sid
 
         data_config = ju.read(data_config_file)

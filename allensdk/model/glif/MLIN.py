@@ -10,7 +10,7 @@ def MLIN(voltage, current, res, cap, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK
         current: numpy array of stimulus with test pulse cut out '''
     t = np.arange(0, len(current)) * dt
     (_, _, _, start_idx, end_idx) = get_square_stim_characteristics(current, t, no_test_pulse=True)
-    stim_len = end_idx - start_idx + 1
+    stim_len = end_idx - start_idx
 
     distribution_start_ind=start_idx + int(.5/dt)
     distribution_end_ind=start_idx + stim_len
