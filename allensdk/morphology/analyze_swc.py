@@ -8,7 +8,7 @@ import psycopg2.extras
 
 def usage():
     print("This script calculates features from neuron morphology data")
-    print("Input to the script is one or more specimen IDs")
+    print("Input to the script is one or more specimen IDs or names")
     print("The script pulls the latest .swc file from LIMS, applies an")
     print("   affine transform to pia space and then calculates features")
     print("   for apical and basal dendrites")
@@ -331,9 +331,8 @@ for k, record in records.iteritems():
         # apply affine transform
         aff = fetch_affine_record(aff_sql % record["spec_id"])
         nrn.apply_affine(aff)
-        # save tmp swc file for BB library, using transformed coordinates
         tmp_swc_file = record["filename"][:-4] + "_pia.swc"
-        success = nrn.save_to(tmp_swc_file)
+        nrn.save_to(tmp_swc_file)
         # apply affine to basal and apical copies too
         basal.apply_affine(aff)
         apical.apply_affine(aff)
@@ -347,6 +346,8 @@ for k, record in records.iteritems():
             if obj.t == 2:
                 nrn.obj_list[i] = None
         nrn.clean_up()
+        tmp_swc_file_bb = record["filename"][:-4] + "_pia_bb.swc"
+        success = nrn.save_to(tmp_swc_file_bb)
         basal_data = calculate_v3d_features(basal, 3, "basal dendrite")
         #print "DEBUG Overloading apical data to test affine on basal"
         #apical_data = calculate_v3d_features(apical, 3, "orig dendrite")
@@ -357,20 +358,20 @@ for k, record in records.iteritems():
         if apical_data is not None:
             data["v3d_apical"] = apical_data
         ####################################################################
-        # v3d feature set
+        # BB feature set
         #
         # TODO check success value above to know what file to use
-#    try:
-#        bb_feat, bb_desc = compute_features_bb(tmp_swc_file)
-#        feat_out = {}
-#        for j in range(len(bb_feat)):
-#            feat_out[bb_desc[j]] =  bb_feat[j]
-#            if bb_desc[j] not in bb_features:
-#                bb_features[bb_desc[j]] = bb_desc[j]
-#        data["bb_features"] = feat_out
-#    except:
-#        print("Error calculating BB features")
-#        raise
+#        try:
+#            bb_feat, bb_desc = compute_features_bb(tmp_swc_file)
+#            feat_out = {}
+#            for j in range(len(bb_feat)):
+#                feat_out[bb_desc[j]] =  bb_feat[j]
+#                if bb_desc[j] not in bb_features:
+#                    bb_features[bb_desc[j]] = bb_desc[j]
+#            data["bb_features"] = feat_out
+#        except:
+#            print("Error calculating BB features")
+#            raise
     except Exception, e:
         print("")
         print("**** Error: analyzing file ****")
