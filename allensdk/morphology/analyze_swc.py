@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import morphology_analysis as morphology
-from morphology_analysis_bb import compute_features as compute_features_bb
+#from morphology_analysis_bb import compute_features as compute_features_bb
+from bb3 import compute_features as compute_features_bb
 import traceback
 import sys
 import psycopg2
@@ -279,7 +280,7 @@ def calculate_v3d_features(morph, swc_type, label):
     # re-hash object tree
     morph.clean_up()
     # calculate features
-    morph_data = {}
+    results = {}
     try:
         gmi, gmi_desc = morphology.computeGMI(morph)
         gmi_out = {}
@@ -287,7 +288,7 @@ def calculate_v3d_features(morph, swc_type, label):
             gmi_out[gmi_desc[j]] = gmi[j]
             if gmi_desc[j] not in v3d_features:
                 v3d_features[gmi_desc[j]] = gmi_desc[j]
-        morph_data["gmi"] = gmi_out
+        results["gmi"] = gmi_out
     except:
         print("Error calculating GMI for " + label)
         raise
@@ -298,15 +299,16 @@ def calculate_v3d_features(morph, swc_type, label):
             feat_out[feature_desc[j]] =  features[j]
             if feature_desc[j] not in v3d_features:
                 v3d_features[feature_desc[j]] = feature_desc[j]
-        morph_data["features"] = feat_out
+        results["features"] = feat_out
     except:
         print("Error calculating l-measure for " + label)
         raise
-    return morph_data
+    return results
 
 # extract feature data
 # global dictionary to store features. one entry per specimen_id
 morph_data = {}
+
 for k, record in records.iteritems():
     # get SWC file
     swc_file = record["path"] + record["filename"]
@@ -338,9 +340,21 @@ for k, record in records.iteritems():
         apical.apply_affine(aff)
         #
         ####################################################################
+        # strip axons from SWC
+        ####################################################################
         # v3d feature set
         #
-        # strip axons from SWC
+        data = {}
+        basal_data = calculate_v3d_features(basal, 3, "basal dendrite")
+        if basal_data is not None:
+            data["v3d_basal"] = basal_data
+        apical_data = calculate_v3d_features(apical, 4, "apical dendrite")
+        if apical_data is not None:
+            data["v3d_apical"] = apical_data
+        ####################################################################
+        # BB feature set
+        #
+        # write cleaned-up file for BB to use
         for i in range(len(nrn.obj_list)):
             obj = nrn.obj_list[i]
             if obj.t == 2:
@@ -348,30 +362,16 @@ for k, record in records.iteritems():
         nrn.clean_up()
         tmp_swc_file_bb = record["filename"][:-4] + "_pia_bb.swc"
         success = nrn.save_to(tmp_swc_file_bb)
-        basal_data = calculate_v3d_features(basal, 3, "basal dendrite")
-        #print "DEBUG Overloading apical data to test affine on basal"
-        #apical_data = calculate_v3d_features(apical, 3, "orig dendrite")
-        apical_data = calculate_v3d_features(apical, 4, "apical dendrite")
-        data = {}
-        if basal_data is not None:
-            data["v3d_basal"] = basal_data
-        if apical_data is not None:
-            data["v3d_apical"] = apical_data
-        ####################################################################
-        # BB feature set
-        #
-        # TODO check success value above to know what file to use
-#        try:
-#            bb_feat, bb_desc = compute_features_bb(tmp_swc_file)
-#            feat_out = {}
-#            for j in range(len(bb_feat)):
-#                feat_out[bb_desc[j]] =  bb_feat[j]
-#                if bb_desc[j] not in bb_features:
-#                    bb_features[bb_desc[j]] = bb_desc[j]
-#            data["bb_features"] = feat_out
-#        except:
-#            print("Error calculating BB features")
-#            raise
+        # calculate features
+        try:
+            bb_data = compute_features_bb(tmp_swc_file_bb)
+            data["bb_features"] = bb_data
+            for k in bb_data:
+                if k not in bb_features:
+                    bb_features[k] = k
+        except:
+            print("Error calculating BB features")
+            raise
     except Exception, e:
         print("")
         print("**** Error: analyzing file ****")
@@ -412,22 +412,23 @@ except IOError:
     print("Unable to open input file '%s'" % cmds["output_file"])
     sys.exit(1)
 # write CSV header row
-f.write("specimen_id,specimen_name,filename,")
+f.write("specimen_name,specimen_id,filename,")
 for i in range(len(v3d_feature_list)):
     f.write("basal_" + v3d_feature_list[i] + ",")
 for i in range(len(v3d_feature_list)):
     f.write("apical_" + v3d_feature_list[i] + ",")
-#
-#for i in range(len(bb_feature_list)):
-#    f.write(bb_feature_list[i] + ",")
+for i in range(len(bb_feature_list)):
+    f.write(bb_feature_list[i] + ",")
 f.write("ignore\n")
-import json
-feat = {}
-feat["feature_data"] = morph_data
-feat["v3d_feature_list"] = v3d_feature_list
-with open("out.json", "w") as jf:
-    json.dump(feat, jf, indent=2)
-    jf.close()
+
+#import json
+#feat = {}
+#feat["feature_data"] = morph_data
+#feat["v3d_feature_list"] = v3d_feature_list
+#feat["v3d_feature_list"] = v3d_feature_list
+#with open("out.json", "w") as jf:
+#    json.dump(feat, jf, indent=2)
+#    jf.close()
 
 # write data
 try:
@@ -436,10 +437,13 @@ try:
         spec_name = record["spec_name"]
         if spec_name not in morph_data:
             continue    # perhaps skipped due earlier error
+        data = morph_data[spec_name]
+        # error processing neuron -- omit from output
+        if "v3d_basal" not in data and "v3d_apical" not in data:
+            continue
         spec_id = record["spec_id"]
         filename = record["path"] + record["filename"]
         f.write("%s,%d,%s," % (spec_name, spec_id, filename))
-        data = morph_data[spec_name]
         # v3d features
         # create an alias
         v3d = v3d_feature_list
@@ -468,6 +472,18 @@ try:
                 f.write(val + ",")
         else:
             for i in range(len(v3d)):
+                f.write("NaN,")
+        # BB features
+        if "bb_features" in data:
+            bb = bb_feature_list
+            for i in range(len(bb)):
+                if bb[i] in data["bb_features"]:
+                    val = str(data["bb_features"][bb[i]])
+                else:
+                    val = "NaN"
+                f.write(val + ",")
+        else:
+            for i in range(len(bb)):
                 f.write("NaN,")
         f.write("\n")
     f.close()

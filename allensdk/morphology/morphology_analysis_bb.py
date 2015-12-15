@@ -685,7 +685,7 @@ def compute_features(swc_file):
     record(feat, desc, "median_%s_branches", branches[0])
     record(feat, desc, "mean_%s_branches", branches[1])
     record(feat, desc, "max_%s_branches", branches[2])
-    record(feat, desc, "number_%s_branches", branches[3])
+    record(feat, desc, "number_%s_branches", branches[3])#
     #
     record(feat, desc, "number_%s_tips", get_number_of_tips(nrn))
     # bounding box
@@ -704,16 +704,32 @@ def compute_features(swc_file):
     record(feat, desc, "mean_%s_diameter", get_diameter(nrn))
     record(feat, desc, "min_%s_diameter", get_min_diameter(nrn))
     record(feat, desc, "max_%s_diameter", get_max_diameter(nrn))
-    record(feat, desc, "total_%s_length", get_length(nrn))
-    record(feat, desc, "total_%s_surface", get_surface(nrn))
-    record(feat, desc, "total_%s_volume", get_volume(nrn))
-    record(feat, desc, "max_%s_euclidean_distance", get_max_euclidean_distance(nrn))
-    record(feat, desc, "max_%s_path_distance", get_max_path_distance(nrn))
+    record(feat, desc, "total_%s_length", get_length(nrn))#
+    record(feat, desc, "total_%s_surface", get_surface(nrn))#
+    record(feat, desc, "total_%s_volume", get_volume(nrn))#
+
+#    ####################################################################
+#    branches = get_number_of_branches(nrn)
+#    record(feat, desc, "number_%s_neurites", get_number_of_nodes(nrn))
+#    record(feat, desc, "number_%s_branches", branches[3])
+#    #
+#    record(feat, desc, "total_%s_length", get_length(nrn))
+#    record(feat, desc, "total_%s_surface", get_surface(nrn))
+#    record(feat, desc, "total_%s_volume", get_volume(nrn))
+#    record(feat, desc, "max_%s_radial_distance", get_max_euclidean_distance(nrn))
+#    record(feat, desc, "max_%s_path_length", get_max_path_distance(nrn))
+#    #
+#    trunk = get_trunk_diameter(nrn)
+#    record(feat, desc, "mean_%s_trunk_diameter", trunk[1])
+#    ####################################################################
+
+    record(feat, desc, "max_%s_euclidean_distance", get_max_euclidean_distance(nrn))#
+    record(feat, desc, "max_%s_path_distance", get_max_path_distance(nrn))#
     record(feat, desc, "max_%s_branch_order", get_max_branch_order(nrn))
     #
     trunk = get_trunk_diameter(nrn)
     record(feat, desc, "median_%s_trunk_diameter", trunk[0])
-    record(feat, desc, "mean_%s_trunk_diameter", trunk[1])
+    record(feat, desc, "mean_%s_trunk_diameter", trunk[1])#
     record(feat, desc, "max_%s_trunk_diameter", trunk[2])
     #
     trunk = get_trunk_length(nrn)
