@@ -15,7 +15,7 @@ def get_optimize_sweep_numbers(sweep_index):
     return fs.find_noise_sweeps(sweep_index)['noise1']
 
 
-def optimize_neuron(model_config, sweep_index):
+def optimize_neuron(model_config, sweep_index, save_callback=None):
     neuron_config = model_config['neuron']
     optimizer_config = model_config['optimizer']
 
@@ -60,6 +60,8 @@ def optimize_neuron(model_config, sweep_index):
 
     def save(optimizer, outer, inner):
         logging.info('finished outer: %d inner: %d' % (outer, inner))
+        if save_callback:
+            save_callback(optimizer, outer, inner)
     
     best_param, begin_param = optimizer.run_many(save) 
     

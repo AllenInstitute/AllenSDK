@@ -5,8 +5,8 @@ from preprocess_neuron import preprocess_neuron
 import allensdk.core.json_utilities as ju
 
 DATA_CONFIG_FILES = [
-#    "/data/mat/Corinne/GLIF_subset/data_config_files/329552531_data_config.json",
-#    "/data/mat/Corinne/GLIF_subset/data_config_files/476106176_data_config.json",
+    "/data/mat/Corinne/GLIF_subset/data_config_files/329552531_data_config.json",
+    "/data/mat/Corinne/GLIF_subset/data_config_files/476106176_data_config.json",
     "/data/mat/Corinne/GLIF_subset/data_config_files/485455285_data_config.json",
     "/data/mat/Corinne/GLIF_subset/data_config_files/369697038_data_config.json",
     "/data/mat/Corinne/GLIF_subset/data_config_files/485912047_data_config.json"
