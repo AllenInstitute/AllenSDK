@@ -602,6 +602,32 @@ def get_ramp_stim_characteristics(i, t):
     return (t[start_idx], start_idx)
     
 
+def get_stim_characteristics(i, t, no_test_pulse=False):
+    '''
+    Identify the start time, duration, amplitude, start index, and
+    end index of a general stimulus.  
+    This assumes that there is a test pulse followed by the stimulus square.
+    '''
+
+    di = np.diff(i)
+    diff_idx = np.flatnonzero(di != 0)
+
+    if len(diff_idx) == 0:
+        return (None, None, 0.0, None, None)
+
+    # skip the first up/down 
+    idx = 0 if no_test_pulse else 1
+    
+    # shift by one to compensate for diff()
+    start_idx = diff_idx[idx] + 1
+    end_idx = diff_idx[-1] + 1
+
+    stim_start = float(t[start_idx])
+    stim_dur = float(t[end_idx] - t[start_idx])
+    stim_amp = float(i[start_idx])
+
+    return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
+
 def calculate_input_resistance(subthresh_data):
     ''' 
     Calculate the input resistance of a sweep using the output of a EphysFeatureExtractor instance 
