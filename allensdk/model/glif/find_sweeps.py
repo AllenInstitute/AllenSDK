@@ -17,7 +17,6 @@ RAMP_TO_RHEO = 'Ramp to Rheobase'
 
 class MissingSweepException( Exception ): pass
 
-
 def get_sweep_numbers(sweep_list):
     return [ s['sweep_number'] for s in sweep_list]
 
