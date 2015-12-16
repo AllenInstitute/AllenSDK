@@ -2,6 +2,7 @@ import numpy as np
 from allensdk.ephys.extract_cell_features import get_square_stim_characteristics
 from scipy import stats
 from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
 
 def MLIN(voltage, current, res, cap, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
     '''voltage, current

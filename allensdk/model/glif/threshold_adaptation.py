@@ -3,7 +3,7 @@ import copy
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
 import logging
-
+import matplotlib.pyplot as plt
 THRESH_PCT_MULTIBLIP = 0.05
 
 def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):

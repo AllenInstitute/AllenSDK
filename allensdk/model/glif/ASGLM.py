@@ -4,6 +4,8 @@ import allensdk.model.GLM as GLM
 import logging
 import statsmodels.api as sm
 
+import matplotlib.pyplot as plt
+
 def ASGLM_pairwise(ks_int, I_stim, voltage, spike_ind, cinit, tauinit, SCL, dt, resting_potential,fit_phrase, 
                    SHORT_RUN=False, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False):
     '''

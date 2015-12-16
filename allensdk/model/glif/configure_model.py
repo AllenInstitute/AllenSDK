@@ -74,11 +74,12 @@ def configure_model(method_config, preprocessor_values):
 
     #The sweeps need to pass both the sweep properties and have a value because the computation using the 
     #available stimulus actually is able to be calculated
-
+    
     # Skip trace if subthreshold noise has a spike in it.
-    noise1_ind = np.concatenate(preprocessor_values['spike_inds']['noise1'])
+    noise1_ind =  [ n1i for n1i in preprocessor_values['spike_inds']['noise1'] if n1i is not None ]
+    noise1_ind = np.concatenate(noise1_ind)
     if np.any(noise1_ind * preprocessor_values['dt'] < 8.0):
-        raise ModelConfigurationException("Noise1 spikes occur too early to configure model.")
+        raise ModelConfigurationException("Subthreshold region of noise1 stimulus contains spikes.")
 
     # check if there is a short square triple
     if preprocessor_values['threshold_adaptation']['b_spike_component_of_threshold'] and preprocessor_values['threshold_adaptation']['a_spike_component_of_threshold']:

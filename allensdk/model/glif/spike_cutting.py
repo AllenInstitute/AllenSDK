@@ -1,9 +1,10 @@
 import numpy as np
 from scipy import stats
 from scipy.optimize import curve_fit, fmin
-from find_spikes import align_and_cut_spikes
+from allensdk.model.glif.find_spikes import align_and_cut_spikes, ALIGN_CUT_WINDOW
 import logging
-from find_spikes import ALIGN_CUT_WINDOW
+
+import matplotlib.pyplot as plt 
 
 def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list, 
                                                     all_voltage_list, dt, El_reference, deltaV, 
@@ -164,13 +165,13 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
     
     if MAKE_PLOT:
         xlim = np.array([min(all_v_spike_init_list), max(all_v_spike_init_list)])
-        plotting.plotLineRegress1(slope_at_min_expVar_list, intercept_at_min_expVar_list, r_value_at_min_expVar_list, xlim)
+        plotLineRegress1(slope_at_min_expVar_list, intercept_at_min_expVar_list, r_value_at_min_expVar_list, xlim)
         plt.legend(loc=2, fontsize=20)
 
 
     if MAKE_PLOT:
         xlim = np.array([min(all_v_spike_init_list), max(all_v_spike_init_list)])
-        plotting.plotLineRegressRed(slope_at_each_time_end[vectorIndex_of_max_explained_var], intercept_at_each_time_end[vectorIndex_of_max_explained_var], np.NAN, xlim)
+        plotLineRegressRed(slope_at_each_time_end[vectorIndex_of_max_explained_var], intercept_at_each_time_end[vectorIndex_of_max_explained_var], np.NAN, xlim)
         plt.legend(loc=2, fontsize=20)
         if SHOW_PLOT:
             plt.show(block=False)                   
@@ -202,3 +203,13 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
         intercept_at_min_expVar_list=intercept_at_min_expVar_list[0]
 
     return spike_cut_length, slope_at_min_expVar_list, intercept_at_min_expVar_list
+
+def plotLineRegress1(slope, intercept, r,xlim):
+    y=slope*xlim+intercept
+    print 'slope=', slope, 'intercept=', intercept, 'xlim', xlim
+    plt.plot(xlim, y, '-k', lw=4, label='slope='+"%.2f"%slope+', intercept='+"%.3f"%intercept+', r='+"%.2f"%r)
+
+def plotLineRegressRed(slope, intercept, r,xlim):
+    y=slope*xlim+intercept
+    print 'slope=', slope, 'intercept=', intercept, 'xlim', xlim
+    plt.plot(xlim, y, '-r', lw=4, label='slope='+"%.2f"%slope+', intercept='+"%.3f"%intercept+', r='+"%.2f"%r)

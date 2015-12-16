@@ -9,6 +9,8 @@ from rc import least_squares_simple_circuit_fit_REl
 
 from glif_neuron_methods import max_of_line_and_const, min_of_line_and_zero
 
+import matplotlib.pyplot as plt
+
 def R2R_subthresh_nonlinearity(rheo_current_list, rheo_voltage_list, res, cap, El, El_R2R_list, dt, 
                                MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False):
     '''Estimates how resistance is dependent on voltage before a spike.  Fits two lines to resistance 

@@ -1,7 +1,9 @@
 import numpy as np
 import logging
 
-from find_spikes import find_spikes, find_spikes_list
+from allensdk.model.glif.find_spikes import find_spikes, find_spikes_list
+
+from allensdk.ephys.extract_cell_features import get_square_stim_characteristics
 
 def least_squares_simple_circuit_fit_RCEl(voltage_list, current_list, dt, no_rest=False):
     '''Calculate resistance, capacitance and resting potential by performing 
@@ -22,7 +24,11 @@ def least_squares_simple_circuit_fit_RCEl(voltage_list, current_list, dt, no_res
             logging.warning('There is a spike in your subthreshold noise. However continuing using least squares')
         if no_rest:
             #find region of stimulus. Note this will only work if there is no test pulse and only one stimulus injection (i.e. entire noise sweep is already truncated to just low amplitude noise injection)
-            stim_start, stim_dur = find_stimulus(current)        
+            t = np.arange(0, len(current)) * dt
+            (_, _, _, start_idx, end_idx) = get_square_stim_characteristics(current, t, no_test_pulse=True)
+            stim_dur = end_idx - start_idx
+            stim_start = start_idx
+                    
             voltage = voltage[stim_start:stim_start+stim_dur]
             current = current[stim_start:stim_start+stim_dur]   
         v_nplus1=voltage[1:]
