@@ -64,8 +64,10 @@ def optimize_neuron(model_config, sweep_index, save_callback=None):
             save_callback(optimizer, outer, inner)
     
     best_param, begin_param = optimizer.run_many(save) 
+
+    experiment.set_neuron_parameters(best_param)
     
-    return neuron, best_param, begin_param
+    return optimizer, best_param, begin_param
 
         
 def main():

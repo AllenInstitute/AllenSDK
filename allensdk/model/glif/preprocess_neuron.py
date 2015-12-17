@@ -21,6 +21,9 @@ from nonlinearity_parameters import R2R_subthresh_nonlinearity
 from MLIN import MLIN
 
 RESTING_POTENTIAL = 'slow_vm_mv'
+DEFAULT_DT = 5e-05
+DEFAULT_CUT = 0
+DEFAULT_BESSEL = { 'N': 4, 'Wn': .1 }
 
 def load_sweep(file_name, sweep_number, dt=None, cut=0, bessel=False):
     ds = NwbDataSet(file_name)
