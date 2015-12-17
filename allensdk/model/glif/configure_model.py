@@ -52,7 +52,7 @@ def validate_method_requirements(method_config_name, has_rheo, has_mss):
     elif not has_mss and has_rheo:
         valid_configs = ['LIF', 'LIF_ASC','LIF_PWL', 'LIF_ASC_PWL']
     elif has_mss and has_rheo:
-        valid_configs = ['LIF', 'LIF_ASC', 'LIF_R', 'LIF_R_ASC', 'LIF_R_ASC_AT', 'LIF_PWL', 'LIF_ASC_PWL', 'LIF_R_PWL', 'LIF_R_ASC_PWL', 'LIF_R_ASC_AT_PWL']
+        valid_configs = ['LIF', 'LIF_ASC', 'LIF_R', 'LIF_R_ASC', 'LIF_R_AT', 'LIF_R_ASC_AT', 'LIF_PWL', 'LIF_ASC_PWL', 'LIF_R_PWL', 'LIF_R_ASC_PWL', 'LIF_R_AT_PWL', 'LIF_R_ASC_AT_PWL']
 
     if method_config_name not in valid_configs:
         raise ModelConfigurationException("Model type %s cannot be configured due to missing data (rheo: %s, mss: %s)" % ( method_config_name, str(has_rheo), str(has_mss) ))
