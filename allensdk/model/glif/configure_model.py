@@ -34,7 +34,7 @@ DEFAULT_OPTIMIZER_PARAMETERS = {
     "ftol": 1e-05, 
     "sigma_outer": 0.3, 
     "sigma_inner": 0.01, 
-    "inner_iterations": 3, 
+    "inner_iterations": 3,  
     "outer_iterations": 3, 
     "internal_iterations": 10000000,
     "iteration_info": [],

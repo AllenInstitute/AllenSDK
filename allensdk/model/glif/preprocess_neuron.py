@@ -46,6 +46,9 @@ def load_sweep(file_name, sweep_number, dt=None, cut=0, bessel=False):
             data["start_idx"] = int(data["index_range"][0] / (dt / data["dt"]))
             data["dt"] = dt
 
+    if "start_idx" not in data:
+        data["start_idx"] = data["index_range"][0]
+
     return {
         "voltage": data["response"],
         "current": data["stimulus"],
