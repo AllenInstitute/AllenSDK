@@ -56,12 +56,16 @@ def validate_swc(swc_file):
     
     
 def main():
-    parser = argparse.ArgumentParser("validate an SWC file for use with NEURON")
-    parser.add_argument('swc_file')
-    
-    args = parser.parse_args()
+    try:
+        parser = argparse.ArgumentParser("validate an SWC file for use with NEURON")
+        parser.add_argument('swc_file')
 
-    validate_swc(args.swc_file)
+        args = parser.parse_args()
+
+        validate_swc(args.swc_file)
+    except Exception as e:
+        print str(e)
+        exit(1)
     
 
 if __name__ == "__main__": main()
