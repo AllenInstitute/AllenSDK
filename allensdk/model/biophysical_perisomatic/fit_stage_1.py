@@ -10,7 +10,7 @@ from allensdk.ephys.feature_extractor import EphysFeatureExtractor, EphysFeature
 import allensdk.core.json_utilities as ju
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.model.biophysical_perisomatic.optimize
-import logging
+from allensdk.model.biophys_sim.config import Config
 
 SEEDS = [1234, 1001, 4321, 1024, 2048]
 FIT_BASE_DIR = os.path.join(os.path.dirname(__file__), "fits")
@@ -18,8 +18,6 @@ APICAL_DENDRITE_TYPE = 4
 OPTIMIZE_SCRIPT = os.path.abspath(os.path.join(os.path.dirname(__file__), 'optimize.py'))
 #MPIEXEC = '/shared/utils.x86_64/hydra/bin/mpiexec'
 MPIEXEC = 'mpiexec'
-
-_fit_stage_1_log = logging.getLogger('allensdk.model.biophysical_perisomatic.fit_stage_1')
 
 def find_core1_trace(data_set, all_sweeps):
     sweep_type = "C1LSCOARSE"
@@ -57,13 +55,15 @@ def find_core1_trace(data_set, all_sweeps):
             elif sweep_info[s]["amp"] < sweep_to_use_amp:
                 use_new_sweep = True
             if use_new_sweep:
-                _fit_stage_1_log.info("now using sweep" + str(s))
+                Config._log.info("now using sweep" + str(s))
+                print "now using sweep", str(s)
                 sweep_to_use = s
                 sweep_to_use_amp = sweep_info[s]["amp"]
                 sweep_to_use_isi_cv = sweep_info[s]["isi_cv"]
             
     if sweep_to_use == -1:
-        _fit_stage_1_log.warn("Could not find appropriate core 1 sweep!")
+        Config._log.warn("Could not find appropriate core 1 sweep!")
+        print "Could not find appropriate core 1 sweep!"
         return []
     else:
         return [sweep_to_use]
@@ -200,16 +200,18 @@ def prepare_stage_1(description, passive_fit_data):
     fi_shift_threshold = 30.0
     sweeps_to_fit = []
     if abs(fi_shift) > fi_shift_threshold:
-        _fit_stage_1_log.info("FI curve shifted; using Core 1")
+        print "FI curve shifted; using Core 1"
         sweeps_to_fit = find_core1_trace(data_set, all_sweeps)
     else:
         sweeps_to_fit = find_core2_trace(data_set, all_sweeps)
 
         if sweeps_to_fit == []:
-            _fit_stage_1_log.info("Not enough good Core 2 traces; using Core 1")
+            Config._log.info("Not enough good Core 2 traces; using Core 1")
+            print "Not enough good Core 2 traces; using Core 1"
             sweeps_to_fit = find_core1_trace(data_set, all_sweeps)
 
-    _fit_stage_1_log.debug("will use sweeps: " + str(sweeps_to_fit))
+    Config._log.debug("will use sweeps: " + str(sweeps_to_fit))
+    print "will use sweeps: ", sweeps_to_fit
 
     jxn = -14.0
 
@@ -277,9 +279,11 @@ def prepare_stage_1(description, passive_fit_data):
     has_apic = False
     if APICAL_DENDRITE_TYPE in pd.unique(swc_data[1]):
         has_apic = True
-        _fit_stage_1_log.info("Has apical dendrite")
+        Config._log.info("Has apical dendrite")
+        print "Has apical dendrite"
     else:
-        _fit_stage_1_log.info("Does not have apical dendrite")
+        Config._log.info("Does not have apical dendrite")
+        print "Does not have apical dendrite"
 
     if has_apic:
         target_dict["passive"][0]["cm"]["apic"] = cm2
@@ -347,6 +351,7 @@ def run_stage_1(jobs):
                 allensdk.model.biophysical_perisomatic.optimize.__name__,
                 str(job['seed']),
                 job['config_path']]
-        _fit_stage_1_log.debug(args)
+        Config._log.debug(args)
+        print args
         with open(job['log'], "w") as outfile:
             subprocess.call(args, stdout=outfile)

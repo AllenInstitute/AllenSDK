@@ -10,8 +10,6 @@ from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.model.biophysical_perisomatic.passive_fitting.neuron_passive_fit
 import logging
 
-_run_passive_fit_log = logging.getLogger('allensdk.model.biophysical_perisomatic.run_passive_fit')
-
 def run_passive_fit(description):
     output_directory = description.manifest.get_path('WORKDIR')
     neuronal_model = ju.read(description.manifest.get_path('neuronal_model_data'))
@@ -68,22 +66,30 @@ def run_passive_fit(description):
         # Check for potentially problematic outcomes
         cm_rel_delta = (passive_fit_data["fit_1"]["Cm"] - passive_fit_data["fit_3"]["Cm"]) / passive_fit_data["fit_1"]["Cm"]
         if passive_fit_data["fit_2"]["err"] < passive_fit_data["fit_1"]["err"]:
-            _run_passive_fit_log.debug("Fixed Ri gave better results than original")
+            Config._log.debug("Fixed Ri gave better results than original")
+            print "Fixed Ri gave better results than original"
             if passive_fit_data["fit_2"]["err"] < passive_fit_data["fit_3"]["err"]:
-                _run_passive_fit_log.debug("Using fixed Ri results")
+                Config._log.debug("Using fixed Ri results")
+                print "Using fixed Ri results"
                 passive_fit_data["fit_for_next_step"] = passive_fit_data["fit_2"]
             else:
-                _run_passive_fit_log.debug("Using electrode results")
+                Config._log.debug("Using electrode results")
+                print "Using electrode results"
                 passive_fit_data["fit_for_next_step"] = passive_fit_data["fit_3"]
         elif abs(cm_rel_delta) > 0.1:
-            _run_passive_fit_log.debug("Original and electrode fits not in sync:")
-            _run_passive_fit_log.debug("original Cm: " + passive_fit_data["fit_1"]["Cm"])
-            _run_passive_fit_log.debug("w/ electrode Cm: " + passive_fit_data["fit_3"]["Cm"])
+            Config._log.debug("Original and electrode fits not in sync:")
+            print "Original and electrode fits not in sync:"
+            Config._log.debug("original Cm: " + passive_fit_data["fit_1"]["Cm"])
+            print "original Cm: ", passive_fit_data["fit_1"]["Cm"]
+            Config._log.debug("w/ electrode Cm: " + passive_fit_data["fit_3"]["Cm"])
+            print "w/ electrode Cm: ", passive_fit_data["fit_3"]["Cm"]
             if passive_fit_data["fit_1"]["err"] < passive_fit_data["fit_3"]["err"]:
-                _run_passive_fit_log.debug("Original has lower error")
+                Config._log.debug("Original has lower error")
+                print "Original has lower error"
                 passive_fit_data["fit_for_next_step"] = passive_fit_data["fit_1"]
             else:
-                _run_passive_fit_log.debug("Electrode has lower error")
+                Config._log.debug("Electrode has lower error")
+                print "Electrode has lower error"
                 passive_fit_data["fit_for_next_step"] = passive_fit_data["fit_3"]
         else:
             passive_fit_data["fit_for_next_step"] = passive_fit_data["fit_1"]
@@ -99,7 +105,8 @@ def run_passive_fit(description):
             cm1 = passive_fit_data["fit_for_next_step"]["Cm"]
             cm2 = passive_fit_data["fit_for_next_step"]["Cm"]
     else:
-        _run_passive_fit_log.debug("No cap check trace found")
+        Config._log.debug("No cap check trace found")
+        print "No cap check trace found"
         ra = 100.0
         cm1 = 1.0
         if is_spiny:

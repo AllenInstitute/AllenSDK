@@ -1,14 +1,21 @@
 from mpi4py import MPI #@UnusedImport
+from allensdk.model.biophys_sim.config import Config
 from allensdk.model.biophysical_perisomatic.deap_utils import Utils
 import neuron_parallel
-import logging, argparse, random
+import logging, os
+
+import argparse
+
 import numpy as np
-from deap import algorithms, base, creator, tools
-from allensdk.model.biophys_sim.config import Config
+import random
+
+from deap import algorithms
+from deap import base
+from deap import creator
+from deap import tools
+from allensdk.model.biophysical_perisomatic.passive_fitting import neuron_utils
 
 BOUND_LOWER, BOUND_UPPER = 0.0, 1.0
-
-_optimize_log = logging.getLogger('allensdk.model.biophysical_perisomatic.optimize')
 
 utils = None
 h = None
@@ -90,6 +97,14 @@ def initPopulation(pcls, ind_init, popfile):
     popdata = np.loadtxt(popfile)
     return pcls(ind_init(utils.normalize_actual_parameters(line)) for line in popdata.tolist())
 
+def config_logging(file_name='optimize.log'):
+    Config._log.setLevel(logging.ERROR)
+    fh = logging.FileHandler(file_name)
+    Config._log.addHandler(fh)
+    Config._log.debug("Creating log file %s" % (file_name))
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+
 
 def main():
     global utils, h, v_vec, i_vec, t_vec, do_block_check, max_stim_amp, stim_params, config, seed
@@ -108,7 +123,8 @@ def main():
     if config.data["fit_name"] in block_check_fit_types:
         max_stim_amp = config.data["fitting"][0]["max_stim_test_na"]
         if max_stim_amp > stim_params["amplitude"]:
-            _optimize_log.debug("Will check for blocks")
+            Config._log.debug("Will check for blocks")
+            print "Will check for blocks"
             do_block_check = True
 
     utils = Utils(config)
@@ -133,7 +149,8 @@ def main():
 
     # Set up genetic algorithm
 
-    _optimize_log.debug("Setting up genetic algorithm")
+    Config._log.debug("Setting up genetic algorithm")
+    print "Setting up GA"
     random.seed(seed)
 
     ngen = 500 
@@ -171,7 +188,8 @@ def main():
     logbook.header = "gen", "nevals", "min", "max", "best"
 
     if "STARTPOP" in manifest.path_info:
-        _optimize_log.debug("Using a pre-defined starting population")
+        Config._log.debug("Using a pre-defined starting population")
+        print "Using a pre-defined starting population"
         start_pop_path = config.manifest.get_path("STARTPOP")
         toolbox.register("population_start", initPopulation, list, creator.Individual)
         pop = toolbox.population_start(start_pop_path)
@@ -189,7 +207,8 @@ def main():
 
     record = stats.compile(pop)
     logbook.record(gen=0, nevals=len(invalid_ind), **record)
-    _optimize_log.debug(logbook.stream)
+    #Config._log.debug(logbook.stream)
+    print logbook.stream
 
     for gen in range(1, ngen + 1):
         offspring = toolbox.variate(pop, toolbox, cxpb, 1.0)
@@ -205,7 +224,8 @@ def main():
 
         record = stats.compile(pop)
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
-        _optimize_log.debug(logbook.stream)
+        #Config._log.debug(logbook.stream)
+        print logbook.stream
 
     fit_dir = config.manifest.get_path("FITDIR")
     seed_dir = fit_dir + "/s{:d}/".format(seed)

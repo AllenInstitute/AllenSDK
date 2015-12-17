@@ -19,9 +19,6 @@ from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
 from shutil import copy
 import numpy
-import logging
-
-_runner_log = logging.getLogger('allensdk.model.biophysical_perisomatic.runner')
 
 def run(description, sweeps=None):
     '''Main function for running a perisomatic biophysical experiment.
@@ -50,11 +47,10 @@ def run(description, sweeps=None):
     mV = 1.0e-3
     
     prepare_nwb_output(manifest.get_path('stimulus_path'),
-                       manifest.get_path('output_path'))
+                       manifest.get_path('output'))
     
     # run sweeps
     for sweep in sweeps:
-        _runner_log.info("Running sweep: %d" % (sweep))
         utils.setup_iclamp(stimulus_path, sweep=sweep)
         
         vec = utils.record_values()
@@ -65,7 +61,7 @@ def run(description, sweeps=None):
         # write to an NWB File
         output_data = (numpy.array(vec['v']) - junction_potential) * mV
         
-        output_path = manifest.get_path("output_path")
+        output_path = manifest.get_path("output")
         save_nwb(output_path, output_data, sweep)
 
 

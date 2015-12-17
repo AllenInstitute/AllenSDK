@@ -1,11 +1,14 @@
-import argparse, os, sys, subprocess, logging
+#!/usr/bin/env python
+
+import argparse
+import os, sys
 import numpy as np
+import subprocess
 import allensdk.core.json_utilities as json_utilities
 from fit_stage_1 import SEEDS, FIT_BASE_DIR, OPTIMIZE_SCRIPT, MPIEXEC
+from allensdk.model.biophys_sim.config import Config
 
 FIT_TYPES = {"f6": "f9", "f12": "f13"}
-
-_fit_stage_2_log = logging.getLogger('allensdk.model.biophysical_perisomatic.fit_stage_2')
 
 def prepare_stage_2(output_directory):
     config_base_data = json_utilities.read(os.path.join(FIT_BASE_DIR, 'config_base.json'))
@@ -19,13 +22,15 @@ def prepare_stage_2(output_directory):
         fit_type_dir = os.path.join(output_directory, fit_type)
 
         if not os.path.exists(fit_type_dir):
-            _fit_stage_2_log.debug("fit type directory does not exist for cell: %s" % fit_type_dir)
+            Config._log.debug("fit type directory does not exist for cell: %s" % fit_type_dir)
+            print "fit type directory does not exist for cell: %s" % fit_type_dir
             continue
 
         for seed in SEEDS:
             hof_fit_file = os.path.join(fit_type_dir, "s%d" % seed, "final_hof_fit.txt")
             if not os.path.exists(hof_fit_file):
-                _fit_stage_2_log.debug("hof fit file does not exist for seed: %d" % (seed))
+                Config._log.debug("hof fit file does not exist for seed: %d" % (seed))
+                print "hof fit file does not exist for seed: %d" % (seed)
                 continue
 
             hof_fit = np.loadtxt(hof_fit_file)
@@ -34,7 +39,8 @@ def prepare_stage_2(output_directory):
                 best_seed = seed
                 best_error = best_for_seed
 
-        _fit_stage_2_log.debug("Best error for fit type %s is %f for seed %d" % (fit_type, best_error, best_seed))
+        Config._log.debug("Best error for fit type %s is %f for seed %d" % (fit_type, best_error, best_seed))
+        print "Best error for fit type %s is %f for seed %d" % (fit_type, best_error, best_seed)
 
         start_pop_file = os.path.join(fit_type_dir, "s%d" % best_seed, "final_hof.txt")
         new_fit_type_dir = os.path.join(output_directory, FIT_TYPES[fit_type])
@@ -79,7 +85,8 @@ def prepare_stage_2(output_directory):
 def run_stage_2(jobs):
     for job in jobs:
         args = [MPIEXEC, '-np', '240', sys.executable, OPTIMIZE_SCRIPT, str(job['seed']), job['config_path']]
-        _fit_stage_2_log.debug(args)
+        Config._log.debug(args)
+        print args
         with open(job['log'], "w") as outfile:
             subprocess.call(args, stdout=outfile)
 
