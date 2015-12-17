@@ -1,16 +1,14 @@
 import os.path
 import numpy as np
-import json
+import json, logging
 from allensdk.core.nwb_data_set import NwbDataSet
-import allensdk.model.biophysical_perisomatic.fits.fit_styles
-from pkg_resources import resource_filename #@UnresolvedImport
 import allensdk.core.json_utilities as ju
 from allensdk.model.biophys_sim.config import Config
 from allensdk.model.biophysical_perisomatic import ephys_utils
 from allensdk.model.biophysical_perisomatic.deap_utils import Utils
 
-
 class Report:
+    _log = logging.getLogger('allensdk.model.biophysical_perisomatic.make_deap_fit_json')
 
     def __init__(self,
                  top_level_description,
@@ -130,8 +128,9 @@ class Report:
                                                              self.fit_type,
                                                              s)
             if not os.path.exists(final_hof_fit_path):
-                print "Could not find output file %s for seed %d" % (final_hof_fit_path, s)
+                Report._log.warn("Could not find output file %s for seed %d" % (final_hof_fit_path, s))
                 continue
+            
             hof_fit_errors = np.loadtxt(final_hof_fit_path)
             hof_fits = np.loadtxt(final_hof_path)
             if not first_created:
@@ -165,12 +164,12 @@ class Report:
         self.utils.stim.dur = 1e12
 
         for ii, org_ind in enumerate(self.sorted_indexes):
-            print "Testing org ", ii, org_ind
+            Report._log.debug("Testing org %s%s" % (ii, org_ind))
             self.utils.set_actual_parameters(self.all_hof_fits[org_ind, :])
             depol_okay = True
             use_ii = -1
             for expt_i in noise_i_stim:
-                print "Running some noise"
+                Report._log.debug("Running some noise")
                 i_stim_vec = h.Vector(expt_i * 1e-3)
                 i_stim_vec.play(self.utils.stim._ref_amp, dt)
                 h.finitialize()
@@ -191,11 +190,11 @@ class Report:
                 if len(up_indexes) != 0:
                     max_depol_duration = np.max([t[down_indexes[k]] - t[up_idx] for k, up_idx in enumerate(up_indexes)])
                     if max_depol_duration > block_min_duration:
-                        print "Encountered depolarization block"
+                        Report._log.debug("Encountered depolarization block")
                         depol_okay = False
                         break
             if depol_okay:
-                print "Did not detect depolarization block on noise traces"
+                Report._log.debug("Did not detect depolarization block on noise traces")
                 use_ii = ii
                 break
         h.cvode_active(1)
@@ -204,6 +203,6 @@ class Report:
         self.utils.h.tstop = self.stim_params["delay"] * 2.0 + self.stim_params["duration"]
 
         if use_ii == -1:
-            print "Could not find an organism without depolarization block on noise."
+            Report._log.debug("Could not find an organism without depolarization block on noise.")
         else:
             self.org_selections = [o + use_ii for o in self.org_selections]

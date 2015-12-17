@@ -1,4 +1,7 @@
 from neuron import h
+import logging
+
+_neuron_parallel_log = logging.getLogger('allensdk.model.biophysical_perisomatic.neuron_parallel')
 
 _pc = h.ParallelContext()
 
@@ -13,7 +16,7 @@ def map(func, *iterables):
         userid += 1
     results = dict(working())
     end_time = pc_time()
-    print "Map took ", end_time - start_time
+    _neuron_parallel_log.debug("Map took %s" % (str(end_time - start_time)))
     return [results[userid] for userid in userids]
 
 def working():
