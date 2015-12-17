@@ -1,14 +1,14 @@
 {
   "voltage_dynamics_method": "forward_euler_piecewise", 
   "threshold_dynamics_method": "spike_component", 
-  "name": "LIF_R_ASC_PWL", 
-  "threshold_reset_method": "sum_spike_and_adapt", 
-  "AScurrent_reset_method": "sum", 
-  "AScurrent_dynamics_method": "exp", 
   "param_fit_names": [
     "th_inf", 
     "asc_amp_array"
   ], 
   "voltage_reset_method": "v_before", 
-  "error_function": "MLIN"
+  "threshold_reset_method": "sum_spike_and_adapt", 
+  "error_function": "MLIN", 
+  "AScurrent_dynamics_method": "exp", 
+  "AScurrent_reset_method": "sum", 
+  "name": "LIF_R_ASC_PWL"
 }
