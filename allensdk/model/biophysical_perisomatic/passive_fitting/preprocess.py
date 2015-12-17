@@ -1,13 +1,14 @@
 import allensdk.model.biophysical_perisomatic.ephys_utils as ephys_utils
-from allensdk.model.biophys_sim.config import Config
+import logging
 import numpy as np
 import pandas as pd
+
+_passive_fit_log = logging.getLogger('allensdk.model.biophysical_perisomatic.passive_fitting.preprocess')  
 
 def get_passive_fit_data(cap_check_sweeps, data_set):
     bridge_balances = [s['bridge_balance_mohm'] for s in cap_check_sweeps]
     bridge_avg = np.array(bridge_balances).mean()
-    Config._log.debug("bridge avg {:.2f}".format(bridge_avg))
-    print "bridge avg {:.2f}".format(bridge_avg)
+    _passive_fit_log.debug("bridge avg {:.2f}".format(bridge_avg))
 
     initialized = False
     for idx, s in enumerate(cap_check_sweeps):

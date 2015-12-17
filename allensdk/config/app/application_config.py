@@ -32,7 +32,7 @@ class ApplicationConfig(object):
     
     _log = logging.getLogger(__name__)
     _DEFAULT_LOG_CONFIG = resource_filename(__name__, 'logging.conf')
-    lc.fileConfig(_DEFAULT_LOG_CONFIG)
+    #lc.fileConfig(_DEFAULT_LOG_CONFIG)
     
     def __init__(self, 
                  defaults,

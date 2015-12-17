@@ -1,10 +1,6 @@
-#!/usr/bin/env python
 import numpy as np
 from collections import Counter
-import argparse
-from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.ephys.feature_extractor import EphysFeatureExtractor
-from allensdk.model.biophys_sim.config import Config
 import ephys_utils
 
 def calculate_fi_curves(data_set, sweeps):
@@ -85,21 +81,3 @@ def estimate_fi_shift(data_set, sweeps):
     # FIX TO RECTIFY PREDICTED FI CURVE
     x_shift = [amp - (freq - c) / m for amp, freq in curve_data["core2_half"]]
     return np.mean(x_shift), len(x_shift)
-
-def parse_input(input_data):
-    return data_set, sweeps
-
-def main():
-    parser = argparse.ArgumentParser(description='analyze cap check sweep')
-    parser.add_argument('specimen_id', type=int)
-    args = parser.parse_args()
-
-    specimen = lims_utils.get_specimen_info(args.specimen_id, nwb_file=True, swc_file=False)
-    data_set = NwbDataSet(specimen['nwb_path'])
-    sweeps = specimen['sweeps']
-
-    x_shift, n = estimate_fi_shift(data_set, sweeps)
-    Config._log.debug("{:d}, {:f}, {:d}".format(args.specimen_id, x_shift, n))
-    print "{:d}, {:f}, {:d}".format(args.specimen_id, x_shift, n)
-
-if __name__ == "__main__": main()
