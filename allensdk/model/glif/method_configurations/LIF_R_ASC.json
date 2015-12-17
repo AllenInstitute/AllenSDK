@@ -6,7 +6,8 @@
   "AScurrent_reset_method": "sum", 
   "AScurrent_dynamics_method": "exp", 
   "param_fit_names": [
-    "th_inf"
+    "th_inf", 
+    "asc_amp_array"
   ], 
   "voltage_reset_method": "v_before", 
   "error_function": "MLIN"

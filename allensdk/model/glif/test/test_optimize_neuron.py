@@ -6,7 +6,8 @@ from optimize_neuron import optimize_neuron
 DATA_CONFIG_PATTERN = "/data/mat/Corinne/GLIF_subset/data_config_files/%d_data_config.json"
 
 MODEL_CONFIG_DIR = "/local1/stash/allensdk/allensdk/model/glif/test/model_config/"
-MODEL_CONFIG_FILES = [ os.path.join(MODEL_CONFIG_DIR, "329552531_LIF_model_config.json"),
+MODEL_CONFIG_FILES = [ os.path.join(MODEL_CONFIG_DIR, "476106176_LIF_R_ASC_AT_PWL_model_config.json"),
+                       os.path.join(MODEL_CONFIG_DIR, "329552531_LIF_model_config.json"),
                        os.path.join(MODEL_CONFIG_DIR, "329552531_LIF_ASC_model_config.json") ]
 OUT_DIR = "/local1/stash/allensdk/allensdk/model/glif/test/optimized_config/"
 

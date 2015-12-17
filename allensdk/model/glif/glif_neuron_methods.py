@@ -327,7 +327,6 @@ def dynamics_threshold_three_sep_components(neuron, threshold_t0, voltage_t0):
     #TODO: I should really go over this equation again and make sure it is more comprehensible
     md = neuron.update_method_data
 
-    print 'hi'
     # initial conditions
     if 'th_spike' not in md:
         md['th_spike'] = [ 0 ]
