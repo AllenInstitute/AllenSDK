@@ -88,7 +88,8 @@ def configure_model(method_config, preprocessor_values):
         has_mss=False
 
     # check if there is ramp to rheo 
-    if preprocessor_values['nonlinearity_parameters']['line_param_ElV_all'] and preprocessor_values['nonlinearity_parameters']['line_param_RV_all']:
+    if ( ( preprocessor_values['nonlinearity_parameters']['line_param_ElV_all'] is not None ) and 
+         ( preprocessor_values['nonlinearity_parameters']['line_param_RV_all'] is not None ) ):
         has_rheo=True
     else: 
         has_rheo=False
