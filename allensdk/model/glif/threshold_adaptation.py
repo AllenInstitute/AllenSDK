@@ -6,6 +6,8 @@ import logging
 import matplotlib.pyplot as plt
 THRESH_PCT_MULTIBLIP = 0.05
 
+from allensdk.model.glif.find_spikes import find_spikes_list
+
 def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
     '''In the multiblip there are problems with artifacts when the stimulus turns on and off 
     creating problems detecting spikes.
@@ -13,7 +15,8 @@ def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOC
     multi_SS_v=multi_SS['voltage']
     multi_SS_i=multi_SS['current']
 
-    spike_ind = find_multiblip_spikes(multi_SS_i, multi_SS_v, dt)
+#    spike_ind = find_multiblip_spikes(multi_SS_i, multi_SS_v, dt)
+    spike_ind, v_at_spike=find_spikes_list(multi_SS_v, dt)
     # eliminate spurious spikes that may exist
     spike_lt=[np.where(SI<int(2.02/dt))[0] for SI in spike_ind]
     if len(np.concatenate(spike_lt))>0:

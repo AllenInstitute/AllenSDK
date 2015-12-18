@@ -278,7 +278,10 @@ def configure_method_parameters(neuron_config,
                     })
     
             method_config['params'] = {}
-    
+        elif method_config['name'] == 'sum_spike_and_adapt_forward':
+            raise Exception('write me in')
+        elif method_config['name'] == 'sum_spike_and_adapt_exact':
+            raise Exception('write me in')
         elif method_config['name'] == 'spike_component':
             neuron_config['init_method_data'].update({
                     'a_spike': a_spike_component_of_threshold,
