@@ -181,7 +181,7 @@ def compute_features(swc_file):
     # Trunk diameter of branches
     num_ap = 0
     num_ba = 0
-    basal = nrn.get_trunk_radii(TreeType.apical_dendrite)
+    basal = nrn.get_trunk_radii(TreeType.basal_dendrite)
     if len(basal) > 0:
         num_ba = 2.0 * np.mean(basal)
     apical = nrn.get_trunk_radii(TreeType.apical_dendrite)
