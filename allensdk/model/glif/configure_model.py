@@ -34,7 +34,7 @@ DEFAULT_OPTIMIZER_PARAMETERS = {
     "ftol": 1e-05, 
     "sigma_outer": 0.3, 
     "sigma_inner": 0.01, 
-    "inner_iterations": 3, 
+    "inner_iterations": 3,  
     "outer_iterations": 3, 
     "internal_iterations": 10000000,
     "iteration_info": [],
@@ -88,7 +88,8 @@ def configure_model(method_config, preprocessor_values):
         has_mss=False
 
     # check if there is ramp to rheo 
-    if preprocessor_values['nonlinearity_parameters']['line_param_ElV_all'] and preprocessor_values['nonlinearity_parameters']['line_param_RV_all']:
+    if ( ( preprocessor_values['nonlinearity_parameters']['line_param_ElV_all'] is not None ) and 
+         ( preprocessor_values['nonlinearity_parameters']['line_param_RV_all'] is not None ) ):
         has_rheo=True
     else: 
         has_rheo=False

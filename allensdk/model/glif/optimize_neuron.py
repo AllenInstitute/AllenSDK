@@ -7,8 +7,8 @@ from allensdk.model.glif.glif_optimizer_neuron import GlifOptimizerNeuron
 from allensdk.model.glif.glif_experiment import GlifExperiment
 from allensdk.model.glif.glif_optimizer import GlifOptimizer
 
-from preprocess_neuron import load_sweeps
-from find_spikes import find_spikes_list
+from allensdk.model.glif.preprocess_neuron import load_sweeps
+from allensdk.model.glif.find_spikes import find_spikes_list
 
 
 def get_optimize_sweep_numbers(sweep_index):
@@ -64,8 +64,10 @@ def optimize_neuron(model_config, sweep_index, save_callback=None):
             save_callback(optimizer, outer, inner)
     
     best_param, begin_param = optimizer.run_many(save) 
+
+    experiment.set_neuron_parameters(best_param)
     
-    return neuron, best_param, begin_param
+    return optimizer, best_param, begin_param
 
         
 def main():

@@ -44,7 +44,6 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
     def from_dict(cls, d):
         
         return cls(El = d['El'],
-                   El_reference = d['El_reference'],
                    dt = d['dt'],
 #                   tau = d['tau'],
                    asc_tau_array=d['asc_tau_array'],

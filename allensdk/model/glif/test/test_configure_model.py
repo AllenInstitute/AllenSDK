@@ -38,6 +38,11 @@ PREP_DIR = "/local1/stash/allensdk/allensdk/model/glif/test/preprocess/"
 OUT_DIR = "/local1/stash/allensdk/allensdk/model/glif/test/model_config/"
 METHOD_CONFIG_DIR = "/local1/stash/allensdk/allensdk/model/glif/method_configurations/"
 
+class ComparisonException( Exception ):
+    def __init__(self, message, key):
+        super(ComparisonException, self).__init__(message)
+        self.key = key
+        
 def cmpdict(d1, d2):
     k1 = set([ unicode(k) for k in d1.keys() ])
     k2 = set([ unicode(k) for k in d2.keys() ])
@@ -57,7 +62,7 @@ def cmpdict(d1, d2):
                 cmpdict(v1, v2)
             elif isinstance(v1, list):
                 if len(v1) != len(v2):
-                    raise 
+                    raise ComparisonException("", k)
 
                 for i in range(len(v1)):
                     if v1[i] != v2[i]:
@@ -65,7 +70,7 @@ def cmpdict(d1, d2):
             elif d1[k] != d2[k]:
                 raise
         except:
-            raise Exception("%s: %s vs %s" % (k, str(d1[k]), str(d2[k])))
+            raise ComparisonException("%s: %s vs %s" % (k, str(d1[k]), str(d2[k])), k)
                             
 
 def test_configure_model():
@@ -94,7 +99,12 @@ def test_configure_model():
             test_config = ju.read(mcf)
 
             cmpdict(test_config['neuron'], out_config['neuron'])
-            cmpdict(test_config['optimizer'], out_config['optimizer'])
+            try:
+                cmpdict(test_config['optimizer'], out_config['optimizer'])
+            except ComparisonException, e:
+                if e.key != "param_fit_names":
+                    raise e
+                
 
         else:
             logging.error("preprocessor file %s does not exist" % prep_file)

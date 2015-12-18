@@ -21,6 +21,9 @@ from nonlinearity_parameters import R2R_subthresh_nonlinearity
 from MLIN import MLIN
 
 RESTING_POTENTIAL = 'slow_vm_mv'
+DEFAULT_DT = 5e-05
+DEFAULT_CUT = 0
+DEFAULT_BESSEL = { 'N': 4, 'Wn': .1 }
 
 def load_sweep(file_name, sweep_number, dt=None, cut=0, bessel=False):
     ds = NwbDataSet(file_name)
@@ -42,6 +45,9 @@ def load_sweep(file_name, sweep_number, dt=None, cut=0, bessel=False):
             data["stimulus"] = subsample_data(data["stimulus"], "mean", data["dt"], dt)
             data["start_idx"] = int(data["index_range"][0] / (dt / data["dt"]))
             data["dt"] = dt
+
+    if "start_idx" not in data:
+        data["start_idx"] = data["index_range"][0]
 
     return {
         "voltage": data["response"],
