@@ -4,6 +4,7 @@ from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
 import logging
 import matplotlib.pyplot as plt
+import logging
 THRESH_PCT_MULTIBLIP = 0.05
 
 from allensdk.model.glif.find_spikes import find_spikes_list
@@ -20,11 +21,11 @@ def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOC
     # eliminate spurious spikes that may exist
     spike_lt=[np.where(SI<int(2.02/dt))[0] for SI in spike_ind]
     if len(np.concatenate(spike_lt))>0:
-        warnings.warn('there is a spike before the stimulus in the multiblip')
+        logging.warning('there is a spike before the stimulus in the multiblip')
     spike_ind=[np.delete(SI,ind)for SI, ind in zip(spike_ind, spike_lt)]
     spike_gt=[np.where(SI>int(2.1/dt))[0] for SI in spike_ind]
     if len(np.concatenate(spike_gt))>0:
-        warnings.warn('there is a spike after the stimulus in the multiblip')    
+        logging.warning('there is a spike after the stimulus in the multiblip')    
     spike_ind=[np.delete(SI,ind)for SI, ind in zip(spike_ind, spike_gt)]
     
     #these are what I want to be final

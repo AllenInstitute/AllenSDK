@@ -69,23 +69,23 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
 
         print slope, intercept, r_value, p_value, std_err
     
-        if slope>1.0:
-            logging.warning('linear regression slope is bigger than one: forcing slope to 1 and refitting intercept.')
-            slope=1.0
-            (intercept, nothing)=curve_fit(line_force_slope_to_1, xdata, ydata)
-            #print "NEW INTERCEPT:", intercept
-            if intercept>0.0:
-                #warnings.warn('/t ... and intercept is bigger than zero: forcing intercept to 0')
-                intercept=0.0
-            
-        if intercept>0.0:
-            logging.warning('Intercept is bigger than zero: forcing intercept to 0 and refitting slope.')
-            intercept=0.0                        
-            (slope, nothing)=curve_fit(line_force_int_to_0,xdata, ydata)  
-            #print "NEW SLOPE: ", slope
-            if slope>1.0:
-                logging.warning('/t ... and linear regression slope is bigger than one: forcing slope to 1.')
-                slope=1.0
+#        if slope>1.0:
+#            logging.warning('linear regression slope is bigger than one: forcing slope to 1 and refitting intercept.')
+#            slope=1.0
+#            (intercept, nothing)=curve_fit(line_force_slope_to_1, xdata, ydata)
+#            #print "NEW INTERCEPT:", intercept
+#            if intercept>0.0:
+#                #warnings.warn('/t ... and intercept is bigger than zero: forcing intercept to 0')
+#                intercept=0.0
+#            
+#        if intercept>0.0:
+#            logging.warning('Intercept is bigger than zero: forcing intercept to 0 and refitting slope.')
+#            intercept=0.0                        
+#            (slope, nothing)=curve_fit(line_force_int_to_0,xdata, ydata)  
+#            #print "NEW SLOPE: ", slope
+#            if slope>1.0:
+#                logging.warning('/t ... and linear regression slope is bigger than one: forcing slope to 1.')
+#                slope=1.0
               
         slope_at_each_time_end.append(slope)
         intercept_at_each_time_end.append(intercept)
