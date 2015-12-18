@@ -212,44 +212,45 @@ def compute_features(swc_file):
 
     # moments for apical dendrite
     first, second = calculate_moments_on_axis(nrn, TYPE_APICAL, AXIS_X)
-    results["first_moment_x_apical"] = first
-    results["second_moment_x_apical"] = second
+    results["bb_first_moment_x_apical"] = first
+    results["bb_second_moment_x_apical"] = second
     first, second = calculate_moments_on_axis(nrn, TYPE_APICAL, AXIS_Y)
-    results["first_moment_y_apical"] = first
-    results["second_moment_y_apical"] = second
+    results["bb_first_moment_y_apical"] = first
+    results["bb_second_moment_y_apical"] = second
     first, second = calculate_moments_on_axis(nrn, TYPE_APICAL, AXIS_Z)
-    results["first_moment_z_apical"] = first
-    results["second_moment_z_apical"] = second
+    results["bb_first_moment_z_apical"] = first
+    results["bb_second_moment_z_apical"] = second
     # moments for basal dendrite
     first, second = calculate_moments_on_axis(nrn, TYPE_BASAL, AXIS_X)
-    results["first_moment_x_basal"] = first
-    results["second_moment_x_basal"] = second
+    results["bb_first_moment_x_basal"] = first
+    results["bb_second_moment_x_basal"] = second
     first, second = calculate_moments_on_axis(nrn, TYPE_BASAL, AXIS_Y)
-    results["first_moment_y_basal"] = first
-    results["second_moment_y_basal"] = second
+    results["bb_first_moment_y_basal"] = first
+    results["bb_second_moment_y_basal"] = second
     first, second = calculate_moments_on_axis(nrn, TYPE_BASAL, AXIS_Z)
-    results["first_moment_z_basal"] = first
-    results["second_moment_z_basal"] = second
+    results["bb_first_moment_z_basal"] = first
+    results["bb_second_moment_z_basal"] = second
     # moments for entire dendrite
     first, second = calculate_moments_on_axis(nrn, TYPE_DENDRITE, AXIS_X)
-    results["first_moment_x_dendrite"] = first
-    results["second_moment_x_dendrite"] = second
+    results["bb_first_moment_x_dendrite"] = first
+    results["bb_second_moment_x_dendrite"] = second
     first, second = calculate_moments_on_axis(nrn, TYPE_DENDRITE, AXIS_Y)
-    results["first_moment_y_dendrite"] = first
-    results["second_moment_y_dendrite"] = second
+    results["bb_first_moment_y_dendrite"] = first
+    results["bb_second_moment_y_dendrite"] = second
     first, second = calculate_moments_on_axis(nrn, TYPE_DENDRITE, AXIS_Z)
-    results["first_moment_z_dendrite"] = first
-    results["second_moment_z_dendrite"] = second
+    results["bb_first_moment_z_dendrite"] = first
+    results["bb_second_moment_z_dendrite"] = second
     # absolute moments for apical, basal and dendrite (because alignment off)
     first, second = calculate_moments(nrn, TYPE_DENDRITE)
-    results["first_moment_dendrite"] = first
-    results["second_moment_dendrite"] = second
+    results["bb_first_moment_dendrite"] = first
+    results["bb_second_moment_dendrite"] = second
     first, second = calculate_moments(nrn, TYPE_BASAL)
-    results["first_moment_basal"] = first
-    results["second_moment_basal"] = second
+    results["bb_first_moment_basal"] = first
+    results["bb_second_moment_basal"] = second
     first, second = calculate_moments(nrn, TYPE_APICAL)
-    results["first_moment_apical"] = first
-    results["second_moment_apical"] = second
+    results["bb_first_moment_apical"] = first
+    results["bb_second_moment_apical"] = second
+
 
     #feat = []
     #desc = []
@@ -260,3 +261,35 @@ def compute_features(swc_file):
     #    feat.append(results[desc[i]])
     #return feat, desc
     return results
+
+# compute custom features to explore in Tim's embedinator
+def compute_embedinator_features(results):
+    frst = results["bb_first_moment_x_apical"] 
+    sec = results["bb_second_moment_x_apical"] 
+    if frst != float('nan') and frst > 0 and sec != float('nan') and sec > 0:
+        results["kg_ratio_moment_x_apical"] = sec / frst
+    else:
+        results["kg_ratio_moment_x_apical"] = float('nan')
+
+    frst = results["bb_first_moment_y_apical"] 
+    sec = results["bb_second_moment_y_apical"] 
+    if frst != float('nan') and frst > 0 and sec != float('nan') and sec > 0:
+        results["kg_ratio_moment_y_apical"] = sec / frst
+    else:
+        results["kg_ratio_moment_y_apical"] = float('nan')
+
+    frst = results["bb_first_moment_z_apical"] 
+    sec = results["bb_second_moment_z_apical"] 
+    if frst != float('nan') and frst > 0 and sec != float('nan') and sec > 0:
+        results["kg_ratio_moment_z_apical"] = sec / frst
+    else:
+        results["kg_ratio_moment_z_apical"] = float('nan')
+
+    frst = results["bb_first_moment_apical"] 
+    sec = results["bb_second_moment_apical"] 
+    if frst != float('nan') and frst > 0 and sec != float('nan') and sec > 0:
+        results["kg_ratio_moment_apical"] = sec / frst
+    else:
+        results["kg_ratio_moment_apical"] = float('nan')
+
+

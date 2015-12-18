@@ -2,6 +2,7 @@
 import morphology_analysis as morphology
 #from morphology_analysis_bb import compute_features as compute_features_bb
 from bb3 import compute_features as compute_features_bb
+from bb3 import compute_embedinator_features
 import traceback
 import sys
 import psycopg2
@@ -315,6 +316,7 @@ for k, record in records.iteritems():
     print("Processing '%s'" % swc_file)
     try:
         nrn = morphology.SWC(swc_file)
+#        axon = morphology.SWC(swc_file)
         basal = morphology.SWC(swc_file)
         apical = morphology.SWC(swc_file)
     except Exception, e:
@@ -336,6 +338,7 @@ for k, record in records.iteritems():
         tmp_swc_file = record["filename"][:-4] + "_pia.swc"
         nrn.save_to(tmp_swc_file)
         # apply affine to basal and apical copies too
+#        axon.apply_affine(aff)
         basal.apply_affine(aff)
         apical.apply_affine(aff)
         #
@@ -345,6 +348,9 @@ for k, record in records.iteritems():
         # v3d feature set
         #
         data = {}
+#        axon_data = calculate_v3d_features(basal, 2, "axon")
+#        if axon_data is not None:
+#            data["v3d_axon"] = axon_data
         basal_data = calculate_v3d_features(basal, 3, "basal dendrite")
         if basal_data is not None:
             data["v3d_basal"] = basal_data
@@ -365,6 +371,7 @@ for k, record in records.iteritems():
         # calculate features
         try:
             bb_data = compute_features_bb(tmp_swc_file_bb)
+            compute_embedinator_features(bb_data)
             data["bb_features"] = bb_data
             for k in bb_data:
                 if k not in bb_features:
@@ -413,6 +420,8 @@ except IOError:
     sys.exit(1)
 # write CSV header row
 f.write("specimen_name,specimen_id,filename,")
+#for i in range(len(v3d_feature_list)):
+#    f.write("axon_" + v3d_feature_list[i] + ",")
 for i in range(len(v3d_feature_list)):
     f.write("basal_" + v3d_feature_list[i] + ",")
 for i in range(len(v3d_feature_list)):
@@ -473,6 +482,19 @@ try:
         else:
             for i in range(len(v3d)):
                 f.write("NaN,")
+#        # axon
+#        if "v3d_axon" in data:
+#            for i in range(len(v3d)):
+#                if v3d[i] in data["v3d_axon"]["gmi"]:
+#                    val = str(data["v3d_axon"]["gmi"][v3d[i]])
+#                elif v3d[i] in data["v3d_axon"]["features"]:
+#                    val = str(data["v3d_axon"]["features"][v3d[i]])
+#                else:
+#                    val = "NaN"
+#                f.write(val + ",")
+#        else:
+#            for i in range(len(v3d)):
+#                f.write("NaN,")
         # BB features
         if "bb_features" in data:
             bb = bb_feature_list
