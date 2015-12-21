@@ -16,7 +16,6 @@ SEEDS = [1234, 1001, 4321, 1024, 2048]
 FIT_BASE_DIR = os.path.join(os.path.dirname(__file__), "fits")
 APICAL_DENDRITE_TYPE = 4
 OPTIMIZE_SCRIPT = os.path.abspath(os.path.join(os.path.dirname(__file__), 'optimize.py'))
-#MPIEXEC = '/shared/utils.x86_64/hydra/bin/mpiexec'
 MPIEXEC = 'mpiexec'
 
 _fit_stage_1_log = logging.getLogger('allensdk.model.biophysical_perisomatic.fit_stage_1')

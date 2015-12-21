@@ -31,8 +31,8 @@ class ApplicationConfig(object):
     '''
     
     _log = logging.getLogger(__name__)
-    _DEFAULT_LOG_CONFIG = resource_filename(__name__, 'logging.conf')
-    #lc.fileConfig(_DEFAULT_LOG_CONFIG)
+    _DEFAULT_LOG_CONFIG = os.getenv('LOG_CFG', resource_filename(__name__, 'logging.conf'))
+    lc.fileConfig(_DEFAULT_LOG_CONFIG)
     
     def __init__(self, 
                  defaults,
