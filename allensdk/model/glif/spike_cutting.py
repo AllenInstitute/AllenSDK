@@ -67,7 +67,7 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
         ydata = np.array(v_at_specificEndPoint)  # this is the voltage at the specified end point
         slope, intercept, r_value, p_value, std_err = stats.linregress(xdata, ydata)
 
-        print slope, intercept, r_value, p_value, std_err
+#        print slope, intercept, r_value, p_value, std_err
     
 #        if slope>1.0:
 #            logging.warning('linear regression slope is bigger than one: forcing slope to 1 and refitting intercept.')

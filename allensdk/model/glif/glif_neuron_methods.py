@@ -1,7 +1,7 @@
 """ The methods in this module are used for configuring dynamics and reset rules for the GlifNeuron.  
 For more details on how to use these methods, see :doc:`glif_models`.
 """
-
+import logging
 import functools
 import numpy as np
 
@@ -329,7 +329,7 @@ def dynamics_threshold_three_sep_components_hybrid(neuron, threshold_t0, voltage
     # initial conditions
     if 'th_spike' not in md:
         md['th_spike'] = [ 0 ]
-        warnings.warn('delete this function it is a hybrid')
+        logging.warning('delete this function it is a hybrid')
     if 'th_voltage' not in md:
         md['th_voltage'] = [ 0 ]
 

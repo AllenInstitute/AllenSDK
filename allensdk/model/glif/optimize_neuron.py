@@ -11,7 +11,7 @@ from allensdk.model.glif.preprocess_neuron import load_sweeps
 from allensdk.model.glif.find_spikes import find_spikes_list
 
 
-def get_optimize_sweep_numbers(sweep_index):
+def get_optimize_sweep_numbers(sweep_index):    
     return fs.find_noise_sweeps(sweep_index)['noise1']
 
 
