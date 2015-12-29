@@ -270,19 +270,33 @@ def configure_method_parameters(neuron_config,
                 'b': b_spike_component_of_threshold 
                 }
             
-        elif method_config['name'] == 'sum_spike_and_adapt':
+        elif method_config['name'] == 'sum_spike_and_adapt_hybrid':
             neuron_config['init_method_data'].update({
                     'a_spike': a_spike_component_of_threshold,
                     'b_spike': b_spike_component_of_threshold,
                     'a_voltage': a_voltage_component_of_threshold,
                     'b_voltage': b_voltage_component_of_threshold
                     })
-    
             method_config['params'] = {}
+            
         elif method_config['name'] == 'sum_spike_and_adapt_forward':
-            raise Exception('write me in')
+            neuron_config['init_method_data'].update({
+                    'a_spike': a_spike_component_of_threshold,
+                    'b_spike': b_spike_component_of_threshold,
+                    'a_voltage': a_voltage_component_of_threshold,
+                    'b_voltage': b_voltage_component_of_threshold
+                    })
+            method_config['params'] = {}
+            
         elif method_config['name'] == 'sum_spike_and_adapt_exact':
-            raise Exception('write me in')
+            neuron_config['init_method_data'].update({
+                    'a_spike': a_spike_component_of_threshold,
+                    'b_spike': b_spike_component_of_threshold,
+                    'a_voltage': a_voltage_component_of_threshold,
+                    'b_voltage': b_voltage_component_of_threshold
+                    })
+            method_config['params'] = {}
+            
         elif method_config['name'] == 'spike_component':
             neuron_config['init_method_data'].update({
                     'a_spike': a_spike_component_of_threshold,
@@ -290,7 +304,6 @@ def configure_method_parameters(neuron_config,
                     'a_voltage': 0,
                     'b_voltage': 0
                     })
-    
             method_config['params'] = {}
     
         elif method_config['name'] == 'inf':

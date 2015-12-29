@@ -264,10 +264,9 @@ class GlifNeuron( object ):
 
         AScurrents_t1 = self.AScurrent_dynamics_method(self, AScurrents_t0, time_step, spike_time_steps)
         voltage_t1 = self.voltage_dynamics_method(self, voltage_t0, AScurrents_t0, inj)
-        threshold_t1 = self.threshold_dynamics_method(self, threshold_t0, voltage_t0)
+        threshold_t1 = self.threshold_dynamics_method(self, threshold_t0, voltage_t0, AScurrents_t0, inj)
 
         return voltage_t1, threshold_t1, AScurrents_t1
-    
         
     def reset(self, voltage_t0, threshold_t0, AScurrents_t0):
         """ Apply reset rules to the neuron's voltage, threshold, and afterspike currents assuming a spike has occurred (voltage is above threshold). 
