@@ -533,7 +533,7 @@ def dynamics_threshold_three_sep_components_exact(neuron, threshold_t0, voltage_
     C = neuron.C * neuron.coeffs['C']
     g = neuron.G * neuron.coeffs['G']
 
-    voltage_component=voltage_component_of_threshold_euler_exact(th_voltage, voltage_t0, I, neuron.dt, a, b, C, g, neuron.El)
+    voltage_component=voltage_component_of_threshold_euler_exact(th_voltage, voltage_t0, I, neuron.dt, a_voltage, b_voltage, C, g, neuron.El)
     spike_component = spike_component_of_threshold_euler_exact(th_spike, b_spike, neuron.dt)
  
     #------update the voltage and spiking values of the the
