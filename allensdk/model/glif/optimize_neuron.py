@@ -93,13 +93,13 @@ def optimize_neuron(model_config, sweep_index, save_callback=None):
             save_callback(optimizer, outer, inner)
     
     # run the optimizer
-    best_param, begin_param = optimizer.run_many(save) 
+    best_param, begin_param, iteration_info = optimizer.run_many(save) 
 
     # over write the the initial experiment parameters with the best found parameters
     # TODO: but why do this since it is not being returned
     experiment.set_neuron_parameters(best_param)
     
-    return optimizer, best_param, begin_param
+    return optimizer, best_param, begin_param, iteration_info
         
 def main():
     parser = argparse.ArgumentParser()
