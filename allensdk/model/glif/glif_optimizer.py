@@ -141,7 +141,8 @@ class GlifOptimizer(object):
                 self.iteration_info.append({
                     'in_params': np.array(params).tolist(),
                     'out_params': xopt.tolist(),
-                    'error': float(fopt)
+                    'error': float(fopt),
+                    'dt_multiplier': self.experiment.neuron.dt_multiplier
                 })
 
 #                ER=self.iteration_info['error']
@@ -200,7 +201,7 @@ class GlifOptimizer(object):
         self.experiment.set_neuron_parameters(best_params)
 
         logging.info('done optimizing')
-        return best_params, self.init_params
+        return best_params, self.init_params, self.iteration_info
 
     def run_once_bound(self, low_bound, high_bound):
         '''

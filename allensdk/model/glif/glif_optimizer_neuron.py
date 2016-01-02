@@ -8,7 +8,7 @@ import allensdk.model.glif.glif_neuron as glif_neuron
 # TODO: document
 
 class GlifNeuronException( Exception ):
-    """ A simple exception for catching simulation errors and reporting intermediate data. """
+    """ Exception for catching simulation errors and reporting intermediate data. """
     def __init__(self, message, data):
         super(Exception, self).__init__(message)
         self.data = data
@@ -21,6 +21,9 @@ class GlifBadInitializationException( Exception ):
         self.step=step
 
 class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
+    '''Contains methods for running the neuron model in a "forced-spike" paradigm
+    used during optimization.
+    '''
     
     TYPE = "GLIF"
     
@@ -36,10 +39,9 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
         else:
             raise Exception('unknown extrapolation method: %s' % self.extrapolation_method_name)
         
+        #TODO: what is this where is it comming from?
         self.dt_multiplier = kwargs.get('dt_multiplier', 1)
-        
-
-    
+            
     @classmethod
     def from_dict(cls, d):
         

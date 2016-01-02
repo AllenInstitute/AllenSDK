@@ -9,32 +9,60 @@ from allensdk.model.glif.glif_optimizer import GlifOptimizer
 
 from allensdk.model.glif.preprocess_neuron import load_sweeps
 from allensdk.model.glif.find_spikes import find_spikes_list
+import allensdk.core.json_utilities as ju
 
-
-def get_optimize_sweep_numbers(sweep_index):    
+def get_optimize_sweep_numbers(sweep_index): 
+    #TODO: why is this here--why are sweep indicies being fed to a find_noise_sweeps sweeps and specifying
+    #noise?--shouldn't the sweeps already be provided?   
     return fs.find_noise_sweeps(sweep_index)['noise1']
 
-
 def optimize_neuron(model_config, sweep_index, save_callback=None):
+    '''Optimizes a neuron.  
+    1. Loads optimizer and neuron configuration data.
+    2. Loads the voltage trace sweeps that will be optimized
+    3. Configures the experiment and optimizer
+    4. Runs the optimizer
+    5. TODO: where is data saved
+    
+    Parameters
+    ----------
+    model_config : dictionary
+        contains values of neuron and optimizer parameters
+    sweep_index : list of integers
+        indices (as labeled in the data configuration file) of sweeps that will be optimized
+    save_callback : module
+        saves output
+    '''
+    # define the neuron and optimizer dictionaries from the model configuration
     neuron_config = model_config['neuron']
     optimizer_config = model_config['optimizer']
 
+    # load the neuron with along with the methods needed for optimization
     neuron = GlifOptimizerNeuron.from_dict(neuron_config)
 
+    # TODO: not sure what this is doing
     optimize_sweeps = get_optimize_sweep_numbers(sweep_index)
+    
+    # load the sweeps to be optimized
     optimize_data = load_sweeps(optimizer_config['nwb_file'], optimize_sweeps, neuron.dt, 
                                 optimizer_config["cut"], optimizer_config["bessel"])
 
-    # offset all voltages by El_reference
+    # needed to offset all voltages by El_reference
     El_reference = neuron_config['El_reference']
 
+    # get indicies of spikes and voltage at those spikes
     spike_ind, spike_v = find_spikes_list(optimize_data['voltage'], neuron_config['dt'])
 
-    grid_spike_times = [ st*neuron_config['dt'] for st in spike_ind ]
+    # get times of spikes 
+    grid_spike_times = [ si*neuron_config['dt'] for si in spike_ind ]
+    
+    # convert voltage at spikes into reference frame of El
     grid_spike_voltages_in_ref_to_zero = [ sv - El_reference for sv in spike_v ]
 
+    # convert voltage into reference frame of El 
     resp_list = [ d - El_reference for d in optimize_data['voltage'] ]  
 
+    # configure experiment
     experiment = GlifExperiment(neuron = neuron, 
                                 dt = neuron.dt,
                                 stim_list = optimize_data['current'],
@@ -44,6 +72,7 @@ def optimize_neuron(model_config, sweep_index, save_callback=None):
                                 grid_spike_voltages = grid_spike_voltages_in_ref_to_zero,
                                 param_fit_names = optimizer_config['param_fit_names'])
 
+    # configure optimizer
     optimizer = GlifOptimizer(experiment = experiment, 
                               dt = neuron.dt,              
                               outer_iterations = optimizer_config['outer_iterations'],
@@ -63,12 +92,14 @@ def optimize_neuron(model_config, sweep_index, save_callback=None):
         if save_callback:
             save_callback(optimizer, outer, inner)
     
-    best_param, begin_param = optimizer.run_many(save) 
+    # run the optimizer
+    best_param, begin_param, iteration_info = optimizer.run_many(save) 
 
+    # over write the the initial experiment parameters with the best found parameters
+    # TODO: but why do this since it is not being returned
     experiment.set_neuron_parameters(best_param)
     
-    return optimizer, best_param, begin_param
-
+    return optimizer, best_param, begin_param, iteration_info
         
 def main():
     parser = argparse.ArgumentParser()

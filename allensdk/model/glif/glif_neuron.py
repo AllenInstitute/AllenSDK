@@ -219,6 +219,7 @@ class GlifNeuron( object ):
         GlifNeuronMethod
             a GlifNeuronMethod instance
         """
+        print "method type", method_type
         method_options = METHOD_LIBRARY.get(method_type, None)
 
         assert method_options is not None, Exception("Unknown method type (%s)" % method_type)
