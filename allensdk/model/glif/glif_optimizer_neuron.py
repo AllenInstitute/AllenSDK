@@ -62,7 +62,6 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
                    voltage_reset_method = d['voltage_reset_method'],
                    AScurrent_reset_method = d['AScurrent_reset_method'],
                    threshold_reset_method = d['threshold_reset_method'],
-                   init_method_data = d.get('init_method_data', {}),
                    init_voltage = d['init_voltage'],
                    init_threshold = d['init_threshold'],
                    init_AScurrents = d['init_AScurrents'],
@@ -111,7 +110,7 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
                 'grid_bio_spike_model_threshold': voltage of the model at biological/input spike times interpolated between time steps
         """
         
-        self.reset_method_data() #get rid of lingering method data
+        self.reset_threshold_components() #get rid of lingering threshold components
 
         voltage_t0 = self.init_voltage
         threshold_t0 = self.init_threshold
@@ -545,10 +544,12 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
                 logging.error('    threshold started the run at: %f' % threshold_out_coarse_grid[0])
                 logging.error('    threshold before: %s' % threshold_out_coarse_grid[time_step-20:time_step])
                 logging.error('    AScurrents_t0: %s' % AScurrents_t0)
-                if self.init_method_data['a_spike']:
-                    logging.error('    a_spike: %s' % self.init_method_data['a_spike'])
-                if self.init_method_data['b_spike']:
-                    logging.error('    b_spike: %s' % self.init_method_data['b_spike'])
+
+                if 'a_spike' in self.threshold_dynamics_method.params:
+                    logging.error('    a_spike: %s' % self.threshold_dynamics_method.params['a_spike'])
+                if 'b_spike' in self.threshold_dynamics_method.params:
+                    logging.error('    b_spike: %s' % self.threshold_dynamics_method.params['b_spike'])
+
                 #need to ouput the correct matrix of values for plotting
                 #set up output to be the original matrix size of nan's
                 

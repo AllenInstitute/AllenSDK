@@ -65,7 +65,7 @@ class GlifNeuron( object ):
     def __init__(self, El, dt, asc_tau_array, R_input, C, asc_amp_array, spike_cut_length, th_inf, th_adapt, coeffs,
                  AScurrent_dynamics_method, voltage_dynamics_method, threshold_dynamics_method,
                  AScurrent_reset_method, voltage_reset_method, threshold_reset_method,
-                 init_method_data, init_voltage, init_threshold, init_AScurrents, **kwargs): 
+                 init_voltage, init_threshold, init_AScurrents, **kwargs): 
 
         """ Initialize the neuron."""
 
@@ -80,10 +80,9 @@ class GlifNeuron( object ):
         self.asc_amp_array = np.array(asc_amp_array)
         self.spike_cut_length = int(spike_cut_length)
         self.th_inf = th_inf
-        self.th_adapt=th_adapt
+        self.th_adapt = th_adapt
 
-        self.init_method_data = init_method_data
-        self.update_method_data = copy.deepcopy(init_method_data)
+        self.threshold_components = None
 
         self.init_voltage = init_voltage
         self.init_threshold = init_threshold
@@ -147,7 +146,6 @@ class GlifNeuron( object ):
                    voltage_reset_method = d['voltage_reset_method'],
                    AScurrent_reset_method = d['AScurrent_reset_method'],
                    threshold_reset_method = d['threshold_reset_method'],
-                   init_method_data = d.get('init_method_data', {}),
                    init_voltage = d['init_voltage'],
                    init_threshold = d['init_threshold'],
                    init_AScurrents = d['init_AScurrents'])
@@ -172,8 +170,6 @@ class GlifNeuron( object ):
             'AScurrent_reset_method': self.AScurrent_reset_method,
             'voltage_reset_method': self.voltage_reset_method,
             'threshold_reset_method': self.threshold_reset_method,
-            'init_method_data': self.init_method_data,
-            'update_method_data': self.update_method_data,
             'init_voltage': self.init_voltage,
             'init_threshold': self.init_threshold,
             'init_AScurrents': self.init_AScurrents
@@ -235,9 +231,6 @@ class GlifNeuron( object ):
         assert method is not None, Exception("unknown method name %s of type %s" % (method_name, method_type))
         
         return GlifNeuron.configure_method(method_name, method, method_params)
-
-    def reset_method_data(self):
-        self.update_method_data = copy.deepcopy(self.init_method_data)
 
     def dynamics(self, voltage_t0, threshold_t0, AScurrents_t0, inj, time_step, spike_time_steps):    
         """ Update the voltage, threshold, and afterspike currents of the neuron for a single time step.
@@ -329,7 +322,7 @@ class GlifNeuron( object ):
         threshold_t0 = self.init_threshold
         AScurrents_t0 = self.init_AScurrents
 
-        self.reset_method_data() #get rid of lingering method data
+        self.reset_threshold_components() #get rid of lingering method data
 
         num_time_steps = len(stim) 
         num_AScurrents = len(AScurrents_t0)
@@ -416,6 +409,20 @@ class GlifNeuron( object ):
             'interpolated_spike_voltage': np.array(interpolated_spike_voltage), 
             'interpolated_spike_threshold': np.array(interpolated_spike_threshold)
             }
+
+    def get_threshold_components(self):
+        if self.threshold_components is None:
+            self.threshold_components = { 'spike': [0], 'voltage': [0] }
+
+        return self.threshold_components
+
+    def add_threshold_components(self, spike, voltage):
+        self.threshold_components['spike'].append(spike)
+        self.threshold_components['voltage'].append(voltage)
+
+    def reset_spike_components(self):
+        self.threshold_components = None 
+            
 
 
 def interpolate_spike_time(dt, time_step, threshold_t0, threshold_t1, voltage_t0, voltage_t1):
