@@ -161,9 +161,6 @@ def configure_method_parameters(neuron_config,
                                 sv_for_expsymm,
                                 tau_from_AC):
     
-    # initialize the generic method data 
-    neuron_config['init_method_data'] = {}
-    
     
     # configure voltage reset rules
     method_config = neuron_config['voltage_reset_method']
@@ -205,8 +202,8 @@ def configure_method_parameters(neuron_config,
             method_config['params'] = {}
             neuron_config['init_threshold'] = adjusted_th_inf
                 
-        elif method_config['name'] == 'sum_spike_and_adapt':
-            method_config['params'] = {}
+        elif method_config['name'] == 'three_components':
+            method_config['params'] = { 'a_spike': a_spike_component_of_threshold }
             neuron_config['init_threshold'] = adjusted_th_inf
                 
         elif method_config['name'] == 'fixed':
@@ -220,11 +217,11 @@ def configure_method_parameters(neuron_config,
     if method_config.get('params', None) is None:
         if method_config['name'] == 'quadratic_i_of_v':
             raise ModelConfigurationException('quadraticIofV of voltage_dynamics_method preprocessing is not yet implemented')
-        elif method_config['name'] == 'forward_euler_linear':
+        elif method_config['name'] == 'linear_forward_euler':
             method_config['params'] = {}
-        elif method_config['name'] == 'euler_exact_linear':
+        elif method_config['name'] == 'linear_exact':
             method_config['params'] = {}
-        elif method_config['name'] == 'forward_euler_piecewise':
+        elif method_config['name'] == 'piecewise_linear_forward_euler':
             #TODO: corinnet MAKE SURE THESE ARE CORRECT! NUMBERS AND THE WAY THEY ARE BEING IMPLIMENTED IN NEURON METHODS 
             method_config['params'] = {
                 'R_tlparam1': pwR[0],
@@ -236,7 +233,7 @@ def configure_method_parameters(neuron_config,
                 # 'El_tlparam2': pwEl[1], 
                 # 'El_t1param3': pwEl[2]
                 }
-        elif method_config['name'] == 'euler_exact_piecewise':
+        elif method_config['name'] == 'piecewise_linear_exact':
             #TODO: corinnet MAKE SURE THESE ARE CORRECT! NUMBERS AND THE WAY THEY ARE BEING IMPLIMENTED IN NEURON METHODS 
             method_config['params'] = {
                 'R_tlparam1': pwR[0],
@@ -262,55 +259,32 @@ def configure_method_parameters(neuron_config,
     method_config = neuron_config['threshold_dynamics_method']
     
     if method_config.get('params', None) is None:
-        if method_config['name'] == 'adapt_standard':
-            raise ModelConfigurationException('adapt_standard is not currently used as a threshold_dynamics method' )
+        if method_config['name'] == 'three_components_forward':
             method_config['params'] = {
-                #TODO: switch out a and b for amp and decay of exponential
-                'a': a_spike_component_of_threshold,
-                'b': b_spike_component_of_threshold 
-                }
-            
-        elif method_config['name'] == 'sum_spike_and_adapt_hybrid':
-            neuron_config['init_method_data'].update({
                     'a_spike': a_spike_component_of_threshold,
                     'b_spike': b_spike_component_of_threshold,
                     'a_voltage': a_voltage_component_of_threshold,
                     'b_voltage': b_voltage_component_of_threshold
-                    })
-            method_config['params'] = {}
+                    }
             
-        elif method_config['name'] == 'sum_spike_and_adapt_forward':
-            neuron_config['init_method_data'].update({
+        elif method_config['name'] == 'three_components_exact':
+            method_config['params'] = {
                     'a_spike': a_spike_component_of_threshold,
                     'b_spike': b_spike_component_of_threshold,
                     'a_voltage': a_voltage_component_of_threshold,
                     'b_voltage': b_voltage_component_of_threshold
-                    })
-            method_config['params'] = {}
-            
-        elif method_config['name'] == 'sum_spike_and_adapt_exact':
-            neuron_config['init_method_data'].update({
-                    'a_spike': a_spike_component_of_threshold,
-                    'b_spike': b_spike_component_of_threshold,
-                    'a_voltage': a_voltage_component_of_threshold,
-                    'b_voltage': b_voltage_component_of_threshold
-                    })
-            method_config['params'] = {}
-            
+                    }
+
         elif method_config['name'] == 'spike_component':
-            neuron_config['init_method_data'].update({
+            method_config['params'] = {
                     'a_spike': a_spike_component_of_threshold,
                     'b_spike': b_spike_component_of_threshold,
                     'a_voltage': 0,
                     'b_voltage': 0
-                    })
-            method_config['params'] = {}
+                    }
     
         elif method_config['name'] == 'inf':
             method_config['params'] = {}
-    
-        elif method_config['name'] == 'fixed':
-            raise ModelConfigurationException('cannot use fixed threshold dynamics method in preprocessor')
     
         else:
             raise ModelConfigurationException("unknown threshold dynamics method: ", method_config['name'])
@@ -352,7 +326,6 @@ def configure_method_parameters(neuron_config,
             'sv_for_expsymm': sv_for_expsymm,
             'tau_from_AC': tau_from_AC
             }
-
 
     # validation
 

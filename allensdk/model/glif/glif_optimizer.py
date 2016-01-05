@@ -201,7 +201,7 @@ class GlifOptimizer(object):
         self.experiment.set_neuron_parameters(best_params)
 
         logging.info('done optimizing')
-        return best_params, self.init_params, self.iteration_info
+        return best_params, self.init_params
 
     def run_once_bound(self, low_bound, high_bound):
         '''

@@ -185,7 +185,7 @@ def dynamics_voltage_linear_forward_euler(neuron, voltage_t0, AScurrents_t0, inj
     """ (TODO) Linear voltage dynamics. """
     return voltage_t0 + (inj + np.sum(AScurrents_t0) - neuron.G * neuron.coeffs['G'] * (voltage_t0 - neuron.El)) * neuron.dt / (neuron.C * neuron.coeffs['C'])
 
-def dynamics_voltage_linear_euler_exact(neuron, voltage_t0, AScurrents_t0, inj):
+def dynamics_voltage_linear_exact(neuron, voltage_t0, AScurrents_t0, inj):
     """ (TODO) Linear voltage dynamics. """
 
     C = (neuron.C * neuron.coeffs['C'])
@@ -196,7 +196,7 @@ def dynamics_voltage_linear_euler_exact(neuron, voltage_t0, AScurrents_t0, inj):
 
     return voltage_t0*np.exp(-neuron.dt*tau) + N*(1-np.exp(-tau*neuron.dt))/tau
 
-def dynamics_voltage_piecewise_euler_exact(neuron, voltage_t0, AScurrents_t0, inj, R_tlparam1, R_tlparam2, R_t1param3, El_slope_param, El_intercept_param):
+def dynamics_voltage_piecewise_linear_exact(neuron, voltage_t0, AScurrents_t0, inj, R_tlparam1, R_tlparam2, R_t1param3, El_slope_param, El_intercept_param):
     """ (TODO) Linear voltage dynamics. """
 
     C = (neuron.C * neuron.coeffs['C'])
@@ -212,7 +212,7 @@ def dynamics_voltage_piecewise_euler_exact(neuron, voltage_t0, AScurrents_t0, in
     return voltage_t0*np.exp(-neuron.dt*tau) + N*(1-np.exp(-tau*neuron.dt))/tau
     
 
-def dynamics_voltage_quadratic_i_of_v(neuron, voltage_t0, AScurrents_t0, inj, a, b, c, d, e):    
+def dynamics_voltage_quadratic_forward_euler(neuron, voltage_t0, AScurrents_t0, inj, a, b, c, d, e):    
     """ (TODO) Quadratic voltage dynamics equation.
 
     Parameters
@@ -236,7 +236,7 @@ def dynamics_voltage_quadratic_i_of_v(neuron, voltage_t0, AScurrents_t0, inj, a,
     return voltage_t0 + (inj + np.sum(AScurrents_t0) - I_of_v) * neuron.dt / (neuron.C * neuron.coeffs['C']) 
 
 
-def dynamics_voltage_piecewise_linear(neuron, voltage_t0, AScurrents_t0, inj, R_tlparam1, R_tlparam2, R_t1param3, El_slope_param, El_intercept_param):
+def dynamics_voltage_piecewise_linear_forward_euler(neuron, voltage_t0, AScurrents_t0, inj, R_tlparam1, R_tlparam2, R_t1param3, El_slope_param, El_intercept_param):
     """ Piecewise linear voltage dynamics methods. This method requires 3 parameters for equations of both resistance and resting potential. 
 
     Parameters
@@ -359,7 +359,7 @@ def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, AScurren
 #     #TODO: I dont trust the a_coeff being multiplied by the whole function
 #     return neuron.coeffs['a']*voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
 
-def spike_component_of_threshold_euler_forward(th_t0, b_spike, dt):
+def spike_component_of_threshold_forward_euler(th_t0, b_spike, dt):
     '''Spike component of threshold modeled as an exponential decay. Implemented 
     here for forward Euler 
     
@@ -375,7 +375,7 @@ def spike_component_of_threshold_euler_forward(th_t0, b_spike, dt):
     b_spike=-b_spike #TODO: this is here because b_spike is always input as positive although it is negative
     return th_t0 + th_t0*b_spike * dt                                                                         
     
-def spike_component_of_threshold_euler_exact(th0, b_spike, t):
+def spike_component_of_threshold_exact(th0, b_spike, t):
     '''Spike component of threshold modeled as an exponential decay. Implemented 
     here as exact analytical solution. 
     
@@ -392,7 +392,7 @@ def spike_component_of_threshold_euler_exact(th0, b_spike, t):
     b_spike=-b_spike
     return th0*np.exp(b_spike * t)
 
-def voltage_component_of_threshold_euler_forward(th_t0, v_t0, dt, a_voltage, b_voltage, El):
+def voltage_component_of_threshold_forward_euler(th_t0, v_t0, dt, a_voltage, b_voltage, El):
     '''Equation 2.1 of Mihalas and Nieber, 2009 implemented for use in forward Euler. Note 
     here all variables are in reference to threshold infinity.  Therefore thr_inf is zero 
     here (replaced threshold_inf with 0 in the equation to be verbose). This is done so that 
@@ -415,7 +415,7 @@ def voltage_component_of_threshold_euler_forward(th_t0, v_t0, dt, a_voltage, b_v
     '''
     return th_t0 + (a_voltage*(v_t0-El)-b_voltage*(th_t0-0))*dt
 
-def voltage_component_of_threshold_euler_exact(th0, v0, I, t, a_voltage, b_voltage, C, g, El):
+def voltage_component_of_threshold_exact(th0, v0, I, t, a_voltage, b_voltage, C, g, El):
     '''Note this function is the exact formulation; however, dt is used because t0 is the initial time and dt
     is the time the function is exactly evaluated at. Note: that here, this equation is in reference to th_inf.
     Therefore th0 is the total threshold-thr_inf (threshold_inf replaced with 0 in the equation to be verbose).  
@@ -448,12 +448,14 @@ def voltage_component_of_threshold_euler_exact(th0, v0, I, t, a_voltage, b_volta
     return phi*(v0-beta)*np.exp(-g*t/C)+1/(np.exp(b_voltage*t))*(th0-phi*(v0-beta)-
                         (a_voltage/b_voltage)*(beta-El)-0) +(a_voltage/b_voltage)*(beta-El) +0
 
-def dynamics_threshold_three_sep_components_forward(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj):        
+
+def dynamics_threshold_three_components_forward(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj, 
+                                                a_spike, b_spike, a_voltage, b_voltage):
     """Threshold dynamics implemented for forward Euler. The threshold will adapt via two mechanisms: 
     1. a voltage dependent adaptation.  
     2. a component initiated by a spike which decays as an exponential.  
     These two component are in reference to threshold infinity and are recorded 
-    in the md parameters.  
+    in the neuron's threshold components.
     The third component refers to th_inf which is added separately as opposed to being 
     included in the voltage component of the threshold as is done in equation 2.1 of
     Mihalas and Nieber 2009.  Threshold infinity is removed for simple optimization.
@@ -468,37 +470,29 @@ def dynamics_threshold_three_sep_components_forward(neuron, threshold_t0, voltag
     AScurrents_t0 : not used here 
     inj : not used here
     """
-    md = neuron.update_method_data
+    tcs = neuron.get_threshold_components()
+    
+    th_spike = tcs['spike'][-1]
+    th_voltage = tcs['voltage'][-1] 
 
-    # initial conditions
-    if 'th_spike' not in md:
-        md['th_spike'] = [ 0 ]
-    if 'th_voltage' not in md:
-        md['th_voltage'] = [ 0 ]
+    a_voltage = a_voltage * neuron.coeffs['a']
+    b_voltage = b_voltage * neuron.coeffs['b']
 
-    th_spike = md['th_spike'][-1]
-    th_voltage = md['th_voltage'][-1] 
+    spike_component = spike_component_of_threshold_forward_euler(th_t0, b_spike, neuron.dt)    
+    voltage_component = voltage_component_of_threshold_forward_euler(th_voltage, voltage_t0, dt, a_voltage, b_voltage, neuron.El)
 
-    a_voltage=md['a_voltage']*neuron.coeffs['a']
-    b_voltage=md['b_voltage']*neuron.coeffs['b']
-    b_spike=md['b_spike']
-
-    spike_component=spike_component_of_threshold_euler_forward(th_t0, b_spike, neuron.dt)    
-    voltage_component=voltage_component_of_threshold_euler_forward(th_voltage, voltage_t0, dt, a_voltage, b_voltage, neuron.El)
-
-    #------update the voltage and spiking values in the md method
-    md['th_spike'].append(spike_component)
-    md['th_voltage'].append(voltage_component)
+    neuron.append_threshold_components(spike_component, voltage_component)
     
     return voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
 
 
-def dynamics_threshold_three_sep_components_exact(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj):        
+def dynamics_threshold_three_components_exact(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj,
+                                              a_spike, b_spike, a_voltage, b_voltage):
     """Analitical solution for threshold dynamics. The threshold will adapt via two mechanisms: 
     1. a voltage dependent adaptation.  
     2. a component initiated by a spike which decays as an exponential.  
     These two component are in reference to threshold infinity and are recorded 
-    in the md parameters.  
+    in the neuron's threshold components.
     The third component refers to th_inf which is added separately as opposed to being 
     included in the voltage component of the threshold as is done in equation 2.1 of
     Mihalas and Nieber 2009.  Threshold infinity is removed for simple optimization.
@@ -515,39 +509,32 @@ def dynamics_threshold_three_sep_components_exact(neuron, threshold_t0, voltage_
     inj : float
         current injected into the neuron
     """
-    md = neuron.update_method_data
+    tcs = neuron.get_threshold_components()
 
-    # initial conditions
-    if 'th_spike' not in md:
-        md['th_spike'] = [ 0 ]
-    if 'th_voltage' not in md:
-        md['th_voltage'] = [ 0 ]
+    th_spike = tcs['spike'][-1]
+    th_voltage = tcs['voltage'][-1] 
 
-    th_spike = md['th_spike'][-1]
-    th_voltage = md['th_voltage'][-1] 
-    
-    a_voltage=md['a_voltage']*neuron.coeffs['a']
-    b_voltage=md['b_voltage']*neuron.coeffs['b']
-    b_spike=md['b_spike']
-    
+    a_voltage = a_voltage * neuron.coeffs['a']
+    b_voltage = b_voltage * neuron.coeffs['b']
+
     I = inj + np.sum(AScurrents_t0)
     C = neuron.C * neuron.coeffs['C']
     g = neuron.G * neuron.coeffs['G']
 
-    voltage_component=voltage_component_of_threshold_euler_exact(th_voltage, voltage_t0, I, neuron.dt, a_voltage, b_voltage, C, g, neuron.El)
-    spike_component = spike_component_of_threshold_euler_exact(th_spike, b_spike, neuron.dt)
+    voltage_component=voltage_component_of_threshold_exact(th_voltage, voltage_t0, I, neuron.dt, a_voltage, b_voltage, C, g, neuron.El)
+    spike_component = spike_component_of_threshold_exact(th_spike, b_spike, neuron.dt)
  
     #------update the voltage and spiking values of the the
-    md['th_spike'].append(spike_component)
-    md['th_voltage'].append(voltage_component)
+    neuron.append_threshold_components(spike_component, voltage_component)
      
     return voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
 
-def dynamics_threshold_spike_component(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj):        
+def dynamics_threshold_spike_component(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj,
+                                       a_spike, b_spike, a_voltage, b_voltage):
     """Analytical solution for spike component of threshold. The threshold will adapt via 
     a component initiated by a spike which decays as an exponential.  The component is in 
-    reference to threshold infinity and are recorded in the md parameters.  The voltage 
-    component of the threshold is set to zero in the md parameters because it is zero here  
+    reference to threshold infinity and are recorded in the neuron's threshold components.  The voltage 
+    component of the threshold is set to zero in the threshold components  because it is zero here  
     The third component refers to th_inf which is added separately as opposed to being 
     included in the voltage component of the threshold as is done in equation 2.1 of
     Mihalas and Nieber 2009.  Threshold infinity is removed for simple optimization.
@@ -564,24 +551,16 @@ def dynamics_threshold_spike_component(neuron, threshold_t0, voltage_t0, AScurre
     inj : float
         current injected into the neuron
     """
-    md = neuron.update_method_data
 
-    # initial conditions
-    if 'th_spike' not in md:
-        md['th_spike'] = [ 0 ]
-    if 'th_voltage' not in md:
-        md['th_voltage'] = [ 0 ]
+    tcs = neuron.get_threshold_components()
 
-    th_spike = md['th_spike'][-1]
-    th_voltage = md['th_voltage'][-1] 
-    
-    b_spike=md['b_spike']
+    th_spike = tcs['spike'][-1]
+    th_voltage = tcs['voltage'][-1] 
 
-    spike_component = spike_component_of_threshold_euler_exact(th_spike, b_spike, neuron.dt)
+    spike_component = spike_component_of_threshold_exact(th_spike, b_spike, neuron.dt)
  
     #------update the voltage and spiking values of the the
-    md['th_spike'].append(spike_component)
-    md['th_voltage'].append(0.0)
+    neuron.append_threshold_components(spike_component, 0.0)
      
     return spike_component+neuron.th_inf * neuron.coeffs['th_inf']
 
@@ -601,20 +580,6 @@ def dynamics_threshold_inf(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj)
     """   
     return neuron.coeffs['th_inf'] * neuron.th_inf
 
-def dynamics_threshold_fixed(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj, value):
-    """ Set threshold a fixed constant.
-
-    Parameters
-    ----------
-    neuron : not used here
-    threshold_t0 : not used here
-    voltage_t0 : not used here
-    AScurrents_t0 : not used here 
-    inj : not used here
-    value : float
-        fixed constant to use for threshold. 
-    """
-    return value
 
 def reset_AScurrent_sum(neuron, AScurrents_t0, r):
     """ Reset afterspike currents by adding summed exponentials. Left over currents from last spikes as 
@@ -704,6 +669,7 @@ def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
     """ Reset the threshold to instantaneous threshold. """
     return neuron.coeffs['th_inf'] * neuron.th_inf
 
+
 def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
     """ Reset the threshold to a fixed value. This method is not sued and will raise an exception if called.
 
@@ -716,27 +682,15 @@ def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
     return  value
 
 
-def reset_threshold_for_adapt_slow_fast(neuron, threshold_t0, voltage_v1):
+def reset_threshold_three_components(neuron, threshold_t0, voltage_v1, a_spike):
     '''This method resets the two components of the threshold: a spike (fast)
     component and a (voltage) component which are summed. 
     '''
-    md = neuron.update_method_data
+    tcs = neuron.get_threshold_components()
+    neuron.append_threshold_components( tcs['spike'][-1] + a_spike,  #adding spiking component of threshold ontop of already existent spike component.
+                                        tcs['voltage'][-1] ) #note these are the same value.
     
-    md['th_spike'].append( md['th_spike'][-1] + md['a_spike'] )
-    md['th_voltage'].append( md['th_voltage'][-1] ) #note these are the same value.
-
-    return md['th_spike'][-1] + md['th_voltage'][-1]
-
-def reset_threshold_for_three_sep_components(neuron, threshold_t0, voltage_v1):
-    '''This method resets the two components of the threshold: a spike (fast)
-    component and a (voltage) component which are summed. 
-    '''
-    md = neuron.update_method_data
-    
-    md['th_spike'].append( md['th_spike'][-1] + md['a_spike'] )  #adding spiking component of threshold ontop of already existent spike component.
-    md['th_voltage'].append( md['th_voltage'][-1] ) #note these are the same value.
-    
-    return md['th_spike'][-1] + md['th_voltage'][-1] + neuron.th_inf * neuron.coeffs['th_inf']
+    return tcs['spike'][-1] + tcs['voltage'][-1] + neuron.th_inf * neuron.coeffs['th_inf']
 
 
 #: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. 'voltage_dynamics_method').  
@@ -744,42 +698,38 @@ def reset_threshold_for_three_sep_components(neuron, threshold_t0, voltage_v1):
 #its dynamics and reset methods.
 METHOD_LIBRARY = {
     'AScurrent_dynamics_method': { 
-        'exp': dynamics_AScurrent_exp,
+        'exp':    dynamics_AScurrent_exp,
         'vector': dynamics_AScurrent_vector,
-        'none': dynamics_AScurrent_none
+        'none':   dynamics_AScurrent_none
         },
     'voltage_dynamics_method': { 
-        'forward_euler_linear': dynamics_voltage_linear_forward_euler,
-        'quadratic_i_of_v': dynamics_voltage_quadratic_i_of_v,
-        'forward_euler_piecewise': dynamics_voltage_piecewise_linear,
-        'euler_exact_linear':dynamics_voltage_linear_euler_exact,
-        'euler_exact_piecewise':dynamics_voltage_piecewise_euler_exact,
+        'linear_forward_euler':           dynamics_voltage_linear_forward_euler,
+        'quadratic_forward_euler':        dynamics_voltage_quadratic_forward_euler,
+        'piecewise_linear_forward_euler': dynamics_voltage_piecewise_linear_forward_euler,
+        'linear_exact':                   dynamics_voltage_linear_exact,
+        'piecewise_linear_exact':         dynamics_voltage_piecewise_linear_exact,
         },
     'threshold_dynamics_method': {
-        #Note: difference between sum_spike_and_adapt spike_component is that in model 
-        #configuration the voltage components of threshold are set to zero.
-#TODO: deprecate    'sum_spike_and_adapt_hybrid':  dynamics_threshold_three_sep_components_hybrid,  #TODO: remove this one as it is a hybrid of forward and exact           
-        'spike_component': dynamics_threshold_spike_component, #note cant just use dynamics_threshold_three_sep_components_exact b/c of a zero division error.
-        'inf': dynamics_threshold_inf,
-        'fixed': dynamics_threshold_fixed,
-        'sum_spike_and_adapt_foward':dynamics_threshold_three_sep_components_forward, 
-        'sum_spike_and_adapt_exact':dynamics_threshold_three_sep_components_exact 
+        'spike_component':          dynamics_threshold_spike_component, #note cant just use dynamics_threshold_three_sep_components_exact b/c of a zero division error.
+        'inf':                      dynamics_threshold_inf,
+        'three_components_forward': dynamics_threshold_three_components_forward, 
+        'three_components_exact':   dynamics_threshold_three_components_exact 
         },
     'AScurrent_reset_method': {
-        'sum': reset_AScurrent_sum,
+        'sum':  reset_AScurrent_sum,
         'none': reset_AScurrent_none
         }, 
     'voltage_reset_method': {
-        'v_before': reset_voltage_v_before,
+        'v_before':   reset_voltage_v_before,
         'i_v_before': reset_voltage_i_v_before,
-        'zero': reset_voltage_zero,
-        'fixed': reset_voltage_fixed
+        'zero':       reset_voltage_zero,
+        'fixed':      reset_voltage_fixed
         }, 
     'threshold_reset_method': {
-        'max_v_th': reset_threshold_max_v_th,
-        'th_before': reset_threshold_th_before,
-        'inf': reset_threshold_inf,
-        'fixed': reset_threshold_fixed,
-        'sum_spike_and_adapt': reset_threshold_for_three_sep_components
+        'max_v_th':         reset_threshold_max_v_th,
+        'th_before':        reset_threshold_th_before,
+        'inf':              reset_threshold_inf,
+        'fixed':            reset_threshold_fixed,
+        'three_components': reset_threshold_three_components
         }
 }
