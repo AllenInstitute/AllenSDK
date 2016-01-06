@@ -420,7 +420,7 @@ class GlifNeuron( object ):
         self.threshold_components['spike'].append(spike)
         self.threshold_components['voltage'].append(voltage)
 
-    def reset_spike_components(self):
+    def reset_threshold_components(self):
         self.threshold_components = None 
             
 
