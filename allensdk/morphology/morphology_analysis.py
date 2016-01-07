@@ -1,6 +1,6 @@
 import math
-import numpy as np
 import sys
+import numpy as np
 import allensdk.core.swc as allen_swc
 
 # The code below is an almost literal c++->python port from the v3d 
@@ -8,17 +8,21 @@ import allensdk.core.swc as allen_swc
 # The primary modification is that feature arrays are returned
 #   from the functions (as opposed to being passed in) and 
 #   a description (text) array is returned with each feature vector
-# The SWC object mimics the interface of NeuronSWC in v3d
+# The SWC object mimics the interface of NeuronSWC in v3d. It has been
+#   extended to assist in analysis tasks
 
 class SWC_Obj(object):
     def __init__(self, obj):
         self.n = int(obj["id"])
-        self.obj_type = int(obj["type"])
+        self.t = int(obj["type"])
         self.x = float(obj["x"])
         self.y = float(obj["y"])
         self.z = float(obj["z"])
         self.radius = float(obj["radius"])
         self.pn = int(obj["parent"])
+        # create index-agnostic links between objects
+        self.parent = None
+        self.children = []
 
 class SWC(object):
     def __init__(self, fname):
@@ -30,6 +34,89 @@ class SWC(object):
             obj = SWC_Obj(lst[i])
             self.obj_list.append(obj)
             self.obj_hash[obj.n] = len(self.obj_list) - 1
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            if obj.pn >= 0:
+                obj.parent = self.obj_list[self.obj_hash[obj.pn]]
+                obj.parent.children.append(obj)
+    
+    # remove blank entries from obj_list and regenerate obj_hash
+    # BB library requires SWC files that have no 'holes' in them
+    def clean_up(self):
+        # assign consecutive job IDs
+        tmp_list = []
+        n = 1
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            if obj is not None:
+                obj.n = n
+                n += 1
+                tmp_list.append(obj)
+        self.obj_list = tmp_list
+        # re-link objects with parents
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            if obj.pn >= 0:
+                obj.pn = obj.parent.n
+
+    def apply_affine(self, aff):
+        # calculate scale. use 2 different approaches
+        #   1) assume isotropic spatial transform, use determinant^1/3
+        #   2) calculate transform of unit vector on each original axis
+        # (1)
+        # calculate the determinant
+        det0 = aff[0] * (aff[4]*aff[8] - aff[5]*aff[7])
+        det1 = aff[1] * (aff[3]*aff[8] - aff[5]*aff[6])
+        det2 = aff[2] * (aff[3]*aff[7] - aff[4]*aff[6])
+        det = det0 + det1 + det2
+        # determinant is change of volume that occurred during transform
+        # assume equal scaling along all axes. take 3rd root to get
+        #   scale factor
+        det_scale = math.pow(abs(det), 1.0/3.0)
+        # (2)
+        scale_x = abs(aff[0] + aff[3] + aff[6])
+        scale_y = abs(aff[1] + aff[4] + aff[7])
+        scale_z = abs(aff[2] + aff[5] + aff[8])
+        avg_scale = (scale_x + scale_y + scale_z) / 3.0;
+        deviance = 0.0
+        if scale_x > avg_scale:
+            deviance = max(deviance, scale_x/avg_scale-1.0)
+        else:
+            deviance = max(deviance, 1.0-scale_x/avg_scale)
+        if scale_y > avg_scale:
+            deviance = max(deviance, scale_y/avg_scale-1.0)
+        else:
+            deviance = max(deviance, 1.0-scale_y/avg_scale)
+        if scale_z > avg_scale:
+            deviance = max(deviance, scale_z/avg_scale-1.0)
+        else:
+            deviance = max(deviance, 1.0-scale_z/avg_scale)
+        # 
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            x = obj.x*aff[0] + obj.y*aff[1] + obj.z*aff[2] + aff[9]
+            y = obj.x*aff[3] + obj.y*aff[4] + obj.z*aff[5] + aff[10]
+            z = obj.x*aff[6] + obj.y*aff[7] + obj.z*aff[8] + aff[11]
+            obj.x = x
+            obj.y = y
+            obj.z = z
+            # use method (1) for scaling for now as it's most simple
+            obj.radius *= det_scale
+
+    # returns True on success, False on failure
+    def save_to(self, file_name):
+        try:
+            f = open(file_name, "w")
+            f.write("#n,type,x,y,z,radius,parent\n")
+            for i in range(len(self.obj_list)):
+                obj = self.obj_list[i]
+                f.write("%d %d %f " % (obj.n, obj.t, obj.x))
+                f.write("%f %f %f %d\n" % (obj.y, obj.z, obj.radius, obj.pn))
+            f.close()
+        except:
+            print("Error creating swc file '%s'" % file_name)
+            return False
+        return True
 
 ########################################################################
 ########################################################################
@@ -258,8 +345,16 @@ def getParent(n,nt):
     else:
         return nt.obj_hash[nt.obj_list[n].pn]
 
-def angle(a,b,c): 
-    return(math.acos((((b).x-(a).x)*((c).x-(a).x)+((b).y-(a).y)*((c).y-(a).y)+((b).z-(a).z)*((c).z-(a).z))/(dist(a,b)*dist(a,c)))*180.0/math.pi)
+def angle(a,b,c):
+    dist_ab = dist(a, b)
+    dist_ac = dist(a, c)
+    if dist_ab == 0 or dist_ac == 0:        
+        print ("Warning. Parent and child SWC nodes have same coordinates. No bifurcation angle to compute.")
+        print ("Parent at  %f,%f,%f" % (a.x, a.y, a.z))
+        print ("Child 0 at %f,%f,%f" % (b.x, b.y, b.z))
+        print ("Child 1 at %f,%f,%f" % (c.x, c.y, c.z))
+        return float('nan')
+    return(math.acos((((b).x-(a).x)*((c).x-(a).x)+((b).y-(a).y)*((c).y-(a).y)+((b).z-(a).z)*((c).z-(a).z))/(dist_ab*dist_ac))*180.0/math.pi)
 
 Width=0.0
 Height=0.0
@@ -324,16 +419,16 @@ def computeFeature(nt):
     #
     rootidx=0
 
-    neuronNum = len(nt.obj_list)
     childs = []
     for i in range(len(nt.obj_list)):
         par = nt.obj_list[i].pn
         if par >= 0:
             pnum = nt.obj_hash[par]
-            # +1 is necessary to replicate behavior of QVector
-            while len(childs) <= pnum + 1:
+            while len(childs) <= pnum:
                 childs.append([])
             childs[pnum].append(i)
+    while len(childs) < len(nt.obj_list):
+        childs.append([])
 
     #find the root
     rootidx = VOID;
@@ -476,7 +571,6 @@ def computeTree(nt):
     global Pd_ratio, Contraction, Max_Eux, Max_Path, BifA_local, BifA_remote, Soma_surface, Fragmentation
     global childs, rootidx
     lst = nt.obj_list
-    soma = nt.obj_list[rootidx];
 
     pathTotal = np.zeros(len(lst))
     depth = np.zeros(len(lst))
