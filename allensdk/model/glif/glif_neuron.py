@@ -156,23 +156,23 @@ class GlifNeuron( object ):
             'type': self.type,
             'El': self.El,
             'dt': self.dt,
-            'asc_tau_array': self.asc_tau_array,
+            'asc_tau_array': copy.deepcopy(self.asc_tau_array),
             'R_input': self.R_input,
             'C': self.C,
-            'asc_amp_array': self.asc_amp_array,
+            'asc_amp_array': copy.deepcopy(self.asc_amp_array),
             'spike_cut_length': self.spike_cut_length,
             'th_inf': self.th_inf,
             'th_adapt': self.th_adapt,
-            'coeffs': self.coeffs,
-            'AScurrent_dynamics_method': self.AScurrent_dynamics_method,
-            'voltage_dynamics_method': self.voltage_dynamics_method,
-            'threshold_dynamics_method': self.threshold_dynamics_method,
-            'AScurrent_reset_method': self.AScurrent_reset_method,
-            'voltage_reset_method': self.voltage_reset_method,
-            'threshold_reset_method': self.threshold_reset_method,
+            'coeffs': copy.deepcopy(self.coeffs),
+            'AScurrent_dynamics_method': copy.deepcopy(self.AScurrent_dynamics_method),
+            'voltage_dynamics_method': copy.deepcopy(self.voltage_dynamics_method),
+            'threshold_dynamics_method': copy.deepcopy(self.threshold_dynamics_method),
+            'AScurrent_reset_method': copy.deepcopy(self.AScurrent_reset_method),
+            'voltage_reset_method': copy.deepcopy(self.voltage_reset_method),
+            'threshold_reset_method': copy.deepcopy(self.threshold_reset_method),
             'init_voltage': self.init_voltage,
             'init_threshold': self.init_threshold,
-            'init_AScurrents': self.init_AScurrents
+            'init_AScurrents': copy.deepcopy(self.init_AScurrents)
         }
 
     @staticmethod

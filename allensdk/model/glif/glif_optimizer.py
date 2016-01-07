@@ -115,6 +115,7 @@ class GlifOptimizer(object):
         
         stop_flag=False
         
+        # TODO: unhardcode this
         dt_multiplier_list = [100, 32, 10]
         #Note the following line may be useful when there are more iteration but is hasnt been tested
 #        dt_multiplier_list = np.ceil(np.logspace(1,2,self.inner_iterations))[::-1].astype(int)
@@ -191,8 +192,14 @@ class GlifOptimizer(object):
         # get the best one!
         min_error = float("inf")
         min_i = -1
+        min_dt_multiplier = float("inf")
+        
         for i, info in enumerate(self.iteration_info):
-            if info['error'] < min_error:
+            if info['dt_multiplier'] < min_dt_multiplier:
+                min_dt_multiplier = info['dt_multiplier']
+        
+        for i, info in enumerate(self.iteration_info):
+            if info['error'] < min_error and info['dt_multiplier'] == min_dt_multiplier:
                 min_error = info['error']
                 min_i = i
 

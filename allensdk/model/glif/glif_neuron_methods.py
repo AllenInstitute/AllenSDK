@@ -481,7 +481,7 @@ def dynamics_threshold_three_components_forward(neuron, threshold_t0, voltage_t0
     spike_component = spike_component_of_threshold_forward_euler(th_t0, b_spike, neuron.dt)    
     voltage_component = voltage_component_of_threshold_forward_euler(th_voltage, voltage_t0, dt, a_voltage, b_voltage, neuron.El)
 
-    neuron.append_threshold_components(spike_component, voltage_component)
+    neuron.add_threshold_components(spike_component, voltage_component)
     
     return voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
 
@@ -525,7 +525,7 @@ def dynamics_threshold_three_components_exact(neuron, threshold_t0, voltage_t0, 
     spike_component = spike_component_of_threshold_exact(th_spike, b_spike, neuron.dt)
  
     #------update the voltage and spiking values of the the
-    neuron.append_threshold_components(spike_component, voltage_component)
+    neuron.add_threshold_components(spike_component, voltage_component)
      
     return voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
 
@@ -560,7 +560,7 @@ def dynamics_threshold_spike_component(neuron, threshold_t0, voltage_t0, AScurre
     spike_component = spike_component_of_threshold_exact(th_spike, b_spike, neuron.dt)
  
     #------update the voltage and spiking values of the the
-    neuron.append_threshold_components(spike_component, 0.0)
+    neuron.add_threshold_components(spike_component, 0.0)
      
     return spike_component+neuron.th_inf * neuron.coeffs['th_inf']
 
@@ -687,8 +687,8 @@ def reset_threshold_three_components(neuron, threshold_t0, voltage_v1, a_spike):
     component and a (voltage) component which are summed. 
     '''
     tcs = neuron.get_threshold_components()
-    neuron.append_threshold_components( tcs['spike'][-1] + a_spike,  #adding spiking component of threshold ontop of already existent spike component.
-                                        tcs['voltage'][-1] ) #note these are the same value.
+    neuron.add_threshold_components( tcs['spike'][-1] + a_spike,  #adding spiking component of threshold ontop of already existent spike component.
+                                     tcs['voltage'][-1] ) #note these are the same value.
     
     return tcs['spike'][-1] + tcs['voltage'][-1] + neuron.th_inf * neuron.coeffs['th_inf']
 
