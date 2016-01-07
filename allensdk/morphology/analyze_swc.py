@@ -22,17 +22,20 @@ def usage():
         name = sys.argv[0][2:]
     else:
         name = sys.argv[0]
-    print("Usage: %s <-i <specimen_id> | -f <input_file> | -n <specimen_name>> <output file>" % name)
+    print("Usage: %s <-a | -i <specimen_id> | -f <input_file> | -n <specimen_name>> <output file>" % name)
     print("with")
-    print("   -i <specimen_id>   the id of a single specimen")
-    print("   -f <input_file>    name of file containing list of specimen IDs")
-    print("   -n <specimen_name> the name of a single specimen")
+    print("  -a                select all morphologies from LIMS")
+    print("  -i <specimen_id>  the id of a single specimen")
+    print("  -f <input_file>   name of file containing list of specimen IDs or SWC files")
+    print("  -n <specimen_name> the name of a single specimen")
+    print("  -x                do not perform affine transform")
     sys.exit(1)
 
 def parse_command_line():
     cmds = {}
     argc = len(sys.argv)
     i = 1
+    cmds["perform_affine"] = True
     while i < argc:
         tok = sys.argv[i]
         if tok[0] == '-':
@@ -40,7 +43,9 @@ def parse_command_line():
                 print("No token following flag %s" % tok)
                 print("")
                 usage()
-            if tok[1] == 'i':
+            if tok[1] == 'a':
+                cmds["select_all"] = True
+            elif tok[1] == 'i':
                 i += 1
                 if "specimen_id" not in cmds:
                     cmds["specimen_id"] = []
@@ -50,11 +55,13 @@ def parse_command_line():
                 if "input_file" in cmds:
                     usage() # only one input file supported right now
                 cmds["input_file"] = sys.argv[i]
-            if tok[1] == 'n':
+            elif tok[1] == 'n':
                 i += 1
                 if "specimen_name" not in cmds:
                     cmds["specimen_name"] = []
                 cmds["specimen_name"].append(sys.argv[i])
+            elif tok[1] == 'x':
+                cmds["perform_affine"] = False
         elif "output_file" not in cmds:
             cmds["output_file"] = tok
         else:
@@ -66,7 +73,12 @@ def parse_command_line():
         print("No output file specified")
         print("")
         usage()
-    if "specimen_id" not in cmds and "input_file" not in cmds and "specimen_name" not in cmds:
+    if "select_all" in cmds:
+        if "specimen_id" in cmds or "input_file" in cmds or "specimen_name" in cmds:
+            print("If specifying -a, cannot specify, -i, -f or -n")
+            print("")
+            usage()
+    elif "specimen_id" not in cmds and "input_file" not in cmds and "specimen_name" not in cmds:
         print("No specimen ID/Name or input file specified")
         print("")
         usage()
@@ -79,6 +91,7 @@ def parse_command_line():
 def read_input_file(fname):
     specimen_ids = []
     specimen_names = []
+    file_names = []
     try:
         f = open(fname, "r")
     except:
@@ -95,55 +108,66 @@ def read_input_file(fname):
                 specimen_id = int(line)
                 specimen_ids.append(specimen_id)
             except:
-                specimen_names.append(line)
+                if line.endswith(".swc"):
+                    file_names.append(line)
+                else:
+                    specimen_names.append(line)
     except:
         print("Error reading/parsing input file '%s'" % fname)
         raise
         sys.exit(1)
     f.close()
-    return specimen_ids, specimen_names
+    return specimen_ids, specimen_names, file_names
 
 
 ########################################################################
 # possible SQL queries to use
-#name_sql = ""
-#name_sql += "SELECT cell.id, cell.name, wkf.filename, wkf.storage_directory "
-#name_sql += "FROM specimens cell "
-#name_sql += "JOIN neuron_reconstructions nr ON cell.id = nr.specimen_id "
-#name_sql += "JOIN well_known_files wkf ON nr.id = wkf.attachable_id "
-#name_sql += "  AND wkf.attachable_type = 'NeuronReconstruction' "
-#name_sql += "WHERE cell.name='%s' AND nr.superseded = false; "
 
-name_sql = ""
-name_sql += "SELECT spec.id, spec.name, wkf.filename, wkf.storage_directory "
-name_sql += "FROM specimens spec "
-name_sql += "JOIN neuron_reconstructions nr ON nr.specimen_id=spec.id "
-name_sql +=   "AND nr.superseded = 'f' AND nr.manual = 't' "
-name_sql += "JOIN well_known_files wkf ON wkf.attachable_id=nr.id "
-name_sql +=   "AND wkf.attachable_type = 'NeuronReconstruction' "
-name_sql += "JOIN cell_soma_locations csl ON csl.specimen_id=spec.id "
-name_sql += "JOIN well_known_file_types wkft "
-name_sql +=   "ON wkft.id=wkf.well_known_file_type_id "
-name_sql += "WHERE spec.name='%s' AND wkft.name = '3DNeuronReconstruction'; "
+all_sql = ""
+all_sql += "SELECT sp.id "
+all_sql += "FROM specimens sp "
+all_sql += "JOIN ephys_roi_results err on err.id = sp.ephys_roi_result_id "
+all_sql += "JOIN neuron_reconstructions nr on nr.specimen_id = sp.id "
+all_sql += "WHERE err.workflow_state = 'manual_passed' "
+all_sql += "AND nr.superseded is false AND nr.manual is true "
+all_sql += "ORDER by sp.name; "
 
-#id_sql = ""
-#id_sql += "SELECT cell.id, cell.name, wkf.filename, wkf.storage_directory "
-#id_sql += "FROM specimens cell "
-#id_sql += "JOIN neuron_reconstructions nr ON cell.id = nr.specimen_id "
-#id_sql += "JOIN well_known_files wkf ON nr.id = wkf.attachable_id "
-#id_sql += "  AND wkf.attachable_type = 'NeuronReconstruction' "
-#id_sql += "WHERE cell.id=%s AND nr.superseded = false; "
-id_sql = ""
-id_sql += "SELECT spec.id, spec.name, wkf.filename, wkf.storage_directory "
-id_sql += "FROM specimens spec "
-id_sql += "JOIN neuron_reconstructions nr ON nr.specimen_id=spec.id "
-id_sql +=   "AND nr.superseded = 'f' AND nr.manual = 't' "
-id_sql += "JOIN well_known_files wkf ON wkf.attachable_id=nr.id "
-id_sql +=   "AND wkf.attachable_type = 'NeuronReconstruction' "
-id_sql += "JOIN cell_soma_locations csl ON csl.specimen_id=spec.id "
-id_sql += "JOIN well_known_file_types wkft "
-id_sql +=   "ON wkft.id=wkf.well_known_file_type_id "
-id_sql += "WHERE spec.id=%s AND wkft.name = '3DNeuronReconstruction'; "
+base_sql = ""
+base_sql += "with dendrite_type as  \n"
+base_sql += "( \n"
+base_sql += "  select sts.specimen_id, st.name  \n"
+base_sql += "  from specimen_tags_specimens sts \n"
+base_sql += "  join specimen_tags st on sts.specimen_tag_id = st.id \n"
+base_sql += "  where st.name like 'dendrite type%s' \n"
+base_sql += ") \n"
+
+name_sql = base_sql
+name_sql += "SELECT spec.id, spec.name, dt.name, str.name, wkf.filename, wkf.storage_directory \n"
+name_sql += "FROM specimens spec \n"
+name_sql += "LEFT JOIN structures str on spec.structure_id = str.id \n"
+name_sql += "LEFT JOIN dendrite_type dt on dt.specimen_id = spec.id \n"
+name_sql += "JOIN neuron_reconstructions nr ON nr.specimen_id=spec.id \n"
+name_sql += "  AND nr.superseded = 'f' AND nr.manual = 't' \n"
+name_sql += "JOIN well_known_files wkf ON wkf.attachable_id=nr.id \n"
+name_sql += "  AND wkf.attachable_type = 'NeuronReconstruction' \n"
+name_sql += "JOIN cell_soma_locations csl ON csl.specimen_id=spec.id \n"
+name_sql += "JOIN well_known_file_types wkft \n"
+name_sql += "  ON wkft.id=wkf.well_known_file_type_id \n"
+name_sql += "WHERE spec.name='%s' AND wkft.name = '3DNeuronReconstruction'; \n"
+
+id_sql = base_sql
+id_sql += "SELECT spec.id, spec.name, dt.name, str.name, wkf.filename, wkf.storage_directory \n"
+id_sql += "FROM specimens spec \n"
+id_sql += "LEFT JOIN structures str on spec.structure_id = str.id \n"
+id_sql += "LEFT JOIN dendrite_type dt on dt.specimen_id = spec.id \n"
+id_sql += "JOIN neuron_reconstructions nr ON nr.specimen_id=spec.id \n"
+id_sql += "  AND nr.superseded = 'f' AND nr.manual = 't' \n"
+id_sql += "JOIN well_known_files wkf ON wkf.attachable_id=nr.id \n"
+id_sql += "  AND wkf.attachable_type = 'NeuronReconstruction' \n"
+id_sql += "JOIN cell_soma_locations csl ON csl.specimen_id=spec.id \n"
+id_sql += "JOIN well_known_file_types wkft \n"
+id_sql += "  ON wkft.id=wkf.well_known_file_type_id \n"
+id_sql += "WHERE spec.id=%s AND wkft.name = '3DNeuronReconstruction'; \n"
 
 aff_sql = ""
 aff_sql += "SELECT "
@@ -163,6 +187,15 @@ conn_string = "host='limsdb2' dbname='lims2' user='atlasreader' password='atlasr
 conn = psycopg2.connect(conn_string)
 cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+def fetch_all_swcs():
+    global cursor, all_sql
+    cursor.execute(all_sql)
+    result = cursor.fetchall()
+    id_list = []
+    for i in range(len(result)):
+        id_list.append(result[i][0])
+    return id_list, []
+
 def fetch_specimen_record(sql):
     global cursor
     cursor.execute(sql)
@@ -175,8 +208,16 @@ def fetch_specimen_record(sql):
     if len(result) > 0:
         record["spec_id"] = result[0][0]
         record["spec_name"] = result[0][1]
-        record["filename"] = result[0][2]
-        record["path"] = result[0][3]
+        if result[0][2] is not None:
+            record["dend_type"] = result[0][2].replace(","," ")
+        else:
+            record["dend_type"] = ""
+        if result[0][3] is not None:
+            record["location"] = result[0][3].replace(","," ")
+        else:
+            record["location"] = ""
+        record["filename"] = result[0][4]
+        record["path"] = result[0][5]
     return record
 
 def fetch_affine_record(sql):
@@ -187,21 +228,7 @@ def fetch_affine_record(sql):
     if len(result) > 0:
         for i in range(12):
             record.append(1000.0 * result[0][i])
-#        record["tvr_00"] = result[0][0]
-#        record["tvr_01"] = result[0][1]
-#        record["tvr_02"] = result[0][2]
-#        record["tvr_03"] = result[0][3]
-#        record["tvr_04"] = result[0][4]
-#        record["tvr_05"] = result[0][5]
-#        record["tvr_06"] = result[0][6]
-#        record["tvr_07"] = result[0][7]
-#        record["tvr_08"] = result[0][8]
-#        record["tvr_09"] = result[0][9]
-#        record["tvr_10"] = result[0][10]
-#        record["tvr_11"] = result[0][11]
-    #print sql
     #print record
-    #print "-----------------------------------------"
     return record
 
 ########################################################################
@@ -209,7 +236,9 @@ def fetch_affine_record(sql):
 
 cmds = parse_command_line()
 if "input_file" in cmds:
-    id_list, name_list = read_input_file(cmds["input_file"])
+    id_list, name_list, file_list = read_input_file(cmds["input_file"])
+elif "select_all" in cmds:
+    id_list, name_list, file_list = fetch_all_swcs()
 else:
     id_list = []
     name_list = []
@@ -227,18 +256,31 @@ if "specimen_name" in cmds:
 # for each id/name, query database to get file, path and name/id
 records = {}
 for i in range(len(id_list)):
-    rec = fetch_specimen_record(id_sql % id_list[i])
+    rec = fetch_specimen_record(id_sql % ('%', id_list[i]))
     if len(rec) == 0:
         print("** Unable to read data for specimen ID '%s'" % id_list[i])
     else:
         records[rec["spec_name"]] = rec
 for i in range(len(name_list)):
-    rec = fetch_specimen_record(name_sql % name_list[i])
+    rec = fetch_specimen_record(name_sql % ('%', name_list[i]))
     if len(rec) == 0:
         print("** Unable to read data for '%s'" % name_list[i])
     else:
         # overwrite existing record if it's present
         records[rec["spec_name"]] = rec
+if len(file_list) > 0:
+    if cmds["perform_affine"]:
+        print("When SWC files are specified, affine transform must be disabled (flag -x)")
+        sys.exit(1)
+    for i in range(len(file_list)):
+        rec = {}
+        rec["spec_id"] = i
+        rec["spec_name"] = file_list[i]
+        rec["dend_type"] = ""
+        rec["location"] = ""
+        rec["filename"] = file_list[i]
+        rec["path"] = ""
+        records[file_list[i]] = rec
 
 ########################################################################
 # calculate features
@@ -333,14 +375,16 @@ for k, record in records.iteritems():
         continue
     try:
         # apply affine transform
-        aff = fetch_affine_record(aff_sql % record["spec_id"])
-        nrn.apply_affine(aff)
-        tmp_swc_file = record["filename"][:-4] + "_pia.swc"
-        nrn.save_to(tmp_swc_file)
-        # apply affine to basal and apical copies too
-#        axon.apply_affine(aff)
-        basal.apply_affine(aff)
-        apical.apply_affine(aff)
+        if cmds["perform_affine"]:
+            aff = fetch_affine_record(aff_sql % record["spec_id"])
+            nrn.apply_affine(aff)
+            # save a copy of affine-corrected file
+            tmp_swc_file = record["filename"][:-4] + "_pia.swc"
+            nrn.save_to(tmp_swc_file)
+            # apply affine to basal and apical copies too
+#           axon.apply_affine(aff)
+            basal.apply_affine(aff)
+            apical.apply_affine(aff)
         #
         ####################################################################
         # strip axons from SWC
@@ -371,6 +415,7 @@ for k, record in records.iteritems():
         # calculate features
         try:
             bb_data = compute_features_bb(tmp_swc_file_bb)
+            #bb_data = compute_features_bb(tmp_swc_file_bb, record["spec_id"])
             compute_embedinator_features(bb_data)
             data["bb_features"] = bb_data
             for k in bb_data:
@@ -419,7 +464,7 @@ except IOError:
     print("Unable to open input file '%s'" % cmds["output_file"])
     sys.exit(1)
 # write CSV header row
-f.write("specimen_name,specimen_id,filename,")
+f.write("specimen_name,specimen_id,dendrite_type,region_info,filename,")
 #for i in range(len(v3d_feature_list)):
 #    f.write("axon_" + v3d_feature_list[i] + ",")
 for i in range(len(v3d_feature_list)):
@@ -451,8 +496,10 @@ try:
         if "v3d_basal" not in data and "v3d_apical" not in data:
             continue
         spec_id = record["spec_id"]
+        dend_type = record["dend_type"]
+        location = record["location"]
         filename = record["path"] + record["filename"]
-        f.write("%s,%d,%s," % (spec_name, spec_id, filename))
+        f.write("%s,%d,%s,%s,%s," % (spec_name, spec_id, dend_type, location, filename))
         # v3d features
         # create an alias
         v3d = v3d_feature_list

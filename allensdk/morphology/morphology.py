@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import morphology_analysis as morphology
+import allensdk.morphology.morphology_analysis as morphology
 import traceback
 import json
 import sys

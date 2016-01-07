@@ -100,6 +100,7 @@ class SWC(object):
             obj.x = x
             obj.y = y
             obj.z = z
+            # use method (1) for scaling for now as it's most simple
             obj.radius *= det_scale
 
     # returns True on success, False on failure
