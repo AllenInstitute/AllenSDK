@@ -1,7 +1,7 @@
 import math
 import sys
 import numpy as np
-import allensdk.core.swc as allen_swc
+#import allensdk.core.swc as allen_swc
 
 # The code below is an almost literal c++->python port from the v3d 
 #   blastneuron module (compute_gmi.cpp and compute_morph.cpp)
@@ -26,14 +26,39 @@ class SWC_Obj(object):
 
 class SWC(object):
     def __init__(self, fname):
-        morphology = allen_swc.read_swc(fname)
+        # use allensdk if it's available
         self.obj_list = []
         self.obj_hash = {}
-        lst = morphology.compartment_list
-        for i in range(len(lst)):
-            obj = SWC_Obj(lst[i])
-            self.obj_list.append(obj)
-            self.obj_hash[obj.n] = len(self.obj_list) - 1
+        try:
+            import xallensdk.core.swc
+            morphology = allen_swc.read_swc(fname)
+            lst = morphology.compartment_list
+            for i in range(len(lst)):
+                obj = SWC_Obj(lst[i])
+                self.obj_list.append(obj)
+                self.obj_hash[obj.n] = len(self.obj_list) - 1
+        except ImportError:
+            f = open(fname, "r")
+            line = f.readline()
+            while len(line) > 0:
+                if not line.startswith('#'):
+                    toks = line.split(' ')
+                    vals = {}
+                    vals["id"] = int(toks[0])
+                    vals["type"] = int(toks[1])
+                    vals["x"] = float(toks[2])
+                    vals["y"] = float(toks[3])
+                    vals["z"] = float(toks[4])
+                    vals["radius"] = float(toks[5])
+                    pn = toks[6].strip('\r')
+                    vals["parent"] = int(pn.strip('\n'))
+                    #
+                    obj = SWC_Obj(vals)
+                    self.obj_list.append(obj)
+                    self.obj_hash[obj.n] = len(self.obj_list) - 1
+                    #self.obj_hash[obj.n] = obj
+                line = f.readline()
+            f.close()
         for i in range(len(self.obj_list)):
             obj = self.obj_list[i]
             if obj.pn >= 0:

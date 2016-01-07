@@ -242,6 +242,7 @@ elif "select_all" in cmds:
 else:
     id_list = []
     name_list = []
+    file_list = []
 
 # merge command-line specified IDs with those in the input file
 if "specimen_id" in cmds:
