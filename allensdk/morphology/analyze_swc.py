@@ -2,7 +2,7 @@
 import morphology_analysis as morphology
 #from morphology_analysis_bb import compute_features as compute_features_bb
 from bb3 import compute_features as compute_features_bb
-from bb3 import compute_embedinator_features
+from bb3 import compute_keith_features
 import traceback
 import sys
 import psycopg2
@@ -415,9 +415,8 @@ for k, record in records.iteritems():
         success = nrn.save_to(tmp_swc_file_bb)
         # calculate features
         try:
-            bb_data = compute_features_bb(tmp_swc_file_bb)
-            #bb_data = compute_features_bb(tmp_swc_file_bb, record["spec_id"])
-            compute_embedinator_features(bb_data)
+            bb_data, keith_data = compute_features_bb(tmp_swc_file_bb)
+            compute_keith_features(nrn, keith_data, bb_data)
             data["bb_features"] = bb_data
             for k in bb_data:
                 if k not in bb_features:

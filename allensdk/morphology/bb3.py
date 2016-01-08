@@ -61,6 +61,9 @@ def calculate_moments_on_axis(nrn, seg_type, axis):
     if cnt > 0.0:
         first /= cnt
         second = second / cnt
+    else:
+        first = float('nan')
+        second = float('nan')
     return first, second
 
 def calculate_moments(nrn, seg_type):
@@ -94,6 +97,9 @@ def calculate_moments(nrn, seg_type):
     if cnt > 0.0:
         first /= cnt
         second = second / cnt
+    else:
+        first = float('nan')
+        second = float('nan')
     return first, second
 
 def calculate_centroid(nrn, seg_type):
@@ -121,7 +127,35 @@ def calculate_centroid(nrn, seg_type):
         px /= cnt
         py /= cnt
         pz /= cnt
+    else:
+        px = float('nan')
+        py = float('nan')
+        pz = float('nan')
     return (px, py, pz)
+
+def calculate_apical_branch_peak_z(nrn):
+    iterator = nrn.iter_neurites(tr.iforking_point)
+    peak = None
+    for seg in iterator:
+        if seg.value[COL_T] == TYPE_APICAL:
+            val = seg.value[COL_Z]
+            if peak is None or val > peak:
+                peak = val
+    if peak is None:
+        peak = float('nan')
+    return peak
+
+def calculate_apical_neurite_peak_z(nrn):
+    iterator = nrn.iter_neurites(tr.isegment)
+    peak = None
+    for seg in iterator:
+        if seg[0].value[COL_T] == TYPE_APICAL:
+            val = seg[0].value[COL_Z]
+            if peak is None or val > peak:
+                peak = val
+    if peak is None:
+        peak = float('nan')
+    return peak
 
 # for each of 4 dimensions (absolute, x, y, z), calculates the centroid
 #   of the specified segment type (eg, basal, apical, axon) and then
@@ -153,7 +187,7 @@ def calculate_branch_center_z(nrn, reference, seg_type):
             mean += abs(dz)
             cnt += 1.0
     if cnt == 0:
-        return [0,0,0]
+        return [float('nan'), float('nan'), float('nan')]
     mean /= cnt
     iterator = nrn.iter_neurites(tr.iforking_point)
     for seg in iterator:
@@ -178,6 +212,33 @@ def calculate_branch_center_z(nrn, reference, seg_type):
     dist = math.sqrt(math.pow((reference[2] - center[2]), 2))
     return [mean, stdev, dist]
 
+# measure moment (mean) and stdev only for branches beyond half-height
+#   of dendrite
+def calculate_apical_outer_branch_moment_z(nrn):
+    outer_z = calculate_apical_neurite_peak_z(nrn)
+    if outer_z == float('nan'):
+        return float('nan')
+    mid_z = nrn.soma.center[COL_Z] + (outer_z - nrn.soma.center[COL_Z]) / 2.0
+    # calculate mean
+    iterator = nrn.iter_neurites(tr.iforking_point)
+    mean = 0.0
+    cnt = 0.0
+    for seg in iterator:
+        if seg.value[COL_Z] > mid_z:
+            mean += seg.value[COL_Z] - mid_z
+            cnt += 1.0
+    if cnt == 0:
+        return [float('nan'), float('nan'), float('nan')]
+    mean /= cnt
+    # calculate stdev
+    stdev = 0.0
+    iterator = nrn.iter_neurites(tr.iforking_point)
+    for seg in iterator:
+        if seg.value[COL_Z] > mid_z:
+            dz = seg.value[COL_Z] - mid_z - mean;
+            stdev += dz*dz
+    stdev = math.sqrt(stdev / cnt)
+    return [mean, stdev, cnt]
 ## for each of 4 dimensions (absolute, x, y, z), calculates the centroid
 ##   of the specified segment type (eg, basal, apical, axon) and then
 ##   calculates the mean and standard deviation of branch locations from
@@ -277,11 +338,12 @@ def compute_features(swc_file, spec_id=None):
     results = {}
 
     ####################################################################
-    center = calculate_branch_center_z(nrn, nrn.soma.center, TYPE_APICAL)
-    results["kg_branch_mean_from_centroid_z_apical"] = center[0]
-    results["kg_branch_stdev_from_centroid_z_apical"] = center[1]
-    results["kg_branch_centroid_distance_z_apical"] = center[2]
-    results["kg_soma_depth"] = nrn.soma.center[2]
+    # some kg_ data must be computed within BB context. do that here
+    keith = {}
+    keith["center"] = calculate_branch_center_z(nrn, nrn.soma.center, TYPE_APICAL)
+    keith["apical_neurite_peak_z"] = calculate_apical_neurite_peak_z(nrn)
+    keith["apical_branch_peak_z"] = calculate_apical_branch_peak_z(nrn)
+    keith["outer"] = calculate_apical_outer_branch_moment_z(nrn)
 
     ####################################################################
     # number of neurites
@@ -363,19 +425,19 @@ def compute_features(swc_file, spec_id=None):
     results["bb_number_branches_basal"] = num_ba
     results["bb_number_branches_dendrite"] = num_ap + num_ba
 
-    ####################################################################
-    # Trunk diameter of branches
-    num_ap = 0
-    num_ba = 0
-    basal = nrn.get_trunk_radii(TreeType.basal_dendrite)
-    if len(basal) > 0:
-        num_ba = 2.0 * np.mean(basal)
-    apical = nrn.get_trunk_radii(TreeType.apical_dendrite)
-    if len(apical) > 0:
-        num_ap = 2.0 * np.mean(apical)
-    results["bb_mean_trunk_diameter_apical"] = num_ap
-    results["bb_mean_trunk_diameter_basal"] = num_ba
-    results["bb_mean_trunk_diameter_dendrite"] = num_ap + num_ba
+#    ####################################################################
+#    # Trunk diameter of branches
+#    num_ap = 0
+#    num_ba = 0
+#    basal = nrn.get_trunk_radii(TreeType.basal_dendrite)
+#    if len(basal) > 0:
+#        num_ba = 2.0 * np.mean(basal)
+#    apical = nrn.get_trunk_radii(TreeType.apical_dendrite)
+#    if len(apical) > 0:
+#        num_ap = 2.0 * np.mean(apical)
+#    results["bb_mean_trunk_diameter_apical"] = num_ap
+#    results["bb_mean_trunk_diameter_basal"] = num_ba
+#    results["bb_mean_trunk_diameter_dendrite"] = num_ap + num_ba
 
     ####################################################################
     # Max branch order
@@ -437,28 +499,84 @@ def compute_features(swc_file, spec_id=None):
     results["bb_first_moment_apical"] = first
     results["bb_second_moment_apical"] = second
 
-    return results
+    return results, keith
 
-# compute custom features to explore in Tim's embedinator
-def compute_embedinator_features(results):
+def compute_keith_features(nrn, keith, results):
+    soma = nrn.obj_list[0]
+    soma_ctr = [soma.x, soma.y, soma.z]
+    # non-apical features
+    results["kg_soma_depth"] = soma_ctr[2]
+    # apical features
+    # prepopulate w/ NaN to simplify checks below
+    results["kg_branch_mean_from_centroid_z_apical"] = float('nan')
+    results["kg_branch_stdev_from_centroid_z_apical"] = float('nan')
+    results["kg_branch_centroid_distance_z_apical"] = float('nan')
+    results["kg_radial_dist_over_moment_z_apical"] = float('nan')
+    results["kg_peak_over_moment_z_apical"] = float('nan')
+    results["kg_num_branches_over_radial_dist_apical"] = float('nan')
+    #
+    results["kg_centroid_over_radial_dist_apical"] = float('nan')
+    results["kg_centroid_over_farthest_neurite_apical"] = float('nan')
+    results["kg_centroid_over_farthest_branch_apical"] = float('nan')
+    #
+    results["kg_mean_over_radial_dist_apical"] = float('nan')
+    results["kg_mean_over_farthest_neurite_apical"] = float('nan')
+    results["kg_mean_over_farthest_branch_apical"] = float('nan')
+    #
+    results["kg_mean_over_centroid"] = float('nan')
+    results["kg_mean_over_stdev"] = float('nan')
+    results["kg_outer_mean_from_center_z_apical"] = float('nan')
+    results["kg_outer_stdev_from_center_z_apical"] = float('nan')
+    results["kg_outer_mean_over_stdev"] = float('nan')
+    results["kg_num_outer_apical_branches"] = 0
+    # if no apical dendrite, fill apical values with zero and return
+    # this way we can avoid NaN checks below. if a NaN shows up and there's
+    #   an apical dendrite then there's a problem somewhere and things should
+    #   fail
+    if results["bb_number_branches_apical"] == 0:
+        return
+    ####################################################################
+    center = keith["center"]
+    results["kg_branch_mean_from_centroid_z_apical"] = center[0]
+    results["kg_branch_stdev_from_centroid_z_apical"] = center[1]
+    results["kg_branch_centroid_distance_z_apical"] = center[2]
+    #
+    apical_neurite_dist_z = keith["apical_neurite_peak_z"] - soma.z
+    apical_branch_dist_z = keith["apical_branch_peak_z"] - soma.z
+
     mom = results["bb_first_moment_z_apical"] 
     dist = results["bb_max_radial_distance_apical"] 
-    bran = results["bb_number_branches_apical"]
-    if mom != float('nan') and mom > 0 and dist != float('nan'):
+    # calculate the ratio of the max radial distance to the first moment, 
+    #   as moment is defined here
+    # also calculate peak Z over moment -- this is more accurate for poorly
+    #   aligned axons
+    if mom > 0:
         results["kg_radial_dist_over_moment_z_apical"] = dist / mom
-    else:
-        results["kg_radial_dist_over_moment_z_apical"] = 0
+        results["kg_peak_over_moment_z_apical"] = apical_neurite_dist_z / mom
 
-    if dist != float('nan') and bran != float('nan') and bran > 0:
+    bran = results["bb_number_branches_apical"]
+    if bran > 0:
         results["kg_num_branches_over_radial_dist_apical"] = dist / bran
-        results["kg_centroid_over_radial_dist_apical"] = results["kg_branch_mean_from_centroid_z_apical"] / results["bb_max_radial_distance_apical"]
-        results["kg_mean_over_centroid"] = results["kg_branch_mean_from_centroid_z_apical"] / results["kg_branch_centroid_distance_z_apical"]
-        results["kg_mean_over_stdev"] = results["kg_branch_mean_from_centroid_z_apical"] / results["kg_branch_stdev_from_centroid_z_apical"]
-    else:
-        results["kg_num_branches_over_radial_dist_apical"] = 0
-        results["kg_centroid_over_radial_dist_apical"] = 0
-        results["kg_mean_over_centroid"] = 0
-        results["kg_mean_over_stdev"] = 0
 
+    # like above, use peak as alternative to radial distance
+    results["kg_centroid_over_radial_dist_apical"] = center[2] / dist
+    results["kg_centroid_over_farthest_neurite_apical"] = center[2] / apical_neurite_dist_z
+    results["kg_centroid_over_farthest_branch_apical"] = center[2] / apical_branch_dist_z
+    #
+    results["kg_mean_over_radial_dist_apical"] = center[0] / dist
+    results["kg_mean_over_farthest_neurite_apical"] = center[0] / apical_neurite_dist_z
+    results["kg_mean_over_farthest_branch_apical"] = center[0] / apical_branch_dist_z
 
+    # ratio of mean to centroid length, and mean to stdev
+    results["kg_mean_over_centroid"] = center[0] / center[2] 
+    results["kg_mean_over_stdev"] = center[0] /center[1] 
+
+    # measure moments only of branches beyond apical midpoint
+    #outer = calculate_apical_outer_branch_moment_z(nrn)
+    outer = keith["outer"]
+    results["kg_outer_mean_from_center_z_apical"] = outer[0]
+    if outer[1] > 0:
+        results["kg_outer_stdev_from_center_z_apical"] = outer[1]
+        results["kg_outer_mean_over_stdev"] = outer[0] / outer[1]
+    results["kg_num_outer_apical_branches"] = outer[2]
 
