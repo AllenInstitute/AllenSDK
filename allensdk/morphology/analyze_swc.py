@@ -8,6 +8,9 @@ import sys
 import psycopg2
 import psycopg2.extras
 
+CALCULATE_AXONS = False
+
+
 def usage():
     print("This script calculates features from neuron morphology data")
     print("Input to the script is one or more specimen IDs or names")
@@ -183,9 +186,12 @@ aff_sql += "WHERE spc.id = %d;"
 
 ########################################################################
 # database interface code
-conn_string = "host='limsdb2' dbname='lims2' user='atlasreader' password='atlasro'"
-conn = psycopg2.connect(conn_string)
-cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+try:
+  conn_string = "host='limsdb2' dbname='lims2' user='atlasreader' password='atlasro'"
+  conn = psycopg2.connect(conn_string)
+  cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+except:
+  print "no db connections!"
 
 def fetch_all_swcs():
     global cursor, all_sql
@@ -359,7 +365,7 @@ for k, record in records.iteritems():
     print("Processing '%s'" % swc_file)
     try:
         nrn = morphology.SWC(swc_file)
-#        axon = morphology.SWC(swc_file)
+        axon = morphology.SWC(swc_file)
         basal = morphology.SWC(swc_file)
         apical = morphology.SWC(swc_file)
     except Exception, e:
@@ -383,7 +389,8 @@ for k, record in records.iteritems():
             tmp_swc_file = record["filename"][:-4] + "_pia.swc"
             nrn.save_to(tmp_swc_file)
             # apply affine to basal and apical copies too
-#           axon.apply_affine(aff)
+            if CALCULATE_AXONS:
+                axon.apply_affine(aff)
             basal.apply_affine(aff)
             apical.apply_affine(aff)
         #
@@ -393,12 +400,18 @@ for k, record in records.iteritems():
         # v3d feature set
         #
         data = {}
-#        axon_data = calculate_v3d_features(basal, 2, "axon")
-#        if axon_data is not None:
-#            data["v3d_axon"] = axon_data
+        if CALCULATE_AXONS:
+          print "calculate axon features"
+          axon_data = calculate_v3d_features(axon, 2, "axon")
+          if axon_data is not None:
+              data["v3d_axon"] = axon_data
+
+        print "calculate basal features"
         basal_data = calculate_v3d_features(basal, 3, "basal dendrite")
         if basal_data is not None:
             data["v3d_basal"] = basal_data
+
+        print "calculate apical features"
         apical_data = calculate_v3d_features(apical, 4, "apical dendrite")
         if apical_data is not None:
             data["v3d_apical"] = apical_data
@@ -529,19 +542,20 @@ try:
         else:
             for i in range(len(v3d)):
                 f.write("NaN,")
-#        # axon
-#        if "v3d_axon" in data:
-#            for i in range(len(v3d)):
-#                if v3d[i] in data["v3d_axon"]["gmi"]:
-#                    val = str(data["v3d_axon"]["gmi"][v3d[i]])
-#                elif v3d[i] in data["v3d_axon"]["features"]:
-#                    val = str(data["v3d_axon"]["features"][v3d[i]])
-#                else:
-#                    val = "NaN"
-#                f.write(val + ",")
-#        else:
-#            for i in range(len(v3d)):
-#                f.write("NaN,")
+        # axon
+        if CALCULATE_AXONS:
+          if "v3d_axon" in data:
+              for i in range(len(v3d)):
+                  if v3d[i] in data["v3d_axon"]["gmi"]:
+                      val = str(data["v3d_axon"]["gmi"][v3d[i]])
+                  elif v3d[i] in data["v3d_axon"]["features"]:
+                      val = str(data["v3d_axon"]["features"][v3d[i]])
+                  else:
+                      val = "NaN"
+                  f.write(val + ",")
+          else:
+              for i in range(len(v3d)):
+                  f.write("NaN,")
         # BB features
         if "bb_features" in data:
             bb = bb_feature_list
