@@ -30,7 +30,7 @@ class SWC(object):
         self.obj_list = []
         self.obj_hash = {}
         try:
-            import xallensdk.core.swc
+            import allensdk.core.swc as allen_swc
             morphology = allen_swc.read_swc(fname)
             lst = morphology.compartment_list
             for i in range(len(lst)):
