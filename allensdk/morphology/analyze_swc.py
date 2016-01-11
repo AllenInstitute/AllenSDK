@@ -327,6 +327,8 @@ def calculate_v3d_features(morph, swc_type, label):
     results = {}
     try:
         gmi, gmi_desc = morphology.computeGMI(morph)
+        if gmi is None:
+            return None
         gmi_out = {}
         for j in range(len(gmi)):
             gmi_out[gmi_desc[j]] = gmi[j]
@@ -338,6 +340,8 @@ def calculate_v3d_features(morph, swc_type, label):
         raise
     try:
         features, feature_desc = morphology.computeFeature(morph)
+        if features is None:
+            return None
         feat_out = {}
         for j in range(len(features)):
             feat_out[feature_desc[j]] =  features[j]

@@ -461,11 +461,13 @@ def computeFeature(nt):
     for i in range(len(lst)):
         if lst[i].pn == -1:
             if rootidx != VOID:
-                print "WARNING - multiple roots are specified. Using the latter"
+                # the v3d algorithm fails when multiple roots are specified
+                print "WARNING - multiple roots are specified. Bailing out to avoid numerical errors"
+                return None, None
             rootidx = i
     if rootidx == VOID:
         print "the input neuron tree does not have a root, please check your data"
-        return
+        return None, None
 
     N_node = len(lst)
     N_stem = len(childs[rootidx])
