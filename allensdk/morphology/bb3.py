@@ -228,7 +228,7 @@ def calculate_apical_outer_branch_moment_z(nrn):
             mean += seg.value[COL_Z] - mid_z
             cnt += 1.0
     if cnt == 0:
-        return [float('nan'), float('nan'), float('nan')]
+        return [float('nan'), float('nan'), 0]
     mean /= cnt
     # calculate stdev
     stdev = 0.0
