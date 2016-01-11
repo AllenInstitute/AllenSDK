@@ -1,7 +1,7 @@
 import math
 import sys
 import numpy as np
-import allensdk.core.swc as allen_swc
+#import allensdk.core.swc as allen_swc
 
 # The code below is an almost literal c++->python port from the v3d 
 #   blastneuron module (compute_gmi.cpp and compute_morph.cpp)
@@ -26,14 +26,39 @@ class SWC_Obj(object):
 
 class SWC(object):
     def __init__(self, fname):
-        morphology = allen_swc.read_swc(fname)
+        # use allensdk if it's available
         self.obj_list = []
         self.obj_hash = {}
-        lst = morphology.compartment_list
-        for i in range(len(lst)):
-            obj = SWC_Obj(lst[i])
-            self.obj_list.append(obj)
-            self.obj_hash[obj.n] = len(self.obj_list) - 1
+        try:
+            import allensdk.core.swc as allen_swc
+            morphology = allen_swc.read_swc(fname)
+            lst = morphology.compartment_list
+            for i in range(len(lst)):
+                obj = SWC_Obj(lst[i])
+                self.obj_list.append(obj)
+                self.obj_hash[obj.n] = len(self.obj_list) - 1
+        except ImportError:
+            f = open(fname, "r")
+            line = f.readline()
+            while len(line) > 0:
+                if not line.startswith('#'):
+                    toks = line.split(' ')
+                    vals = {}
+                    vals["id"] = int(toks[0])
+                    vals["type"] = int(toks[1])
+                    vals["x"] = float(toks[2])
+                    vals["y"] = float(toks[3])
+                    vals["z"] = float(toks[4])
+                    vals["radius"] = float(toks[5])
+                    pn = toks[6].strip('\r')
+                    vals["parent"] = int(pn.strip('\n'))
+                    #
+                    obj = SWC_Obj(vals)
+                    self.obj_list.append(obj)
+                    self.obj_hash[obj.n] = len(self.obj_list) - 1
+                    #self.obj_hash[obj.n] = obj
+                line = f.readline()
+            f.close()
         for i in range(len(self.obj_list)):
             obj = self.obj_list[i]
             if obj.pn >= 0:
@@ -436,11 +461,13 @@ def computeFeature(nt):
     for i in range(len(lst)):
         if lst[i].pn == -1:
             if rootidx != VOID:
-                print "WARNING - multiple roots are specified. Using the latter"
+                # the v3d algorithm fails when multiple roots are specified
+                print "WARNING - multiple roots are specified. Bailing out to avoid numerical errors"
+                return None, None
             rootidx = i
     if rootidx == VOID:
         print "the input neuron tree does not have a root, please check your data"
-        return
+        return None, None
 
     N_node = len(lst)
     N_stem = len(childs[rootidx])
@@ -472,7 +499,10 @@ def computeFeature(nt):
     features[18] = Pd_ratio     # feature # 18: Average Parent-daughter Ratio
     features[19] = BifA_local   # feature # 19: Average Bifurcation Angle Local
     features[20] = BifA_remote  # feature # 20: Average Bifurcation Angle Remote
-    features[21] = 1.0 * N_node / N_branch
+    if N_branch == 0:
+         features[21] = float('nan')
+    else:
+         features[21] = 1.0 * N_node / N_branch
 
     feature_desc = []
     feature_desc.append("number_of_nodes")
@@ -659,10 +689,20 @@ def computeTree(nt):
 
             pathTotal[tmp] = pathTotal[t] + pathlength
             depth[tmp] = depth[t] + 1
+    if N_ratio == 0:
+        Pd_ratio = float('nan')
+    else:
+         Pd_ratio /= N_ratio
 
-    Pd_ratio /= N_ratio
-    Fragmentation /= N_branch
-    Contraction /= N_Contraction
+    if  N_branch == 0 :
+       Fragmentation = float('nan')
+    else:
+      Fragmentation /= N_branch
+
+    if N_Contraction == 0:
+       Contraction = float('nan')
+    else:
+       Contraction /= N_Contraction
     
     if N_bifs==0:
         BifA_local = 0
