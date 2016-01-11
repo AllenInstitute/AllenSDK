@@ -425,19 +425,19 @@ def compute_features(swc_file, spec_id=None):
     results["bb_number_branches_basal"] = num_ba
     results["bb_number_branches_dendrite"] = num_ap + num_ba
 
-#    ####################################################################
-#    # Trunk diameter of branches
-#    num_ap = 0
-#    num_ba = 0
-#    basal = nrn.get_trunk_radii(TreeType.basal_dendrite)
-#    if len(basal) > 0:
-#        num_ba = 2.0 * np.mean(basal)
-#    apical = nrn.get_trunk_radii(TreeType.apical_dendrite)
-#    if len(apical) > 0:
-#        num_ap = 2.0 * np.mean(apical)
-#    results["bb_mean_trunk_diameter_apical"] = num_ap
-#    results["bb_mean_trunk_diameter_basal"] = num_ba
-#    results["bb_mean_trunk_diameter_dendrite"] = num_ap + num_ba
+    # Trunk diameter of branches
+    # FIX ME:(XIAOXIAO)  no get_trunk_radii function defined in NeuronM
+    num_ap = 0
+    num_ba = 0
+    #basal = 0#nrn.get_trunk_radii(TreeType.basal_dendrite)
+    #if len(basal) > 0:
+    #    num_ba = 2.0 * np.mean(basal)
+    #apical = 0#nrn.get_trunk_radii(TreeType.apical_dendrite)
+    #if len(apical) > 0:
+    #    num_ap = 2.0 * np.mean(apical)
+    results["bb_mean_trunk_diameter_apical"] = num_ap
+    results["bb_mean_trunk_diameter_basal"] = num_ba
+    results["bb_mean_trunk_diameter_dendrite"] = num_ap + num_ba
 
     ####################################################################
     # Max branch order

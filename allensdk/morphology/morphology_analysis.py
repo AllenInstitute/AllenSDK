@@ -499,7 +499,10 @@ def computeFeature(nt):
     features[18] = Pd_ratio     # feature # 18: Average Parent-daughter Ratio
     features[19] = BifA_local   # feature # 19: Average Bifurcation Angle Local
     features[20] = BifA_remote  # feature # 20: Average Bifurcation Angle Remote
-    features[21] = 1.0 * N_node / N_branch
+    if N_branch == 0:
+         features[21] = float('nan')
+    else:
+         features[21] = 1.0 * N_node / N_branch
 
     feature_desc = []
     feature_desc.append("number_of_nodes")
@@ -686,10 +689,20 @@ def computeTree(nt):
 
             pathTotal[tmp] = pathTotal[t] + pathlength
             depth[tmp] = depth[t] + 1
+    if N_ratio == 0:
+        Pd_ratio = float('nan')
+    else:
+         Pd_ratio /= N_ratio
 
-    Pd_ratio /= N_ratio
-    Fragmentation /= N_branch
-    Contraction /= N_Contraction
+    if  N_branch == 0 :
+       Fragmentation = float('nan')
+    else:
+      Fragmentation /= N_branch
+
+    if N_Contraction == 0:
+       Contraction = float('nan')
+    else:
+       Contraction /= N_Contraction
     
     if N_bifs==0:
         BifA_local = 0
