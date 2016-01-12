@@ -117,8 +117,8 @@ class SWC(object):
                     self.obj_list[i].pn = root
                     self.obj_list[i].parent = root_node
                     changed = True
-            if err:
-                raise ValueError("There is likely a problem with the SWC file. Bailing out")
+        if err:
+            raise ValueError("There is likely a problem with the SWC file. Bailing out")
         if changed:
             self.relink()
 
