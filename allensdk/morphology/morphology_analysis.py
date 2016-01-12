@@ -24,12 +24,33 @@ class SWC_Obj(object):
         self.parent = None
         self.children = []
 
+    def __repr__(self):
+        disp = "SWC object\n"
+        disp += "  id:   %d\n" % self.n
+        disp += "  type: %d\n" % self.t
+        disp += "  x:    %f\n" % self.x
+        disp += "  y:    %f\n" % self.y
+        disp += "  z:    %f\n" % self.z
+        disp += "  r:    %f\n" % self.radius
+        disp += "  par:  %d\n" % self.pn
+        if self.parent.n is not None:
+            disp += "  par:  %d\n" % self.parent.n
+        else:
+            disp += "  par:  -1\n"
+        disp += "  children:"
+        ch = ""
+        for i in range(len(self.children)):
+            ch += " %d," % self.children[i].n
+        disp += ch[:-1] + "\n"
+
+        return disp
+
 class SWC(object):
     def __init__(self, fname):
-        # use allensdk if it's available
         self.obj_list = []
         self.obj_hash = {}
         try:
+            # use allensdk if it's available
             import allensdk.core.swc as allen_swc
             morphology = allen_swc.read_swc(fname)
             lst = morphology.compartment_list
@@ -64,6 +85,51 @@ class SWC(object):
             if obj.pn >= 0:
                 obj.parent = self.obj_list[self.obj_hash[obj.pn]]
                 obj.parent.children.append(obj)
+
+    # make sure that types are not cross-connected -- eg, an axon doesn't
+    #   sprout off an apical dendrite. if specified, 'fix' errors by 
+    #   having type-orphans adopted by soma (ie, point to soma instead)
+    def check_consistency(self, fix=False):
+        # find root node
+        root = -1
+        root_node = None
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            if obj.pn < 0 and obj.t == 1:
+                root = obj.n
+                root_node = obj
+                break
+        err = False
+        changed = False
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            if obj.pn < 0:
+                continue
+            par = self.obj_list[self.obj_hash[obj.pn]]
+            if par.t != obj.t and par.t != 1:
+                if not fix:
+                    print("Object %d with type %d has parent with type %d" % (obj.n, obj.t, par.t))
+                    err = True
+                # type-orphan. change it's parent to root
+                if fix == True:
+                    if root < 0:
+                        raise ValueError("Unable to identify root node. Cannot fix type-consistency")
+                    self.obj_list[i].pn = root
+                    self.obj_list[i].parent = root_node
+                    changed = True
+            if err:
+                raise ValueError("There is likely a problem with the SWC file. Bailing out")
+        if changed:
+            self.relink()
+
+    # strip out everything but the soma and the specified SWC type
+    def strip(self, obj_type):
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            if obj is not None:
+                if obj.t != obj_type and obj.t != 1:
+                    self.obj_list[i] = None
+        self.clean_up()
     
     # remove blank entries from obj_list and regenerate obj_hash
     # BB library requires SWC files that have no 'holes' in them
@@ -78,11 +144,21 @@ class SWC(object):
                 n += 1
                 tmp_list.append(obj)
         self.obj_list = tmp_list
+        self.relink()
+
+    def relink(self):
         # re-link objects with parents
         for i in range(len(self.obj_list)):
             obj = self.obj_list[i]
+            obj.children = []
             if obj.pn >= 0:
                 obj.pn = obj.parent.n
+        # re-link parents with children
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            if obj.pn >= 0:
+                obj.parent = self.obj_list[self.obj_hash[obj.pn]]
+                obj.parent.children.append(obj)
 
     def apply_affine(self, aff):
         # calculate scale. use 2 different approaches
@@ -150,6 +226,7 @@ class SWC(object):
 VOID = 1000000000
 
 def computeGMI(nt):
+    nt.save_to("tmp2.swc")
     # v3d version calculates 14 moments
     gmi = np.zeros(14)
     lst = nt.obj_list

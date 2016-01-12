@@ -28,6 +28,7 @@ def usage():
     print("Usage: %s <-a | -i <specimen_id> | -f <input_file> | -n <specimen_name>> <output file>" % name)
     print("with")
     print("  -a                select all morphologies from LIMS")
+    print("  -c                fix type-inconstency error")
     print("  -i <specimen_id>  the id of a single specimen")
     print("  -f <input_file>   name of file containing list of specimen IDs or SWC files")
     print("  -n <specimen_name> the name of a single specimen")
@@ -39,26 +40,37 @@ def parse_command_line():
     argc = len(sys.argv)
     i = 1
     cmds["perform_affine"] = True
+    cmds["fix_type_error"] = False
     while i < argc:
         tok = sys.argv[i]
         if tok[0] == '-':
-            if i == argc-1:
-                print("No token following flag %s" % tok)
-                print("")
-                usage()
             if tok[1] == 'a':
                 cmds["select_all"] = True
+            elif tok[1] == 'c':
+                cmds["fix_type_error"] = True
             elif tok[1] == 'i':
+                if i == argc-1:
+                    print("No token following flag %s" % tok)
+                    print("")
+                    usage()
                 i += 1
                 if "specimen_id" not in cmds:
                     cmds["specimen_id"] = []
                 cmds["specimen_id"].append(sys.argv[i])
             elif tok[1] == 'f':
+                if i == argc-1:
+                    print("No token following flag %s" % tok)
+                    print("")
+                    usage()
                 i += 1
                 if "input_file" in cmds:
                     usage() # only one input file supported right now
                 cmds["input_file"] = sys.argv[i]
             elif tok[1] == 'n':
+                if i == argc-1:
+                    print("No token following flag %s" % tok)
+                    print("")
+                    usage()
                 i += 1
                 if "specimen_name" not in cmds:
                     cmds["specimen_name"] = []
@@ -200,7 +212,7 @@ def fetch_all_swcs():
     id_list = []
     for i in range(len(result)):
         id_list.append(result[i][0])
-    return id_list, []
+    return id_list, [], []
 
 def fetch_specimen_record(sql):
     global cursor
@@ -299,19 +311,18 @@ bb_features = {}
 # returns dictionary containing GMI and features
 def calculate_v3d_features(morph, swc_type, label):
     global v3d_features
+    # strip out everything but the soma and the specified swc type
+    morph.strip(swc_type)
+    # keep track of number of soma roots and roots in specified type
     cnt = 0
     soma_cnt = 0
     root_cnt = 0
-    # strip out everything but the soma and the specified swc type
-    # keep track of number of soma roots and roots in specified type
     for i in range(len(morph.obj_list)):
         obj = morph.obj_list[i]
         if obj.t == 1:
             soma_cnt += 1
             if obj.pn < 0:
                 root_cnt += 1
-        elif obj.t != swc_type:
-            morph.obj_list[i] = None
         else:
             if obj.pn < 0:
                 root_cnt += 1
@@ -320,15 +331,15 @@ def calculate_v3d_features(morph, swc_type, label):
         return None
     # v3d assumes there's only one root object. calculations can be
     #   erroneous if more exist
-    if soma_cnt != 1:
+    if soma_cnt > 1:
         print("** Multiple somas detected. Skipping %s analysis to avoid errors" % label)
-        print("***DEBUG -- Not skipping analysis***")
-        #return None
+        return None
+    elif soma_cnt == 0:
+        print("** No soma detected. Skipping %s analysis to avoid errors" % label)
+        return None
     if root_cnt != 1:
         print("** Non-singular root detected. Skipping %s analysis" % label)
         return None
-    # re-hash object tree
-    morph.clean_up()
     # calculate features
     results = {}
     try:
@@ -369,9 +380,18 @@ for k, record in records.iteritems():
     print("Processing '%s'" % swc_file)
     try:
         nrn = morphology.SWC(swc_file)
-        axon = morphology.SWC(swc_file)
+        nrn.check_consistency(cmds["fix_type_error"])
+        #
+        if CALCULATE_AXONS:
+            axon = morphology.SWC(swc_file)
+            axon.check_consistency(cmds["fix_type_error"])
+        #
         basal = morphology.SWC(swc_file)
+        basal.check_consistency(cmds["fix_type_error"])
+        basal.save_to("tmp3.swc")
+        #
         apical = morphology.SWC(swc_file)
+        apical.check_consistency(cmds["fix_type_error"])
     except Exception, e:
         #print e
         print("")
