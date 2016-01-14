@@ -77,8 +77,8 @@ def run_passive_fit(description):
                 passive_fit_data["fit_for_next_step"] = passive_fit_data["fit_3"]
         elif abs(cm_rel_delta) > 0.1:
             _run_passive_fit_log.debug("Original and electrode fits not in sync:")
-            _run_passive_fit_log.debug("original Cm: " + passive_fit_data["fit_1"]["Cm"])
-            _run_passive_fit_log.debug("w/ electrode Cm: " + passive_fit_data["fit_3"]["Cm"])
+            _run_passive_fit_log.debug("original Cm: " + str(passive_fit_data["fit_1"]["Cm"]))
+            _run_passive_fit_log.debug("w/ electrode Cm: " + str(passive_fit_data["fit_3"]["Cm"]))
             if passive_fit_data["fit_1"]["err"] < passive_fit_data["fit_3"]["err"]:
                 _run_passive_fit_log.debug("Original has lower error")
                 passive_fit_data["fit_for_next_step"] = passive_fit_data["fit_1"]
