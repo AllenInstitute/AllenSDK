@@ -89,6 +89,7 @@ class SWC(object):
     # make sure that types are not cross-connected -- eg, an axon doesn't
     #   sprout off an apical dendrite. if specified, 'fix' errors by 
     #   having type-orphans adopted by soma (ie, point to soma instead)
+    # exception: a single axon can sprout off a basal dendrite
     def check_consistency(self, fix=False):
         # find root node
         root = -1
@@ -101,22 +102,32 @@ class SWC(object):
                 break
         err = False
         changed = False
+        axon_count = 0
         for i in range(len(self.obj_list)):
             obj = self.obj_list[i]
             if obj.pn < 0:
                 continue
             par = self.obj_list[self.obj_hash[obj.pn]]
+            if par.t != obj.t and par.t == 1:
+                if obj.t == 2:
+                    axon_count += 1
             if par.t != obj.t and par.t != 1:
-                if not fix:
-                    print("Object %d with type %d has parent with type %d" % (obj.n, obj.t, par.t))
-                    err = True
-                # type-orphan. change it's parent to root
-                if fix == True:
-                    if root < 0:
-                        raise ValueError("Unable to identify root node. Cannot fix type-consistency")
-                    self.obj_list[i].pn = root
-                    self.obj_list[i].parent = root_node
-                    changed = True
+                if par.t == 3 and obj.t == 2: # this is OK
+                    axon_count += 1
+                else:
+                    if not fix:
+                        print("Object %d with type %d has parent with type %d" % (obj.n, obj.t, par.t))
+                        err = True
+                    # type-orphan. change it's parent to root
+                    if fix == True:
+                        if root < 0:
+                            raise ValueError("Unable to identify root node. Cannot fix type-consistency")
+                        self.obj_list[i].pn = root
+                        self.obj_list[i].parent = root_node
+                        changed = True
+        if axon_count > 1:
+            print("More than one axon detected")
+            err = True
         if err:
             raise ValueError("There is likely a problem with the SWC file. Bailing out")
         if changed:
@@ -128,6 +139,15 @@ class SWC(object):
             obj = self.obj_list[i]
             if obj is not None:
                 if obj.t != obj_type and obj.t != 1:
+                    self.obj_list[i] = None
+        self.clean_up()
+    
+    # strip out everything but the specified SWC type
+    def strip_all(self, obj_type):
+        for i in range(len(self.obj_list)):
+            obj = self.obj_list[i]
+            if obj is not None:
+                if obj.t != obj_type:
                     self.obj_list[i] = None
         self.clean_up()
     
