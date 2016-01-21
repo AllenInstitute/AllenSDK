@@ -194,7 +194,7 @@ def fetch_all_swcs():
     id_list = []
     for i in range(len(result)):
         id_list.append(result[i][0])
-    return id_list, []
+    return id_list, [], []
 
 def fetch_specimen_record(sql):
     global cursor
@@ -242,6 +242,7 @@ elif "select_all" in cmds:
 else:
     id_list = []
     name_list = []
+    file_list = []
 
 # merge command-line specified IDs with those in the input file
 if "specimen_id" in cmds:
