@@ -309,154 +309,18 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
             'grid_bio_spike_model_voltage': grid_bio_spike_model_voltage,
             'grid_bio_spike_model_threshold': grid_bio_spike_model_threshold
         }
-                
-#     def run_until_biological_spike(self, voltage_t0, threshold_t0, AScurrents_t0, 
-#                                    stimulus, response, start_index, end_index, 
-#                                    bio_spike_time_steps):
-#         """ Run the neuron simulation over a segment of a stimulus given initial conditions. The model simulates
-#         until either the model spikes or the end of the segment is reached.  If the model does not spike, a 
-#         spike time is extrapolated past the end of the simulation segment.
-# 
-#         Parameters
-#         ----------
-#         voltage_t0 : float
-#             the current voltage of the neuron
-#         threshold_t0 : float
-#             the current spike threshold level of the neuron
-#         AScurrents_t0 : np.ndarray
-#             the current state of the afterspike currents in the neuron
-#         stimulus : np.ndarray
-#             the full stimulus array (not just the segment of data being simulated)
-#         response : np.ndarray
-#             the full response array (not just the segment of data being simulated)
-#         start_index : int
-#             index to start simulating
-#         end_index : int
-#             index *after* the last index to be simulated
-#         bio_spike_time_steps : list
-#             time steps of input spikes
-# 
-#         Returns
-#         -------
-#         dict
-#             a dictionary containing:
-#                 'voltage': simulated voltage value
-#                 'threshold': simulated threshold values
-#                 'AScurrent_matrix': afterspike current values during the simulation
-#                 'grid_model_spike_time': model spike time (in units of dt) 
-#                 'interpolated_model_spike_time': model spike time (in units of dt) interpolated between time steps
-#                 'voltage_t0': reset voltage value to be used in subsequent simulation interval 
-#                 'threshold_t0': reset threshold value to be used in subsequent simulation interval
-#                 'AScurrents_t0': reset afterspike current value to be used in subsequent simulation interval
-#                 'grid_bio_spike_model_voltage': model voltage at the time of the input spike
-#                 'grid_bio_spike_model_threshold': model threshold at the time of the input spike
-#         """
-#         
-# 
-# 
-#         # preallocate arrays and matricies
-#         num_time_steps = end_index - start_index
-#         num_spikes = len(bio_spike_time_steps)
-# 
-#         voltage_out = np.empty(num_time_steps)
-#         voltage_out[:] = np.nan
-#         threshold_out = np.empty(num_time_steps)
-#         threshold_out[:] = np.nan
-#         AScurrent_matrix = np.empty(shape=(num_time_steps, len(AScurrents_t0)))
-#         AScurrent_matrix[:] = np.nan
-# 
-#         grid_model_spike_time = None
-#         grid_model_spike_voltage = None
-#         
-#         interpolated_model_spike_time = None
-#         interpolated_model_spike_voltage = None
-#         
-#         # calculate the model values between the two target spikes (don't stop if there is a spike)
-#         for time_step in xrange(num_time_steps):
-# 
-#             # Note that here you are not recording the first v0 because that was recoded at the end of the previous spike
-#             voltage_out[time_step] = voltage_t0 
-#             threshold_out[time_step] = threshold_t0
-#             AScurrent_matrix[time_step,:] = np.matrix(AScurrents_t0) 
-#             
-#             if np.isnan(voltage_t0) or np.isinf(voltage_t0) or np.isnan(threshold_t0) or np.isinf(threshold_t0) or any(np.isnan(AScurrents_t0)) or any(np.isinf(AScurrents_t0)):
-#                 logging.error(self)
-#                 logging.error('time step: %d / %d' % (time_step, num_time_steps))
-#                 logging.error('    voltage_t0: %f' % voltage_t0)
-#                 logging.error('    voltage started the run at: %f' % voltage_out[0])
-#                 logging.error('    voltage before: %s' % voltage_out[time_step-20:time_step])
-#                 logging.error('    threshold_t0: %f' % threshold_t0)
-#                 logging.error('    threshold started the run at: %f' % threshold_out[0])
-#                 logging.error('    threshold before: %s' % threshold_out[time_step-20:time_step])
-#                 logging.error('    AScurrents_t0: %s' % AScurrents_t0)
-#                 raise GlifNeuronException('Invalid threshold, voltage, or after-spike current encountered.', {
-#                         'voltage': voltage_out,
-#                         'threshold': threshold_out,
-#                         'AScurrent_matrix': AScurrent_matrix
-#                         })
-# 
-#             (voltage_t1, threshold_t1, AScurrents_t1) = self.dynamics(voltage_t0, threshold_t0, AScurrents_t0, stimulus[time_step+start_index], time_step+start_index, bio_spike_time_steps) #TODO fix list versus array
-# 
-#             
-#             voltage_t0=voltage_t1
-#             threshold_t0=threshold_t1
-#             AScurrents_t0=AScurrents_t1
-#         
-#         # comment this out if you just want TRD
-#         
-#         #--see if model crosses threshold in the interval (TRDX)
-#         grid_model_spike_time, grid_model_spike_voltage, interpolated_model_spike_time, interpolated_model_spike_voltage = find_first_model_spike(voltage_out, threshold_out, voltage_t1, threshold_t1, self.dt)
-# 
-#         # if the model never spiked, extrapolate to guess when it would have spiked
-#         if grid_model_spike_time is None: 
-#             grid_model_spike_time, grid_model_spike_voltage, interpolated_model_spike_time, interpolated_model_spike_voltage = extrapolate_model_spike_from_endpoints(voltage_out, threshold_out, voltage_t1, threshold_t1, self.dt, self.tau_m)
-#         
-#         # if the target spiked, reset so that next round will start at reset but not recording it in the voltage here.
-#         # note that at the last section of the stimulus where there is no current injected the model will be reset even if
-#         # the biological neuron doesn't spike.  However, this doesnt matter as it won't be recorded. 
-#         if num_spikes > 0:
-#             if end_index<len(stimulus):
-#                 # BEGIN HACK
-#                 bio_v = response[end_index]
-#                 bio_thresh = bio_v
-#                 
-#                 # overwrite the slow component of threshold with biological spike threshold
-#                 if self.threshold_reset_method.name == 'adapt_sum_slow_fast':                
-#                     self.update_method_data['th_voltage'][-1] = bio_v 
-#                                 
-#                 voltage_t1 = bio_v
-#                 threshold_t1 = bio_thresh
-#                 # END HACK
-#             
-#                 (voltage_t0, threshold_t0, AScurrents_t0) = self.reset(voltage_t1, threshold_t1, AScurrents_t1)
-#             else:
-#                 (voltage_t0, threshold_t0, AScurrents_t0) = None, None, None
-#         
-#         return {
-#             'voltage': voltage_out, 
-#             'threshold': threshold_out, 
-#             'AScurrent_matrix': AScurrent_matrix, 
-# 
-#             'grid_model_spike_time': grid_model_spike_time,
-#             'interpolated_model_spike_time': interpolated_model_spike_time,
-#             
-#             'grid_model_spike_voltage': grid_model_spike_voltage,
-#             'interpolated_model_spike_voltage': interpolated_model_spike_voltage,
-# 
-#             'voltage_t0': voltage_t0, 
-#             'threshold_t0': threshold_t0, 
-#             'AScurrents_t0': AScurrents_t0, 
-# 
-#             'grid_bio_spike_model_voltage': voltage_t1, 
-#             'grid_bio_spike_model_threshold': threshold_t1            
-#             }
         
     def run_until_biological_spike(self, voltage_t0, threshold_t0, AScurrents_t0, 
-                                   stimulus, response, start_index, end_index, 
+                                   stimulus, response, start_index, after_end_index, 
                                    bio_spike_time_steps):
-        """ Run the neuron simulation over a segment of a stimulus given initial conditions. The model simulates
-        until either the model spikes or the end of the segment is reached.  If the model does not spike, a 
-        spike time is extrapolated past the end of the simulation segment.
+        """ Run the neuron simulation over a segment of a stimulus given initial conditions for use in the "forced spike"
+        optimization paradigm. [Note: the section of stimulus 
+        is meant to be between two biological neuron spikes.  Thus the stimulus is during the interspike interval (ISI)].  The 
+        model is simulated until either the model spikes or the end of the segment is reached.  If the model does not spike, a 
+        spike time is extrapolated past the end of the simulation segment.  
+        
+        This function also returns the initial conditions for the subsequent stimulus segment. In the forced spike paradigm 
+        there are several ways 
 
         Parameters
         ----------
@@ -471,9 +335,9 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
         response : np.ndarray
             the full response array (not just the segment of data being simulated)
         start_index : int
-            index to start simulating
-        end_index : int
-            index *after* the last index to be simulated
+            index of global stimulus at which to start simulation
+        after_end_index : int
+            index of global stimulus *after* the last index to be simulated
         bio_spike_time_steps : list
             time steps of input spikes
 
@@ -499,15 +363,23 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
         interpolated_model_spike_voltage = None
 
         # preallocate arrays and matricies
-        num_time_steps_fine = end_index - start_index
+        num_time_steps_fine = after_end_index - start_index
         t_fine_grid = np.arange(num_time_steps_fine)*self.dt
 
-        # Apply refinement factor:
+        #--------------------------------------------------------------------------------
+        #---Apply refinement factor to integrate over larger time steps (assumes--------- 
+        #---current within the steps can be averaged):----------------------------------
+        #--------------------------------------------------------------------------------
         dt_old = self.dt
         self.dt =  self.dt*self.dt_multiplier
         
-        local_coarse_indicies=np.append(np.arange(num_time_steps_fine)[::self.dt_multiplier], end_index - start_index)
-        if len(local_coarse_indicies)==2:
+        # define the local course grain indicies note the last graining will be shorter and is appended to the end
+        local_coarse_indicies=np.append(np.arange(num_time_steps_fine)[::self.dt_multiplier], after_end_index - start_index) #the last indicie in this array is still one longer than the last simulated index 
+        # convert the local coarse grained indicies into global incidies 
+        global_coarse_indicies=local_coarse_indicies+start_index
+
+        # TODO: I dont think this does anything.
+        if len(local_coarse_indicies)==2:  
             pass
         
         num_time_steps_coarse = len(local_coarse_indicies)
@@ -517,23 +389,24 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
         threshold_out_coarse_grid[:] = np.nan
         AScurrent_matrix_coarse_grid = np.empty(shape=(num_time_steps_coarse, len(AScurrents_t0))) 
         AScurrent_matrix_coarse_grid[:] = np.nan
-        #these grid times are in the local frame of reference
+        # these grid times are in the local frame of reference
         t_coarse_grid = np.arange(num_time_steps_coarse-1)*self.dt #subtracting the one off here because appending the actual last time that is not the same dt.
         t_coarse_grid = np.append(t_coarse_grid, t_fine_grid[-1])
-        dt_vector=t_coarse_grid[1:]-t_coarse_grid[:-1]
+        dt_vector=t_coarse_grid[1:]-t_coarse_grid[:-1] #note that this vector is one index shorter than the t_course_grid
 
-        global_coarse_indicies=local_coarse_indicies+start_index
+        # Define the coarse grain stimulus by taking the stimulus average between indicies.  Note that since the initial input voltage is recorded in 
+        # the output vectors the stimulus average is indeed the input to the correct time step (i.e. current being fed in is the average current before the step)
         stimulus_coarse=[stimulus[global_coarse_indicies[ii]:global_coarse_indicies[ii+1]].mean() for ii in range(len(global_coarse_indicies)-1)]
 
-        #why am I looking over time step as opposed to matrix; fine but how do I take into account last epic
-        for time_step in range(len(local_coarse_indicies)-1):  #TODO: check this may not record the last value
-            # Note that here you are not recording the first v0 because that was recoded at the end of the previous spike
+        # step though time steps and calculate voltage values
+        for time_step in range(len(local_coarse_indicies)-1):  #minus 1 is needed to match vector sizes because initial inputs are recorded in output vectors.
+            # update output values (Note: in general one can update values before or after the first time step.  
+            # Here the input starting value of voltage is recorded before a time step. This means the last value is not recorded.)
             voltage_out_coarse_grid[time_step] = voltage_t0 
             threshold_out_coarse_grid[time_step] = threshold_t0
             AScurrent_matrix_coarse_grid[time_step,:] = np.matrix(AScurrents_t0) 
             
-            
-            
+            # record error in optimization if they are happening
             if np.isnan(voltage_t0) or np.isinf(voltage_t0) or np.isnan(threshold_t0) or np.isinf(threshold_t0) or any(np.isnan(AScurrents_t0)) or any(np.isinf(AScurrents_t0)):
                 logging.error(self)
                 logging.error('time step: %d / %d' % (time_step, num_time_steps_coarse))
@@ -544,15 +417,12 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
                 logging.error('    threshold started the run at: %f' % threshold_out_coarse_grid[0])
                 logging.error('    threshold before: %s' % threshold_out_coarse_grid[time_step-20:time_step])
                 logging.error('    AScurrents_t0: %s' % AScurrents_t0)
-
                 if 'a_spike' in self.threshold_dynamics_method.params:
                     logging.error('    a_spike: %s' % self.threshold_dynamics_method.params['a_spike'])
                 if 'b_spike' in self.threshold_dynamics_method.params:
                     logging.error('    b_spike: %s' % self.threshold_dynamics_method.params['b_spike'])
-
-                #need to ouput the correct matrix of values for plotting
-                #set up output to be the original matrix size of nan's
                 
+                # plot output in original index space
                 temp_fine_grid_for_intp=np.arange(0,t_coarse_grid[time_step-1], dt_old)
                 voltage_out_fine_grid = np.empty(num_time_steps_fine)
                 voltage_out_fine_grid[:] = np.nan
@@ -578,18 +448,13 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
                         'voltage': voltage_out_fine_grid,
                         'threshold': threshold_out_fine_grid,
                         'AScurrent_matrix': AScurrent_matrix
-                        })
-#             print voltage_t0, threshold_t0, AScurrents_t0, stimulus[time_step+start_index], time_step+start_index, bio_spike_time_steps
-#            why is this function being provided bio spike times?
-#            Should pass in dt here because it might change for last step in euler exact
+                        })    
             
-            if time_step == len(local_coarse_indicies)-1:
-                pass
-            #!!!!!!!!!!!!!!!!!!!!!!TODO: THIS IS A HUGE HACK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            #Changing dt be the dt of the bin (which is variable for the last bin)
+            # changing dt be the dt of the coarse bin (which is variable for the last bin)
             self.dt=dt_vector[time_step]
             (voltage_t1, threshold_t1, AScurrents_t1) = self.dynamics(voltage_t0, threshold_t0, AScurrents_t0, stimulus_coarse[time_step], time_step+start_index, bio_spike_time_steps) #TODO fix list versus array
 
+            # updating the input values 
             voltage_t0=voltage_t1
             threshold_t0=threshold_t1
             AScurrents_t0=AScurrents_t1
@@ -600,68 +465,41 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
         threshold_out_coarse_grid[time_step+1] = threshold_t0
         AScurrent_matrix_coarse_grid[time_step+1,:] = np.matrix(AScurrents_t0)
 
-        
         # Reset dt to previous value:
         self.dt =  dt_old
-                
-#        plt.plot(t_coarse_grid, voltage_out_coarse_grid, label='v course grid')
-#        plt.plot(t_coarse_grid, threshold_out_coarse_grid, label='thr course grid')
-        
+
         fv = spi.interp1d(t_coarse_grid, voltage_out_coarse_grid, assume_sorted=True, bounds_error=False, fill_value=voltage_out_coarse_grid[-1])
         ft = spi.interp1d(t_coarse_grid, threshold_out_coarse_grid, assume_sorted=True, bounds_error=False, fill_value=threshold_out_coarse_grid[-1])
-#        plt.plot(t_fine_grid, fv(t_fine_grid), '--', label='v fine grid')
-#        plt.plot(t_fine_grid, ft(t_fine_grid), '--', label='thr fine grid')
-#        plt.legend(loc=2)
-#         
-#        plt.show()
-        
-#         voltage_out_fine_grid = np.empty(num_time_steps_fine)
-#         voltage_out_fine_grid[:] = np.nan
-#         threshold_out_fine_grid = np.empty(num_time_steps_fine)
-#         threshold_out_fine_grid[:] = np.nan
-  
         voltage_out = fv(t_fine_grid)
         threshold_out = ft(t_fine_grid)
+        
+        # initalize after spike current matrix
         AScurrent_matrix = np.empty(shape=(num_time_steps_fine, len(AScurrents_t0)))
         AScurrent_matrix[:] = np.nan
         for ii in range(len(AScurrents_t0)):
             curr_fASc = spi.interp1d(t_coarse_grid, AScurrent_matrix_coarse_grid[:,ii], assume_sorted=True, bounds_error=False, fill_value=AScurrent_matrix_coarse_grid[-1,ii])
             AScurrent_matrix[:,ii] = curr_fASc(t_fine_grid) 
         
-        # comment this out if you just want TRD
-        
-        #
-        #-------USE THIS FUNCTION IF YOU WANT TO GET MODEL CROSSING THRESHOLD------- 
+        # find where model voltage crosses model threshold 
         grid_model_spike_time, grid_model_spike_voltage, interpolated_model_spike_time, interpolated_model_spike_voltage = find_first_model_spike(voltage_out, threshold_out, voltage_t1, threshold_t1, self.dt)
-
         # if the model never spiked, extrapolate to guess when it would have spiked
         if grid_model_spike_time is None: 
-            
             grid_model_spike_time, grid_model_spike_voltage, interpolated_model_spike_time, interpolated_model_spike_voltage = self.extrapolation_method(self, voltage_out, threshold_out, voltage_t1, threshold_t1, self.dt)
         
-        # if the target spiked, reset so that next round will start at reset but not recording it in the voltage here.
+        # when the target spikes, reset so that next round will start at reset but not recording it in the voltage here.
         # note that at the last section of the stimulus where there is no current injected the model will be reset even if
         # the biological neuron doesn't spike.  However, this doesnt matter as it won't be recorded. 
         num_spikes = len(bio_spike_time_steps)
         if num_spikes > 0:
-            if end_index<len(stimulus):
-                # BEGIN HACK ( input to threshold reset rule is biological spike voltage for adapt_sum_slow_fast threshold reset method
-                #bio_v = response[end_index]
-                #bio_thresh = bio_v
-                # 
-                # overwrite the slow component of threshold with biological spike threshold
-                #if self.threshold_reset_method.name == 'adapt_sum_slow_fast':                
-                #    self.update_method_data['th_voltage'][-1] = bio_v 
-                #                
-                #voltage_t1 = bio_v
-                #threshold_t1 = bio_thresh
-                # END HACK
+            if after_end_index<len(stimulus):
                 
+                #TODO: ????????????????????????????????WHAT IS THIS?????????????????????????????????????????????????????????????
+                #I CANT FIGURE OUT WHY THIS WOULD HAVE BEEN HERE
                 if self.threshold_reset_method.name == 'adapt_sum_slow_fast':
                     voltage_t1 = threshold_t1
                 #---------------------------------------------------------------------------------------------------------------------
-                #---------below is the option you choose for reseting based on interpolated voltage versus voltage at----------------- 
-                #---------the time of the biological spike----------------------------------------------------------------------------
+                #---------below is an option you choose for reseting based on values of model at the biological spike----------------- 
+                #---------or at the time where model voltage crosses model threshold--------------------------------------------------
                 #---------------------------------------------------------------------------------------------------------------------
                 #(voltage_t0, threshold_t0, AScurrents_t0) = self.reset(interpolated_model_spike_voltage, interpolated_model_spike_voltage, AScurrents_t1) #USE THIS IF YOU WANT TO USE USE MODEL VALUES AT MODEL SPIKE
                 (voltage_t0, threshold_t0, AScurrents_t0, bad_reset_flag) = self.reset(voltage_t1, threshold_t1, AScurrents_t1)  #USE THIS IF YOU WANT TO USE MODEL VALUES AT TIME OF BIOLOGICAL SPIKE
