@@ -25,6 +25,8 @@ import datetime
 import matplotlib.pyplot as plt
 #import seaborn as sns
 
+AXIS_Y_RANGE = [ -110, 60 ]
+
 def get_time_string():
     return datetime.datetime.now().strftime("%I:%M%p %B %d, %Y")
 
@@ -443,9 +445,8 @@ def plot_instantaneous_threshold_thumbnail(nwb_file, sweep_numbers, cell_feature
     tscale = 0.005
 
     plt.plot(t, v, linewidth=1, color=color)
-    plt.plot([ tstart, tstart, tstart + tscale ], [ 10, 0, 0 ], linewidth=1, color='#dddddd')
     
-    plt.ylim(-90, 70)
+    plt.ylim(AXIS_Y_RANGE[0], AXIS_Y_RANGE[1])
     plt.xlim(tstart, tend)
 
     return fig
@@ -664,11 +665,8 @@ def plot_sweep_set_summary(nwb_file, highlight_sweep_number, sweep_numbers,
     
     tstart = stim_start - 0.05
     tend = stim_start + stim_dur + 0.25
-    tscale = 0.005
 
-    plt.plot( [tstart, tstart, tstart + tscale], [10, 0, 0], linewidth=1, color='#dddddd')
-
-    ax.set_ylim(-110, 40)
+    ax.set_ylim(AXIS_Y_RANGE[0], AXIS_Y_RANGE[1])
     ax.set_xlim(tstart, tend)
 
     return fig
