@@ -9,15 +9,15 @@ THRESH_PCT_MULTIBLIP = 0.05
 
 from allensdk.model.glif.find_spikes import find_spikes_list
 
-def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
+def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
     '''In the multiblip there are problems with artifacts when the stimulus turns on and off 
     creating problems detecting spikes.
     '''    
     multi_SS_v=multi_SS['voltage']
     multi_SS_i=multi_SS['current']
 
-#    spike_ind = find_multiblip_spikes(multi_SS_i, multi_SS_v, dt)
-    spike_ind, v_at_spike=find_spikes_list(multi_SS_v, dt)
+    spike_ind = find_multiblip_spikes(multi_SS_i, multi_SS_v, dt)
+    spike_ind, _=find_spikes_list(multi_SS_v, dt)
     # eliminate spurious spikes that may exist
     spike_lt=[np.where(SI<int(2.02/dt))[0] for SI in spike_ind]
     if len(np.concatenate(spike_lt))>0:
@@ -69,7 +69,7 @@ def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOC
     try: #this try here because sometimes even though have the traces there isnt more than one trace with two spikes
         threshold=np.concatenate(threshold)
         time_previous_spike=np.concatenate(time_previous_spike)  #note that this will have nans in it
-        
+        v_at_spike
     #    for thr, times in zip(threshold, time_previous_spike):
     #        print thr
     #        print times
@@ -192,7 +192,7 @@ def err_fix_th(x, voltage, El, spike_cut_length, spikeInd, thi, dt, a_spike, b_s
     return F
 
 def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
-    '''This can not be integrated into the find spike class because it will require the stimulation inticies
+    '''This can not be integrated into the find spike class because it will require the stimulation indicies
     '''
     artifact_ave_window_time_s=0.0003
     window_indicies_to_ave_len=int(artifact_ave_window_time_s/dt)
