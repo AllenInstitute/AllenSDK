@@ -10,14 +10,37 @@ THRESH_PCT_MULTIBLIP = 0.05
 from allensdk.model.glif.find_spikes import find_spikes_list
 
 def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
-    '''In the multiblip there are problems with artifacts when the stimulus turns on and off 
-    creating problems detecting spikes.
+    '''Calculate the spike components of the threshold by fitting a decaying exponential function to data to threshold versus time 
+    since last spike in the multiblip data. The exponential is forced to decay to the local th_inf (calculated as the mean all of the 
+    threshold values of the first spikes in each individual triblip stimulus). 
+    
+    Notes: The standard SDK spike detection algorithm does not work with the multiblip stimulus due to artifacts 
+    when the stimulus turns on and off. Please see the find_multiblip_spikes module for more information.
+    
+    Input
+    
+    multi_SS: dictionary
+        contains multiblip information such as current and stimulus
+    dt: float
+        time step in seconds
+    
+    Returns
+    
+    const_to_add_to_thresh_for_reset: float
+        amplitude of the exponential fit otherwise known as a_spike
+    decay_const: float
+        decay constant of exponential. Note the function fit is a negative exponential which will mean this value will 
+        either have to be negated when it is used or the functions used will have to have to include the negative.
+    thresh_inf: float
+    
     '''    
     multi_SS_v=multi_SS['voltage']
     multi_SS_i=multi_SS['current']
 
+    # get indicies of spikes
     spike_ind = find_multiblip_spikes(multi_SS_i, multi_SS_v, dt)
 #    spike_ind, _=find_spikes_list(multi_SS_v, dt)
+
     # eliminate spurious spikes that may exist
     spike_lt=[np.where(SI<int(2.02/dt))[0] for SI in spike_ind]
     if len(np.concatenate(spike_lt))>0:
@@ -28,17 +51,18 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
         logging.warning('there is a spike after the stimulus in the multiblip')    
     spike_ind=[np.delete(SI,ind)for SI, ind in zip(spike_ind, spike_gt)]
     
-    #these are what I want to be final
+    # intialize output lists
     time_previous_spike=[]
     threshold=[]
     thresh_first_spike=[]  #will set constant to this
-    
+            # voltage at all spikes in a single tri blip
+
     if MAKE_PLOT:
         plt.figure()
+        
+    # loop though each tri blip stimulus in muliblip stimulus
     for k in range(0, len(multi_SS_v)):
-        #voltage at all spikes in multiblip data
-        thresh=[multi_SS_v[k][j] for j in spike_ind[k]]
-
+        thresh=[multi_SS_v[k][j] for j in spike_ind[k]] # voltage at all spikes in a single tri blip
         if thresh!=[] and len(thresh)>1:# there needs to be more than one spike so that we can find the time difference
             thresh_first_spike.append(thresh[0])
             threshold.append(thresh[1:])
@@ -63,18 +87,13 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
     if SHOW_PLOT:        
         plt.show(block=BLOCK)
 
-    #put numbers in one vector5
+    #put numbers into one vector for fitting of exponential function
     thresh_inf=np.mean(thresh_first_spike)  #note this threshold infinity isnt the one coming from single blip
     print "average threshold of first spike",  thresh_inf
     try: #this try here because sometimes even though have the traces there isnt more than one trace with two spikes
         threshold=np.concatenate(threshold)
         time_previous_spike=np.concatenate(time_previous_spike)  #note that this will have nans in it
-        v_at_spike
-    #    for thr, times in zip(threshold, time_previous_spike):
-    #        print thr
-    #        print times
-    #        if len(thr)!=len(times):
-    #            print "not equal", 
+        v_at_spike 
     
         if MAKE_PLOT:
             plt.figure()
@@ -82,19 +101,21 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
             plt.ylabel('threshold (mV)')
             plt.xlabel('time since last spike (s)')
     
-        
+        # calculate values of exponential function both if force function to local threshold infinity and not forcing to a value
+        # (not forcing to a value seems less valid unless a bunch of points are added corresponding to the threshold of the
+        # first spike at time equal infinity (because the first spike is a spike that happens where the spike before it was an
+        # infinite time away)).  Therefore, the values that are obtained from forcing are the ones that are used.
         p0_force=[.002, -100.]
         p0_fit=[.002, -100., thresh_inf]
-    #    guess=exp_force_c(time_previous_spike, p0_force[0], p0_force[1])
+        
+        #TODO: THIS WOULD BE BETTER IF IT CALLED THE ACTUAL FUNCTION IN THE NEURON METHODS THAT WAY THEY WOULD HAVE TO BE THE SAME
         (popt_force, pcov_force)= curve_fit(exp_force_c, (time_previous_spike, thresh_inf), threshold, p0=p0_force, maxfev=100000)
         (popt_fit, pcov_fit)= curve_fit(exp_fit_c, time_previous_spike, threshold, p0=p0_fit, maxfev=100000)
-        print 'popt_force', popt_force
-    #    print 'popt_fit', popt_fit
-        #since time is not in order lets make new time vector
-        time_previous_spike.sort()
+
+        # viewing fit functions
+        time_previous_spike.sort() #since time is not in order, making new time vector so that obtained fit curve can be plotted
         fit_force=exp_force_c((time_previous_spike, thresh_inf), popt_force[0], popt_force[1])
         fit_fit=exp_fit_c(time_previous_spike, popt_fit[0], popt_fit[1], popt_fit[2])
-    #    plt.plot(time_previous_spike, guess, label='guess')
         if MAKE_PLOT:
             plt.plot(time_previous_spike, fit_force, 'r', lw=4, label="exp fit (force const to thesh first spike)\n  k=%.3g, amp=%.3g" % (popt_force[1], popt_force[0]))
             plt.plot(time_previous_spike, fit_fit, 'b', lw=4, label="exp fit (fit constant)\n  k=%.3g, amp=%.3g" % (popt_fit[1], popt_fit[0]))
@@ -110,13 +131,11 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
                 for k in range(0, len(multi_SS_v)):
                     thresh=[multi_SS_v[k][j] for j in spike_ind[k]]
     
-    #                plt.subplot(2,1,1)
                     ax1.plot(np.arange(0, len(multi_SS_i[k]))*dt, multi_SS_i[k]*1.e12, lw=2)
                     ax1.set_ylabel('current (pA)', fontsize=16)
                     ax1.set_xlim([2., 2.12])
                     ax1.set_title('Triple Short Square', fontsize=20)
     
-    #                plt.subplot(2,1,2)
                     ax2.plot(np.arange(0, len(multi_SS_v[k]))*dt, multi_SS_v[k]*1.e3, lw=2)
                     ax2.plot(spike_ind[k]*dt, np.array(thresh)*1.e3, '.k', ms=16)
                     ax2.set_ylabel('voltage (mV)', fontsize=16)
@@ -132,16 +151,19 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
                 ax3.legend() 
                 plt.tight_layout()
                 plt.show()
-                
+        
+        #TODO: THE ABS VALUES SOULD REALLY NOT BE NECESSARY: THEY WERE PROBABLY PUT HERE SO THAT VOLTAGE RESET RULES WILL WORK
+        #TODO: IN REALITY THERE SHOULD BE A BIG FAT WARNING THAT COMES OUT SO IT CAN BE LOOKED OUT IF EITHER OF THE VALUES ARE NEGATIVE
+        #TODO: IF GOING TO CHANGE VALUE OF SIGN OF B_SPIKE NOW WOULD BE THE TIME TO DO IT
         #TODO: Corinne abs is put in hastily make sure this is ok
-        const_to_add_to_thresh_for_reset=abs(popt_force[0]) 
-        b=abs(popt_force[1])
+        decay_const=abs(popt_force[1])
+        
     except Exception, e:
         logging.error(e.message)
         const_to_add_to_thresh_for_reset=None 
-        b=None
+        decay_const=None
         
-    return const_to_add_to_thresh_for_reset, b, thresh_inf
+    return const_to_add_to_thresh_for_reset, decay_const, thresh_inf
 
 def err_fix_th(x, voltage, El, spike_cut_length, spikeInd, thi, dt, a_spike, b_spike):
     '''Based on calc_full_err_fixth module in test_fmin_fixth_ab.py created by Ram Iyer
