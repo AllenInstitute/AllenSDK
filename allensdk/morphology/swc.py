@@ -695,29 +695,16 @@ class Morphology( object ):
                 tree_num = local_trees[0]   # use existing tree
             elif len(local_trees) > 1:
                 # this node is an intersection of multiple trees
-                # merge these into the largest existing tree
-                # find biggest tree number
-                tree_num = -1   # default to invalid value
-                count = len(trees[local_trees[0]])
-                for j in range(1, len(local_trees)):
-                    if len(trees[local_trees[j]]) > count:
-                        count = len(trees[local_trees[j]])
-                        tree_num = local_trees[j][0][NODE_TREE_ID]
-                # merge others into largest tree
-                master_tree = trees[tree_num]
-                for j in range(len(local_trees)):
-                    if j == tree_num:
-                        continue    # this is the master list
-                    for k in range(len(trees[local_trees[j]])):
-                        small_tree = trees[local_trees[j]]
-                        # reset each node's tree ID
-                        small_tree[k][NODE_TREE_ID] = tree_num
-                        # add nodes to common tree
-                        master_tree.append(small_tree[k])
-                    # delete the old tree as it's not needed anymore
-                    local_trees[j] = None
+                # merge all trees into the first one found
+                tree_num = local_trees[0]
+                for j in range(1,len(local_trees)):
+                    dead_tree = local_trees[j]
+                    trees[dead_tree] = []
+                    for node in self.compartment_list:
+                        if node[NODE_TREE_ID] == dead_tree:
+                            node[NODE_TREE_ID] = tree_num
             # merge node into tree
-            # ensure ther'es space
+            # ensure there's space
             while len(trees) <= tree_num:
                 trees.append([])
             trees[tree_num].append(seg)
@@ -725,7 +712,8 @@ class Morphology( object ):
         # consolidate tree lists into class's tree list object
         self._tree_list = []
         for tree in trees:
-            self._tree_list.append(tree)
+            if len(tree) > 0:
+                self._tree_list.append(tree)
         # make soma's tree be the first tree, if soma present
         # this should be the case if the file is properly ordered, but
         #   don't assume that
@@ -750,6 +738,7 @@ class Morphology( object ):
                 self._tree_list[i][j][NODE_TREE_ID] = i
 
     # TODO verify that only recognized types are present
+    # TODO make sure each branch has at most one axon root
     # returns number of errors detected in file
     def check_consistency(self):
         # make sure that each tree has exactly one root
@@ -766,9 +755,35 @@ class Morphology( object ):
             if root == -1:
                 print("No root present in tree %d" % i)
                 errs += 1
+        # make sure each branch has at most one axon root
+        # find type boundaries. at each axon boundary, walk back up
+        #   tree to root and make sure another axon segment not
+        #   encountered
+        adoptees = self.find_type_boundary()
+        for child in adoptees:
+            if child[NODE_TYPE] == Morphology.AXON:
+                par_id = child[NODE_PN]
+                while par_id >= 0:
+                    par = self.compartment_list[par_id]
+                    if par[NODE_TYPE] == Morphology.AXON:
+                        print("Branch has multiple axon roots")
+                        errs += 1
+                        break
+                    par_id = par[NODE_PN]
         if errs > 0:
             print("Failed consistency check: %d errors encountered" % errs)
         return errs
+
+    # return a list of segments who have parents that are a different type
+    def find_type_boundary(self):
+        adoptees = []
+        for node in self.compartment_list:
+            par = self.parent_of(node)
+            if par is None:
+                continue
+            if node[NODE_TYPE] != par[NODE_TYPE]:
+                adoptees.append(node)
+        return adoptees
 
     # remove tree from swc's "forest"
     def delete_tree(self, n):
@@ -784,6 +799,11 @@ class Morphology( object ):
         self.reconstruct()
         # reset node tree_id to correct tree number
         self.reset_tree_ids()
+
+    # code to assist in debugging
+    def print_all_nodes(self):
+        for node in self.compartment_list:
+            print_node(node)
 
 
 def str_to_num(s):
