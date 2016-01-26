@@ -5,6 +5,14 @@ from subprocess import call
 import sys
 from swc import *
 
+########################################################################
+#
+# script to merge 2 swc files
+# It merges the dendrite morphology from the first file with the axon
+#   morphology of the second. All axons nodes are removed from the 
+#   dendrite morphology and that is replaced by the 2nd axon morphology
+#
+
 DEND_SUFFIX = "Dendrite.swc"
 AXON_SUFFIX = "DendriteAxon.swc"
 MERGE_SUFFIX = "Merged.swc"
@@ -182,13 +190,16 @@ if len(sys.argv) == 2:
     else:
         axon_files.append(sys.argv[1] + AXON_SUFFIX)
         dend_files.append(sys.argv[1] + DEND_SUFFIX)
-        output_files.append(sys.argv[1] + MERGE_SUFFIX)
+        combined_files.append(sys.argv[1] + MERGE_SUFFIX)
 elif len(sys.argv) == 1:
-    files = glob.glob("*_p_*%s.swc" % DEND_SUFFIX)
-    for root in files:
+    name_expr = "*_p_%s" % DEND_SUFFIX
+    #print("Looking for files like '%s'" % name_expr)
+    files = glob.glob(name_expr)
+    for f in files:
+        root = f.split('_p_')[0] + "_p_"
         axon_files.append(root + AXON_SUFFIX)
         dend_files.append(root + DEND_SUFFIX)
-        output_files.append(root + MERGE_SUFFIX)
+        combined_files.append(root + MERGE_SUFFIX)
 else:
     usage()
 
@@ -198,23 +209,8 @@ for i in range(len(dend_files)):
     m = combined_files[i]
     try:
         merge_files(d, a, m)
+        print("")
     except IOError:
         print("** Error creating merge file")
         traceback.print_exc()
-
-
-#def strip_file(ifname, ofname):
-#    nrn = SWC(ifname)
-#    nrn.strip_all(2)
-#    nrn.save_to(ofname)
-#files = glob.glob("axon_files/*.swc")
-#for i in range(len(files)):
-#    try:
-#        fname = files[i]
-#        oname = "stripped" + fname[10:]
-#        strip_file(fname, oname)
-#    except:
-#        print "Error processing '%s'" % fname
-#        traceback.print_exc()
-        
 
