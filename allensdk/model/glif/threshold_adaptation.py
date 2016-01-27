@@ -85,15 +85,13 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
             plt.xlim([2., 2.12])
     
     if SHOW_PLOT:        
-        plt.show(block=BLOCK)
+        plt.show(block=False)
 
-    #put numbers into one vector for fitting of exponential function
+    # put numbers into one vector for fitting of exponential function
     thresh_inf=np.mean(thresh_first_spike)  #note this threshold infinity isnt the one coming from single blip
-    print "average threshold of first spike",  thresh_inf
     try: #this try here because sometimes even though have the traces there isnt more than one trace with two spikes
         threshold=np.concatenate(threshold)
         time_previous_spike=np.concatenate(time_previous_spike)  #note that this will have nans in it
-        v_at_spike 
     
         if MAKE_PLOT:
             plt.figure()
@@ -152,11 +150,20 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
                 plt.tight_layout()
                 plt.show()
         
-        #TODO: THE ABS VALUES SOULD REALLY NOT BE NECESSARY: THEY WERE PROBABLY PUT HERE SO THAT VOLTAGE RESET RULES WILL WORK
-        #TODO: IN REALITY THERE SHOULD BE A BIG FAT WARNING THAT COMES OUT SO IT CAN BE LOOKED OUT IF EITHER OF THE VALUES ARE NEGATIVE
-        #TODO: IF GOING TO CHANGE VALUE OF SIGN OF B_SPIKE NOW WOULD BE THE TIME TO DO IT
-        #TODO: Corinne abs is put in hastily make sure this is ok
-        decay_const=abs(popt_force[1])
+        const_to_add_to_thresh_for_reset=popt_force[0]
+        #REDICULOUS: this decay constant was originally forced to be positive and then it is negated everywhere
+        #it is utalized elsewhere in the code.  For most neurons b_spike will be negative as the threshold decays.  
+        #However that is not necessarily true--so using the abs would ignore those special neurons.  However, removing
+        # abs would create problems for the rest of the code that negates this value, therefore I am negating the value 
+        # here so that positive values will work correctly in the code for the special neurons.
+        #this would be zero 
+        #decay_const=abs(popt_force[1])
+        decay_const=-popt_force[1]
+        
+        if decay_const <0:
+            logging.CRITICAL('This neuron has an increasing decay value for the spike component of the threshold')
+        if const_to_add_to_thresh_for_reset<0:
+            logging.CRITICAL('This neuron has a negative amplitude for the spike component of the threshold') 
         
     except Exception, e:
         logging.error(e.message)
@@ -214,9 +221,19 @@ def err_fix_th(x, voltage, El, spike_cut_length, spikeInd, thi, dt, a_spike, b_s
     return F
 
 def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
-    '''This can not be integrated into the find spike class because it will require the stimulation indicies
+    '''artifacts caused by turning stimulus on and off created artifacts that 
+    created problems for the standard spike detection algorithm.  Several alterations 
+    were made so that the algorithm would detect spikes appropriately. Please see multiblip
+    spike cutting documentation for more information on how the code differs from the SDK 
+    version and what was needed to solve specific issues.
+    input:
+    multi_SS_i: list of arrays
+        each array corresponds to the current stimulation of one triblip stimulus
+    multi_SS_v: list of arrays
+        each array corresponds to the voltage trace of triblip simulus
+    dt: float 
     '''
-    artifact_ave_window_time_s=0.0003
+    artifact_ave_window_time_s=0.0003 #
     window_indicies_to_ave_len=int(artifact_ave_window_time_s/dt)
     out_spk_idxs_list=[]
     for current, voltage in zip(multi_SS_i, multi_SS_v):
@@ -230,7 +247,7 @@ def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
         for index in potential_artifact_indexes:
             smooth_window=range(index,index+window_indicies_to_ave_len+1)
             
-            #artifact_removed_voltage[smooth_window]=np.mean(artifact_removed_voltage[smooth_window])
+            # interpolate in the smoothing window
             blah=interp1d([smooth_window[0], smooth_window[-1]], [artifact_removed_voltage[smooth_window[0]], artifact_removed_voltage[smooth_window[-1]]])
             artifact_removed_voltage[smooth_window]=blah(smooth_window)
             
@@ -246,7 +263,8 @@ def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
 #        
 #        t = np.arange(0, len()) * dt
 
-        #NOTE: in original code this smoothing was with a possible bessel function    
+        # keeping the smooth_v convention of the SDK find spike code.  However in the SDK code 
+        # this is used to name data potentially smoothed by a bessel filter
         smooth_v = artifact_removed_voltage
         dv = np.diff(smooth_v)    
         dvdt = dv / dt
@@ -257,9 +275,10 @@ def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
         spikes = []
         out_spk_idxs = []
         
-        peaks=get_peaks(v)
+        peaks=get_peaks(v) # find potential spikes by finding peak over zero mv
       
         # Etay defines spike as time of threshold crossing.  Threshold is defined as the time at which dvdt is some percent of maximum threshold.
+        # TODO: figure out how maximum threshold is defined in original code so I can say why I don't use it
         for spk_n, peak_idx in enumerate(peaks):
             #---------find spike peak----------------------------
             spk = {}
@@ -272,9 +291,10 @@ def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
                 
             # Define threshold where dvdt = 5% * max upstroke
             dvdt_thr_target = THRESH_PCT_MULTIBLIP * spk["upstroke"]
-            print 'spk[upstroke]', spk["upstroke"], 'dvdt_thr_target', dvdt_thr_target
+            #print 'spk[upstroke]', spk["upstroke"], 'dvdt_thr_target', dvdt_thr_target
             prev_idx = peak_idx-int(.0035/dt)
-            #check to make sure prev_idx is not before or in a window where the stimulus blip comes on because it will errorniously trip the threshold dvdt
+            #check to make sure prev_idx is not before or in a window where the stimulus blip comes on because 
+            #it will errorniously trip the threshold dvdt
             for index in up_blip_index:
                 if prev_idx<=index+int(.0005/dt) and prev_idx>= index-int(.0035/dt):
                     prev_idx=index+int(.0005/dt)
