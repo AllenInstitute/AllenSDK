@@ -2,12 +2,11 @@ import numpy as np
 import copy
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
-import logging
 import matplotlib.pyplot as plt
 import logging
 THRESH_PCT_MULTIBLIP = 0.05
 
-from allensdk.model.glif.find_spikes import find_spikes_list
+from allensdk.model.glif.glif_neuron_methods import spike_component_of_threshold_exact
 
 def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
     '''Calculate the spike components of the threshold by fitting a decaying exponential function to data to threshold versus time 
@@ -161,9 +160,9 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
         decay_const=-popt_force[1]
         
         if decay_const <0:
-            logging.CRITICAL('This neuron has an increasing decay value for the spike component of the threshold')
+            logging.critical('This neuron has an increasing decay value for the spike component of the threshold')
         if const_to_add_to_thresh_for_reset<0:
-            logging.CRITICAL('This neuron has a negative amplitude for the spike component of the threshold') 
+            logging.critical('This neuron has a negative amplitude for the spike component of the threshold') 
         
     except Exception, e:
         logging.error(e.message)
@@ -172,51 +171,79 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
         
     return const_to_add_to_thresh_for_reset, decay_const, thresh_inf
 
-def err_fix_th(x, voltage, El, spike_cut_length, spikeInd, thi, dt, a_spike, b_spike):
-    '''Based on calc_full_err_fixth module in test_fmin_fixth_ab.py created by Ram Iyer
-    x[0]=a_spike input, x[1] is b_spike from multiblip'''
-    #TODO: figure out how this works.
-#    print "x, El, spike_cut_length, spikeInd, thi, dt, a_spike, b_spike"
-#    print x, El, spike_cut_length, spikeInd, thi, dt, a_spike, b_spike   
+
+def err_fix_th(x, voltage, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spike, b_spike):
+    '''This function returns the squared error for the difference between the 'known' voltage 
+    component of the threshold obtained from the biological neuron and the voltage component 
+    of the threshold of the model obtained with the input parameters (so that the minimum can be 
+    searched for via fmin). The overall threshold is the sum of threshold infinity the spike component
+    of the threshold and the voltage component of the threshold.  Therefore threshold infinity and 
+    the spike component of the threshold must be subtracted from the threshold of the neuron in order
+    to isolate the voltage component of the threshold.  In the evaluation of the model the actual
+    voltage of the neuron is used so that any errors in the other components of the model will not 
+    influence the fits here (for example if a afterspike current was estimated incorrectly)
+  
+    Notes:
+    * The spike component of the threshold is subtracted from the 
+        voltage which means that the voltage component of the threshold should only be added to rules.
+    * b_spike was fit using a negative value in the function therefore the negative is placed in the 
+        equation. 
+    * values in this function are in 'real' voltage as opposed to voltage
+        relative to resting potential. 
+    * curret injection during the spike is not taken into account.  This seems reasonable as the 
+        ion channels are open during this time and injected current may not greatly influence the neuron.
     
-    mba=a_spike
-    mbb=b_spike
-    t0=spikeInd
-    vL = El
-    fi = []                          #list to store sum of square errors for every pair of spikes
-    for kk in range(len(t0)-1):      #loop over all (n-1) spikes in data
-        sind = t0[kk]+int(spike_cut_length)
-        eind = t0[kk+1]
-        v=voltage[sind:eind-1]
-#         offset = mba*np.exp(-mbb*dt*(t0[kk+1]-t0[kk])) #this offset is computed from your multi-blip data
-#         theta2 = voltage[t0[kk+1]]-offset
-        #######################################################################
-        ##THIS IS THE PART THAT HAS BEEN MODIFIED FROM PREVIOUS CODE
-        offset_sum = 0
-        for jj in range(kk+1):
-            offset = mba*np.exp(-mbb*dt*(t0[kk+1]-t0[jj])) #this offset is computed from your multi-blip data
-            offset_sum = offset_sum + offset
-                      
-        theta2 = voltage[t0[kk+1]]-offset_sum  #threshold after subtracting spiking component
-        #######################################################################
-        theta1 = voltage[t0[kk]]*np.exp(-x[1]*dt*(eind-sind))
-        delt = len(v)*dt
-        tvec = np.arange(0,delt,dt)
-        tvec = tvec[0:len(v)]
+    x: numpy array
+        x[0]=a_voltage input, x[1] is b_voltage_input
+    voltage: numpy array
+        voltage trace (voltage, El, and th_inf must be in the same frame of reference)
+    El: float
+        reversal potential (voltage, El, and th_inf must be in the same frame of reference)
+    spike_cut_length: int
+        number of indicies removed after initiation of a spike
+    all_spikeInd: numpy array
+        indicies of spike train 
+    th_inf: float
+        threshold infinity (voltage, El, and th_inf must be in the same frame of reference)
+    dt: float 
+        size of time step (SI units)
+    a_spike: float
+        amplitude of spike component of threshold.
+    b_spike: float
+        decay constant in spike component of the threshold
+    '''
+    a_voltage=x[0]
+    b_voltage=x[1]
+    # effect of the spike component of the threshold from each spike and previous spikes
+    sp_comp_of_offset_sum_vector=[0] #at first spike there is no spike component of threshold    
+    for spike_number in range(1,len(all_spikeInd)):      #skipping first spike since no residual spike component of threshold
+        t=(all_spikeInd[spike_number]-all_spikeInd[spike_number-1])*dt
+        sp_comp_of_th_offset_local = spike_component_of_threshold_exact(a_spike, b_spike, t)# spike component of threshold at each ISI
+        sp_comp_of_offset_sum_vector.append(sp_comp_of_offset_sum_vector[-1] + sp_comp_of_th_offset_local)  #keeping track of residual spike comonent of threshold at each spike
+
+    # Compute voltage component of threshold at biological spike (subtract th_inf and spike component of threshold
+    # from biological voltage values at spike initiation)
+    bio_spike_comp_of_th_at_each_spike=voltage[all_spikeInd]-np.array(sp_comp_of_offset_sum_vector)-th_inf
+    
+    # For each ISI, calculate the difference between the voltage dependent component of the threshold
+    # and the value that would be determined via a model that uses the actual voltage of neuron.  
+    sq_err = []    #list to store squared error between the model and biological threshold
+    for spike_number in range(1, len(all_spikeInd)):      #loop over all ISI's in data
+        v_start_ind = all_spikeInd[spike_number-1]+int(spike_cut_length) #spike time plus cut
+        end_ind = all_spikeInd[spike_number]
+        v_in_ISI=voltage[v_start_ind:end_ind]
+        theta0=bio_spike_comp_of_th_at_each_spike[spike_number-1]
+        theta1=bio_spike_comp_of_th_at_each_spike[spike_number]
+        tvec=np.arange(len(v_in_ISI))*dt
         
-        lhs = theta2-theta1
-        rhs2 = thi*(1-np.exp(-x[1]*dt*(eind-sind)))
-        rhs1 = x[0]*np.exp(-x[1]*tvec[-1])*np.sum(dt*(v-vL)*np.exp(x[1]*tvec))
-        rhs = rhs1+rhs2
-        
+        lhs=theta1-theta0*np.exp(-b_voltage*dt*(end_ind-v_start_ind))
+        rhs=a_voltage*np.exp(-b_voltage*tvec[-1])*np.sum(dt*(v_in_ISI-El)*np.exp(b_voltage*tvec))
+#        print "spike",all_spikeInd[spike_number], "OS",sp_comp_of_offset_sum_vector[spike_number], "theta1", theta0,"theta2", theta1,"lhs", lhs, "rhs", rhs       
         err = (lhs-rhs)**2
         if ~np.isnan(err):
-            fi.append(err)
+            sq_err.append(err)
             
-    F = np.sum(fi)
-    
-    #Print EVOLUTION OF ERROR FOR CONSISTENCY CHECK
-    #print F*1e6
+    F = np.sum(sq_err)
     
     return F
 
