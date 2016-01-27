@@ -2,22 +2,44 @@ import numpy as np
 import copy
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
-import logging
 import matplotlib.pyplot as plt
 import logging
 THRESH_PCT_MULTIBLIP = 0.05
 
-from allensdk.model.glif.find_spikes import find_spikes_list
+from allensdk.model.glif.glif_neuron_methods import spike_component_of_threshold_exact
 
-def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
-    '''In the multiblip there are problems with artifacts when the stimulus turns on and off 
-    creating problems detecting spikes.
+def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
+    '''Calculate the spike components of the threshold by fitting a decaying exponential function to data to threshold versus time 
+    since last spike in the multiblip data. The exponential is forced to decay to the local th_inf (calculated as the mean all of the 
+    threshold values of the first spikes in each individual triblip stimulus). 
+    
+    Notes: The standard SDK spike detection algorithm does not work with the multiblip stimulus due to artifacts 
+    when the stimulus turns on and off. Please see the find_multiblip_spikes module for more information.
+    
+    Input
+    
+    multi_SS: dictionary
+        contains multiblip information such as current and stimulus
+    dt: float
+        time step in seconds
+    
+    Returns
+    
+    const_to_add_to_thresh_for_reset: float
+        amplitude of the exponential fit otherwise known as a_spike
+    decay_const: float
+        decay constant of exponential. Note the function fit is a negative exponential which will mean this value will 
+        either have to be negated when it is used or the functions used will have to have to include the negative.
+    thresh_inf: float
+    
     '''    
     multi_SS_v=multi_SS['voltage']
     multi_SS_i=multi_SS['current']
 
-#    spike_ind = find_multiblip_spikes(multi_SS_i, multi_SS_v, dt)
-    spike_ind, v_at_spike=find_spikes_list(multi_SS_v, dt)
+    # get indicies of spikes
+    spike_ind = find_multiblip_spikes(multi_SS_i, multi_SS_v, dt)
+#    spike_ind, _=find_spikes_list(multi_SS_v, dt)
+
     # eliminate spurious spikes that may exist
     spike_lt=[np.where(SI<int(2.02/dt))[0] for SI in spike_ind]
     if len(np.concatenate(spike_lt))>0:
@@ -28,17 +50,18 @@ def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOC
         logging.warning('there is a spike after the stimulus in the multiblip')    
     spike_ind=[np.delete(SI,ind)for SI, ind in zip(spike_ind, spike_gt)]
     
-    #these are what I want to be final
+    # intialize output lists
     time_previous_spike=[]
     threshold=[]
     thresh_first_spike=[]  #will set constant to this
-    
+            # voltage at all spikes in a single tri blip
+
     if MAKE_PLOT:
         plt.figure()
+        
+    # loop though each tri blip stimulus in muliblip stimulus
     for k in range(0, len(multi_SS_v)):
-        #voltage at all spikes in multiblip data
-        thresh=[multi_SS_v[k][j] for j in spike_ind[k]]
-
+        thresh=[multi_SS_v[k][j] for j in spike_ind[k]] # voltage at all spikes in a single tri blip
         if thresh!=[] and len(thresh)>1:# there needs to be more than one spike so that we can find the time difference
             thresh_first_spike.append(thresh[0])
             threshold.append(thresh[1:])
@@ -61,20 +84,13 @@ def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOC
             plt.xlim([2., 2.12])
     
     if SHOW_PLOT:        
-        plt.show(block=BLOCK)
+        plt.show(block=False)
 
-    #put numbers in one vector5
+    # put numbers into one vector for fitting of exponential function
     thresh_inf=np.mean(thresh_first_spike)  #note this threshold infinity isnt the one coming from single blip
-    print "average threshold of first spike",  thresh_inf
     try: #this try here because sometimes even though have the traces there isnt more than one trace with two spikes
         threshold=np.concatenate(threshold)
         time_previous_spike=np.concatenate(time_previous_spike)  #note that this will have nans in it
-        
-    #    for thr, times in zip(threshold, time_previous_spike):
-    #        print thr
-    #        print times
-    #        if len(thr)!=len(times):
-    #            print "not equal", 
     
         if MAKE_PLOT:
             plt.figure()
@@ -82,19 +98,21 @@ def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOC
             plt.ylabel('threshold (mV)')
             plt.xlabel('time since last spike (s)')
     
-        
+        # calculate values of exponential function both if force function to local threshold infinity and not forcing to a value
+        # (not forcing to a value seems less valid unless a bunch of points are added corresponding to the threshold of the
+        # first spike at time equal infinity (because the first spike is a spike that happens where the spike before it was an
+        # infinite time away)).  Therefore, the values that are obtained from forcing are the ones that are used.
         p0_force=[.002, -100.]
         p0_fit=[.002, -100., thresh_inf]
-    #    guess=exp_force_c(time_previous_spike, p0_force[0], p0_force[1])
+        
+        #TODO: THIS WOULD BE BETTER IF IT CALLED THE ACTUAL FUNCTION IN THE NEURON METHODS THAT WAY THEY WOULD HAVE TO BE THE SAME
         (popt_force, pcov_force)= curve_fit(exp_force_c, (time_previous_spike, thresh_inf), threshold, p0=p0_force, maxfev=100000)
         (popt_fit, pcov_fit)= curve_fit(exp_fit_c, time_previous_spike, threshold, p0=p0_fit, maxfev=100000)
-        print 'popt_force', popt_force
-    #    print 'popt_fit', popt_fit
-        #since time is not in order lets make new time vector
-        time_previous_spike.sort()
+
+        # viewing fit functions
+        time_previous_spike.sort() #since time is not in order, making new time vector so that obtained fit curve can be plotted
         fit_force=exp_force_c((time_previous_spike, thresh_inf), popt_force[0], popt_force[1])
         fit_fit=exp_fit_c(time_previous_spike, popt_fit[0], popt_fit[1], popt_fit[2])
-    #    plt.plot(time_previous_spike, guess, label='guess')
         if MAKE_PLOT:
             plt.plot(time_previous_spike, fit_force, 'r', lw=4, label="exp fit (force const to thesh first spike)\n  k=%.3g, amp=%.3g" % (popt_force[1], popt_force[0]))
             plt.plot(time_previous_spike, fit_fit, 'b', lw=4, label="exp fit (fit constant)\n  k=%.3g, amp=%.3g" % (popt_fit[1], popt_fit[0]))
@@ -110,13 +128,11 @@ def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOC
                 for k in range(0, len(multi_SS_v)):
                     thresh=[multi_SS_v[k][j] for j in spike_ind[k]]
     
-    #                plt.subplot(2,1,1)
                     ax1.plot(np.arange(0, len(multi_SS_i[k]))*dt, multi_SS_i[k]*1.e12, lw=2)
                     ax1.set_ylabel('current (pA)', fontsize=16)
                     ax1.set_xlim([2., 2.12])
                     ax1.set_title('Triple Short Square', fontsize=20)
     
-    #                plt.subplot(2,1,2)
                     ax2.plot(np.arange(0, len(multi_SS_v[k]))*dt, multi_SS_v[k]*1.e3, lw=2)
                     ax2.plot(spike_ind[k]*dt, np.array(thresh)*1.e3, '.k', ms=16)
                     ax2.set_ylabel('voltage (mV)', fontsize=16)
@@ -132,69 +148,119 @@ def calc_a_b_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOC
                 ax3.legend() 
                 plt.tight_layout()
                 plt.show()
-                
-        #TODO: Corinne abs is put in hastily make sure this is ok
-        const_to_add_to_thresh_for_reset=abs(popt_force[0]) 
-        b=abs(popt_force[1])
+        
+        const_to_add_to_thresh_for_reset=popt_force[0]
+        #REDICULOUS: this decay constant was originally forced to be positive and then it is negated everywhere
+        #it is utalized elsewhere in the code.  For most neurons b_spike will be negative as the threshold decays.  
+        #However that is not necessarily true--so using the abs would ignore those special neurons.  However, removing
+        # abs would create problems for the rest of the code that negates this value, therefore I am negating the value 
+        # here so that positive values will work correctly in the code for the special neurons.
+        #this would be zero 
+        #decay_const=abs(popt_force[1])
+        decay_const=-popt_force[1]
+        
+        if decay_const <0:
+            logging.critical('This neuron has an increasing decay value for the spike component of the threshold')
+        if const_to_add_to_thresh_for_reset<0:
+            logging.critical('This neuron has a negative amplitude for the spike component of the threshold') 
+        
     except Exception, e:
         logging.error(e.message)
         const_to_add_to_thresh_for_reset=None 
-        b=None
+        decay_const=None
         
-    return const_to_add_to_thresh_for_reset, b, thresh_inf
+    return const_to_add_to_thresh_for_reset, decay_const, thresh_inf
 
-def err_fix_th(x, voltage, El, spike_cut_length, spikeInd, thi, dt, a_spike, b_spike):
-    '''Based on calc_full_err_fixth module in test_fmin_fixth_ab.py created by Ram Iyer
-    x[0]=a_spike input, x[1] is b_spike from multiblip'''
-    #TODO: figure out how this works.
-#    print "x, El, spike_cut_length, spikeInd, thi, dt, a_spike, b_spike"
-#    print x, El, spike_cut_length, spikeInd, thi, dt, a_spike, b_spike   
+
+def err_fix_th(x, voltage, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spike, b_spike):
+    '''This function returns the squared error for the difference between the 'known' voltage 
+    component of the threshold obtained from the biological neuron and the voltage component 
+    of the threshold of the model obtained with the input parameters (so that the minimum can be 
+    searched for via fmin). The overall threshold is the sum of threshold infinity the spike component
+    of the threshold and the voltage component of the threshold.  Therefore threshold infinity and 
+    the spike component of the threshold must be subtracted from the threshold of the neuron in order
+    to isolate the voltage component of the threshold.  In the evaluation of the model the actual
+    voltage of the neuron is used so that any errors in the other components of the model will not 
+    influence the fits here (for example if a afterspike current was estimated incorrectly)
+  
+    Notes:
+    * The spike component of the threshold is subtracted from the 
+        voltage which means that the voltage component of the threshold should only be added to rules.
+    * b_spike was fit using a negative value in the function therefore the negative is placed in the 
+        equation. 
+    * values in this function are in 'real' voltage as opposed to voltage
+        relative to resting potential. 
+    * curret injection during the spike is not taken into account.  This seems reasonable as the 
+        ion channels are open during this time and injected current may not greatly influence the neuron.
     
-    mba=a_spike
-    mbb=b_spike
-    t0=spikeInd
-    vL = El
-    fi = []                          #list to store sum of square errors for every pair of spikes
-    for kk in range(len(t0)-1):      #loop over all (n-1) spikes in data
-        sind = t0[kk]+int(spike_cut_length)
-        eind = t0[kk+1]
-        v=voltage[sind:eind-1]
-#         offset = mba*np.exp(-mbb*dt*(t0[kk+1]-t0[kk])) #this offset is computed from your multi-blip data
-#         theta2 = voltage[t0[kk+1]]-offset
-        #######################################################################
-        ##THIS IS THE PART THAT HAS BEEN MODIFIED FROM PREVIOUS CODE
-        offset_sum = 0
-        for jj in range(kk+1):
-            offset = mba*np.exp(-mbb*dt*(t0[kk+1]-t0[jj])) #this offset is computed from your multi-blip data
-            offset_sum = offset_sum + offset
-                      
-        theta2 = voltage[t0[kk+1]]-offset_sum  #threshold after subtracting spiking component
-        #######################################################################
-        theta1 = voltage[t0[kk]]*np.exp(-x[1]*dt*(eind-sind))
-        delt = len(v)*dt
-        tvec = np.arange(0,delt,dt)
-        tvec = tvec[0:len(v)]
+    x: numpy array
+        x[0]=a_voltage input, x[1] is b_voltage_input
+    voltage: numpy array
+        voltage trace (voltage, El, and th_inf must be in the same frame of reference)
+    El: float
+        reversal potential (voltage, El, and th_inf must be in the same frame of reference)
+    spike_cut_length: int
+        number of indicies removed after initiation of a spike
+    all_spikeInd: numpy array
+        indicies of spike train 
+    th_inf: float
+        threshold infinity (voltage, El, and th_inf must be in the same frame of reference)
+    dt: float 
+        size of time step (SI units)
+    a_spike: float
+        amplitude of spike component of threshold.
+    b_spike: float
+        decay constant in spike component of the threshold
+    '''
+    a_voltage=x[0]
+    b_voltage=x[1]
+    # effect of the spike component of the threshold from each spike and previous spikes
+    sp_comp_of_offset_sum_vector=[0] #at first spike there is no spike component of threshold    
+    for spike_number in range(1,len(all_spikeInd)):      #skipping first spike since no residual spike component of threshold
+        t=(all_spikeInd[spike_number]-all_spikeInd[spike_number-1])*dt
+        sp_comp_of_th_offset_local = spike_component_of_threshold_exact(a_spike, b_spike, t)# spike component of threshold at each ISI
+        sp_comp_of_offset_sum_vector.append(sp_comp_of_offset_sum_vector[-1] + sp_comp_of_th_offset_local)  #keeping track of residual spike comonent of threshold at each spike
+
+    # Compute voltage component of threshold at biological spike (subtract th_inf and spike component of threshold
+    # from biological voltage values at spike initiation)
+    bio_spike_comp_of_th_at_each_spike=voltage[all_spikeInd]-np.array(sp_comp_of_offset_sum_vector)-th_inf
+    
+    # For each ISI, calculate the difference between the voltage dependent component of the threshold
+    # and the value that would be determined via a model that uses the actual voltage of neuron.  
+    sq_err = []    #list to store squared error between the model and biological threshold
+    for spike_number in range(1, len(all_spikeInd)):      #loop over all ISI's in data
+        v_start_ind = all_spikeInd[spike_number-1]+int(spike_cut_length) #spike time plus cut
+        end_ind = all_spikeInd[spike_number]
+        v_in_ISI=voltage[v_start_ind:end_ind]
+        theta0=bio_spike_comp_of_th_at_each_spike[spike_number-1]
+        theta1=bio_spike_comp_of_th_at_each_spike[spike_number]
+        tvec=np.arange(len(v_in_ISI))*dt
         
-        lhs = theta2-theta1
-        rhs2 = thi*(1-np.exp(-x[1]*dt*(eind-sind)))
-        rhs1 = x[0]*np.exp(-x[1]*tvec[-1])*np.sum(dt*(v-vL)*np.exp(x[1]*tvec))
-        rhs = rhs1+rhs2
-        
+        lhs=theta1-theta0*np.exp(-b_voltage*dt*(end_ind-v_start_ind))
+        rhs=a_voltage*np.exp(-b_voltage*tvec[-1])*np.sum(dt*(v_in_ISI-El)*np.exp(b_voltage*tvec))
+#        print "spike",all_spikeInd[spike_number], "OS",sp_comp_of_offset_sum_vector[spike_number], "theta1", theta0,"theta2", theta1,"lhs", lhs, "rhs", rhs       
         err = (lhs-rhs)**2
         if ~np.isnan(err):
-            fi.append(err)
+            sq_err.append(err)
             
-    F = np.sum(fi)
-    
-    #Print EVOLUTION OF ERROR FOR CONSISTENCY CHECK
-    #print F*1e6
+    F = np.sum(sq_err)
     
     return F
 
 def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
-    '''This can not be integrated into the find spike class because it will require the stimulation inticies
+    '''artifacts caused by turning stimulus on and off created artifacts that 
+    created problems for the standard spike detection algorithm.  Several alterations 
+    were made so that the algorithm would detect spikes appropriately. Please see multiblip
+    spike cutting documentation for more information on how the code differs from the SDK 
+    version and what was needed to solve specific issues.
+    input:
+    multi_SS_i: list of arrays
+        each array corresponds to the current stimulation of one triblip stimulus
+    multi_SS_v: list of arrays
+        each array corresponds to the voltage trace of triblip simulus
+    dt: float 
     '''
-    artifact_ave_window_time_s=0.0003
+    artifact_ave_window_time_s=0.0003 #
     window_indicies_to_ave_len=int(artifact_ave_window_time_s/dt)
     out_spk_idxs_list=[]
     for current, voltage in zip(multi_SS_i, multi_SS_v):
@@ -208,7 +274,7 @@ def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
         for index in potential_artifact_indexes:
             smooth_window=range(index,index+window_indicies_to_ave_len+1)
             
-            #artifact_removed_voltage[smooth_window]=np.mean(artifact_removed_voltage[smooth_window])
+            # interpolate in the smoothing window
             blah=interp1d([smooth_window[0], smooth_window[-1]], [artifact_removed_voltage[smooth_window[0]], artifact_removed_voltage[smooth_window[-1]]])
             artifact_removed_voltage[smooth_window]=blah(smooth_window)
             
@@ -224,7 +290,8 @@ def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
 #        
 #        t = np.arange(0, len()) * dt
 
-        #NOTE: in original code this smoothing was with a possible bessel function    
+        # keeping the smooth_v convention of the SDK find spike code.  However in the SDK code 
+        # this is used to name data potentially smoothed by a bessel filter
         smooth_v = artifact_removed_voltage
         dv = np.diff(smooth_v)    
         dvdt = dv / dt
@@ -235,9 +302,10 @@ def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
         spikes = []
         out_spk_idxs = []
         
-        peaks=get_peaks(v)
+        peaks=get_peaks(v) # find potential spikes by finding peak over zero mv
       
         # Etay defines spike as time of threshold crossing.  Threshold is defined as the time at which dvdt is some percent of maximum threshold.
+        # TODO: figure out how maximum threshold is defined in original code so I can say why I don't use it
         for spk_n, peak_idx in enumerate(peaks):
             #---------find spike peak----------------------------
             spk = {}
@@ -250,9 +318,10 @@ def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
                 
             # Define threshold where dvdt = 5% * max upstroke
             dvdt_thr_target = THRESH_PCT_MULTIBLIP * spk["upstroke"]
-            print 'spk[upstroke]', spk["upstroke"], 'dvdt_thr_target', dvdt_thr_target
+            #print 'spk[upstroke]', spk["upstroke"], 'dvdt_thr_target', dvdt_thr_target
             prev_idx = peak_idx-int(.0035/dt)
-            #check to make sure prev_idx is not before or in a window where the stimulus blip comes on because it will errorniously trip the threshold dvdt
+            #check to make sure prev_idx is not before or in a window where the stimulus blip comes on because 
+            #it will errorniously trip the threshold dvdt
             for index in up_blip_index:
                 if prev_idx<=index+int(.0005/dt) and prev_idx>= index-int(.0035/dt):
                     prev_idx=index+int(.0005/dt)

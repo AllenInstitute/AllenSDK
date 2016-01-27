@@ -16,7 +16,8 @@ from rc import least_squares_simple_circuit_fit_RCEl
 
 from ASGLM import ASGLM_pairwise
 
-from threshold_adaptation import calc_a_b_from_multiblip, err_fix_th
+from threshold_adaptation import calc_spike_component_of_threshold_from_multiblip, err_fix_th
+
 from nonlinearity_parameters import R2R_subthresh_nonlinearity
 from MLIN import MLIN
 
@@ -239,7 +240,7 @@ def preprocess_neuron(nwb_file, sweep_list, dt=None, cut=0, bessel=None):
 
     if ssq_triple_data:
         (a_spike_component_of_threshold, b_spike_component_of_threshold, mean_voltage_first_spike_of_blip) = \
-            calc_a_b_from_multiblip(ssq_triple_data, dt, 
+            calc_spike_component_of_threshold_from_multiblip(ssq_triple_data, dt, 
                                     MAKE_PLOT=False,
                                     SHOW_PLOT=False,
                                     BLOCK=False,
