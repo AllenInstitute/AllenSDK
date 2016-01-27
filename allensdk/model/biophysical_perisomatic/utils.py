@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -62,18 +62,84 @@ class Utils(HocUtils):
         
         h("soma[0] area(0.5)")
         for sec in h.allsec():
-            sec.nseg = 1 + 2 * int(sec.L / 40)
+            sec.nseg = 1 + 2 * int(sec.L / 40.0)
             if sec.name()[:4] == "axon":
                 h.delete_section(sec=sec)
         h('create axon[2]')
         for sec in h.axon:
             sec.L = 30
             sec.diam = 1
-            sec.nseg = 1 + 2 * int(sec.L / 40)
-        h.axon[0].connect(h.soma[0], 0.5, 0)
-        h.axon[1].connect(h.axon[0], 1, 0)
+            sec.nseg = 1 + 2 * int(sec.L / 40.0)
+        h.axon[0].connect(h.soma[0], 0.5, 0.0)
+        h.axon[1].connect(h.axon[0], 1.0, 0.0)
         
         h.define_shape()
+        
+
+    def load_cell_parameters_active_dendrite(self):
+        '''Configure a neuron after the cell morphology has been loaded.'''
+        passive = self.description.data['passive'][0]
+        genome = self.description.data['genome']
+        conditions = self.description.data['conditions'][0]
+        h = self.h
+        
+        h("access soma")
+        
+        # Set fixed passive properties
+        for sec in h.allsec():
+            sec.Ra = passive['ra']
+            sec.insert('pas')
+            # for seg in sec:
+            #     seg.pas.e = passive["e_pas"]
+
+        # for c in passive["cm"]:
+        #     h('forsec "' + c["section"] + '" { cm = %g }' % c["cm"])
+
+        # Insert channels and set parameters
+        for p in genome:
+            section_array = p["section"]
+            mechanism = p["mechanism"]
+            param_name = p["name"]
+            param_value = float(p["value"])
+            if section_array == "glob":  # global parameter
+                h(p["name"] + " = %g " % p["value"])
+            else:
+                if hasattr(h, section_array):
+                    if mechanism != "":
+                        for section in getattr(h, section_array):
+                            if self.h.ismembrane(str(mechanism),
+                                                 sec=section) != 1:
+                                # print 'Adding mechanism %s to %s to %s' \
+                                #    % (mechanism, section_array, self.h.secname(sec=section))
+                                section.insert(mechanism)
+
+                    print 'Setting %s to %.6g in %s' \
+                        % (param_name, param_value, section_array)
+                    for section in getattr(h, section_array):
+                        setattr(section, param_name, param_value)
+
+        # Set reversal potentials
+        for erev in conditions['erev']:
+            erev_section_array = erev["section"]
+            ek = float(erev["ek"])
+            ena = float(erev["ena"])
+
+            print 'Setting ek to %.6g and ena to %.6g in %s' \
+                % (ek, ena, erev_section_array)
+
+            if hasattr(h, erev_section_array):
+                for section in getattr(h, erev_section_array):
+                    if self.h.ismembrane("k_ion", sec=section) == 1:
+                        setattr(section, 'ek', ek)
+
+                    if self.h.ismembrane("na_ion", sec=section) == 1:
+                        setattr(section, 'ena', ena)
+            else:
+                print "Warning: can't set erev for %s, " \
+                    "section array doesn't exist" % erev_section_array
+
+        self.h.v_init = conditions['v_init']
+        self.h.celsius = conditions['celsius']
     
     
     def load_cell_parameters(self):
@@ -120,11 +186,12 @@ class Utils(HocUtils):
         stimulus_path : string
             NWB file name
         '''
-        self.stim = self.h.IClamp(self.h.soma[0](0.5))  # TODO: does soma have to be parametrized?
+        self.stim = self.h.IClamp(self.h.soma[0](0.5))
         self.stim.amp = 0
         self.stim.delay = 0
-        self.stim.dur = 1e12 # just set to be really big; doesn't need to match the waveform
-        
+        # just set to be really big; doesn't need to match the waveform
+        self.stim.dur = 1e12
+
         self.read_stimulus(stimulus_path, sweep=sweep)
         self.h.dt = self.sampling_rate
         stim_vec = self.h.Vector(self.stim_curr)
@@ -135,7 +202,7 @@ class Utils(HocUtils):
         self.stim_vec_list.append(stim_vec)
     
     
-    def read_stimulus(self, stimulus_path, sweep=0, fmt='NWB'):
+    def read_stimulus(self, stimulus_path, sweep=0):
         '''load current values for a specific experiment sweep.
         
         Parameters
@@ -145,14 +212,19 @@ class Utils(HocUtils):
         sweep : integer, optional
             sweep index
         '''
-        Utils._log.info("reading stimulus path: %s, sweep %s" %
-                        (stimulus_path, sweep))
+        Utils._log.info(
+            "reading stimulus path: %s, sweep %s",
+            stimulus_path,
+            sweep)
         
         stimulus_data = NwbDataSet(stimulus_path)
-        
         sweep_data = stimulus_data.get_sweep(sweep)
-        self.stim_curr = sweep_data['stimulus'] * 1.0e9 # convert to nA for NEURON
-        self.sampling_rate = 1.0e3 / sweep_data['sampling_rate'] # convert from Hz
+        
+        # convert to nA for NEURON
+        self.stim_curr = sweep_data['stimulus'] * 1.0e9
+        
+        # convert from Hz        
+        self.sampling_rate = 1.0e3 / sweep_data['sampling_rate']
     
     
     def record_values(self):
