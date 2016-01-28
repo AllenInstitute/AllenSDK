@@ -1,8 +1,9 @@
 #!/usr/bin/python
-import morphology_analysis as morphology
+import morphology_analysis2 as morphology
 #from morphology_analysis_bb import compute_features as compute_features_bb
 from bb3 import compute_features as compute_features_bb
 from bb3 import compute_keith_features
+#import * from swc
 import traceback
 import sys
 import psycopg2
@@ -312,19 +313,19 @@ bb_features = {}
 def calculate_v3d_features(morph, swc_type, label):
     global v3d_features
     # strip out everything but the soma and the specified swc type
-    morph.strip(swc_type)
+    morph.strip_all_other_types(swc_type)
     # keep track of number of soma roots and roots in specified type
     cnt = 0
     soma_cnt = 0
     root_cnt = 0
-    for i in range(len(morph.obj_list)):
-        obj = morph.obj_list[i]
-        if obj.t == 1:
+    for i in range(len(morph.compartment_list)):
+        obj = morph.compartment_list[i]
+        if obj[morphology.NODE_TYPE] == 1:
             soma_cnt += 1
-            if obj.pn < 0:
+            if obj[morphology.NODE_PN] < 0:
                 root_cnt += 1
         else:
-            if obj.pn < 0:
+            if obj[morphology.NODE_PN] < 0:
                 root_cnt += 1
             cnt += 1
     if cnt == 0:
@@ -379,19 +380,23 @@ for k, record in records.iteritems():
     swc_file = record["path"] + record["filename"]
     print("Processing '%s'" % swc_file)
     try:
-        nrn = morphology.SWC(swc_file)
-        nrn.check_consistency(cmds["fix_type_error"])
+        nrn = morphology.read_swc(swc_file)
+        #nrn = morphology.SWC(swc_file)
+        #nrn.check_consistency(cmds["fix_type_error"])
         #
         if CALCULATE_AXONS:
-            axon = morphology.SWC(swc_file)
-            axon.check_consistency(cmds["fix_type_error"])
+            axon = morphology.read_swc(swc_file)
+            #axon = morphology.SWC(swc_file)
+            #axon.check_consistency(cmds["fix_type_error"])
         #
-        basal = morphology.SWC(swc_file)
-        basal.check_consistency(cmds["fix_type_error"])
-        basal.save_to("tmp3.swc")
+        basal = morphology.read_swc(swc_file)
+        #basal = morphology.SWC(swc_file)
+        #basal.check_consistency(cmds["fix_type_error"])
+        basal.write("tmp3.swc")
         #
-        apical = morphology.SWC(swc_file)
-        apical.check_consistency(cmds["fix_type_error"])
+        apical = morphology.read_swc(swc_file)
+        #apical = morphology.SWC(swc_file)
+        #apical.check_consistency(cmds["fix_type_error"])
     except Exception, e:
         #print e
         print("")
@@ -411,7 +416,7 @@ for k, record in records.iteritems():
             nrn.apply_affine(aff)
             # save a copy of affine-corrected file
             tmp_swc_file = record["filename"][:-4] + "_pia.swc"
-            nrn.save_to(tmp_swc_file)
+            nrn.write(tmp_swc_file)
             # apply affine to basal and apical copies too
             if CALCULATE_AXONS:
                 axon.apply_affine(aff)
@@ -443,24 +448,20 @@ for k, record in records.iteritems():
         # BB feature set
         #
         # write cleaned-up file for BB to use
-        for i in range(len(nrn.obj_list)):
-            obj = nrn.obj_list[i]
-            if obj.t == 2:
-                nrn.obj_list[i] = None
-        nrn.clean_up()
+        nrn.strip_type(morphology.Morphology.AXON)
         tmp_swc_file_bb = record["filename"][:-4] + "_pia_bb.swc"
-        success = nrn.save_to(tmp_swc_file_bb)
+        success = nrn.write(tmp_swc_file_bb)
         # calculate features
-        try:
-            bb_data, keith_data = compute_features_bb(tmp_swc_file_bb)
-            compute_keith_features(nrn, keith_data, bb_data)
-            data["bb_features"] = bb_data
-            for k in bb_data:
-                if k not in bb_features:
-                    bb_features[k] = k
-        except:
-            print("Error calculating BB features")
-            raise
+#        try:
+#            bb_data, keith_data = compute_features_bb(tmp_swc_file_bb)
+#            compute_keith_features(nrn, keith_data, bb_data)
+#            data["bb_features"] = bb_data
+#            for k in bb_data:
+#                if k not in bb_features:
+#                    bb_features[k] = k
+#        except:
+#            print("Error calculating BB features")
+#            raise
     except Exception, e:
         print("")
         print("**** Error: analyzing file ****")
@@ -580,18 +581,18 @@ try:
           else:
               for i in range(len(v3d)):
                   f.write("NaN,")
-        # BB features
-        if "bb_features" in data:
-            bb = bb_feature_list
-            for i in range(len(bb)):
-                if bb[i] in data["bb_features"]:
-                    val = str(data["bb_features"][bb[i]])
-                else:
-                    val = "NaN"
-                f.write(val + ",")
-        else:
-            for i in range(len(bb)):
-                f.write("NaN,")
+#        # BB features
+#        if "bb_features" in data:
+#            bb = bb_feature_list
+#            for i in range(len(bb)):
+#                if bb[i] in data["bb_features"]:
+#                    val = str(data["bb_features"][bb[i]])
+#                else:
+#                    val = "NaN"
+#                f.write(val + ",")
+#        else:
+#            for i in range(len(bb)):
+#                f.write("NaN,")
         f.write("\n")
     f.close()
 except IOError, ioe:

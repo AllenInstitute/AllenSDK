@@ -181,6 +181,8 @@ class Morphology( object ):
                 if self._soma is not None:
                     raise ValueError("Multiple somas detected in SWC file")
                 self._soma = seg
+        # TODO
+        #self.check_consistency()
 
     ########################
 
@@ -270,9 +272,10 @@ class Morphology( object ):
         A morphology object having the specified ID, or None if it doesn't
         exist
         """
-        if n < 0 or n >= len(self._compartment_list):
-            return None
-        return self._compartment_list[n]
+#        if n < 0 or n >= len(self._compartment_list):
+#            return None
+#        return self._compartment_list[n]
+        return self.resolve_node_type(n)
 
     # returns a list of nodes located within dist of x,y,z
     def find(self, x, y, z, dist):
@@ -323,9 +326,9 @@ class Morphology( object ):
 
     def resolve_node_type(self, seg):
         if type(seg).__name__ == 'int':
-            if seg <= 0 or seg >= len(self._compartment_list):
+            if seg < 0 or seg >= len(self._compartment_list):
                 raise ValueError("Specified child (%d) is not a valid ID" % seg)
-            return self.node(seg)
+            return self._compartment_list[seg]
         elif type(seg).__name__ == 'dict':
             if RTTI not in seg or seg[RTTI] != MORPHOLOGY_NODE:
                 raise TypeError("Object not recognized as morphology node")
@@ -432,7 +435,7 @@ class Morphology( object ):
             for child in c[NODE_CHILDREN]:
                 assert child in compartments, "bad child id: %s" % (child)
 
-        
+
 
     def sparsify(self, modulo, compress_ids=False):
         """ Return a new Morphology object that has a given number of non-leaf,
@@ -556,6 +559,11 @@ class Morphology( object ):
         for seg in self._compartment_list:
             if seg[NODE_PN] >= 0:
                 self._compartment_list[seg[NODE_PN]][NODE_CHILDREN].append(seg)
+        # verify that each node ID is the same as its position in the
+        #   compartment list
+        for i in range(len(self.compartment_list)):
+            if i != self.node(i)[NODE_ID]:
+                raise Assertion_Error("Internal error detected -- compartment list not properly formed")
 
     # add additional nodes to Morphology compartment list
     def append(self, seg_list):
@@ -581,6 +589,39 @@ class Morphology( object ):
         self.reconstruct()
 
 
+    def stumpify_axon(self, count=10):
+        """ remove all axon compartments except the first 'count' nodes
+        of the connected axon root
+        """
+        # find connected axon root
+        axon_root = None
+        for seg in self.compartment_list:
+            if seg[NODE_TYPE] == Morphology.AXON:
+                par_id = seg[NODE_PN]
+                if par_id >= 0:
+                    par = self.compartment_list[par_id]
+                    if par[NODE_TYPE] != Morphology.AXON:
+                        axon_root = seg
+                        break
+        if axon_root is None:
+            return
+        # flag the first 'count' nodes from the axon root
+        ax = axon_root
+        for i in range(count):
+            # ignore bifurcations -- go 'count' deep on one line only
+            ax["flag"] = i
+            children = ax[NODE_CHILDREN]
+            if len(children) > 0:
+                ax = children[0]
+        # strip out all axons that aren't flagged
+        for i in range(len(self.compartment_list)):
+            seg = self.compartment_list[i]
+            if seg[NODE_TYPE] == Morphology.AXON:
+                if "flag" not in seg:
+                    self.compartment_list[i] = None
+        self.reconstruct()
+            
+        
     # strip out everything but the soma and the specified SWC type
     def strip_all_other_types(self, obj_type, keep_soma=True):
         for i in range(len(self.compartment_list)):
@@ -767,6 +808,8 @@ class Morphology( object ):
                     par = self.compartment_list[par_id]
                     if par[NODE_TYPE] == Morphology.AXON:
                         print("Branch has multiple axon roots")
+                        print_node(child)
+                        print_node(par)
                         errs += 1
                         break
                     par_id = par[NODE_PN]
