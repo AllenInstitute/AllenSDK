@@ -17,6 +17,18 @@ import logging
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
 
+PERISOMATIC_TYPE = "Biophysical - perisomatic"
+ALL_ACTIVE_TYPE = "Biophysical - all active"
+
+def create_utils(description, model_type=None):
+    if model_type is None:
+        model_type = PERISOMATIC_TYPE
+
+    if model_type == PERISOMATIC_TYPE:
+        return Utils(description)
+    elif model_type == ALL_ACTIVE_TYPE:
+        return AllActiveUtils(description)
+
 
 class Utils(HocUtils):
     '''A helper class for NEURON functionality needed for
@@ -75,72 +87,6 @@ class Utils(HocUtils):
         
         h.define_shape()
         
-
-    def load_cell_parameters_active_dendrite(self):
-        '''Configure a neuron after the cell morphology has been loaded.'''
-        passive = self.description.data['passive'][0]
-        genome = self.description.data['genome']
-        conditions = self.description.data['conditions'][0]
-        h = self.h
-        
-        h("access soma")
-        
-        # Set fixed passive properties
-        for sec in h.allsec():
-            sec.Ra = passive['ra']
-            sec.insert('pas')
-            # for seg in sec:
-            #     seg.pas.e = passive["e_pas"]
-
-        # for c in passive["cm"]:
-        #     h('forsec "' + c["section"] + '" { cm = %g }' % c["cm"])
-
-        # Insert channels and set parameters
-        for p in genome:
-            section_array = p["section"]
-            mechanism = p["mechanism"]
-            param_name = p["name"]
-            param_value = float(p["value"])
-            if section_array == "glob":  # global parameter
-                h(p["name"] + " = %g " % p["value"])
-            else:
-                if hasattr(h, section_array):
-                    if mechanism != "":
-                        for section in getattr(h, section_array):
-                            if self.h.ismembrane(str(mechanism),
-                                                 sec=section) != 1:
-                                # print 'Adding mechanism %s to %s to %s' \
-                                #    % (mechanism, section_array, self.h.secname(sec=section))
-                                section.insert(mechanism)
-
-                    print 'Setting %s to %.6g in %s' \
-                        % (param_name, param_value, section_array)
-                    for section in getattr(h, section_array):
-                        setattr(section, param_name, param_value)
-
-        # Set reversal potentials
-        for erev in conditions['erev']:
-            erev_section_array = erev["section"]
-            ek = float(erev["ek"])
-            ena = float(erev["ena"])
-
-            print 'Setting ek to %.6g and ena to %.6g in %s' \
-                % (ek, ena, erev_section_array)
-
-            if hasattr(h, erev_section_array):
-                for section in getattr(h, erev_section_array):
-                    if self.h.ismembrane("k_ion", sec=section) == 1:
-                        setattr(section, 'ek', ek)
-
-                    if self.h.ismembrane("na_ion", sec=section) == 1:
-                        setattr(section, 'ena', ena)
-            else:
-                print "Warning: can't set erev for %s, " \
-                    "section array doesn't exist" % erev_section_array
-
-        self.h.v_init = conditions['v_init']
-        self.h.celsius = conditions['celsius']
-    
     
     def load_cell_parameters(self):
         '''Configure a neuron after the cell morphology has been loaded.'''
@@ -236,3 +182,72 @@ class Utils(HocUtils):
         vec["t"].record(self.h._ref_t)
     
         return vec
+
+class AllActiveUtils(Utils):
+
+    def load_cell_parameters(self):
+        '''Configure a neuron after the cell morphology has been loaded.'''
+        passive = self.description.data['passive'][0]
+        genome = self.description.data['genome']
+        conditions = self.description.data['conditions'][0]
+        h = self.h
+        
+        h("access soma")
+        
+        # Set fixed passive properties
+        for sec in h.allsec():
+            sec.Ra = passive['ra']
+            sec.insert('pas')
+            # for seg in sec:
+            #     seg.pas.e = passive["e_pas"]
+
+        # for c in passive["cm"]:
+        #     h('forsec "' + c["section"] + '" { cm = %g }' % c["cm"])
+
+        # Insert channels and set parameters
+        for p in genome:
+            section_array = p["section"]
+            mechanism = p["mechanism"]
+            param_name = p["name"]
+            param_value = float(p["value"])
+            if section_array == "glob":  # global parameter
+                h(p["name"] + " = %g " % p["value"])
+            else:
+                if hasattr(h, section_array):
+                    if mechanism != "":
+                        for section in getattr(h, section_array):
+                            if self.h.ismembrane(str(mechanism),
+                                                 sec=section) != 1:
+                                # print 'Adding mechanism %s to %s to %s' \
+                                #    % (mechanism, section_array, self.h.secname(sec=section))
+                                section.insert(mechanism)
+
+                    print 'Setting %s to %.6g in %s' \
+                        % (param_name, param_value, section_array)
+                    for section in getattr(h, section_array):
+                        setattr(section, param_name, param_value)
+
+        # Set reversal potentials
+        for erev in conditions['erev']:
+            erev_section_array = erev["section"]
+            ek = float(erev["ek"])
+            ena = float(erev["ena"])
+
+            print 'Setting ek to %.6g and ena to %.6g in %s' \
+                % (ek, ena, erev_section_array)
+
+            if hasattr(h, erev_section_array):
+                for section in getattr(h, erev_section_array):
+                    if self.h.ismembrane("k_ion", sec=section) == 1:
+                        setattr(section, 'ek', ek)
+
+                    if self.h.ismembrane("na_ion", sec=section) == 1:
+                        setattr(section, 'ena', ena)
+            else:
+                print "Warning: can't set erev for %s, " \
+                    "section array doesn't exist" % erev_section_array
+
+        self.h.v_init = conditions['v_init']
+        self.h.celsius = conditions['celsius']
+
+    

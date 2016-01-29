@@ -14,14 +14,16 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.model.biophys_sim.config import Config
-from allensdk.model.biophysical_perisomatic.utils import Utils
+from allensdk.model.biophysical_perisomatic.utils import create_utils
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
 from shutil import copy
 import numpy
 import logging
+import time
 
 _runner_log = logging.getLogger('allensdk.model.biophysical_perisomatic.runner')
+
 
 def run(description, sweeps=None):
     '''Main function for running a perisomatic biophysical experiment.
@@ -31,8 +33,10 @@ def run(description, sweeps=None):
     description : Config
         All information needed to run the experiment.
     '''
+    model_type = description.data['biophys'][0]['model_type']
+
     # configure NEURON
-    utils = Utils(description)
+    utils = create_utils(description, model_type)
     h = utils.h
     
     # configure model
@@ -56,11 +60,13 @@ def run(description, sweeps=None):
     for sweep in sweeps:
         _runner_log.info("Running sweep: %d" % (sweep))
         utils.setup_iclamp(stimulus_path, sweep=sweep)
-        
+        _runner_log.info("Done loading sweep: %d" % (sweep))
         vec = utils.record_values()
-        
+        tstart = time.time()
         h.finitialize()
         h.run()
+        tstop = time.time()
+        _runner_log.info("Time: %f" % (tstop-tstart))
         
         # write to an NWB File
         output_data = (numpy.array(vec['v']) - junction_potential) * mV
@@ -136,6 +142,5 @@ if '__main__' == __name__:
     import sys
     
     description = load_description(sys.argv[-1])
-    
     run(description)
 
