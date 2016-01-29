@@ -12,19 +12,12 @@ VOID = 1000000000
 def computeGMI(nt):
     # v3d version calculates 14 moments
     gmi = np.zeros(14)
-    LUT = {}
-    for i in range(nt.num_nodes):
-        LUT[nt.node(i)[NODE_ID]] = i
-
     center_pos = np.zeros(3)
-    
+    avgR = 0.0;
+
     b = []
     for i in range(nt.num_nodes):
         b.append([])
-
-    avgR = 0.0;
-
-    for i in range(nt.num_nodes):
         b[i] = np.zeros(4)
         b[i][0] = nt.node(i)[NODE_X]
         b[i][1] = nt.node(i)[NODE_Y]
@@ -33,7 +26,7 @@ def computeGMI(nt):
         if nt.node(i)[NODE_PN] < 0:
             b[i][3] = -1;
         else:
-            b[i][3] = LUT[nt.node(i)[NODE_PN]];
+            b[i][3] = nt.node(i)[NODE_PN]
 
     avgR /= nt.num_nodes
     gmi[13] = avgR
@@ -294,18 +287,7 @@ def computeFeature(nt):
     BifA_remote=0
     Soma_surface=0
     Fragmentation=0
-    #find the root
     root_node = nt.root
-#    for node in nt.compartment_list:
-#        if node[NODE_PN] < 0 and node[NODE_TYPE] == Morphology.SOMA:
-#            if rootidx != VOID:
-#                # the v3d algorithm fails when multiple roots are specified
-#                print "WARNING - multiple soma roots are specified. Bailing out to avoid numerical errors"
-#                return None, None
-#            rootidx = node[NODE_ID]
-#    if rootidx == VOID:
-#        print "the input neuron tree does not have a root, please check your data"
-#        return None, None
 
     N_node = nt.num_nodes
     N_stem = len(root_node[NODE_CHILDREN])
@@ -475,16 +457,15 @@ def computeTree(nt):
     fragment = None
     while len(stack) > 0:
         t = stack.pop()
-        child = nt.node(t)[NODE_CHILDREN]
         for child in nt.node(t)[NODE_CHILDREN]:
             N_branch += 1
-            child_id = child[NODE_ID]
             if nt.node(t)[NODE_R] > 0:
                 N_ratio += 1
-                Pd_ratio += nt.node(child_id)[NODE_R]/nt.node(t)[NODE_R]
-            pathlength = dist(nt.node(child_id), nt.node(t))
+                Pd_ratio += 1.0*child[NODE_R]/nt.node(t)[NODE_R]
+            pathlength = dist(child, nt.node(t))
 
             fragment = 0.0
+            child_id = child[NODE_ID]
             while len(nt.node(child_id)[NODE_CHILDREN]) == 1:
                 ch = nt.node(child_id)[NODE_CHILDREN][0][NODE_ID]
                 pathlength += dist(nt.node(ch), nt.node(child_id))

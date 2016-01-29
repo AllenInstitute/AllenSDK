@@ -452,16 +452,16 @@ for k, record in records.iteritems():
         tmp_swc_file_bb = record["filename"][:-4] + "_pia_bb.swc"
         success = nrn.write(tmp_swc_file_bb)
         # calculate features
-#        try:
-#            bb_data, keith_data = compute_features_bb(tmp_swc_file_bb)
-#            compute_keith_features(nrn, keith_data, bb_data)
-#            data["bb_features"] = bb_data
-#            for k in bb_data:
-#                if k not in bb_features:
-#                    bb_features[k] = k
-#        except:
-#            print("Error calculating BB features")
-#            raise
+        try:
+            bb_data, keith_data = compute_features_bb(tmp_swc_file_bb)
+            compute_keith_features(nrn, keith_data, bb_data)
+            data["bb_features"] = bb_data
+            for k in bb_data:
+                if k not in bb_features:
+                    bb_features[k] = k
+        except:
+            print("Error calculating BB features")
+            raise
     except Exception, e:
         print("")
         print("**** Error: analyzing file ****")
@@ -581,18 +581,18 @@ try:
           else:
               for i in range(len(v3d)):
                   f.write("NaN,")
-#        # BB features
-#        if "bb_features" in data:
-#            bb = bb_feature_list
-#            for i in range(len(bb)):
-#                if bb[i] in data["bb_features"]:
-#                    val = str(data["bb_features"][bb[i]])
-#                else:
-#                    val = "NaN"
-#                f.write(val + ",")
-#        else:
-#            for i in range(len(bb)):
-#                f.write("NaN,")
+        # BB features
+        if "bb_features" in data:
+            bb = bb_feature_list
+            for i in range(len(bb)):
+                if bb[i] in data["bb_features"]:
+                    val = str(data["bb_features"][bb[i]])
+                else:
+                    val = "NaN"
+                f.write(val + ",")
+        else:
+            for i in range(len(bb)):
+                f.write("NaN,")
         f.write("\n")
     f.close()
 except IOError, ioe:
