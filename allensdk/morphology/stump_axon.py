@@ -5,8 +5,13 @@ from subprocess import call
 import sys
 from swc import *
 
-SOURCE_DIR = "/mnt/For_Annotation/AutoTraceFiles/Production/KeithandWayne/Dendrites_MergewithAxons/"
-TARGET_DIR = "/mnt/For_Annotation/AutoTraceFiles/Production/KeithandWayne/Dendrites_NeedAxonsRemoved/Stripped_Dendrites_without_Axons/"
+#SOURCE_DIR = "/aibsdata/informatics/keithg/dendrite_axon/"
+SOURCE_DIR = "/mnt/For_Annotation/AutoTraceFiles/Production/KeithandWayne/keith/need_axon_removed/"
+
+TARGET_DIR = "/mnt/For_Annotation/AutoTraceFiles/Production/KeithandWayne/keith/dendrites_with_axon_stumps/"
+
+#SOURCE_DIR = "/mnt/For_Annotation/AutoTraceFiles/Production/KeithandWayne/Dendrites_MergewithAxons/"
+#TARGET_DIR = "/aibsdata/informatics/keithg/Stripped_Dendrites_without_Axons/"
 #TARGET_DIR = "./Stripped_Dendrites_without_Axons/"
 
 if len(sys.argv) == 1:

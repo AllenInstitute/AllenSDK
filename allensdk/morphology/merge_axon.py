@@ -65,7 +65,11 @@ def merge_files(master_dend, master_axon, combined):
                 merge = True
         # if merge specified, do it
         if merge:
-            old_par = merged.find(par[NODE_X], par[NODE_Y], par[NODE_Z], 2.0)
+            for tries in range(9):
+                rad = 1.0 + 2 * tries
+                old_par = merged.find(par[NODE_X], par[NODE_Y], par[NODE_Z], rad)
+                if len(old_par) >= 1:
+                    break
             if len(old_par) != 1:
                 print("** Position mismatch of parent node between files")
                 print("   Found %d possible matches" % len(old_par))
@@ -79,7 +83,11 @@ def merge_files(master_dend, master_axon, combined):
                     print_node(x)
                 continue
                 print("")
-            old_child = merged.find(seg[NODE_X], seg[NODE_Y], seg[NODE_Z], 2.0)
+            for tries in range(9):
+                rad = 1.0 + 2 * tries
+                old_child = merged.find(seg[NODE_X], seg[NODE_Y], seg[NODE_Z], rad)
+                if len(old_child) >= 1:
+                    break
             if len(old_child) != 1:
                 print("** Position mismatch of root axon node between files")
                 print("   Found %d possible matches" % len(old_child))
@@ -184,6 +192,8 @@ axon_files = []
 dend_files = []
 combined_files = []
 
+ROOT = "/mnt/For_Annotation/AutoTraceFiles/Production/KeithandWayne/keith/merge_with_axons/"
+
 if len(sys.argv) == 2:
     if sys.argv[1] == "TEST":
         unit_tests()
@@ -192,7 +202,7 @@ if len(sys.argv) == 2:
         dend_files.append(sys.argv[1] + DEND_SUFFIX)
         combined_files.append(sys.argv[1] + MERGE_SUFFIX)
 elif len(sys.argv) == 1:
-    name_expr = "*_p_%s" % DEND_SUFFIX
+    name_expr = ROOT + "*_p_%s" % DEND_SUFFIX
     #print("Looking for files like '%s'" % name_expr)
     files = glob.glob(name_expr)
     for f in files:
