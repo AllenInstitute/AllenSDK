@@ -91,6 +91,7 @@ class SWC(object):
     #   having type-orphans adopted by soma (ie, point to soma instead)
     # exception: a single axon can sprout off a basal dendrite
     def check_consistency(self, fix=False):
+        return
         # find root node
         root = -1
         root_node = None
@@ -139,6 +140,12 @@ class SWC(object):
             obj = self.obj_list[i]
             if obj is not None:
                 if obj.t != obj_type and obj.t != 1:
+                    for j in range(len(obj.children)):
+                        # make children forget about removed parent
+                        child_id = self.obj_hash[obj.children[j].n]
+                        child = self.obj_list[child_id]
+                        if child is not None:
+                            child.pn = -1
                     self.obj_list[i] = None
         self.clean_up()
     
@@ -148,6 +155,12 @@ class SWC(object):
             obj = self.obj_list[i]
             if obj is not None:
                 if obj.t != obj_type:
+                    for j in range(len(obj.children)):
+                        # make children forget about removed parent
+                        child_id = self.obj_hash[obj.children[j].n]
+                        child = self.obj_list[child_id]
+                        if child is not None:
+                            child.pn = -1
                     self.obj_list[i] = None
         self.clean_up()
     

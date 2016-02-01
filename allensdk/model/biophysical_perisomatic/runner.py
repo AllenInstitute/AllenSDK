@@ -13,14 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+import numpy
+import os
+
 from allensdk.model.biophys_sim.config import Config
-from allensdk.model.biophysical_perisomatic.utils import Utils
+from allensdk.model.biophysical_perisomatic.utils import create_utils
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
 from shutil import copy
-import numpy
 
-def run(description, sweeps=None):
+import logging
+
+_runner_log = logging.getLogger('allensdk.model.biophysical_perisomatic.runner')
+
+
+def run(description, sweeps=None, model_type=None):
     '''Main function for running a perisomatic biophysical experiment.
     
     Parameters
@@ -29,7 +36,7 @@ def run(description, sweeps=None):
         All information needed to run the experiment.
     '''
     # configure NEURON
-    utils = Utils(description)
+    utils = create_utils(description, model_type)
     h = utils.h
     
     # configure model
@@ -128,10 +135,21 @@ def load_description(manifest_json_path):
     return description
 
 
-if '__main__' == __name__:
+if '__main__' == __name__: 
     import sys
     
-    description = load_description(sys.argv[-1])
+    description = load_description(sys.argv[1])
+
+    if len(sys.argv) > 2:
+        model_type = sys.argv[2]
+    else:
+        model_type = None
+
+    if len(sys.argv) > 3:
+        sweeps = [ int(s) for s in sys.argv[3:] ]
+    else:
+        sweeps = None
     
-    run(description)
+    run(description, sweeps=sweeps, model_type=model_type)
+    
 

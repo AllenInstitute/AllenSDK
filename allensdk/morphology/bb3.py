@@ -9,6 +9,7 @@ from morphology_analysis_bb import *
 import numpy as np
 import math
 import sys
+import swc
 
 #AXON = 0
 #BASAL = 1
@@ -502,8 +503,8 @@ def compute_features(swc_file, spec_id=None):
     return results, keith
 
 def compute_keith_features(nrn, keith, results):
-    soma = nrn.obj_list[0]
-    soma_ctr = [soma.x, soma.y, soma.z]
+    soma = nrn.soma
+    soma_ctr = [soma[swc.NODE_X], soma[swc.NODE_Y], soma[swc.NODE_Z]]
     # non-apical features
     results["kg_soma_depth"] = soma_ctr[2]
     # apical features
@@ -541,8 +542,8 @@ def compute_keith_features(nrn, keith, results):
     results["kg_branch_stdev_from_centroid_z_apical"] = center[1]
     results["kg_branch_centroid_distance_z_apical"] = center[2]
     #
-    apical_neurite_dist_z = keith["apical_neurite_peak_z"] - soma.z
-    apical_branch_dist_z = keith["apical_branch_peak_z"] - soma.z
+    apical_neurite_dist_z = keith["apical_neurite_peak_z"] - soma[swc.NODE_Z]
+    apical_branch_dist_z = keith["apical_branch_peak_z"] - soma[swc.NODE_Z]
 
     mom = results["bb_first_moment_z_apical"] 
     dist = results["bb_max_radial_distance_apical"] 

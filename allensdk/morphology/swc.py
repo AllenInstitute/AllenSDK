@@ -181,6 +181,8 @@ class Morphology( object ):
                 if self._soma is not None:
                     raise ValueError("Multiple somas detected in SWC file")
                 self._soma = seg
+        # TODO
+        #self.check_consistency()
 
     ########################
 
@@ -270,9 +272,10 @@ class Morphology( object ):
         A morphology object having the specified ID, or None if it doesn't
         exist
         """
-        if n < 0 or n >= len(self._compartment_list):
-            return None
-        return self._compartment_list[n]
+#        if n < 0 or n >= len(self._compartment_list):
+#            return None
+#        return self._compartment_list[n]
+        return self.resolve_node_type(n)
 
     # returns a list of nodes located within dist of x,y,z
     def find(self, x, y, z, dist):
@@ -323,12 +326,21 @@ class Morphology( object ):
 
     def resolve_node_type(self, seg):
         if type(seg).__name__ == 'int':
-            if seg <= 0 or seg >= len(self._compartment_list):
+            if seg < 0 or seg >= len(self._compartment_list):
                 raise ValueError("Specified child (%d) is not a valid ID" % seg)
-            return self.node(seg)
+            return self._compartment_list[seg]
         elif type(seg).__name__ == 'dict':
             if RTTI not in seg or seg[RTTI] != MORPHOLOGY_NODE:
                 raise TypeError("Object not recognized as morphology node")
+        # no luck. try converting it to an int
+        else:
+            try:
+                seg = int(seg)
+                if seg < 0 or seg >= len(self._compartment_list):
+                    return None
+                seg = self._compartment_list[seg]
+            except ValueError:
+                raise TypeError("Object not recognized as morphology node or index")
         return seg
 
     def change_parent(self, child, parent):
@@ -336,8 +348,8 @@ class Morphology( object ):
         parent_seg = self.resolve_node_type(parent)
         # if child has former parent, remove it from parent's child list
         if child_seg[NODE_PN] >= 0:
-            old_par = node(child_seg[NODE_PN])
-            old_par.children.remove(child_seg)
+            old_par = self.node(child_seg[NODE_PN])
+            old_par[NODE_CHILDREN].remove(child_seg)
         parent_seg[NODE_CHILDREN].append(child_seg)
         child_seg[NODE_PN] = parent_seg[NODE_ID]
             
@@ -355,24 +367,25 @@ class Morphology( object ):
         A list of the child morphology objects. If the ID of the parent
         node is invalid, None is returned.
         """
-        # handle case when index passed
-        if type(seg).__name__ == 'int':
-            if seg < 0 or seg >= len(self._compartment_list):
-                return None
-            seg = self._compartment_list[seg]
-        # handle case when node (dictionary) passed
-        elif type(seg).__name__ == 'dict':
-            if RTTI not in seg or seg[RTTI] != MORPHOLOGY_NODE:
-                raise TypeError("Object not recognized as morphology node")
-        # no luck. try converting it to an int
-        else:
-            try:
-                seg = int(seg)
-                if seg < 0 or seg >= len(self._compartment_list):
-                    return None
-                seg = self._compartment_list[seg]
-            except ValueError:
-                raise TypeError("Object not recognized as morphology node or index")
+        seg = self.resolve_node_type(seg)
+#        # handle case when index passed
+#        if type(seg).__name__ == 'int':
+#            if seg < 0 or seg >= len(self._compartment_list):
+#                return None
+#            seg = self._compartment_list[seg]
+#        # handle case when node (dictionary) passed
+#        elif type(seg).__name__ == 'dict':
+#            if RTTI not in seg or seg[RTTI] != MORPHOLOGY_NODE:
+#                raise TypeError("Object not recognized as morphology node")
+#        # no luck. try converting it to an int
+#        else:
+#            try:
+#                seg = int(seg)
+#                if seg < 0 or seg >= len(self._compartment_list):
+#                    return None
+#                seg = self._compartment_list[seg]
+#            except ValueError:
+#                raise TypeError("Object not recognized as morphology node or index")
         return seg[NODE_CHILDREN]
 
     @property
@@ -398,7 +411,7 @@ class Morphology( object ):
         return { c[NODE_ID]: c for c in self._compartment_list if c[NODE_TYPE] == compartment_type }
 
 
-    def write(self, file_name, columns=None):
+    def save(self, file_name):
         """ Write this morphology out to an SWC file 
       
         Parameters
@@ -406,33 +419,20 @@ class Morphology( object ):
         file_name: string
             desired name of your SWC file
 
-        columns: list
-            columns to write to your SWC file (default: SWC_COLUMNS)
         """
-        if columns is None:
-            columns = SWC_COLUMNS
-        
-        # convert to array, sort by id
-        sorted_compartments = sorted(self.compartment_list, key=lambda x: int(x[NODE_ID]))
-
-        with open(file_name, 'wb') as f:
-            writer = csv.DictWriter(f, delimiter=' ', fieldnames=columns, extrasaction='ignore')
-            writer.writerows(sorted_compartments)
+        f = open(file_name, "w")
+        f.write("#n,type,x,y,z,radius,parent\n")
+        for seg in self.compartment_list:
+            f.write("%d %d " % (seg[NODE_ID], seg[NODE_TYPE]))
+            f.write("%f %f %f " % (seg[NODE_X], seg[NODE_Y], seg[NODE_Z]))
+            f.write("%f %d\n" % (seg[NODE_R], seg[NODE_PN]))
+        f.close()
 
 
-    def validate(self):
-        """ Make sure that the parents and children are assigned properly. """
-        compartments = self._compartment_index
+    # keep for backward compatibility, but don't publish in docs
+    def write(self, file_name):
+        self.save(file_name)
 
-        for cid, c in self.compartment_index.iteritems():
-            #if c[NODE_PN] != "-1":
-            if c[NODE_PN] >= 0:
-                assert c[NODE_PN] in compartments, "bad parent id: %s" % (c[NODE_PN] )
-                
-            for child in c[NODE_CHILDREN]:
-                assert child in compartments, "bad child id: %s" % (child)
-
-        
 
     def sparsify(self, modulo, compress_ids=False):
         """ Return a new Morphology object that has a given number of non-leaf,
@@ -556,18 +556,30 @@ class Morphology( object ):
         for seg in self._compartment_list:
             if seg[NODE_PN] >= 0:
                 self._compartment_list[seg[NODE_PN]][NODE_CHILDREN].append(seg)
+        # verify that each node ID is the same as its position in the
+        #   compartment list
+        for i in range(len(self.compartment_list)):
+            if i != self.node(i)[NODE_ID]:
+                raise Assertion_Error("Internal error detected -- compartment list not properly formed")
 
-    # add additional nodes to Morphology compartment list
-    def append(self, seg_list):
+
+    def append(self, node_list):
+        """ Add additional nodes to this Morphology. Those nodes must
+        originate from another morphology object.
+
+        Parameters
+        ----------
+        node_list: list of Morphology nodes
+        """
         # construct a map between new and old IDs of added nodes
         remap = {}
-        for i in range(len(seg_list)):
+        for i in range(len(node_list)):
             remap[i] = -1
         # map old old node numbers to new ones. reset n to the new ID
         # append new nodes to existing node list
         old_count = len(self.compartment_list)
         new_id = old_count
-        for seg in seg_list:
+        for seg in node_list:
             if seg is not None:
                 remap[seg[NODE_ID]] = new_id
                 seg[NODE_ID] = new_id
@@ -581,6 +593,39 @@ class Morphology( object ):
         self.reconstruct()
 
 
+    def stumpify_axon(self, count=10):
+        """ remove all axon compartments except the first 'count' nodes
+        of the connected axon root
+        """
+        # find connected axon root
+        axon_root = None
+        for seg in self.compartment_list:
+            if seg[NODE_TYPE] == Morphology.AXON:
+                par_id = seg[NODE_PN]
+                if par_id >= 0:
+                    par = self.compartment_list[par_id]
+                    if par[NODE_TYPE] != Morphology.AXON:
+                        axon_root = seg
+                        break
+        if axon_root is None:
+            return
+        # flag the first 'count' nodes from the axon root
+        ax = axon_root
+        for i in range(count):
+            # ignore bifurcations -- go 'count' deep on one line only
+            ax["flag"] = i
+            children = ax[NODE_CHILDREN]
+            if len(children) > 0:
+                ax = children[0]
+        # strip out all axons that aren't flagged
+        for i in range(len(self.compartment_list)):
+            seg = self.compartment_list[i]
+            if seg[NODE_TYPE] == Morphology.AXON:
+                if "flag" not in seg:
+                    self.compartment_list[i] = None
+        self.reconstruct()
+            
+        
     # strip out everything but the soma and the specified SWC type
     def strip_all_other_types(self, obj_type, keep_soma=True):
         for i in range(len(self.compartment_list)):
@@ -613,11 +658,36 @@ class Morphology( object ):
                         seg[NODE_PN] = -1
         self.reconstruct()
     
+
     def apply_affine(self, aff):
-        # calculate scale. use 2 different approaches
-        #   1) assume isotropic spatial transform, use determinant^1/3
-        #   2) calculate transform of unit vector on each original axis
-        # (1)
+        """ Apply an affine transform to all compartments in this 
+        morphology. Node radius is adjusted as well.
+        
+        Format of the affine matrix is:
+
+        [x0 y0 z0 tx]
+        [x1 y1 z1 ty]
+        [x2 y2 z2 tz]
+
+        where the left 3x3 portion of the matrix defines the affine
+        rotation and scaling, and the right column is the translation
+        vector
+        
+        Parameters
+        ----------
+        aff: 3x4 array of floats (python 2D list, or numpy 2D array)
+            the transformation matrix
+        """
+        # In addition to transforming the locations of the morphology
+        #   nodes, the radius of each node must be adjusted.
+        # There are 2 ways to measure scale from a transform. Assuming
+        #   an isotropic transform, the scale is the cube root of the
+        #   matrix determinant. The other ways is to measure scale 
+        #   independently along each axis.
+        # For now, the node radius is only updated based on the average
+        #   scale along all 3 axes (eg, isotropic assumption), so calculate
+        #   scale using the determinant
+        #
         # calculate the determinant
         det0 = aff[0] * (aff[4]*aff[8] - aff[5]*aff[7])
         det1 = aff[1] * (aff[3]*aff[8] - aff[5]*aff[6])
@@ -627,25 +697,12 @@ class Morphology( object ):
         # assume equal scaling along all axes. take 3rd root to get
         #   scale factor
         det_scale = math.pow(abs(det), 1.0/3.0)
-        # (2)
-        scale_x = abs(aff[0] + aff[3] + aff[6])
-        scale_y = abs(aff[1] + aff[4] + aff[7])
-        scale_z = abs(aff[2] + aff[5] + aff[8])
-        avg_scale = (scale_x + scale_y + scale_z) / 3.0;
-        deviance = 0.0
-        if scale_x > avg_scale:
-            deviance = max(deviance, scale_x/avg_scale-1.0)
-        else:
-            deviance = max(deviance, 1.0-scale_x/avg_scale)
-        if scale_y > avg_scale:
-            deviance = max(deviance, scale_y/avg_scale-1.0)
-        else:
-            deviance = max(deviance, 1.0-scale_y/avg_scale)
-        if scale_z > avg_scale:
-            deviance = max(deviance, scale_z/avg_scale-1.0)
-        else:
-            deviance = max(deviance, 1.0-scale_z/avg_scale)
-        # 
+        ## measure scale along each axis
+        ## keep this code here in case 
+        #scale_x = abs(aff[0] + aff[3] + aff[6])
+        #scale_y = abs(aff[1] + aff[4] + aff[7])
+        #scale_z = abs(aff[2] + aff[5] + aff[8])
+        #avg_scale = (scale_x + scale_y + scale_z) / 3.0;
         for seg in self.compartment_list:
             x = seg[NODE_X]*aff[0] + seg[NODE_Y]*aff[1] + seg[NODE_Z]*aff[2] + aff[9]
             y = seg[NODE_X]*aff[3] + seg[NODE_Y]*aff[4] + seg[NODE_Z]*aff[5] + aff[10]
@@ -653,22 +710,8 @@ class Morphology( object ):
             seg[NODE_X] = x
             seg[NODE_Y] = y
             seg[NODE_Z] = z
-            # use method (1) for scaling for now as it's most simple
+            # use determinant for scaling for now as it's most simple
             seg[NODE_R] *= det_scale
-
-    # returns True on success, False on failure
-    def save(self, file_name):
-        try:
-            f = open(file_name, "w")
-            f.write("#n,type,x,y,z,radius,parent\n")
-            for seg in self.compartment_list:
-                f.write("%d %d %f " % (seg[NODE_ID], seg[NODE_TYPE], seg[NODE_X]))
-                f.write("%f %f %f %d\n" % (seg[NODE_Y], seg[NODE_Z], seg[NODE_R], seg[NODE_PN]))
-            f.close()
-        except:
-            print("Error creating swc file '%s'" % file_name)
-            return False
-        return True
 
     # construct list of independent trees (each tree has a root of -1)
     def separate_trees(self):
@@ -695,29 +738,16 @@ class Morphology( object ):
                 tree_num = local_trees[0]   # use existing tree
             elif len(local_trees) > 1:
                 # this node is an intersection of multiple trees
-                # merge these into the largest existing tree
-                # find biggest tree number
-                tree_num = -1   # default to invalid value
-                count = len(trees[local_trees[0]])
-                for j in range(1, len(local_trees)):
-                    if len(trees[local_trees[j]]) > count:
-                        count = len(trees[local_trees[j]])
-                        tree_num = local_trees[j][0][NODE_TREE_ID]
-                # merge others into largest tree
-                master_tree = trees[tree_num]
-                for j in range(len(local_trees)):
-                    if j == tree_num:
-                        continue    # this is the master list
-                    for k in range(len(trees[local_trees[j]])):
-                        small_tree = trees[local_trees[j]]
-                        # reset each node's tree ID
-                        small_tree[k][NODE_TREE_ID] = tree_num
-                        # add nodes to common tree
-                        master_tree.append(small_tree[k])
-                    # delete the old tree as it's not needed anymore
-                    local_trees[j] = None
+                # merge all trees into the first one found
+                tree_num = local_trees[0]
+                for j in range(1,len(local_trees)):
+                    dead_tree = local_trees[j]
+                    trees[dead_tree] = []
+                    for node in self.compartment_list:
+                        if node[NODE_TREE_ID] == dead_tree:
+                            node[NODE_TREE_ID] = tree_num
             # merge node into tree
-            # ensure ther'es space
+            # ensure there's space
             while len(trees) <= tree_num:
                 trees.append([])
             trees[tree_num].append(seg)
@@ -725,7 +755,8 @@ class Morphology( object ):
         # consolidate tree lists into class's tree list object
         self._tree_list = []
         for tree in trees:
-            self._tree_list.append(tree)
+            if len(tree) > 0:
+                self._tree_list.append(tree)
         # make soma's tree be the first tree, if soma present
         # this should be the case if the file is properly ordered, but
         #   don't assume that
@@ -752,6 +783,11 @@ class Morphology( object ):
     # TODO verify that only recognized types are present
     # returns number of errors detected in file
     def check_consistency(self):
+        # Make sure that the parents are of proper ID range
+        n = self.num_nodes
+        for seg in self.compartment_list:
+            if seg[NODE_PN] >= 0:
+                assert(seg[NODE_PN] < n)
         # make sure that each tree has exactly one root
         errs = 0
         for i in range(self.num_trees):
@@ -766,9 +802,37 @@ class Morphology( object ):
             if root == -1:
                 print("No root present in tree %d" % i)
                 errs += 1
+        # make sure each branch has at most one axon root
+        # find type boundaries. at each axon boundary, walk back up
+        #   tree to root and make sure another axon segment not
+        #   encountered
+        adoptees = self.find_type_boundary()
+        for child in adoptees:
+            if child[NODE_TYPE] == Morphology.AXON:
+                par_id = child[NODE_PN]
+                while par_id >= 0:
+                    par = self.compartment_list[par_id]
+                    if par[NODE_TYPE] == Morphology.AXON:
+                        print("Branch has multiple axon roots")
+                        print_node(child)
+                        print_node(par)
+                        errs += 1
+                        break
+                    par_id = par[NODE_PN]
         if errs > 0:
             print("Failed consistency check: %d errors encountered" % errs)
         return errs
+
+    # return a list of segments who have parents that are a different type
+    def find_type_boundary(self):
+        adoptees = []
+        for node in self.compartment_list:
+            par = self.parent_of(node)
+            if par is None:
+                continue
+            if node[NODE_TYPE] != par[NODE_TYPE]:
+                adoptees.append(node)
+        return adoptees
 
     # remove tree from swc's "forest"
     def delete_tree(self, n):
@@ -784,6 +848,11 @@ class Morphology( object ):
         self.reconstruct()
         # reset node tree_id to correct tree number
         self.reset_tree_ids()
+
+    # code to assist in debugging
+    def print_all_nodes(self):
+        for node in self.compartment_list:
+            print_node(node)
 
 
 def str_to_num(s):
