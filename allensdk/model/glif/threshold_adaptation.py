@@ -157,27 +157,18 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
         # here so that positive values will work correctly in the code for the special neurons.
         #this would be zero 
         #decay_const=abs(popt_force[1])
-
-        decay_const=popt_force[1]
-        if decay_const >0:
+        decay_const=-popt_force[1]
+        
+        if decay_const <0:
             logging.critical('This neuron has an increasing decay value for the spike component of the threshold')
         if const_to_add_to_thresh_for_reset<0:
             logging.critical('This neuron has a negative amplitude for the spike component of the threshold') 
-        
-        # ignore spiking component by setting amplidute to zero
-        if decay_const >0 or const_to_add_to_thresh_for_reset <0:
-            decay_const=-1.0
-            const_to_add_to_thresh_for_reset=0.
-        
-        decay_const=-decay_const
-        print 'decay constant after negation', decay_const
         
     except Exception, e:
         logging.error(e.message)
         const_to_add_to_thresh_for_reset=None 
         decay_const=None
         
-    
     return const_to_add_to_thresh_for_reset, decay_const, thresh_inf
 
 
@@ -242,7 +233,6 @@ def err_fix_th(x, voltage, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spi
         end_ind = all_spikeInd[spike_number]
         v_in_ISI=voltage[v_start_ind:end_ind]
         theta0=bio_spike_comp_of_th_at_each_spike[spike_number-1]
-#        theta0=bio_spike_comp_of_th_at_each_spike[spike_number-1]+sp_comp_of_offset_sum_vector[spike_number-1]
         theta1=bio_spike_comp_of_th_at_each_spike[spike_number]
         tvec=np.arange(len(v_in_ISI))*dt
         
@@ -256,87 +246,6 @@ def err_fix_th(x, voltage, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spi
     F = np.sum(sq_err)
     
     return F
-
-# version I have before I am going to change it
-def err_fix_th_Ram(x, voltage, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spike, b_spike):
-    '''Indeed this does match my implimented function when the theta1 is corrected
-    Based on calc_full_err_fixth module in test_fmin_fixth_ab.py created by Ram Iyer.
-    NOTE THAT THIS OLDER VERSION IS CORRECT EXEPT FOR THE FACT THAT THE SPIKE OFFSET WAS ONLY 
-    SUBTRACTED FROM ONE OF THE PRE OR POST SPIKES.  ALSO THE NOTATION OF THETA1 AND THETA2 HERE 
-    IS CONFUSING BECAUSE IT IS NOT THE THESH AT THE BEGINNING OF THE ISI AND AT THE END OF THE ISI.
-    This function returns the squared error for the difference between the 'known' voltage 
-    component of the threshold and the voltage component of the threshold obtained with 
-    the parameters here (so that is can be searched for via fmin).
-    Note that the spike component of the threshold is subtracted from the voltage.
-    Note b_spike is a positive number: the negative is placed in the equation to result 
-    in a decay. Note values in this function are in 'real' voltage as opposed to voltage
-    relative to resting potential. 
-    
-    IS THIS EVEN A LINEAR REGRESSION SINCE WE ARE USING FMIN?
-    I DONT UNDERSTAND THE REGRESSION HERE SINCE YOU ONLY KNOW THE THRESHOLD AT THE SPIKE TIME
-    IF THIS WERE ME, I WOULD SOLVE FOR THRESHOLD AT EACH VOLTAGE VALUE (SINCE THE THRESHOLD 
-    DEPENDS ON VOLTAGE).  THE SPIKE COMPONENT OF THE THRESHOLD WILL NEED TO BE SUBTRACTED.  
-    THEN THE LEAST SQUARED ERROR IS THE DIFFERENCE BETWEEN THE CALCULATED VOLTAGE COMPONENT OF 
-    THE THRESHOLD AND THE SPIKE COMPONENT OF THE TRHESHOLD. I CAN PROBABLY JUST CALL THE ACTUAL 
-    NEURON METHOD.
-    
-    x: numpy array
-        x[0]=a_voltage input, x[1] is b_voltage
-    voltage: numpy array
-        voltage trace
-    El: float
-        reversal potential
-    spike_cut_length: int
-        number of indicies removed after initiation of a spike
-    all_spikeInd: numpy array
-        indicies of spike train 
-    th_inf: float
-        threshold infinity
-    dt: float 
-        size of time step (SI units)
-    a_spike: float
-        amplitude of spike component of threshold.
-    b_spike: float
-        decay constant in spike component of the threshold
-    '''
-    
-    # Perform a linear regression on all spike ISI's
-    sq_err = []    #list to store sum of square errors for every pair of spikes
-    for spike_number in range(len(all_spikeInd)-1):      #loop over all ISI's in data
-        start_ind = all_spikeInd[spike_number]+int(spike_cut_length) #spike time plus cut
-        end_ind = all_spikeInd[spike_number+1]  #next spike
-        v=voltage[start_ind:end_ind]  #TOD: why is there a -1 here
-#         offset = a_spike*np.exp(-b_spike*dt*(all_spikeInd[spike_number+1]-all_spikeInd[spike_number])) #this offset is computed from your multi-blip data
-#         theta2 = voltage[all_spikeInd[spike_number+1]]-offset
-
-        #summing the effect of the spike component of the threshold from each spike
-        offset_sum = 0
-        for jj in range(spike_number+1): 
-            offset = a_spike*np.exp(-b_spike*dt*(all_spikeInd[jj+1]-all_spikeInd[jj])) # spike component of threshold at each ISI
-            offset_sum = offset_sum + offset  #keeping track of residual spike comonent of threshold
-#            print "Ram OS", offset_sum
-                      
-        theta2 = voltage[all_spikeInd[spike_number+1]]-offset_sum  #threshold at spike after subtracting spiking component of threshold (it is threshold because neuron spikes and thus the voltage must be threshold) 
-        theta1 = voltage[all_spikeInd[spike_number]] #voltage component of threshold left over from previous spikes 
-
-        delt = len(v)*dt
-        tvec = np.arange(0,delt,dt)
-        tvec = tvec[0:len(v)]
-        
-        lhs = theta2-theta1*np.exp(-x[1]*dt*(end_ind-start_ind))
-        rhs2 = th_inf*(1-np.exp(-x[1]*dt*(end_ind-start_ind))) #second term of general solution to thr eq with initial cond included
-        rhs1 = x[0]*np.exp(-x[1]*tvec[-1])*np.sum(dt*(v-El)*np.exp(x[1]*tvec)) #first term general solution to threshold eq
-        print "Ram: spike",all_spikeInd[spike_number+1], "OS", offset_sum, "theta1", theta1, "theta2", theta2, "lhs",lhs, "rhs1, rhs2",  rhs1, rhs2
-        rhs = rhs1+rhs2
-        
-        err = (lhs-rhs)**2
-        if ~np.isnan(err):
-            sq_err.append(err)
-            
-    F = np.sum(sq_err)
-    
-    return F
-
 
 def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
     '''artifacts caused by turning stimulus on and off created artifacts that 

@@ -17,6 +17,7 @@ from rc import least_squares_simple_circuit_fit_RCEl
 from ASGLM import ASGLM_pairwise
 
 from threshold_adaptation import calc_spike_component_of_threshold_from_multiblip, err_fix_th
+
 from nonlinearity_parameters import R2R_subthresh_nonlinearity
 from MLIN import MLIN
 
@@ -260,7 +261,7 @@ def preprocess_neuron(nwb_file, sweep_list, dt=None, cut=0, bessel=None):
             #TODO note that currently using th_inf_from_5percentile_noise_from0+El_noise instead of the value calculated using the local noise El
             ab_voltage_component_of_threshold_from_noise = fmin(func=err_fix_th, args=(noise1_data['voltage'][0], El_noise, 
                                                                                        spike_cut_length_NODELTAV, noise1_ind_wo_test_pulse_removed[0], 
-                                                                                       th_inf_via_Vmeasure_from0+El_noise, dt, a_spike_component_of_threshold, 
+                                                                                       th_inf_from_5percentile_noise_from0+El_noise, dt, a_spike_component_of_threshold, 
                                                                                        b_spike_component_of_threshold), x0=[a_voltage_guess,b_voltage_guess])
             a_voltage_component_of_threshold=ab_voltage_component_of_threshold_from_noise[0]
             b_voltage_component_of_threshold=ab_voltage_component_of_threshold_from_noise[1]        
