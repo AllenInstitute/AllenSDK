@@ -150,19 +150,24 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
                 plt.show()
         
         const_to_add_to_thresh_for_reset=popt_force[0]
-        #REDICULOUS: this decay constant was originally forced to be positive and then it is negated everywhere
-        #it is utalized elsewhere in the code.  For most neurons b_spike will be negative as the threshold decays.  
-        #However that is not necessarily true--so using the abs would ignore those special neurons.  However, removing
-        # abs would create problems for the rest of the code that negates this value, therefore I am negating the value 
-        # here so that positive values will work correctly in the code for the special neurons.
-        #this would be zero 
-        #decay_const=abs(popt_force[1])
-        decay_const=-popt_force[1]
+        decay_const=popt_force[1]
         
-        if decay_const <0:
+        if decay_const >0:
             logging.critical('This neuron has an increasing decay value for the spike component of the threshold')
         if const_to_add_to_thresh_for_reset<0:
             logging.critical('This neuron has a negative amplitude for the spike component of the threshold') 
+
+        #if the decay constant is positive, or the amplidute is negative set the amplitude to 0 so that there 
+        #will be no spike component of the threshold
+        if decay_const >0 or const_to_add_to_thresh_for_reset < 0:
+            const_to_add_to_thresh_for_reset=0
+            decay=-1.0  #note that this number doesnt matter since the amplitude is set to zero
+            
+        # This decay constant was originally forced to be positive (i.e. decay_const=abs(popt_force[1]))
+        # and then it is negated everywhere it is utilized elsewhere in the code.  Now things are forced in 
+        # a different way above.  However the decay constant still needs to be negated here for use in the 
+        # rest of the code. 
+        decay_const=-decay_const
         
     except Exception, e:
         logging.error(e.message)
