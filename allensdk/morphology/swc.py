@@ -278,14 +278,15 @@ class Morphology( object ):
         return self.resolve_node_type(n)
 
     # returns a list of nodes located within dist of x,y,z
-    def find(self, x, y, z, dist):
+    def find(self, x, y, z, dist, node_type=None):
         found = []
         for seg in self.compartment_list:
             dx = seg[NODE_X] - x
             dy = seg[NODE_Y] - y
             dz = seg[NODE_Z] - z
             if math.sqrt(dx*dx + dy*dy + dz*dz) <= dist:
-                found.append(seg)
+                if node_type is None or seg[NODE_TYPE] == node_type:
+                    found.append(seg)
         return found
 
 
@@ -424,8 +425,11 @@ class Morphology( object ):
         f.write("#n,type,x,y,z,radius,parent\n")
         for seg in self.compartment_list:
             f.write("%d %d " % (seg[NODE_ID], seg[NODE_TYPE]))
-            f.write("%f %f %f " % (seg[NODE_X], seg[NODE_Y], seg[NODE_Z]))
-            f.write("%f %d\n" % (seg[NODE_R], seg[NODE_PN]))
+            f.write("%0.4f " % seg[NODE_X])
+            f.write("%0.4f " % seg[NODE_Y])
+            f.write("%0.4f " % seg[NODE_Z])
+            f.write("%0.4f " % seg[NODE_R])
+            f.write("%d\n" % seg[NODE_PN])
         f.close()
 
 
@@ -659,7 +663,7 @@ class Morphology( object ):
         self.reconstruct()
     
 
-    def apply_affine(self, aff):
+    def apply_affine(self, aff, scale=None):
         """ Apply an affine transform to all compartments in this 
         morphology. Node radius is adjusted as well.
         
@@ -672,6 +676,10 @@ class Morphology( object ):
         where the left 3x3 portion of the matrix defines the affine
         rotation and scaling, and the right column is the translation
         vector
+
+        The matrix must be collapsed and stored as a list as follows:
+
+        [x0 y0, z0, x1, y1, z1, x2, y2, z2, tx, ty, tz]
         
         Parameters
         ----------
@@ -688,21 +696,25 @@ class Morphology( object ):
         #   scale along all 3 axes (eg, isotropic assumption), so calculate
         #   scale using the determinant
         #
-        # calculate the determinant
-        det0 = aff[0] * (aff[4]*aff[8] - aff[5]*aff[7])
-        det1 = aff[1] * (aff[3]*aff[8] - aff[5]*aff[6])
-        det2 = aff[2] * (aff[3]*aff[7] - aff[4]*aff[6])
-        det = det0 + det1 + det2
-        # determinant is change of volume that occurred during transform
-        # assume equal scaling along all axes. take 3rd root to get
-        #   scale factor
-        det_scale = math.pow(abs(det), 1.0/3.0)
-        ## measure scale along each axis
-        ## keep this code here in case 
-        #scale_x = abs(aff[0] + aff[3] + aff[6])
-        #scale_y = abs(aff[1] + aff[4] + aff[7])
-        #scale_z = abs(aff[2] + aff[5] + aff[8])
-        #avg_scale = (scale_x + scale_y + scale_z) / 3.0;
+        if scale is None:
+            # calculate the determinant
+            det0 = aff[0] * (aff[4]*aff[8] - aff[5]*aff[7])
+            det1 = aff[1] * (aff[3]*aff[8] - aff[5]*aff[6])
+            det2 = aff[2] * (aff[3]*aff[7] - aff[4]*aff[6])
+            det = det0 + det1 + det2
+            # determinant is change of volume that occurred during transform
+            # assume equal scaling along all axes. take 3rd root to get
+            #   scale factor
+            det_scale = math.pow(abs(det), 1.0/3.0)
+            ## measure scale along each axis
+            ## keep this code here in case 
+            #scale_x = abs(aff[0] + aff[3] + aff[6])
+            #scale_y = abs(aff[1] + aff[4] + aff[7])
+            #scale_z = abs(aff[2] + aff[5] + aff[8])
+            #avg_scale = (scale_x + scale_y + scale_z) / 3.0;
+            #
+            # use determinant for scaling for now as it's most simple
+            scale = det_scale
         for seg in self.compartment_list:
             x = seg[NODE_X]*aff[0] + seg[NODE_Y]*aff[1] + seg[NODE_Z]*aff[2] + aff[9]
             y = seg[NODE_X]*aff[3] + seg[NODE_Y]*aff[4] + seg[NODE_Z]*aff[5] + aff[10]
@@ -710,8 +722,7 @@ class Morphology( object ):
             seg[NODE_X] = x
             seg[NODE_Y] = y
             seg[NODE_Z] = z
-            # use determinant for scaling for now as it's most simple
-            seg[NODE_R] *= det_scale
+            seg[NODE_R] *= scale
 
     # construct list of independent trees (each tree has a root of -1)
     def separate_trees(self):

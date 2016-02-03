@@ -17,6 +17,15 @@ DEND_SUFFIX = "Dendrite.swc"
 AXON_SUFFIX = "DendriteAxon.swc"
 MERGE_SUFFIX = "Merged.swc"
 
+def find_nearest_match(orig, dendriteaxon, node_type):
+    matches = []
+    for tries in range(20):
+        rad = 1.0 + tries
+        matches = dendriteaxon.find(orig[NODE_X], orig[NODE_Y], orig[NODE_Z], rad, node_type)
+        if len(matches) >= 1:
+            break
+    return matches
+
 def merge_files(master_dend, master_axon, combined):
     print("Reading master dendrite file '%s'" % master_dend)
     final_dend = read_swc(master_dend)
@@ -47,66 +56,67 @@ def merge_files(master_dend, master_axon, combined):
         #   soma/dendrite node, or a dendrite node with a parent axon
         #
         # look for axon that has a parent dendrite or soma node
-        merge_type = ""
-        if seg["type"] == 2:
+        if seg[NODE_TYPE] == 2:
             par = final_dend.parent_of(seg)
-            if par is not None:
-                if par["type"] == 1:
-                    merge_type = "axon to soma"
-                    merge = True
-                elif par["type"] == 3:
-                    merge_type = "axon to dendrite"
-                    merge = True
+            if par is None:
+                continue
+            if par[NODE_TYPE] == 1:
+                # merge segment to soma
+                parent_type = 1
+                merge_type = "axon to soma"
+                merge = True
+            elif par[NODE_TYPE] == 3:
+                parent_type = 3
+                merge_type = "axon to dendrite"
+                merge = True
         # look for a dendrite that has an axon parent
-        elif seg["type"] == 3:
+        elif seg[NODE_TYPE] == 3:
             par = final_dend.parent_of(seg)
-            if par is not None and par["type"] == 2:
+            if par is not None and par[NODE_TYPE] == 2:
+                parent_type = 2
                 merge_type = "dendrite to axon"
                 merge = True
         # if merge specified, do it
         if merge:
-            for tries in range(9):
-                rad = 1.0 + 2 * tries
-                old_par = merged.find(par[NODE_X], par[NODE_Y], par[NODE_Z], rad)
-                if len(old_par) >= 1:
-                    break
-            if len(old_par) != 1:
-                print("** Position mismatch of parent node between files")
-                print("   Found %d possible matches" % len(old_par))
+            da_child = find_nearest_match(seg, merged, seg[NODE_TYPE])
+            da_par = find_nearest_match(par, merged, parent_type)
+            # if multiple children but only one has parent that matches
+            #   type of original parent, select it
+            if len(da_child) != 1:
+                print("** Unable to find child node in DendAxon")
+                print("   Found %d possible matches" % len(da_child))
                 print("")
-                print("Master dendrite file nodes:")
+                print("Master dendrite file node:")
                 print_node(seg)
-                print_node(par)
                 print("")
-                print("Master axon file matches:")
-                for x in old_par:
+                print("DendAxon matches:")
+                for x in da_child:
                     print_node(x)
+                print("----------------------------------------------")
                 continue
-                print("")
-            for tries in range(9):
-                rad = 1.0 + 2 * tries
-                old_child = merged.find(seg[NODE_X], seg[NODE_Y], seg[NODE_Z], rad)
-                if len(old_child) >= 1:
-                    break
-            if len(old_child) != 1:
-                print("** Position mismatch of root axon node between files")
-                print("   Found %d possible matches" % len(old_child))
-                print("")
-                print("Master dendrite file nodes:")
-                print_node(seg)
-                print_node(par)
-                print("")
-                print("Master axon file matches:")
-                for x in old_child:
-                    print_node(x)
-                continue
+            if parent_type == 1:
+                merged.change_parent(da_child[0], merged.soma)
+            else:
+                # look for parent nearest to one from Dendrite file
+                if len(da_par) != 1:
+                    print("** Found %d possible parent matches" % len(da_par))
+                    print("")
+                    print("Master dendrite file parent:")
+                    print_node(par)
+                    print("")
+                    print("Master dendrite-axon file matches:")
+                    for x in da_par:
+                        print_node(x)
+                    print("----------------------------------------------")
+                    continue
+                merged.change_parent(da_child[0], da_par[0])
             merge_types.append(merge_type)
-            merged.change_parent(old_child[0], old_par[0])
     plural = "s"
     if len(merge_types) == 1:
         plural = ""
     print("Merged %d root%s" % (len(merge_types), plural))
-    for s in merge_types:
+    for i in range(len(merge_types)):
+        s = merge_types[i]
         print("\t%s" % s)
     print("Writing '%s'" % combined)
     merged.write(combined)
@@ -192,7 +202,9 @@ axon_files = []
 dend_files = []
 combined_files = []
 
-ROOT = "/mnt/For_Annotation/AutoTraceFiles/Production/KeithandWayne/keith/merge_with_axons/"
+#ROOT = "/mnt/For_Annotation/AutoTraceFiles/Production/KeithandWayne/keith/merge_with_axons/"
+#ROOT = "/aibsdata/informatics/keithg/morphology/testing/"
+ROOT = "/aibsdata/informatics/keithg/morphology/merge_with_axons/"
 
 if len(sys.argv) == 2:
     if sys.argv[1] == "TEST":
