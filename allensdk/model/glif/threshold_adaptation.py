@@ -237,7 +237,7 @@ def err_fix_th(x, voltage, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spi
         v_start_ind = all_spikeInd[spike_number-1]+int(spike_cut_length) #spike time plus cut
         end_ind = all_spikeInd[spike_number]
         v_in_ISI=voltage[v_start_ind:end_ind]
-        theta0=bio_spike_comp_of_th_at_each_spike[spike_number-1]
+        theta0=bio_spike_comp_of_th_at_each_spike[spike_number-1]+sp_comp_of_offset_sum_vector[spike_number-1]
         theta1=bio_spike_comp_of_th_at_each_spike[spike_number]
         tvec=np.arange(len(v_in_ISI))*dt
         

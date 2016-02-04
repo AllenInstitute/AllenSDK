@@ -7,7 +7,7 @@ from allensdk.model.glif.glif_optimizer_neuron import GlifOptimizerNeuron
 from allensdk.model.glif.glif_experiment import GlifExperiment
 from allensdk.model.glif.glif_optimizer import GlifOptimizer
 
-from allensdk.model.glif.preprocess_neuron import load_sweeps
+from allensdk.model.data_access import load_sweeps
 from allensdk.model.glif.find_spikes import find_spikes_list
 import allensdk.core.json_utilities as ju
 
