@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -13,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
+import logging, os
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
 
-PERISOMATIC_TYPE = "biophysical_perisomatic"
-ALL_ACTIVE_TYPE = "biophysical_all_active"
-
+PERISOMATIC_TYPE = "Biophysical - perisomatic"
+ALL_ACTIVE_TYPE = "Biophysical - all active"
 
 def create_utils(description, model_type=None):
     if model_type is None:
@@ -75,19 +74,19 @@ class Utils(HocUtils):
         
         h("soma[0] area(0.5)")
         for sec in h.allsec():
-            sec.nseg = 1 + 2 * int(sec.L / 40)
+            sec.nseg = 1 + 2 * int(sec.L / 40.0)
             if sec.name()[:4] == "axon":
                 h.delete_section(sec=sec)
         h('create axon[2]')
         for sec in h.axon:
             sec.L = 30
             sec.diam = 1
-            sec.nseg = 1 + 2 * int(sec.L / 40)
-        h.axon[0].connect(h.soma[0], 0.5, 0)
-        h.axon[1].connect(h.axon[0], 1, 0)
+            sec.nseg = 1 + 2 * int(sec.L / 40.0)
+        h.axon[0].connect(h.soma[0], 0.5, 0.0)
+        h.axon[1].connect(h.axon[0], 1.0, 0.0)
         
         h.define_shape()
-
+        
     
     def load_cell_parameters(self):
         '''Configure a neuron after the cell morphology has been loaded.'''
@@ -133,11 +132,12 @@ class Utils(HocUtils):
         stimulus_path : string
             NWB file name
         '''
-        self.stim = self.h.IClamp(self.h.soma[0](0.5))  # TODO: does soma have to be parametrized?
+        self.stim = self.h.IClamp(self.h.soma[0](0.5))
         self.stim.amp = 0
         self.stim.delay = 0
-        self.stim.dur = 1e12 # just set to be really big; doesn't need to match the waveform
-        
+        # just set to be really big; doesn't need to match the waveform
+        self.stim.dur = 1e12
+
         self.read_stimulus(stimulus_path, sweep=sweep)
         self.h.dt = self.sampling_rate
         stim_vec = self.h.Vector(self.stim_curr)
@@ -158,25 +158,83 @@ class Utils(HocUtils):
         sweep : integer, optional
             sweep index
         '''
-        Utils._log.info("reading stimulus path: %s, sweep %s" %
-                        (stimulus_path, sweep))
+        Utils._log.info(
+            "reading stimulus path: %s, sweep %s",
+            stimulus_path,
+            sweep)
+        
         stimulus_data = NwbDataSet(stimulus_path)
         sweep_data = stimulus_data.get_sweep(sweep)
-        self.stim_curr = sweep_data['stimulus'] * 1.0e9 # convert to nA for NEURON
-        self.sampling_rate = 1.0e3 / sweep_data['sampling_rate'] # convert from Hz
+        
+        # convert to nA for NEURON
+        self.stim_curr = sweep_data['stimulus'] * 1.0e9
+        
+        # convert from Hz        
+        self.sampling_rate = 1.0e3 / sweep_data['sampling_rate']
     
     
     def record_values(self):
         '''Set up output voltage recording.'''
         vec = { "v": self.h.Vector(),
                 "t": self.h.Vector() }
-    
+        
         vec["v"].record(self.h.soma[0](0.5)._ref_v)
         vec["t"].record(self.h._ref_t)
     
         return vec
 
 class AllActiveUtils(Utils):
+
+    def generate_morphology(self, morph_filename):
+        '''Load a neurolucida or swc-format cell morphology file.
+
+        Parameters
+        ----------
+        morph_filename : string
+            Path to morphology.
+        '''
+
+        morph_basename = os.path.basename(morph_filename)
+        morph_extension = morph_basename.split('.')[-1]
+        if morph_extension.lower() == 'swc':
+            morph = self.h.Import3d_SWC_read()
+        elif morph_extension.lower() == 'asc':
+            morph = self.h.Import3d_Neurolucida3()
+        else:
+            raise Exception("Unknown filetype: %s" % morph_extension)
+
+        morph.input(morph_filename)
+        imprt = self.h.Import3d_GUI(morph, 0)
+
+        self.h("objref this")
+        imprt.instantiate(self.h.this)
+
+        self.h("soma[0] area(0.5)")
+        axon_diams = [self.h.axon[0].diam, self.h.axon[0].diam]
+
+        self.h.distance(sec=self.h.soma[0])
+        for sec in self.h.allsec():
+            if sec.name()[:4] == "axon":
+                if self.h.distance(0.5, sec=sec) > 60:
+                    axon_diams[1] = sec.diam
+                    break
+        for sec in self.h.allsec():
+            if sec.name()[:4] == "axon":
+                self.h.delete_section(sec=sec)
+        self.h('create axon[2]')
+        for index, sec in enumerate(self.h.axon):
+            sec.L = 30
+            sec.diam = axon_diams[index]
+
+        for sec in self.h.allsec():
+            sec.nseg = 1 + 2 * int(sec.L / 40.0)
+
+        self.h.axon[0].connect(self.h.soma[0], 1.0, 0.0)
+        self.h.axon[1].connect(self.h.axon[0], 1.0, 0.0)
+
+        # make sure diam reflects 3d points
+        self.h.area(.5, sec=self.h.soma[0])
+
 
     def load_cell_parameters(self):
         '''Configure a neuron after the cell morphology has been loaded.'''
@@ -208,11 +266,11 @@ class AllActiveUtils(Utils):
             else:
                 if hasattr(h, section_array):
                     if mechanism != "":
+                        print 'Adding mechanism %s to %s' \
+                            % (mechanism, section_array)
                         for section in getattr(h, section_array):
                             if self.h.ismembrane(str(mechanism),
                                                  sec=section) != 1:
-                                # print 'Adding mechanism %s to %s to %s' \
-                                #    % (mechanism, section_array, self.h.secname(sec=section))
                                 section.insert(mechanism)
 
                     print 'Setting %s to %.6g in %s' \

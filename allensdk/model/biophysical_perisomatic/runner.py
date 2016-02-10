@@ -13,21 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import numpy
-import os
-
 from allensdk.model.biophys_sim.config import Config
 from allensdk.model.biophysical_perisomatic.utils import create_utils
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
 from shutil import copy
-
+import numpy
 import logging
+import time
+import os
 
 _runner_log = logging.getLogger('allensdk.model.biophysical_perisomatic.runner')
 
 
-def run(description, sweeps=None, model_type=None):
+def run(description, sweeps=None):
     '''Main function for running a perisomatic biophysical experiment.
     
     Parameters
@@ -35,6 +34,8 @@ def run(description, sweeps=None, model_type=None):
     description : Config
         All information needed to run the experiment.
     '''
+    model_type = description.data['biophys'][0]['model_type']
+
     # configure NEURON
     utils = create_utils(description, model_type)
     h = utils.h
@@ -54,21 +55,24 @@ def run(description, sweeps=None, model_type=None):
     mV = 1.0e-3
     
     prepare_nwb_output(manifest.get_path('stimulus_path'),
-                       manifest.get_path('output'))
+                       manifest.get_path('output_path'))
     
     # run sweeps
     for sweep in sweeps:
+        _runner_log.info("Running sweep: %d" % (sweep))
         utils.setup_iclamp(stimulus_path, sweep=sweep)
-        
+        _runner_log.info("Done loading sweep: %d" % (sweep))
         vec = utils.record_values()
-        
+        tstart = time.time()
         h.finitialize()
         h.run()
+        tstop = time.time()
+        _runner_log.info("Time: %f" % (tstop-tstart))
         
         # write to an NWB File
         output_data = (numpy.array(vec['v']) - junction_potential) * mV
         
-        output_path = manifest.get_path("output")
+        output_path = manifest.get_path("output_path")
         save_nwb(output_path, output_data, sweep)
 
 
@@ -83,6 +87,11 @@ def prepare_nwb_output(nwb_stimulus_path,
     nwb_result_path : string
         NWB file name
     '''
+
+    output_dir = os.path.dirname(nwb_result_path)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     copy(nwb_stimulus_path, nwb_result_path)
     data_set = NwbDataSet(nwb_result_path)
     data_set.fill_sweep_responses(0.0)
@@ -135,21 +144,9 @@ def load_description(manifest_json_path):
     return description
 
 
-if '__main__' == __name__: 
+if '__main__' == __name__:
     import sys
     
-    description = load_description(sys.argv[1])
-
-    if len(sys.argv) > 2:
-        model_type = sys.argv[2]
-    else:
-        model_type = None
-
-    if len(sys.argv) > 3:
-        sweeps = [ int(s) for s in sys.argv[3:] ]
-    else:
-        sweeps = None
-    
-    run(description, sweeps=sweeps, model_type=model_type)
-    
+    description = load_description(sys.argv[-1])
+    run(description)
 
