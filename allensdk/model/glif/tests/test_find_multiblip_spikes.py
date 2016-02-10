@@ -1,6 +1,7 @@
 from allensdk.model.glif.threshold_adaptation import find_multiblip_spikes
 import allensdk.core.json_utilities as ju
 
+
 import numpy as np
 
 def test_find_multiblip_spikes():

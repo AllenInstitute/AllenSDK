@@ -7,6 +7,7 @@ import logging
 THRESH_PCT_MULTIBLIP = 0.05
 
 from allensdk.model.glif.glif_neuron_methods import spike_component_of_threshold_exact
+from allensdk.model.glif.find_spikes import find_spikes_list
 
 def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
     '''Calculate the spike components of the threshold by fitting a decaying exponential function to data to threshold versus time 
@@ -37,8 +38,8 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
     multi_SS_i=multi_SS['current']
 
     # get indicies of spikes
-    spike_ind = find_multiblip_spikes(multi_SS_i, multi_SS_v, dt)
-#    spike_ind, _=find_spikes_list(multi_SS_v, dt)
+#    spike_ind = find_multiblip_spikes(multi_SS_i, multi_SS_v, dt) currently this is broken
+    spike_ind, _=find_spikes_list(multi_SS_v, dt)
 
     # eliminate spurious spikes that may exist
     spike_lt=[np.where(SI<int(2.02/dt))[0] for SI in spike_ind]

@@ -1,6 +1,6 @@
 from allensdk.core.nwb_data_set import NwbDataSet
 from scipy import signal
-import np as np
+import numpy as np
 
 def load_sweep(file_name, sweep_number, dt=None, cut=0, bessel=False):
     ds = NwbDataSet(file_name)
