@@ -1,256 +1,7 @@
 import math
+from allensdk.core.swc import *
 import sys
 import numpy as np
-#import allensdk.core.swc as allen_swc
-
-# The code below is an almost literal c++->python port from the v3d 
-#   blastneuron module (compute_gmi.cpp and compute_morph.cpp)
-# The primary modification is that feature arrays are returned
-#   from the functions (as opposed to being passed in) and 
-#   a description (text) array is returned with each feature vector
-# The SWC object mimics the interface of NeuronSWC in v3d. It has been
-#   extended to assist in analysis tasks
-
-class SWC_Obj(object):
-    def __init__(self, obj):
-        self.n = int(obj["id"])
-        self.t = int(obj["type"])
-        self.x = float(obj["x"])
-        self.y = float(obj["y"])
-        self.z = float(obj["z"])
-        self.radius = float(obj["radius"])
-        self.pn = int(obj["parent"])
-        # create index-agnostic links between objects
-        self.parent = None
-        self.children = []
-
-    def __repr__(self):
-        disp = "SWC object\n"
-        disp += "  id:   %d\n" % self.n
-        disp += "  type: %d\n" % self.t
-        disp += "  x:    %f\n" % self.x
-        disp += "  y:    %f\n" % self.y
-        disp += "  z:    %f\n" % self.z
-        disp += "  r:    %f\n" % self.radius
-        disp += "  par:  %d\n" % self.pn
-        if self.parent.n is not None:
-            disp += "  par:  %d\n" % self.parent.n
-        else:
-            disp += "  par:  -1\n"
-        disp += "  children:"
-        ch = ""
-        for i in range(len(self.children)):
-            ch += " %d," % self.children[i].n
-        disp += ch[:-1] + "\n"
-
-        return disp
-
-class SWC(object):
-    def __init__(self, fname):
-        self.obj_list = []
-        self.obj_hash = {}
-        try:
-            # use allensdk if it's available
-            import allensdk.core.swc as allen_swc
-            morphology = allen_swc.read_swc(fname)
-            lst = morphology.compartment_list
-            for i in range(len(lst)):
-                obj = SWC_Obj(lst[i])
-                self.obj_list.append(obj)
-                self.obj_hash[obj.n] = len(self.obj_list) - 1
-        except ImportError:
-            f = open(fname, "r")
-            line = f.readline()
-            while len(line) > 0:
-                if not line.startswith('#'):
-                    toks = line.split(' ')
-                    vals = {}
-                    vals["id"] = int(toks[0])
-                    vals["type"] = int(toks[1])
-                    vals["x"] = float(toks[2])
-                    vals["y"] = float(toks[3])
-                    vals["z"] = float(toks[4])
-                    vals["radius"] = float(toks[5])
-                    pn = toks[6].strip('\r')
-                    vals["parent"] = int(pn.strip('\n'))
-                    #
-                    obj = SWC_Obj(vals)
-                    self.obj_list.append(obj)
-                    self.obj_hash[obj.n] = len(self.obj_list) - 1
-                    #self.obj_hash[obj.n] = obj
-                line = f.readline()
-            f.close()
-        for i in range(len(self.obj_list)):
-            obj = self.obj_list[i]
-            if obj.pn >= 0:
-                obj.parent = self.obj_list[self.obj_hash[obj.pn]]
-                obj.parent.children.append(obj)
-
-    # make sure that types are not cross-connected -- eg, an axon doesn't
-    #   sprout off an apical dendrite. if specified, 'fix' errors by 
-    #   having type-orphans adopted by soma (ie, point to soma instead)
-    # exception: a single axon can sprout off a basal dendrite
-    def check_consistency(self, fix=False):
-        return
-        # find root node
-        root = -1
-        root_node = None
-        for i in range(len(self.obj_list)):
-            obj = self.obj_list[i]
-            if obj.pn < 0 and obj.t == 1:
-                root = obj.n
-                root_node = obj
-                break
-        err = False
-        changed = False
-        axon_count = 0
-        for i in range(len(self.obj_list)):
-            obj = self.obj_list[i]
-            if obj.pn < 0:
-                continue
-            par = self.obj_list[self.obj_hash[obj.pn]]
-            if par.t != obj.t and par.t == 1:
-                if obj.t == 2:
-                    axon_count += 1
-            if par.t != obj.t and par.t != 1:
-                if par.t == 3 and obj.t == 2: # this is OK
-                    axon_count += 1
-                else:
-                    if not fix:
-                        print("Object %d with type %d has parent with type %d" % (obj.n, obj.t, par.t))
-                        err = True
-                    # type-orphan. change it's parent to root
-                    if fix == True:
-                        if root < 0:
-                            raise ValueError("Unable to identify root node. Cannot fix type-consistency")
-                        self.obj_list[i].pn = root
-                        self.obj_list[i].parent = root_node
-                        changed = True
-        if axon_count > 1:
-            print("More than one axon detected")
-            err = True
-        if err:
-            raise ValueError("There is likely a problem with the SWC file. Bailing out")
-        if changed:
-            self.relink()
-
-    # strip out everything but the soma and the specified SWC type
-    def strip(self, obj_type):
-        for i in range(len(self.obj_list)):
-            obj = self.obj_list[i]
-            if obj is not None:
-                if obj.t != obj_type and obj.t != 1:
-                    for j in range(len(obj.children)):
-                        # make children forget about removed parent
-                        child_id = self.obj_hash[obj.children[j].n]
-                        child = self.obj_list[child_id]
-                        if child is not None:
-                            child.pn = -1
-                    self.obj_list[i] = None
-        self.clean_up()
-    
-    # strip out everything but the specified SWC type
-    def strip_all(self, obj_type):
-        for i in range(len(self.obj_list)):
-            obj = self.obj_list[i]
-            if obj is not None:
-                if obj.t != obj_type:
-                    for j in range(len(obj.children)):
-                        # make children forget about removed parent
-                        child_id = self.obj_hash[obj.children[j].n]
-                        child = self.obj_list[child_id]
-                        if child is not None:
-                            child.pn = -1
-                    self.obj_list[i] = None
-        self.clean_up()
-    
-    # remove blank entries from obj_list and regenerate obj_hash
-    # BB library requires SWC files that have no 'holes' in them
-    def clean_up(self):
-        # assign consecutive job IDs
-        tmp_list = []
-        n = 1
-        for i in range(len(self.obj_list)):
-            obj = self.obj_list[i]
-            if obj is not None:
-                obj.n = n
-                n += 1
-                tmp_list.append(obj)
-        self.obj_list = tmp_list
-        self.relink()
-
-    def relink(self):
-        # re-link objects with parents
-        for i in range(len(self.obj_list)):
-            obj = self.obj_list[i]
-            obj.children = []
-            if obj.pn >= 0:
-                obj.pn = obj.parent.n
-        # re-link parents with children
-        for i in range(len(self.obj_list)):
-            obj = self.obj_list[i]
-            if obj.pn >= 0:
-                obj.parent = self.obj_list[self.obj_hash[obj.pn]]
-                obj.parent.children.append(obj)
-
-    def apply_affine(self, aff):
-        # calculate scale. use 2 different approaches
-        #   1) assume isotropic spatial transform, use determinant^1/3
-        #   2) calculate transform of unit vector on each original axis
-        # (1)
-        # calculate the determinant
-        det0 = aff[0] * (aff[4]*aff[8] - aff[5]*aff[7])
-        det1 = aff[1] * (aff[3]*aff[8] - aff[5]*aff[6])
-        det2 = aff[2] * (aff[3]*aff[7] - aff[4]*aff[6])
-        det = det0 + det1 + det2
-        # determinant is change of volume that occurred during transform
-        # assume equal scaling along all axes. take 3rd root to get
-        #   scale factor
-        det_scale = math.pow(abs(det), 1.0/3.0)
-        # (2)
-        scale_x = abs(aff[0] + aff[3] + aff[6])
-        scale_y = abs(aff[1] + aff[4] + aff[7])
-        scale_z = abs(aff[2] + aff[5] + aff[8])
-        avg_scale = (scale_x + scale_y + scale_z) / 3.0;
-        deviance = 0.0
-        if scale_x > avg_scale:
-            deviance = max(deviance, scale_x/avg_scale-1.0)
-        else:
-            deviance = max(deviance, 1.0-scale_x/avg_scale)
-        if scale_y > avg_scale:
-            deviance = max(deviance, scale_y/avg_scale-1.0)
-        else:
-            deviance = max(deviance, 1.0-scale_y/avg_scale)
-        if scale_z > avg_scale:
-            deviance = max(deviance, scale_z/avg_scale-1.0)
-        else:
-            deviance = max(deviance, 1.0-scale_z/avg_scale)
-        # 
-        for i in range(len(self.obj_list)):
-            obj = self.obj_list[i]
-            x = obj.x*aff[0] + obj.y*aff[1] + obj.z*aff[2] + aff[9]
-            y = obj.x*aff[3] + obj.y*aff[4] + obj.z*aff[5] + aff[10]
-            z = obj.x*aff[6] + obj.y*aff[7] + obj.z*aff[8] + aff[11]
-            obj.x = x
-            obj.y = y
-            obj.z = z
-            # use method (1) for scaling for now as it's most simple
-            obj.radius *= det_scale
-
-    # returns True on success, False on failure
-    def save_to(self, file_name):
-        try:
-            f = open(file_name, "w")
-            f.write("#n,type,x,y,z,radius,parent\n")
-            for i in range(len(self.obj_list)):
-                obj = self.obj_list[i]
-                f.write("%d %d %f " % (obj.n, obj.t, obj.x))
-                f.write("%f %f %f %d\n" % (obj.y, obj.z, obj.radius, obj.pn))
-            f.close()
-        except:
-            print("Error creating swc file '%s'" % file_name)
-            return False
-        return True
 
 ########################################################################
 ########################################################################
@@ -259,45 +10,35 @@ class SWC(object):
 VOID = 1000000000
 
 def computeGMI(nt):
-    nt.save_to("tmp2.swc")
     # v3d version calculates 14 moments
     gmi = np.zeros(14)
-    lst = nt.obj_list
-    LUT = {}
-    for i in range(len(lst)):
-        LUT[lst[i].n] = i
-
     center_pos = np.zeros(3)
-    
-    siz = len(lst)
-    b = []
-    for i in range(siz):
-        b.append([])
-
     avgR = 0.0;
 
-    for i in range(siz):
+    b = []
+    for i in range(nt.num_nodes):
+        b.append([])
         b[i] = np.zeros(4)
-        b[i][0] = lst[i].x
-        b[i][1] = lst[i].y
-        b[i][2] = lst[i].z
-        avgR += lst[i].radius
-        if lst[i].pn < 0:
+        b[i][0] = nt.node(i)[NODE_X]
+        b[i][1] = nt.node(i)[NODE_Y]
+        b[i][2] = nt.node(i)[NODE_Z]
+        avgR += nt.node(i)[NODE_R]
+        if nt.node(i)[NODE_PN] < 0:
             b[i][3] = -1;
         else:
-            b[i][3] = LUT[lst[i].pn];
+            b[i][3] = nt.node(i)[NODE_PN]
 
-    avgR /= siz
+    avgR /= nt.num_nodes
     gmi[13] = avgR
 
-    m000 = compute_moments(b, siz, 0, 0, 0, VOID);
-    center_pos[0] = compute_moments(b, siz, 1, 0, 0, VOID);
-    center_pos[1] = compute_moments(b, siz, 0, 1, 0, VOID);
-    center_pos[2] = compute_moments(b, siz, 0, 0, 1, VOID);
+    m000 = compute_moments(b, nt.num_nodes, 0, 0, 0, VOID);
+    center_pos[0] = compute_moments(b, nt.num_nodes, 1, 0, 0, VOID);
+    center_pos[1] = compute_moments(b, nt.num_nodes, 0, 1, 0, VOID);
+    center_pos[2] = compute_moments(b, nt.num_nodes, 0, 0, 1, VOID);
 
     for j in range(3):
         center_pos[j] /= m000
-    compute_neuron_GMI(b, siz, center_pos, VOID, gmi);
+    compute_neuron_GMI(b, nt.num_nodes, center_pos, VOID, gmi);
 
     gmi_desc = []
     for i in range(len(gmi)):
@@ -472,24 +213,21 @@ def compute_moments(a_array, siz, p, q, r, rad_thres):
 # Morphology calculations
 
 def dist(a,b):
-    return math.sqrt(((a).x-(b).x)*((a).x-(b).x)+((a).y-(b).y)*((a).y-(b).y)+((a).z-(b).z)*((a).z-(b).z))
-
-def getParent(n,nt): 
-    if nt.obj_list[n].pn < 0:
-        return VOID
-    else:
-        return nt.obj_hash[nt.obj_list[n].pn]
+    dx = a[NODE_X] - b[NODE_X]
+    dy = a[NODE_Y] - b[NODE_Y]
+    dz = a[NODE_Z] - b[NODE_Z]
+    return math.sqrt(dx*dx + dy*dy + dz*dz)
 
 def angle(a,b,c):
     dist_ab = dist(a, b)
     dist_ac = dist(a, c)
     if dist_ab == 0 or dist_ac == 0:        
         print ("Warning. Parent and child SWC nodes have same coordinates. No bifurcation angle to compute.")
-        print ("Parent at  %f,%f,%f" % (a.x, a.y, a.z))
-        print ("Child 0 at %f,%f,%f" % (b.x, b.y, b.z))
-        print ("Child 1 at %f,%f,%f" % (c.x, c.y, c.z))
+        print ("Parent at  %f,%f,%f" % (a[NODE_X], a[NODE_Y], a[NODE_Z]))
+        print ("Child 0 at %f,%f,%f" % (b[NODE_X], b[NODE_Y], b[NODE_Z]))
+        print ("Child 1 at %f,%f,%f" % (c[NODE_X], c[NODE_Y], c[NODE_Z]))
         return float('nan')
-    return(math.acos((((b).x-(a).x)*((c).x-(a).x)+((b).y-(a).y)*((c).y-(a).y)+((b).z-(a).z)*((c).z-(a).z))/(dist_ab*dist_ac))*180.0/math.pi)
+    return(math.acos((((b)[NODE_X]-(a)[NODE_X])*((c)[NODE_X]-(a)[NODE_X])+((b)[NODE_Y]-(a)[NODE_Y])*((c)[NODE_Y]-(a)[NODE_Y])+((b)[NODE_Z]-(a)[NODE_Z])*((c)[NODE_Z]-(a)[NODE_Z]))/(dist_ab*dist_ac))*180.0/math.pi)
 
 Width=0.0
 Height=0.0
@@ -516,15 +254,13 @@ BifA_remote=0.0
 Soma_surface=0.0
 Fragmentation=0.0
 #
-rootidx=0
-
-childs = []
+root_node=0
 
 def computeFeature(nt):
     global Width, Height, Depth, Diameter, Length, Volume, Surface, Hausdorff
     global N_node, N_stem, N_bifs, N_branch, N_tips, Max_Order
     global Pd_ratio, Contraction, Max_Eux, Max_Path, BifA_local, BifA_remote, Soma_surface, Fragmentation
-    global childs, rootidx
+    global root_node
     # v3d returns a vector of 21 features. this is returned to the calling
     #   functin
     Width=0.0
@@ -551,37 +287,11 @@ def computeFeature(nt):
     BifA_remote=0
     Soma_surface=0
     Fragmentation=0
-    #
-    rootidx=0
+    root_node = nt.root
 
-    childs = []
-    for i in range(len(nt.obj_list)):
-        par = nt.obj_list[i].pn
-        if par >= 0:
-            pnum = nt.obj_hash[par]
-            while len(childs) <= pnum:
-                childs.append([])
-            childs[pnum].append(i)
-    while len(childs) < len(nt.obj_list):
-        childs.append([])
-
-    #find the root
-    rootidx = VOID;
-    lst = nt.obj_list
-    for i in range(len(lst)):
-        if lst[i].pn == -1:
-            if rootidx != VOID:
-                # the v3d algorithm fails when multiple roots are specified
-                print "WARNING - multiple roots are specified. Bailing out to avoid numerical errors"
-                return None, None
-            rootidx = i
-    if rootidx == VOID:
-        print "the input neuron tree does not have a root, please check your data"
-        return None, None
-
-    N_node = len(lst)
-    N_stem = len(childs[rootidx])
-    Soma_surface = 4*math.pi*(lst[rootidx].radius)*(lst[rootidx].radius)
+    N_node = nt.num_nodes
+    N_stem = len(root_node[NODE_CHILDREN])
+    Soma_surface = 4*math.pi*(root_node[NODE_R])*(root_node[NODE_R])
 
     computeLinear(nt)
     computeTree(nt)
@@ -641,13 +351,19 @@ def computeFeature(nt):
     return features, feature_desc
 
 
-def getRemoteChild(t):
-    global childs
+# move forward and find indices (IDs) of furthest nodes along each
+#   branch that are leaf nodes or that are right before the next
+#   bifurcation
+def getRemoteChild(nt, t):
     rchildlist = []
-    for i in range(len(childs[t])):
-        tmp = childs[t][i]
-        while len(childs[tmp]) == 1:
-            tmp = childs[tmp][0]
+    root_seg = nt.node(t)
+    children = root_seg[NODE_CHILDREN]
+    for seg in children:
+        tmp = seg[NODE_ID]
+        child_seg = seg
+        while len(child_seg[NODE_CHILDREN]) == 1:
+            child_seg = child_seg[NODE_CHILDREN][0]
+            tmp = child_seg[NODE_ID]
         rchildlist.append(tmp)
     return rchildlist
 
@@ -658,48 +374,39 @@ def computeLinear(nt):
     global Width, Height, Depth, Diameter, Length, Volume, Surface, Hausdorff
     global N_node, N_stem, N_bifs, N_branch, N_tips, Max_Order
     global Pd_ratio, Contraction, Max_Eux, Max_Path, BifA_local, BifA_remote, Soma_surface, Fragmentation
-    global childs, rootidx
+    global root_node
     xmin = VOID
     ymin = VOID
     zmin = VOID
     xmax = 0.0
     ymax = 0.0
     zmax = 0.0
-    lst = nt.obj_list
-    soma = lst[rootidx]
 
-    for i in range(len(lst)):
-        curr = lst[i];
-        xmin = min(xmin,curr.x)
-        ymin = min(ymin,curr.y)
-        zmin = min(zmin,curr.z)
-        xmax = max(xmax,curr.x)
-        ymax = max(ymax,curr.y)
-        zmax = max(zmax,curr.z)
-        if len(childs[i]) == 0:
+    for curr in nt.compartment_list:
+        xmin = min(xmin,curr[NODE_X])
+        ymin = min(ymin,curr[NODE_Y])
+        zmin = min(zmin,curr[NODE_Z])
+        xmax = max(xmax,curr[NODE_X])
+        ymax = max(ymax,curr[NODE_Y])
+        zmax = max(zmax,curr[NODE_Z])
+        if len(curr[NODE_CHILDREN]) == 0:
             N_tips += 1
-        elif len(childs[i]) > 1:
+        elif len(curr[NODE_CHILDREN]) > 1:
             N_bifs += 1
-        parent = getParent(i,nt);
-        if parent == VOID:
+        parent = nt.parent_of(curr)
+        if parent is None:
             continue
-        try:
-            l = dist(curr,lst[parent]);
-        except IndexError:
-            print parent
-            print curr
-            print len(lst)
-            raise
-        Diameter += 2*curr.radius;
+        l = dist(curr,parent);
+        Diameter += 2*curr[NODE_R];
         Length += l;
-        Surface += 2*math.pi*curr.radius*l
-        Volume += math.pi*curr.radius*curr.radius*l
-        lsoma = dist(curr,soma)
+        Surface += 2*math.pi*curr[NODE_R]*l
+        Volume += math.pi*curr[NODE_R]*curr[NODE_R]*l
+        lsoma = dist(curr, root_node)
         Max_Eux = max(Max_Eux,lsoma)
     Width = xmax-xmin
     Height = ymax-ymin
     Depth = zmax-zmin
-    Diameter /= len(lst)
+    Diameter /= nt.num_nodes
 
 
 # do a search along the tree to compute N_branch, max path distance, 
@@ -709,14 +416,13 @@ def computeTree(nt):
     global Width, Height, Depth, Diameter, Length, Volume, Surface, Hausdorff
     global N_node, N_stem, N_bifs, N_branch, N_tips, Max_Order
     global Pd_ratio, Contraction, Max_Eux, Max_Path, BifA_local, BifA_remote, Soma_surface, Fragmentation
-    global childs, rootidx
-    lst = nt.obj_list
+    global root_node
 
-    pathTotal = np.zeros(len(lst))
-    depth = np.zeros(len(lst))
+    pathTotal = np.zeros(nt.num_nodes)
+    depth = np.zeros(nt.num_nodes)
 
     stack = []
-    stack.append(rootidx)
+    stack.append(root_node[NODE_ID])
     pathlength = 0.0
     eudist = 0.0
     max_local_ang = 0.0
@@ -725,18 +431,19 @@ def computeTree(nt):
     N_ratio = 0
     N_Contraction = 0
    
-    if len(childs[rootidx]) > 1:
+    if len(root_node[NODE_CHILDREN]) > 1:
         local_ang = 0.0
         remote_ang = 0.0
         max_local_ang = 0.0
         max_remote_ang = 0.0
-        ch_local1 = childs[rootidx][0]
-        ch_local2 = childs[rootidx][1]
-        local_ang = angle(lst[rootidx],lst[ch_local1],lst[ch_local2])
+        ch_local1 = root_node[NODE_CHILDREN][0][NODE_ID]
+        ch_local2 = root_node[NODE_CHILDREN][1][NODE_ID]
+        local_ang = angle(root_node,nt.node(ch_local1),nt.node(ch_local2))
 
-        ch_remote1 = getRemoteChild(rootidx)[0];
-        ch_remote2 = getRemoteChild(rootidx)[1];
-        remote_ang = angle(lst[rootidx],lst[ch_remote1],lst[ch_remote2]);
+        remotes = getRemoteChild(nt, root_node)
+        ch_remote1 = remotes[0]
+        ch_remote2 = remotes[1]
+        remote_ang = angle(root_node,nt.node(ch_remote1),nt.node(ch_remote2));
         if local_ang == local_ang:
             max_local_ang = max(max_local_ang,local_ang);
         if remote_ang == remote_ang:
@@ -750,22 +457,21 @@ def computeTree(nt):
     fragment = None
     while len(stack) > 0:
         t = stack.pop()
-        child = childs[t]
-        for i in range(len(child)):
+        for child in nt.node(t)[NODE_CHILDREN]:
             N_branch += 1
-            tmp = child[i]
-            if lst[t].radius > 0:
+            if nt.node(t)[NODE_R] > 0:
                 N_ratio += 1
-                Pd_ratio += lst[tmp].radius/lst[t].radius
-            pathlength = dist(lst[tmp],lst[t])
+                Pd_ratio += 1.0*child[NODE_R]/nt.node(t)[NODE_R]
+            pathlength = dist(child, nt.node(t))
 
             fragment = 0.0
-            while len(childs[tmp]) == 1:
-                ch = childs[tmp][0]
-                pathlength += dist(lst[ch],lst[tmp])
+            child_id = child[NODE_ID]
+            while len(nt.node(child_id)[NODE_CHILDREN]) == 1:
+                ch = nt.node(child_id)[NODE_CHILDREN][0][NODE_ID]
+                pathlength += dist(nt.node(ch), nt.node(child_id))
                 fragment += 1
-                tmp = ch
-            eudist = dist(lst[tmp],lst[t])
+                child_id = ch
+            eudist = dist(nt.node(child_id), nt.node(t))
             Fragmentation += fragment
             if pathlength > 0:
                 Contraction += eudist/pathlength
@@ -773,32 +479,32 @@ def computeTree(nt):
 
             #we are reaching a tip point or another branch point, 
             #   computation for this branch is over
-            chsz = len(childs[tmp])
+            chsz = len(nt.node(child_id)[NODE_CHILDREN])
             if chsz > 1:  #another branch
-                stack.append(tmp)
+                stack.append(child_id)
 
                 #compute local bif angle and remote bif angle
                 local_ang = 0.0
                 remote_ang = 0.0
                 max_local_ang = 0
                 max_remote_ang = 0
-                ch_local1 = childs[tmp][0]
-                ch_local2 = childs[tmp][1]
-                local_ang = angle(lst[tmp],lst[ch_local1],lst[ch_local2])
+                ch_local1 = nt.node(child_id)[NODE_CHILDREN][0][NODE_ID]
+                ch_local2 = nt.node(child_id)[NODE_CHILDREN][1][NODE_ID]
+                local_ang = angle(nt.node(child_id),nt.node(ch_local1),nt.node(ch_local2))
 
-                ch_remote1 = getRemoteChild(tmp)[0];
-                ch_remote2 = getRemoteChild(tmp)[1];
-                remote_ang = angle(lst[tmp],lst[ch_remote1],lst[ch_remote2]);
+                remotes = getRemoteChild(nt, child_id)
+                ch_remote1 = remotes[0]
+                ch_remote2 = remotes[1]
+                remote_ang = angle(nt.node(child_id),nt.node(ch_remote1),nt.node(ch_remote2));
                 if local_ang == local_ang:
                     max_local_ang = max(max_local_ang,local_ang)
                 if remote_ang == remote_ang:
                     max_remote_ang = max(max_remote_ang,remote_ang)
-
                 BifA_local += max_local_ang
                 BifA_remote += max_remote_ang
 
-            pathTotal[tmp] = pathTotal[t] + pathlength
-            depth[tmp] = depth[t] + 1
+            pathTotal[child_id] = pathTotal[t] + pathlength
+            depth[child_id] = depth[t] + 1
     if N_ratio == 0:
         Pd_ratio = float('nan')
     else:
@@ -821,7 +527,7 @@ def computeTree(nt):
         BifA_local /= N_bifs
         BifA_remote /= N_bifs
 
-    for i in range(len(lst)):
+    for i in range(nt.num_nodes):
         Max_Path = max(Max_Path, pathTotal[i])
         Max_Order = max(Max_Order, depth[i])
 
