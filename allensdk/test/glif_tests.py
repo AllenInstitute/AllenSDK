@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from allensdk.api.queries.glif_api import GlifApi
 import allensdk.core.json_utilities as json_utilities
 from allensdk.model.glif.glif_neuron import GlifNeuron
-import os, shutil
+from allensdk.model.glif.simulate_neuron import simulate_neuron
+import os, shutil, logging
 
 #NEURONAL_MODEL_ID = 491547163 # level 1 LIF
 NEURONAL_MODEL_ID = 491547171 # level 5 GLIF
@@ -52,6 +53,18 @@ def test_run():
     plt.plot(threshold)
     plt.savefig(os.path.join(OUTPUT_DIR, 'plot.png'))
 
+def test_simulate():
+    logging.getLogger().setLevel(logging.DEBUG)
+    neuron_config = json_utilities.read(os.path.join(OUTPUT_DIR, '%d_neuron_config.json' % NEURONAL_MODEL_ID))
+    ephys_sweeps = json_utilities.read(os.path.join(OUTPUT_DIR, 'ephys_sweeps.json'))
+    ephys_file_name = os.path.join(OUTPUT_DIR, '%d.nwb' % NEURONAL_MODEL_ID)
+
+    neuron = GlifNeuron.from_dict(neuron_config)
+
+    sweep_numbers = [ s['sweep_number'] for s in ephys_sweeps ]
+    simulate_neuron(neuron, sweep_numbers, ephys_file_name, ephys_file_name, 0.05)
+
 if __name__ == "__main__": 
-    test_download()
-    test_run()
+    #test_download()
+    #test_run()
+    test_simulate()
