@@ -92,7 +92,7 @@ class GlifApi(RmaApi):
         try:
             ephys_result = specimen['ephys_result']
             for wkf in ephys_result['well_known_files']:
-                if wkf['well_known_file_type']['name'] == 'NWB':
+                if wkf['well_known_file_type']['name'] == 'NWBDownload':
                     self.stimulus_url = wkf['download_link']
                     break
         except Exception, e:
