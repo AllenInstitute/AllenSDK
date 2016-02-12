@@ -56,13 +56,14 @@ class CellTypesCache(Cache):
     EPHYS_DATA_KEY = 'EPHYS_DATA'
     EPHYS_SWEEPS_KEY = 'EPHYS_SWEEPS'
     RECONSTRUCTION_KEY = 'RECONSTRUCTION'
+    MARKER_KEY = 'MARKER'
     
-    def __init__(self, cache=True, manifest_file='manifest.json'):
+    def __init__(self, cache=True, manifest_file='manifest.json', base_uri=None):
         super(CellTypesCache, self).__init__(manifest=manifest_file, cache=cache)
-        self.api = CellTypesApi()
+        self.api = CellTypesApi(base_uri=base_uri)
 
 
-    def get_cells(self, file_name=None, require_morphology=False, require_reconstruction=False):
+    def get_cells(self, file_name=None, require_morphology=False, require_reconstruction=False, reporter_status=None):
         '''
         Download metadata for all cells in the database and optionally return a
         subset filtered by whether or not they have a morphology or reconstruction.
@@ -80,6 +81,9 @@ class CellTypesCache(Cache):
 
         require_reconstruction: boolean
             Filter out cells that have no morphological reconstructions.
+           
+        reporter_status: list
+            Filter for cells that have one or more cell reporter statuses.
         '''
 
         file_name = self.get_cache_path(file_name, self.CELLS_KEY)
@@ -93,7 +97,7 @@ class CellTypesCache(Cache):
                 json_utilities.write(file_name, cells)
 
         # filter the cells on the way out
-        return self.api.filter_cells(cells, require_morphology, require_reconstruction)
+        return self.api.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
     
 
     def get_ephys_sweeps(self, specimen_id, file_name=None):
@@ -262,7 +266,7 @@ class CellTypesCache(Cache):
             The ID of a cell specimen to download.
 
         file_name: string
-            File name to save/read the ephys features metadata as CSV.  
+            File name to save/read the reconstruction SWC.  
             If file_name is None, the file_name will be pulled out of the 
             manifest.  If caching is disabled, no file will be saved. 
             Default is None.
@@ -282,6 +286,43 @@ class CellTypesCache(Cache):
             self.api.save_reconstruction(specimen_id, file_name)
 
         return swc.read_swc(file_name)
+
+    def get_reconstruction_marker(self, specimen_id, file_name=None):
+        '''
+        Download and open a reconstruction marker file for a single cell in the database.
+
+        Parameters
+        ----------
+        
+        specimen_id: int
+            The ID of a cell specimen to download.
+
+        file_name: string
+            File name to save/read the reconstruction marker.  
+            If file_name is None, the file_name will be pulled out of the 
+            manifest.  If caching is disabled, no file will be saved. 
+            Default is None.
+
+        Returns
+        -------
+        Morphology
+             A class instance with methods for accessing morphology compartments.
+        '''
+
+        file_name = self.get_cache_path(file_name, self.MARKER_KEY, specimen_id)
+
+        if file_name is None:
+            raise Exception("Please enable caching (CellTypes.cache = True) or specify a save_file_name.")
+
+        if not os.path.exists(file_name):
+            self.api.save_reconstruction_marker(specimen_id, file_name)
+
+        df = pd.read_csv(file_name, 
+                         comment='#', 
+                         header=None, 
+                         names=['x','y','z','radius','shape','name','comment','color_r','color_g','color_b'])
+
+        return df.to_dict(orient='records')
 
 
     def build_manifest(self, file_name):
@@ -304,6 +345,7 @@ class CellTypesCache(Cache):
         mb.add_path(self.EPHYS_FEATURES_KEY, 'ephys_features.csv', typename='file', parent_key='BASEDIR')
         mb.add_path(self.MORPHOLOGY_FEATURES_KEY, 'morphology_features.csv', typename='file', parent_key='BASEDIR')
         mb.add_path(self.RECONSTRUCTION_KEY, 'specimen_%d/reconstruction.swc', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.MARKER_KEY, 'specimen_%d/reconstruction.marker', typename='file', parent_key='BASEDIR')
         mb.add_path(self.EPHYS_SWEEPS_KEY, 'specimen_%d/ephys_sweeps.json', typename='file', parent_key='BASEDIR')
 
 
