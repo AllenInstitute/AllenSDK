@@ -227,7 +227,7 @@ class CellTypesApi(RmaApi):
             pass
 
         criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
-        includes = 'neuron_reconstructions(well_known_files(well_known_file_type[name%eq\'%s\']))'% self.SWC_FILE_TYPE
+        includes = 'neuron_reconstructions(well_known_files(well_known_file_type[name$eq\'%s\']))' % self.SWC_FILE_TYPE
         
         results = self.model_query('Specimen',
                                    criteria=criteria,
