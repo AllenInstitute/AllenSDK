@@ -139,10 +139,10 @@ class Morphology( object ):
 
     SOMA = 1
     AXON = 2
-    BASAL_DENDRITE = 3
+    DENDRITE = 3
     APICAL_DENDRITE = 4
 
-    NODE_TYPES = [ SOMA, AXON, BASAL_DENDRITE, APICAL_DENDRITE ]
+    NODE_TYPES = [ SOMA, AXON, DENDRITE, APICAL_DENDRITE ]
 
     def __init__(self, compartment_list=None, compartment_index=None):
         """ 
@@ -173,12 +173,14 @@ class Morphology( object ):
             self.compartment_list = compartment_list
         elif compartment_index:
             self.compartment_index = compartment_index
+
         ##############################################
         # verify morphology is consistent with morphology rules (e.g.,
         #   no dendrite branching from an axon)
         num_errors = self.check_consistency()
         if num_errors > 0:
             raise ValueError("Morphology appears to be inconsistent")
+
         ##############################################
         # root node (this must be part of the soma)
         self._soma = None
@@ -249,7 +251,7 @@ class Morphology( object ):
 
     @property
     def soma(self):
-        """ [deprecated] Returns root node of soma, if present"""
+        """ Returns root node of soma, if present """
         return self._soma
 
     @property
@@ -312,6 +314,7 @@ class Morphology( object ):
         A morphology object, or None if no parent exists or if the
         specified node ID doesn't exist
         """
+
         # handle case when index passed
         if type(seg).__name__ == 'int':
             if seg < 0 or seg >= len(self._compartment_list):
@@ -421,7 +424,7 @@ class Morphology( object ):
             The search radius
         
         node_type: enum (optional)
-            One of the following constants: SOMA, AXON, BASAL_DENDRITE, 
+            One of the following constants: SOMA, AXON, DENDRITE, 
             or APICAL_DENDRITE
             
         Returns
@@ -699,7 +702,7 @@ class Morphology( object ):
         node_type: enum
             The compartment type to keep in the morphology. 
             Use one of the following constants: SOMA, AXON, 
-            BASAL_DENDRITE, or APICAL_DENDRITE
+            DENDRITE, or APICAL_DENDRITE
         
         keep_soma: Boolean (optional)
             True (default) if soma nodes should remain in the 
@@ -737,7 +740,7 @@ class Morphology( object ):
         node_type: enum
             The compartment type to strip from the morphology.
             Use one of the following constants: SOMA, AXON, 
-            BASAL_DENDRITE, or APICAL_DENDRITE
+            DENDRITE, or APICAL_DENDRITE
         """
         flagged_for_removal = {}
         for seg in self.compartment_list:
@@ -769,12 +772,12 @@ class Morphology( object ):
         old_type: enum
             The compartment type to be changed.
             Use one of the following constants: SOMA, AXON, 
-            BASAL_DENDRITE, or APICAL_DENDRITE
+            DENDRITE, or APICAL_DENDRITE
 
         new_type: enum
             The target compartment type.
             Use one of the following constants: SOMA, AXON, 
-            BASAL_DENDRITE, or APICAL_DENDRITE
+            DENDRITE, or APICAL_DENDRITE
         """
         for seg in self.compartment_list:
             if seg[NODE_TYPE] == old_type:
