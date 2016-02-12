@@ -26,7 +26,8 @@ class CellTypesApi(RmaApi):
 
 
     def list_cells(self, require_morphology=False, require_reconstruction=False, reporter_status=None):
-        ''' Query the API for a list of all cells in the Cell Types Database.
+        """ 
+        Query the API for a list of all cells in the Cell Types Database.
 
         Parameters
         ----------
@@ -43,7 +44,7 @@ class CellTypesApi(RmaApi):
         -------
         list
             Meta data for all cells.
-        '''
+        """
 
         criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
         
@@ -78,7 +79,7 @@ class CellTypesApi(RmaApi):
 
 
     def get_ephys_sweeps(self, specimen_id):
-        '''
+        """
         Query the API for a list of sweeps for a particular cell in the Cell Types Database.
 
         Parameters
@@ -90,14 +91,14 @@ class CellTypesApi(RmaApi):
         Returns
         -------
         list: List of sweep dictionaries belonging to a cell
-        '''
+        """
         criteria = "[specimen_id$eq%d]" % specimen_id
         
         return self.model_query('EphysSweep', criteria=criteria, num_rows='all')
 
 
     def filter_cells(self, cells, require_morphology, require_reconstruction, reporter_status):
-        ''' 
+        """ 
         Filter a list of cell specimens to those that optionally have morphologies
         or have morphological reconstructions.
 
@@ -114,8 +115,8 @@ class CellTypesApi(RmaApi):
             Filter out cells that have no morphological reconstructions.
 
         reporter_status: list
-            Filter for cells that have a particular cell reporter status            
-        '''
+            Filter for cells that have a particular cell reporter status
+        """
 
         if require_morphology:
             cells = [ c for c in cells if c['has_morphology'] ]
@@ -130,7 +131,7 @@ class CellTypesApi(RmaApi):
         
 
     def get_ephys_features(self, dataframe=False):
-        '''
+        """
         Query the API for the full table of EphysFeatures for all cells.  
 
         Parameters
@@ -139,7 +140,7 @@ class CellTypesApi(RmaApi):
         dataframe: boolean
             If true, return the results as a Pandas DataFrame.  Otherwise
             return a list of dictionaries.
-        '''
+        """
 
         features = self.model_query('EphysFeature', num_rows='all')
 
@@ -150,7 +151,7 @@ class CellTypesApi(RmaApi):
 
 
     def get_morphology_features(self, dataframe=False):
-        '''
+        """
         Query the API for the full table of morphology features for all cells
         
         Parameters
@@ -159,7 +160,7 @@ class CellTypesApi(RmaApi):
         dataframe: boolean
             If true, return the results as a Pandas DataFrame.  Otherwise
             return a list of dictionaries.
-        '''
+        """
 
         features = self.model_query('NeuronReconstruction', criteria="specimen", num_rows='all')
 
@@ -174,6 +175,18 @@ class CellTypesApi(RmaApi):
 
 
     def save_ephys_data(self, specimen_id, file_name):
+        """
+        Save the electrophysology recordings for a cell as an NWB file.
+
+        Parameters
+        ----------
+        specimen_id: int
+            ID of the specimen, from the Specimens database model in the Allen Institute API.
+
+        file_name: str
+            Path to save the NWB file.  
+        """
+
         try: 
             os.makedirs(os.path.dirname(file_name))
         except:
@@ -196,6 +209,18 @@ class CellTypesApi(RmaApi):
         
 
     def save_reconstruction(self, specimen_id, file_name):
+        """
+        Save the morphological reconstruction of a cell as an SWC file.  
+
+        Parameters
+        ----------
+        specimen_id: int
+            ID of the specimen, from the Specimens database model in the Allen Institute API.
+
+        file_name: str
+            Path to save the SWC file.  
+        """
+
         try: 
             os.makedirs(os.path.dirname(file_name))
         except:
@@ -218,6 +243,20 @@ class CellTypesApi(RmaApi):
 
 
     def save_reconstruction_marker(self, specimen_id, file_name):
+        """
+        Save the marker file for the morphological reconstruction of a cell.  These are
+        comma-delimited files indicating points of interest in a reconstruction (truncation
+        points, early tracing termination, etc).
+
+        Parameters
+        ----------
+        specimen_id: int
+            ID of the specimen, from the Specimens database model in the Allen Institute API.
+
+        file_name: str
+            Path to save the marker file.
+        """
+
         try: 
             os.makedirs(os.path.dirname(file_name))
         except:

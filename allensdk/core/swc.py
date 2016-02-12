@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -18,12 +18,7 @@ import csv
 import copy
 import math
 
-########################################################################
-# morphology nodes
-#
-# morphology nodenodes are stored as dicts and have the following fields
-# the first seven correspond directly to fields in SWC files. SWC fields
-#   are numeric
+# Morphology nodes have the following fields. SWC fields are numeric.
 NODE_ID      = 'id'
 NODE_TYPE    = 'type'
 NODE_X       = 'x'
@@ -32,20 +27,26 @@ NODE_Z       = 'z'
 NODE_R       = 'radius'
 NODE_PN      = 'parent'
 SWC_COLUMNS = [ NODE_ID, NODE_TYPE, NODE_X, NODE_Y, NODE_Z, NODE_R, NODE_PN ]
-# additional node data
-# each unconnected graph has its own ID. this is the ID of graph that the
-#   node resides in
+
+# Each unconnected graph has its own ID. This is the ID of graph that the
+# node resides in
 NODE_TREE_ID = 'tree_id'     
-# a list references to child nodes
+
+# A list references to child nodes
 NODE_CHILDREN = 'children'   
-# each object is tagged with a label to detect type errors
+
+# Each object is tagged with a label to detect type errors
 RTTI = 'rtti'   # type information label
 MORPHOLOGY_NODE   = "morphology node" # identifying node tag
 
+
 def print_node(seg):
+    """ Print node information to stdout """
+
     # verify passed value is morphology node
     if RTTI not in seg or seg[RTTI] != MORPHOLOGY_NODE:
         raise TypeError("Object not recognized as morphology node")
+
     disp = "SWC node: "
     disp += "%d " % seg[NODE_ID]
     disp += "%d " % seg[NODE_TYPE]
@@ -55,17 +56,21 @@ def print_node(seg):
     disp += "%f " % seg[NODE_R]
     disp += "%d [" % seg[NODE_PN]
     ch = ""
+
     for i in range(len(seg[NODE_CHILDREN])):
         ch += "%d " % seg[NODE_CHILDREN][i][NODE_ID]
+
     if len(ch) > 0:
         ch = ch[:-1]
+
     disp += ch[:] + "] %d" % seg[NODE_TREE_ID]
-    print disp
+
+    print (disp)
 
 
-########################################################################
 def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
-    """  Read in an SWC file and return a Morphology object.
+    """  
+    Read in an SWC file and return a Morphology object.
 
     Parameters
     ----------
@@ -77,6 +82,7 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
     Morphology
         A Morphology instance.
     """
+
     compartments = []
     line_num = 1
     try:
@@ -85,6 +91,7 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
                 # remove comments
                 if line.lstrip().startswith('#'):
                     continue
+                
                 # read values. expected SWC format is:
                 #   ID, type, x, y, z, rad, parent
                 # x, y, z and rad are floats. the others are ints
@@ -97,8 +104,10 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
                 vals[NODE_Z]    = float(toks[4])
                 vals[NODE_R]    = float(toks[5])
                 vals[NODE_PN]   = int(toks[6].rstrip())
+                
                 # store this compartment
                 compartments.append(vals)
+                
                 # increment line number (used for error reporting only)
                 line_num += 1
     except ValueError:
@@ -108,7 +117,6 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
             err += "Content: '%s'\n" % line
         raise IOError(err)
 
-    # return new Morphology object
     return Morphology(compartment_list=compartments)    
 
 
@@ -119,12 +127,14 @@ def read_string(s, columns=SWC_COLUMNS, numeric_columns="NOT_USED"):
     raise AssertionError("This function is deprecated")
 
 
-########################################################################
-########################################################################
-
 class Morphology( object ):
-    """ Keep track of the list of compartments in a morphology and provide 
+    """ 
+    Keep track of the list of compartments in a morphology and provide 
     a few helper methods (soma, tree information, pruning, etc).
+
+    Morphology node are stored as dicts and have the following fields
+    the first seven correspond directly to fields in SWC files. SWC fields
+    are numeric.
     """
 
     SOMA = 1
@@ -135,7 +145,8 @@ class Morphology( object ):
     NODE_TYPES = [ SOMA, AXON, BASAL_DENDRITE, APICAL_DENDRITE ]
 
     def __init__(self, compartment_list=None, compartment_index=None):
-        """ Try to initialize from a list of compartments first, then from
+        """ 
+        Try to initialize from a list of compartments first, then from
         a dictionary indexed by compartment id if that fails, and finally just
         leave everything empty.
         
@@ -243,7 +254,7 @@ class Morphology( object ):
 
     @property
     def root(self):
-        """ [deprecated] Returns root node of soma, if present. Use 'soma' instead of 'root'"""
+        """ [deprecated] Returns root node of soma, if present. Use 'soma' instead of 'root"""'
         return self._soma
 
     ####################################################################
