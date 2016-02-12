@@ -140,9 +140,10 @@ class Morphology( object ):
     SOMA = 1
     AXON = 2
     DENDRITE = 3
+    BASAL_DENDRITE = 3 
     APICAL_DENDRITE = 4
 
-    NODE_TYPES = [ SOMA, AXON, DENDRITE, APICAL_DENDRITE ]
+    NODE_TYPES = [ SOMA, AXON, DENDRITE, BASAL_DENDRITE, APICAL_DENDRITE ]
 
     def __init__(self, compartment_list=None, compartment_index=None):
         """ 
@@ -417,7 +418,7 @@ class Morphology( object ):
         
         node_type: enum (optional)
             One of the following constants: SOMA, AXON, DENDRITE, 
-            or APICAL_DENDRITE
+            BASAL_DENDRITE, or APICAL_DENDRITE
             
         Returns
         -------
@@ -695,7 +696,7 @@ class Morphology( object ):
         node_type: enum
             The compartment type to keep in the morphology. 
             Use one of the following constants: SOMA, AXON, 
-            DENDRITE, or APICAL_DENDRITE
+            DENDRITE, BASAL_DENDRITE, or APICAL_DENDRITE
         
         keep_soma: Boolean (optional)
             True (default) if soma nodes should remain in the 
@@ -733,7 +734,7 @@ class Morphology( object ):
         node_type: enum
             The compartment type to strip from the morphology.
             Use one of the following constants: SOMA, AXON, 
-            DENDRITE, or APICAL_DENDRITE
+            DENDRITE, BASAL_DENDRITE, or APICAL_DENDRITE
         """
         flagged_for_removal = {}
         for seg in self.compartment_list:
@@ -765,12 +766,12 @@ class Morphology( object ):
         old_type: enum
             The compartment type to be changed.
             Use one of the following constants: SOMA, AXON, 
-            DENDRITE, or APICAL_DENDRITE
+            DENDRITE, BASAL_DENDRITE, or APICAL_DENDRITE
 
         new_type: enum
             The target compartment type.
             Use one of the following constants: SOMA, AXON, 
-            DENDRITE, or APICAL_DENDRITE
+            DENDRITE, BASAL_DENDRITE, or APICAL_DENDRITE
         """
         for seg in self.compartment_list:
             if seg[NODE_TYPE] == old_type:
