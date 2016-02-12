@@ -57,9 +57,9 @@ class CellTypesCache(Cache):
     EPHYS_SWEEPS_KEY = 'EPHYS_SWEEPS'
     RECONSTRUCTION_KEY = 'RECONSTRUCTION'
     
-    def __init__(self, cache=True, manifest_file='manifest.json'):
+    def __init__(self, cache=True, manifest_file='manifest.json', base_uri=None):
         super(CellTypesCache, self).__init__(manifest=manifest_file, cache=cache)
-        self.api = CellTypesApi()
+        self.api = CellTypesApi(base_uri=base_uri)
 
 
     def get_cells(self, file_name=None, require_morphology=False, require_reconstruction=False):

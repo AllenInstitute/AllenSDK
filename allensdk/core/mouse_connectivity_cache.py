@@ -73,11 +73,11 @@ class MouseConnectivityCache(Cache):
     STRUCTURES_KEY = 'STRUCTURES'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
     
-    def __init__(self, resolution=25, cache=True, manifest_file='manifest.json'):
+    def __init__(self, resolution=25, cache=True, manifest_file='manifest.json', base_uri=None):
         super(MouseConnectivityCache, self).__init__(manifest=manifest_file, cache=cache)
 
         self.resolution = resolution
-        self.api = MouseConnectivityApi()
+        self.api = MouseConnectivityApi(base_uri=base_uri)
 
 
     def get_annotation_volume(self, file_name=None):
