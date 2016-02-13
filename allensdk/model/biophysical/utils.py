@@ -32,7 +32,7 @@ def create_utils(description, model_type=None):
 
 class Utils(HocUtils):
     '''A helper class for NEURON functionality needed for
-    perisomatic biophysical simulations.
+    biophysical simulations.
     
     Attributes
     ----------

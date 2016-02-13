@@ -36,7 +36,7 @@ of individual neurons in the mouse primary visual cortex.  The Allen SDK provide
 for accessing electrophysiology measurements (`NWB files <cell_types.html#neurodata-without-borders>`_) 
 for all neurons and morphological reconstructions (`SWC files <cell_types.html#morphology-swc-files>`_) for a subset of neurons.
 
-The Database also contains two classes of models fit to this data set: perisomatic biophysical 
+The Database also contains two classes of models fit to this data set: biophysical
 models produced using the NEURON simulator and generalized leaky integrate and fire models (GLIFs) 
 produced using custom Python code provided with this toolkit. 
 
@@ -44,7 +44,7 @@ The Allen SDK provides sample code
 demonstrating how to download neuronal model parameters from the Allen Brain Atlas API and run 
 your own simulations using stimuli from the Allen Cell Types Database or custom current injections:
 
-    * :doc:`biophysical_perisomatic_script`
+    * :doc:`biophysical_models`
     * :doc:`glif_models`
 
 

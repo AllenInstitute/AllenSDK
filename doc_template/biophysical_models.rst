@@ -1,5 +1,5 @@
-Perisomatic Biophysical Models
-==============================
+Biophysical Models
+==================
 
 The Allen Cell Types Database contains biophysical models that
 characterize the firing behavior of neurons measured in slices
@@ -24,7 +24,7 @@ Prerequisites
 You must have NEURON with the Python interpreter enabled and the Allen SDK installed.
 
 The Allen Institute perisomatic biophysical models were generated using
-NEURON `version v7.3.ansi-1078 <http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078>`_.
+NEURON `version v7.4.rel-1370 <http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/v7.4.rel-1370>`_.
 Instructions for compiling NEURON with the Python interpreter 
 are available from the NEURON team under the heading 
 `Installation with Python as an alternative interpreter <http://www.neuron.yale.edu/neuron/download/compile_linux#otheroptions>`_.
@@ -46,19 +46,21 @@ The first way is to visit http://celltypes.brain-map.org and find cells that hav
 biophysical models available for download.  The electrophysiology details page
 for a cell has a neuronal model download link.  Specifically:
 
-    #. Check 'More Options+'...'Models -> Biophysical'
+    #. Click 'More Options+'
+    #. Check 'Models -> Biophysical - perisomatic' or 'Biophysical - all active'
     #. Use the Filters, Cell Location and Cell Feature Filters to narrow your results.
     #. Click on a Cell Summary to view the Mouse Experiment Electrophysiology.
     #. Click the "download data" link to download the NWB stimulus and response file.
-    #. Click "show model response" and select "Biophysical - perisomatic".
-    #. Scroll down and click the Biophysical - perisomatic "download model" link.
+    #. Click "show model response" and select 'Biophysical - perisomatic' or 'Biophysical - all active'.
+    #. Scroll down and click the 'Biophysical - perisomatic' or 'Biophysical - all active' "download model" link.
 
 
 This may be also be done programmatically.
 The neuronal model id can be found to the left of
-the corresponding 'Biophysical - perisomatic "download model" link.
+the corresponding 'Biophysical - perisomatic' or
+'Biophysical - all active' "download model" link.
 
-.. literalinclude:: _static/examples/biophysical_perisomatic_ex1.py
+.. literalinclude:: _static/examples/biophysical_ex1.py
 
 More help can be found in the
 `online help <http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database>`_

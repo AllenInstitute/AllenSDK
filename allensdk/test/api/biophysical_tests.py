@@ -4,11 +4,11 @@ from allensdk.api.queries.rma_api import RmaApi
 import pandas as pd
 import pandas.io.json as pj
 import allensdk.core.json_utilities as ju
-from allensdk.api.queries.biophysical_perisomatic_api import \
+from allensdk.api.queries.biophysical_api import \
     BiophysicalPerisomaticApi
 from allensdk.config.manifest import Manifest
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-from allensdk.model.biophysical_perisomatic.runner import run
+from allensdk.model.biophysical.runner import run
 import os
 import subprocess
 from allensdk.model.biophys_sim.config import Config
