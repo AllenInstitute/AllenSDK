@@ -21,6 +21,7 @@ class NwbDataSet(object):
     from an NWB file.
     """
     SPIKE_TIMES = "spike_times"
+    DEPRECATED_SPIKE_TIMES = "aibs_spike_times"
     
     def __init__(self, file_name, spike_time_key=None):
         """ Initialize the NwbDataSet instance with a file name
@@ -142,7 +143,7 @@ class NwbDataSet(object):
     
 
     def get_spike_times(self, sweep_number, key=None):
-        """ Return any spike times stored in the NWB file for a sweep.
+        """ Return any spike times stored in the NWB file for a sweep.  
 
         Parameters
         ----------
@@ -162,13 +163,13 @@ class NwbDataSet(object):
         
         with h5py.File(self.file_name,'r') as f:
             sweep_name = "Sweep_%d" % sweep_number
-            
-            try:
-                spikes = f["analysis"][key][sweep_name]
-            except KeyError:
-                return []
-            
-            return spikes.value
+            datasets = [ "analysis/%s/Sweep_%d" % ( key, sweep_number ),
+                         "analysis/%s/Sweep_%d" % ( self.DEPRECATED_SPIKE_TIMES, sweep_number ) ]
+
+            for ds in datasets:
+                if ds in f:
+                    return f[ds].value
+            return []
     
     
     def set_spike_times(self, sweep_number, spike_times, key=None):

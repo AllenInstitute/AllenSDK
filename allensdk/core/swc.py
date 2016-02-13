@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -18,12 +18,7 @@ import csv
 import copy
 import math
 
-########################################################################
-# morphology nodes
-#
-# morphology nodenodes are stored as dicts and have the following fields
-# the first seven correspond directly to fields in SWC files. SWC fields
-#   are numeric
+# Morphology nodes have the following fields. SWC fields are numeric.
 NODE_ID      = 'id'
 NODE_TYPE    = 'type'
 NODE_X       = 'x'
@@ -32,20 +27,26 @@ NODE_Z       = 'z'
 NODE_R       = 'radius'
 NODE_PN      = 'parent'
 SWC_COLUMNS = [ NODE_ID, NODE_TYPE, NODE_X, NODE_Y, NODE_Z, NODE_R, NODE_PN ]
-# additional node data
-# each unconnected graph has its own ID. this is the ID of graph that the
-#   node resides in
+
+# Each unconnected graph has its own ID. This is the ID of graph that the
+# node resides in
 NODE_TREE_ID = 'tree_id'     
-# a list references to child nodes
+
+# A list references to child nodes
 NODE_CHILDREN = 'children'   
-# each object is tagged with a label to detect type errors
+
+# Each object is tagged with a label to detect type errors
 RTTI = 'rtti'   # type information label
 MORPHOLOGY_NODE   = "morphology node" # identifying node tag
 
+
 def print_node(seg):
+    """ Print node information to stdout """
+
     # verify passed value is morphology node
     if RTTI not in seg or seg[RTTI] != MORPHOLOGY_NODE:
         raise TypeError("Object not recognized as morphology node")
+
     disp = "SWC node: "
     disp += "%d " % seg[NODE_ID]
     disp += "%d " % seg[NODE_TYPE]
@@ -55,17 +56,21 @@ def print_node(seg):
     disp += "%f " % seg[NODE_R]
     disp += "%d [" % seg[NODE_PN]
     ch = ""
+
     for i in range(len(seg[NODE_CHILDREN])):
         ch += "%d " % seg[NODE_CHILDREN][i][NODE_ID]
+
     if len(ch) > 0:
         ch = ch[:-1]
+
     disp += ch[:] + "] %d" % seg[NODE_TREE_ID]
-    print disp
+
+    print (disp)
 
 
-########################################################################
 def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
-    """  Read in an SWC file and return a Morphology object.
+    """  
+    Read in an SWC file and return a Morphology object.
 
     Parameters
     ----------
@@ -77,6 +82,7 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
     Morphology
         A Morphology instance.
     """
+
     compartments = []
     line_num = 1
     try:
@@ -85,6 +91,7 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
                 # remove comments
                 if line.lstrip().startswith('#'):
                     continue
+                
                 # read values. expected SWC format is:
                 #   ID, type, x, y, z, rad, parent
                 # x, y, z and rad are floats. the others are ints
@@ -97,8 +104,10 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
                 vals[NODE_Z]    = float(toks[4])
                 vals[NODE_R]    = float(toks[5])
                 vals[NODE_PN]   = int(toks[6].rstrip())
+                
                 # store this compartment
                 compartments.append(vals)
+                
                 # increment line number (used for error reporting only)
                 line_num += 1
     except ValueError:
@@ -108,7 +117,6 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
             err += "Content: '%s'\n" % line
         raise IOError(err)
 
-    # return new Morphology object
     return Morphology(compartment_list=compartments)    
 
 
@@ -119,23 +127,27 @@ def read_string(s, columns=SWC_COLUMNS, numeric_columns="NOT_USED"):
     raise AssertionError("This function is deprecated")
 
 
-########################################################################
-########################################################################
-
 class Morphology( object ):
-    """ Keep track of the list of compartments in a morphology and provide 
+    """ 
+    Keep track of the list of compartments in a morphology and provide 
     a few helper methods (soma, tree information, pruning, etc).
+
+    Morphology node are stored as dicts and have the following fields
+    the first seven correspond directly to fields in SWC files. SWC fields
+    are numeric.
     """
 
     SOMA = 1
     AXON = 2
-    BASAL_DENDRITE = 3
+    DENDRITE = 3
+    BASAL_DENDRITE = 3 
     APICAL_DENDRITE = 4
 
-    NODE_TYPES = [ SOMA, AXON, BASAL_DENDRITE, APICAL_DENDRITE ]
+    NODE_TYPES = [ SOMA, AXON, DENDRITE, BASAL_DENDRITE, APICAL_DENDRITE ]
 
     def __init__(self, compartment_list=None, compartment_index=None):
-        """ Try to initialize from a list of compartments first, then from
+        """ 
+        Try to initialize from a list of compartments first, then from
         a dictionary indexed by compartment id if that fails, and finally just
         leave everything empty.
         
@@ -147,9 +159,11 @@ class Morphology( object ):
         compartment_index: dict
             dictionary of compartments indexed by id
         """
-        ##############################################
+
         self._compartment_list = []
         self._compartment_index = {}
+
+        ##############################################
         # define tree list here for clarity, even though it's reset below
         #   when nodes are assigned
         self._tree_list = []
@@ -162,12 +176,14 @@ class Morphology( object ):
             self.compartment_list = compartment_list
         elif compartment_index:
             self.compartment_index = compartment_index
+
         ##############################################
         # verify morphology is consistent with morphology rules (e.g.,
         #   no dendrite branching from an axon)
-        num_errors = self.check_consistency()
+        num_errors = self._check_consistency()
         if num_errors > 0:
             raise ValueError("Morphology appears to be inconsistent")
+
         ##############################################
         # root node (this must be part of the soma)
         self._soma = None
@@ -177,10 +193,6 @@ class Morphology( object ):
                 if self._soma is not None:
                     raise ValueError("Multiple somas detected in SWC file")
                 self._soma = seg
-
-    ####################################################################
-    ####################################################################
-    # class properties, and helper functions for them
 
     @property 
     def compartment_list(self):
@@ -216,16 +228,16 @@ class Morphology( object ):
         """ Return the number of compartments in the morphology. """
         return len(self.compartment_list)
 
-    # internal function
-    # take a list of SWC-like objects and turn those into morphology
-    #   nodes
-    # need to be able to initialize from a list supplied by an SWC file
-    #   while also being able to initialize from the compartment list of
-    #   an existing Morphology object. As nodes in a morphology object
-    #   contain reference to nodes in that object, make a shallow copy
-    #   of input nodes and overwrite known references (ie, the 
-    #   'children' array)
     def _set_compartments(self, compartment_list):
+        """ Take a list of SWC-like objects and turn those into morphology nodes
+        need to be able to initialize from a list supplied by an SWC file
+        while also being able to initialize from the compartment list of
+        an existing Morphology object. As nodes in a morphology object
+        contain reference to nodes in that object, make a shallow copy
+        of input nodes and overwrite known references (ie, the 
+        'children' array)
+        """
+
         self._compartment_list = []
         for obj in compartment_list:
             seg = copy.copy(obj)
@@ -233,12 +245,13 @@ class Morphology( object ):
             seg[NODE_CHILDREN] = []
             seg[RTTI] = MORPHOLOGY_NODE
             self._compartment_list.append(seg)
+
         # list data now set. remove holes in sequence and re-index
-        self.reconstruct()
+        self._reconstruct()
 
     @property
     def soma(self):
-        """ [deprecated] Returns root node of soma, if present"""
+        """ Returns root node of soma, if present """
         return self._soma
 
     @property
@@ -265,13 +278,15 @@ class Morphology( object ):
         A list of all morphology objects in the specified tree, or None
         if the tree doesn't exist
         """
+
         if n < 0 or n >= len(self._tree_list):
             return None
         return self._tree_list[n]
 
 
     def node(self, n):
-        """ Returns the morphology node having the specified ID.
+        """ 
+        Returns the morphology node having the specified ID.
         
         Parameters
         ----------
@@ -283,9 +298,10 @@ class Morphology( object ):
         A morphology object having the specified ID, or None if such a
         node doesn't exist
         """
+        
         # undocumented feature -- if a node is supplied instead of a
         #   node ID, the node is returned and no error is triggered
-        return self.resolve_node_type(n)
+        return self._resolve_node_type(n)
 
 
     def parent_of(self, seg):
@@ -301,26 +317,14 @@ class Morphology( object ):
         A morphology object, or None if no parent exists or if the
         specified node ID doesn't exist
         """
-        # handle case when index passed
-        if type(seg).__name__ == 'int':
-            if seg < 0 or seg >= len(self._compartment_list):
-                return None
-            seg = self._compartment_list[seg]
-        # handle case when node (dictionary) passed
-        elif type(seg).__name__ == 'dict':
-            if RTTI not in seg or seg[RTTI] != MORPHOLOGY_NODE:
-                raise TypeError("Object not recognized as morphology node")
-        # no luck. try converting it to an int
-        else:
-            try:
-                seg = int(seg)
-                if seg < 0 or seg >= len(self._compartment_list):
-                    return None
-                seg = self._compartment_list[seg]
-            except ValueError:
-                raise TypeError("Object not recognized as morphology node or index")
+        try:
+            seg = self._resolve_node_type(seg)
+        except TypeError:
+            return None
+
         if seg[NODE_PN] >= 0:
             return self._compartment_list[seg[NODE_PN]]
+
         return None
 
 
@@ -337,7 +341,7 @@ class Morphology( object ):
         A list of the child morphology objects. If the ID of the parent
         node is invalid, None is returned.
         """
-        seg = self.resolve_node_type(seg)
+        seg = self._resolve_node_type(seg)
         return seg[NODE_CHILDREN]
 
 
@@ -345,13 +349,16 @@ class Morphology( object ):
     ###################################################################
     # Information querying and data manipulation
 
-    # internal function. takes an integer and returns the node having
-    #   that ID. IF a node is passed in instead, it is returned
-    def resolve_node_type(self, seg):
+
+    def _resolve_node_type(self, seg):
+        """ Internal function. takes an integer and returns the node having
+        that ID. IF a node is passed in instead, it is returned
+        """
         if type(seg).__name__ == 'int':
             if seg < 0 or seg >= len(self._compartment_list):
                 raise ValueError("Specified child (%d) is not a valid ID" % seg)
             return self._compartment_list[seg]
+        # handle case when node (dictionary) passed
         elif type(seg).__name__ == 'dict':
             if RTTI not in seg or seg[RTTI] != MORPHOLOGY_NODE:
                 raise TypeError("Object not recognized as morphology node")
@@ -385,8 +392,8 @@ class Morphology( object ):
         -------
         Nothing
         """
-        child_seg = self.resolve_node_type(child)
-        parent_seg = self.resolve_node_type(parent)
+        child_seg = self._resolve_node_type(child)
+        parent_seg = self._resolve_node_type(parent)
         # if child has former parent, remove it from parent's child list
         if child_seg[NODE_PN] >= 0:
             old_par = self.node(child_seg[NODE_PN])
@@ -410,8 +417,8 @@ class Morphology( object ):
             The search radius
         
         node_type: enum (optional)
-            One of the following constants: SOMA, AXON, BASAL_DENDRITE, 
-            or APICAL_DENDRITE
+            One of the following constants: SOMA, AXON, DENDRITE, 
+            BASAL_DENDRITE, or APICAL_DENDRITE
             
         Returns
         -------
@@ -505,12 +512,14 @@ class Morphology( object ):
         compartments = copy.deepcopy(self.compartment_index)
         root = self.root
         keep = {}
+
         # figure out which compartments to toss
         ct = 0
         for i, c in compartments.iteritems():
             pid = c[NODE_PN]
             cid = c[NODE_ID]
             ctype = c[NODE_TYPE]
+
             # keep the root, soma, junctions, and the first child of the root (for visualization)
             #if pid == "-1" or len(c[NODE_CHILDREN]) != 1 or pid == root[NODE_ID] or ctype == Morphology.SOMA:
             if pid < 0 or len(c[NODE_CHILDREN]) != 1 or pid == root[NODE_ID] or ctype == Morphology.SOMA:
@@ -526,8 +535,8 @@ class Morphology( object ):
                 parent_id = c[NODE_PN]
                 while keep[parent_id] is False:
                     parent_id = compartments[parent_id][NODE_PN]
-                for child_id in c[NODE_CHILDREN]:
-                    compartments[child_id][NODE_PN] = parent_id
+                for child in c[NODE_CHILDREN]:
+                    child[NODE_PN] = parent_id
         
         # filter out the orphans
         sparsified_compartments = { k:v for k,v in compartments.iteritems() if keep[k] }
@@ -535,6 +544,7 @@ class Morphology( object ):
             ids = sorted(sparsified_compartments.keys(), key=lambda x: int(x))
             id_hash = { fid:str(i+1) for i,fid in enumerate(ids) }
             id_hash[-1] = -1
+
             # build the final compartment index
             out_compartments = {}
             for cid, compartment in sparsified_compartments.iteritems():
@@ -546,17 +556,14 @@ class Morphology( object ):
             return Morphology(compartment_index=sparsified_compartments)
 
 
-    ####################################################################
-    ####################################################################
-    #
-    # internal function that restructures data and establishes 
-    #   appropriate internal linking
-    # data is re-order, removing 'holes' in sequence so that each object 
-    #   ID corresponds to its position in compartment list
-    # trees are (re)calculated
-    # parent-child indices are recalculated as is compartment table
-    def reconstruct(self):
-        # construct a map between new and old IDs
+    def _reconstruct(self):
+        """ Internal function that restructures data and establishes 
+        appropriate internal linking data is re-order, removing 'holes' in 
+        sequence so that each object ID corresponds to its position in 
+        compartment list trees are (re)calculated parent-child indices 
+        are recalculated as is compartment table construct a map between 
+        new and old IDs """
+
         remap = {}
         # everything defaults to root. this way if a parent was deleted
         #   the child will become a new root
@@ -588,7 +595,8 @@ class Morphology( object ):
             if par_num >= 0:
                 self.compartment_list[par_num][NODE_CHILDREN].append(seg)
         # update tree lists
-        self.separate_trees()
+        self._separate_trees()
+
         ############################
         # Rebuild internal index and links between parents and children
         self._compartment_index = { c[NODE_ID]: c for c in self.compartment_list }
@@ -635,7 +643,7 @@ class Morphology( object ):
             seg = self.compartment_list[i]
             if seg[NODE_PN] >= 0:
                 seg[NODE_PN] = remap[seg[NODE_PN]]
-        self.reconstruct()
+        self._reconstruct()
 
 
     def stumpify_axon(self, count=10):
@@ -673,7 +681,7 @@ class Morphology( object ):
             if seg[NODE_TYPE] == Morphology.AXON:
                 if "flag" not in seg:
                     self.compartment_list[i] = None
-        self.reconstruct()
+        self._reconstruct()
             
         
     # strip out everything but the soma and the specified SWC type
@@ -688,7 +696,7 @@ class Morphology( object ):
         node_type: enum
             The compartment type to keep in the morphology. 
             Use one of the following constants: SOMA, AXON, 
-            BASAL_DENDRITE, or APICAL_DENDRITE
+            DENDRITE, BASAL_DENDRITE, or APICAL_DENDRITE
         
         keep_soma: Boolean (optional)
             True (default) if soma nodes should remain in the 
@@ -712,7 +720,7 @@ class Morphology( object ):
             elif seg[NODE_PN] in flagged_for_removal:
                 # parent was eliminated. make this a new root
                 seg[NODE_PN] = -1
-        self.reconstruct()
+        self._reconstruct()
     
     # strip out the specified SWC type
     def strip_type(self, node_type):
@@ -726,7 +734,7 @@ class Morphology( object ):
         node_type: enum
             The compartment type to strip from the morphology.
             Use one of the following constants: SOMA, AXON, 
-            BASAL_DENDRITE, or APICAL_DENDRITE
+            DENDRITE, BASAL_DENDRITE, or APICAL_DENDRITE
         """
         flagged_for_removal = {}
         for seg in self.compartment_list:
@@ -744,7 +752,7 @@ class Morphology( object ):
             elif seg[NODE_PN] in flagged_for_removal:
                 # parent was eliminated. make this a new root
                 seg[NODE_PN] = -1
-        self.reconstruct()
+        self._reconstruct()
     
 
     # strip out the specified SWC type
@@ -758,12 +766,12 @@ class Morphology( object ):
         old_type: enum
             The compartment type to be changed.
             Use one of the following constants: SOMA, AXON, 
-            BASAL_DENDRITE, or APICAL_DENDRITE
+            DENDRITE, BASAL_DENDRITE, or APICAL_DENDRITE
 
         new_type: enum
             The target compartment type.
             Use one of the following constants: SOMA, AXON, 
-            BASAL_DENDRITE, or APICAL_DENDRITE
+            DENDRITE, BASAL_DENDRITE, or APICAL_DENDRITE
         """
         for seg in self.compartment_list:
             if seg[NODE_TYPE] == old_type:
@@ -832,9 +840,9 @@ class Morphology( object ):
             seg[NODE_R] *= scale
 
 
-    # internal function -- don't publish it in the docs
-    # construct list of independent trees (each tree has a root of -1)
-    def separate_trees(self):
+    def _separate_trees(self):
+        """ internal function -- construct list of independent trees (each tree has a root of -1) """
+
         trees = []
         # reset each node's tree ID to indicate that it's not assigned
         for seg in self.compartment_list:
@@ -891,23 +899,23 @@ class Morphology( object ):
             self._tree_list[soma_tree] = self._tree_list[0]
             self._tree_list[0] = tmp
         # reset node tree_id to correct tree number
-        self.reset_tree_ids()
+        self._reset_tree_ids()
 
 
-    # internal function -- don't publish in docs
-    # reset each node's tree_id value to the correct tree number
-    def reset_tree_ids(self):
+    def _reset_tree_ids(self):
+        """ internal function -- reset each node's tree_id value to the correct tree number """
+
         for i in range(len(self._tree_list)):
             for j in range(len(self._tree_list[i])):
                 self._tree_list[i][j][NODE_TREE_ID] = i
 
 
-    # internal function -- don't publish in the docs
-    #
-    # TODO? print warning if unrecognized types are present
-    # 
-    # Return value: number of errors detected in file
-    def check_consistency(self):
+    def _check_consistency(self):
+        """ internal function 
+        TODO? print warning if unrecognized types are present
+        Return value: number of errors detected in file
+        """
+
         errs = 0
         # Make sure that the parents are of proper ID range
         n = self.num_nodes
@@ -933,7 +941,7 @@ class Morphology( object ):
         # find type boundaries. at each axon boundary, walk back up
         #   tree to root and make sure another axon segment not
         #   encountered
-        adoptees = self.find_type_boundary()
+        adoptees = self._find_type_boundary()
         for child in adoptees:
             if child[NODE_TYPE] == Morphology.AXON:
                 par_id = child[NODE_PN]
@@ -951,9 +959,10 @@ class Morphology( object ):
         return errs
 
 
-    # internal function -- don't publish in the docs
-    # return a list of segments who have parents that are a different type
-    def find_type_boundary(self):
+    def _find_type_boundary(self):
+        """ internal function -- return a list of segments whose have
+        parents that are a different type """
+
         adoptees = []
         for node in self.compartment_list:
             par = self.parent_of(node)
@@ -982,13 +991,14 @@ class Morphology( object ):
         for i in range(len(tree)):
             self.compartment_list[tree[i][NODE_ID]] = None
         del self._tree_list[n]
-        self.reconstruct()
+        self._reconstruct()
         # reset node tree_id to correct tree number
-        self.reset_tree_ids()
+        self._reset_tree_ids()
 
 
-    # debugging function -- don't publish in the docs
-    def print_all_nodes(self):
+    def _print_all_nodes(self):
+        """ debugging function """
+
         for node in self.compartment_list:
             print_node(node)
 
