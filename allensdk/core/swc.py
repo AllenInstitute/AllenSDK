@@ -492,16 +492,6 @@ class Morphology( object ):
         self.save(file_name)
 
 
-    def __deepcopy__(self, memo):
-        compartments = []
-        for comp in self.compartment_list:
-            new_comp = {}
-            for k,v in comp.iteritems():
-                if k != RTTI and k != NODE_CHILDREN:
-                    new_comp[k] = v
-            compartments.append(new_comp)
-        return Morphology(compartment_list=compartments)
-
     def sparsify(self, modulo, compress_ids=False):
         """ Return a new Morphology object that has a given number of non-leaf,
         non-root nodes removed.  IDs can be reassigned so as to be continuous.
