@@ -50,6 +50,7 @@ class CellTypesCache(Cache):
        File name of the manifest to be read.  Default is "manifest.json".
     """
 
+    # manifest keys
     CELLS_KEY = 'CELLS'
     EPHYS_FEATURES_KEY = 'EPHYS_FEATURES'
     MORPHOLOGY_FEATURES_KEY = 'MORPHOLOGY_FEATURES'
@@ -57,7 +58,7 @@ class CellTypesCache(Cache):
     EPHYS_SWEEPS_KEY = 'EPHYS_SWEEPS'
     RECONSTRUCTION_KEY = 'RECONSTRUCTION'
     MARKER_KEY = 'MARKER'
-    
+
     def __init__(self, cache=True, manifest_file='manifest.json', base_uri=None):
         super(CellTypesCache, self).__init__(manifest=manifest_file, cache=cache)
         self.api = CellTypesApi(base_uri=base_uri)
@@ -95,6 +96,9 @@ class CellTypesCache(Cache):
 
             if self.cache:
                 json_utilities.write(file_name, cells)
+
+        if isinstance(reporter_status, basestring):
+            reporter_status = [ reporter_status ]
 
         # filter the cells on the way out
         return self.api.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
@@ -351,7 +355,16 @@ class CellTypesCache(Cache):
 
         mb.write_json_file(file_name)
 
-        
+
+class ReporterStatus:
+    """
+    Valid strings for filtering by cell reporter status.
+    """
+
+    POSITIVE = 'cre reporter positive'
+    NEGATIVE = 'cre reporter negative'
+    NA = 'not applicable'
+    INDETERMINATE = 'cre reporter indeterminate'
 
 
 
