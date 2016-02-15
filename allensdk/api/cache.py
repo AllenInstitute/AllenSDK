@@ -79,6 +79,12 @@ class Cache(object):
         '''
         if file_name != None:
             if not os.path.exists(file_name):
+
+                # make the directory if it doesn't exist already
+                dirname = os.path.dirname(file_name)
+                if not os.path.exists(dirname):
+                    os.makedirs(dirname)
+
                 self.build_manifest(file_name)
 
             

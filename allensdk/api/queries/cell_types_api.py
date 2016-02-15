@@ -18,6 +18,7 @@ import pandas as pd
 import os
 
 class CellTypesApi(RmaApi):
+    NWB_FILE_TYPE = 'NWBDownload'
     SWC_FILE_TYPE = '3DNeuronReconstruction'
     MARKER_FILE_TYPE = '3DNeuronMarker'
 
@@ -142,7 +143,7 @@ class CellTypesApi(RmaApi):
             return a list of dictionaries.
         """
 
-        features = self.model_query('EphysFeature', num_rows='all')
+        features = self.model_query('EphysFeature', criteria='specimen', num_rows='all')
 
         if dataframe:
             return pd.DataFrame(features)
@@ -187,12 +188,11 @@ class CellTypesApi(RmaApi):
             Path to save the NWB file.  
         """
 
-        try: 
-            os.makedirs(os.path.dirname(file_name))
-        except:
-            pass
+        dirname = os.path.dirname(file_name)
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
 
-        criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eqNWB]))' % specimen_id
+        criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eq%s]))' % (specimen_id, self.NWB_FILE_TYPE)
         includes = 'ephys_result(well_known_files(well_known_file_type))'
 
         results = self.model_query('Specimen',
@@ -269,7 +269,7 @@ class CellTypesApi(RmaApi):
                                    criteria=criteria,
                                    include=includes,
                                    num_rows='all')
-        print results
+
         try:
             file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
         except:

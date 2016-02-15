@@ -28,44 +28,7 @@ NODE_R       = 'radius'
 NODE_PN      = 'parent'
 SWC_COLUMNS = [ NODE_ID, NODE_TYPE, NODE_X, NODE_Y, NODE_Z, NODE_R, NODE_PN ]
 
-# Each unconnected graph has its own ID. This is the ID of graph that the
-# node resides in
 NODE_TREE_ID = 'tree_id'     
-
-# A list references to child nodes
-NODE_CHILDREN = 'children'   
-
-# Each object is tagged with a label to detect type errors
-RTTI = 'rtti'   # type information label
-MORPHOLOGY_NODE   = "morphology node" # identifying node tag
-
-
-def print_node(seg):
-    """ Print node information to stdout """
-
-    # verify passed value is morphology node
-    if RTTI not in seg or seg[RTTI] != MORPHOLOGY_NODE:
-        raise TypeError("Object not recognized as morphology node")
-
-    disp = "SWC node: "
-    disp += "%d " % seg[NODE_ID]
-    disp += "%d " % seg[NODE_TYPE]
-    disp += "%f " % seg[NODE_X]
-    disp += "%f " % seg[NODE_Y]
-    disp += "%f " % seg[NODE_Z]
-    disp += "%f " % seg[NODE_R]
-    disp += "%d [" % seg[NODE_PN]
-    ch = ""
-
-    for i in range(len(seg[NODE_CHILDREN])):
-        ch += "%d " % seg[NODE_CHILDREN][i][NODE_ID]
-
-    if len(ch) > 0:
-        ch = ch[:-1]
-
-    disp += ch[:] + "] %d" % seg[NODE_TREE_ID]
-
-    print (disp)
 
 
 def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
@@ -96,20 +59,22 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
                 #   ID, type, x, y, z, rad, parent
                 # x, y, z and rad are floats. the others are ints
                 toks = line.split(' ')
-                vals = {}
-                vals[NODE_ID]   = int(toks[0])
-                vals[NODE_TYPE] = int(toks[1])
-                vals[NODE_X]    = float(toks[2])
-                vals[NODE_Y]    = float(toks[3])
-                vals[NODE_Z]    = float(toks[4])
-                vals[NODE_R]    = float(toks[5])
-                vals[NODE_PN]   = int(toks[6].rstrip())
+                vals = MorphologyNode({
+                        NODE_ID: int(toks[0]),
+                        NODE_TYPE: int(toks[1]),
+                        NODE_X: float(toks[2]),
+                        NODE_Y: float(toks[3]),
+                        NODE_Z: float(toks[4]),
+                        NODE_R: float(toks[5]),
+                        NODE_PN: int(toks[6].rstrip())
+                        })
                 
                 # store this compartment
                 compartments.append(vals)
                 
                 # increment line number (used for error reporting only)
                 line_num += 1
+
     except ValueError:
         err = "File not recognized as valid SWC file.\n"
         err += "Problem parsing line %d\n" % line_num
@@ -127,6 +92,32 @@ def read_string(s, columns=SWC_COLUMNS, numeric_columns="NOT_USED"):
     raise AssertionError("This function is deprecated")
 
 
+class MorphologyNode( dict ): 
+    def __init__(self, *args, **kwargs):
+        super(MorphologyNode, self).__init__(*args, **kwargs)
+
+        # Each unconnected graph has its own ID. This is the ID of graph that the
+        # node resides in        
+        self.tree_id = -1
+
+        # references to child nodes
+        self.children = []
+
+
+    def print_extra(self):
+        """ print out basic information plus child IDs and tree ID """
+
+        print "id: %d " % self[NODE_ID] + \
+            "type: %d " % self[NODE_TYPE] + \
+            "x: %f " % self[NODE_X] + \
+            "y: %f " % self[NODE_Y] + \
+            "z: %f " % self[NODE_Z] + \
+            "radius: %f " % self[NODE_R] + \
+            "parent: %d " % self[NODE_PN] + \
+            "children: " + str([ c['id'] for c in self.children ]) + " " + \
+            "tree: %d" % self.tree_id
+
+    
 class Morphology( object ):
     """ 
     Keep track of the list of compartments in a morphology and provide 
@@ -241,9 +232,8 @@ class Morphology( object ):
         self._compartment_list = []
         for obj in compartment_list:
             seg = copy.copy(obj)
-            seg[NODE_TREE_ID] = -1
-            seg[NODE_CHILDREN] = []
-            seg[RTTI] = MORPHOLOGY_NODE
+            seg.tree_id = -1
+            seg.children = []
             self._compartment_list.append(seg)
 
         # list data now set. remove holes in sequence and re-index
@@ -342,7 +332,7 @@ class Morphology( object ):
         node is invalid, None is returned.
         """
         seg = self._resolve_node_type(seg)
-        return seg[NODE_CHILDREN]
+        return seg.children
 
 
     ###################################################################
@@ -354,14 +344,13 @@ class Morphology( object ):
         """ Internal function. takes an integer and returns the node having
         that ID. IF a node is passed in instead, it is returned
         """
-        if type(seg).__name__ == 'int':
+        if isinstance(seg, int):
             if seg < 0 or seg >= len(self._compartment_list):
                 raise ValueError("Specified child (%d) is not a valid ID" % seg)
             return self._compartment_list[seg]
-        # handle case when node (dictionary) passed
-        elif type(seg).__name__ == 'dict':
-            if RTTI not in seg or seg[RTTI] != MORPHOLOGY_NODE:
-                raise TypeError("Object not recognized as morphology node")
+        # handle case when node  passed
+        elif isinstance(seg, MorphologyNode):
+            return self._compartment_list[seg['id']]
         # no luck guessing what type is. try converting it to an int
         else:
             try:
@@ -397,8 +386,8 @@ class Morphology( object ):
         # if child has former parent, remove it from parent's child list
         if child_seg[NODE_PN] >= 0:
             old_par = self.node(child_seg[NODE_PN])
-            old_par[NODE_CHILDREN].remove(child_seg)
-        parent_seg[NODE_CHILDREN].append(child_seg)
+            old_par.children.remove(child_seg)
+        parent_seg.children.append(child_seg)
         child_seg[NODE_PN] = parent_seg[NODE_ID]
             
 
@@ -521,8 +510,8 @@ class Morphology( object ):
             ctype = c[NODE_TYPE]
 
             # keep the root, soma, junctions, and the first child of the root (for visualization)
-            #if pid == "-1" or len(c[NODE_CHILDREN]) != 1 or pid == root[NODE_ID] or ctype == Morphology.SOMA:
-            if pid < 0 or len(c[NODE_CHILDREN]) != 1 or pid == root[NODE_ID] or ctype == Morphology.SOMA:
+            #if pid == "-1" or len(c.children) != 1 or pid == root[NODE_ID] or ctype == Morphology.SOMA:
+            if pid < 0 or len(c.children) != 1 or pid == root[NODE_ID] or ctype == Morphology.SOMA:
                 keep[cid] = True
             else:
                 keep[cid] = (ct % modulo) == 0
@@ -535,7 +524,7 @@ class Morphology( object ):
                 parent_id = c[NODE_PN]
                 while keep[parent_id] is False:
                     parent_id = compartments[parent_id][NODE_PN]
-                for child in c[NODE_CHILDREN]:
+                for child in c.children:
                     child[NODE_PN] = parent_id
         
         # filter out the orphans
@@ -588,12 +577,12 @@ class Morphology( object ):
         # reconstruct parent/child relationship links
         # forget old relations
         for seg in self.compartment_list:
-            seg[NODE_CHILDREN] = []
+            seg.children = []
         # add each object to its parents child list
         for seg in self.compartment_list:
             par_num = seg[NODE_PN]
             if par_num >= 0:
-                self.compartment_list[par_num][NODE_CHILDREN].append(seg)
+                self.compartment_list[par_num].children.append(seg)
         # update tree lists
         self._separate_trees()
 
@@ -605,10 +594,10 @@ class Morphology( object ):
         # for each node, reset children array
         # for each node, add self to parent's child list
         for seg in self._compartment_list:
-            seg[NODE_CHILDREN] = []
+            seg.children = []
         for seg in self._compartment_list:
             if seg[NODE_PN] >= 0:
-                self._compartment_list[seg[NODE_PN]][NODE_CHILDREN].append(seg)
+                self._compartment_list[seg[NODE_PN]].children.append(seg)
         # verify that each node ID is the same as its position in the
         #   compartment list
         for i in range(len(self.compartment_list)):
@@ -672,7 +661,7 @@ class Morphology( object ):
         for i in range(count):
             # ignore bifurcations -- go 'count' deep on one line only
             ax["flag"] = i
-            children = ax[NODE_CHILDREN]
+            children = ax.children
             if len(children) > 0:
                 ax = children[0]
         # strip out all axons that aren't flagged
@@ -846,18 +835,19 @@ class Morphology( object ):
         trees = []
         # reset each node's tree ID to indicate that it's not assigned
         for seg in self.compartment_list:
-            seg[NODE_TREE_ID] = -1
+            seg.tree_id = -1
+
         # construct trees for each node
         # if a node is adjacent an existing tree, merge to it
         # if a node is adjacent multiple trees, merge all
         for seg in self.compartment_list:
             # see what trees this node is adjacent to
             local_trees = []
-            if seg[NODE_PN] >= 0 and self.compartment_list[seg[NODE_PN]][NODE_TREE_ID] >= 0:
-                local_trees.append(self.compartment_list[seg[NODE_PN]][NODE_TREE_ID])
-            for child in seg[NODE_CHILDREN]:
-                if child[NODE_TREE_ID] >= 0:
-                    local_trees.append(child[NODE_TREE_ID])
+            if seg[NODE_PN] >= 0 and self.compartment_list[seg[NODE_PN]].tree_id >= 0:
+                local_trees.append(self.compartment_list[seg[NODE_PN]].tree_id)
+            for child in seg.children:
+                if child.tree_id >= 0:
+                    local_trees.append(child.tree_id)
             # figure out which tree to put node into
             # if there are muliple possibilities, merge all of them
             if len(local_trees) == 0:
@@ -872,14 +862,14 @@ class Morphology( object ):
                     dead_tree = local_trees[j]
                     trees[dead_tree] = []
                     for node in self.compartment_list:
-                        if node[NODE_TREE_ID] == dead_tree:
-                            node[NODE_TREE_ID] = tree_num
+                        if node.tree_id == dead_tree:
+                            node.tree_id = tree_num
             # merge node into tree
             # ensure there's space
             while len(trees) <= tree_num:
                 trees.append([])
             trees[tree_num].append(seg)
-            seg[NODE_TREE_ID] = tree_num
+            seg.tree_id = tree_num
         # consolidate tree lists into class's tree list object
         self._tree_list = []
         for tree in trees:
@@ -891,7 +881,7 @@ class Morphology( object ):
         soma_tree = -1
         for seg in self.compartment_list:
             if seg[NODE_TYPE] == 1:
-                soma_tree = seg[NODE_TREE_ID]
+                soma_tree = seg.tree_id
                 break
         if soma_tree > 0:
             # swap soma tree for first tree in list
@@ -907,7 +897,7 @@ class Morphology( object ):
 
         for i in range(len(self._tree_list)):
             for j in range(len(self._tree_list[i])):
-                self._tree_list[i][j][NODE_TREE_ID] = i
+                self._tree_list[i][j].tree_id = i
 
 
     def _check_consistency(self):
@@ -949,8 +939,8 @@ class Morphology( object ):
                     par = self.compartment_list[par_id]
                     if par[NODE_TYPE] == Morphology.AXON:
                         print("Branch has multiple axon roots")
-                        print_node(child)
-                        print_node(par)
+                        print child
+                        print par
                         errs += 1
                         break
                     par_id = par[NODE_PN]
@@ -1000,6 +990,6 @@ class Morphology( object ):
         """ debugging function """
 
         for node in self.compartment_list:
-            print_node(node)
+            print node
 
 
