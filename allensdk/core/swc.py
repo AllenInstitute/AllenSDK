@@ -491,7 +491,7 @@ class Morphology( object ):
     def write(self, file_name):
         self.save(file_name)
 
-        
+
     def sparsify(self, modulo, compress_ids=False):
         """ Return a new Morphology object that has a given number of non-leaf,
         non-root nodes removed.  IDs can be reassigned so as to be continuous.
@@ -509,7 +509,7 @@ class Morphology( object ):
         Morphology
             A new morphology instance
         """
-        compartments = copy.deepcopy(self.compartment_index)
+        compartments = self.compartment_index
         root = self.root
         keep = {}
 
