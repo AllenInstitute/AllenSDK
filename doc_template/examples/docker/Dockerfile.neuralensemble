@@ -62,5 +62,6 @@ RUN tar xvzf /home/docker/packages/${ALLENSDK}
 RUN $VENV/bin/pip install /home/docker/packages/${ALLENSDK}
 
 RUN $VENV/bin/pip install jupyter
+RUN jupyter-notebook --generate-config
 
 RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv

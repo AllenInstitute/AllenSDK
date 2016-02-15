@@ -278,6 +278,13 @@ class MouseConnectivityApi(RmaApi):
                                                       release,
                                                       coordinate_framework)
         
+        if save_file_path == None:
+            save_file_path = file_name
+        
+        if save_file_path == None:
+            save_file_path = 'volumetric_data.nrrd'
+        
+        
         self.retrieve_file_over_http(url, save_file_path)
     
     
