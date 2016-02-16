@@ -254,7 +254,7 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x7f66d0bfcd10&gt;</pre>
+<pre>&lt;matplotlib.text.Text at 0x7fb2fc262d10&gt;</pre>
 </div>
 
 </div>
@@ -503,7 +503,7 @@ QkREDmMSISIih/1//BusB8xy2E8AAAAASUVORK5CYII=
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Cell-Morphology-Reconstructions">Cell Morphology Reconstructions<a class="anchor-link" href="#Cell-Morphology-Reconstructions">&#182;</a></h2><p>The Cell Types Database also contains 3D reconstructions of neuronal morphologies. The data are presented in the SWC format. We'll download a particular cell's reconstrution here.</p>
+<h2 id="Filtering-Cells-via-Metadata">Filtering Cells via Metadata<a class="anchor-link" href="#Filtering-Cells-via-Metadata">&#182;</a></h2><p>Cell records in the Cell Types Database come with a large amount of metadata.  We have exposed the most commonly used of these are arguments to CellTypesCache.get_cells.</p>
 
 </div>
 </div>
@@ -514,17 +514,26 @@ QkREDmMSISIih/1//BusB8xy2E8AAAAASUVORK5CYII=
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.core.cell_types_cache</span> <span class="kn">import</span> <span class="n">CellTypesCache</span>
+<span class="kn">from</span> <span class="nn">allensdk.core.cell_types_cache</span> <span class="kn">import</span> <span class="n">ReporterStatus</span> <span class="k">as</span> <span class="n">RS</span>
 
 <span class="n">ctc</span> <span class="o">=</span> <span class="n">CellTypesCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;cell_types/manifest.json&#39;</span><span class="p">)</span>
 
-<span class="c"># this downloads metadata for all cells with reconstructions</span>
-<span class="n">cells</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_cells</span><span class="p">(</span><span class="n">require_reconstruction</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c"># this downloads metadata for all cells with morphology images</span>
+<span class="n">cells</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_cells</span><span class="p">(</span><span class="n">require_morphology</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;Cells with morphology images: &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
+
+<span class="c"># cells with reconstructions</span>
+<span class="n">cells</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_cells</span><span class="p">(</span><span class="n">require_reconstruction</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Cells with reconstructions: &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
 
-<span class="c"># download and open an SWC file</span>
-<span class="n">cell_id</span> <span class="o">=</span> <span class="mi">464212183</span>
-<span class="n">morphology</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_reconstruction</span><span class="p">(</span><span class="n">cell_id</span><span class="p">)</span> 
-<span class="k">print</span> <span class="n">morphology</span>
+<span class="c"># all cre positive cells</span>
+<span class="n">cells</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_cells</span><span class="p">(</span><span class="n">reporter_status</span> <span class="o">=</span> <span class="n">RS</span><span class="o">.</span><span class="n">POSITIVE</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;Cre-positive cells: &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
+
+<span class="c"># cre negative cells with reconstructions</span>
+<span class="n">cells</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_cells</span><span class="p">(</span><span class="n">require_reconstruction</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> 
+                      <span class="n">reporter_status</span> <span class="o">=</span> <span class="n">RS</span><span class="o">.</span><span class="n">NEGATIVE</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;Cre-negative cells with reconstructions: &quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -537,8 +546,10 @@ QkREDmMSISIih/1//BusB8xy2E8AAAAASUVORK5CYII=
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Cells with reconstructions:  217
-&lt;allensdk.core.swc.Morphology object at 0x7f66ca9acad0&gt;
+<pre>Cells with morphology images:  510
+Cells with reconstructions:  217
+Cre-positive cells:  675
+Cre-negative cells with reconstructions:  24
 </pre>
 </div>
 </div>
@@ -552,6 +563,7 @@ QkREDmMSISIih/1//BusB8xy2E8AAAAASUVORK5CYII=
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Cell-Morphology-Reconstructions">Cell Morphology Reconstructions<a class="anchor-link" href="#Cell-Morphology-Reconstructions">&#182;</a></h2><p>The Cell Types Database also contains 3D reconstructions of neuronal morphologies. The data are presented in the SWC format. We'll download a particular cell's reconstrution here.</p>
 <p>The AllenSDK contains a module that makes it easier to work with the SWC files. We'll see how the data is contained in the file by looking at the first node.</p>
 
 </div>
@@ -562,7 +574,11 @@ QkREDmMSISIih/1//BusB8xy2E8AAAAASUVORK5CYII=
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">compartment_list</span> <span class="o">=</span> <span class="n">morphology</span><span class="o">.</span><span class="n">compartment_list</span>
+<div class=" highlight hl-ipython2"><pre><span class="c"># download and open an SWC file</span>
+<span class="n">cell_id</span> <span class="o">=</span> <span class="mi">464212183</span>
+<span class="n">morphology</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_reconstruction</span><span class="p">(</span><span class="n">cell_id</span><span class="p">)</span> 
+
+<span class="n">compartment_list</span> <span class="o">=</span> <span class="n">morphology</span><span class="o">.</span><span class="n">compartment_list</span>
 <span class="k">print</span> <span class="n">compartment_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 
@@ -628,7 +644,7 @@ QkREDmMSISIih/1//BusB8xy2E8AAAAASUVORK5CYII=
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x7f66ca5b78d0&gt;</pre>
+<pre>&lt;matplotlib.text.Text at 0x7fb2f543f090&gt;</pre>
 </div>
 
 </div>
@@ -1004,7 +1020,7 @@ BAKBQGAwIogIBAKBwGBEEBEIBAKBwYggIhAIBAKD+T/YYkWRKBhoLQAAAABJRU5ErkJggg==
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x7f66ca945090&gt;</pre>
+<pre>&lt;matplotlib.text.Text at 0x7fb2f5ff3150&gt;</pre>
 </div>
 
 </div>
@@ -1509,7 +1525,7 @@ m 0.108437886192 c 8.39002615421
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x7f66c320ca90&gt;</pre>
+<pre>&lt;matplotlib.text.Text at 0x7fb2ef174750&gt;</pre>
 </div>
 
 </div>
@@ -2017,7 +2033,7 @@ NyoahBBCePsfLny+HZHEPIEAAAAASUVORK5CYII=
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x7f66ca9451d0&gt;</pre>
+<pre>&lt;matplotlib.text.Text at 0x7fb2f02d35d0&gt;</pre>
 </div>
 
 </div>
