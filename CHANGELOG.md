@@ -1,6 +1,19 @@
 # Change Log
 All notable changes to this projection will be documented in this file.
 
+## [0.11.0] - 2016-3-3
+
+### Added
+
+- CellTypesCache.get_cells has a new argument 'reporter_status', which accepts one or more ReporterStatus values.
+- CellTypesApi.save_reconstruction_marker and CellTypesCache.get_reconstruction_marker download and open files containing positions that mark special points in reconstruction (truncation, early termination of reconstruction, etc).
+- Morphology has new methods for manipulating the morphology tree structure.
+
+### Changed
+
+- Morphology compartments are now Compartment objects that behave exactly like dictionaries
+- Compartment.children stores references to immediate decescendant Compartments.
+
 ## [0.10.1] - 2015-9-24
 
 ### Added

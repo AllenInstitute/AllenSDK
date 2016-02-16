@@ -24,6 +24,8 @@ import allensdk.core.json_utilities as json_utilities
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.core.swc as swc
 
+import logging
+
 class CellTypesCache(Cache):
     """
     Cache class for storing and accessing data from the Cell Types Database.
@@ -291,7 +293,8 @@ class CellTypesCache(Cache):
 
         return swc.read_swc(file_name)
 
-    def get_reconstruction_marker(self, specimen_id, file_name=None):
+
+    def get_reconstruction_markers(self, specimen_id, file_name=None):
         """
         Download and open a reconstruction marker file for a single cell in the database.
 
@@ -319,14 +322,13 @@ class CellTypesCache(Cache):
             raise Exception("Please enable caching (CellTypes.cache = True) or specify a save_file_name.")
 
         if not os.path.exists(file_name):
-            self.api.save_reconstruction_marker(specimen_id, file_name)
+            try:
+                self.api.save_reconstruction_markers(specimen_id, file_name)
+            except LookupError as e:
+                logging.warning(e.message)
+                return []
 
-        df = pd.read_csv(file_name, 
-                         comment='#', 
-                         header=None, 
-                         names=['x','y','z','radius','shape','name','comment','color_r','color_g','color_b'])
-
-        return df.to_dict(orient='records')
+        return swc.read_marker_file(file_name)
 
 
     def build_manifest(self, file_name):

@@ -17,6 +17,7 @@
 import csv
 import copy
 import math
+import pandas as pd
 
 # Morphology nodes have the following fields. SWC fields are numeric.
 NODE_ID      = 'id'
@@ -59,7 +60,7 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
                 #   ID, type, x, y, z, rad, parent
                 # x, y, z and rad are floats. the others are ints
                 toks = line.split(' ')
-                vals = MorphologyNode({
+                vals = Compartment({
                         NODE_ID: int(toks[0]),
                         NODE_TYPE: int(toks[1]),
                         NODE_X: float(toks[2]),
@@ -92,9 +93,13 @@ def read_string(s, columns=SWC_COLUMNS, numeric_columns="NOT_USED"):
     raise AssertionError("This function is deprecated")
 
 
-class MorphologyNode( dict ): 
+class Compartment( dict ): 
+    """
+    A dictionary class with extra properties for keeping lists of child references.
+    """
+
     def __init__(self, *args, **kwargs):
-        super(MorphologyNode, self).__init__(*args, **kwargs)
+        super(Compartment, self).__init__(*args, **kwargs)
 
         # Each unconnected graph has its own ID. This is the ID of graph that the
         # node resides in        
@@ -349,7 +354,7 @@ class Morphology( object ):
                 raise ValueError("Specified child (%d) is not a valid ID" % seg)
             return self._compartment_list[seg]
         # handle case when node  passed
-        elif isinstance(seg, MorphologyNode):
+        elif isinstance(seg, Compartment):
             return self._compartment_list[seg['id']]
         # no luck guessing what type is. try converting it to an int
         else:
@@ -993,3 +998,32 @@ class Morphology( object ):
             print node
 
 
+class Marker( dict ): 
+    """ Simple dictionary class for handling reconstruction marker objects. """
+
+    SPACING = [ .1144, .1144, .28 ]
+
+    CUT_DENDRITE = 10 
+    NO_RECONSTRUCTION = 20
+
+    def __init__(self, *args, **kwargs):
+        super(Marker, self).__init__(*args, **kwargs)
+
+        # marker file x,y,z coordinates are offset by a single image-space pixel
+        self['x'] -= self.SPACING[0]
+        self['y'] -= self.SPACING[1]
+        self['z'] -= self.SPACING[2]
+        
+
+
+def read_marker_file(file_name):
+    """ read in a marker file and return a list of dictionaries """
+
+    df = pd.read_csv(file_name, 
+                     comment='#', 
+                     header=None, 
+                     names=['x','y','z','radius','shape','name','comment','color_r','color_g','color_b'])
+
+    dicts = df.to_dict(orient='records')
+
+    return [ Marker({ 'x': d['x'], 'y': d['y'], 'z': d['z'], 'name': d['name'] }) for d in dicts ]
