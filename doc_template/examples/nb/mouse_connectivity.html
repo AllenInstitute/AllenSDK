@@ -191,7 +191,7 @@ div#notebook {
 <span class="c"># the data that has already been downloaded onto the hard drives.</span>
 <span class="c"># If you supply a relative path, it is assumed to be relative to your</span>
 <span class="c"># current working directory.</span>
-<span class="n">mcc</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;connectivity/manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="s">&#39;http://testwarehouse:9000&#39;</span><span class="p">)</span>
+<span class="n">mcc</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;connectivity/manifest.json&#39;</span><span class="p">)</span>
 
 <span class="c"># open up a list of all of the experiments</span>
 <span class="n">all_experiments</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_experiments</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
