@@ -94,8 +94,8 @@ class CellTypesApi(RmaApi):
         list: List of sweep dictionaries belonging to a cell
         """
         criteria = "[specimen_id$eq%d]" % specimen_id
-        
-        return self.model_query('EphysSweep', criteria=criteria, num_rows='all')
+        sweeps = self.model_query('EphysSweep', criteria=criteria, num_rows='all')
+        return sorted(sweeps, key=lambda x: x['sweep_number'])
 
 
     def filter_cells(self, cells, require_morphology, require_reconstruction, reporter_status):

@@ -206,7 +206,7 @@ class NwbDataSet(object):
                 # rewriting data -- delete old dataset
                 del spike_dir[sweep_name]
             
-            spike_dir.create_dataset(sweep_name, data=spike_times, dtype='f8')
+            spike_dir.create_dataset(sweep_name, data=spike_times, dtype='f8', maxshape=(None,))
 
 
     def get_sweep_numbers(self):
