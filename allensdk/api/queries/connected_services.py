@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -735,6 +735,11 @@ class ConnectedServices(object):
                   'array_type' : [ INTEGER, STRING ], 
                   'optional' : True
                 },
+                { 'name' : 'product_ids',
+                  'type' : ARRAY,
+                  'array_type' : [ INTEGER ], 
+                  'optional' : True
+                },
                 { 'name' : 'hemisphere',
                   'type' : STRING,
                   'optional' : True,
@@ -789,6 +794,11 @@ class ConnectedServices(object):
                   'array_type' : [ INTEGER, STRING ],
                   'optional' : True
                 },
+                { 'name' : 'product_ids',
+                  'type' : ARRAY,
+                  'array_type' : [ INTEGER ], 
+                  'optional' : True
+                },
                 { 'name' : 'primary_structure_only',
                   'optional' : True
                 },
@@ -835,6 +845,11 @@ class ConnectedServices(object):
                   'array_type' : [ INTEGER, STRING ],
                   'optional' : True
                 },
+                { 'name' : 'product_ids',
+                  'type' : ARRAY,
+                  'array_type' : [ INTEGER ], 
+                  'optional' : True
+                },
                 { 'name' : 'primary_structure_only',
                   'type' : BOOLEAN,
                   'optional' : True
@@ -869,6 +884,11 @@ class ConnectedServices(object):
                 { 'name' : 'injection_structures',
                   'type' : ARRAY,
                   'array_type' : [ INTEGER, STRING ],
+                  'optional' : True
+                },
+                { 'name' : 'product_ids',
+                  'type' : ARRAY,
+                  'array_type' : [ INTEGER ], 
                   'optional' : True
                 },
                 { 'name' : 'primary_structure_only',

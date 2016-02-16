@@ -5,7 +5,7 @@ import pandas as pd
 import pandas.io.json as pj
 import allensdk.core.json_utilities as ju
 from allensdk.api.queries.biophysical_api import \
-    BiophysicalPerisomaticApi
+    BiophysicalApi
 from allensdk.config.manifest import Manifest
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.model.biophysical.runner import run
@@ -47,7 +47,7 @@ class BiophysicalTests(unittest.TestCase):
             20.2433  ,  20.40018 ,  20.470915,  20.759715,  20.82156 ,
             20.866465,  20.90807 ,  20.939175]
         
-        bp = BiophysicalPerisomaticApi('http://api.brain-map.org')
+        bp = BiophysicalApi('http://api.brain-map.org')
         bp.cache_stimulus = True # change to False to not download the large stimulus NWB file
         neuronal_model_id = 472451419    # get this from the web site as above
         bp.cache_data(neuronal_model_id, working_directory='neuronal_model')
