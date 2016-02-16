@@ -97,7 +97,7 @@ def read_url_post(url):
     
     try:
         response = opener.open(request)
-    except Exception, e:
+    except Exception as e:
         response = e
         
     if response.code == 200:

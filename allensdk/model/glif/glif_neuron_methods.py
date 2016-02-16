@@ -170,7 +170,7 @@ def dynamics_AScurrent_vector(neuron, AScurrents_t0, time_step, spike_time_steps
     for spike_time_step in spike_time_steps:
         try:
             total += vector[:, time_step - spike_time_step]
-        except Exception, e:
+        except Exception as e:
             pass
         
     return total

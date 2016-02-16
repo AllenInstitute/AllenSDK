@@ -38,7 +38,7 @@ class Cache(object):
         '''
         try:
             os.makedirs(directory)
-        except Exception, e:
+        except Exception as e:
             print e.message
             
 

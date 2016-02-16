@@ -202,7 +202,7 @@ class CellTypesApi(RmaApi):
 
         try:
             file_url = results[0]['ephys_result']['well_known_files'][0]['download_link']
-        except Exception, _:
+        except Exception as _:
             raise Exception("Specimen %d has no ephys data" % specimen_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
@@ -242,7 +242,7 @@ class CellTypesApi(RmaApi):
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
 
-    def save_reconstruction_marker(self, specimen_id, file_name):
+    def save_reconstruction_markers(self, specimen_id, file_name):
         """
         Save the marker file for the morphological reconstruction of a cell.  These are
         comma-delimited files indicating points of interest in a reconstruction (truncation
@@ -273,7 +273,7 @@ class CellTypesApi(RmaApi):
         try:
             file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
         except:
-            raise Exception("Specimen %d has no marker file" % specimen_id)
+            raise LookupError("Specimen %d has no marker file" % specimen_id)
         
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 

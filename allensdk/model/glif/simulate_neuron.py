@@ -89,7 +89,7 @@ def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_
     
     try:
         data = load_sweep(input_file_name, sweep_number)
-    except Exception,e:
+    except Exception as e:
         logging.warning("Failed to load sweep, skipping. (%s)" % str(e))
         raise
         
