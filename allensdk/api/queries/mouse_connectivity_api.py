@@ -370,6 +370,8 @@ class MouseConnectivityApi(RmaApi):
         injection_domain : list of integers or strings, optional
              Integer Structure.id or String Structure.acronym.
         primary_structure_only : boolean, optional
+        product_ids : list of integers, optional
+            Integer Product.id
         start_row : integer, optional
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
@@ -405,6 +407,8 @@ class MouseConnectivityApi(RmaApi):
         injection_structures : list of integers or strings, optional
             Integer Structure.id or String Structure.acronym.
         primary_structure_only : boolean, optional
+        product_ids : list of integers, optional
+            Integer Product.id
         start_row : integer, optional
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
@@ -436,6 +440,8 @@ class MouseConnectivityApi(RmaApi):
         injection_structures : list of integers or strings, optional
             Integer Structure.id or String Structure.acronym.
         primary_structure_only : boolean, optional
+        product_ids : list of integers, optional
+            Integer Product.id        
         start_row : integer, optional
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
@@ -470,6 +476,8 @@ class MouseConnectivityApi(RmaApi):
         injection_structures : list of integers or strings, optional
             Integer Structure.id or String Structure.acronym.
         primary_structure_only : boolean, optional
+        product_ids : list of integers, optional
+            Integer Product.id
         start_row : integer, optional
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
