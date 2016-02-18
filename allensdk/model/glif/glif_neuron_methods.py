@@ -710,7 +710,7 @@ METHOD_LIBRARY = {
         'piecewise_linear_exact':         dynamics_voltage_piecewise_linear_exact,
         },
     'threshold_dynamics_method': {
-        'spike_component':          dynamics_threshold_spike_component, #note cant just use dynamics_threshold_three_sep_components_exact b/c of a zero division error.
+        'spike_component':          dynamics_threshold_spike_component, 
         'inf':                      dynamics_threshold_inf,
         'three_components_forward': dynamics_threshold_three_components_forward, 
         'three_components_exact':   dynamics_threshold_three_components_exact 

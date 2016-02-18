@@ -798,3 +798,9 @@ dl.method > dt {
    border: 1px solid: #99daff;
    padding: 3px;
 }
+
+dl.function > dt {
+   background-color: #a0d279;
+   border: 1px solid: #9cf25a;
+   padding: 3px;
+}
