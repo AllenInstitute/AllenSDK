@@ -786,3 +786,15 @@ div.sphinxsidebar p.questions {
   margin-right: 15px;
   font-size: 90%;
 }
+
+dl.class > dt {
+   background-color: #ef9c43;
+   border: 1px solid #ff9c33;
+   padding: 3px;
+}
+
+dl.method > dt {
+   background-color: #add4eb;
+   border: 1px solid: #99daff;
+   padding: 3px;
+}
