@@ -16,6 +16,7 @@ All notable changes to this projection will be documented in this file.
 - Compartment.children stores references to immediate decescendant Compartments.
 - spike times in NWB files are stored in "analysis/spike_times" instead of "analysis/aibs_spike_times"
 - NwbDataSet looks for spike times in both locations ("spike_times" first)
+- glif_neuron_methods.py function names have been changed to be more standardized
 
 ### Fixed
 
