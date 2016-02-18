@@ -15,7 +15,7 @@ of the model parameters to match the experimentally-recorded firing behaviors.
 The biophysical models are run with the `NEURON <http://www.neuron.yale.edu/neuron/>`_ 
 simulation environment.  The Allen SDK package contains libraries that assist
 in downloading and setting up the models available on the Allen Institute web site
-for users to run using NEUORN. 
+for users to run using NEURON. 
 
 
 Prerequisites
@@ -410,6 +410,7 @@ description of the interconnections.
 
     network1.json: 
     ::
+        
         /* A self-contained sub-network */
         {
             "cells": [
@@ -424,6 +425,7 @@ description of the interconnections.
     
     network2.json: 
     ::
+        
         /* Another self-contained sub-network */
         {
             "cells": [
@@ -437,6 +439,7 @@ description of the interconnections.
     
     interconnect.json:
     ::
+        
         {
             // the additional connections needed to
             // connect the network1 and network2

@@ -49,6 +49,7 @@ that can be accessed via the API.
                            
 Using the criteria, include and other parameter, specific data can be requested.
 ::
+    
     associations = ''.join(['[id$eq1]',
                             'structure_graph(ontology),',
                             'graphic_group_labels'])

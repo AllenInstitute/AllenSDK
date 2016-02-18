@@ -377,6 +377,9 @@ class MouseConnectivityCache(Cache):
         """ 
         Take a list of experiments and filter them by cre status and injection structure.
 
+        Parameters
+        ----------
+
         cre: boolean or list
             If True, return only cre-positive experiments.  If False, return only
             cre-negative experiments.  If None, return all experients. If list, return
@@ -460,6 +463,8 @@ class MouseConnectivityCache(Cache):
         Take a list of unionzes and return a subset of records filtered by injection status, structure, and
         hemisphere.
 
+        Parameters
+        ----------
         is_injection: boolean
             If True, only return unionize records that disregard non-injection pixels.
             If False, only return unionize records that disregard injection pixels.
@@ -492,6 +497,8 @@ class MouseConnectivityCache(Cache):
         Get structure unionizes for a set of experiment IDs.  Filter the results by injection status, 
         structure, and hemisphere.
 
+        Parameters
+        ----------
         experiment_ids: list
             List of experiment IDs.  Corresponds to section_data_set_id in the API.
         

@@ -25,7 +25,7 @@ The Allen SDK focuses the Allen Cell Types Database and the Allen Mouse Brain Co
 Functionality relevant to other atlases is coming in future releases.  
 
 .. image:: /_static/ccf_v3_sdk.png
-    :align: right
+   :align: right
 
 
 Allen Cell Types Database
@@ -44,14 +44,14 @@ The Allen SDK provides sample code
 demonstrating how to download neuronal model parameters from the Allen Brain Atlas API and run 
 your own simulations using stimuli from the Allen Cell Types Database or custom current injections:
 
-    * :doc:`biophysical_models`
-    * :doc:`glif_models`
+   * :doc:`biophysical_models`
+   * :doc:`glif_models`
 
 
 ....
 
 .. image:: /_static/connectivity.png
-    :align: right
+   :align: right
 
 Allen Mouse Brain Connectivity Atlas
 ------------------------------------

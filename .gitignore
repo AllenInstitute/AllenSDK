@@ -7,3 +7,6 @@ doc/
 /.settings/
 .project
 .pydevproject
+doc_template/examples/nb/connectivity*
+doc_template/examples/nb/cell_types
+*#

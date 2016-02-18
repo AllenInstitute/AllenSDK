@@ -254,9 +254,11 @@ class NwbDataSet(object):
         Includes information on stimulus parameters like its name and amplitude 
         as well as recording quality metadata, like access resistance and 
         seal quality.
+
         Parameters
         ----------
         sweep_number: int
+
         Returns
         -------
         dict

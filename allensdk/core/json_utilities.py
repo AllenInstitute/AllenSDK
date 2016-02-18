@@ -51,12 +51,12 @@ def read_url_get(url):
     Parameters
     ----------
     url : string
-    where to get the json.
+        where to get the json.
     
     Returns
     -------
     dict
-    Python version of the input
+        Python version of the input
     
     Note: if the input is a bare array or literal, for example,
     the output will be of the corresponding type.
@@ -74,12 +74,12 @@ def read_url_post(url):
     Parameters
     ----------
     url : string
-    where to get the json.
+        where to get the json.
     
     Returns
     -------
     dict
-    Python version of the input
+        Python version of the input
     
     Note: if the input is a bare array or literal, for example,
     the output will be of the corresponding type.
