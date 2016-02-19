@@ -19,6 +19,7 @@ Welcome to the Allen SDK
    examples
    Source Documentation <allensdk>
    Github Profile <https://github.com/AllenInstitute/AllenSDK>
+   
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
 The Allen SDK focuses the Allen Cell Types Database and the Allen Mouse Brain Connectivity Atlas.  
@@ -62,9 +63,14 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-....
+What's New - Release 0.11.0
+---------------------------
 
-Developer Documentation
------------------------
+The 0.11.0 release addressed several issues raised on our Github issue tracker.  Other changes and updates include:
 
-Please refer to the :ref:`modindex` for inline source code documentation. 
+    * Cell Types Database cells can now be filtered on their reporter status (cre+ or cre-).
+    * Cell Types Database reconstructions have markers indicating truncation and tracing termination.
+    * The Morphology class has a number of new methods for tree manipulation, and slightly different internal data structure for compartments.
+    * The GLIF simulator has more standard function names for dynamics and reset rules.
+
+To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 
