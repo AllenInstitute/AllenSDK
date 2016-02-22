@@ -19,7 +19,7 @@ def test_download():
         
     os.makedirs(OUTPUT_DIR)
 
-    glif_api = GlifApi('http://testwarehouse:9000')
+    glif_api = GlifApi()
     glif_api.get_neuronal_model(NEURONAL_MODEL_ID)
     glif_api.cache_stimulus_file(os.path.join(OUTPUT_DIR, '%d.nwb' % NEURONAL_MODEL_ID))
 
