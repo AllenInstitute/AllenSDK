@@ -241,6 +241,21 @@ class Manifest(object):
         return path_format
     
     
+    @classmethod
+    def safe_mkdir(cls, directory):
+        '''Create path if not already there.
+        
+        Parameters
+        ----------
+        directory : string
+            create it if it doesn't exist
+        '''        
+        try:
+            os.makedirs(directory)
+        except Exception as e:
+            print e.message
+                
+    
     def create_dir(self, path_key):
         '''Make a directory for an entry.
         
@@ -250,11 +265,7 @@ class Manifest(object):
             Reference to the entry.
         '''
         dir_path = self.get_path(path_key)
-        
-        try:
-            os.stat(dir_path)
-        except:
-            os.mkdir(dir_path)
+        Manifest.safe_mkdir(dir_path)
     
     
     def check_dir(self, path_key, do_exit=False):
