@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -14,6 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.queries.rma_api import RmaApi
+from allensdk.config.manifest import Manifest
 import pandas as pd
 import os
 
@@ -189,8 +190,7 @@ class CellTypesApi(RmaApi):
         """
 
         dirname = os.path.dirname(file_name)
-        if not os.path.exists(dirname):
-            os.makedirs(dirname)
+        Manifest.safe_mkdir(dirname)
 
         criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eq%s]))' % (specimen_id, self.NWB_FILE_TYPE)
         includes = 'ephys_result(well_known_files(well_known_file_type))'

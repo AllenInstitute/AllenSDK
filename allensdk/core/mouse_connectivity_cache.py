@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.cache import Cache
 from allensdk.config.manifest_builder import ManifestBuilder
+from allensdk.api.cache import Cache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.api.queries.ontologies_api import OntologiesApi
 
@@ -24,6 +24,7 @@ from allensdk.core.ontology import Ontology
 import nrrd, os
 import pandas as pd
 import numpy as np
+from allensdk.config.manifest import Manifest
 
 class MouseConnectivityCache(Cache):
     """
@@ -102,7 +103,7 @@ class MouseConnectivityCache(Cache):
         if os.path.exists(file_name):
             annotation, info = nrrd.read(file_name)
         else:
-            self.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_mkdir(os.path.dirname(file_name))
 
             annotation, info = self.api.download_annotation_volume(self.resolution, file_name)
 
@@ -131,7 +132,7 @@ class MouseConnectivityCache(Cache):
         if os.path.exists(file_name):
             annotation, info = nrrd.read(file_name)
         else:
-            self.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_mkdir(os.path.dirname(file_name))
 
             annotation, info = self.api.download_template_volume(self.resolution, file_name)
 
@@ -164,7 +165,7 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            self.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_mkdir(os.path.dirname(file_name))
             self.api.download_projection_density(file_name, experiment_id, self.resolution)
                                               
         return nrrd.read(file_name)
@@ -197,7 +198,7 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            self.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_mkdir(os.path.dirname(file_name))
 
             self.api.download_injection_density(file_name, experiment_id,  self.resolution)
                                               
@@ -230,7 +231,7 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            self.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_mkdir(os.path.dirname(file_name))
 
             self.api.download_injection_fraction(file_name, experiment_id, self.resolution)
                                               
@@ -263,7 +264,7 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            self.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_mkdir(os.path.dirname(file_name))
 
             self.api.download_data_mask(file_name, experiment_id, self.resolution)
                                               
@@ -308,7 +309,7 @@ class MouseConnectivityCache(Cache):
             structures = pd.DataFrame(structures)
 
             if self.cache:
-                self.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_mkdir(os.path.dirname(file_name))
 
                 structures.to_csv(file_name)
 
@@ -359,7 +360,7 @@ class MouseConnectivityCache(Cache):
                 del e['name']
 
             if self.cache:
-                self.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_mkdir(os.path.dirname(file_name))
 
                 json_utilities.write(file_name, experiments)
 
@@ -451,7 +452,7 @@ class MouseConnectivityCache(Cache):
                                   for c in unionizes.columns ]
                 
             if self.cache:
-                self.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_mkdir(os.path.dirname(file_name))
 
                 unionizes.to_csv(file_name)
 
@@ -563,7 +564,7 @@ class MouseConnectivityCache(Cache):
                 columns.append({ 'hemisphere_id': hid, 'structure_id': sid, 'label': label })
                 cidx += 1
 
-        for row_index, row in unionizes.iterrows():
+        for _, row in unionizes.iterrows():
             ridx = row_lookup[row['experiment_id']]
             k = (row['hemisphere_id'], row['structure_id'])
             cidx = column_lookup[k]
@@ -614,7 +615,7 @@ class MouseConnectivityCache(Cache):
             mask = self.make_structure_mask(structure_ids, annotation)
             
             if self.cache:
-                self.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_mkdir(os.path.dirname(file_name))
                 nrrd.write(file_name, mask)
 
             return mask, None
@@ -638,7 +639,7 @@ class MouseConnectivityCache(Cache):
 
         m = np.zeros(annotation.shape, dtype=np.uint8)
 
-        for i,sid in enumerate(structure_ids):
+        for _, sid in enumerate(structure_ids):
             m[annotation==sid] = 1
         
         return m

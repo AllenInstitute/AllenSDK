@@ -16,6 +16,7 @@
 from allensdk.api.api import Api
 import os, json
 from collections import OrderedDict
+from allensdk.config.manifest import Manifest
 
 class BiophysicalApi(Api):
     _NWB_file_type = 'NWBDownload'
@@ -275,23 +276,14 @@ class BiophysicalApi(Api):
         '''
         if working_directory is None:
             working_directory = self.default_working_directory
-        try:
-            os.stat(working_directory)
-        except:
-            os.mkdir(working_directory)
+            
+        Manifest.safe_mkdir(working_directory)        
         
+        work_dir = os.path.join(working_directory, 'work')        
+        Manifest.safe_mkdir(work_dir)
         
-        work_dir = os.path.join(working_directory, 'work')
-        try:
-            os.stat(work_dir)
-        except:
-            os.mkdir(work_dir)
-        
-        modfile_dir = os.path.join(working_directory, 'modfiles')
-        try:
-            os.stat(modfile_dir)
-        except:
-            os.mkdir(modfile_dir)
+        modfile_dir = os.path.join(working_directory, 'modfiles')       
+        Manifest.safe_mkdir(modfile_dir)
         
         well_known_file_id_dict = self.get_well_known_file_ids(neuronal_model_id)
         
