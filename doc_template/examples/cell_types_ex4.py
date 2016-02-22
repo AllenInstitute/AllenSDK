@@ -17,6 +17,5 @@ root = morphology.root
 
 # all compartments are dictionaries of compartment properties
 # compartments also keep track of ids of their children
-for child_id in root['children']:
-    child = compartments_by_id[child_id]
-    print child['x'], child['y'], child['z'], child['radius']
+for child in root.children:
+    print(child['x'], child['y'], child['z'], child['radius'])

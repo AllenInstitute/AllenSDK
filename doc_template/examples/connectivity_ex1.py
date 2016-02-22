@@ -1,5 +1,8 @@
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 
+from allensdk.api.api import Api
+Api.default_api_url = 'http://testwarehouse:9000'
+
 mca = MouseConnectivityApi()
 
 # get metadata for all non-Cre experiments

@@ -30,7 +30,7 @@ setup(
                         'pandas>=0.16.2',
                         'numpy>=1.8.2',
                         'six>=1.8.0',
-                        'pynrrd <= 0.2.0.dev'],
+                        'pynrrd >= 0.2.1'],
     dependency_links = [
         'git+https://github.com/mhe/pynrrd.git@9e09b24ff1#egg=pynrrd-0.1.999.dev'
     ],
@@ -38,7 +38,9 @@ setup(
                    'coverage>=3.7.1',
                    'mock'],
     setup_requires=['setuptools', 'sphinx', 'numpydoc'],
-    url='http://alleninstitute.github.io/AllenSDK/',
+    url='https://github.com/AllenInstitute/AllenSDK/tree/v%s' % (allensdk.__version__),
+    download_url = 'https://github.com/AllenInstitute/AllenSDK/tarball/v%s' % (allensdk.__version__),
+    keywords = ['neuroscience', 'bioinformatics', 'scientific'  ],
     scripts=['allensdk/model/biophys_sim/scripts/bps'],
     classifiers=[
         'Development Status :: 4 - Beta',

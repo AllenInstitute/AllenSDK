@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -14,17 +14,22 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.queries.rma_api import RmaApi
+from allensdk.config.manifest import Manifest
 import pandas as pd
 import os
 
 class CellTypesApi(RmaApi):
+    NWB_FILE_TYPE = 'NWBDownload'
+    SWC_FILE_TYPE = '3DNeuronReconstruction'
+    MARKER_FILE_TYPE = '3DNeuronMarker'
 
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
 
-        
-    def list_cells(self, require_morphology=False, require_reconstruction=False):
-        ''' Query the API for a list of all cells in the Cell Types Database.
+
+    def list_cells(self, require_morphology=False, require_reconstruction=False, reporter_status=None):
+        """ 
+        Query the API for a list of all cells in the Cell Types Database.
 
         Parameters
         ----------
@@ -34,16 +39,19 @@ class CellTypesApi(RmaApi):
         require_reconstruction: boolean
             Only return cells that have morphological reconstructions.
 
+        reporter_status: list
+            Return cells that have a particular cell reporter status.
+
         Returns
         -------
         list
             Meta data for all cells.
-        '''
+        """
 
         criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
         
         include = ( 'structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
-                    'ephys_features,data_sets,neuron_reconstructions' )
+                    'ephys_features,data_sets,neuron_reconstructions,cell_reporter' )
 
         cells = self.model_query('Specimen', criteria=criteria, include=include, num_rows='all')
         
@@ -65,11 +73,15 @@ class CellTypesApi(RmaApi):
                 if tl['transgenic_line_type_name'] == 'driver':
                     cell['transgenic_line'] = tl['name']
 
-        return self.filter_cells(cells, require_morphology, require_reconstruction)
+            # cell reporter status
+            cell['reporter_status'] = cell['cell_reporter']['name']
+
+
+        return self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
 
 
     def get_ephys_sweeps(self, specimen_id):
-        '''
+        """
         Query the API for a list of sweeps for a particular cell in the Cell Types Database.
 
         Parameters
@@ -81,14 +93,14 @@ class CellTypesApi(RmaApi):
         Returns
         -------
         list: List of sweep dictionaries belonging to a cell
-        '''
+        """
         criteria = "[specimen_id$eq%d]" % specimen_id
-        
-        return self.model_query('EphysSweep', criteria=criteria, num_rows='all')
+        sweeps = self.model_query('EphysSweep', criteria=criteria, num_rows='all')
+        return sorted(sweeps, key=lambda x: x['sweep_number'])
 
 
-    def filter_cells(self, cells, require_morphology, require_reconstruction):
-        ''' 
+    def filter_cells(self, cells, require_morphology, require_reconstruction, reporter_status):
+        """ 
         Filter a list of cell specimens to those that optionally have morphologies
         or have morphological reconstructions.
 
@@ -103,7 +115,10 @@ class CellTypesApi(RmaApi):
 
         require_reconstruction: boolean
             Filter out cells that have no morphological reconstructions.
-        '''
+
+        reporter_status: list
+            Filter for cells that have a particular cell reporter status
+        """
 
         if require_morphology:
             cells = [ c for c in cells if c['has_morphology'] ]
@@ -111,11 +126,14 @@ class CellTypesApi(RmaApi):
         if require_reconstruction:
             cells = [ c for c in cells if c['has_reconstruction'] ]
 
+        if reporter_status:
+            cells = [ c for c in cells if c['reporter_status'] in reporter_status]
+
         return cells
         
 
     def get_ephys_features(self, dataframe=False):
-        '''
+        """
         Query the API for the full table of EphysFeatures for all cells.  
 
         Parameters
@@ -124,9 +142,9 @@ class CellTypesApi(RmaApi):
         dataframe: boolean
             If true, return the results as a Pandas DataFrame.  Otherwise
             return a list of dictionaries.
-        '''
+        """
 
-        features = self.model_query('EphysFeature', num_rows='all')
+        features = self.model_query('EphysFeature', criteria='specimen', num_rows='all')
 
         if dataframe:
             return pd.DataFrame(features)
@@ -135,7 +153,7 @@ class CellTypesApi(RmaApi):
 
 
     def get_morphology_features(self, dataframe=False):
-        '''
+        """
         Query the API for the full table of morphology features for all cells
         
         Parameters
@@ -144,7 +162,7 @@ class CellTypesApi(RmaApi):
         dataframe: boolean
             If true, return the results as a Pandas DataFrame.  Otherwise
             return a list of dictionaries.
-        '''
+        """
 
         features = self.model_query('NeuronReconstruction', criteria="specimen", num_rows='all')
 
@@ -159,12 +177,22 @@ class CellTypesApi(RmaApi):
 
 
     def save_ephys_data(self, specimen_id, file_name):
-        try: 
-            os.makedirs(os.path.dirname(file_name))
-        except:
-            pass
+        """
+        Save the electrophysology recordings for a cell as an NWB file.
 
-        criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eqNWB]))' % specimen_id
+        Parameters
+        ----------
+        specimen_id: int
+            ID of the specimen, from the Specimens database model in the Allen Institute API.
+
+        file_name: str
+            Path to save the NWB file.  
+        """
+
+        dirname = os.path.dirname(file_name)
+        Manifest.safe_mkdir(dirname)
+
+        criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eq%s]))' % (specimen_id, self.NWB_FILE_TYPE)
         includes = 'ephys_result(well_known_files(well_known_file_type))'
 
         results = self.model_query('Specimen',
@@ -174,20 +202,32 @@ class CellTypesApi(RmaApi):
 
         try:
             file_url = results[0]['ephys_result']['well_known_files'][0]['download_link']
-        except Exception, _:
+        except Exception as _:
             raise Exception("Specimen %d has no ephys data" % specimen_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
         
 
     def save_reconstruction(self, specimen_id, file_name):
+        """
+        Save the morphological reconstruction of a cell as an SWC file.  
+
+        Parameters
+        ----------
+        specimen_id: int
+            ID of the specimen, from the Specimens database model in the Allen Institute API.
+
+        file_name: str
+            Path to save the SWC file.  
+        """
+
         try: 
             os.makedirs(os.path.dirname(file_name))
         except:
             pass
 
         criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
-        includes = 'neuron_reconstructions(well_known_files)'
+        includes = 'neuron_reconstructions(well_known_files(well_known_file_type[name$eq\'%s\']))' % self.SWC_FILE_TYPE
         
         results = self.model_query('Specimen',
                                    criteria=criteria,
@@ -198,6 +238,42 @@ class CellTypesApi(RmaApi):
             file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
         except:
             raise Exception("Specimen %d has no reconstruction" % specimen_id)
+        
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+
+
+    def save_reconstruction_markers(self, specimen_id, file_name):
+        """
+        Save the marker file for the morphological reconstruction of a cell.  These are
+        comma-delimited files indicating points of interest in a reconstruction (truncation
+        points, early tracing termination, etc).
+
+        Parameters
+        ----------
+        specimen_id: int
+            ID of the specimen, from the Specimens database model in the Allen Institute API.
+
+        file_name: str
+            Path to save the marker file.
+        """
+
+        try: 
+            os.makedirs(os.path.dirname(file_name))
+        except:
+            pass
+
+        criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
+        includes = 'neuron_reconstructions(well_known_files(well_known_file_type[name$eq\'%s\']))' % self.MARKER_FILE_TYPE
+        
+        results = self.model_query('Specimen',
+                                   criteria=criteria,
+                                   include=includes,
+                                   num_rows='all')
+
+        try:
+            file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
+        except:
+            raise LookupError("Specimen %d has no marker file" % specimen_id)
         
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
 

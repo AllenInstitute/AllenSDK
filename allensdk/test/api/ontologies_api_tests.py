@@ -113,7 +113,7 @@ class OntologiesApiTests(unittest.TestCase):
         self.oa.json_msg_query = \
             MagicMock(name='json_msg_query')
         
-        self.oa.get_structures(structure_set_names="'Mouse Connectivity - Summary'")
+        self.oa.get_structures(structure_set_names=self.oa.quote_string("Mouse Connectivity - Summary"))
         
         self.oa.json_msg_query.assert_called_once_with(expected)
 
@@ -124,8 +124,8 @@ class OntologiesApiTests(unittest.TestCase):
         self.oa.json_msg_query = \
             MagicMock(name='json_msg_query')
         
-        self.oa.get_structures(structure_set_names=["'NHP - Coarse'",
-                                                    "'Mouse Connectivity - Summary'"])
+        self.oa.get_structures(structure_set_names=[self.oa.quote_string("NHP - Coarse"),
+                                                    self.oa.quote_string("Mouse Connectivity - Summary")])
         
         self.oa.json_msg_query.assert_called_once_with(expected)
 
