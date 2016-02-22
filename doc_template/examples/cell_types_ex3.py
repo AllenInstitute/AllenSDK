@@ -2,10 +2,6 @@ from allensdk.api.queries.cell_types_api import CellTypesApi
 from allensdk.ephys.extract_cell_features import extract_cell_features
 from collections import defaultdict
 
-
-from allensdk.api.api import Api
-Api.default_api_url = 'http://tcelltypes'
-
 # pick a cell to analyze
 specimen_id = 324257146
 nwb_file = 'ephys.nwb'

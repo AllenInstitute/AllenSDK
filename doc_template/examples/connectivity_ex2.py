@@ -1,8 +1,5 @@
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 
-from allensdk.api.api import Api
-Api.default_api_url = 'http://testwarehouse:9000'
-
 # tell the cache class what resolution (in microns) of data you want to download
 mcc = MouseConnectivityCache(resolution=25)
 

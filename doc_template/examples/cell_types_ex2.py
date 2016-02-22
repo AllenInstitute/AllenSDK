@@ -1,8 +1,5 @@
 from allensdk.core.cell_types_cache import CellTypesCache
 
-from allensdk.api.api import Api
-Api.default_api_url = 'http://tcelltypes'
-
 ctc = CellTypesCache()
 
 # a list of cell metadata for cells with reconstructions, download if necessary

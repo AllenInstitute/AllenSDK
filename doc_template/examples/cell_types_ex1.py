@@ -1,8 +1,5 @@
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
-from allensdk.api.api import Api
-Api.default_api_url = 'http://tcelltypes'
-
 ct = CellTypesApi()
 
 # a list of dictionaries containing metadata for cells with reconstructions
