@@ -8,15 +8,18 @@ All notable changes to this projection will be documented in this file.
 - CellTypesCache.get_cells has a new argument 'reporter_status', which accepts one or more ReporterStatus values.
 - CellTypesApi.save_reconstruction_marker and CellTypesCache.get_reconstruction_marker download and open files containing positions that mark special points in reconstruction (truncation, early termination of reconstruction, etc).
 - swc.read_marker_file for reading in marker files 
-- Morphology has new methods for manipulating the morphology tree structure.
+- Morphology has new methods for manipulating the morphology tree structure
+- allensdk.model.biophysical package supports active and passive models
 
 ### Changed
 
 - Morphology compartments are now Compartment objects that behave like dictionaries
-- Compartment.children stores references to immediate decescendant Compartments.
+- Compartment.children stores references to immediate descendant Compartments
 - spike times in NWB files are stored in "analysis/spike_times" instead of "analysis/aibs_spike_times"
 - NwbDataSet looks for spike times in both locations ("spike_times" first)
 - glif_neuron_methods.py function names have been changed to be more standardized
+- allensdk.model.biophysical_perisomatic package renamed to allensdk.model.biophysical
+- NEURON dependency updated to 7.4 release 1370
 
 ### Fixed
 
