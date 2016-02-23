@@ -2,7 +2,7 @@ import allensdk.core.json_utilities as json_utilities
 from allensdk.model.glif.glif_neuron import GlifNeuron
 
 # initialize the neuron
-neuron_config = json_utilities.read('49154717_neuron_config.json')
+neuron_config = json_utilities.read('neuron_config.json')
 neuron = GlifNeuron.from_dict(neuron_config)
 
 # make a short square pulse. stimulus units should be in Amps.
