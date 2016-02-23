@@ -2,9 +2,9 @@ import allensdk.core.json_utilities as json_utilities
 from allensdk.model.glif.glif_neuron import GlifNeuron
 from allensdk.core.nwb_data_set import NwbDataSet
 
-neuron_config = json_utilities.read('49154717_neuron_config.json')
+neuron_config = json_utilities.read('neuron_config.json')
 ephys_sweeps = json_utilities.read('ephys_sweeps.json')
-ephys_file_name = '49154717.nwb'
+ephys_file_name = 'stimulus.nwb'
 
 # pull out the stimulus for the first sweep
 ephys_sweep = ephys_sweeps[0]
