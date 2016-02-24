@@ -119,23 +119,10 @@ class Compartment(dict):
         self[NODE_CHILDREN] = []
 
 
-    def __str__(self):
-        """ create string with compartment information in succinct, 
-        single-line form """
-        return "%d %d %.4f %.4f %.4f %.4f %d %s %d" % (self[_N], self[_TYP], self[_X], self[_Y], self[_Z], self[_R], self[_P], str(self[_C]), self[_TID])
-
-    def print_extra(self):
+    def print_node(self):
         """ print out compartment information with field names """
+        print("%d %d %.4f %.4f %.4f %.4f %d %s %d" % (self[_N], self[_TYP], self[_X], self[_Y], self[_Z], self[_R], self[_P], str(self[_C]), self[_TID]))
         
-        print "id: %d " % self[NODE_ID] + \
-            "type: %d " % self[NODE_TYPE] + \
-            "x: %f " % self[NODE_X] + \
-            "y: %f " % self[NODE_Y] + \
-            "z: %f " % self[NODE_Z] + \
-            "radius: %f " % self[NODE_R] + \
-            "parent: %d " % self[NODE_PN] + \
-            "children: %s " % str(self[NODE_CHILDREN]) + \
-            "tree: %d" % self[NODE_TREE_ID]
 
 ########################################################################
 ########################################################################
@@ -1026,15 +1013,15 @@ class Marker( dict ):
 
 
 def read_marker_file(file_name):
-    import pandas as pd
     """ read in a marker file and return a list of dictionaries """
 
-    df = pd.read_csv(file_name, 
-                     comment='#', 
-                     header=None, 
-                     names=['x','y','z','radius','shape','name','comment','color_r','color_g','color_b'])
+    with open(file_name, 'r') as f:
+        rows = csv.DictReader((r for r in f if not r.startswith('#')), 
+                              fieldnames=['x','y','z','radius','shape','name','comment',
+                                          'color_r','color_g','color_b'])
 
-    dicts = df.to_dict(orient='records')
-
-    return [ Marker({ 'x': d['x'], 'y': d['y'], 'z': d['z'], 'name': d['name'] }) for d in dicts ]
+        return [ Marker({ 'x': float(r['x']), 
+                          'y': float(r['y']), 
+                          'z': float(r['z']), 
+                          'name': int(r['name']) }) for r in rows ]
 
