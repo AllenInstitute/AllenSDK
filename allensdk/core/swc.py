@@ -374,10 +374,9 @@ class Morphology( object ):
 
 
     def change_parent(self, child, parent):
-        """ Change the parent of a node. The pointer of the child node 
-        is adjusted to point to the new parent, the child is taken off
-        of the previous parent's child list, and it is added to the new
-        parent's child list.
+        """ Change the parent of a node. The child node is adjusted to 
+        point to the new parent, the child is taken off of the previous 
+        parent's child list, and it is added to the new parent's child list.
         
         Parameters
         ----------
