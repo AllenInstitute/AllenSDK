@@ -59,7 +59,7 @@ class MouseConnectivityCache(Cache):
         in the function call (e.g. get_projection_density(file_name='file.nrrd')).
 
     manifest_file: string
-        File name of the manifest to be read.  Default is "manifest.json".
+        File name of the manifest to be read.  Default is "mouse_connectivity_manifest.json".
         
     """
 
@@ -74,7 +74,7 @@ class MouseConnectivityCache(Cache):
     STRUCTURES_KEY = 'STRUCTURES'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
     
-    def __init__(self, resolution=25, cache=True, manifest_file='manifest.json', base_uri=None):
+    def __init__(self, resolution=25, cache=True, manifest_file='mouse_connectivity_manifest.json', base_uri=None):
         super(MouseConnectivityCache, self).__init__(manifest=manifest_file, cache=cache)
 
         self.resolution = resolution
