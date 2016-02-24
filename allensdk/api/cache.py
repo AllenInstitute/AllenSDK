@@ -28,20 +28,6 @@ class Cache(object):
         self.load_manifest(manifest)
     
 
-    def safe_mkdir(self, directory):
-        '''Create path if not already there.
-        
-        Parameters
-        ----------
-        directory : string
-            create it if it doesn't exist
-        '''
-        try:
-            os.makedirs(directory)
-        except Exception, e:
-            print e.message
-            
-
     def get_cache_path(self, file_name, manifest_key, *args):
         '''Helper method for accessing path specs from manifest keys.
         
@@ -79,6 +65,11 @@ class Cache(object):
         '''
         if file_name != None:
             if not os.path.exists(file_name):
+
+                # make the directory if it doesn't exist already
+                dirname = os.path.dirname(file_name)
+                Manifest.safe_mkdir(dirname)
+
                 self.build_manifest(file_name)
 
             

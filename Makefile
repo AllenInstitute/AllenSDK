@@ -13,7 +13,7 @@ DOC_URL=http://alleninstitute.github.io/AllenSDK
 #TGZ_URL=https:\/\/github.com\/AllenInstitute\/AllenSDK\/archive\/master.tar.gz
 
 build:
-	mkdir -p $(DISTDIR)/$(PROJECTNAME)
+	mkdir -p $(DISTDIR)/$(PROJECTNAME) 
 	cp -r allensdk setup.py README.md $(DISTDIR)/$(PROJECTNAME)/
 	cd $(DISTDIR); tar czvf $(PROJECTNAME).tgz $(PROJECTNAME)
 	
@@ -27,10 +27,17 @@ setversion:
 sdist: distutils_build
 	python setup.py sdist
 
+pypi_register:
+	python setup.py register --repository https://testpypi.python.org/pypi
+
+pypi_deploy:
+	python setup.py sdist upload --repository https://testpypi.python.org/pypi
+	
+
 EXAMPLES=doc/_static/examples
 
 doc: FORCE
-	sphinx-apidoc -d 4 -H "Allen SDK" -A "Allen Institute for Brain Science" -V $(VERSION) -R $(VERSION).dev$(RELEASE) --full -o doc $(PROJECTNAME)
+	sphinx-apidoc -d 4 -H "Allen SDK" -A "Allen Institute for Brain Science" -V $(VERSION) -R $(VERSION).$(RELEASE) --full -o doc $(PROJECTNAME)
 	cp doc_template/*.rst doc_template/conf.py doc
 	cp -R doc_template/examples $(EXAMPLES)
 	sed -i --expression "s/|version|/${VERSION}/g" doc/conf.py
@@ -45,8 +52,8 @@ doc: FORCE
 	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html
 	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
 	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_static/external_assets/javascript/portal.js
-	cd $(EXAMPLES)/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter nbconvert --to html {} \;
-	cd $(EXAMPLES)/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter nbconvert --to html {} \;
+	cd $(EXAMPLES)/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
+	cd $(EXAMPLES)/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
 	cd doc && make html || true
 
 FORCE:

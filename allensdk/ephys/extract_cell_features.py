@@ -57,15 +57,27 @@ def extract_cell_features(nwb_file, long_square_sweeps, short_square_sweeps, ram
 
     long_square_features = analyze_long_squares(long_square_sweeps, nwb_file)
 
-    if ( ( "hero_sweep_num" in long_square_features ) and ( "input_resistance" in long_square_features ) ):
-        return {
-            'long_squares': long_square_features,
-            'ramps': analyze_ramps(ramp_sweeps, nwb_file),
-            'short_squares': analyze_short_squares(short_square_sweeps, nwb_file)
-            }
-
-    else:
+    if "hero_sweep_num" not in long_square_features:
+        logging.error("could not identify a hero sweep")
         return None
+
+    if "input_resistance" not in long_square_features:
+        logging.error("could not compute input resistance")
+        return None
+
+    short_square_features = analyze_short_squares(short_square_sweeps, nwb_file)
+
+    if short_square_features.get("up_down_ratio",None) is None:
+        logging.error("could not compute short square up/down ratio: most likely short square stimuli did not trigger a spike")
+        return None
+
+    ramp_features = analyze_ramps(ramp_sweeps, nwb_file)
+
+    return {
+        'long_squares': long_square_features,
+        'ramps': ramp_features,
+        'short_squares': short_square_features
+        }
 
 
 def extract_sweep_features(nwb_file, sweep_numbers):
@@ -88,6 +100,7 @@ def extract_sweep_features(nwb_file, sweep_numbers):
     all_sweep_features = {}
 
     for sweep_number in sweep_numbers:
+        logging.debug("extracting features for sweep %d" % sweep_number)
         sweep_features = extract_single_sweep_features(features, nwb_file, sweep_number)
         all_sweep_features[sweep_number] = sweep_features
 
@@ -550,27 +563,31 @@ def get_sweep_from_nwb(nwb_file, sweep_num):
     return (v, i, t)
         
 
-def get_square_stim_characteristics(i, t):
+def get_square_stim_characteristics(i, t, no_test_pulse=False):
     '''
     Identify the start time, duration, amplitude, start index, and
     end index of a square stimulus.  
+    This assumes that there is a test pulse followed by the stimulus square.
     '''
 
-    # Assumes that there is a test pulse followed by the stimulus square
     di = np.diff(i)
     up_idx = np.flatnonzero(di > 0)
     down_idx = np.flatnonzero(di < 0)
+
+    idx = 0 if no_test_pulse else 1
     
     # second square is the stimulus
-    if up_idx[1] < down_idx[1]: # positive square
-        start_idx = up_idx[1] + 1 # shift by one to compensate for diff()
-        end_idx = down_idx[1] + 1
+    if up_idx[idx] < down_idx[idx]: # positive square
+        start_idx = up_idx[idx] + 1 # shift by one to compensate for diff()
+        end_idx = down_idx[idx] + 1
     else: # negative square
-        start_idx = down_idx[1] + 1
-        end_idx = up_idx[1] + 1
+        start_idx = down_idx[idx] + 1
+        end_idx = up_idx[idx] + 1
+
     stim_start = float(t[start_idx])
     stim_dur = float(t[end_idx] - t[start_idx])
     stim_amp = float(i[start_idx])
+
     return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
 
 
@@ -584,6 +601,32 @@ def get_ramp_stim_characteristics(i, t):
     start_idx = up_idx[1] + 1 # shift by one to compensate for diff()
     return (t[start_idx], start_idx)
     
+
+def get_stim_characteristics(i, t, no_test_pulse=False):
+    '''
+    Identify the start time, duration, amplitude, start index, and
+    end index of a general stimulus.  
+    This assumes that there is a test pulse followed by the stimulus square.
+    '''
+
+    di = np.diff(i)
+    diff_idx = np.flatnonzero(di != 0)
+
+    if len(diff_idx) == 0:
+        return (None, None, 0.0, None, None)
+
+    # skip the first up/down 
+    idx = 0 if no_test_pulse else 1
+    
+    # shift by one to compensate for diff()
+    start_idx = diff_idx[idx] + 1
+    end_idx = diff_idx[-1] + 1
+
+    stim_start = float(t[start_idx])
+    stim_dur = float(t[end_idx] - t[start_idx])
+    stim_amp = float(i[start_idx])
+
+    return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
 
 def calculate_input_resistance(subthresh_data):
     ''' 

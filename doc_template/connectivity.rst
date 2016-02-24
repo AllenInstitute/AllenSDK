@@ -60,10 +60,6 @@ Usage is straightforward:
 
 .. literalinclude:: _static/examples/connectivity_ex3.py
 
-.. warning::
-    
-    The pynrrd package available on PyPI contains known issues on Windows.  If you are a Windows
-    user, please install the latest version available here: `<https://github.com/mhe/pynrrd>`_.
 
 
 
