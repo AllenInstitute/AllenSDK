@@ -18,7 +18,7 @@ import csv
 import copy
 import math
 
-# Morphology nodes have the following fields. SWC fields are numeric.
+# Morphology compartments have the following fields. SWC fields are numeric.
 NODE_ID      = 'id'
 NODE_TYPE    = 'type'
 NODE_X       = 'x'
@@ -30,17 +30,6 @@ SWC_COLUMNS = [ NODE_ID, NODE_TYPE, NODE_X, NODE_Y, NODE_Z, NODE_R, NODE_PN ]
 
 NODE_TREE_ID = 'tree_id'     
 NODE_CHILDREN = 'children'   
-
-# shorthand for dictionary entries, to shorten sometimes long code lines
-_N = NODE_ID
-_TYP = NODE_TYPE
-_X = NODE_X
-_Y = NODE_Y
-_Z = NODE_Z
-_R = NODE_R
-_P = NODE_PN
-_C = NODE_CHILDREN
-_TID = NODE_TREE_ID
 
 
 ########################################################################
@@ -98,7 +87,7 @@ def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
 
 class Compartment(dict): 
     """
-    A dictionary class storing information about a single morphology node
+    A dictionary class storing information about a single morphology compartment
     """
 
     def __init__(self, *args, **kwargs):
@@ -112,17 +101,12 @@ class Compartment(dict):
                 NODE_PN not in self):
             raise ValueError("Compartment was not initialized with requisite fields")
         # Each unconnected graph has its own ID. This is the ID 
-        #   of graph that the node resides in        
+        #   of graph that the compartment resides in        
         self[NODE_TREE_ID] = -1
         
-        # IDs of child nodes
+        # IDs of child compartments
         self[NODE_CHILDREN] = []
 
-
-    def print_node(self):
-        """ print out compartment information with field names """
-        print("%d %d %.4f %.4f %.4f %.4f %d %s %d" % (self[_N], self[_TYP], self[_X], self[_Y], self[_Z], self[_R], self[_P], str(self[_C]), self[_TID]))
-        
 
 class Node(object): 
     """
@@ -137,15 +121,15 @@ class Node(object):
         """
         if not isinstance(obj, Compartment):
             raise ValueError, "Must be initialized using Compartment object"
-        self.n = node[NODE_ID]
-        self.t = node[NODE_TYPE]
-        self.x = node[NODE_X]
-        self.y = node[NODE_Y]
-        self.z = node[NODE_Z]
-        self.radius = node[NODE_R]
-        self.parent = node[NODE_PN]
-        self.children = node[NODE_CHILDREN]
-        self.tree = node[NODE_TREE_ID]
+        self.n = obj[NODE_ID]
+        self.t = obj[NODE_TYPE]
+        self.x = obj[NODE_X]
+        self.y = obj[NODE_Y]
+        self.z = obj[NODE_Z]
+        self.radius = obj[NODE_R]
+        self.parent = obj[NODE_PN]
+        self.children = obj[NODE_CHILDREN]
+        self.tree = obj[NODE_TREE_ID]
 
 
     def __str__(self):
@@ -190,7 +174,7 @@ class Morphology( object ):
 
         ##############################################
         # define tree list here for clarity, even though it's reset below
-        #   when nodes are assigned
+        #   when compartments are assigned
         self._tree_list = []
         
         ##############################################
@@ -208,7 +192,7 @@ class Morphology( object ):
         if num_errors > 0:
             raise ValueError("Morphology appears to be inconsistent")
         ##############################################
-        # root node (this must be part of the soma)
+        # root compartment (this must be part of the soma)
         self._soma = None
         for i in range(len(self.compartment_list)):
             seg = self.compartment_list[i]
@@ -249,9 +233,18 @@ class Morphology( object ):
         defined as everything following from a single root compartment. """
         return len(self._tree_list)
 
-    # TODO add filter for number of nodes of a particular type
     @property
     def num_nodes(self):
+        """ 
+        [deprecated]
+        Return the number of compartments in the morphology. 
+        Use 'num_compartments()' instead.
+        """
+        return len(self.compartment_list)
+
+    # TODO add filter for number of compartments of a particular type
+    @property
+    def num_compartments(self):
         """ Return the number of compartments in the morphology. """
         return len(self.compartment_list)
 
@@ -259,11 +252,11 @@ class Morphology( object ):
     def _set_compartments(self, compartment_list):
         """
         take a list of SWC-like objects and turn those into morphology
-        nodes need to be able to initialize from a list supplied by an SWC
+        compartments need to be able to initialize from a list supplied by an SWC
         file while also being able to initialize from the compartment list
-        of an existing Morphology object. As nodes in a morphology object
-        contain reference to nodes in that object, make a shallow copy
-        of input nodes and overwrite known references (ie, the 
+        of an existing Morphology object. As compartments in a morphology object
+        contain reference to compartments in that object, make a shallow copy
+        of input compartments and overwrite known references (ie, the 
         'children' array)
         """
         self._compartment_list = []
@@ -277,22 +270,22 @@ class Morphology( object ):
 
     @property
     def soma(self):
-        """ Returns root node of soma, if present"""
+        """ Returns root compartment of soma, if present"""
         return self._soma
 
     @property
     def root(self):
-        """ [deprecated] Returns root node of soma, if present. Use 'soma' instead of 'root'"""
+        """ [deprecated] Returns root compartment of soma, if present. Use 'soma' instead of 'root'"""
         return self._soma
 
     ####################################################################
     ####################################################################
-    # tree and node access
+    # tree and compartment access
 
     def tree(self, n):
         """ 
         Returns a list of all Morphology Nodes within the specified
-        tree. A tree is defined as a fully connected graph of nodes.
+        tree. A tree is defined as a fully connected graph of compartments.
         Each tree has exactly one root.
         
         Parameters
@@ -311,71 +304,93 @@ class Morphology( object ):
 
 
     def node(self, n):
+        """
+        [Deprecated] Returns the specified morphology compartment. Use
+        'compartment(n)' instead
+        """
+        return self.compartment(n)
+
+
+    def compartment(self, n):
         """ 
-        Returns the morphology node having the specified ID.
+        Returns the morphology compartment having the specified ID.
         
         Parameters
         ----------
         n: integer
-            ID of desired node
+            ID of desired compartment
             
         Returns
         -------
         A morphology object having the specified ID, or None if such a
-        node doesn't exist
+        compartment doesn't exist
         """
-        # undocumented feature -- if a node is supplied instead of a
-        #   node ID, the node is returned and no error is triggered
-        return self._resolve_node_type(n)
+        # undocumented feature -- if a compartment is supplied instead of a
+        #   compartment ID, the compartment is returned and no error is 
+        #   triggered
+        return self._resolve_compartment_type(n)
 
 
     def parent_of(self, seg):
-        """ Returns parent of the specified node.
+        """ Returns parent of the specified compartment.
         
         Parameters
         ----------
         seg: integer or Morphology Object
-            The ID of the child node, or the child node itself
+            The ID of the child compartment, or the child compartment itself
             
         Returns
         -------
         A morphology object, or None if no parent exists or if the
-        specified node ID doesn't exist
+        specified compartment ID doesn't exist
         """
         # if ID passed in, make sure it's converted to a compartment
         # don't trap for exception here -- if supplied segment is 
         #   incorrect, make sure the user knows about it
-        seg = self._resolve_node_type(seg)
-        # return parent of specified node
+        seg = self._resolve_compartment_type(seg)
+        # return parent of specified compartment
         if seg is not None and seg[NODE_PN] >= 0:
             return self._compartment_list[seg[NODE_PN]]
         return None
 
 
     def children_of(self, seg):
-        """ Returns a list of the children of the specified node
+        """ Returns a list of the children of the specified compartment
         
         Parameters
         ----------
         seg: integer or Morphology Object
-            The ID of the parent node, or the parent node itself
+            The ID of the parent compartment, or the parent compartment itself
             
         Returns
         -------
         A list of the child morphology objects. If the ID of the parent
-        node is invalid, None is returned.
+        compartment is invalid, None is returned.
         """
-        seg = self._resolve_node_type(seg)
+        seg = self._resolve_compartment_type(seg)
         return [ self._compartment_list[c] for c in seg[NODE_CHILDREN] ]
+
+
+    def create_node_list(self):
+        """
+        Returns a list of Node objects. These Nodes are a copy
+        of the Morphology. Modifying them will not modify anything in
+        the Morphology itself.
+        """
+        compartments = []
+        for seg in self._compartment_list:
+            assert seg[NODE_ID] == len(compartments), "Internal error"
+            compartments.append(Node(seg))
+        return compartments
 
 
     ###################################################################
     ###################################################################
     # Information querying and data manipulation
 
-    # internal function. takes an integer and returns the node having
-    #   that ID. IF a node is passed in instead, it is returned
-    def _resolve_node_type(self, seg):
+    # internal function. takes an integer and returns the compartment having
+    #   that ID. IF a compartment is passed in instead, it is returned
+    def _resolve_compartment_type(self, seg):
         # if compartment passed then we don't need to convert anything
         # if compartment not passed, try converting value to int
         #   and using that as an index
@@ -386,42 +401,42 @@ class Morphology( object ):
                     return None
                 seg = self._compartment_list[seg]
             except ValueError:
-                raise TypeError("Object not recognized as morphology node or index")
+                raise TypeError("Object not recognized as morphology compartment or index")
         return seg
 
 
     def change_parent(self, child, parent):
-        """ Change the parent of a node. The child node is adjusted to 
+        """ Change the parent of a compartment. The child compartment is adjusted to 
         point to the new parent, the child is taken off of the previous 
         parent's child list, and it is added to the new parent's child list.
         
         Parameters
         ----------
         child: integer or Morphology Object
-            The ID of the child node, or the child node itself
+            The ID of the child compartment, or the child compartment itself
             
         parent: integer or Morphology Object
-            The ID of the parent node, or the parent node itself
+            The ID of the parent compartment, or the parent compartment itself
             
         Returns
         -------
         Nothing
         """
-        child_seg = self._resolve_node_type(child)
-        parent_seg = self._resolve_node_type(parent)
+        child_seg = self._resolve_compartment_type(child)
+        parent_seg = self._resolve_compartment_type(parent)
         # if child has former parent, remove it from parent's child list
         if child_seg[NODE_PN] >= 0:
-            old_par = self.node(child_seg[NODE_PN])
+            old_par = self.compartment(child_seg[NODE_PN])
             old_par[NODE_CHILDREN].remove(child_seg[NODE_ID])
         parent_seg[NODE_CHILDREN].append(child_seg[NODE_ID])
         child_seg[NODE_PN] = parent_seg[NODE_ID]
             
 
-    # returns a list of nodes located within dist of x,y,z
-    def find(self, x, y, z, dist, node_type=None):
+    # returns a list of compartments located within dist of x,y,z
+    def find(self, x, y, z, dist, compartment_type=None):
         """ Returns a list of Morphology Objects located within 'dist' 
-        of coordinate (x,y,z). If node_type is specified, the search 
-        will be constrained to return only nodes of that type.
+        of coordinate (x,y,z). If compartment_type is specified, the search 
+        will be constrained to return only compartments of that type.
         
         Parameters
         ----------
@@ -431,7 +446,7 @@ class Morphology( object ):
         dist: float
             The search radius
         
-        node_type: enum (optional)
+        compartment_type: enum (optional)
             One of the following constants: SOMA, AXON, DENDRITE, 
             BASAL_DENDRITE or APICAL_DENDRITE
             
@@ -445,7 +460,7 @@ class Morphology( object ):
             dy = seg[NODE_Y] - y
             dz = seg[NODE_Z] - z
             if math.sqrt(dx*dx + dy*dy + dz*dz) <= dist:
-                if node_type is None or seg[NODE_TYPE] == node_type:
+                if compartment_type is None or seg[NODE_TYPE] == compartment_type:
                     found.append(seg)
         return found
 
@@ -509,12 +524,12 @@ class Morphology( object ):
         
     def sparsify(self, modulo, compress_ids=False):
         """ Return a new Morphology object that has a given number of non-leaf,
-        non-root nodes removed.  IDs can be reassigned so as to be continuous.
+        non-root compartments removed.  IDs can be reassigned so as to be continuous.
         
         Parameters
         ----------
         modulo: int
-           keep 1 out of every modulo nodes.
+           keep 1 out of every modulo compartments.
         
         compress_ids: boolean
            Reassign ids so that ids are continuous (no missing id numbers).
@@ -584,8 +599,8 @@ class Morphology( object ):
         #   the child will become a new root
         for i in range(len(self.compartment_list)):
             remap[i] = -1
-        # map old old node numbers to new ones. reset n to the new ID
-        #   and put node in new list
+        # map old old compartment numbers to new ones. reset n to the new ID
+        #   and put compartment in new list
         new_id = 0
         tmp_list = []
         for seg in self.compartment_list:
@@ -598,7 +613,7 @@ class Morphology( object ):
         for seg in tmp_list:
             if seg[NODE_PN] >= 0:
                 seg[NODE_PN] = remap[seg[NODE_PN]]
-        # replace compartment list with newly created node list
+        # replace compartment list with newly created compartment list
         self._compartment_list = tmp_list
         # reconstruct parent/child relationship links
         # forget old relations
@@ -616,37 +631,37 @@ class Morphology( object ):
         self._compartment_index = { c[NODE_ID]: c for c in self.compartment_list }
         # compartment list is complete and sequential so don't need index
         #   to resolve relationships
-        # for each node, reset children array
-        # for each node, add self to parent's child list
+        # for each compartment, reset children array
+        # for each compartment, add self to parent's child list
         for seg in self._compartment_list:
             seg[NODE_CHILDREN] = []
         for seg in self._compartment_list:
             if seg[NODE_PN] >= 0:
                 self._compartment_list[seg[NODE_PN]][NODE_CHILDREN].append(seg[NODE_ID])
-        # verify that each node ID is the same as its position in the
+        # verify that each compartment ID is the same as its position in the
         #   compartment list
         for i in range(len(self.compartment_list)):
-            if i != self.node(i)[NODE_ID]:
+            if i != self.compartment(i)[NODE_ID]:
                 raise Assertion_Error("Internal error detected -- compartment list not properly formed")
 
 
-    def append(self, node_list):
-        """ Add additional nodes to this Morphology. Those nodes must
+    def append(self, compartments):
+        """ Add additional compartments to this Morphology. Those compartments must
         originate from another morphology object.
         
         Parameters
         ----------
-        node_list: list of Morphology nodes
+        compartments: list of Morphology compartments
         """
-        # construct a map between new and old IDs of added nodes
+        # construct a map between new and old IDs of added compartments
         remap = {}
-        for i in range(len(node_list)):
+        for i in range(len(compartments)):
             remap[i] = -1
-        # map old old node numbers to new ones. reset n to the new ID
-        # append new nodes to existing node list
+        # map old old compartment numbers to new ones. reset n to the new ID
+        # append new compartments to existing compartment list
         old_count = len(self.compartment_list)
         new_id = old_count
-        for seg in node_list:
+        for seg in compartments:
             if seg is not None:
                 remap[seg[NODE_ID]] = new_id
                 seg[NODE_ID] = new_id
@@ -662,7 +677,7 @@ class Morphology( object ):
 
     def stumpify_axon(self, count=10):
         """ Remove all axon compartments except the first 'count'
-        nodes, as counted from the connected axon root.
+        compartments, as counted from the connected axon root.
         
         Parameters
         ----------
@@ -681,7 +696,7 @@ class Morphology( object ):
                         break
         if axon_root is None:
             return
-        # flag the first 'count' nodes from the axon root
+        # flag the first 'count' compartments from the axon root
         ax = axon_root
         for i in range(count):
             # ignore bifurcations -- go 'count' deep on one line only
@@ -699,7 +714,7 @@ class Morphology( object ):
             
         
     # strip out everything but the soma and the specified SWC type
-    def strip_all_other_types(self, node_type, keep_soma=True):
+    def strip_all_other_types(self, compartment_type, keep_soma=True):
         """ Strips everything from the morphology except for the
         specified type.
         Parent and child relationships are updated accordingly, creating
@@ -707,20 +722,20 @@ class Morphology( object ):
         
         Parameters
         ----------
-        node_type: enum
+        compartment_type: enum
             The compartment type to keep in the morphology. 
             Use one of the following constants: SOMA, AXON, DENDRITE, 
             BASAL_DENDRITE, or APICAL_DENDRITE
         
         keep_soma: Boolean (optional)
-            True (default) if soma nodes should remain in the 
+            True (default) if soma compartments should remain in the 
             morpyhology, and False if the soma should also be stripped
         """
         flagged_for_removal = {}
-        # scan nodes and see which ones should be removed. keep a record
+        # scan compartments and see which ones should be removed. keep a record
         #   of them
         for seg in self.compartment_list:
-            if seg[NODE_TYPE] == node_type:
+            if seg[NODE_TYPE] == compartment_type:
                 remove = False
             elif seg[NODE_TYPE] == 1 and keep_soma:
                 remove = False
@@ -728,11 +743,11 @@ class Morphology( object ):
                 remove = True
             if remove:
                 flagged_for_removal[seg[NODE_ID]] = True
-        # remove selected nodes andreset parent links
+        # remove selected compartments andreset parent links
         for i in range(len(self.compartment_list)):
             seg = self.compartment_list[i]
             if seg[NODE_ID] in flagged_for_removal:
-                # eliminate node
+                # eliminate compartment
                 self.compartment_list[i] = None
             elif seg[NODE_PN] in flagged_for_removal:
                 # parent was eliminated. make this a new root
@@ -740,7 +755,7 @@ class Morphology( object ):
         self._reconstruct()
     
     # strip out the specified SWC type
-    def strip_type(self, node_type):
+    def strip_type(self, compartment_type):
         """ Strips all compartments of the specified type from the
         morphology. 
         Parent and child relationships are updated accordingly, creating
@@ -748,14 +763,14 @@ class Morphology( object ):
         
         Parameters
         ----------
-        node_type: enum
+        compartment_type: enum
             The compartment type to strip from the morphology.
             Use one of the following constants: SOMA, AXON, DENDRITE,
             BASAL_DENDRITE, or APICAL_DENDRITE
         """
         flagged_for_removal = {}
         for seg in self.compartment_list:
-            if seg[NODE_TYPE] == node_type:
+            if seg[NODE_TYPE] == compartment_type:
                 remove = True
             else:
                 remove = False
@@ -764,7 +779,7 @@ class Morphology( object ):
         for i in range(len(self.compartment_list)):
             seg = self.compartment_list[i]
             if seg[NODE_ID] in flagged_for_removal:
-                # eliminate node
+                # eliminate compartment
                 self.compartment_list[i] = None
             elif seg[NODE_PN] in flagged_for_removal:
                 # parent was eliminated. make this a new root
@@ -819,12 +834,12 @@ class Morphology( object ):
             the transformation matrix
         """
         # In addition to transforming the locations of the morphology
-        #   nodes, the radius of each node must be adjusted.
+        #   compartments, the radius of each compartment must be adjusted.
         # There are 2 ways to measure scale from a transform. Assuming
         #   an isotropic transform, the scale is the cube root of the
         #   matrix determinant. The other ways is to measure scale 
         #   independently along each axis.
-        # For now, the node radius is only updated based on the average
+        # For now, the compartment radius is only updated based on the average
         #   scale along all 3 axes (eg, isotropic assumption), so calculate
         #   scale using the determinant
         #
@@ -862,14 +877,14 @@ class Morphology( object ):
         construct list of independent trees (each tree has a root of -1)
         """
         trees = []
-        # reset each node's tree ID to indicate that it's not assigned
+        # reset each compartment's tree ID to indicate that it's not assigned
         for seg in self.compartment_list:
             seg[NODE_TREE_ID] = -1
-        # construct trees for each node
-        # if a node is adjacent an existing tree, merge to it
-        # if a node is adjacent multiple trees, merge all
+        # construct trees for each compartment
+        # if a compartment is adjacent an existing tree, merge to it
+        # if a compartment is adjacent multiple trees, merge all
         for seg in self.compartment_list:
-            # see what trees this node is adjacent to
+            # see what trees this compartment is adjacent to
             local_trees = []
             if seg[NODE_PN] >= 0 and self.compartment_list[seg[NODE_PN]][NODE_TREE_ID] >= 0:
                 local_trees.append(self.compartment_list[seg[NODE_PN]][NODE_TREE_ID])
@@ -877,23 +892,23 @@ class Morphology( object ):
                 child = self.compartment_list[child_id]
                 if child[NODE_TREE_ID] >= 0:
                     local_trees.append(child[NODE_TREE_ID])
-            # figure out which tree to put node into
+            # figure out which tree to put compartment into
             # if there are muliple possibilities, merge all of them
             if len(local_trees) == 0:
                 tree_num = len(trees) # create new tree
             elif len(local_trees) == 1:
                 tree_num = local_trees[0]   # use existing tree
             elif len(local_trees) > 1:
-                # this node is an intersection of multiple trees
+                # this compartment is an intersection of multiple trees
                 # merge all trees into the first one found
                 tree_num = local_trees[0]
                 for j in range(1,len(local_trees)):
                     dead_tree = local_trees[j]
                     trees[dead_tree] = []
-                    for node in self.compartment_list:
-                        if node[NODE_TREE_ID] == dead_tree:
-                            node[NODE_TREE_ID] = tree_num
-            # merge node into tree
+                    for compartment in self.compartment_list:
+                        if compartment[NODE_TREE_ID] == dead_tree:
+                            compartment[NODE_TREE_ID] = tree_num
+            # merge compartment into tree
             # ensure there's space
             while len(trees) <= tree_num:
                 trees.append([])
@@ -917,13 +932,13 @@ class Morphology( object ):
             tmp = self._tree_list[soma_tree]
             self._tree_list[soma_tree] = self._tree_list[0]
             self._tree_list[0] = tmp
-        # reset node tree_id to correct tree number
+        # reset compartment tree_id to correct tree number
         self._reset_tree_ids()
 
 
     def _reset_tree_ids(self):
         """
-        reset each node's tree_id value to the correct tree number
+        reset each compartment's tree_id value to the correct tree number
         """
         for i in range(len(self._tree_list)):
             for j in range(len(self._tree_list[i])):
@@ -938,11 +953,11 @@ class Morphology( object ):
         """
         errs = 0
         # Make sure that the parents are of proper ID range
-        n = self.num_nodes
+        n = self.num_compartments
         for seg in self.compartment_list:
             if seg[NODE_PN] >= 0:
                 if seg[NODE_PN] >= n:
-                    print("Parent for node %d is invalid (%d)" % (seg[NODE_ID], seg[NODE_PN]))
+                    print("Parent for compartment %d is invalid (%d)" % (seg[NODE_ID], seg[NODE_PN]))
                     errs += 1
         # make sure that each tree has exactly one root
         for i in range(self.num_trees):
@@ -984,12 +999,12 @@ class Morphology( object ):
         return a list of segments who have parents that are a different type
         """
         adoptees = []
-        for node in self.compartment_list:
-            par = self.parent_of(node)
+        for compartment in self.compartment_list:
+            par = self.parent_of(compartment)
             if par is None:
                 continue
-            if node[NODE_TYPE] != par[NODE_TYPE]:
-                adoptees.append(node)
+            if compartment[NODE_TYPE] != par[NODE_TYPE]:
+                adoptees.append(compartment)
         return adoptees
 
 
@@ -1012,16 +1027,16 @@ class Morphology( object ):
             self.compartment_list[tree[i][NODE_ID]] = None
         del self._tree_list[n]
         self._reconstruct()
-        # reset node tree_id to correct tree number
+        # reset compartment tree_id to correct tree number
         self._reset_tree_ids()
 
 
-    def _print_all_nodes(self):
+    def _print_all_compartments(self):
         """
-        debugging function. prints all nodes
+        debugging function. prints all compartments
         """
-        for node in self.compartment_list:
-            print(node)
+        for compartment in self.compartment_list:
+            print(compartment)
 
 ########################################################################
 class Marker( dict ): 
