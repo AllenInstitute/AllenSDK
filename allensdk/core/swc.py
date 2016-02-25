@@ -137,6 +137,36 @@ class Compartment(dict):
             "children: %s " % str(self[NODE_CHILDREN]) + \
             "tree: %d" % self[NODE_TREE_ID]
 
+class Node(object): 
+    """
+    Class for accessing compartment elements in a more traditional way
+    """
+
+    def __init__(self, obj):
+        """
+        Parameters
+        ----------
+        obj: Compartment
+        """
+        if not isinstance(obj, Compartment):
+            raise ValueError, "Must be initialized using Compartment object"
+        self.n = node[NODE_ID]
+        self.t = node[NODE_TYPE]
+        self.x = node[NODE_X]
+        self.y = node[NODE_Y]
+        self.z = node[NODE_Z]
+        self.radius = node[NODE_R]
+        self.parent = node[NODE_PN]
+        self.children = node[NODE_CHILDREN]
+        self.tree = node[NODE_TREE_ID]
+
+
+    def __str__(self):
+        """ create string with compartment information in succinct, 
+        single-line form """
+        return "%d %d %.4f %.4f %.4f %.4f %d %s %d" % (self.n, self.t, self.x, self.y, self.z, self.radius, self.parent, str(self.children), self.tree);
+
+
 ########################################################################
 ########################################################################
 
