@@ -39,6 +39,7 @@ class BiophysicalArchiver(object):
     def get_neuronal_models(self, specimen_ids):
         return self.rma.model_query('NeuronalModel',
                                     criteria='specimen[id$in%s]' % ','.join(str(i) for i in specimen_ids),
+                                    include='specimen',
                                     num_rows='all')
     
     def get_stimulus_file(self, neuronal_model_id):
@@ -56,9 +57,12 @@ class BiophysicalArchiver(object):
         
         return stimulus_filename
     
-    def archive_cell(self, specimen_id, template, neuronal_model_id):
+    def archive_cell(self, ephys_result_id, specimen_id, template, neuronal_model_id):
         url = self.neuronal_model_download_endpoint + "/%d" % (neuronal_model_id)
-        file_name = os.path.join(self.archive_dir, 'specimen_%d_%s_neuronal_model_%d.zip' % (specimen_id, template, neuronal_model_id))
+        file_name = os.path.join(self.archive_dir, 'ephys_result_%d_specimen_%d_%s_neuronal_model_%d.zip' % (ephys_result_id,
+                                                                                                             specimen_id,
+                                                                                                             template,
+                                                                                                             neuronal_model_id))
         self.rma.retrieve_file_over_http(url, file_name)
         nwb_file = self.get_stimulus_file(neuronal_model_id)
         shutil.copy(nwb_file, self.archive_dir) 
@@ -73,12 +77,12 @@ if __name__ == '__main__':
     specimen_ids = (cell['id'] for cell in cells)
     neuronal_models = ba.get_neuronal_models(specimen_ids)
     for nm in neuronal_models:
+        ephys_result_id = nm['specimen']['ephys_result_id']
         template_id = nm['neuronal_model_template_id'] 
         if template_id in ba.template_names:
             template = ba.template_names[template_id]
         else:
             template = 'unknown'
-            
-        ba.archive_cell(nm['specimen_id'], template, nm['id'])
+        ba.archive_cell(ephys_result_id, nm['specimen_id'], template, nm['id'])
     with open(os.path.join(ba.archive_dir, 'STIMULUS.csv'), 'w') as f:
         f.write("\n".join(ba.nwb_list))
