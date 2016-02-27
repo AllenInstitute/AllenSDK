@@ -31,9 +31,6 @@ setup(
                         'numpy>=1.8.2',
                         'six>=1.8.0',
                         'pynrrd >= 0.2.1'],
-    dependency_links = [
-        'git+https://github.com/mhe/pynrrd.git@9e09b24ff1#egg=pynrrd-0.1.999.dev'
-    ],
     tests_require=['nose>=1.2.1',
                    'coverage>=3.7.1',
                    'mock'],
