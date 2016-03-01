@@ -118,7 +118,7 @@ specifically `.loc <http://pandas.pydata.org/pandas-docs/stable/indexing.html#se
 
 ::
 
-    names_and_acromyms = structures.loc[:,['name', 'acronym']]
+    names_and_acronyms = structures.loc[:,['name', 'acronym']]
 
 and `Boolean indexing <http://pandas.pydata.org/pandas-docs/stable/indexing.html#boolean-indexing>`_
 

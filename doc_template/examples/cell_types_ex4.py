@@ -12,10 +12,10 @@ compartment_list = sparse_morphology.compartment_list
 # a dictionary of compartments indexed by compartment id
 compartments_by_id = sparse_morphology.compartment_index
 
-# the root compartment (usually the soma)
-root = morphology.root
+# the root soma compartment 
+soma = morphology.soma
 
 # all compartments are dictionaries of compartment properties
 # compartments also keep track of ids of their children
-for child in root.children:
+for child in morphology.children_of(soma):
     print(child['x'], child['y'], child['z'], child['radius'])

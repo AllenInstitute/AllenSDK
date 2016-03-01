@@ -276,17 +276,21 @@ class BiophysicalApi(Api):
         '''
         if working_directory is None:
             working_directory = self.default_working_directory
+
+        well_known_file_id_dict = self.get_well_known_file_ids(neuronal_model_id)
+        
+        if not well_known_file_id_dict or \
+           (not any(well_known_file_id_dict.values())):
+            raise(Exception("No data found for neuronal model id %d" % (neuronal_model_id)))
             
-        Manifest.safe_mkdir(working_directory)        
+        Manifest.safe_mkdir(working_directory)
         
         work_dir = os.path.join(working_directory, 'work')        
         Manifest.safe_mkdir(work_dir)
         
         modfile_dir = os.path.join(working_directory, 'modfiles')       
         Manifest.safe_mkdir(modfile_dir)
-        
-        well_known_file_id_dict = self.get_well_known_file_ids(neuronal_model_id)
-        
+                
         for key, id_dict in well_known_file_id_dict.items():
             if (not self.cache_stimulus) and (key == 'stimulus'):
                 continue
