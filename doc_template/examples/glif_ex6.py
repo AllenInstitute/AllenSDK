@@ -4,7 +4,7 @@ def custom_voltage_reset_rule(neuron, voltage_t0, custom_param_a, custom_param_b
     return custom_param_a * voltage_t0 + custom_param_b
 
 # initialize a neuron from a neuron config file
-neuron_config = json_utilities.read('49154717_neuron_config.json')
+neuron_config = json_utilities.read('neuron_config.json')
 neuron = GlifNeuron.from_dict(neuron_config)
 
 # configure a new method and overwrite the neuron's old method

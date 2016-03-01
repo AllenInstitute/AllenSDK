@@ -48,6 +48,7 @@ All notable changes to this projection will be documented in this file.
 - API Access/Data API Client documentation better reflects new 0.10.x allensdk.api.query modules.
 - Cache.wrap method defaults to save_as_json=False.
 - Cache.wrap method defaults to returning json rather than a pandas dataframe (new parameter return_dataframe=False).
+- BiophysicalApi.cache_data throws an exception if no data is found for a neuronal model id.
 - Replaced brainscales Dockerfile with neuralenseble Dockerfiles.
 
 

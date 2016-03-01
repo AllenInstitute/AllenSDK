@@ -49,7 +49,7 @@ class CellTypesCache(Cache):
         in the function call (e.g. get_ephys_data(file_name='file.nwb')).
 
     manifest_file: string
-       File name of the manifest to be read.  Default is "manifest.json".
+       File name of the manifest to be read.  Default is "cell_types_manifest.json".
     """
 
     # manifest keys
@@ -61,7 +61,7 @@ class CellTypesCache(Cache):
     RECONSTRUCTION_KEY = 'RECONSTRUCTION'
     MARKER_KEY = 'MARKER'
 
-    def __init__(self, cache=True, manifest_file='manifest.json', base_uri=None):
+    def __init__(self, cache=True, manifest_file='cell_types_manifest.json', base_uri=None):
         super(CellTypesCache, self).__init__(manifest=manifest_file, cache=cache)
         self.api = CellTypesApi(base_uri=base_uri)
 
