@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.config.model package &mdash; Allen SDK 0.10.1 documentation</title>
+    <title>allensdk.config.model package &mdash; Allen SDK 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,9 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
     <link rel="up" title="allensdk.config package" href="allensdk.config.html" />
-    <link rel="next" title="allensdk.config.model.formats package" href="allensdk.config.model.formats.html" /> 
+    <link rel="next" title="allensdk.config.model.formats package" href="allensdk.config.model.formats.html" />
+    <link rel="prev" title="allensdk.config.app package" href="allensdk.config.app.html" /> 
   </head>
   <body>
 <script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
@@ -639,18 +640,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.config.model.formats.html">allensdk.config.model.formats package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.hdf5_util">allensdk.config.model.formats.hdf5_util module</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_description_parser">allensdk.config.model.formats.json_description_parser module</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_util">allensdk.config.model.formats.json_util module</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.pycfg_description_parser">allensdk.config.model.formats.pycfg_description_parser module</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.hdf5_util">allensdk.config.model.formats.hdf5_util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_description_parser">allensdk.config.model.formats.json_description_parser module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_util">allensdk.config.model.formats.json_util module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.pycfg_description_parser">allensdk.config.model.formats.pycfg_description_parser module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats">Module contents</a></li>
 </ul>
 </li>
@@ -666,30 +659,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <dt id="allensdk.config.model.description.Description">
 <em class="property">class </em><tt class="descclassname">allensdk.config.model.description.</tt><tt class="descname">Description</tt><a class="reference internal" href="_modules/allensdk/config/model/description.html#Description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description.Description" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.description.Description.fix_unary_sections" title="allensdk.config.model.description.Description.fix_unary_sections"><tt class="xref py py-obj docutils literal"><span class="pre">fix_unary_sections</span></tt></a>([section_names])</td>
-<td>Wrap section contents that don&#8217;t have the proper array surrounding them in an array.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.description.Description.is_empty" title="allensdk.config.model.description.Description.is_empty"><tt class="xref py py-obj docutils literal"><span class="pre">is_empty</span></tt></a>()</td>
-<td>Check if anything is in the object.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.description.Description.unpack" title="allensdk.config.model.description.Description.unpack"><tt class="xref py py-obj docutils literal"><span class="pre">unpack</span></tt></a>(data[,&nbsp;section])</td>
-<td>Read the manifest and other stand-alone configuration structure, or insert a configuration object into a section of an existing configuration.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.description.Description.unpack_manifest" title="allensdk.config.model.description.Description.unpack_manifest"><tt class="xref py py-obj docutils literal"><span class="pre">unpack_manifest</span></tt></a>(data)</td>
-<td>Pull the manifest configuration section into a separate place.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.description.Description.update_data" title="allensdk.config.model.description.Description.update_data"><tt class="xref py py-obj docutils literal"><span class="pre">update_data</span></tt></a>(data[,&nbsp;section])</td>
-<td>Merge configuration data possibly from multiple files.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.config.model.description.Description.fix_unary_sections">
 <tt class="descname">fix_unary_sections</tt><big>(</big><em>section_names=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/description.html#Description.fix_unary_sections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description.Description.fix_unary_sections" title="Permalink to this definition">¶</a></dt>
@@ -800,30 +769,9 @@ or an configuration object to be placed within a section.</p>
 <dt id="allensdk.config.model.description_parser.DescriptionParser">
 <em class="property">class </em><tt class="descclassname">allensdk.config.model.description_parser.</tt><tt class="descname">DescriptionParser</tt><a class="reference internal" href="_modules/allensdk/config/model/description_parser.html#DescriptionParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.description_parser.DescriptionParser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.description_parser.DescriptionParser.parser_for_extension" title="allensdk.config.model.description_parser.DescriptionParser.parser_for_extension"><tt class="xref py py-obj docutils literal"><span class="pre">parser_for_extension</span></tt></a>(filename)</td>
-<td>Choose a subclass that can read the format.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.description_parser.DescriptionParser.read" title="allensdk.config.model.description_parser.DescriptionParser.read"><tt class="xref py py-obj docutils literal"><span class="pre">read</span></tt></a>(file_path[,&nbsp;description,&nbsp;section])</td>
-<td>Parse data needed for a simulation.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.description_parser.DescriptionParser.read_string" title="allensdk.config.model.description_parser.DescriptionParser.read_string"><tt class="xref py py-obj docutils literal"><span class="pre">read_string</span></tt></a>(data_string[,&nbsp;description,&nbsp;...])</td>
-<td>Parse data needed for a simulation from a string.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.description_parser.DescriptionParser.write" title="allensdk.config.model.description_parser.DescriptionParser.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(filename,&nbsp;description)</td>
-<td>Save the configuration.</td>
-</tr>
-</tbody>
-</table>
 <dl class="attribute">
 <dt id="allensdk.config.model.description_parser.DescriptionParser.log">
-<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x2aaaacccb110&gt;</em><a class="headerlink" href="#allensdk.config.model.description_parser.DescriptionParser.log" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x2aaaacee3250&gt;</em><a class="headerlink" href="#allensdk.config.model.description_parser.DescriptionParser.log" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -907,42 +855,6 @@ or an configuration object to be placed within a section.</p>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Manages the location of external files 
 referenced in an Allen SDK configuration</p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.add_file" title="allensdk.config.model.manifest.Manifest.add_file"><tt class="xref py py-obj docutils literal"><span class="pre">add_file</span></tt></a>(file_key,&nbsp;file_name[,&nbsp;dir_key,&nbsp;...])</td>
-<td>Insert a new file entry.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.add_path" title="allensdk.config.model.manifest.Manifest.add_path"><tt class="xref py py-obj docutils literal"><span class="pre">add_path</span></tt></a>(key,&nbsp;path[,&nbsp;path_type,&nbsp;absolute,&nbsp;...])</td>
-<td>Insert a new entry.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.add_paths" title="allensdk.config.model.manifest.Manifest.add_paths"><tt class="xref py py-obj docutils literal"><span class="pre">add_paths</span></tt></a>(path_info)</td>
-<td>add information about paths stored in the manifest.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.check_dir" title="allensdk.config.model.manifest.Manifest.check_dir"><tt class="xref py py-obj docutils literal"><span class="pre">check_dir</span></tt></a>(path_key[,&nbsp;do_exit])</td>
-<td>Verify a directories existence or optionally exit.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.create_dir" title="allensdk.config.model.manifest.Manifest.create_dir"><tt class="xref py py-obj docutils literal"><span class="pre">create_dir</span></tt></a>(path_key)</td>
-<td>Make a directory for an entry.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.get_format" title="allensdk.config.model.manifest.Manifest.get_format"><tt class="xref py py-obj docutils literal"><span class="pre">get_format</span></tt></a>(path_key)</td>
-<td>Retrieve the type of a path entry.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.get_path" title="allensdk.config.model.manifest.Manifest.get_path"><tt class="xref py py-obj docutils literal"><span class="pre">get_path</span></tt></a>(path_key,&nbsp;*args)</td>
-<td>Retrieve an entry with substitutions.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.load_config" title="allensdk.config.model.manifest.Manifest.load_config"><tt class="xref py py-obj docutils literal"><span class="pre">load_config</span></tt></a>(config)</td>
-<td>Load paths into the manifest from an Allen SDK config section.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.config.model.manifest.Manifest.resolve_paths" title="allensdk.config.model.manifest.Manifest.resolve_paths"><tt class="xref py py-obj docutils literal"><span class="pre">resolve_paths</span></tt></a>(description_dict[,&nbsp;suffix])</td>
-<td>Walk input items and expand those that refer to a manifest entry.</td>
-</tr>
-</tbody>
-</table>
 <dl class="attribute">
 <dt id="allensdk.config.model.manifest.Manifest.DIR">
 <tt class="descname">DIR</tt><em class="property"> = 'dir'</em><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.DIR" title="Permalink to this definition">¶</a></dt>
@@ -1152,7 +1064,7 @@ referenced in an Allen SDK configuration</p>
 
 <dl class="attribute">
 <dt id="allensdk.config.model.manifest.Manifest.log">
-<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x2aaaace2c690&gt;</em><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.log" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x2aaaacfd08d0&gt;</em><a class="headerlink" href="#allensdk.config.model.manifest.Manifest.log" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1204,7 +1116,7 @@ referenced in an Allen SDK configuration</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -1220,6 +1132,15 @@ referenced in an Allen SDK configuration</p>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
 </ul>
 
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>

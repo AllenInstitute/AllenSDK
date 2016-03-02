@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries package &mdash; Allen SDK 0.10.1 documentation</title>
+    <title>allensdk.api.queries package &mdash; Allen SDK 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,8 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
     <link rel="up" title="allensdk.api package" href="allensdk.api.html" />
+    <link rel="next" title="allensdk.config package" href="allensdk.config.html" />
     <link rel="prev" title="allensdk.api package" href="allensdk.api.html" /> 
   </head>
   <body>
@@ -644,105 +645,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></tt></a></p>
 <p>See:
 <a class="reference external" href="http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets">Searching Annotated SectionDataSets</a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
-<td>Combine one or more RMA query stages into a single RMA query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
-<td>Build the URL that will fetch the data schema.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
-<td>serialize a single RMA query filter clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
-<td>serialize RMA query filter clauses.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets" title="allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets"><tt class="xref py py-obj docutils literal"><span class="pre">get_annotated_section_data_sets</span></tt></a>(structures)</td>
-<td>For a list of target structures, find the SectionDataSet that matches the parameters for intensity_values, density_values, pattern_values, and Age.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets_via_rma" title="allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets_via_rma"><tt class="xref py py-obj docutils literal"><span class="pre">get_annotated_section_data_sets_via_rma</span></tt></a>(...)</td>
-<td>For a list of target structures, find the SectionDataSet that matches the parameters for intensity_values, density_values, pattern_values, and Age.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_compound_annotated_section_data_sets" title="allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_compound_annotated_section_data_sets"><tt class="xref py py-obj docutils literal"><span class="pre">get_compound_annotated_section_data_sets</span></tt></a>(queries)</td>
-<td>Find the SectionDataSet that matches several annotated_section_data_sets queries linked together with a Boolean &#8216;and&#8217; or &#8216;or&#8217;.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
-<td>Retrieve schema information.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and execute a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
-<td>Construct a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
-<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
-<td>build rma:: options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
-<td>Connect model and service stages via their JSON responses.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
-<td>Wrap a clause in single quotes.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
-<td>Construct an RMA query fragment to send a request to a connected service.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
-<td>Construct an RMA filter clause.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets">
 <tt class="descname">get_annotated_section_data_sets</tt><big>(</big><em>structures</em>, <em>intensity_values=None</em>, <em>density_values=None</em>, <em>pattern_values=None</em>, <em>age_names=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/annotated_section_data_sets_api.html#AnnotatedSectionDataSetsApi.get_annotated_section_data_sets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets" title="Permalink to this definition">¶</a></dt>
@@ -861,75 +763,15 @@ linked together with a Boolean &#8216;and&#8217; or &#8216;or&#8217;.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-allensdk.api.queries.biophysical_perisomatic_api">
-<span id="allensdk-api-queries-biophysical-perisomatic-api-module"></span><h2>allensdk.api.queries.biophysical_perisomatic_api module<a class="headerlink" href="#module-allensdk.api.queries.biophysical_perisomatic_api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-allensdk.api.queries.biophysical_api">
+<span id="allensdk-api-queries-biophysical-api-module"></span><h2>allensdk.api.queries.biophysical_api module<a class="headerlink" href="#module-allensdk.api.queries.biophysical_api" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi">
-<em class="property">class </em><tt class="descclassname">allensdk.api.queries.biophysical_perisomatic_api.</tt><tt class="descname">BiophysicalPerisomaticApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi">
+<em class="property">class </em><tt class="descclassname">allensdk.api.queries.biophysical_api.</tt><tt class="descname">BiophysicalApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.api.Api" title="allensdk.api.api.Api"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.api.Api</span></tt></a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma"><tt class="xref py py-obj docutils literal"><span class="pre">build_rma</span></tt></a>(neuronal_model_id[,&nbsp;fmt])</td>
-<td>Construct a query to find all files related to a neuronal model.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data"><tt class="xref py py-obj docutils literal"><span class="pre">cache_data</span></tt></a>(neuronal_model_id[,&nbsp;...])</td>
-<td>Take a an experiment id, query the Api RMA to get well-known-files download the files, and store them in the working directory.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest"><tt class="xref py py-obj docutils literal"><span class="pre">create_manifest</span></tt></a>([fit_path,&nbsp;...])</td>
-<td>Generate a json configuration file with parameters for a  a biophysical experiment.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids"><tt class="xref py py-obj docutils literal"><span class="pre">get_well_known_file_ids</span></tt></a>(neuronal_model_id)</td>
-<td>Query the current RMA endpoint with a neuronal_model id to get the corresponding well known file ids.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type"><tt class="xref py py-obj docutils literal"><span class="pre">is_well_known_file_type</span></tt></a>(wkf,&nbsp;name)</td>
-<td>Check if a structure has the expected name.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json"><tt class="xref py py-obj docutils literal"><span class="pre">read_json</span></tt></a>(json_parsed_data)</td>
-<td>Get the list of well_known_file ids from a response body containing nested sample,microarray_slides,well_known_files.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma">
-<tt class="descname">build_rma</tt><big>(</big><em>neuronal_model_id</em>, <em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.build_rma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.build_rma">
+<tt class="descname">build_rma</tt><big>(</big><em>neuronal_model_id</em>, <em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.build_rma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.build_rma" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a query to find all files related to a neuronal model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -956,8 +798,8 @@ linked together with a Boolean &#8216;and&#8217; or &#8216;or&#8217;.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data">
-<tt class="descname">cache_data</tt><big>(</big><em>neuronal_model_id</em>, <em>working_directory=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.cache_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.cache_data">
+<tt class="descname">cache_data</tt><big>(</big><em>neuronal_model_id</em>, <em>working_directory=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.cache_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.cache_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a an experiment id, query the Api RMA to get well-known-files
 download the files, and store them in the working directory.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -979,8 +821,8 @@ download the files, and store them in the working directory.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest">
-<tt class="descname">create_manifest</tt><big>(</big><em>fit_path=''</em>, <em>stimulus_filename=''</em>, <em>swc_morphology_path=''</em>, <em>sweeps=[]</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.create_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.create_manifest">
+<tt class="descname">create_manifest</tt><big>(</big><em>fit_path=''</em>, <em>model_type=''</em>, <em>stimulus_filename=''</em>, <em>swc_morphology_path=''</em>, <em>marker_path=''</em>, <em>sweeps=[]</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.create_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.create_manifest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a json configuration file with parameters for a 
 a biophysical experiment.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1010,8 +852,8 @@ a biophysical experiment.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids">
-<tt class="descname">get_well_known_file_ids</tt><big>(</big><em>neuronal_model_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.get_well_known_file_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.get_well_known_file_ids">
+<tt class="descname">get_well_known_file_ids</tt><big>(</big><em>neuronal_model_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.get_well_known_file_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.get_well_known_file_ids" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query the current RMA endpoint with a neuronal_model id
 to get the corresponding well known file ids.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1029,8 +871,8 @@ to get the corresponding well known file ids.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type">
-<tt class="descname">is_well_known_file_type</tt><big>(</big><em>wkf</em>, <em>name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.is_well_known_file_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.is_well_known_file_type">
+<tt class="descname">is_well_known_file_type</tt><big>(</big><em>wkf</em>, <em>name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.is_well_known_file_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.is_well_known_file_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if a structure has the expected name.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1051,15 +893,15 @@ to get the corresponding well known file ids.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <dl class="last docutils">
-<dt><a class="reference internal" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json"><tt class="xref py py-obj docutils literal"><span class="pre">read_json</span></tt></a></dt>
+<dt><a class="reference internal" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.read_json" title="allensdk.api.queries.biophysical_api.BiophysicalApi.read_json"><tt class="xref py py-obj docutils literal"><span class="pre">read_json</span></tt></a></dt>
 <dd>where this helper function is used.</dd>
 </dl>
 </div>
 </dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json">
-<tt class="descname">read_json</tt><big>(</big><em>json_parsed_data</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.read_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.biophysical_api.BiophysicalApi.read_json">
+<tt class="descname">read_json</tt><big>(</big><em>json_parsed_data</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_api.html#BiophysicalApi.read_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_api.BiophysicalApi.read_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the list of well_known_file ids from a response body
 containing nested sample,microarray_slides,well_known_files.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1085,126 +927,69 @@ containing nested sample,microarray_slides,well_known_files.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-allensdk.api.queries.biophysical_perisomatic_api">
+<span id="allensdk-api-queries-biophysical-perisomatic-api-module"></span><h2>allensdk.api.queries.biophysical_perisomatic_api module<a class="headerlink" href="#module-allensdk.api.queries.biophysical_perisomatic_api" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi">
+<em class="property">class </em><tt class="descclassname">allensdk.api.queries.biophysical_perisomatic_api.</tt><tt class="descname">BiophysicalPerisomaticApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma">
+<tt class="descname">build_rma</tt><big>(</big><em>neuronal_model_id</em>, <em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.build_rma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data">
+<tt class="descname">cache_data</tt><big>(</big><em>neuronal_model_id</em>, <em>working_directory=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.cache_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest">
+<tt class="descname">create_manifest</tt><big>(</big><em>fit_path=''</em>, <em>model_type=''</em>, <em>stimulus_filename=''</em>, <em>swc_morphology_path=''</em>, <em>marker_path=''</em>, <em>sweeps=[]</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.create_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids">
+<tt class="descname">get_well_known_file_ids</tt><big>(</big><em>neuronal_model_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.get_well_known_file_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type">
+<tt class="descname">is_well_known_file_type</tt><big>(</big><em>wkf</em>, <em>name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.is_well_known_file_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json">
+<tt class="descname">read_json</tt><big>(</big><em>json_parsed_data</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.read_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-allensdk.api.queries.cell_types_api">
 <span id="allensdk-api-queries-cell-types-api-module"></span><h2>allensdk.api.queries.cell_types_api module<a class="headerlink" href="#module-allensdk.api.queries.cell_types_api" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi">
 <em class="property">class </em><tt class="descclassname">allensdk.api.queries.cell_types_api.</tt><tt class="descname">CellTypesApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></tt></a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
-<td>Combine one or more RMA query stages into a single RMA query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
-<td>Build the URL that will fetch the data schema.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
-<td>serialize a single RMA query filter clause.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells" title="allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells"><tt class="xref py py-obj docutils literal"><span class="pre">filter_cells</span></tt></a>(cells,&nbsp;require_morphology,&nbsp;...)</td>
-<td>Filter a list of cell specimens to those that optionally have morphologies or have morphological reconstructions.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
-<td>serialize RMA query filter clauses.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_features" title="allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_features"><tt class="xref py py-obj docutils literal"><span class="pre">get_ephys_features</span></tt></a>([dataframe])</td>
-<td>Query the API for the full table of EphysFeatures for all cells.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_sweeps" title="allensdk.api.queries.cell_types_api.CellTypesApi.get_ephys_sweeps"><tt class="xref py py-obj docutils literal"><span class="pre">get_ephys_sweeps</span></tt></a>(specimen_id)</td>
-<td>Query the API for a list of sweeps for a particular cell in the Cell Types Database.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.get_morphology_features" title="allensdk.api.queries.cell_types_api.CellTypesApi.get_morphology_features"><tt class="xref py py-obj docutils literal"><span class="pre">get_morphology_features</span></tt></a>([dataframe])</td>
-<td>Query the API for the full table of morphology features for all cells</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
-<td>Retrieve schema information.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="allensdk.api.queries.cell_types_api.CellTypesApi.list_cells"><tt class="xref py py-obj docutils literal"><span class="pre">list_cells</span></tt></a>([require_morphology,&nbsp;...])</td>
-<td>Query the API for a list of all cells in the Cell Types Database.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and execute a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
-<td>Construct a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
-<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
-<td>build rma:: options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
-<td>Connect model and service stages via their JSON responses.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
-<td>Wrap a clause in single quotes.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data" title="allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data"><tt class="xref py py-obj docutils literal"><span class="pre">save_ephys_data</span></tt></a>(specimen_id,&nbsp;file_name)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction" title="allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction"><tt class="xref py py-obj docutils literal"><span class="pre">save_reconstruction</span></tt></a>(specimen_id,&nbsp;file_name)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
-<td>Construct an RMA query fragment to send a request to a connected service.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
-<td>Construct an RMA filter clause.</td>
-</tr>
-</tbody>
-</table>
+<dl class="attribute">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.MARKER_FILE_TYPE">
+<tt class="descname">MARKER_FILE_TYPE</tt><em class="property"> = '3DNeuronMarker'</em><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.MARKER_FILE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.NWB_FILE_TYPE">
+<tt class="descname">NWB_FILE_TYPE</tt><em class="property"> = 'NWBDownload'</em><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.NWB_FILE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.SWC_FILE_TYPE">
+<tt class="descname">SWC_FILE_TYPE</tt><em class="property"> = '3DNeuronReconstruction'</em><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.SWC_FILE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells">
-<tt class="descname">filter_cells</tt><big>(</big><em>cells</em>, <em>require_morphology</em>, <em>require_reconstruction</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.filter_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">filter_cells</tt><big>(</big><em>cells</em>, <em>require_morphology</em>, <em>require_reconstruction</em>, <em>reporter_status</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.filter_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter a list of cell specimens to those that optionally have morphologies
 or have morphological reconstructions.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1220,8 +1005,12 @@ or have morphological reconstructions.</p>
 <div><p>Filter out cells that have no morphological images.</p>
 </div></blockquote>
 <p><strong>require_reconstruction: boolean</strong></p>
-<blockquote class="last">
+<blockquote>
 <div><p>Filter out cells that have no morphological reconstructions.</p>
+</div></blockquote>
+<p><strong>reporter_status: list</strong></p>
+<blockquote class="last">
+<div><p>Filter for cells that have a particular cell reporter status</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1290,7 +1079,7 @@ return a list of dictionaries.</p>
 
 <dl class="method">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi.list_cells">
-<tt class="descname">list_cells</tt><big>(</big><em>require_morphology=False</em>, <em>require_reconstruction=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.list_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">list_cells</tt><big>(</big><em>require_morphology=False</em>, <em>require_reconstruction=False</em>, <em>reporter_status=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.list_cells"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.list_cells" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query the API for a list of all cells in the Cell Types Database.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1303,6 +1092,10 @@ return a list of dictionaries.</p>
 <p><strong>require_reconstruction: boolean</strong></p>
 <blockquote>
 <div><p>Only return cells that have morphological reconstructions.</p>
+</div></blockquote>
+<p><strong>reporter_status: list</strong></p>
+<blockquote>
+<div><p>Return cells that have a particular cell reporter status.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1319,12 +1112,70 @@ return a list of dictionaries.</p>
 <dl class="method">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data">
 <tt class="descname">save_ephys_data</tt><big>(</big><em>specimen_id</em>, <em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.save_ephys_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_ephys_data" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Save the electrophysology recordings for a cell as an NWB file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>specimen_id: int</strong></p>
+<blockquote>
+<div><p>ID of the specimen, from the Specimens database model in the Allen Institute API.</p>
+</div></blockquote>
+<p><strong>file_name: str</strong></p>
+<blockquote class="last">
+<div><p>Path to save the NWB file.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction">
 <tt class="descname">save_reconstruction</tt><big>(</big><em>specimen_id</em>, <em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.save_reconstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Save the morphological reconstruction of a cell as an SWC file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>specimen_id: int</strong></p>
+<blockquote>
+<div><p>ID of the specimen, from the Specimens database model in the Allen Institute API.</p>
+</div></blockquote>
+<p><strong>file_name: str</strong></p>
+<blockquote class="last">
+<div><p>Path to save the SWC file.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction_markers">
+<tt class="descname">save_reconstruction_markers</tt><big>(</big><em>specimen_id</em>, <em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/cell_types_api.html#CellTypesApi.save_reconstruction_markers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.cell_types_api.CellTypesApi.save_reconstruction_markers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save the marker file for the morphological reconstruction of a cell.  These are
+comma-delimited files indicating points of interest in a reconstruction (truncation
+points, early tracing termination, etc).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>specimen_id: int</strong></p>
+<blockquote>
+<div><p>ID of the specimen, from the Specimens database model in the Allen Institute API.</p>
+</div></blockquote>
+<p><strong>file_name: str</strong></p>
+<blockquote class="last">
+<div><p>Path to save the marker file.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -1343,21 +1194,6 @@ for a human-readable list of services and parameters.</p>
 <a class="reference external" href="http://help.brain-map.org/display/api/Service+Pipelines">Service Pipelines</a>.</p>
 <p>Connected Services only include API services that are accessed
 via the RMA endpoint using an rma::services stage.</p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.connected_services.ConnectedServices.build_url" title="allensdk.api.queries.connected_services.ConnectedServices.build_url"><tt class="xref py py-obj docutils literal"><span class="pre">build_url</span></tt></a>(service_name,&nbsp;kwargs)</td>
-<td>Create a single stage RMA url from a service name and parameters.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.connected_services.ConnectedServices.schema" title="allensdk.api.queries.connected_services.ConnectedServices.schema"><tt class="xref py py-obj docutils literal"><span class="pre">schema</span></tt></a></td>
-<td>Dictionary of service names and parameters.</td>
-</tr>
-</tbody>
-</table>
 <dl class="attribute">
 <dt id="allensdk.api.queries.connected_services.ConnectedServices.ARRAY">
 <tt class="descname">ARRAY</tt><em class="property"> = 'array'</em><a class="headerlink" href="#allensdk.api.queries.connected_services.ConnectedServices.ARRAY" title="Permalink to this definition">¶</a></dt>
@@ -1407,111 +1243,6 @@ for a human-readable list of connected services and their parameters.</p>
 <dt id="allensdk.api.queries.glif_api.GlifApi">
 <em class="property">class </em><tt class="descclassname">allensdk.api.queries.glif_api.</tt><tt class="descname">GlifApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></tt></a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
-<td>Combine one or more RMA query stages into a single RMA query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
-<td>Build the URL that will fetch the data schema.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file" title="allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file"><tt class="xref py py-obj docutils literal"><span class="pre">cache_stimulus_file</span></tt></a>(output_file_name)</td>
-<td>Download the NWB file for the current neuronal model and save it to a file.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
-<td>serialize a single RMA query filter clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
-<td>serialize RMA query filter clauses.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps" title="allensdk.api.queries.glif_api.GlifApi.get_ephys_sweeps"><tt class="xref py py-obj docutils literal"><span class="pre">get_ephys_sweeps</span></tt></a>()</td>
-<td>Retrieve ephys sweep information out of downloaded metadata for a neuronal model</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.get_neuron_config" title="allensdk.api.queries.glif_api.GlifApi.get_neuron_config"><tt class="xref py py-obj docutils literal"><span class="pre">get_neuron_config</span></tt></a>([output_file_name])</td>
-<td>Retrieve a model configuration file from the API, optionally save it to disk, and  return the contents of that file as a dictionary.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.get_neuronal_model" title="allensdk.api.queries.glif_api.GlifApi.get_neuronal_model"><tt class="xref py py-obj docutils literal"><span class="pre">get_neuronal_model</span></tt></a>(neuronal_model_id)</td>
-<td>Query the current RMA endpoint with a neuronal_model id to get the corresponding well known files and meta data.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
-<td>Retrieve schema information.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.glif_api.GlifApi.list_neuronal_models" title="allensdk.api.queries.glif_api.GlifApi.list_neuronal_models"><tt class="xref py py-obj docutils literal"><span class="pre">list_neuronal_models</span></tt></a>()</td>
-<td>Query the API for a list of all GLIF neuronal models.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and execute a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
-<td>Construct a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
-<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
-<td>build rma:: options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
-<td>Connect model and service stages via their JSON responses.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
-<td>Wrap a clause in single quotes.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
-<td>Construct an RMA query fragment to send a request to a connected service.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
-<td>Construct an RMA filter clause.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file">
 <tt class="descname">cache_stimulus_file</tt><big>(</big><em>output_file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/glif_api.html#GlifApi.cache_stimulus_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file" title="Permalink to this definition">¶</a></dt>
@@ -1615,102 +1346,6 @@ to get the corresponding well known files and meta data.</p>
 <dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></tt></a></p>
 <p>HTTP Client for the Allen 3-D Expression Grid Data Service.</p>
 <p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data">Downloading 3-D Expression Grid Data</a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
-<td>Combine one or more RMA query stages into a single RMA query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
-<td>Build the URL that will fetch the data schema.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.grid_data_api.GridDataApi.download_expression_grid_data" title="allensdk.api.queries.grid_data_api.GridDataApi.download_expression_grid_data"><tt class="xref py py-obj docutils literal"><span class="pre">download_expression_grid_data</span></tt></a>(...[,&nbsp;...])</td>
-<td>Download in NRRD format.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.grid_data_api.GridDataApi.download_projection_grid_data" title="allensdk.api.queries.grid_data_api.GridDataApi.download_projection_grid_data"><tt class="xref py py-obj docutils literal"><span class="pre">download_projection_grid_data</span></tt></a>(...[,&nbsp;image,&nbsp;...])</td>
-<td>Download in NRRD format.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
-<td>serialize a single RMA query filter clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
-<td>serialize RMA query filter clauses.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
-<td>Retrieve schema information.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and execute a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
-<td>Construct a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
-<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
-<td>build rma:: options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
-<td>Connect model and service stages via their JSON responses.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
-<td>Wrap a clause in single quotes.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
-<td>Construct an RMA query fragment to send a request to a connected service.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
-<td>Construct an RMA filter clause.</td>
-</tr>
-</tbody>
-</table>
 <dl class="attribute">
 <dt id="allensdk.api.queries.grid_data_api.GridDataApi.DATA_MASK">
 <tt class="descname">DATA_MASK</tt><em class="property"> = 'data_mask'</em><a class="headerlink" href="#allensdk.api.queries.grid_data_api.GridDataApi.DATA_MASK" title="Permalink to this definition">¶</a></dt>
@@ -1834,108 +1469,6 @@ for additional documentation.</p>
 with the SectionImage, AtlasImage and ProjectionImage Download Services.</p>
 <p>See <a class="reference external" href="http://help.brain-map.org/display/api/Downloading+an+Image">Downloading an Image</a>
 for more documentation.</p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.atlas_image_query" title="allensdk.api.queries.image_download_api.ImageDownloadApi.atlas_image_query"><tt class="xref py py-obj docutils literal"><span class="pre">atlas_image_query</span></tt></a>(atlas_id[,&nbsp;image_type_name])</td>
-<td>Build the URL.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
-<td>Combine one or more RMA query stages into a single RMA query.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
-<td>Build the URL that will fetch the data schema.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.download_atlas_image" title="allensdk.api.queries.image_download_api.ImageDownloadApi.download_atlas_image"><tt class="xref py py-obj docutils literal"><span class="pre">download_atlas_image</span></tt></a>(atlas_image_id[,&nbsp;file_path])</td>
-<td>Download whole or partial two-dimensional images from the Allen Institute with the AtlasImage service.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.download_projection_image" title="allensdk.api.queries.image_download_api.ImageDownloadApi.download_projection_image"><tt class="xref py py-obj docutils literal"><span class="pre">download_projection_image</span></tt></a>(projection_image_id)</td>
-<td>Download whole or partial two-dimensional images from the Allen Institute with the AtlasImage service.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image" title="allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image"><tt class="xref py py-obj docutils literal"><span class="pre">download_section_image</span></tt></a>(section_image_id[,&nbsp;...])</td>
-<td>Download whole or partial two-dimensional images from the Allen Institute with the SectionImage service.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
-<td>serialize a single RMA query filter clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
-<td>serialize RMA query filter clauses.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
-<td>Retrieve schema information.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and execute a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
-<td>Construct a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
-<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
-<td>build rma:: options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
-<td>Connect model and service stages via their JSON responses.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
-<td>Wrap a clause in single quotes.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
-<td>Construct an RMA query fragment to send a request to a connected service.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
-<td>Construct an RMA filter clause.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.api.queries.image_download_api.ImageDownloadApi.atlas_image_query">
 <tt class="descname">atlas_image_query</tt><big>(</big><em>atlas_id</em>, <em>image_type_name=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/image_download_api.html#ImageDownloadApi.atlas_image_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.image_download_api.ImageDownloadApi.atlas_image_query" title="Permalink to this definition">¶</a></dt>
@@ -2236,167 +1769,6 @@ help topic.</p>
 <dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></tt></a></p>
 <p>HTTP Client for the Allen Mouse Brain Connectivity Atlas.</p>
 <p>See: <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/API">Mouse Connectivity API</a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
-<td>Combine one or more RMA query stages into a single RMA query.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_reference_aligned_image_channel_volumes_url" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_reference_aligned_image_channel_volumes_url"><tt class="xref py py-obj docutils literal"><span class="pre">build_reference_aligned_image_channel_volumes_url</span></tt></a>(...)</td>
-<td>Construct url to download the red, green, and blue channels aligned to the 25um adult mouse brain reference space volume.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
-<td>Build the URL that will fetch the data schema.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_volumetric_data_download_url" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.build_volumetric_data_download_url"><tt class="xref py py-obj docutils literal"><span class="pre">build_volumetric_data_download_url</span></tt></a>(data,&nbsp;...)</td>
-<td>Construct url to download 3D reference model in NRRD format.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.calculate_injection_centroid" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.calculate_injection_centroid"><tt class="xref py py-obj docutils literal"><span class="pre">calculate_injection_centroid</span></tt></a>(...[,&nbsp;resolution])</td>
-<td>Compute the centroid of an injection site.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_annotation_volume" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_annotation_volume"><tt class="xref py py-obj docutils literal"><span class="pre">download_annotation_volume</span></tt></a>(resolution,&nbsp;file_name)</td>
-<td>Download the annotation volume at a particular resolution.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_data_mask" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_data_mask"><tt class="xref py py-obj docutils literal"><span class="pre">download_data_mask</span></tt></a>(path,&nbsp;experiment_id,&nbsp;...)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_density" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_density"><tt class="xref py py-obj docutils literal"><span class="pre">download_injection_density</span></tt></a>(path,&nbsp;...)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_fraction" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_injection_fraction"><tt class="xref py py-obj docutils literal"><span class="pre">download_injection_fraction</span></tt></a>(path,&nbsp;...)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_projection_density" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_projection_density"><tt class="xref py py-obj docutils literal"><span class="pre">download_projection_density</span></tt></a>(path,&nbsp;...)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_reference_aligned_image_channel_volumes" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_reference_aligned_image_channel_volumes"><tt class="xref py py-obj docutils literal"><span class="pre">download_reference_aligned_image_channel_volumes</span></tt></a>(...)</td>
-<td><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_template_volume" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_template_volume"><tt class="xref py py-obj docutils literal"><span class="pre">download_template_volume</span></tt></a>(resolution,&nbsp;file_name)</td>
-<td>Download the registration template volume at a particular resolution.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_volumetric_data" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_volumetric_data"><tt class="xref py py-obj docutils literal"><span class="pre">download_volumetric_data</span></tt></a>(data,&nbsp;file_name[,&nbsp;...])</td>
-<td>Download 3D reference model in NRRD format.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_correlation_search" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_correlation_search"><tt class="xref py py-obj docutils literal"><span class="pre">experiment_correlation_search</span></tt></a>(**kwargs)</td>
-<td>Select a seed experiment and a domain over which the similarity comparison is to be made.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_injection_coordinate_search" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_injection_coordinate_search"><tt class="xref py py-obj docutils literal"><span class="pre">experiment_injection_coordinate_search</span></tt></a>(**kwargs)</td>
-<td>User specifies a seed location within the 3D reference space.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_source_search" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_source_search"><tt class="xref py py-obj docutils literal"><span class="pre">experiment_source_search</span></tt></a>(**kwargs)</td>
-<td>Search over the whole projection signal statistics dataset to find experiments with specific projection profiles.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_spatial_search" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_spatial_search"><tt class="xref py py-obj docutils literal"><span class="pre">experiment_spatial_search</span></tt></a>(**kwargs)</td>
-<td>Displays all SectionDataSets with projection signal density &gt;= 0.1 at the seed point.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
-<td>serialize a single RMA query filter clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
-<td>serialize RMA query filter clauses.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiment_detail" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiment_detail"><tt class="xref py py-obj docutils literal"><span class="pre">get_experiment_detail</span></tt></a>(experiment_id)</td>
-<td>Retrieve the experiments data.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiments" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiments"><tt class="xref py py-obj docutils literal"><span class="pre">get_experiments</span></tt></a>(structure_ids,&nbsp;**kwargs)</td>
-<td>Fetch experiment metadata from the Mouse Brain Connectivity Atlas.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_manual_injection_summary" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_manual_injection_summary"><tt class="xref py py-obj docutils literal"><span class="pre">get_manual_injection_summary</span></tt></a>(experiment_id)</td>
-<td>Retrieve manual injection summary.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_projection_image_info" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_projection_image_info"><tt class="xref py py-obj docutils literal"><span class="pre">get_projection_image_info</span></tt></a>(experiment_id,&nbsp;...)</td>
-<td>Fetch meta-information of one projection image.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_reference_aligned_image_channel_volumes_url" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_reference_aligned_image_channel_volumes_url"><tt class="xref py py-obj docutils literal"><span class="pre">get_reference_aligned_image_channel_volumes_url</span></tt></a>(...)</td>
-<td>Retrieve the download link for a specific data set.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
-<td>Retrieve schema information.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_structure_unionizes" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_structure_unionizes"><tt class="xref py py-obj docutils literal"><span class="pre">get_structure_unionizes</span></tt></a>(experiment_ids[,&nbsp;...])</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and execute a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
-<td>Construct a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
-<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
-<td>build rma:: options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
-<td>Connect model and service stages via their JSON responses.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
-<td>Wrap a clause in single quotes.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
-<td>Construct an RMA query fragment to send a request to a connected service.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
-<td>Construct an RMA filter clause.</td>
-</tr>
-</tbody>
-</table>
 <dl class="attribute">
 <dt id="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.PRODUCT_IDS">
 <tt class="descname">PRODUCT_IDS</tt><em class="property"> = [5, 31]</em><a class="headerlink" href="#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.PRODUCT_IDS" title="Permalink to this definition">¶</a></dt>
@@ -2612,6 +1984,10 @@ which the similarity comparison is to be made.</p>
 <div><p>Integer Structure.id or String Structure.acronym.</p>
 </div></blockquote>
 <p><strong>primary_structure_only</strong> : boolean, optional</p>
+<p><strong>product_ids</strong> : list of integers, optional</p>
+<blockquote>
+<div><p>Integer Product.id</p>
+</div></blockquote>
 <p><strong>start_row</strong> : integer, optional</p>
 <blockquote>
 <div><p>For paging purposes. Defaults to 0.</p>
@@ -2653,6 +2029,10 @@ by distance of its injection site to the specified seed location.</p>
 <div><p>Integer Structure.id or String Structure.acronym.</p>
 </div></blockquote>
 <p><strong>primary_structure_only</strong> : boolean, optional</p>
+<p><strong>product_ids</strong> : list of integers, optional</p>
+<blockquote>
+<div><p>Integer Product.id</p>
+</div></blockquote>
 <p><strong>start_row</strong> : integer, optional</p>
 <blockquote>
 <div><p>For paging purposes. Defaults to 0.</p>
@@ -2705,6 +2085,10 @@ to find experiments with specific projection profiles.</p>
 <div><p>Integer Structure.id or String Structure.acronym.</p>
 </div></blockquote>
 <p><strong>primary_structure_only</strong> : boolean, optional</p>
+<p><strong>product_ids</strong> : list of integers, optional</p>
+<blockquote>
+<div><p>Integer Product.id</p>
+</div></blockquote>
 <p><strong>start_row</strong> : integer, optional</p>
 <blockquote>
 <div><p>For paging purposes. Defaults to 0.</p>
@@ -2753,6 +2137,10 @@ to the center of each injection site..</p>
 <div><p>Integer Structure.id or String Structure.acronym.</p>
 </div></blockquote>
 <p><strong>primary_structure_only</strong> : boolean, optional</p>
+<p><strong>product_ids</strong> : list of integers, optional</p>
+<blockquote>
+<div><p>Integer Product.id</p>
+</div></blockquote>
 <p><strong>start_row</strong> : integer, optional</p>
 <blockquote>
 <div><p>For paging purposes. Defaults to 0.</p>
@@ -2853,120 +2241,6 @@ for additional documentation.</p>
 <em class="property">class </em><tt class="descclassname">allensdk.api.queries.ontologies_api.</tt><tt class="descname">OntologiesApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_template.RmaTemplate" title="allensdk.api.queries.rma_template.RmaTemplate"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_template.RmaTemplate</span></tt></a></p>
 <p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies">Atlas Drawings and Ontologies</a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
-<td>Combine one or more RMA query stages into a single RMA query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
-<td>Build the URL that will fetch the data schema.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
-<td>serialize a single RMA query filter clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
-<td>serialize RMA query filter clauses.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases"><tt class="xref py py-obj docutils literal"><span class="pre">get_atlases</span></tt></a>()</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table"><tt class="xref py py-obj docutils literal"><span class="pre">get_atlases_table</span></tt></a>([atlas_ids,&nbsp;brief])</td>
-<td>List Atlases available through the API with associated ontologies and structure graphs.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
-<td>Retrieve schema information.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_graphs"><tt class="xref py py-obj docutils literal"><span class="pre">get_structure_graphs</span></tt></a>()</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets"><tt class="xref py py-obj docutils literal"><span class="pre">get_structure_sets</span></tt></a>()</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures" title="allensdk.api.queries.ontologies_api.OntologiesApi.get_structures"><tt class="xref py py-obj docutils literal"><span class="pre">get_structures</span></tt></a>([structure_graph_ids,&nbsp;...])</td>
-<td>Retrieve data about anatomical structures.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and execute a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
-<td>Construct a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
-<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
-<td>build rma:: options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
-<td>Connect model and service stages via their JSON responses.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
-<td>Wrap a clause in single quotes.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
-<td>Construct an RMA query fragment to send a request to a connected service.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">template_query</span></tt>(template_name,&nbsp;entry_name,&nbsp;...)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">to_filter_rhs</span></tt>(rhs)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
-<td>Construct an RMA filter clause.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.ontologies_api.OntologiesApi.unpack_structure_set_ancestors" title="allensdk.api.queries.ontologies_api.OntologiesApi.unpack_structure_set_ancestors"><tt class="xref py py-obj docutils literal"><span class="pre">unpack_structure_set_ancestors</span></tt></a>(...)</td>
-<td>Convert a slash-separated structure_id_path field to a list.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases">
 <tt class="descname">get_atlases</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/ontologies_api.html#OntologiesApi.get_atlases"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases" title="Permalink to this definition">¶</a></dt>
@@ -3060,7 +2334,7 @@ See also: <a class="reference external" href="http://api.brain-map.org/doc/Atlas
 
 <dl class="attribute">
 <dt id="allensdk.api.queries.ontologies_api.OntologiesApi.rma_templates">
-<tt class="descname">rma_templates</tt><em class="property"> = {'ontology_queries': [{'count': False, 'name': 'structures_by_graph_ids', 'criteria': '[graph_id$in{{ graph_ids }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['graph_ids'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_graph_names', 'criteria': 'graph[structure_graphs.name$in{{ graph_names }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['graph_names'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_set_ids', 'criteria': '[structure_set_id$in{{ set_ids }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['set_ids'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_set_names', 'criteria': &quot;structure_sets[name$in'{{ set_names }}']&quot;, 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['set_names'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'StructureGraph', 'name': 'structure_graphs_list', 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'StructureSet', 'name': 'structure_sets_list', 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'Atlas', 'name': 'atlases_list', 'description': 'see name'}, {'count': False, 'only': ['atlases.id', 'atlases.name', 'atlases.image_type', 'ontologies.id', 'ontologies.name', 'structure_graphs.id', 'structure_graphs.name', 'graphic_group_labels.id', 'graphic_group_labels.name'], 'criteria_params': ['atlas_ids'], 'name': 'atlases_table', 'criteria': '{% if atlas_ids is defined %}[id$in{{ atlas_ids }}],{%endif%}structure_graph(ontology),graphic_group_labels', 'num_rows': 'all', 'model': 'Atlas', 'include': 'structure_graph(ontology),graphic_group_labels', 'description': 'see name'}]}</em><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.rma_templates" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">rma_templates</tt><em class="property"> = {'ontology_queries': [{'count': False, 'name': 'structures_by_graph_ids', 'criteria': '[graph_id$in{{ graph_ids }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['graph_ids'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_graph_names', 'criteria': 'graph[structure_graphs.name$in{{ graph_names }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['graph_names'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_set_ids', 'criteria': '[structure_set_id$in{{ set_ids }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['set_ids'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'count': False, 'name': 'structures_by_set_names', 'criteria': 'structure_sets[name$in{{ set_names }}]', 'num_rows': 'all', 'model': 'Structure', 'criteria_params': ['set_names'], 'order': ['structures.graph_order'], 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'StructureGraph', 'name': 'structure_graphs_list', 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'StructureSet', 'name': 'structure_sets_list', 'description': 'see name'}, {'num_rows': 'all', 'count': False, 'model': 'Atlas', 'name': 'atlases_list', 'description': 'see name'}, {'count': False, 'only': ['atlases.id', 'atlases.name', 'atlases.image_type', 'ontologies.id', 'ontologies.name', 'structure_graphs.id', 'structure_graphs.name', 'graphic_group_labels.id', 'graphic_group_labels.name'], 'criteria_params': ['atlas_ids'], 'name': 'atlases_table', 'criteria': '{% if atlas_ids is defined %}[id$in{{ atlas_ids }}],{%endif%}structure_graph(ontology),graphic_group_labels', 'num_rows': 'all', 'model': 'Atlas', 'include': 'structure_graph(ontology),graphic_group_labels', 'description': 'see name'}]}</em><a class="headerlink" href="#allensdk.api.queries.ontologies_api.OntologiesApi.rma_templates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -3097,96 +2371,6 @@ See also: <a class="reference external" href="http://api.brain-map.org/doc/Atlas
 <em class="property">class </em><tt class="descclassname">allensdk.api.queries.rma_api.</tt><tt class="descname">RmaApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/rma_api.html#RmaApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.api.Api" title="allensdk.api.api.Api"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.api.Api</span></tt></a></p>
 <p>See: <a class="reference external" href="http://help.brain-map.org/display/api/RESTful+Model+Access+%28RMA%29">RESTful Model Access (RMA)</a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.build_query_url" title="allensdk.api.queries.rma_api.RmaApi.build_query_url"><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt></a>(stage_clauses[,&nbsp;fmt])</td>
-<td>Combine one or more RMA query stages into a single RMA query.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.build_schema_query" title="allensdk.api.queries.rma_api.RmaApi.build_schema_query"><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt></a>([clazz,&nbsp;fmt])</td>
-<td>Build the URL that will fetch the data schema.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.debug_clause" title="allensdk.api.queries.rma_api.RmaApi.debug_clause"><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt></a>([debug_value])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.filter" title="allensdk.api.queries.rma_api.RmaApi.filter"><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt></a>(key,&nbsp;value)</td>
-<td>serialize a single RMA query filter clause.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.filters" title="allensdk.api.queries.rma_api.RmaApi.filters"><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt></a>(filters)</td>
-<td>serialize RMA query filter clauses.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.get_schema" title="allensdk.api.queries.rma_api.RmaApi.get_schema"><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt></a>([clazz])</td>
-<td>Retrieve schema information.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.model_query" title="allensdk.api.queries.rma_api.RmaApi.model_query"><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Construct and execute a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.model_stage" title="allensdk.api.queries.rma_api.RmaApi.model_stage"><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt></a>(model,&nbsp;**kwargs)</td>
-<td>Construct a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.only_except_tabular_clause" title="allensdk.api.queries.rma_api.RmaApi.only_except_tabular_clause"><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt></a>(filter_type,&nbsp;...)</td>
-<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.options_clause" title="allensdk.api.queries.rma_api.RmaApi.options_clause"><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt></a>(**kwargs)</td>
-<td>build rma:: options clause.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.order_clause" title="allensdk.api.queries.rma_api.RmaApi.order_clause"><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt></a>([order_list])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.pipe_stage" title="allensdk.api.queries.rma_api.RmaApi.pipe_stage"><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt></a>(pipe_name,&nbsp;parameters)</td>
-<td>Connect model and service stages via their JSON responses.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.quote_string" title="allensdk.api.queries.rma_api.RmaApi.quote_string"><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt></a>(the_string)</td>
-<td>Wrap a clause in single quotes.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.service_query" title="allensdk.api.queries.rma_api.RmaApi.service_query"><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt></a>(*args,&nbsp;**kwargs)</td>
-<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.service_stage" title="allensdk.api.queries.rma_api.RmaApi.service_stage"><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt></a>(service_name[,&nbsp;parameters])</td>
-<td>Construct an RMA query fragment to send a request to a connected service.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi.tuple_filters" title="allensdk.api.queries.rma_api.RmaApi.tuple_filters"><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt></a>(filters)</td>
-<td>Construct an RMA filter clause.</td>
-</tr>
-</tbody>
-</table>
 <dl class="attribute">
 <dt id="allensdk.api.queries.rma_api.RmaApi.ALL">
 <tt class="descname">ALL</tt><em class="property"> = 'all'</em><a class="headerlink" href="#allensdk.api.queries.rma_api.RmaApi.ALL" title="Permalink to this definition">¶</a></dt>
@@ -3757,102 +2941,6 @@ and
 <em class="property">class </em><tt class="descclassname">allensdk.api.queries.rma_template.</tt><tt class="descname">RmaTemplate</tt><big>(</big><em>base_uri=None</em>, <em>query_manifest=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/rma_template.html#RmaTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_template.RmaTemplate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_api.RmaApi" title="allensdk.api.queries.rma_api.RmaApi"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_api.RmaApi</span></tt></a></p>
 <p>See: <a class="reference external" href="http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies">Atlas Drawings and Ontologies</a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_query_url</span></tt>(stage_clauses[,&nbsp;fmt])</td>
-<td>Combine one or more RMA query stages into a single RMA query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">build_schema_query</span></tt>([clazz,&nbsp;fmt])</td>
-<td>Build the URL that will fetch the data schema.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">debug_clause</span></tt>([debug_value])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">filter</span></tt>(key,&nbsp;value)</td>
-<td>serialize a single RMA query filter clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">filters</span></tt>(filters)</td>
-<td>serialize RMA query filter clauses.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">get_schema</span></tt>([clazz])</td>
-<td>Retrieve schema information.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and execute a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">model_stage</span></tt>(model,&nbsp;**kwargs)</td>
-<td>Construct a model stage of an RMA query string.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">only_except_tabular_clause</span></tt>(filter_type,&nbsp;...)</td>
-<td>Construct a clause to filter which attributes are returned for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">options_clause</span></tt>(**kwargs)</td>
-<td>build rma:: options clause.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">order_clause</span></tt>([order_list])</td>
-<td>Construct a debug clause for use in an rma::options clause.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">pipe_stage</span></tt>(pipe_name,&nbsp;parameters)</td>
-<td>Connect model and service stages via their JSON responses.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">quote_string</span></tt>(the_string)</td>
-<td>Wrap a clause in single quotes.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_query</span></tt>(*args,&nbsp;**kwargs)</td>
-<td>Construct and Execute a single-stage RMA query to send a request to a connected service.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">service_stage</span></tt>(service_name[,&nbsp;parameters])</td>
-<td>Construct an RMA query fragment to send a request to a connected service.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.rma_template.RmaTemplate.template_query" title="allensdk.api.queries.rma_template.RmaTemplate.template_query"><tt class="xref py py-obj docutils literal"><span class="pre">template_query</span></tt></a>(template_name,&nbsp;entry_name,&nbsp;...)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.rma_template.RmaTemplate.to_filter_rhs" title="allensdk.api.queries.rma_template.RmaTemplate.to_filter_rhs"><tt class="xref py py-obj docutils literal"><span class="pre">to_filter_rhs</span></tt></a>(rhs)</td>
-<td></td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">tuple_filters</span></tt>(filters)</td>
-<td>Construct an RMA filter clause.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.api.queries.rma_template.RmaTemplate.template_query">
 <tt class="descname">template_query</tt><big>(</big><em>template_name</em>, <em>entry_name</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/rma_template.html#RmaTemplate.template_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.rma_template.RmaTemplate.template_query" title="Permalink to this definition">¶</a></dt>
@@ -3872,57 +2960,6 @@ and
 <dt id="allensdk.api.queries.svg_api.SvgApi">
 <em class="property">class </em><tt class="descclassname">allensdk.api.queries.svg_api.</tt><tt class="descname">SvgApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/svg_api.html#SvgApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.svg_api.SvgApi" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.api.Api" title="allensdk.api.api.Api"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.api.Api</span></tt></a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.svg_api.SvgApi.build_query" title="allensdk.api.queries.svg_api.SvgApi.build_query"><tt class="xref py py-obj docutils literal"><span class="pre">build_query</span></tt></a>(section_image_id[,&nbsp;groups,&nbsp;download])</td>
-<td>Build the URL that will fetch meta data for the specified structure.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.svg_api.SvgApi.download_svg" title="allensdk.api.queries.svg_api.SvgApi.download_svg"><tt class="xref py py-obj docutils literal"><span class="pre">download_svg</span></tt></a>(section_image_id[,&nbsp;groups,&nbsp;...])</td>
-<td>Download the svg file</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.svg_api.SvgApi.get_svg" title="allensdk.api.queries.svg_api.SvgApi.get_svg"><tt class="xref py py-obj docutils literal"><span class="pre">get_svg</span></tt></a>(section_image_id[,&nbsp;groups])</td>
-<td>Get the svg document.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.api.queries.svg_api.SvgApi.build_query">
 <tt class="descname">build_query</tt><big>(</big><em>section_image_id</em>, <em>groups=None</em>, <em>download=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/svg_api.html#SvgApi.build_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.svg_api.SvgApi.build_query" title="Permalink to this definition">¶</a></dt>
@@ -3978,66 +3015,6 @@ Note: all locations on SectionImages are reported in pixel coordinates
 and all locations in 3-D ReferenceSpaces are reported in microns.</p>
 <p>See <a class="reference external" href="http://help.brain-map.org/display/api/Image-to-Image+Synchronization">Image to Image Synchronization</a>
 for additional documentation.</p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_atlas" title="allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_atlas"><tt class="xref py py-obj docutils literal"><span class="pre">get_image_to_atlas</span></tt></a>(section_image_id,&nbsp;x,&nbsp;y,&nbsp;...)</td>
-<td>For a specified Atlas, find the closest annotated SectionImage and (x,y) location as defined by a seed SectionImage and seed (x,y) location.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_image" title="allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_image"><tt class="xref py py-obj docutils literal"><span class="pre">get_image_to_image</span></tt></a>(section_image_id,&nbsp;x,&nbsp;y,&nbsp;...)</td>
-<td>For a list of target SectionDataSets, find the closest SectionImage and (x,y) location as defined by a seed SectionImage and seed (x,y) pixel location.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_image_2d" title="allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_image_2d"><tt class="xref py py-obj docutils literal"><span class="pre">get_image_to_image_2d</span></tt></a>(section_image_id,&nbsp;x,&nbsp;...)</td>
-<td>For a list of target SectionImages, find the closest (x,y) location as defined by a seed SectionImage and seed (x,y) location.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_reference" title="allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_reference"><tt class="xref py py-obj docutils literal"><span class="pre">get_image_to_reference</span></tt></a>(section_image_id,&nbsp;x,&nbsp;y)</td>
-<td>For a specified SectionImage and (x,y) location, return the (x,y,z) location in the ReferenceSpace of the associated SectionDataSet.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.synchronization_api.SynchronizationApi.get_reference_to_image" title="allensdk.api.queries.synchronization_api.SynchronizationApi.get_reference_to_image"><tt class="xref py py-obj docutils literal"><span class="pre">get_reference_to_image</span></tt></a>(reference_space_id,&nbsp;...)</td>
-<td>For a list of target SectionDataSets, find the closest SectionImage and (x,y) location as defined by a (x,y,z) location in a specified ReferenceSpace.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.api.queries.synchronization_api.SynchronizationApi.get_structure_to_image" title="allensdk.api.queries.synchronization_api.SynchronizationApi.get_structure_to_image"><tt class="xref py py-obj docutils literal"><span class="pre">get_structure_to_image</span></tt></a>(section_data_set_id,&nbsp;...)</td>
-<td>For a list of target structures, find the closest SectionImage  and (x,y) location as defined by the centroid of each Structure.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_atlas">
 <tt class="descname">get_image_to_atlas</tt><big>(</big><em>section_image_id</em>, <em>x</em>, <em>y</em>, <em>atlas_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/synchronization_api.html#SynchronizationApi.get_image_to_atlas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_atlas" title="Permalink to this definition">¶</a></dt>
@@ -4263,51 +3240,6 @@ and (x,y) location as defined by the centroid of each Structure.</p>
 <dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.api.Api" title="allensdk.api.api.Api"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.api.Api</span></tt></a></p>
 <p>See <a class="reference external" href="http://help.brain-map.org/display/api/Image-to-Image+Synchronization">Searching a Specimen or Structure Tree</a>
 for additional documentation.</p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">construct_well_known_file_download_url</span></tt>(...)</td>
-<td>Join data api endpoint and id.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_query</span></tt>(url_builder_fn,&nbsp;json_traversal_fn,&nbsp;...)</td>
-<td>Bundle an query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">do_rma_query</span></tt>(rma_builder_fn,&nbsp;...)</td>
-<td>Bundle an RMA query url construction function with a corresponding response json traversal function.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.api.queries.tree_search_api.TreeSearchApi.get_tree" title="allensdk.api.queries.tree_search_api.TreeSearchApi.get_tree"><tt class="xref py py-obj docutils literal"><span class="pre">get_tree</span></tt></a>(kind,&nbsp;db_id[,&nbsp;ancestors,&nbsp;descendants])</td>
-<td>Fetch meta data for the specified structure or specimen.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">json_msg_query</span></tt>(url[,&nbsp;dataframe])</td>
-<td>Common case where the url is fully constructed     and the response data is stored in the &#8216;msg&#8217; field.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">load_api_schema</span></tt>()</td>
-<td>Download the RMA schema from the current RMA endpoint</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">read_data</span></tt>(parsed_json)</td>
-<td>Return the message data from the parsed query.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_file_over_http</span></tt>(url,&nbsp;file_path)</td>
-<td>Get a file from the data api and save it.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_parsed_json_over_http</span></tt>(url[,&nbsp;post])</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">retrieve_xml_over_http</span></tt>(url)</td>
-<td>Get the document and put it in a Python data structure</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_api_urls</span></tt>(api_base_url_string)</td>
-<td>Set the internal RMA and well known file download endpoint urls based on a api server endpoint.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">set_default_working_directory</span></tt>(working_directory)</td>
-<td>Set the working directory where files will be saved.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.api.queries.tree_search_api.TreeSearchApi.get_tree">
 <tt class="descname">get_tree</tt><big>(</big><em>kind</em>, <em>db_id</em>, <em>ancestors=None</em>, <em>descendants=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/tree_search_api.html#TreeSearchApi.get_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.tree_search_api.TreeSearchApi.get_tree" title="Permalink to this definition">¶</a></dt>
@@ -4371,7 +3303,7 @@ for additional documentation.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -4387,6 +3319,15 @@ for additional documentation.</p>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
 </ul>
 
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>

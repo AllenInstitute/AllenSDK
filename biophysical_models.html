@@ -1,0 +1,1222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Biophysical Models &mdash; Allen SDK 0.11.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.11.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="up" title="Models" href="models.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Generalized LIF Models" href="glif_models.html" /> 
+  </head>
+  <body>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<style>
+
+	/* the icon font-family definition and helper classes */
+	@font-face {
+	  font-family: 'portal_icon_font';
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  font-weight: normal;
+	  font-style: normal;
+	}
+	 
+	 [class^="icon-"]:before, [class*=" icon-"]:before {
+	  font-family: "portal_icon_font";
+	  font-style: normal;
+	  font-weight: normal;
+	  speak: none;
+	 
+	  display: inline-block;
+	  text-decoration: inherit;
+	  width: 1em;
+	  margin-right: .2em;
+	  text-align: center;
+	  /* opacity: .8; */
+	 
+	  /* For safety - reset parent styles, that can break glyph codes*/
+	  font-variant: normal;
+	  text-transform: none;
+	     
+	  /* fix buttons height, for twitter bootstrap */
+	  line-height: 1em;
+	 
+	  /* Animation center compensation - margins should be symmetric */
+	  /* remove if not needed */
+	  margin-left: .2em;
+	
+	}
+	 
+	.icon-spin5:before { content: '\e806'; } /* '' */
+	.icon-left-open-1:before { content: '\e81e'; } /* '' */
+	.icon-plus-1:before { content: '\e801'; } /* '' */
+	.icon-facebook:before { content: '\e816'; } /* '' */
+	.icon-gplus:before { content: '\e818'; } /* '' */
+	.icon-linkedin-3:before { content: '\e815'; } /* '' */
+	.icon-twitter:before { content: '\e817'; } /* '' */
+	.icon-youtube-play:before { content: '\e805'; } /* '' */
+	.icon-plus-2:before { content: '\e809'; } /* '' */
+	.icon-record-1:before { content: '\e81c'; } /* '' */
+	.icon-cancel:before { content: '\e80b'; } /* '' */
+	.icon-search:before { content: '\e804'; } /* '' */
+	.icon-cancel-2:before { content: '\e80c'; } /* '' */
+	.icon-plus-4:before { content: '\e80d'; } /* '' */
+	.icon-cancel-3:before { content: '\e80e'; } /* '' */
+	.icon-plus:before { content: '\e808'; } /* '' */
+	.icon-down-open:before { content: '\e800'; } /* '' */
+	.icon-right-open:before { content: '\e802'; } /* '' */
+	.icon-up-open:before { content: '\e803'; } /* '' */
+	.icon-stop:before { content: '\e813'; } /* '' */
+	.icon-cancel-1:before { content: '\e820'; } /* '' */
+	.icon-plus-3:before { content: '\e80a'; } /* '' */
+	/* end icon font helpers */
+
+	/* icon font spin animation */
+	.animate-spin {
+	  -moz-animation: spin 2s infinite linear;
+	  -o-animation: spin 2s infinite linear;
+	  -webkit-animation: spin 2s infinite linear;
+	  animation: spin 2s infinite linear;
+	  display: inline-block;
+	}
+	@-moz-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-webkit-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-o-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-ms-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	/*  end spin animation */	
+
+	@font-face {
+	    font-family: 'bebas_neueregular';
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	/* top chrome styles */
+	#top_chrome {
+
+		width:100%;
+		height:28px;
+		background-color:#163E65;
+	}
+
+	.chrome_link_block {
+
+		color:#fff !important;	
+		display:inline-block;
+		height:100%;
+		max-height:28px;
+	}
+
+	.chrome_link_block:hover {
+
+		background-color:#eee;
+		color:#0779BE !important;	
+		cursor:pointer;
+	}
+
+	#top_chrome a {
+
+		color:inherit !important;	
+		text-decoration:none;
+	}
+
+	#top_chrome a:hover {
+
+		color:inherit !important;	
+	}
+
+	#top_chrome_buttons {
+
+		float:right;
+		margin-right:50px;
+	}
+
+	.chrome_button {
+
+		font-family:arial,sans-serif;
+		font-weight:bold;
+		display:inline-block;
+		font-size:9px;
+		text-align:left;
+		text-decoration:none;
+		margin:9px 20px 10px 20px;
+	}
+
+	.chrome_active {
+
+		background-color:#1b7abd;
+		color:#fff;
+	}
+
+
+	/* header element styles*/
+	#header_content {
+
+		font-family: bebas_neueregular, arial, sans-serif;
+		font-size:22px;
+		color:#0779be;		
+		letter-spacing:0.03em;
+
+		position:relative;
+		width:calc(100% - 112px);
+		min-width:800px;
+		height:76px;
+		border-bottom:2px solid #A5A8AB;
+		margin-left:50px;
+		margin-right:50px;
+        z-index:9999; /* IT-9508 */
+	}
+
+	#portal_logo {
+
+		position:absolute;
+		top:20px;
+		left:0px;
+		width:236px;
+	}
+
+	#portal_tabs {
+
+		position: absolute;
+		bottom: 12px;
+		left: 0px;
+		margin-bottom: -12px;
+		display: block;
+	}
+
+	.horizontal_list
+	{
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		display: inline; 		
+	}
+
+	.horizontal_list li { 
+
+		display: inline; 	
+	}	
+
+	#portal_tab_menu_container {
+
+		display:none;
+	}
+
+	#portal_search_input_group {
+
+		position:absolute;
+		margin: 0;
+		padding: 0;
+		bottom:12px;
+		right:0px;
+		border:1px solid #DAD9D3;
+		color:#DAD9D3;
+	}
+
+	#portal_search_input_group input {
+
+		margin: 0;
+		padding: 0;
+		border:none;
+		width:110px;
+		color:#DAD9D3;
+		font-family:Helvetica,sans-serif;
+		font-size:12px;
+		height:28px;
+		margin-left:10px;
+
+		outline:none;
+	}
+
+	input::-ms-clear {
+		display: none;
+	}
+
+	#portal_search_input_group i {
+
+		font-size:0.8em;
+		cursor:pointer;
+	}
+
+	#pSiteSearchTextInput:focus {
+
+		color:#000;
+	}
+
+	.icon_menu_down {
+
+		font-size: 12px;
+		margin-left: 4px;
+		vertical-align: text-top;
+		padding-top: 4px;
+		display: inline-block;
+	}
+
+	.portal_tab_item {
+
+		background-color: #fff;
+		padding: 12px;
+		padding-left:20px;
+		padding-right:20px;
+		display: inline-block !important;		
+	}
+
+	.portal_tab_item a:hover {
+
+		color:#fbe300;	
+	}
+
+	.portal_tab_item:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}	
+
+
+	.portal_menu_active {
+
+		background-color: #EEEEEE;
+	}	
+
+	.portal_menu_item_active {
+
+		color:#fbe300 !important;	
+	}
+
+	.portal_tab_active {
+
+		color:#a5a8ab !important;
+	}
+
+	#header_content a {		
+
+		color:inherit !important;
+	}
+
+	#header_content a:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}
+
+	#header_content ul {
+
+		list-style: none;
+		position: relative;
+		top: 58px;
+		display: inline-table;
+	}
+
+	#header_content ul ul {
+		
+		display:none;
+		opacity:0;
+	}
+
+	/* the fly out menus */
+	#header_content ul li:hover > ul,
+	#header_content ul li.hover > ul {
+
+		position: absolute;
+		top: 48px;
+		z-index:999;
+
+		display: block;
+		width: 152px;
+		padding:0px;
+		padding-top:20px;
+		padding-bottom:10px;
+		font-size: 12px;
+		font-family: Arial,Sans-Serif;
+		font-weight: bold;
+		text-transform: uppercase;
+
+		background-color: rgba(8,122,191,0.98);
+		color: #fff !important;
+		opacity: 1;
+
+		-webkit-animation: fade 0.25s;
+		animation: fade 0.25s;
+	}
+
+	@-webkit-keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}
+	@keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}	
+
+	#header_content ul li:hover > ul li {
+
+		padding: 10px;
+		padding-top: 0px;
+		padding-left: 20px;
+		display: block;
+		opacity:1;
+	}
+
+	#header_content ul li:hover > ul a {
+
+		display: block;
+		opacity:1;
+		white-space:nowrap;
+	}
+
+	#portal_menu_start_list {
+
+		left: 81px;
+
+		/* IE sauce */
+		left:85px\9;
+
+		/* Safari sauce */
+		(;left:79px;);
+	}
+
+	#portal_menu_atlases_list {
+
+		left: 290px;
+		width: 210px !important;
+        height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 303px\9;
+        height: 225px\9;
+
+		/* Safari sauce */
+		(;left:279px;);
+	}
+
+	#portal_menu_tools_list {
+
+		left: 500px;
+		width: 172px !important;
+		height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 513px\9;
+		height:225px\9;
+
+		/* Safari sauce */
+		(;left:489px;);
+		(;height:227px;);
+	}
+
+	/* mozilla sauce */
+	@-moz-document url-prefix() {
+
+		#header_content {
+
+			height:107px;
+		}
+
+		#portal_menu_start_list {
+
+			left:85px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 302px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 512px;
+			height:236px;
+		}
+	}
+
+
+	/* make it look OK on iPad also */
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}  
+	}
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}	  
+	}
+
+	.portal_menu_list_heading {
+
+		color:#9ccae5;
+		border-bottom:1px solid #9ccae5;
+		padding-bottom:5px !important;
+	}
+
+	.portal_menu_list_heading + li {
+
+		padding-top:10px !important;
+	}
+
+	.portal_menu_list_heading li {
+
+		padding-bottom:0px;
+	}	
+
+	#portal_menu_atlases_list li:last-of-type {
+
+		padding-bottom:15px !important;
+	}
+
+	.icon-spin5 {
+
+		color:#000;
+	}
+</style>
+<div id="pHeader">
+<div id="top_chrome">
+	<div id="top_chrome_buttons">
+		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
+		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
+	</div>
+</div>
+
+<div id="header_content">
+
+	<a href="http://AllenInstitute.github.io/AllenSDK">
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+	</a>
+</div>
+</div>
+
+<script>
+
+jQuery('#portal_tab_menu').bind('touchstart', function() {
+
+	if(window.console)
+		console.log("touchstart");
+});
+</script>
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="biophysical-models">
+<h1>Biophysical Models<a class="headerlink" href="#biophysical-models" title="Permalink to this headline">¶</a></h1>
+<p>The Allen Cell Types Database contains biophysical models that
+characterize the firing behavior of neurons measured in slices
+through current injection by a somatic whole-cell patch clamp electrode.
+These models contain a set of 10 active conductances placed at the soma
+and use the reconstructed 3D morphologies of the modeled neurons.
+The biophysical modeling
+<a class="reference external" href="http://help.brain-map.org/display/celltypes/Documentation">technical white paper</a>
+contains details
+on the specific construction of these models and the optimization
+of the model parameters to match the experimentally-recorded firing behaviors.</p>
+<p>The biophysical models are run with the <a class="reference external" href="http://www.neuron.yale.edu/neuron/">NEURON</a>
+simulation environment.  The Allen SDK package contains libraries that assist
+in downloading and setting up the models available on the Allen Institute web site
+for users to run using NEURON.</p>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>You must have NEURON with the Python interpreter enabled and the Allen SDK installed.</p>
+<p>The Allen Institute perisomatic biophysical models were generated using
+NEURON <a class="reference external" href="http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/v7.4.rel-1370">version v7.4.rel-1370</a>.
+Instructions for compiling NEURON with the Python interpreter
+are available from the NEURON team under the heading
+<a class="reference external" href="http://www.neuron.yale.edu/neuron/download/compile_linux#otheroptions">Installation with Python as an alternative interpreter</a>.
+The Allen SDK is compatible with Python version 2.7.8, included in the Anaconda 2.1.0 distribution.</p>
+<p>Instructions for optional
+<a class="reference external" href="./install.html#installation-with-docker-optional">Docker installation</a>
+are also available.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Building and installing NEURON with the Python wrapper enabled is not always easy.
+This page targets users that have a background in NEURON usage and installation.</p>
+</div>
+</div>
+<div class="section" id="downloading-biophysical-models">
+<h2>Downloading Biophysical Models<a class="headerlink" href="#downloading-biophysical-models" title="Permalink to this headline">¶</a></h2>
+<p>There are two ways to download files necessary to run a biophysical model.
+The first way is to visit <a class="reference external" href="http://celltypes.brain-map.org">http://celltypes.brain-map.org</a> and find cells that have
+biophysical models available for download.  The electrophysiology details page
+for a cell has a neuronal model download link.  Specifically:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Click &#8216;More Options+&#8217;</li>
+<li>Check &#8216;Models -&gt; Biophysical - perisomatic&#8217; or &#8216;Biophysical - all active&#8217;</li>
+<li>Use the Filters, Cell Location and Cell Feature Filters to narrow your results.</li>
+<li>Click on a Cell Summary to view the Mouse Experiment Electrophysiology.</li>
+<li>Click the &#8220;download data&#8221; link to download the NWB stimulus and response file.</li>
+<li>Click &#8220;show model response&#8221; and select &#8216;Biophysical - perisomatic&#8217; or &#8216;Biophysical - all active&#8217;.</li>
+<li>Scroll down and click the &#8216;Biophysical - perisomatic&#8217; or &#8216;Biophysical - all active&#8217; &#8220;download model&#8221; link.</li>
+</ol>
+</div></blockquote>
+<p>This may be also be done programmatically.
+The neuronal model id can be found to the left of
+the corresponding &#8216;Biophysical - perisomatic&#8217; or
+&#8216;Biophysical - all active&#8217; &#8220;download model&#8221; link.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.biophysical_api</span> <span class="kn">import</span> \
+    <span class="n">BiophysicalApi</span>
+
+<span class="n">bp</span> <span class="o">=</span> <span class="n">BiophysicalApi</span><span class="p">()</span>
+<span class="n">bp</span><span class="o">.</span><span class="n">cache_stimulus</span> <span class="o">=</span> <span class="bp">True</span> <span class="c"># change to False to not download the large stimulus NWB file</span>
+<span class="n">neuronal_model_id</span> <span class="o">=</span> <span class="mi">472451419</span>    <span class="c"># get this from the web site as above</span>
+<span class="n">bp</span><span class="o">.</span><span class="n">cache_data</span><span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">,</span> <span class="n">working_directory</span><span class="o">=</span><span class="s">&#39;neuronal_model&#39;</span><span class="p">)</span>
+<span class="k">pass</span>
+</pre></div>
+</div>
+<p>More help can be found in the
+<a class="reference external" href="http://help.brain-map.org/display/celltypes/Allen+Cell+Types+Database">online help</a>
+for the Allen Cell Types Database web application.</p>
+</div>
+<div class="section" id="directory-structure">
+<h2>Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this headline">¶</a></h2>
+<p>The structure of the directory created looks like this.
+It includes stimulus files, model parameters, morphology, cellular mechanisms
+and application configuration.</p>
+<div class="highlight-python"><div class="highlight"><pre>neuronal_model
+|-- manifest.json
+|-- 472451419_fit.json
+|-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01.nwb
+|-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01_403165543_m.swc
+|-- modfiles
+|   |--CaDynamics.mod
+|   |--Ca_HVA.mod
+|   |--Ca_LVA.mod
+|   |--Ih.mod
+|   `--...etc.
+|
+|--x86_64
+`---work
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-the-simulation">
+<h2>Running the Simulation<a class="headerlink" href="#running-the-simulation" title="Permalink to this headline">¶</a></h2>
+<p>All of the sweeps available from the web site are included in manifest.json and will be run by default.
+This can take some time.</p>
+<div class="highlight-python"><div class="highlight"><pre>cd neuronal_model
+nrnivmodl ./modfiles   # compile the model (only needs to be done once)
+python -m allensdk.model.biophysical_perisomatic.runner manifest.json
+</pre></div>
+</div>
+</div>
+<div class="section" id="selecting-a-specific-sweep">
+<h2>Selecting a Specific Sweep<a class="headerlink" href="#selecting-a-specific-sweep" title="Permalink to this headline">¶</a></h2>
+<p>The sweeps are listed in manifest.json.
+You can remove all of the sweep numbers that you do not want run.</p>
+</div>
+<div class="section" id="simulation-main-loop">
+<h2>Simulation Main Loop<a class="headerlink" href="#simulation-main-loop" title="Permalink to this headline">¶</a></h2>
+<p>The top level script is in the
+<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.run" title="allensdk.model.biophysical_perisomatic.runner.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a>
+method of the <a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#module-allensdk.model.biophysical_perisomatic.runner" title="allensdk.model.biophysical_perisomatic.runner"><tt class="xref py py-mod docutils literal"><span class="pre">allensdk.model.biophysical_perisomatic.runner</span></tt></a>
+module.  The implementation of the method is shown here step-by-step:</p>
+<p>First configure NEURON based on the configuration file, which was
+read in from the command line at the very bottom of the script.</p>
+<p><a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.run" title="allensdk.model.biophysical_perisomatic.runner.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># configure NEURON</span>
+<span class="n">utils</span> <span class="o">=</span> <span class="n">Utils</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">h</span>
+</pre></div>
+</div>
+<p>The next step is to get the path of the morphology file and pass it to NEURON.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># configure model</span>
+<span class="n">manifest</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span>
+<span class="n">morphology_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;MORPHOLOGY&#39;</span><span class="p">)</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">generate_morphology</span><span class="p">(</span><span class="n">morphology_path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;ascii&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">))</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">load_cell_parameters</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Then read the stimulus and recording configuration and configure NEURON</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># configure stimulus and recording</span>
+<span class="n">stimulus_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;stimulus_path&#39;</span><span class="p">)</span>
+<span class="n">nwb_out_path</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">)</span>
+<span class="n">output</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">nwb_out_path</span><span class="p">)</span>
+<span class="n">run_params</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;runs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">sweeps</span> <span class="o">=</span> <span class="n">run_params</span><span class="p">[</span><span class="s">&#39;sweeps&#39;</span><span class="p">]</span>
+<span class="n">junction_potential</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;fitting&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;junction_potential&#39;</span><span class="p">]</span>
+<span class="n">mV</span> <span class="o">=</span> <span class="mf">1.0e-3</span>
+</pre></div>
+</div>
+<p>Loop through the stimulus sweeps and write the output.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># run sweeps</span>
+<span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">sweeps</span><span class="p">:</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">setup_iclamp</span><span class="p">(</span><span class="n">stimulus_path</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=</span><span class="n">sweep</span><span class="p">)</span>
+    <span class="n">vec</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">record_values</span><span class="p">()</span>
+
+    <span class="n">h</span><span class="o">.</span><span class="n">finitialize</span><span class="p">()</span>
+    <span class="n">h</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+    <span class="c"># write to an NWB File</span>
+    <span class="n">output_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="n">junction_potential</span><span class="p">)</span> <span class="o">*</span> <span class="n">mV</span>
+    <span class="n">output</span><span class="o">.</span><span class="n">set_sweep</span><span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">output_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="customization">
+<h2>Customization<a class="headerlink" href="#customization" title="Permalink to this headline">¶</a></h2>
+<p>Much of the code in the perisomatic simulation is not core Allen SDK code.
+The runner.py script largely reads the configuration file and calls into
+methods in the <a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils" title="allensdk.model.biophysical_perisomatic.utils.Utils"><tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt></a> class.
+Utils is a subclass of the <a class="reference internal" href="allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils" title="allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils"><tt class="xref py py-class docutils literal"><span class="pre">HocUtils</span></tt></a>
+class, which provides access to objects in the NEURON package.
+The various methods called by the runner.script are implemented here, including:
+<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology" title="allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology"><tt class="xref py py-meth docutils literal"><span class="pre">generate_morphology()</span></tt></a>,
+<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters" title="allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters"><tt class="xref py py-meth docutils literal"><span class="pre">load_cell_parameters()</span></tt></a>,
+<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp" title="allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp"><tt class="xref py py-meth docutils literal"><span class="pre">setup_iclamp()</span></tt></a>,
+<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus" title="allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus"><tt class="xref py py-meth docutils literal"><span class="pre">read_stimulus()</span></tt></a>
+and
+<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.record_values" title="allensdk.model.biophysical_perisomatic.utils.Utils.record_values"><tt class="xref py py-meth docutils literal"><span class="pre">record_values()</span></tt></a>.</p>
+<p><a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils" title="allensdk.model.biophysical_perisomatic.utils.Utils"><tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre>from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
+
+.....
+
+class Utils(HocUtils):
+.....
+
+    def __init__(self, description):
+        super(Utils, self).__init__(description)
+....
+</pre></div>
+</div>
+<p>To create a biophysical model using your own software or data,
+simply model your directory structure on one of the downloaded simulations
+or one of the examples below.
+Add your own runner.py and utils.py module to the simulation directory.</p>
+<p>Compile the .mod files using NEURON&#8217;s nrnivmodl command:</p>
+<div class="highlight-python"><div class="highlight"><pre>nrnivmodl modfiles
+</pre></div>
+</div>
+<p>Then call your runner script directly, passing in the manifest file to your script:</p>
+<div class="highlight-python"><div class="highlight"><pre>python runner.py manifest.json
+</pre></div>
+</div>
+<p>The output from your simulation and any intermediate files will go in the work directory.</p>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>A <a class="reference download internal" href="_downloads/simple_example.tgz"><tt class="xref download docutils literal"><span class="pre">minimal</span> <span class="pre">example</span> <span class="pre">(simple_example.tgz)</span></tt></a>
+and a <a class="reference download internal" href="_downloads/multicell_example.tgz"><tt class="xref download docutils literal"><span class="pre">multicell</span> <span class="pre">example</span> <span class="pre">(multicell_example.tgz)</span></tt></a>
+are available to download as a starting point for your own projects.</p>
+<p>Each example provides its own utils.py file along with a main script
+and supporting configuration files.</p>
+<p>simple_example.tgz:</p>
+<div class="highlight-python"><div class="highlight"><pre>tar xvzf simple_example.tgz
+cd simple
+nrnivmodl modfiles
+python simple.py
+</pre></div>
+</div>
+<p>multicell_example.tgz:</p>
+<div class="highlight-python"><div class="highlight"><pre>tar xvzf multicell_example.tgz
+cd multicell
+nrnivmodl modfiles
+python multi.py
+python multicell_diff.py
+</pre></div>
+</div>
+</div>
+<div class="section" id="exporting-output-to-text-format-or-image">
+<h2>Exporting Output to Text Format or Image<a class="headerlink" href="#exporting-output-to-text-format-or-image" title="Permalink to this headline">¶</a></h2>
+<p>This is an example of using the AllenSDK
+to save a response voltage to other formats.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.core.dat_utilities</span> <span class="kn">import</span> \
+    <span class="n">DatUtilities</span>
+<span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> \
+    <span class="n">NwbDataSet</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s">&quot;Agg&quot;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="n">nwb_file</span> <span class="o">=</span> <span class="s">&#39;313862020.nwb&#39;</span>
+<span class="n">sweep_number</span> <span class="o">=</span> <span class="mi">52</span>
+<span class="n">dat_file</span> <span class="o">=</span> <span class="s">&#39;313862020_</span><span class="si">%d</span><span class="s">.dat&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep_number</span><span class="p">)</span>
+
+<span class="n">nwb</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">)</span>
+<span class="n">sweep</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">get_sweep</span><span class="p">(</span><span class="n">sweep_number</span><span class="p">)</span>
+
+<span class="c"># read v and t as numpy arrays</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">sweep</span><span class="p">[</span><span class="s">&#39;response&#39;</span><span class="p">]</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0e3</span> <span class="o">/</span> <span class="n">sweep</span><span class="p">[</span><span class="s">&#39;sampling_rate&#39;</span><span class="p">]</span>
+<span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
+
+<span class="c"># save as text file</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="n">v</span><span class="p">)))</span>
+<span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">dat_file</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="c"># save image using matplotlib</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Sweep </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep_number</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;out.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="model-description-files">
+<h2>Model Description Files<a class="headerlink" href="#model-description-files" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="basic-structure">
+<h3>Basic Structure<a class="headerlink" href="#basic-structure" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>A model description file is simply a JSON object with several sections at the top level
+and an array of JSON objects within each section.</p>
+<div class="highlight-python"><div class="highlight"><pre> {
+    &quot;cell_section&quot;: [
+        {
+          &quot;name&quot;: &quot;cell 1&quot;,
+          &quot;shape&quot;: &quot;pyramidal&quot;
+          &quot;position&quot;: [ 0.1, 0.2, 0.3 ]
+        },
+        {
+          &quot;name&quot;: &quot;cell 2&quot;,
+          &quot;shape&quot;: &quot;glial&quot;,
+          &quot;position&quot;: [ 0.1, 0.2, 0.3 ]
+        }
+    ],
+    &quot;extra&quot;: [
+       { &quot;what&quot;: &quot;wood&quot;,
+         &quot;who&quot;: &quot;woodchuck&quot;
+       }
+    ]
+}
+</pre></div>
+</div>
+<p>Even if a section contains no objects or only one object the array brackets must be present.</p>
+</div></blockquote>
+</div>
+<div class="section" id="objects-within-sections">
+<h3>Objects Within Sections<a class="headerlink" href="#objects-within-sections" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>While no restrictions are enforced on what kinds of objects are stored in a section,
+some rules of thumb make the file easier to work with.</p>
+<ol class="arabic simple">
+<li>All objects within a section are the same structure.
+Common operations on a section are to display it as a table,
+iterate over it, load from or write to a spreadsheet or csv file.
+These operations are all easier if the section is fairly homogeneous.</li>
+<li>Objects are not deeply nested.
+While some shallow nesting is often useful, deep nesting such as a tree structure
+is not recommended.
+It makes interoperability with other tools and data formats more difficult.</li>
+<li>Arrays are allowed, though they should not be deeply nested either.</li>
+<li>Object member values should be literals.  Do not use pickled classes, for example.</li>
+</ol>
+</div></blockquote>
+</div>
+<div class="section" id="comment-lines">
+<h3>Comment Lines<a class="headerlink" href="#comment-lines" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>The JSON specification does not allow comments.
+However, the Allen SDK library applies a preprocessing stage
+to remove C++-style comments, so they can be used in description files.</p>
+<p>Multi-line comments should be surrounded by /* */
+and single-line comments start with //.
+Commented description files will not be recognized by strict json parsers
+unless the comments are stripped.</p>
+<p>commented.json:</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+   /*
+    *  multi-line comment
+    */
+   &quot;section1&quot;: [
+       {
+          &quot;name&quot;: &quot;simon&quot;  // single line comment
+       }]
+   }
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="split-description-files-by-section">
+<h3>Split Description Files by Section<a class="headerlink" href="#split-description-files-by-section" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>A model description can be split into multiple files
+by putting some sections in one file and other sections into another file.
+This can be useful if you want to put a topology of cells and connections in one file
+and experimental conditions and stimulus in another file.  The resulting structure in
+memory will behave the same way as if the files were not split.
+This allows a small experiment to be described in a single file
+and large experiments to be more modular.</p>
+<p>cells.json:</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+   &quot;cell_section&quot;: [
+       {
+         &quot;name&quot;: &quot;cell 1&quot;,
+         &quot;shape&quot;: &quot;pyramidal&quot;
+         &quot;position&quot;: [ 0.1, 0.2, 0.3 ]
+       },
+       {
+         &quot;name&quot;: &quot;cell 2&quot;,
+         &quot;shape&quot;: &quot;glial&quot;,
+         &quot;position&quot;: [ 0.1, 0.2, 0.3 ]
+       }
+   ]
+}
+</pre></div>
+</div>
+<p>extras.json:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="s">&quot;extra&quot;</span><span class="p">:</span> <span class="p">[</span>
+       <span class="p">{</span>
+         <span class="s">&quot;what&quot;</span><span class="p">:</span> <span class="s">&quot;wood&quot;</span><span class="p">,</span>
+         <span class="s">&quot;who&quot;</span><span class="p">:</span> <span class="s">&quot;woodchuck&quot;</span>
+       <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="split-sections-between-description-files">
+<h3>Split Sections Between Description Files<a class="headerlink" href="#split-sections-between-description-files" title="Permalink to this headline">¶</a></h3>
+<p>If two description files containing the same sections are combined,
+the resulting description will contain objects from both files.
+This feature allows sub-networks to be described in separate files.
+The sub-networks can then be composed into a larger network with an additional
+description of the interconnections.</p>
+<blockquote>
+<div><p>network1.json:</p>
+<div class="highlight-python"><div class="highlight"><pre>/* A self-contained sub-network */
+{
+    &quot;cells&quot;: [
+        { &quot;name&quot;: &quot;cell1&quot; },
+        { &quot;name&quot;: &quot;cell2&quot; }
+    ],
+    /* intra-network connections /*
+    &quot;connections&quot;: [
+        { &quot;source&quot;: &quot;cell1&quot;, &quot;target&quot; : &quot;cell2&quot; }
+    ]
+}
+</pre></div>
+</div>
+<p>network2.json:</p>
+<div class="highlight-python"><div class="highlight"><pre>/* Another self-contained sub-network */
+{
+    &quot;cells&quot;: [
+        { &quot;name&quot;: &quot;cell3&quot; },
+        { &quot;name&quot;: &quot;cell4&quot; }
+    ],
+    &quot;connections&quot;: [
+        { &quot;source&quot;: &quot;cell3&quot;, &quot;target&quot; : &quot;cell4&quot; }
+    ]
+}
+</pre></div>
+</div>
+<p>interconnect.json:</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+    // the additional connections needed to
+    // connect the network1 and network2
+    // into a ring topology.
+    &quot;connections&quot;: [
+       { &quot;source&quot;: &quot;cell2&quot;, &quot;target&quot;: &quot;cell3&quot; },
+       { &quot;source&quot;: &quot;cell4&quot;, &quot;target&quot;: &quot;cell1&quot; }
+    ]
+}
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="resource-manifest">
+<h2>Resource Manifest<a class="headerlink" href="#resource-manifest" title="Permalink to this headline">¶</a></h2>
+<p>JSON has many advantages.  It is widely supported,
+readable and easy to parse and edit.
+As data sets get larger or specialized those advantages diminish.
+Large or complex models and experiments generally need more than
+a single model description file to completely describe an experiment.
+A manifest file is a way to describe all of the resources needed within
+the Allen SDK description format itself.</p>
+<p>The manifest section is named &#8220;manifest&#8221; by default,
+though it is configurable.  The objects in the manifest section
+each specify a directory, file, or file pattern.
+Files and directories may be organized in a parent-child relationship.</p>
+<div class="section" id="a-simple-manifest">
+<h3>A Simple Manifest<a class="headerlink" href="#a-simple-manifest" title="Permalink to this headline">¶</a></h3>
+<p>This is a simple manifest file that specifies the BASEDIR directory
+using &#8221;.&#8221;, meaning the current directory:</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+    &quot;manifest&quot;: [
+        {   &quot;key&quot;: &quot;BASEDIR&quot;,
+            &quot;type&quot;: &quot;dir&quot;,
+            &quot;spec&quot;: &quot;.&quot;
+        }
+    ] }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="parent-child-relationships">
+<h3>Parent Child Relationships<a class="headerlink" href="#parent-child-relationships" title="Permalink to this headline">¶</a></h3>
+<p>Adding the optional &#8220;parent_key&#8221; member to a manifest object
+creates a parent-child relation.  In this case WORKDIR will
+be found in &#8221;./work&#8221;:</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+    &quot;manifest&quot;: [
+        {   &quot;key&quot;: &quot;BASEDIR&quot;,
+            &quot;type&quot;: &quot;dir&quot;,
+            &quot;spec&quot;: &quot;.&quot;
+        },
+        {   &quot;key&quot;: &quot;WORKDIR&quot;,
+            &quot;type&quot;: &quot;dir&quot;,
+            &quot;spec&quot;: &quot;/work&quot;,
+            &quot;parent_key&quot;: &quot;BASEDIR&quot;
+        }
+    ] }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="file-spec-patterns">
+<h3>File Spec Patterns<a class="headerlink" href="#file-spec-patterns" title="Permalink to this headline">¶</a></h3>
+<p>Files can be specified using the type &#8220;file&#8221; instead of &#8220;dir&#8221;.
+If a sequence of many files is needed, the spec may contain patterns
+to indicate where the sequence number (%d) or string (%s) will be
+interpolated:</p>
+<div class="highlight-python"><div class="highlight"><pre>{
+    &quot;manifest&quot;: [
+        {   &quot;key&quot;: &quot;BASEDIR&quot;,
+            &quot;type&quot;: &quot;dir&quot;,
+            &quot;spec&quot;: &quot;.&quot;
+        },
+        {
+            &quot;key&quot;: &quot;voltage_out_cell_path&quot;,
+            &quot;type&quot;: &quot;file&quot;,
+            &quot;spec&quot;: &quot;v_out-cell-%d.dat&quot;,
+            &quot;parent_key&quot;: &quot;BASEDIR&quot;
+        }
+    ] }
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="split-manifest-files">
+<h3>Split Manifest Files<a class="headerlink" href="#split-manifest-files" title="Permalink to this headline">¶</a></h3>
+<p>Manifest files can be split like any description file.
+This allows the specification of a general directory structure in a
+shared file and specific files in a separate configuration
+(i.e. stimulus and working directory)</p>
+</div>
+<div class="section" id="extensions">
+<h3>Extensions<a class="headerlink" href="#extensions" title="Permalink to this headline">¶</a></h3>
+<p>To date, manifest description files have not been used to reference
+URLs that provide model data, but it is a planned future use case.</p>
+</div>
+</div>
+<div class="section" id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="http://www.neuron.yale.edu/neuron">NEURON</a></li>
+<li><a class="reference external" href="https://www.python.org/">Python</a></li>
+<li><a class="reference external" href="http://www.w3schools.com/json/">JSON</a></li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="models.html">Models</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer">
+    </div>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+
+  </body>
+</html>

@@ -12,6 +12,14 @@ allensdk.api.queries.annotated_section_data_sets_api module
     :undoc-members:
     :show-inheritance:
 
+allensdk.api.queries.biophysical_api module
+-------------------------------------------
+
+.. automodule:: allensdk.api.queries.biophysical_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.api.queries.biophysical_perisomatic_api module
 -------------------------------------------------------
 

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.mouse_connectivity_cache &mdash; Allen SDK 0.10.1 documentation</title>
+    <title>allensdk.core.mouse_connectivity_cache &mdash; Allen SDK 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.1 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
@@ -631,7 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.core.mouse_connectivity_cache</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -646,8 +646,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">Cache</span>
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="kn">import</span> <span class="n">ManifestBuilder</span>
+<span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">Cache</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.queries.mouse_connectivity_api</span> <span class="kn">import</span> <span class="n">MouseConnectivityApi</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.queries.ontologies_api</span> <span class="kn">import</span> <span class="n">OntologiesApi</span>
 
@@ -657,6 +657,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">import</span> <span class="nn">nrrd</span><span class="o">,</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
 
 <div class="viewcode-block" id="MouseConnectivityCache"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache">[docs]</a><span class="k">class</span> <span class="nc">MouseConnectivityCache</span><span class="p">(</span><span class="n">Cache</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -691,7 +692,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        in the function call (e.g. get_projection_density(file_name=&#39;file.nrrd&#39;)).</span>
 
 <span class="sd">    manifest_file: string</span>
-<span class="sd">        File name of the manifest to be read.  Default is &quot;manifest.json&quot;.</span>
+<span class="sd">        File name of the manifest to be read.  Default is &quot;mouse_connectivity_manifest.json&quot;.</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -706,11 +707,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">STRUCTURES_KEY</span> <span class="o">=</span> <span class="s">&#39;STRUCTURES&#39;</span>
     <span class="n">STRUCTURE_MASK_KEY</span> <span class="o">=</span> <span class="s">&#39;STRUCTURE_MASK&#39;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;manifest.json&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;mouse_connectivity_manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MouseConnectivityCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="n">base_uri</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="MouseConnectivityCache.get_annotation_volume"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_annotation_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_annotation_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -735,7 +736,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+            <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
 
             <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_annotation_volume</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
 
@@ -764,7 +765,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+            <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
 
             <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_template_volume</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
 
@@ -797,7 +798,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+            <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_projection_density</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
                                               
         <span class="k">return</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -830,7 +831,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+            <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_injection_density</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
                                               
@@ -863,7 +864,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+            <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_injection_fraction</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
                                               
@@ -896,7 +897,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+            <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_data_mask</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
                                               
@@ -941,7 +942,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">structures</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">structures</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+                <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
 
                 <span class="n">structures</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
@@ -992,7 +993,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="k">del</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+                <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
 
                 <span class="n">json_utilities</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">experiments</span><span class="p">)</span>
 
@@ -1009,6 +1010,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="MouseConnectivityCache.filter_experiments"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">filter_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiments</span><span class="p">,</span> <span class="n">cre</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">injection_structure_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">        Take a list of experiments and filter them by cre status and injection structure.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
 
 <span class="sd">        cre: boolean or list</span>
 <span class="sd">            If True, return only cre-positive experiments.  If False, return only</span>
@@ -1081,7 +1085,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                   <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">unionizes</span><span class="o">.</span><span class="n">columns</span> <span class="p">]</span>
                 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+                <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
 
                 <span class="n">unionizes</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
@@ -1093,6 +1097,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        Take a list of unionzes and return a subset of records filtered by injection status, structure, and</span>
 <span class="sd">        hemisphere.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
 <span class="sd">        is_injection: boolean</span>
 <span class="sd">            If True, only return unionize records that disregard non-injection pixels.</span>
 <span class="sd">            If False, only return unionize records that disregard injection pixels.</span>
@@ -1125,6 +1131,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        Get structure unionizes for a set of experiment IDs.  Filter the results by injection status, </span>
 <span class="sd">        structure, and hemisphere.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
 <span class="sd">        experiment_ids: list</span>
 <span class="sd">            List of experiment IDs.  Corresponds to section_data_set_id in the API.</span>
 <span class="sd">        </span>
@@ -1189,7 +1197,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">({</span> <span class="s">&#39;hemisphere_id&#39;</span><span class="p">:</span> <span class="n">hid</span><span class="p">,</span> <span class="s">&#39;structure_id&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span> <span class="s">&#39;label&#39;</span><span class="p">:</span> <span class="n">label</span> <span class="p">})</span>
                 <span class="n">cidx</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="k">for</span> <span class="n">row_index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">unionizes</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">unionizes</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
             <span class="n">ridx</span> <span class="o">=</span> <span class="n">row_lookup</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;experiment_id&#39;</span><span class="p">]]</span>
             <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;hemisphere_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;structure_id&#39;</span><span class="p">])</span>
             <span class="n">cidx</span> <span class="o">=</span> <span class="n">column_lookup</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
@@ -1235,12 +1243,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">return</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ont</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ontology</span><span class="p">()</span>
-            <span class="n">structure_ids</span> <span class="o">=</span> <span class="n">ont</span><span class="o">.</span><span class="n">get_descendant_ids</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
+            <span class="n">structure_ids</span> <span class="o">=</span> <span class="n">ont</span><span class="o">.</span><span class="n">get_descendant_ids</span><span class="p">([</span><span class="n">structure_id</span><span class="p">])</span>
             <span class="n">annotation</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_annotation_volume</span><span class="p">(</span><span class="n">annotation_file_name</span><span class="p">)</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_structure_mask</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">,</span> <span class="n">annotation</span><span class="p">)</span>
             
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+                <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
                 <span class="n">nrrd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="n">mask</span><span class="p">,</span> <span class="bp">None</span>
@@ -1264,7 +1272,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">annotation</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">sid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">sid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">):</span>
             <span class="n">m</span><span class="p">[</span><span class="n">annotation</span><span class="o">==</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
         
         <span class="k">return</span> <span class="n">m</span>
@@ -1355,7 +1363,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../glif_models.html">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
@@ -1371,6 +1379,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
 </ul>
 
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>

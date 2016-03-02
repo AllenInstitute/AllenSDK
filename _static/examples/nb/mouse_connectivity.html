@@ -182,7 +182,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[41]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.core.mouse_connectivity_cache</span> <span class="kn">import</span> <span class="n">MouseConnectivityCache</span>
@@ -191,7 +191,7 @@ div#notebook {
 <span class="c"># the data that has already been downloaded onto the hard drives.</span>
 <span class="c"># If you supply a relative path, it is assumed to be relative to your</span>
 <span class="c"># current working directory.</span>
-<span class="n">mcc</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;connectivity/manifest.json&#39;</span><span class="p">)</span>
+<span class="n">mcc</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;connectivity/mouse_connectivity_manifest.json&#39;</span><span class="p">)</span>
 
 <span class="c"># open up a list of all of the experiments</span>
 <span class="n">all_experiments</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_experiments</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -211,12 +211,13 @@ div#notebook {
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>2173 total experiments
+<pre>
+2173 total experiments
 </pre>
 </div>
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[41]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[1]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -251,7 +252,7 @@ Name: 122642490, dtype: object</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[42]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># grab the Ontology instance</span>
@@ -270,10 +271,10 @@ Name: 122642490, dtype: object</pre>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[42]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[2]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<div>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -328,27 +329,27 @@ Name: 122642490, dtype: object</pre>
   <tbody>
     <tr>
       <th>315</th>
-      <td> Isocortex</td>
-      <td> 746</td>
-      <td> 70FF71</td>
-      <td> 5</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td> 5</td>
-      <td> 3</td>
-      <td> 315</td>
+      <td>Isocortex</td>
+      <td>746</td>
+      <td>70FF71</td>
+      <td>5</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>5</td>
+      <td>3</td>
+      <td>315</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 695</td>
-      <td> Isocortex</td>
-      <td> 6</td>
+      <td>1</td>
+      <td>695</td>
+      <td>Isocortex</td>
+      <td>6</td>
       <td>NaN</td>
-      <td> /997/8/567/688/695/315/</td>
-      <td> 2323732626</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/</td>
+      <td>2323732626</td>
+      <td>8690</td>
     </tr>
   </tbody>
 </table>
@@ -374,13 +375,15 @@ Name: 122642490, dtype: object</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[43]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.ontologies_api</span> <span class="kn">import</span> <span class="n">OntologiesApi</span>
 
 <span class="c"># get the adult mouse structures summary structures</span>
-<span class="n">summary_structures</span> <span class="o">=</span> <span class="n">OntologiesApi</span><span class="p">()</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_set_names</span><span class="o">=</span><span class="s">&#39;Mouse Connectivity - Summary&#39;</span><span class="p">)</span>
+<span class="n">oa</span> <span class="o">=</span> <span class="n">OntologiesApi</span><span class="p">()</span>
+<span class="n">set_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">oa</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="s">&#39;Mouse Connectivity - Summary&#39;</span><span class="p">)]</span>
+<span class="n">summary_structures</span> <span class="o">=</span> <span class="n">oa</span><span class="o">.</span><span class="n">get_structures</span><span class="p">(</span><span class="n">structure_set_names</span><span class="o">=</span><span class="n">set_name</span><span class="p">)</span>
 
 <span class="n">summary_structure_ids</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">summary_structures</span> <span class="p">]</span>
 
@@ -395,10 +398,10 @@ Name: 122642490, dtype: object</pre>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[43]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[3]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<div>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -452,724 +455,724 @@ Name: 122642490, dtype: object</pre>
   </thead>
   <tbody>
     <tr>
-      <th>1   </th>
-      <td>          TMv</td>
-      <td> 424</td>
-      <td> FF4C3E</td>
-      <td> 8</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  710</td>
-      <td> 3</td>
-      <td>    1</td>
+      <th>1</th>
+      <td>TMv</td>
+      <td>424</td>
+      <td>FF4C3E</td>
+      <td>8</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>710</td>
+      <td>3</td>
+      <td>1</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  557</td>
-      <td>             Tuberomammillary nucleus ventral part</td>
-      <td>  711</td>
+      <td>1</td>
+      <td>557</td>
+      <td>Tuberomammillary nucleus ventral part</td>
+      <td>711</td>
       <td>NaN</td>
-      <td>   /997/8/343/1129/1097/467/331/557/1/</td>
-      <td> 3678649713</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/1097/467/331/557/1/</td>
+      <td>3678649713</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1027</th>
-      <td>        AUDpo</td>
-      <td> 835</td>
-      <td> 019399</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  126</td>
-      <td> 3</td>
-      <td> 1027</td>
+      <td>AUDpo</td>
+      <td>835</td>
+      <td>019399</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>126</td>
+      <td>3</td>
+      <td>1027</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  247</td>
-      <td>                           Posterior auditory area</td>
-      <td>  127</td>
+      <td>1</td>
+      <td>247</td>
+      <td>Posterior auditory area</td>
+      <td>127</td>
       <td>NaN</td>
-      <td>      /997/8/567/688/695/315/247/1027/</td>
-      <td>   57661303</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/247/1027/</td>
+      <td>57661303</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>4   </th>
-      <td>           IC</td>
-      <td> 141</td>
-      <td> FF7AFF</td>
-      <td> 5</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  746</td>
-      <td> 3</td>
-      <td>    4</td>
+      <th>4</th>
+      <td>IC</td>
+      <td>141</td>
+      <td>FF7AFF</td>
+      <td>5</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>746</td>
+      <td>3</td>
+      <td>4</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  339</td>
-      <td>                               Inferior colliculus</td>
-      <td>  747</td>
+      <td>1</td>
+      <td>339</td>
+      <td>Inferior colliculus</td>
+      <td>747</td>
       <td>NaN</td>
-      <td>                 /997/8/343/313/339/4/</td>
-      <td> 3456805092</td>
-      <td> 8690</td>
+      <td>/997/8/343/313/339/4/</td>
+      <td>3456805092</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1029</th>
-      <td>          POL</td>
-      <td> 269</td>
-      <td> FF909F</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  615</td>
-      <td> 3</td>
-      <td> 1029</td>
+      <td>POL</td>
+      <td>269</td>
+      <td>FF909F</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>615</td>
+      <td>3</td>
+      <td>1029</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  138</td>
-      <td>        Posterior limiting nucleus of the thalamus</td>
-      <td>  616</td>
+      <td>1</td>
+      <td>138</td>
+      <td>Posterior limiting nucleus of the thalamus</td>
+      <td>616</td>
       <td>NaN</td>
-      <td>     /997/8/343/1129/549/856/138/1029/</td>
-      <td> 3921343755</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/549/856/138/1029/</td>
+      <td>3921343755</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1031</th>
-      <td>          GPi</td>
-      <td> 128</td>
-      <td> 8599CC</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  560</td>
-      <td> 3</td>
-      <td> 1031</td>
+      <td>GPi</td>
+      <td>128</td>
+      <td>8599CC</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>560</td>
+      <td>3</td>
+      <td>1031</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  818</td>
-      <td>                  Globus pallidus internal segment</td>
-      <td>  561</td>
+      <td>1</td>
+      <td>818</td>
+      <td>Globus pallidus internal segment</td>
+      <td>561</td>
       <td>NaN</td>
-      <td>          /997/8/567/623/803/818/1031/</td>
-      <td> 2033111499</td>
-      <td> 8690</td>
+      <td>/997/8/567/623/803/818/1031/</td>
+      <td>2033111499</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1033</th>
-      <td>         COPY</td>
-      <td> 411</td>
-      <td> FFFC91</td>
-      <td> 5</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  994</td>
-      <td> 3</td>
-      <td> 1033</td>
+      <td>COPY</td>
+      <td>411</td>
+      <td>FFFC91</td>
+      <td>5</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>994</td>
+      <td>3</td>
+      <td>1033</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1073</td>
-      <td>                                  Copula pyramidis</td>
-      <td>  995</td>
+      <td>1</td>
+      <td>1073</td>
+      <td>Copula pyramidis</td>
+      <td>995</td>
       <td>NaN</td>
-      <td>             /997/8/512/528/1073/1033/</td>
-      <td> 2916242466</td>
-      <td> 8690</td>
+      <td>/997/8/512/528/1073/1033/</td>
+      <td>2916242466</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>523 </th>
-      <td>          MPO</td>
-      <td> 206</td>
-      <td> FF5547</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  684</td>
-      <td> 3</td>
-      <td>  523</td>
+      <th>523</th>
+      <td>MPO</td>
+      <td>206</td>
+      <td>FF5547</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>684</td>
+      <td>3</td>
+      <td>523</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  141</td>
-      <td>                              Medial preoptic area</td>
-      <td>  685</td>
+      <td>1</td>
+      <td>141</td>
+      <td>Medial preoptic area</td>
+      <td>685</td>
       <td>NaN</td>
-      <td>         /997/8/343/1129/1097/141/523/</td>
-      <td> 1992330649</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/1097/141/523/</td>
+      <td>1992330649</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>12  </th>
-      <td>           IF</td>
-      <td> 142</td>
-      <td> FFA6FF</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  796</td>
-      <td> 3</td>
-      <td>   12</td>
+      <th>12</th>
+      <td>IF</td>
+      <td>142</td>
+      <td>FFA6FF</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>796</td>
+      <td>3</td>
+      <td>12</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  165</td>
-      <td>                     Interfascicular nucleus raphe</td>
-      <td>  797</td>
+      <td>1</td>
+      <td>165</td>
+      <td>Interfascicular nucleus raphe</td>
+      <td>797</td>
       <td>NaN</td>
-      <td>            /997/8/343/313/348/165/12/</td>
-      <td> 1057138099</td>
-      <td> 8690</td>
+      <td>/997/8/343/313/348/165/12/</td>
+      <td>1057138099</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1037</th>
-      <td>         POST</td>
-      <td> 270</td>
-      <td> 48C83C</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  488</td>
-      <td> 3</td>
-      <td> 1037</td>
+      <td>POST</td>
+      <td>270</td>
+      <td>48C83C</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>488</td>
+      <td>3</td>
+      <td>1037</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  822</td>
-      <td>                                     Postsubiculum</td>
-      <td>  489</td>
+      <td>1</td>
+      <td>822</td>
+      <td>Postsubiculum</td>
+      <td>489</td>
       <td>NaN</td>
-      <td>     /997/8/567/688/695/1089/822/1037/</td>
-      <td> 2028146433</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/1089/822/1037/</td>
+      <td>2028146433</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>15  </th>
-      <td>           PT</td>
-      <td> 284</td>
-      <td> FF909F</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  636</td>
-      <td> 3</td>
-      <td>   15</td>
+      <th>15</th>
+      <td>PT</td>
+      <td>284</td>
+      <td>FF909F</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>636</td>
+      <td>3</td>
+      <td>15</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  571</td>
-      <td>                               Parataenial nucleus</td>
-      <td>  637</td>
+      <td>1</td>
+      <td>571</td>
+      <td>Parataenial nucleus</td>
+      <td>637</td>
       <td>NaN</td>
-      <td>       /997/8/343/1129/549/856/571/15/</td>
-      <td> 1224128658</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/549/856/571/15/</td>
+      <td>1224128658</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1041</th>
-      <td>          PFL</td>
-      <td> 412</td>
-      <td> FFFC91</td>
-      <td> 5</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  998</td>
-      <td> 3</td>
-      <td> 1041</td>
+      <td>PFL</td>
+      <td>412</td>
+      <td>FFFC91</td>
+      <td>5</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>998</td>
+      <td>3</td>
+      <td>1041</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1073</td>
-      <td>                                     Paraflocculus</td>
-      <td>  999</td>
+      <td>1</td>
+      <td>1073</td>
+      <td>Paraflocculus</td>
+      <td>999</td>
       <td>NaN</td>
-      <td>             /997/8/512/528/1073/1041/</td>
-      <td>  775625608</td>
-      <td> 8690</td>
+      <td>/997/8/512/528/1073/1041/</td>
+      <td>775625608</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>19  </th>
-      <td>           IG</td>
-      <td> 143</td>
-      <td> 7ED04B</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  452</td>
-      <td> 3</td>
-      <td>   19</td>
+      <th>19</th>
+      <td>IG</td>
+      <td>143</td>
+      <td>7ED04B</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>452</td>
+      <td>3</td>
+      <td>19</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1080</td>
-      <td>                                  Induseum griseum</td>
-      <td>  453</td>
+      <td>1</td>
+      <td>1080</td>
+      <td>Induseum griseum</td>
+      <td>453</td>
       <td>NaN</td>
-      <td>      /997/8/567/688/695/1089/1080/19/</td>
-      <td> 2117099319</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/1089/1080/19/</td>
+      <td>2117099319</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1044</th>
-      <td>           PP</td>
-      <td> 271</td>
-      <td> FF8084</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  604</td>
-      <td> 3</td>
-      <td> 1044</td>
+      <td>PP</td>
+      <td>271</td>
+      <td>FF8084</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>604</td>
+      <td>3</td>
+      <td>1044</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  864</td>
-      <td>                            Peripeduncular nucleus</td>
-      <td>  605</td>
+      <td>1</td>
+      <td>864</td>
+      <td>Peripeduncular nucleus</td>
+      <td>605</td>
       <td>NaN</td>
-      <td>         /997/8/343/1129/549/864/1044/</td>
-      <td> 4073956777</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/549/864/1044/</td>
+      <td>4073956777</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>533 </th>
-      <td>        VISpm</td>
-      <td> 915</td>
-      <td> 08858C</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  182</td>
-      <td> 3</td>
-      <td>  533</td>
+      <th>533</th>
+      <td>VISpm</td>
+      <td>915</td>
+      <td>08858C</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>182</td>
+      <td>3</td>
+      <td>533</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  669</td>
-      <td>                         posteromedial visual area</td>
-      <td>  183</td>
+      <td>1</td>
+      <td>669</td>
+      <td>posteromedial visual area</td>
+      <td>183</td>
       <td>NaN</td>
-      <td>       /997/8/567/688/695/315/669/533/</td>
-      <td>  558797901</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/669/533/</td>
+      <td>558797901</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>534 </th>
-      <td>          SUT</td>
-      <td> 349</td>
-      <td> FFBA86</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  835</td>
-      <td> 3</td>
-      <td>  534</td>
+      <th>534</th>
+      <td>SUT</td>
+      <td>349</td>
+      <td>FFBA86</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>835</td>
+      <td>3</td>
+      <td>534</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  987</td>
-      <td>                           Supratrigeminal nucleus</td>
-      <td>  836</td>
+      <td>1</td>
+      <td>987</td>
+      <td>Supratrigeminal nucleus</td>
+      <td>836</td>
       <td>NaN</td>
-      <td>          /997/8/343/1065/771/987/534/</td>
-      <td>  252744374</td>
-      <td> 8690</td>
+      <td>/997/8/343/1065/771/987/534/</td>
+      <td>252744374</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>23  </th>
-      <td>          AAA</td>
-      <td>   2</td>
-      <td> 80C0E2</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  542</td>
-      <td> 3</td>
-      <td>   23</td>
+      <th>23</th>
+      <td>AAA</td>
+      <td>2</td>
+      <td>80C0E2</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>542</td>
+      <td>3</td>
+      <td>23</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  278</td>
-      <td>                           Anterior amygdalar area</td>
-      <td>  543</td>
+      <td>1</td>
+      <td>278</td>
+      <td>Anterior amygdalar area</td>
+      <td>543</td>
       <td>NaN</td>
-      <td>            /997/8/567/623/477/278/23/</td>
-      <td> 4252873038</td>
-      <td> 8690</td>
+      <td>/997/8/567/623/477/278/23/</td>
+      <td>4252873038</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>536 </th>
-      <td>          CEA</td>
-      <td>  66</td>
-      <td> 80C0E2</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  544</td>
-      <td> 3</td>
-      <td>  536</td>
+      <th>536</th>
+      <td>CEA</td>
+      <td>66</td>
+      <td>80C0E2</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>544</td>
+      <td>3</td>
+      <td>536</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  278</td>
-      <td>                         Central amygdalar nucleus</td>
-      <td>  545</td>
+      <td>1</td>
+      <td>278</td>
+      <td>Central amygdalar nucleus</td>
+      <td>545</td>
       <td>NaN</td>
-      <td>           /997/8/567/623/477/278/536/</td>
-      <td> 3284898075</td>
-      <td> 8690</td>
+      <td>/997/8/567/623/477/278/536/</td>
+      <td>3284898075</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1049</th>
-      <td>           FL</td>
-      <td> 413</td>
-      <td> FFFC91</td>
-      <td> 5</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td> 1002</td>
-      <td> 3</td>
-      <td> 1049</td>
+      <td>FL</td>
+      <td>413</td>
+      <td>FFFC91</td>
+      <td>5</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>1002</td>
+      <td>3</td>
+      <td>1049</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1073</td>
-      <td>                                         Flocculus</td>
-      <td> 1003</td>
+      <td>1</td>
+      <td>1073</td>
+      <td>Flocculus</td>
+      <td>1003</td>
       <td>NaN</td>
-      <td>             /997/8/512/528/1073/1049/</td>
-      <td> 1738627181</td>
-      <td> 8690</td>
+      <td>/997/8/512/528/1073/1049/</td>
+      <td>1738627181</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>27  </th>
-      <td>          IGL</td>
-      <td> 144</td>
-      <td> FF909F</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  646</td>
-      <td> 3</td>
-      <td>   27</td>
+      <th>27</th>
+      <td>IGL</td>
+      <td>144</td>
+      <td>FF909F</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>646</td>
+      <td>3</td>
+      <td>27</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1014</td>
-      <td> Intergeniculate leaflet of the lateral genicul...</td>
-      <td>  647</td>
+      <td>1</td>
+      <td>1014</td>
+      <td>Intergeniculate leaflet of the lateral genicul...</td>
+      <td>647</td>
       <td>NaN</td>
-      <td>      /997/8/343/1129/549/856/1014/27/</td>
-      <td> 1900856090</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/549/856/1014/27/</td>
+      <td>1900856090</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1052</th>
-      <td>          PPN</td>
-      <td> 272</td>
-      <td> FFA6FF</td>
-      <td> 5</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  794</td>
-      <td> 3</td>
-      <td> 1052</td>
+      <td>PPN</td>
+      <td>272</td>
+      <td>FFA6FF</td>
+      <td>5</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>794</td>
+      <td>3</td>
+      <td>1052</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  348</td>
-      <td>                          Pedunculopontine nucleus</td>
-      <td>  795</td>
+      <td>1</td>
+      <td>348</td>
+      <td>Pedunculopontine nucleus</td>
+      <td>795</td>
       <td>NaN</td>
-      <td>              /997/8/343/313/348/1052/</td>
-      <td> 2704258246</td>
-      <td> 8690</td>
+      <td>/997/8/343/313/348/1052/</td>
+      <td>2704258246</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>541 </th>
-      <td>          TEa</td>
-      <td> 350</td>
-      <td> 15B0B3</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  321</td>
-      <td> 3</td>
-      <td>  541</td>
+      <th>541</th>
+      <td>TEa</td>
+      <td>350</td>
+      <td>15B0B3</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>321</td>
+      <td>3</td>
+      <td>541</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  315</td>
-      <td>                        Temporal association areas</td>
-      <td>  322</td>
+      <td>1</td>
+      <td>315</td>
+      <td>Temporal association areas</td>
+      <td>322</td>
       <td>NaN</td>
-      <td>           /997/8/567/688/695/315/541/</td>
-      <td> 2291994334</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/541/</td>
+      <td>2291994334</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>30  </th>
-      <td>          PVa</td>
-      <td> 286</td>
-      <td> FF5D50</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  671</td>
-      <td> 3</td>
-      <td>   30</td>
+      <th>30</th>
+      <td>PVa</td>
+      <td>286</td>
+      <td>FF5D50</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>671</td>
+      <td>3</td>
+      <td>30</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  157</td>
-      <td> Periventricular hypothalamic nucleus anterior ...</td>
-      <td>  672</td>
+      <td>1</td>
+      <td>157</td>
+      <td>Periventricular hypothalamic nucleus anterior ...</td>
+      <td>672</td>
       <td>NaN</td>
-      <td>          /997/8/343/1129/1097/157/30/</td>
-      <td> 4028794868</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/1097/157/30/</td>
+      <td>4028794868</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>773 </th>
-      <td>          XII</td>
-      <td> 379</td>
-      <td> FFB3D9</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  920</td>
-      <td> 3</td>
-      <td>  773</td>
+      <th>773</th>
+      <td>XII</td>
+      <td>379</td>
+      <td>FFB3D9</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>920</td>
+      <td>3</td>
+      <td>773</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  370</td>
-      <td>                               Hypoglossal nucleus</td>
-      <td>  921</td>
+      <td>1</td>
+      <td>370</td>
+      <td>Hypoglossal nucleus</td>
+      <td>921</td>
       <td>NaN</td>
-      <td>          /997/8/343/1065/354/370/773/</td>
-      <td> 2567805299</td>
-      <td> 8690</td>
+      <td>/997/8/343/1065/354/370/773/</td>
+      <td>2567805299</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1057</th>
-      <td>           GU</td>
-      <td> 131</td>
-      <td> 009C75</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>   97</td>
-      <td> 3</td>
-      <td> 1057</td>
+      <td>GU</td>
+      <td>131</td>
+      <td>009C75</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>97</td>
+      <td>3</td>
+      <td>1057</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  315</td>
-      <td>                                   Gustatory areas</td>
-      <td>   98</td>
+      <td>1</td>
+      <td>315</td>
+      <td>Gustatory areas</td>
+      <td>98</td>
       <td>NaN</td>
-      <td>          /997/8/567/688/695/315/1057/</td>
-      <td>  722362724</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/1057/</td>
+      <td>722362724</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>35  </th>
-      <td>          III</td>
-      <td> 145</td>
-      <td> FF90FF</td>
-      <td> 5</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  783</td>
-      <td> 3</td>
-      <td>   35</td>
+      <th>35</th>
+      <td>III</td>
+      <td>145</td>
+      <td>FF90FF</td>
+      <td>5</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>783</td>
+      <td>3</td>
+      <td>35</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  323</td>
-      <td>                                Oculomotor nucleus</td>
-      <td>  784</td>
+      <td>1</td>
+      <td>323</td>
+      <td>Oculomotor nucleus</td>
+      <td>784</td>
       <td>NaN</td>
-      <td>                /997/8/343/313/323/35/</td>
-      <td> 3545914074</td>
-      <td> 8690</td>
+      <td>/997/8/343/313/323/35/</td>
+      <td>3545914074</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1061</th>
-      <td>          PPT</td>
-      <td> 273</td>
-      <td> FF90FF</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  780</td>
-      <td> 3</td>
-      <td> 1061</td>
+      <td>PPT</td>
+      <td>273</td>
+      <td>FF90FF</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>780</td>
+      <td>3</td>
+      <td>1061</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1100</td>
-      <td>                       Posterior pretectal nucleus</td>
-      <td>  781</td>
+      <td>1</td>
+      <td>1100</td>
+      <td>Posterior pretectal nucleus</td>
+      <td>781</td>
       <td>NaN</td>
-      <td>         /997/8/343/313/323/1100/1061/</td>
-      <td>  834486063</td>
-      <td> 8690</td>
+      <td>/997/8/343/313/323/1100/1061/</td>
+      <td>834486063</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>38  </th>
-      <td>          PVH</td>
-      <td> 287</td>
-      <td> FF5D50</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  660</td>
-      <td> 3</td>
-      <td>   38</td>
+      <th>38</th>
+      <td>PVH</td>
+      <td>287</td>
+      <td>FF5D50</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>660</td>
+      <td>3</td>
+      <td>38</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  157</td>
-      <td>              Paraventricular hypothalamic nucleus</td>
-      <td>  661</td>
+      <td>1</td>
+      <td>157</td>
+      <td>Paraventricular hypothalamic nucleus</td>
+      <td>661</td>
       <td>NaN</td>
-      <td>          /997/8/343/1129/1097/157/38/</td>
-      <td> 3443963014</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/1097/157/38/</td>
+      <td>3443963014</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>39  </th>
-      <td>         ACAd</td>
-      <td>   4</td>
-      <td> 40A666</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  209</td>
-      <td> 3</td>
-      <td>   39</td>
+      <th>39</th>
+      <td>ACAd</td>
+      <td>4</td>
+      <td>40A666</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>209</td>
+      <td>3</td>
+      <td>39</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>   31</td>
-      <td>               Anterior cingulate area dorsal part</td>
-      <td>  210</td>
+      <td>1</td>
+      <td>31</td>
+      <td>Anterior cingulate area dorsal part</td>
+      <td>210</td>
       <td>NaN</td>
-      <td>         /997/8/567/688/695/315/31/39/</td>
-      <td> 1697985147</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/31/39/</td>
+      <td>1697985147</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>7   </th>
-      <td>          PSV</td>
-      <td> 283</td>
-      <td> FFAE6F</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  808</td>
-      <td> 3</td>
-      <td>    7</td>
+      <th>7</th>
+      <td>PSV</td>
+      <td>283</td>
+      <td>FFAE6F</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>808</td>
+      <td>3</td>
+      <td>7</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1132</td>
-      <td>       Principal sensory nucleus of the trigeminal</td>
-      <td>  809</td>
+      <td>1</td>
+      <td>1132</td>
+      <td>Principal sensory nucleus of the trigeminal</td>
+      <td>809</td>
       <td>NaN</td>
-      <td>           /997/8/343/1065/771/1132/7/</td>
-      <td>  977401861</td>
-      <td> 8690</td>
+      <td>/997/8/343/1065/771/1132/7/</td>
+      <td>977401861</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>44  </th>
-      <td>          ILA</td>
-      <td> 146</td>
-      <td> 59B363</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  228</td>
-      <td> 3</td>
-      <td>   44</td>
+      <th>44</th>
+      <td>ILA</td>
+      <td>146</td>
+      <td>59B363</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>228</td>
+      <td>3</td>
+      <td>44</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  315</td>
-      <td>                                  Infralimbic area</td>
-      <td>  229</td>
+      <td>1</td>
+      <td>315</td>
+      <td>Infralimbic area</td>
+      <td>229</td>
       <td>NaN</td>
-      <td>            /997/8/567/688/695/315/44/</td>
-      <td> 1110609938</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/44/</td>
+      <td>1110609938</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>...</th>
@@ -1196,724 +1199,724 @@ Name: 122642490, dtype: object</pre>
       <td>...</td>
     </tr>
     <tr>
-      <th>970 </th>
-      <td>        PGRNd</td>
-      <td> 828</td>
-      <td> FFB3D9</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  904</td>
-      <td> 3</td>
-      <td>  970</td>
+      <th>970</th>
+      <td>PGRNd</td>
+      <td>828</td>
+      <td>FFB3D9</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>904</td>
+      <td>3</td>
+      <td>970</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  938</td>
-      <td> Paragigantocellular reticular nucleus dorsal part</td>
-      <td>  905</td>
+      <td>1</td>
+      <td>938</td>
+      <td>Paragigantocellular reticular nucleus dorsal part</td>
+      <td>905</td>
       <td>NaN</td>
-      <td>      /997/8/343/1065/354/370/938/970/</td>
-      <td>   33977280</td>
-      <td> 8690</td>
+      <td>/997/8/343/1065/354/370/938/970/</td>
+      <td>33977280</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>972 </th>
-      <td>           PL</td>
-      <td> 262</td>
-      <td> 2FA850</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  221</td>
-      <td> 3</td>
-      <td>  972</td>
+      <th>972</th>
+      <td>PL</td>
+      <td>262</td>
+      <td>2FA850</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>221</td>
+      <td>3</td>
+      <td>972</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  315</td>
-      <td>                                    Prelimbic area</td>
-      <td>  222</td>
+      <td>1</td>
+      <td>315</td>
+      <td>Prelimbic area</td>
+      <td>222</td>
       <td>NaN</td>
-      <td>           /997/8/567/688/695/315/972/</td>
-      <td> 1936208719</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/972/</td>
+      <td>1936208719</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>463 </th>
-      <td>          CA3</td>
-      <td>  57</td>
-      <td> 7ED04B</td>
-      <td> 8</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  428</td>
-      <td> 3</td>
-      <td>  463</td>
+      <th>463</th>
+      <td>CA3</td>
+      <td>57</td>
+      <td>7ED04B</td>
+      <td>8</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>428</td>
+      <td>3</td>
+      <td>463</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  375</td>
-      <td>                                         Field CA3</td>
-      <td>  429</td>
+      <td>1</td>
+      <td>375</td>
+      <td>Field CA3</td>
+      <td>429</td>
       <td>NaN</td>
-      <td> /997/8/567/688/695/1089/1080/375/463/</td>
-      <td> 3396545448</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/1089/1080/375/463/</td>
+      <td>3396545448</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>612 </th>
-      <td>          NLL</td>
-      <td> 217</td>
-      <td> FFAE6F</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  804</td>
-      <td> 3</td>
-      <td>  612</td>
+      <th>612</th>
+      <td>NLL</td>
+      <td>217</td>
+      <td>FFAE6F</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>804</td>
+      <td>3</td>
+      <td>612</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1132</td>
-      <td>                  Nucleus of the lateral lemniscus</td>
-      <td>  805</td>
+      <td>1</td>
+      <td>1132</td>
+      <td>Nucleus of the lateral lemniscus</td>
+      <td>805</td>
       <td>NaN</td>
-      <td>         /997/8/343/1065/771/1132/612/</td>
-      <td> 3619563008</td>
-      <td> 8690</td>
+      <td>/997/8/343/1065/771/1132/612/</td>
+      <td>3619563008</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>978 </th>
-      <td>        PGRNl</td>
-      <td> 829</td>
-      <td> FFB3D9</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  905</td>
-      <td> 3</td>
-      <td>  978</td>
+      <th>978</th>
+      <td>PGRNl</td>
+      <td>829</td>
+      <td>FFB3D9</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>905</td>
+      <td>3</td>
+      <td>978</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  938</td>
-      <td> Paragigantocellular reticular nucleus lateral ...</td>
-      <td>  906</td>
+      <td>1</td>
+      <td>938</td>
+      <td>Paragigantocellular reticular nucleus lateral ...</td>
+      <td>906</td>
       <td>NaN</td>
-      <td>      /997/8/343/1065/354/370/938/978/</td>
-      <td> 3947319470</td>
-      <td> 8690</td>
+      <td>/997/8/343/1065/354/370/938/978/</td>
+      <td>3947319470</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>980 </th>
-      <td>          PMd</td>
-      <td> 263</td>
-      <td> FF4C3E</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  715</td>
-      <td> 3</td>
-      <td>  980</td>
+      <th>980</th>
+      <td>PMd</td>
+      <td>263</td>
+      <td>FF4C3E</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>715</td>
+      <td>3</td>
+      <td>980</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  467</td>
-      <td>                      Dorsal premammillary nucleus</td>
-      <td>  716</td>
+      <td>1</td>
+      <td>467</td>
+      <td>Dorsal premammillary nucleus</td>
+      <td>716</td>
       <td>NaN</td>
-      <td>         /997/8/343/1129/1097/467/980/</td>
-      <td>  282623527</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/1097/467/980/</td>
+      <td>282623527</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>982 </th>
-      <td>           FC</td>
-      <td> 122</td>
-      <td> 7ED04B</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  451</td>
-      <td> 3</td>
-      <td>  982</td>
+      <th>982</th>
+      <td>FC</td>
+      <td>122</td>
+      <td>7ED04B</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>451</td>
+      <td>3</td>
+      <td>982</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1080</td>
-      <td>                                  Fasciola cinerea</td>
-      <td>  452</td>
-      <td>  8</td>
-      <td>     /997/8/567/688/695/1089/1080/982/</td>
-      <td> 2329016707</td>
-      <td> 8690</td>
+      <td>1</td>
+      <td>1080</td>
+      <td>Fasciola cinerea</td>
+      <td>452</td>
+      <td>8</td>
+      <td>/997/8/567/688/695/1089/1080/982/</td>
+      <td>2329016707</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>985 </th>
-      <td>          MOp</td>
-      <td> 830</td>
-      <td> 1F9D5A</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>   15</td>
-      <td> 3</td>
-      <td>  985</td>
+      <th>985</th>
+      <td>MOp</td>
+      <td>830</td>
+      <td>1F9D5A</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>15</td>
+      <td>3</td>
+      <td>985</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  500</td>
-      <td>                                Primary motor area</td>
-      <td>   16</td>
+      <td>1</td>
+      <td>500</td>
+      <td>Primary motor area</td>
+      <td>16</td>
       <td>NaN</td>
-      <td>       /997/8/567/688/695/315/500/985/</td>
-      <td> 1852742012</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/500/985/</td>
+      <td>1852742012</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>475 </th>
-      <td>           MG</td>
-      <td> 200</td>
-      <td> FF8084</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  606</td>
-      <td> 3</td>
-      <td>  475</td>
+      <th>475</th>
+      <td>MG</td>
+      <td>200</td>
+      <td>FF8084</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>606</td>
+      <td>3</td>
+      <td>475</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1008</td>
-      <td>                         Medial geniculate complex</td>
-      <td>  607</td>
+      <td>1</td>
+      <td>1008</td>
+      <td>Medial geniculate complex</td>
+      <td>607</td>
       <td>NaN</td>
-      <td>     /997/8/343/1129/549/864/1008/475/</td>
-      <td> 3303425611</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/549/864/1008/475/</td>
+      <td>3303425611</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>135 </th>
-      <td>          AMB</td>
-      <td>  16</td>
-      <td> FFB3D9</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  883</td>
-      <td> 3</td>
-      <td>  135</td>
+      <th>135</th>
+      <td>AMB</td>
+      <td>16</td>
+      <td>FFB3D9</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>883</td>
+      <td>3</td>
+      <td>135</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  370</td>
-      <td>                                  Nucleus ambiguus</td>
-      <td>  884</td>
+      <td>1</td>
+      <td>370</td>
+      <td>Nucleus ambiguus</td>
+      <td>884</td>
       <td>NaN</td>
-      <td>          /997/8/343/1065/354/370/135/</td>
-      <td> 1540571580</td>
-      <td> 8690</td>
+      <td>/997/8/343/1065/354/370/135/</td>
+      <td>1540571580</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>989 </th>
-      <td>           FN</td>
-      <td> 123</td>
-      <td> FFFDBC</td>
-      <td> 4</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td> 1010</td>
-      <td> 3</td>
-      <td>  989</td>
+      <th>989</th>
+      <td>FN</td>
+      <td>123</td>
+      <td>FFFDBC</td>
+      <td>4</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>1010</td>
+      <td>3</td>
+      <td>989</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  519</td>
-      <td>                                 Fastigial nucleus</td>
-      <td> 1011</td>
+      <td>1</td>
+      <td>519</td>
+      <td>Fastigial nucleus</td>
+      <td>1011</td>
       <td>NaN</td>
-      <td>                   /997/8/512/519/989/</td>
-      <td>  960199658</td>
-      <td> 8690</td>
+      <td>/997/8/512/519/989/</td>
+      <td>960199658</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>993 </th>
-      <td>          MOs</td>
-      <td> 831</td>
-      <td> 1F9D5A</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>   21</td>
-      <td> 3</td>
-      <td>  993</td>
+      <th>993</th>
+      <td>MOs</td>
+      <td>831</td>
+      <td>1F9D5A</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>21</td>
+      <td>3</td>
+      <td>993</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  500</td>
-      <td>                              Secondary motor area</td>
-      <td>   22</td>
+      <td>1</td>
+      <td>500</td>
+      <td>Secondary motor area</td>
+      <td>22</td>
       <td>NaN</td>
-      <td>       /997/8/567/688/695/315/500/993/</td>
-      <td> 1043755260</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/500/993/</td>
+      <td>1043755260</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1107</th>
-      <td>        MDRNv</td>
-      <td> 845</td>
-      <td> FFB3D9</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  900</td>
-      <td> 3</td>
-      <td> 1107</td>
+      <td>MDRNv</td>
+      <td>845</td>
+      <td>FFB3D9</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>900</td>
+      <td>3</td>
+      <td>1107</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  395</td>
-      <td>          Medullary reticular nucleus ventral part</td>
-      <td>  901</td>
+      <td>1</td>
+      <td>395</td>
+      <td>Medullary reticular nucleus ventral part</td>
+      <td>901</td>
       <td>NaN</td>
-      <td>     /997/8/343/1065/354/370/395/1107/</td>
-      <td> 4055979044</td>
-      <td> 8690</td>
+      <td>/997/8/343/1065/354/370/395/1107/</td>
+      <td>4055979044</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>483 </th>
-      <td>           MH</td>
-      <td> 201</td>
-      <td> FF909F</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  652</td>
-      <td> 3</td>
-      <td>  483</td>
+      <th>483</th>
+      <td>MH</td>
+      <td>201</td>
+      <td>FF909F</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>652</td>
+      <td>3</td>
+      <td>483</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  958</td>
-      <td>                                   Medial habenula</td>
-      <td>  653</td>
+      <td>1</td>
+      <td>958</td>
+      <td>Medial habenula</td>
+      <td>653</td>
       <td>NaN</td>
-      <td>      /997/8/343/1129/549/856/958/483/</td>
-      <td>  176609275</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/549/856/958/483/</td>
+      <td>176609275</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>422 </th>
-      <td>         SPFp</td>
-      <td> 335</td>
-      <td> FF8084</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  602</td>
-      <td> 3</td>
-      <td>  422</td>
+      <th>422</th>
+      <td>SPFp</td>
+      <td>335</td>
+      <td>FF8084</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>602</td>
+      <td>3</td>
+      <td>422</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  406</td>
-      <td>      Subparafascicular nucleus parvicellular part</td>
-      <td>  603</td>
+      <td>1</td>
+      <td>406</td>
+      <td>Subparafascicular nucleus parvicellular part</td>
+      <td>603</td>
       <td>NaN</td>
-      <td>      /997/8/343/1129/549/864/406/422/</td>
-      <td> 1800790730</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/549/864/406/422/</td>
+      <td>1800790730</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>998 </th>
-      <td>           FS</td>
-      <td> 124</td>
-      <td> 80CDF8</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  526</td>
-      <td> 3</td>
-      <td>  998</td>
+      <th>998</th>
+      <td>FS</td>
+      <td>124</td>
+      <td>80CDF8</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>526</td>
+      <td>3</td>
+      <td>998</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  493</td>
-      <td>                                Fundus of striatum</td>
-      <td>  527</td>
+      <td>1</td>
+      <td>493</td>
+      <td>Fundus of striatum</td>
+      <td>527</td>
       <td>NaN</td>
-      <td>           /997/8/567/623/477/493/998/</td>
-      <td>  663741194</td>
-      <td> 8690</td>
+      <td>/997/8/567/623/477/493/998/</td>
+      <td>663741194</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1002</th>
-      <td>         AUDp</td>
-      <td> 832</td>
-      <td> 019399</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  119</td>
-      <td> 3</td>
-      <td> 1002</td>
+      <td>AUDp</td>
+      <td>832</td>
+      <td>019399</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>119</td>
+      <td>3</td>
+      <td>1002</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  247</td>
-      <td>                             Primary auditory area</td>
-      <td>  120</td>
+      <td>1</td>
+      <td>247</td>
+      <td>Primary auditory area</td>
+      <td>120</td>
       <td>NaN</td>
-      <td>      /997/8/567/688/695/315/247/1002/</td>
-      <td>  760301534</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/247/1002/</td>
+      <td>760301534</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>491 </th>
-      <td>           MM</td>
-      <td> 202</td>
-      <td> FF4C3E</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  703</td>
-      <td> 3</td>
-      <td>  491</td>
+      <th>491</th>
+      <td>MM</td>
+      <td>202</td>
+      <td>FF4C3E</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>703</td>
+      <td>3</td>
+      <td>491</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  331</td>
-      <td>                         Medial mammillary nucleus</td>
-      <td>  704</td>
+      <td>1</td>
+      <td>331</td>
+      <td>Medial mammillary nucleus</td>
+      <td>704</td>
       <td>NaN</td>
-      <td>     /997/8/343/1129/1097/467/331/491/</td>
-      <td>  338961468</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/1097/467/331/491/</td>
+      <td>338961468</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1004</th>
-      <td>          PMv</td>
-      <td> 266</td>
-      <td> FF4C3E</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  716</td>
-      <td> 3</td>
-      <td> 1004</td>
+      <td>PMv</td>
+      <td>266</td>
+      <td>FF4C3E</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>716</td>
+      <td>3</td>
+      <td>1004</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  467</td>
-      <td>                     Ventral premammillary nucleus</td>
-      <td>  717</td>
+      <td>1</td>
+      <td>467</td>
+      <td>Ventral premammillary nucleus</td>
+      <td>717</td>
       <td>NaN</td>
-      <td>        /997/8/343/1129/1097/467/1004/</td>
-      <td>  959948768</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/1097/467/1004/</td>
+      <td>959948768</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>177 </th>
-      <td>           NR</td>
-      <td> 446</td>
-      <td> FFB3D9</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  908</td>
-      <td> 3</td>
-      <td>  177</td>
+      <th>177</th>
+      <td>NR</td>
+      <td>446</td>
+      <td>FFB3D9</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>908</td>
+      <td>3</td>
+      <td>177</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  154</td>
-      <td>                                 Nucleus of Roller</td>
-      <td>  909</td>
+      <td>1</td>
+      <td>154</td>
+      <td>Nucleus of Roller</td>
+      <td>909</td>
       <td>NaN</td>
-      <td>      /997/8/343/1065/354/370/154/177/</td>
-      <td> 2483747197</td>
-      <td> 8690</td>
+      <td>/997/8/343/1065/354/370/154/177/</td>
+      <td>2483747197</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>173 </th>
-      <td>          RCH</td>
-      <td> 304</td>
-      <td> F2483B</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  733</td>
-      <td> 3</td>
-      <td>  173</td>
+      <th>173</th>
+      <td>RCH</td>
+      <td>304</td>
+      <td>F2483B</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>733</td>
+      <td>3</td>
+      <td>173</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  290</td>
-      <td>                              Retrochiasmatic area</td>
-      <td>  734</td>
+      <td>1</td>
+      <td>290</td>
+      <td>Retrochiasmatic area</td>
+      <td>734</td>
       <td>NaN</td>
-      <td>         /997/8/343/1129/1097/290/173/</td>
-      <td> 3507634346</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/1097/290/173/</td>
+      <td>3507634346</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1009</th>
-      <td> fiber tracts</td>
-      <td> 691</td>
-      <td> CCCCCC</td>
-      <td> 1</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td> 1013</td>
-      <td> 3</td>
-      <td> 1009</td>
+      <td>fiber tracts</td>
+      <td>691</td>
+      <td>CCCCCC</td>
+      <td>1</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>1013</td>
+      <td>3</td>
+      <td>1009</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  997</td>
-      <td>                                      fiber tracts</td>
-      <td> 1014</td>
+      <td>1</td>
+      <td>997</td>
+      <td>fiber tracts</td>
+      <td>1014</td>
       <td>NaN</td>
-      <td>                            /997/1009/</td>
-      <td>  771268094</td>
-      <td> 8690</td>
+      <td>/997/1009/</td>
+      <td>771268094</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1011</th>
-      <td>         AUDd</td>
-      <td> 833</td>
-      <td> 019399</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  112</td>
-      <td> 3</td>
-      <td> 1011</td>
+      <td>AUDd</td>
+      <td>833</td>
+      <td>019399</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>112</td>
+      <td>3</td>
+      <td>1011</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  247</td>
-      <td>                              Dorsal auditory area</td>
-      <td>  113</td>
+      <td>1</td>
+      <td>247</td>
+      <td>Dorsal auditory area</td>
+      <td>113</td>
       <td>NaN</td>
-      <td>      /997/8/567/688/695/315/247/1011/</td>
-      <td> 2633724239</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/247/1011/</td>
+      <td>2633724239</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>502 </th>
-      <td>          SUB</td>
-      <td> 345</td>
-      <td> 4FC244</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  496</td>
-      <td> 3</td>
-      <td>  502</td>
+      <th>502</th>
+      <td>SUB</td>
+      <td>345</td>
+      <td>4FC244</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>496</td>
+      <td>3</td>
+      <td>502</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  822</td>
-      <td>                                         Subiculum</td>
-      <td>  497</td>
+      <td>1</td>
+      <td>822</td>
+      <td>Subiculum</td>
+      <td>497</td>
       <td>NaN</td>
-      <td>      /997/8/567/688/695/1089/822/502/</td>
-      <td> 3628141206</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/1089/822/502/</td>
+      <td>3628141206</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1017</th>
-      <td>           AN</td>
-      <td> 409</td>
-      <td> FFFC91</td>
-      <td> 5</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  981</td>
-      <td> 3</td>
-      <td> 1017</td>
+      <td>AN</td>
+      <td>409</td>
+      <td>FFFC91</td>
+      <td>5</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>981</td>
+      <td>3</td>
+      <td>1017</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td> 1073</td>
-      <td>                                   Ansiform lobule</td>
-      <td>  982</td>
+      <td>1</td>
+      <td>1073</td>
+      <td>Ansiform lobule</td>
+      <td>982</td>
       <td>NaN</td>
-      <td>             /997/8/512/528/1073/1017/</td>
-      <td> 3221901529</td>
-      <td> 8690</td>
+      <td>/997/8/512/528/1073/1017/</td>
+      <td>3221901529</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1018</th>
-      <td>         AUDv</td>
-      <td> 834</td>
-      <td> 019399</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  133</td>
-      <td> 3</td>
-      <td> 1018</td>
+      <td>AUDv</td>
+      <td>834</td>
+      <td>019399</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>133</td>
+      <td>3</td>
+      <td>1018</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  247</td>
-      <td>                             Ventral auditory area</td>
-      <td>  134</td>
+      <td>1</td>
+      <td>247</td>
+      <td>Ventral auditory area</td>
+      <td>134</td>
       <td>NaN</td>
-      <td>      /997/8/567/688/695/315/247/1018/</td>
-      <td> 3132221761</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/315/247/1018/</td>
+      <td>3132221761</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>507 </th>
-      <td>          MOB</td>
-      <td> 204</td>
-      <td> 9AD2BD</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  341</td>
-      <td> 3</td>
-      <td>  507</td>
+      <th>507</th>
+      <td>MOB</td>
+      <td>204</td>
+      <td>9AD2BD</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>341</td>
+      <td>3</td>
+      <td>507</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  698</td>
-      <td>                               Main olfactory bulb</td>
-      <td>  342</td>
+      <td>1</td>
+      <td>698</td>
+      <td>Main olfactory bulb</td>
+      <td>342</td>
       <td>NaN</td>
-      <td>           /997/8/567/688/695/698/507/</td>
-      <td> 2457606556</td>
-      <td> 8690</td>
+      <td>/997/8/567/688/695/698/507/</td>
+      <td>2457606556</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1020</th>
-      <td>           PO</td>
-      <td> 268</td>
-      <td> FF909F</td>
-      <td> 7</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  614</td>
-      <td> 3</td>
-      <td> 1020</td>
+      <td>PO</td>
+      <td>268</td>
+      <td>FF909F</td>
+      <td>7</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>614</td>
+      <td>3</td>
+      <td>1020</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  138</td>
-      <td>                 Posterior complex of the thalamus</td>
-      <td>  615</td>
+      <td>1</td>
+      <td>138</td>
+      <td>Posterior complex of the thalamus</td>
+      <td>615</td>
       <td>NaN</td>
-      <td>     /997/8/343/1129/549/856/138/1020/</td>
-      <td> 2102251263</td>
-      <td> 8690</td>
+      <td>/997/8/343/1129/549/856/138/1020/</td>
+      <td>2102251263</td>
+      <td>8690</td>
     </tr>
     <tr>
       <th>1022</th>
-      <td>          GPe</td>
-      <td> 127</td>
-      <td> 8599CC</td>
-      <td> 6</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  559</td>
-      <td> 3</td>
-      <td> 1022</td>
+      <td>GPe</td>
+      <td>127</td>
+      <td>8599CC</td>
+      <td>6</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>559</td>
+      <td>3</td>
+      <td>1022</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  818</td>
-      <td>                  Globus pallidus external segment</td>
-      <td>  560</td>
+      <td>1</td>
+      <td>818</td>
+      <td>Globus pallidus external segment</td>
+      <td>560</td>
       <td>NaN</td>
-      <td>          /997/8/567/623/803/818/1022/</td>
-      <td> 3096725950</td>
-      <td> 8690</td>
+      <td>/997/8/567/623/803/818/1022/</td>
+      <td>3096725950</td>
+      <td>8690</td>
     </tr>
     <tr>
-      <th>975 </th>
-      <td>           EW</td>
-      <td> 121</td>
-      <td> FF90FF</td>
-      <td> 5</td>
-      <td> False</td>
-      <td> 734881840</td>
-      <td> 1</td>
-      <td>  784</td>
-      <td> 3</td>
-      <td>  975</td>
+      <th>975</th>
+      <td>EW</td>
+      <td>121</td>
+      <td>FF90FF</td>
+      <td>5</td>
+      <td>False</td>
+      <td>734881840</td>
+      <td>1</td>
+      <td>784</td>
+      <td>3</td>
+      <td>975</td>
       <td>...</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td> 1</td>
-      <td>  323</td>
-      <td>                          Edinger-Westphal nucleus</td>
-      <td>  785</td>
+      <td>1</td>
+      <td>323</td>
+      <td>Edinger-Westphal nucleus</td>
+      <td>785</td>
       <td>NaN</td>
-      <td>               /997/8/343/313/323/975/</td>
-      <td> 3165212518</td>
-      <td> 8690</td>
+      <td>/997/8/343/313/323/975/</td>
+      <td>3165212518</td>
+      <td>8690</td>
     </tr>
   </tbody>
 </table>
@@ -1939,7 +1942,7 @@ Name: 122642490, dtype: object</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[44]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># fetch the experiments that have injections in the isocortex of cre-positive mice</span>
@@ -1988,7 +1991,7 @@ Name: 122642490, dtype: object</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[45]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># find wild-type injections into primary visual area</span>
@@ -2027,7 +2030,7 @@ Name: 122642490, dtype: object</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[46]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">structure_unionizes</span>
@@ -2041,10 +2044,10 @@ Name: 122642490, dtype: object</pre>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[46]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[6]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<div>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -2072,664 +2075,664 @@ Name: 122642490, dtype: object</pre>
   </thead>
   <tbody>
     <tr>
-      <th>0    </th>
-      <td> 3</td>
-      <td> 466802104</td>
-      <td> False</td>
-      <td> 1.000000</td>
-      <td> 10140</td>
-      <td> 1490</td>
-      <td>  7680</td>
-      <td> 0.045834</td>
-      <td> 0.067916</td>
-      <td>  120.268000</td>
-      <td> 1770.830</td>
-      <td> 3.666620e-02</td>
-      <td> 180296424</td>
-      <td>       442</td>
-      <td> 1.353400e+11</td>
-      <td>  440712000</td>
-      <td> 5.300370e+10</td>
-      <td> 2.993160e+07</td>
-      <td> 0.539872</td>
+      <th>0</th>
+      <td>3</td>
+      <td>466802104</td>
+      <td>False</td>
+      <td>1.000000</td>
+      <td>10140</td>
+      <td>1490</td>
+      <td>7680</td>
+      <td>4.583400e-02</td>
+      <td>0.067916</td>
+      <td>120.268000</td>
+      <td>1770.830</td>
+      <td>3.666620e-02</td>
+      <td>180296424</td>
+      <td>442</td>
+      <td>1.353400e+11</td>
+      <td>440712000</td>
+      <td>5.300370e+10</td>
+      <td>2.993160e+07</td>
+      <td>0.539872</td>
     </tr>
     <tr>
-      <th>1    </th>
-      <td> 3</td>
-      <td> 466802595</td>
-      <td> False</td>
-      <td> 0.361521</td>
-      <td>  4800</td>
-      <td> 2840</td>
-      <td>  8160</td>
-      <td> 0.000149</td>
-      <td> 0.000087</td>
-      <td>    0.031525</td>
-      <td>  361.665</td>
-      <td> 1.192570e-04</td>
-      <td> 180296424</td>
-      <td>      1102</td>
-      <td> 2.371280e+11</td>
-      <td> 1116870000</td>
-      <td> 3.520900e+07</td>
-      <td> 9.735250e+04</td>
-      <td> 1.368160</td>
+      <th>1</th>
+      <td>3</td>
+      <td>466802595</td>
+      <td>False</td>
+      <td>0.361521</td>
+      <td>4800</td>
+      <td>2840</td>
+      <td>8160</td>
+      <td>1.490750e-04</td>
+      <td>0.000087</td>
+      <td>0.031525</td>
+      <td>361.665</td>
+      <td>1.192570e-04</td>
+      <td>180296424</td>
+      <td>1102</td>
+      <td>2.371280e+11</td>
+      <td>1116870000</td>
+      <td>3.520900e+07</td>
+      <td>9.735250e+04</td>
+      <td>1.368160</td>
     </tr>
     <tr>
-      <th>2    </th>
-      <td> 3</td>
-      <td> 466802641</td>
-      <td> False</td>
-      <td> 0.998660</td>
-      <td>  8120</td>
-      <td> 1830</td>
-      <td>  8920</td>
-      <td> 0.008150</td>
-      <td> 0.138228</td>
-      <td>  157.277000</td>
-      <td> 1137.810</td>
-      <td> 6.519820e-03</td>
-      <td> 180296424</td>
-      <td> 312782624</td>
-      <td> 1.556250e+10</td>
-      <td>   38503800</td>
-      <td> 6.055750e+09</td>
-      <td> 5.322300e+06</td>
-      <td> 0.047167</td>
+      <th>2</th>
+      <td>3</td>
+      <td>466802641</td>
+      <td>False</td>
+      <td>0.998660</td>
+      <td>8120</td>
+      <td>1830</td>
+      <td>8920</td>
+      <td>8.150000e-03</td>
+      <td>0.138228</td>
+      <td>157.277000</td>
+      <td>1137.810</td>
+      <td>6.519820e-03</td>
+      <td>180296424</td>
+      <td>312782624</td>
+      <td>1.556250e+10</td>
+      <td>38503800</td>
+      <td>6.055750e+09</td>
+      <td>5.322300e+06</td>
+      <td>0.047167</td>
     </tr>
     <tr>
-      <th>3    </th>
-      <td> 2</td>
-      <td> 466801549</td>
-      <td> False</td>
-      <td> 0.517563</td>
-      <td>  6530</td>
-      <td> 4610</td>
-      <td>  9600</td>
-      <td> 0.000213</td>
-      <td> 0.007225</td>
-      <td>    3.065770</td>
-      <td>  424.333</td>
-      <td> 1.703020e-04</td>
-      <td> 180296424</td>
-      <td>       849</td>
-      <td> 2.487860e+09</td>
-      <td>   19242000</td>
-      <td> 5.899160e+07</td>
-      <td> 1.390220e+05</td>
-      <td> 0.023571</td>
+      <th>3</th>
+      <td>2</td>
+      <td>466801549</td>
+      <td>False</td>
+      <td>0.517563</td>
+      <td>6530</td>
+      <td>4610</td>
+      <td>9600</td>
+      <td>2.128840e-04</td>
+      <td>0.007225</td>
+      <td>3.065770</td>
+      <td>424.333</td>
+      <td>1.703020e-04</td>
+      <td>180296424</td>
+      <td>849</td>
+      <td>2.487860e+09</td>
+      <td>19242000</td>
+      <td>5.899160e+07</td>
+      <td>1.390220e+05</td>
+      <td>0.023571</td>
     </tr>
     <tr>
-      <th>4    </th>
-      <td> 3</td>
-      <td> 466802487</td>
-      <td> False</td>
-      <td> 0.178821</td>
-      <td>  4740</td>
-      <td> 2960</td>
-      <td>  9310</td>
-      <td> 0.000006</td>
-      <td> 0.000005</td>
-      <td>    0.002624</td>
-      <td>  498.282</td>
-      <td> 5.168790e-06</td>
-      <td> 180296424</td>
-      <td>       950</td>
-      <td> 2.640480e+11</td>
-      <td>  801248000</td>
-      <td> 2.102460e+06</td>
-      <td> 4.219420e+03</td>
-      <td> 0.981529</td>
+      <th>4</th>
+      <td>3</td>
+      <td>466802487</td>
+      <td>False</td>
+      <td>0.178821</td>
+      <td>4740</td>
+      <td>2960</td>
+      <td>9310</td>
+      <td>6.461160e-06</td>
+      <td>0.000005</td>
+      <td>0.002624</td>
+      <td>498.282</td>
+      <td>5.168790e-06</td>
+      <td>180296424</td>
+      <td>950</td>
+      <td>2.640480e+11</td>
+      <td>801248000</td>
+      <td>2.102460e+06</td>
+      <td>4.219420e+03</td>
+      <td>0.981529</td>
     </tr>
     <tr>
-      <th>5    </th>
-      <td> 1</td>
-      <td> 466800731</td>
-      <td> False</td>
-      <td> 0.714281</td>
-      <td>  8310</td>
-      <td>  820</td>
-      <td>  4380</td>
-      <td> 0.004481</td>
-      <td> 0.016841</td>
-      <td>    9.103330</td>
-      <td>  540.531</td>
-      <td> 3.585070e-03</td>
-      <td> 180296424</td>
-      <td>       774</td>
-      <td> 3.999920e+10</td>
-      <td>  173773000</td>
-      <td> 1.581910e+09</td>
-      <td> 2.926590e+06</td>
-      <td> 0.212872</td>
+      <th>5</th>
+      <td>1</td>
+      <td>466800731</td>
+      <td>False</td>
+      <td>0.714281</td>
+      <td>8310</td>
+      <td>820</td>
+      <td>4380</td>
+      <td>4.481460e-03</td>
+      <td>0.016841</td>
+      <td>9.103330</td>
+      <td>540.531</td>
+      <td>3.585070e-03</td>
+      <td>180296424</td>
+      <td>774</td>
+      <td>3.999920e+10</td>
+      <td>173773000</td>
+      <td>1.581910e+09</td>
+      <td>2.926590e+06</td>
+      <td>0.212872</td>
     </tr>
     <tr>
-      <th>6    </th>
-      <td> 1</td>
-      <td> 466800580</td>
-      <td> False</td>
-      <td> 0.635501</td>
-      <td>  8120</td>
-      <td>  690</td>
-      <td>  4100</td>
-      <td> 0.009341</td>
-      <td> 0.051480</td>
-      <td>   33.828600</td>
-      <td>  657.116</td>
-      <td> 7.472350e-03</td>
-      <td> 180296424</td>
-      <td>       565</td>
-      <td> 3.452200e+10</td>
-      <td>  118490000</td>
-      <td> 4.008330e+09</td>
-      <td> 6.099880e+06</td>
-      <td> 0.145150</td>
+      <th>6</th>
+      <td>1</td>
+      <td>466800580</td>
+      <td>False</td>
+      <td>0.635501</td>
+      <td>8120</td>
+      <td>690</td>
+      <td>4100</td>
+      <td>9.340700e-03</td>
+      <td>0.051480</td>
+      <td>33.828600</td>
+      <td>657.116</td>
+      <td>7.472350e-03</td>
+      <td>180296424</td>
+      <td>565</td>
+      <td>3.452200e+10</td>
+      <td>118490000</td>
+      <td>4.008330e+09</td>
+      <td>6.099880e+06</td>
+      <td>0.145150</td>
     </tr>
     <tr>
-      <th>7    </th>
-      <td> 1</td>
-      <td> 466800912</td>
-      <td> False</td>
-      <td> 0.700408</td>
-      <td>  4340</td>
-      <td> 2120</td>
-      <td>  5200</td>
-      <td> 0.000733</td>
-      <td> 0.001560</td>
-      <td>    0.734970</td>
-      <td>  471.269</td>
-      <td> 5.865830e-04</td>
-      <td> 180296424</td>
-      <td>      1015</td>
-      <td> 7.725300e+10</td>
-      <td>  307039000</td>
-      <td> 2.256640e+08</td>
-      <td> 4.788430e+05</td>
-      <td> 0.376122</td>
+      <th>7</th>
+      <td>1</td>
+      <td>466800912</td>
+      <td>False</td>
+      <td>0.700408</td>
+      <td>4340</td>
+      <td>2120</td>
+      <td>5200</td>
+      <td>7.332490e-04</td>
+      <td>0.001560</td>
+      <td>0.734970</td>
+      <td>471.269</td>
+      <td>5.865830e-04</td>
+      <td>180296424</td>
+      <td>1015</td>
+      <td>7.725300e+10</td>
+      <td>307039000</td>
+      <td>2.256640e+08</td>
+      <td>4.788430e+05</td>
+      <td>0.376122</td>
     </tr>
     <tr>
-      <th>8    </th>
-      <td> 1</td>
-      <td> 466800945</td>
-      <td> False</td>
-      <td> 0.417395</td>
-      <td>  7870</td>
-      <td> 1950</td>
-      <td>  2390</td>
-      <td> 0.000714</td>
-      <td> 0.004476</td>
-      <td>    1.719120</td>
-      <td>  384.104</td>
-      <td> 5.713050e-04</td>
-      <td> 180296424</td>
-      <td>      1062</td>
-      <td> 1.379890e+10</td>
-      <td>  104202000</td>
-      <td> 1.791350e+08</td>
-      <td> 4.663720e+05</td>
-      <td> 0.127647</td>
+      <th>8</th>
+      <td>1</td>
+      <td>466800945</td>
+      <td>False</td>
+      <td>0.417395</td>
+      <td>7870</td>
+      <td>1950</td>
+      <td>2390</td>
+      <td>7.141510e-04</td>
+      <td>0.004476</td>
+      <td>1.719120</td>
+      <td>384.104</td>
+      <td>5.713050e-04</td>
+      <td>180296424</td>
+      <td>1062</td>
+      <td>1.379890e+10</td>
+      <td>104202000</td>
+      <td>1.791350e+08</td>
+      <td>4.663720e+05</td>
+      <td>0.127647</td>
     </tr>
     <tr>
-      <th>9    </th>
-      <td> 2</td>
-      <td> 466801357</td>
-      <td> False</td>
-      <td> 1.000000</td>
-      <td>  9830</td>
-      <td> 1760</td>
-      <td>  9280</td>
-      <td> 0.209088</td>
-      <td> 0.106538</td>
-      <td>  135.337000</td>
-      <td> 1270.320</td>
-      <td> 1.672660e-01</td>
-      <td> 180296424</td>
-      <td>       541</td>
-      <td> 4.517480e+11</td>
-      <td> 1281640000</td>
-      <td> 1.734540e+11</td>
-      <td> 1.365440e+08</td>
-      <td> 1.570010</td>
+      <th>9</th>
+      <td>2</td>
+      <td>466801357</td>
+      <td>False</td>
+      <td>1.000000</td>
+      <td>9830</td>
+      <td>1760</td>
+      <td>9280</td>
+      <td>2.090880e-01</td>
+      <td>0.106538</td>
+      <td>135.337000</td>
+      <td>1270.320</td>
+      <td>1.672660e-01</td>
+      <td>180296424</td>
+      <td>541</td>
+      <td>4.517480e+11</td>
+      <td>1281640000</td>
+      <td>1.734540e+11</td>
+      <td>1.365440e+08</td>
+      <td>1.570010</td>
     </tr>
     <tr>
-      <th>10   </th>
-      <td> 2</td>
-      <td> 466801525</td>
-      <td> False</td>
-      <td> 0.785237</td>
-      <td>  8520</td>
-      <td> 2910</td>
-      <td> 10440</td>
-      <td> 0.006212</td>
-      <td> 0.034698</td>
-      <td>   23.092000</td>
-      <td>  665.518</td>
-      <td> 4.969230e-03</td>
-      <td> 180296424</td>
-      <td>       816</td>
-      <td> 3.698490e+10</td>
-      <td>  116910000</td>
-      <td> 2.699680e+09</td>
-      <td> 4.056520e+06</td>
-      <td> 0.143215</td>
+      <th>10</th>
+      <td>2</td>
+      <td>466801525</td>
+      <td>False</td>
+      <td>0.785237</td>
+      <td>8520</td>
+      <td>2910</td>
+      <td>10440</td>
+      <td>6.211720e-03</td>
+      <td>0.034698</td>
+      <td>23.092000</td>
+      <td>665.518</td>
+      <td>4.969230e-03</td>
+      <td>180296424</td>
+      <td>816</td>
+      <td>3.698490e+10</td>
+      <td>116910000</td>
+      <td>2.699680e+09</td>
+      <td>4.056520e+06</td>
+      <td>0.143215</td>
     </tr>
     <tr>
-      <th>11   </th>
-      <td> 3</td>
-      <td> 466802568</td>
-      <td> False</td>
-      <td> 0.352882</td>
-      <td>  6290</td>
-      <td> 4150</td>
-      <td> 10030</td>
-      <td> 0.000148</td>
-      <td> 0.000221</td>
-      <td>    0.115465</td>
-      <td>  523.065</td>
-      <td> 1.181360e-04</td>
-      <td> 180296424</td>
-      <td>      1058</td>
-      <td> 1.030480e+11</td>
-      <td>  436867000</td>
-      <td> 5.044300e+07</td>
-      <td> 9.643740e+04</td>
-      <td> 0.535162</td>
+      <th>11</th>
+      <td>3</td>
+      <td>466802568</td>
+      <td>False</td>
+      <td>0.352882</td>
+      <td>6290</td>
+      <td>4150</td>
+      <td>10030</td>
+      <td>1.476740e-04</td>
+      <td>0.000221</td>
+      <td>0.115465</td>
+      <td>523.065</td>
+      <td>1.181360e-04</td>
+      <td>180296424</td>
+      <td>1058</td>
+      <td>1.030480e+11</td>
+      <td>436867000</td>
+      <td>5.044300e+07</td>
+      <td>9.643740e+04</td>
+      <td>0.535162</td>
     </tr>
     <tr>
-      <th>12   </th>
-      <td> 1</td>
-      <td> 466801006</td>
-      <td> False</td>
-      <td> 0.999915</td>
-      <td>  9700</td>
-      <td> 2100</td>
-      <td>  1680</td>
-      <td> 0.003824</td>
-      <td> 0.082374</td>
-      <td>   91.951400</td>
-      <td> 1116.270</td>
-      <td> 3.058820e-03</td>
-      <td> 180296424</td>
-      <td> 312782578</td>
-      <td> 7.417700e+09</td>
-      <td>   30312900</td>
-      <td> 2.787310e+09</td>
-      <td> 2.496990e+06</td>
-      <td> 0.037133</td>
+      <th>12</th>
+      <td>1</td>
+      <td>466801006</td>
+      <td>False</td>
+      <td>0.999915</td>
+      <td>9700</td>
+      <td>2100</td>
+      <td>1680</td>
+      <td>3.823630e-03</td>
+      <td>0.082374</td>
+      <td>91.951400</td>
+      <td>1116.270</td>
+      <td>3.058820e-03</td>
+      <td>180296424</td>
+      <td>312782578</td>
+      <td>7.417700e+09</td>
+      <td>30312900</td>
+      <td>2.787310e+09</td>
+      <td>2.496990e+06</td>
+      <td>0.037133</td>
     </tr>
     <tr>
-      <th>13   </th>
-      <td> 2</td>
-      <td> 466801459</td>
-      <td> False</td>
-      <td> 0.255427</td>
-      <td>  5860</td>
-      <td> 3090</td>
-      <td>  9440</td>
-      <td> 0.000039</td>
-      <td> 0.000065</td>
-      <td>    0.039638</td>
-      <td>  606.151</td>
-      <td> 3.151540e-05</td>
-      <td> 180296424</td>
-      <td>       702</td>
-      <td> 1.172000e+11</td>
-      <td>  393419000</td>
-      <td> 1.559440e+07</td>
-      <td> 2.572680e+04</td>
-      <td> 0.481938</td>
+      <th>13</th>
+      <td>2</td>
+      <td>466801459</td>
+      <td>False</td>
+      <td>0.255427</td>
+      <td>5860</td>
+      <td>3090</td>
+      <td>9440</td>
+      <td>3.939530e-05</td>
+      <td>0.000065</td>
+      <td>0.039638</td>
+      <td>606.151</td>
+      <td>3.151540e-05</td>
+      <td>180296424</td>
+      <td>702</td>
+      <td>1.172000e+11</td>
+      <td>393419000</td>
+      <td>1.559440e+07</td>
+      <td>2.572680e+04</td>
+      <td>0.481938</td>
     </tr>
     <tr>
-      <th>14   </th>
-      <td> 1</td>
-      <td> 466800936</td>
-      <td> False</td>
-      <td> 0.545816</td>
-      <td>  7720</td>
-      <td> 1510</td>
-      <td>  2050</td>
-      <td> 0.000626</td>
-      <td> 0.001123</td>
-      <td>    0.620849</td>
-      <td>  553.064</td>
-      <td> 5.005410e-04</td>
-      <td> 180296424</td>
-      <td>      1047</td>
-      <td> 1.030480e+11</td>
-      <td>  363993000</td>
-      <td> 2.259850e+08</td>
-      <td> 4.086050e+05</td>
-      <td> 0.445892</td>
+      <th>14</th>
+      <td>1</td>
+      <td>466800936</td>
+      <td>False</td>
+      <td>0.545816</td>
+      <td>7720</td>
+      <td>1510</td>
+      <td>2050</td>
+      <td>6.256940e-04</td>
+      <td>0.001123</td>
+      <td>0.620849</td>
+      <td>553.064</td>
+      <td>5.005410e-04</td>
+      <td>180296424</td>
+      <td>1047</td>
+      <td>1.030480e+11</td>
+      <td>363993000</td>
+      <td>2.259850e+08</td>
+      <td>4.086050e+05</td>
+      <td>0.445892</td>
     </tr>
     <tr>
-      <th>15   </th>
-      <td> 1</td>
-      <td> 466800462</td>
-      <td> False</td>
-      <td> 0.412181</td>
-      <td>  3840</td>
-      <td> 2750</td>
-      <td>  2130</td>
-      <td> 0.000165</td>
-      <td> 0.000036</td>
-      <td>    0.008584</td>
-      <td>  238.208</td>
-      <td> 1.317400e-04</td>
-      <td> 180296424</td>
-      <td>       345</td>
-      <td> 8.391130e+11</td>
-      <td> 2984430000</td>
-      <td> 2.561750e+07</td>
-      <td> 1.075430e+05</td>
-      <td> 3.655920</td>
+      <th>15</th>
+      <td>1</td>
+      <td>466800462</td>
+      <td>False</td>
+      <td>0.412181</td>
+      <td>3840</td>
+      <td>2750</td>
+      <td>2130</td>
+      <td>1.646790e-04</td>
+      <td>0.000036</td>
+      <td>0.008584</td>
+      <td>238.208</td>
+      <td>1.317400e-04</td>
+      <td>180296424</td>
+      <td>345</td>
+      <td>8.391130e+11</td>
+      <td>2984430000</td>
+      <td>2.561750e+07</td>
+      <td>1.075430e+05</td>
+      <td>3.655920</td>
     </tr>
     <tr>
-      <th>16   </th>
-      <td> 2</td>
-      <td> 466801389</td>
-      <td> False</td>
-      <td> 1.000000</td>
-      <td>  8130</td>
-      <td> 1770</td>
-      <td>  8950</td>
-      <td> 0.054765</td>
-      <td> 0.651217</td>
-      <td> 1497.320000</td>
-      <td> 2299.260</td>
-      <td> 4.381110e-02</td>
-      <td> 180296424</td>
-      <td>       601</td>
-      <td> 9.689360e+10</td>
-      <td>   54918900</td>
-      <td> 8.223110e+10</td>
-      <td> 3.576410e+07</td>
-      <td> 0.067276</td>
+      <th>16</th>
+      <td>2</td>
+      <td>466801389</td>
+      <td>False</td>
+      <td>1.000000</td>
+      <td>8130</td>
+      <td>1770</td>
+      <td>8950</td>
+      <td>5.476540e-02</td>
+      <td>0.651217</td>
+      <td>1497.320000</td>
+      <td>2299.260</td>
+      <td>4.381110e-02</td>
+      <td>180296424</td>
+      <td>601</td>
+      <td>9.689360e+10</td>
+      <td>54918900</td>
+      <td>8.223110e+10</td>
+      <td>3.576410e+07</td>
+      <td>0.067276</td>
     </tr>
     <tr>
-      <th>17   </th>
-      <td> 3</td>
-      <td> 466802355</td>
-      <td> False</td>
-      <td> 1.000000</td>
-      <td>  9120</td>
-      <td>  430</td>
-      <td>  7000</td>
-      <td> 0.060444</td>
-      <td> 0.251688</td>
-      <td>  588.038000</td>
-      <td> 2336.380</td>
-      <td> 4.835420e-02</td>
-      <td> 180296424</td>
-      <td>       805</td>
-      <td> 1.296370e+11</td>
-      <td>  156832000</td>
-      <td> 9.222330e+10</td>
-      <td> 3.947280e+07</td>
-      <td> 0.192119</td>
+      <th>17</th>
+      <td>3</td>
+      <td>466802355</td>
+      <td>False</td>
+      <td>1.000000</td>
+      <td>9120</td>
+      <td>430</td>
+      <td>7000</td>
+      <td>6.044440e-02</td>
+      <td>0.251688</td>
+      <td>588.038000</td>
+      <td>2336.380</td>
+      <td>4.835420e-02</td>
+      <td>180296424</td>
+      <td>805</td>
+      <td>1.296370e+11</td>
+      <td>156832000</td>
+      <td>9.222330e+10</td>
+      <td>3.947280e+07</td>
+      <td>0.192119</td>
     </tr>
     <tr>
-      <th>18   </th>
-      <td> 3</td>
-      <td> 466802448</td>
-      <td> False</td>
-      <td> 1.000000</td>
-      <td>  9740</td>
-      <td> 2110</td>
-      <td>  2220</td>
-      <td> 0.111439</td>
-      <td> 0.475599</td>
-      <td> 1431.370000</td>
-      <td> 3009.620</td>
-      <td> 8.914880e-02</td>
-      <td> 180296424</td>
-      <td>       902</td>
-      <td> 2.617320e+11</td>
-      <td>  153016000</td>
-      <td> 2.190240e+11</td>
-      <td> 7.277450e+07</td>
-      <td> 0.187445</td>
+      <th>18</th>
+      <td>3</td>
+      <td>466802448</td>
+      <td>False</td>
+      <td>1.000000</td>
+      <td>9740</td>
+      <td>2110</td>
+      <td>2220</td>
+      <td>1.114390e-01</td>
+      <td>0.475599</td>
+      <td>1431.370000</td>
+      <td>3009.620</td>
+      <td>8.914880e-02</td>
+      <td>180296424</td>
+      <td>902</td>
+      <td>2.617320e+11</td>
+      <td>153016000</td>
+      <td>2.190240e+11</td>
+      <td>7.277450e+07</td>
+      <td>0.187445</td>
     </tr>
     <tr>
-      <th>19   </th>
-      <td> 2</td>
-      <td> 466801696</td>
-      <td> False</td>
-      <td> 0.589572</td>
-      <td>  5050</td>
-      <td> 4670</td>
-      <td>  9120</td>
-      <td> 0.002646</td>
-      <td> 0.001296</td>
-      <td>    0.576712</td>
-      <td>  445.088</td>
-      <td> 2.116400e-03</td>
-      <td> 180296424</td>
-      <td>      1057</td>
-      <td> 2.628800e+11</td>
-      <td> 1333360000</td>
-      <td> 7.689670e+08</td>
-      <td> 1.727670e+06</td>
-      <td> 1.633370</td>
+      <th>19</th>
+      <td>2</td>
+      <td>466801696</td>
+      <td>False</td>
+      <td>0.589572</td>
+      <td>5050</td>
+      <td>4670</td>
+      <td>9120</td>
+      <td>2.645570e-03</td>
+      <td>0.001296</td>
+      <td>0.576712</td>
+      <td>445.088</td>
+      <td>2.116400e-03</td>
+      <td>180296424</td>
+      <td>1057</td>
+      <td>2.628800e+11</td>
+      <td>1333360000</td>
+      <td>7.689670e+08</td>
+      <td>1.727670e+06</td>
+      <td>1.633370</td>
     </tr>
     <tr>
-      <th>20   </th>
-      <td> 2</td>
-      <td> 466801527</td>
-      <td> False</td>
-      <td> 0.495069</td>
-      <td>  4650</td>
-      <td> 2440</td>
-      <td>  6530</td>
-      <td> 0.001171</td>
-      <td> 0.025503</td>
-      <td>   10.014300</td>
-      <td>  392.675</td>
-      <td> 9.371090e-04</td>
-      <td> 180296424</td>
-      <td>       819</td>
-      <td> 5.166290e+09</td>
-      <td>   29996100</td>
-      <td> 3.003910e+08</td>
-      <td> 7.649870e+05</td>
-      <td> 0.036745</td>
+      <th>20</th>
+      <td>2</td>
+      <td>466801527</td>
+      <td>False</td>
+      <td>0.495069</td>
+      <td>4650</td>
+      <td>2440</td>
+      <td>6530</td>
+      <td>1.171420e-03</td>
+      <td>0.025503</td>
+      <td>10.014300</td>
+      <td>392.675</td>
+      <td>9.371090e-04</td>
+      <td>180296424</td>
+      <td>819</td>
+      <td>5.166290e+09</td>
+      <td>29996100</td>
+      <td>3.003910e+08</td>
+      <td>7.649870e+05</td>
+      <td>0.036745</td>
     </tr>
     <tr>
-      <th>21   </th>
-      <td> 2</td>
-      <td> 466801200</td>
-      <td> False</td>
-      <td> 0.636549</td>
-      <td>  5330</td>
-      <td> 1840</td>
-      <td>  5950</td>
-      <td> 0.025154</td>
-      <td> 0.050278</td>
-      <td>   30.936100</td>
-      <td>  615.299</td>
-      <td> 2.012240e-02</td>
-      <td> 180296424</td>
-      <td>       296</td>
-      <td> 9.273840e+10</td>
-      <td>  326711000</td>
-      <td> 1.010720e+10</td>
-      <td> 1.642640e+07</td>
-      <td> 0.400221</td>
+      <th>21</th>
+      <td>2</td>
+      <td>466801200</td>
+      <td>False</td>
+      <td>0.636549</td>
+      <td>5330</td>
+      <td>1840</td>
+      <td>5950</td>
+      <td>2.515370e-02</td>
+      <td>0.050278</td>
+      <td>30.936100</td>
+      <td>615.299</td>
+      <td>2.012240e-02</td>
+      <td>180296424</td>
+      <td>296</td>
+      <td>9.273840e+10</td>
+      <td>326711000</td>
+      <td>1.010720e+10</td>
+      <td>1.642640e+07</td>
+      <td>0.400221</td>
     </tr>
     <tr>
-      <th>22   </th>
-      <td> 1</td>
-      <td> 466800973</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 180296424</td>
-      <td>      1106</td>
-      <td> 4.292520e+10</td>
-      <td>  190055000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.232817</td>
+      <th>22</th>
+      <td>1</td>
+      <td>466800973</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>180296424</td>
+      <td>1106</td>
+      <td>4.292520e+10</td>
+      <td>190055000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.232817</td>
     </tr>
     <tr>
-      <th>23   </th>
-      <td> 2</td>
-      <td> 466801547</td>
-      <td> False</td>
-      <td> 0.846486</td>
-      <td>  8400</td>
-      <td> 2500</td>
-      <td> 10000</td>
-      <td> 0.027546</td>
-      <td> 0.054915</td>
-      <td>   38.221200</td>
-      <td>  696.010</td>
-      <td> 2.203590e-02</td>
-      <td> 180296424</td>
-      <td>       847</td>
-      <td> 1.085070e+11</td>
-      <td>  327571000</td>
-      <td> 1.252020e+10</td>
-      <td> 1.798850e+07</td>
-      <td> 0.401275</td>
+      <th>23</th>
+      <td>2</td>
+      <td>466801547</td>
+      <td>False</td>
+      <td>0.846486</td>
+      <td>8400</td>
+      <td>2500</td>
+      <td>10000</td>
+      <td>2.754560e-02</td>
+      <td>0.054915</td>
+      <td>38.221200</td>
+      <td>696.010</td>
+      <td>2.203590e-02</td>
+      <td>180296424</td>
+      <td>847</td>
+      <td>1.085070e+11</td>
+      <td>327571000</td>
+      <td>1.252020e+10</td>
+      <td>1.798850e+07</td>
+      <td>0.401275</td>
     </tr>
     <tr>
-      <th>24   </th>
-      <td> 3</td>
-      <td> 466802012</td>
-      <td> False</td>
-      <td> 0.595259</td>
-      <td>  5520</td>
-      <td> 4980</td>
-      <td>  9230</td>
-      <td> 0.003496</td>
-      <td> 0.011546</td>
-      <td>    6.246480</td>
-      <td>  541.022</td>
-      <td> 2.796390e-03</td>
-      <td> 180296424</td>
-      <td>       314</td>
-      <td> 3.662030e+10</td>
-      <td>  197716000</td>
-      <td> 1.235030e+09</td>
-      <td> 2.282760e+06</td>
-      <td> 0.242202</td>
+      <th>24</th>
+      <td>3</td>
+      <td>466802012</td>
+      <td>False</td>
+      <td>0.595259</td>
+      <td>5520</td>
+      <td>4980</td>
+      <td>9230</td>
+      <td>3.495580e-03</td>
+      <td>0.011546</td>
+      <td>6.246480</td>
+      <td>541.022</td>
+      <td>2.796390e-03</td>
+      <td>180296424</td>
+      <td>314</td>
+      <td>3.662030e+10</td>
+      <td>197716000</td>
+      <td>1.235030e+09</td>
+      <td>2.282760e+06</td>
+      <td>0.242202</td>
     </tr>
     <tr>
-      <th>25   </th>
-      <td> 1</td>
-      <td> 466800648</td>
-      <td> False</td>
-      <td> 0.575121</td>
-      <td>  6330</td>
-      <td>  830</td>
-      <td>  4920</td>
-      <td> 0.000099</td>
-      <td> 0.000027</td>
-      <td>    0.020303</td>
-      <td>  757.162</td>
-      <td> 7.941070e-05</td>
-      <td> 180296424</td>
-      <td>       648</td>
-      <td> 6.836670e+11</td>
-      <td> 2417570000</td>
-      <td> 4.908310e+07</td>
-      <td> 6.482510e+04</td>
-      <td> 2.961530</td>
+      <th>25</th>
+      <td>1</td>
+      <td>466800648</td>
+      <td>False</td>
+      <td>0.575121</td>
+      <td>6330</td>
+      <td>830</td>
+      <td>4920</td>
+      <td>9.926620e-05</td>
+      <td>0.000027</td>
+      <td>0.020303</td>
+      <td>757.162</td>
+      <td>7.941070e-05</td>
+      <td>180296424</td>
+      <td>648</td>
+      <td>6.836670e+11</td>
+      <td>2417570000</td>
+      <td>4.908310e+07</td>
+      <td>6.482510e+04</td>
+      <td>2.961530</td>
     </tr>
     <tr>
-      <th>26   </th>
-      <td> 2</td>
-      <td> 466801446</td>
-      <td> False</td>
-      <td> 0.864219</td>
-      <td>  8670</td>
-      <td>  920</td>
-      <td>  6570</td>
-      <td> 0.081020</td>
-      <td> 0.064046</td>
-      <td>   57.951900</td>
-      <td>  904.844</td>
-      <td> 6.481380e-02</td>
-      <td> 180296424</td>
-      <td>       687</td>
-      <td> 2.660670e+11</td>
-      <td>  826108000</td>
-      <td> 4.787460e+10</td>
-      <td> 5.290920e+07</td>
-      <td> 1.011980</td>
+      <th>26</th>
+      <td>2</td>
+      <td>466801446</td>
+      <td>False</td>
+      <td>0.864219</td>
+      <td>8670</td>
+      <td>920</td>
+      <td>6570</td>
+      <td>8.101950e-02</td>
+      <td>0.064046</td>
+      <td>57.951900</td>
+      <td>904.844</td>
+      <td>6.481380e-02</td>
+      <td>180296424</td>
+      <td>687</td>
+      <td>2.660670e+11</td>
+      <td>826108000</td>
+      <td>4.787460e+10</td>
+      <td>5.290920e+07</td>
+      <td>1.011980</td>
     </tr>
     <tr>
-      <th>27   </th>
-      <td> 2</td>
-      <td> 466801773</td>
-      <td> False</td>
-      <td> 1.000000</td>
-      <td>  9670</td>
-      <td> 2200</td>
-      <td>  9450</td>
-      <td> 0.191289</td>
-      <td> 0.745494</td>
-      <td> 3466.000000</td>
-      <td> 4649.270</td>
-      <td> 1.530270e-01</td>
-      <td> 180296424</td>
-      <td> 312782636</td>
-      <td> 6.103670e+11</td>
-      <td>  167566000</td>
-      <td> 5.807850e+11</td>
-      <td> 1.249200e+08</td>
-      <td> 0.205269</td>
+      <th>27</th>
+      <td>2</td>
+      <td>466801773</td>
+      <td>False</td>
+      <td>1.000000</td>
+      <td>9670</td>
+      <td>2200</td>
+      <td>9450</td>
+      <td>1.912890e-01</td>
+      <td>0.745494</td>
+      <td>3466.000000</td>
+      <td>4649.270</td>
+      <td>1.530270e-01</td>
+      <td>180296424</td>
+      <td>312782636</td>
+      <td>6.103670e+11</td>
+      <td>167566000</td>
+      <td>5.807850e+11</td>
+      <td>1.249200e+08</td>
+      <td>0.205269</td>
     </tr>
     <tr>
-      <th>28   </th>
-      <td> 1</td>
-      <td> 466800778</td>
-      <td> False</td>
-      <td> 0.178543</td>
-      <td>  5680</td>
-      <td> 2530</td>
-      <td>  1320</td>
-      <td> 0.000001</td>
-      <td> 0.000001</td>
-      <td>    0.000282</td>
-      <td>  227.492</td>
-      <td> 6.779390e-07</td>
-      <td> 180296424</td>
-      <td>       838</td>
-      <td> 1.141290e+11</td>
-      <td>  446302000</td>
-      <td> 1.258980e+05</td>
-      <td> 5.534190e+02</td>
-      <td> 0.546720</td>
+      <th>28</th>
+      <td>1</td>
+      <td>466800778</td>
+      <td>False</td>
+      <td>0.178543</td>
+      <td>5680</td>
+      <td>2530</td>
+      <td>1320</td>
+      <td>8.474470e-07</td>
+      <td>0.000001</td>
+      <td>0.000282</td>
+      <td>227.492</td>
+      <td>6.779390e-07</td>
+      <td>180296424</td>
+      <td>838</td>
+      <td>1.141290e+11</td>
+      <td>446302000</td>
+      <td>1.258980e+05</td>
+      <td>5.534190e+02</td>
+      <td>0.546720</td>
     </tr>
     <tr>
-      <th>29   </th>
-      <td> 3</td>
-      <td> 466802094</td>
-      <td> False</td>
-      <td> 1.000000</td>
-      <td> 10030</td>
-      <td> 1850</td>
-      <td>  2190</td>
-      <td> 0.043933</td>
-      <td> 0.051044</td>
-      <td>   57.830300</td>
-      <td> 1132.950</td>
-      <td> 3.514510e-02</td>
-      <td> 180296424</td>
-      <td>       427</td>
-      <td> 1.260440e+11</td>
-      <td>  562062000</td>
-      <td> 3.250420e+10</td>
-      <td> 2.868990e+07</td>
-      <td> 0.688526</td>
+      <th>29</th>
+      <td>3</td>
+      <td>466802094</td>
+      <td>False</td>
+      <td>1.000000</td>
+      <td>10030</td>
+      <td>1850</td>
+      <td>2190</td>
+      <td>4.393260e-02</td>
+      <td>0.051044</td>
+      <td>57.830300</td>
+      <td>1132.950</td>
+      <td>3.514510e-02</td>
+      <td>180296424</td>
+      <td>427</td>
+      <td>1.260440e+11</td>
+      <td>562062000</td>
+      <td>3.250420e+10</td>
+      <td>2.868990e+07</td>
+      <td>0.688526</td>
     </tr>
     <tr>
       <th>...</th>
@@ -2755,663 +2758,663 @@ Name: 122642490, dtype: object</pre>
     </tr>
     <tr>
       <th>27810</th>
-      <td> 1</td>
-      <td> 469438008</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       816</td>
-      <td> 1.653280e+10</td>
-      <td>  116910000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.143215</td>
+      <td>1</td>
+      <td>469438008</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>816</td>
+      <td>1.653280e+10</td>
+      <td>116910000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.143215</td>
     </tr>
     <tr>
       <th>27811</th>
-      <td> 2</td>
-      <td> 469439076</td>
-      <td> False</td>
-      <td> 0.459489</td>
-      <td>  8600</td>
-      <td> 1240</td>
-      <td>  9220</td>
-      <td> 0.025146</td>
-      <td> 0.003110</td>
-      <td>    0.883070</td>
-      <td>  283.950</td>
-      <td> 1.989060e-03</td>
-      <td> 304762965</td>
-      <td>       409</td>
-      <td> 7.073120e+10</td>
-      <td>  522106000</td>
-      <td> 4.610560e+08</td>
-      <td> 1.623720e+06</td>
-      <td> 0.639580</td>
+      <td>2</td>
+      <td>469439076</td>
+      <td>False</td>
+      <td>0.459489</td>
+      <td>8600</td>
+      <td>1240</td>
+      <td>9220</td>
+      <td>2.514610e-02</td>
+      <td>0.003110</td>
+      <td>0.883070</td>
+      <td>283.950</td>
+      <td>1.989060e-03</td>
+      <td>304762965</td>
+      <td>409</td>
+      <td>7.073120e+10</td>
+      <td>522106000</td>
+      <td>4.610560e+08</td>
+      <td>1.623720e+06</td>
+      <td>0.639580</td>
     </tr>
     <tr>
       <th>27812</th>
-      <td> 2</td>
-      <td> 469440003</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td> 312782550</td>
-      <td> 5.150820e+09</td>
-      <td>   38745000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.047463</td>
+      <td>2</td>
+      <td>469440003</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>312782550</td>
+      <td>5.150820e+09</td>
+      <td>38745000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.047463</td>
     </tr>
     <tr>
       <th>27813</th>
-      <td> 2</td>
-      <td> 469440079</td>
-      <td> False</td>
-      <td> 0.202515</td>
-      <td>  9380</td>
-      <td> 2660</td>
-      <td>  9460</td>
-      <td> 0.000736</td>
-      <td> 0.000815</td>
-      <td>    0.224985</td>
-      <td>  275.993</td>
-      <td> 5.821670e-05</td>
-      <td> 304762965</td>
-      <td> 312782648</td>
-      <td> 7.267470e+09</td>
-      <td>   58298400</td>
-      <td> 1.311630e+07</td>
-      <td> 4.752380e+04</td>
-      <td> 0.071415</td>
+      <td>2</td>
+      <td>469440079</td>
+      <td>False</td>
+      <td>0.202515</td>
+      <td>9380</td>
+      <td>2660</td>
+      <td>9460</td>
+      <td>7.359880e-04</td>
+      <td>0.000815</td>
+      <td>0.224985</td>
+      <td>275.993</td>
+      <td>5.821670e-05</td>
+      <td>304762965</td>
+      <td>312782648</td>
+      <td>7.267470e+09</td>
+      <td>58298400</td>
+      <td>1.311630e+07</td>
+      <td>4.752380e+04</td>
+      <td>0.071415</td>
     </tr>
     <tr>
       <th>27814</th>
-      <td> 2</td>
-      <td> 469439208</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       540</td>
-      <td> 1.641650e+10</td>
-      <td>  205690000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.251970</td>
+      <td>2</td>
+      <td>469439208</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>540</td>
+      <td>1.641650e+10</td>
+      <td>205690000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.251970</td>
     </tr>
     <tr>
       <th>27815</th>
-      <td> 3</td>
-      <td> 469441870</td>
-      <td> False</td>
-      <td> 0.020616</td>
-      <td>  5500</td>
-      <td> 1480</td>
-      <td>  9090</td>
-      <td> 0.000013</td>
-      <td> 0.000007</td>
-      <td>    0.001025</td>
-      <td>  145.365</td>
-      <td> 1.050820e-06</td>
-      <td> 304762965</td>
-      <td> 182305693</td>
-      <td> 1.264440e+10</td>
-      <td>  121613000</td>
-      <td> 1.246950e+05</td>
-      <td> 8.578110e+02</td>
-      <td> 0.148976</td>
+      <td>3</td>
+      <td>469441870</td>
+      <td>False</td>
+      <td>0.020616</td>
+      <td>5500</td>
+      <td>1480</td>
+      <td>9090</td>
+      <td>1.328470e-05</td>
+      <td>0.000007</td>
+      <td>0.001025</td>
+      <td>145.365</td>
+      <td>1.050820e-06</td>
+      <td>304762965</td>
+      <td>182305693</td>
+      <td>1.264440e+10</td>
+      <td>121613000</td>
+      <td>1.246950e+05</td>
+      <td>8.578110e+02</td>
+      <td>0.148976</td>
     </tr>
     <tr>
       <th>27816</th>
-      <td> 1</td>
-      <td> 469437808</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       598</td>
-      <td> 3.507420e+09</td>
-      <td>   36933300</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.045243</td>
+      <td>1</td>
+      <td>469437808</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>598</td>
+      <td>3.507420e+09</td>
+      <td>36933300</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.045243</td>
     </tr>
     <tr>
       <th>27817</th>
-      <td> 2</td>
-      <td> 469439225</td>
-      <td> False</td>
-      <td> 0.146811</td>
-      <td>  8340</td>
-      <td>  930</td>
-      <td>  7540</td>
-      <td> 0.000234</td>
-      <td> 0.000127</td>
-      <td>    0.032278</td>
-      <td>  253.262</td>
-      <td> 1.849910e-05</td>
-      <td> 304762965</td>
-      <td>       565</td>
-      <td> 1.620310e+10</td>
-      <td>  118490000</td>
-      <td> 3.824590e+06</td>
-      <td> 1.510130e+04</td>
-      <td> 0.145150</td>
+      <td>2</td>
+      <td>469439225</td>
+      <td>False</td>
+      <td>0.146811</td>
+      <td>8340</td>
+      <td>930</td>
+      <td>7540</td>
+      <td>2.338700e-04</td>
+      <td>0.000127</td>
+      <td>0.032278</td>
+      <td>253.262</td>
+      <td>1.849910e-05</td>
+      <td>304762965</td>
+      <td>565</td>
+      <td>1.620310e+10</td>
+      <td>118490000</td>
+      <td>3.824590e+06</td>
+      <td>1.510130e+04</td>
+      <td>0.145150</td>
     </tr>
     <tr>
       <th>27818</th>
-      <td> 1</td>
-      <td> 469438021</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       827</td>
-      <td> 2.813640e+10</td>
-      <td>  210684000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.258088</td>
+      <td>1</td>
+      <td>469438021</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>827</td>
+      <td>2.813640e+10</td>
+      <td>210684000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.258088</td>
     </tr>
     <tr>
       <th>27819</th>
-      <td> 2</td>
-      <td> 469439787</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>      1023</td>
-      <td> 5.153460e+10</td>
-      <td>  335030000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.410411</td>
+      <td>2</td>
+      <td>469439787</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>1023</td>
+      <td>5.153460e+10</td>
+      <td>335030000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.410411</td>
     </tr>
     <tr>
       <th>27820</th>
-      <td> 2</td>
-      <td> 469439876</td>
-      <td> False</td>
-      <td> 0.015097</td>
-      <td>  4840</td>
-      <td> 2320</td>
-      <td>  6750</td>
-      <td> 0.000001</td>
-      <td> 0.000002</td>
-      <td>    0.000134</td>
-      <td>   80.000</td>
-      <td> 8.554880e-08</td>
-      <td> 304762965</td>
-      <td>      1085</td>
-      <td> 1.017130e+09</td>
-      <td>   41661900</td>
-      <td> 5.586860e+03</td>
-      <td> 6.983570e+01</td>
-      <td> 0.051036</td>
+      <td>2</td>
+      <td>469439876</td>
+      <td>False</td>
+      <td>0.015097</td>
+      <td>4840</td>
+      <td>2320</td>
+      <td>6750</td>
+      <td>1.081530e-06</td>
+      <td>0.000002</td>
+      <td>0.000134</td>
+      <td>80.000</td>
+      <td>8.554880e-08</td>
+      <td>304762965</td>
+      <td>1085</td>
+      <td>1.017130e+09</td>
+      <td>41661900</td>
+      <td>5.586860e+03</td>
+      <td>6.983570e+01</td>
+      <td>0.051036</td>
     </tr>
     <tr>
       <th>27821</th>
-      <td> 1</td>
-      <td> 469437507</td>
-      <td> False</td>
-      <td> 0.089657</td>
-      <td>  9590</td>
-      <td> 2100</td>
-      <td>  2950</td>
-      <td> 0.000043</td>
-      <td> 0.000038</td>
-      <td>    0.006940</td>
-      <td>  181.393</td>
-      <td> 3.420330e-06</td>
-      <td> 304762965</td>
-      <td>       305</td>
-      <td> 6.528450e+09</td>
-      <td>   72981900</td>
-      <td> 5.064700e+05</td>
-      <td> 2.792110e+03</td>
-      <td> 0.089403</td>
+      <td>1</td>
+      <td>469437507</td>
+      <td>False</td>
+      <td>0.089657</td>
+      <td>9590</td>
+      <td>2100</td>
+      <td>2950</td>
+      <td>4.324060e-05</td>
+      <td>0.000038</td>
+      <td>0.006940</td>
+      <td>181.393</td>
+      <td>3.420330e-06</td>
+      <td>304762965</td>
+      <td>305</td>
+      <td>6.528450e+09</td>
+      <td>72981900</td>
+      <td>5.064700e+05</td>
+      <td>2.792110e+03</td>
+      <td>0.089403</td>
     </tr>
     <tr>
       <th>27822</th>
-      <td> 1</td>
-      <td> 469437761</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       545</td>
-      <td> 5.032990e+08</td>
-      <td>    6943500</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.008506</td>
+      <td>1</td>
+      <td>469437761</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>545</td>
+      <td>5.032990e+08</td>
+      <td>6943500</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.008506</td>
     </tr>
     <tr>
       <th>27823</th>
-      <td> 3</td>
-      <td> 469440248</td>
-      <td> False</td>
-      <td> 0.170834</td>
-      <td>  4470</td>
-      <td> 4760</td>
-      <td>  1650</td>
-      <td> 0.001285</td>
-      <td> 0.000015</td>
-      <td>    0.002798</td>
-      <td>  180.851</td>
-      <td> 1.016150e-04</td>
-      <td> 304762965</td>
-      <td>        95</td>
-      <td> 6.540200e+11</td>
-      <td> 5362290000</td>
-      <td> 1.500180e+07</td>
-      <td> 8.295100e+04</td>
-      <td> 6.568800</td>
+      <td>3</td>
+      <td>469440248</td>
+      <td>False</td>
+      <td>0.170834</td>
+      <td>4470</td>
+      <td>4760</td>
+      <td>1650</td>
+      <td>1.284640e-03</td>
+      <td>0.000015</td>
+      <td>0.002798</td>
+      <td>180.851</td>
+      <td>1.016150e-04</td>
+      <td>304762965</td>
+      <td>95</td>
+      <td>6.540200e+11</td>
+      <td>5362290000</td>
+      <td>1.500180e+07</td>
+      <td>8.295100e+04</td>
+      <td>6.568800</td>
     </tr>
     <tr>
       <th>27824</th>
-      <td> 2</td>
-      <td> 469439524</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       810</td>
-      <td> 1.591090e+10</td>
-      <td>  129384000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.158495</td>
+      <td>2</td>
+      <td>469439524</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>810</td>
+      <td>1.591090e+10</td>
+      <td>129384000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.158495</td>
     </tr>
     <tr>
       <th>27825</th>
-      <td> 3</td>
-      <td> 469441059</td>
-      <td> False</td>
-      <td> 0.157981</td>
-      <td>  8880</td>
-      <td> 2050</td>
-      <td> 10110</td>
-      <td> 0.000381</td>
-      <td> 0.000060</td>
-      <td>    0.019188</td>
-      <td>  318.441</td>
-      <td> 3.010690e-05</td>
-      <td> 304762965</td>
-      <td>       527</td>
-      <td> 4.089860e+10</td>
-      <td>  407880000</td>
-      <td> 7.826360e+06</td>
-      <td> 2.457710e+04</td>
-      <td> 0.499653</td>
+      <td>3</td>
+      <td>469441059</td>
+      <td>False</td>
+      <td>0.157981</td>
+      <td>8880</td>
+      <td>2050</td>
+      <td>10110</td>
+      <td>3.806190e-04</td>
+      <td>0.000060</td>
+      <td>0.019188</td>
+      <td>318.441</td>
+      <td>3.010690e-05</td>
+      <td>304762965</td>
+      <td>527</td>
+      <td>4.089860e+10</td>
+      <td>407880000</td>
+      <td>7.826360e+06</td>
+      <td>2.457710e+04</td>
+      <td>0.499653</td>
     </tr>
     <tr>
       <th>27826</th>
-      <td> 1</td>
-      <td> 469437178</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>        44</td>
-      <td> 9.173870e+10</td>
-      <td>  770998000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.944472</td>
+      <td>1</td>
+      <td>469437178</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>44</td>
+      <td>9.173870e+10</td>
+      <td>770998000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.944472</td>
     </tr>
     <tr>
       <th>27827</th>
-      <td> 2</td>
-      <td> 469439414</td>
-      <td> False</td>
-      <td> 0.102676</td>
-      <td>  4410</td>
-      <td> 5090</td>
-      <td>  9590</td>
-      <td> 0.000208</td>
-      <td> 0.000062</td>
-      <td>    0.009947</td>
-      <td>  160.151</td>
-      <td> 1.642980e-05</td>
-      <td> 304762965</td>
-      <td>       704</td>
-      <td> 2.258010e+10</td>
-      <td>  215940000</td>
-      <td> 2.147960e+06</td>
-      <td> 1.341210e+04</td>
-      <td> 0.264526</td>
+      <td>2</td>
+      <td>469439414</td>
+      <td>False</td>
+      <td>0.102676</td>
+      <td>4410</td>
+      <td>5090</td>
+      <td>9590</td>
+      <td>2.077090e-04</td>
+      <td>0.000062</td>
+      <td>0.009947</td>
+      <td>160.151</td>
+      <td>1.642980e-05</td>
+      <td>304762965</td>
+      <td>704</td>
+      <td>2.258010e+10</td>
+      <td>215940000</td>
+      <td>2.147960e+06</td>
+      <td>1.341210e+04</td>
+      <td>0.264526</td>
     </tr>
     <tr>
       <th>27828</th>
-      <td> 3</td>
-      <td> 469441884</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td> 312782554</td>
-      <td> 1.753940e+10</td>
-      <td>  142772000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.174896</td>
+      <td>3</td>
+      <td>469441884</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>312782554</td>
+      <td>1.753940e+10</td>
+      <td>142772000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.174896</td>
     </tr>
     <tr>
       <th>27829</th>
-      <td> 1</td>
-      <td> 469437765</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       556</td>
-      <td> 3.212740e+10</td>
-      <td>  232503000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.284817</td>
+      <td>1</td>
+      <td>469437765</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>556</td>
+      <td>3.212740e+10</td>
+      <td>232503000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.284817</td>
     </tr>
     <tr>
       <th>27830</th>
-      <td> 2</td>
-      <td> 469439195</td>
-      <td> False</td>
-      <td> 0.157981</td>
-      <td>  8880</td>
-      <td> 2050</td>
-      <td> 10110</td>
-      <td> 0.000379</td>
-      <td> 0.000120</td>
-      <td>    0.038315</td>
-      <td>  319.015</td>
-      <td> 3.000480e-05</td>
-      <td> 304762965</td>
-      <td>       527</td>
-      <td> 2.488420e+10</td>
-      <td>  203940000</td>
-      <td> 7.813870e+06</td>
-      <td> 2.449370e+04</td>
-      <td> 0.249827</td>
+      <td>2</td>
+      <td>469439195</td>
+      <td>False</td>
+      <td>0.157981</td>
+      <td>8880</td>
+      <td>2050</td>
+      <td>10110</td>
+      <td>3.793280e-04</td>
+      <td>0.000120</td>
+      <td>0.038315</td>
+      <td>319.015</td>
+      <td>3.000480e-05</td>
+      <td>304762965</td>
+      <td>527</td>
+      <td>2.488420e+10</td>
+      <td>203940000</td>
+      <td>7.813870e+06</td>
+      <td>2.449370e+04</td>
+      <td>0.249827</td>
     </tr>
     <tr>
       <th>27831</th>
-      <td> 2</td>
-      <td> 469439304</td>
-      <td> False</td>
-      <td> 0.058628</td>
-      <td>  8040</td>
-      <td> 1260</td>
-      <td>  6500</td>
-      <td> 0.000038</td>
-      <td> 0.000065</td>
-      <td>    0.012544</td>
-      <td>  191.803</td>
-      <td> 3.013540e-06</td>
-      <td> 304762965</td>
-      <td>       622</td>
-      <td> 2.285570e+09</td>
-      <td>   37614600</td>
-      <td> 4.718400e+05</td>
-      <td> 2.460030e+03</td>
-      <td> 0.046078</td>
+      <td>2</td>
+      <td>469439304</td>
+      <td>False</td>
+      <td>0.058628</td>
+      <td>8040</td>
+      <td>1260</td>
+      <td>6500</td>
+      <td>3.809780e-05</td>
+      <td>0.000065</td>
+      <td>0.012544</td>
+      <td>191.803</td>
+      <td>3.013540e-06</td>
+      <td>304762965</td>
+      <td>622</td>
+      <td>2.285570e+09</td>
+      <td>37614600</td>
+      <td>4.718400e+05</td>
+      <td>2.460030e+03</td>
+      <td>0.046078</td>
     </tr>
     <tr>
       <th>27832</th>
-      <td> 3</td>
-      <td> 469441524</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       893</td>
-      <td> 7.170690e+09</td>
-      <td>  120206000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.147252</td>
+      <td>3</td>
+      <td>469441524</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>893</td>
+      <td>7.170690e+09</td>
+      <td>120206000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.147252</td>
     </tr>
     <tr>
       <th>27833</th>
-      <td> 3</td>
-      <td> 469441572</td>
-      <td> False</td>
-      <td> 0.710235</td>
-      <td>  7240</td>
-      <td> 5090</td>
-      <td> 10030</td>
-      <td> 0.002244</td>
-      <td> 0.000073</td>
-      <td>    0.027705</td>
-      <td>  377.139</td>
-      <td> 1.774660e-04</td>
-      <td> 304762965</td>
-      <td>       922</td>
-      <td> 1.861460e+11</td>
-      <td> 1972080000</td>
-      <td> 5.463620e+07</td>
-      <td> 1.448700e+05</td>
-      <td> 2.415800</td>
+      <td>3</td>
+      <td>469441572</td>
+      <td>False</td>
+      <td>0.710235</td>
+      <td>7240</td>
+      <td>5090</td>
+      <td>10030</td>
+      <td>2.243560e-03</td>
+      <td>0.000073</td>
+      <td>0.027705</td>
+      <td>377.139</td>
+      <td>1.774660e-04</td>
+      <td>304762965</td>
+      <td>922</td>
+      <td>1.861460e+11</td>
+      <td>1972080000</td>
+      <td>5.463620e+07</td>
+      <td>1.448700e+05</td>
+      <td>2.415800</td>
     </tr>
     <tr>
       <th>27834</th>
-      <td> 3</td>
-      <td> 469441361</td>
-      <td> False</td>
-      <td> 0.697775</td>
-      <td>  8390</td>
-      <td> 3010</td>
-      <td> 10560</td>
-      <td> 0.000212</td>
-      <td> 0.000029</td>
-      <td>    0.013508</td>
-      <td>  459.254</td>
-      <td> 1.676350e-05</td>
-      <td> 304762965</td>
-      <td>       755</td>
-      <td> 5.417440e+10</td>
-      <td>  465255000</td>
-      <td> 6.284680e+06</td>
-      <td> 1.368450e+04</td>
-      <td> 0.569937</td>
+      <td>3</td>
+      <td>469441361</td>
+      <td>False</td>
+      <td>0.697775</td>
+      <td>8390</td>
+      <td>3010</td>
+      <td>10560</td>
+      <td>2.119280e-04</td>
+      <td>0.000029</td>
+      <td>0.013508</td>
+      <td>459.254</td>
+      <td>1.676350e-05</td>
+      <td>304762965</td>
+      <td>755</td>
+      <td>5.417440e+10</td>
+      <td>465255000</td>
+      <td>6.284680e+06</td>
+      <td>1.368450e+04</td>
+      <td>0.569937</td>
     </tr>
     <tr>
       <th>27835</th>
-      <td> 3</td>
-      <td> 469441142</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       582</td>
-      <td> 4.146330e+10</td>
-      <td>  328088000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.401908</td>
+      <td>3</td>
+      <td>469441142</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>582</td>
+      <td>4.146330e+10</td>
+      <td>328088000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.401908</td>
     </tr>
     <tr>
       <th>27836</th>
-      <td> 1</td>
-      <td> 469437580</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       363</td>
-      <td> 2.919100e+10</td>
-      <td>  203117000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.248819</td>
+      <td>1</td>
+      <td>469437580</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>363</td>
+      <td>2.919100e+10</td>
+      <td>203117000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.248819</td>
     </tr>
     <tr>
       <th>27837</th>
-      <td> 2</td>
-      <td> 469439511</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       800</td>
-      <td> 2.306240e+10</td>
-      <td>  182028000</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.222984</td>
+      <td>2</td>
+      <td>469439511</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>800</td>
+      <td>2.306240e+10</td>
+      <td>182028000</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.222984</td>
     </tr>
     <tr>
       <th>27838</th>
-      <td> 1</td>
-      <td> 469438137</td>
-      <td> False</td>
-      <td> 0.000000</td>
-      <td>     0</td>
-      <td>    0</td>
-      <td>     0</td>
-      <td> 0.000000</td>
-      <td> 0.000000</td>
-      <td>    0.000000</td>
-      <td>    0.000</td>
-      <td> 0.000000e+00</td>
-      <td> 304762965</td>
-      <td>       869</td>
-      <td> 2.206210e+09</td>
-      <td>   20761200</td>
-      <td> 0.000000e+00</td>
-      <td> 0.000000e+00</td>
-      <td> 0.025433</td>
+      <td>1</td>
+      <td>469438137</td>
+      <td>False</td>
+      <td>0.000000</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000</td>
+      <td>0.000000e+00</td>
+      <td>304762965</td>
+      <td>869</td>
+      <td>2.206210e+09</td>
+      <td>20761200</td>
+      <td>0.000000e+00</td>
+      <td>0.000000e+00</td>
+      <td>0.025433</td>
     </tr>
     <tr>
       <th>27839</th>
-      <td> 2</td>
-      <td> 469439450</td>
-      <td> False</td>
-      <td> 0.930085</td>
-      <td>  2710</td>
-      <td> 4330</td>
-      <td>  6030</td>
-      <td> 0.003920</td>
-      <td> 0.000419</td>
-      <td>    3.089020</td>
-      <td> 7372.700</td>
-      <td> 3.100840e-04</td>
-      <td> 304762965</td>
-      <td>       746</td>
-      <td> 7.987390e+10</td>
-      <td>  604155000</td>
-      <td> 1.866250e+09</td>
-      <td> 2.531300e+05</td>
-      <td> 0.740090</td>
+      <td>2</td>
+      <td>469439450</td>
+      <td>False</td>
+      <td>0.930085</td>
+      <td>2710</td>
+      <td>4330</td>
+      <td>6030</td>
+      <td>3.920150e-03</td>
+      <td>0.000419</td>
+      <td>3.089020</td>
+      <td>7372.700</td>
+      <td>3.100840e-04</td>
+      <td>304762965</td>
+      <td>746</td>
+      <td>7.987390e+10</td>
+      <td>604155000</td>
+      <td>1.866250e+09</td>
+      <td>2.531300e+05</td>
+      <td>0.740090</td>
     </tr>
   </tbody>
 </table>
@@ -3437,7 +3440,7 @@ Name: 122642490, dtype: object</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[47]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">dense_unionizes</span> <span class="o">=</span> <span class="n">structure_unionizes</span><span class="p">[</span> <span class="n">structure_unionizes</span><span class="o">.</span><span class="n">projection_density</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">5</span> <span class="p">]</span>
@@ -3476,10 +3479,10 @@ Name: name, dtype: object
 </div>
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[47]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[7]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
-<div style="max-height:1000px;max-width:1500px;overflow:auto;">
+<div>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -3507,510 +3510,510 @@ Name: name, dtype: object
   </thead>
   <tbody>
     <tr>
-      <th>39   </th>
-      <td> 3</td>
-      <td> 466802085</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9710</td>
-      <td> 2040</td>
-      <td> 1740</td>
-      <td> 0.687285</td>
-      <td> 0.529886</td>
-      <td> 2256.86</td>
-      <td> 4259.15</td>
-      <td> 0.549813</td>
-      <td> 180296424</td>
-      <td>       409</td>
-      <td> 2.068930e+12</td>
-      <td>  847026000</td>
-      <td> 1.911620e+12</td>
-      <td>  448827000</td>
-      <td> 1.037610</td>
+      <th>39</th>
+      <td>3</td>
+      <td>466802085</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9710</td>
+      <td>2040</td>
+      <td>1740</td>
+      <td>0.687285</td>
+      <td>0.529886</td>
+      <td>2256.86</td>
+      <td>4259.15</td>
+      <td>0.549813</td>
+      <td>180296424</td>
+      <td>409</td>
+      <td>2.068930e+12</td>
+      <td>847026000</td>
+      <td>1.911620e+12</td>
+      <td>448827000</td>
+      <td>1.037610</td>
     </tr>
     <tr>
-      <th>219  </th>
-      <td> 2</td>
-      <td> 466801771</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9410</td>
-      <td> 2500</td>
-      <td> 9080</td>
-      <td> 0.597458</td>
-      <td> 0.835835</td>
-      <td> 4615.01</td>
-      <td> 5521.43</td>
-      <td> 0.477953</td>
-      <td> 180296424</td>
-      <td> 312782628</td>
-      <td> 2.205160e+12</td>
-      <td>  466797000</td>
-      <td> 2.154270e+12</td>
-      <td>  390166000</td>
-      <td> 0.571827</td>
+      <th>219</th>
+      <td>2</td>
+      <td>466801771</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9410</td>
+      <td>2500</td>
+      <td>9080</td>
+      <td>0.597458</td>
+      <td>0.835835</td>
+      <td>4615.01</td>
+      <td>5521.43</td>
+      <td>0.477953</td>
+      <td>180296424</td>
+      <td>312782628</td>
+      <td>2.205160e+12</td>
+      <td>466797000</td>
+      <td>2.154270e+12</td>
+      <td>390166000</td>
+      <td>0.571827</td>
     </tr>
     <tr>
-      <th>616  </th>
-      <td> 3</td>
-      <td> 466802642</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9790</td>
-      <td> 2150</td>
-      <td> 1700</td>
-      <td> 0.761375</td>
-      <td> 0.523711</td>
-      <td> 2418.87</td>
-      <td> 4618.72</td>
-      <td> 0.609083</td>
-      <td> 180296424</td>
-      <td> 312782628</td>
-      <td> 2.469310e+12</td>
-      <td>  949400000</td>
-      <td> 2.296480e+12</td>
-      <td>  497211000</td>
-      <td> 1.163010</td>
+      <th>616</th>
+      <td>3</td>
+      <td>466802642</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9790</td>
+      <td>2150</td>
+      <td>1700</td>
+      <td>0.761375</td>
+      <td>0.523711</td>
+      <td>2418.87</td>
+      <td>4618.72</td>
+      <td>0.609083</td>
+      <td>180296424</td>
+      <td>312782628</td>
+      <td>2.469310e+12</td>
+      <td>949400000</td>
+      <td>2.296480e+12</td>
+      <td>497211000</td>
+      <td>1.163010</td>
     </tr>
     <tr>
-      <th>640  </th>
-      <td> 3</td>
-      <td> 466802093</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9840</td>
-      <td> 2070</td>
-      <td> 1760</td>
-      <td> 0.385286</td>
-      <td> 0.507268</td>
-      <td> 1933.31</td>
-      <td> 3811.22</td>
-      <td> 0.308221</td>
-      <td> 180296424</td>
-      <td>       425</td>
-      <td> 1.067280e+12</td>
-      <td>  496007000</td>
-      <td> 9.589370e+11</td>
-      <td>  251609000</td>
-      <td> 0.607608</td>
+      <th>640</th>
+      <td>3</td>
+      <td>466802093</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9840</td>
+      <td>2070</td>
+      <td>1760</td>
+      <td>0.385286</td>
+      <td>0.507268</td>
+      <td>1933.31</td>
+      <td>3811.22</td>
+      <td>0.308221</td>
+      <td>180296424</td>
+      <td>425</td>
+      <td>1.067280e+12</td>
+      <td>496007000</td>
+      <td>9.589370e+11</td>
+      <td>251609000</td>
+      <td>0.607608</td>
     </tr>
     <tr>
-      <th>778  </th>
-      <td> 2</td>
-      <td> 466801045</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9560</td>
-      <td> 1360</td>
-      <td> 7700</td>
-      <td> 0.493331</td>
-      <td> 0.619365</td>
-      <td> 2160.03</td>
-      <td> 3487.49</td>
-      <td> 0.394654</td>
-      <td> 180296424</td>
-      <td>        33</td>
-      <td> 1.253770e+12</td>
-      <td>  520156000</td>
-      <td> 1.123550e+12</td>
-      <td>  322166000</td>
-      <td> 0.637191</td>
+      <th>778</th>
+      <td>2</td>
+      <td>466801045</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9560</td>
+      <td>1360</td>
+      <td>7700</td>
+      <td>0.493331</td>
+      <td>0.619365</td>
+      <td>2160.03</td>
+      <td>3487.49</td>
+      <td>0.394654</td>
+      <td>180296424</td>
+      <td>33</td>
+      <td>1.253770e+12</td>
+      <td>520156000</td>
+      <td>1.123550e+12</td>
+      <td>322166000</td>
+      <td>0.637191</td>
     </tr>
     <tr>
-      <th>781  </th>
-      <td> 2</td>
-      <td> 466801434</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9120</td>
-      <td>  430</td>
-      <td> 7000</td>
-      <td> 4.282840</td>
-      <td> 0.522578</td>
-      <td> 2109.36</td>
-      <td> 4036.45</td>
-      <td> 3.426180</td>
-      <td> 180296424</td>
-      <td>       669</td>
-      <td> 1.258740e+13</td>
-      <td> 5352090000</td>
-      <td> 1.128950e+13</td>
-      <td> 2796880000</td>
-      <td> 6.556300</td>
+      <th>781</th>
+      <td>2</td>
+      <td>466801434</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9120</td>
+      <td>430</td>
+      <td>7000</td>
+      <td>4.282840</td>
+      <td>0.522578</td>
+      <td>2109.36</td>
+      <td>4036.45</td>
+      <td>3.426180</td>
+      <td>180296424</td>
+      <td>669</td>
+      <td>1.258740e+13</td>
+      <td>5352090000</td>
+      <td>1.128950e+13</td>
+      <td>2796880000</td>
+      <td>6.556300</td>
     </tr>
     <tr>
-      <th>1385 </th>
-      <td> 2</td>
-      <td> 468716555</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9410</td>
-      <td> 2500</td>
-      <td> 9080</td>
-      <td> 0.384089</td>
-      <td> 0.703545</td>
-      <td> 4746.31</td>
-      <td> 6746.28</td>
-      <td> 0.415927</td>
-      <td> 309004492</td>
-      <td> 312782628</td>
-      <td> 2.462820e+12</td>
-      <td>  482602000</td>
-      <td> 2.290580e+12</td>
-      <td>  339533000</td>
-      <td> 0.591188</td>
+      <th>1385</th>
+      <td>2</td>
+      <td>468716555</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9410</td>
+      <td>2500</td>
+      <td>9080</td>
+      <td>0.384089</td>
+      <td>0.703545</td>
+      <td>4746.31</td>
+      <td>6746.28</td>
+      <td>0.415927</td>
+      <td>309004492</td>
+      <td>312782628</td>
+      <td>2.462820e+12</td>
+      <td>482602000</td>
+      <td>2.290580e+12</td>
+      <td>339533000</td>
+      <td>0.591188</td>
     </tr>
     <tr>
-      <th>1672 </th>
-      <td> 3</td>
-      <td> 468717338</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9310</td>
-      <td> 2520</td>
-      <td> 9140</td>
-      <td> 0.247361</td>
-      <td> 0.500414</td>
-      <td> 3419.28</td>
-      <td> 6832.92</td>
-      <td> 0.267866</td>
-      <td> 309004492</td>
-      <td> 312782574</td>
-      <td> 1.597700e+12</td>
-      <td>  436971000</td>
-      <td> 1.494130e+12</td>
-      <td>  218666000</td>
-      <td> 0.535289</td>
+      <th>1672</th>
+      <td>3</td>
+      <td>468717338</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9310</td>
+      <td>2520</td>
+      <td>9140</td>
+      <td>0.247361</td>
+      <td>0.500414</td>
+      <td>3419.28</td>
+      <td>6832.92</td>
+      <td>0.267866</td>
+      <td>309004492</td>
+      <td>312782574</td>
+      <td>1.597700e+12</td>
+      <td>436971000</td>
+      <td>1.494130e+12</td>
+      <td>218666000</td>
+      <td>0.535289</td>
     </tr>
     <tr>
-      <th>2282 </th>
-      <td> 2</td>
-      <td> 464590260</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 7890</td>
-      <td> 1480</td>
-      <td> 8340</td>
-      <td> 0.309360</td>
-      <td> 0.511926</td>
-      <td> 1307.37</td>
-      <td> 2553.82</td>
-      <td> 0.280996</td>
-      <td> 309372716</td>
-      <td>       417</td>
-      <td> 6.881910e+11</td>
-      <td>  448082000</td>
-      <td> 5.858080e+11</td>
-      <td>  229385000</td>
-      <td> 0.548900</td>
+      <th>2282</th>
+      <td>2</td>
+      <td>464590260</td>
+      <td>False</td>
+      <td>1</td>
+      <td>7890</td>
+      <td>1480</td>
+      <td>8340</td>
+      <td>0.309360</td>
+      <td>0.511926</td>
+      <td>1307.37</td>
+      <td>2553.82</td>
+      <td>0.280996</td>
+      <td>309372716</td>
+      <td>417</td>
+      <td>6.881910e+11</td>
+      <td>448082000</td>
+      <td>5.858080e+11</td>
+      <td>229385000</td>
+      <td>0.548900</td>
     </tr>
     <tr>
-      <th>2387 </th>
-      <td> 2</td>
-      <td> 464589276</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 8350</td>
-      <td> 1210</td>
-      <td> 7550</td>
-      <td> 0.341720</td>
-      <td> 0.592527</td>
-      <td> 1758.98</td>
-      <td> 2968.60</td>
-      <td> 0.310390</td>
-      <td> 309372716</td>
-      <td>        33</td>
-      <td> 8.231460e+11</td>
-      <td>  427625000</td>
-      <td> 7.521820e+11</td>
-      <td>  253379000</td>
-      <td> 0.523841</td>
+      <th>2387</th>
+      <td>2</td>
+      <td>464589276</td>
+      <td>False</td>
+      <td>1</td>
+      <td>8350</td>
+      <td>1210</td>
+      <td>7550</td>
+      <td>0.341720</td>
+      <td>0.592527</td>
+      <td>1758.98</td>
+      <td>2968.60</td>
+      <td>0.310390</td>
+      <td>309372716</td>
+      <td>33</td>
+      <td>8.231460e+11</td>
+      <td>427625000</td>
+      <td>7.521820e+11</td>
+      <td>253379000</td>
+      <td>0.523841</td>
     </tr>
     <tr>
-      <th>3136 </th>
-      <td> 2</td>
-      <td> 464673011</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 8410</td>
-      <td> 1810</td>
-      <td> 8790</td>
-      <td> 0.346579</td>
-      <td> 0.576891</td>
-      <td> 2265.98</td>
-      <td> 3927.91</td>
-      <td> 0.366763</td>
-      <td> 307558646</td>
-      <td>       409</td>
-      <td> 1.339100e+12</td>
-      <td>  518986000</td>
-      <td> 1.176010e+12</td>
-      <td>  299399000</td>
-      <td> 0.635758</td>
+      <th>3136</th>
+      <td>2</td>
+      <td>464673011</td>
+      <td>False</td>
+      <td>1</td>
+      <td>8410</td>
+      <td>1810</td>
+      <td>8790</td>
+      <td>0.346579</td>
+      <td>0.576891</td>
+      <td>2265.98</td>
+      <td>3927.91</td>
+      <td>0.366763</td>
+      <td>307558646</td>
+      <td>409</td>
+      <td>1.339100e+12</td>
+      <td>518986000</td>
+      <td>1.176010e+12</td>
+      <td>299399000</td>
+      <td>0.635758</td>
     </tr>
     <tr>
-      <th>3874 </th>
-      <td> 2</td>
-      <td> 469049369</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 7740</td>
-      <td> 1390</td>
-      <td> 8080</td>
-      <td> 0.835746</td>
-      <td> 0.632798</td>
-      <td> 1974.78</td>
-      <td> 3120.72</td>
-      <td> 0.340669</td>
-      <td> 113887162</td>
-      <td>       417</td>
-      <td> 9.587200e+11</td>
-      <td>  439472000</td>
-      <td> 8.678630e+11</td>
-      <td>  278097000</td>
-      <td> 0.538353</td>
+      <th>3874</th>
+      <td>2</td>
+      <td>469049369</td>
+      <td>False</td>
+      <td>1</td>
+      <td>7740</td>
+      <td>1390</td>
+      <td>8080</td>
+      <td>0.835746</td>
+      <td>0.632798</td>
+      <td>1974.78</td>
+      <td>3120.72</td>
+      <td>0.340669</td>
+      <td>113887162</td>
+      <td>417</td>
+      <td>9.587200e+11</td>
+      <td>439472000</td>
+      <td>8.678630e+11</td>
+      <td>278097000</td>
+      <td>0.538353</td>
     </tr>
     <tr>
-      <th>4290 </th>
-      <td> 2</td>
-      <td> 469048301</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 7750</td>
-      <td> 1220</td>
-      <td> 7790</td>
-      <td> 1.092520</td>
-      <td> 0.514036</td>
-      <td> 1456.22</td>
-      <td> 2832.91</td>
-      <td> 0.445337</td>
-      <td> 113887162</td>
-      <td>        22</td>
-      <td> 1.193390e+12</td>
-      <td>  707227000</td>
-      <td> 1.029880e+12</td>
-      <td>  363540000</td>
-      <td> 0.866353</td>
+      <th>4290</th>
+      <td>2</td>
+      <td>469048301</td>
+      <td>False</td>
+      <td>1</td>
+      <td>7750</td>
+      <td>1220</td>
+      <td>7790</td>
+      <td>1.092520</td>
+      <td>0.514036</td>
+      <td>1456.22</td>
+      <td>2832.91</td>
+      <td>0.445337</td>
+      <td>113887162</td>
+      <td>22</td>
+      <td>1.193390e+12</td>
+      <td>707227000</td>
+      <td>1.029880e+12</td>
+      <td>363540000</td>
+      <td>0.866353</td>
     </tr>
     <tr>
-      <th>4529 </th>
-      <td> 2</td>
-      <td> 464693465</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9410</td>
-      <td> 2500</td>
-      <td> 9080</td>
-      <td> 0.588003</td>
-      <td> 0.525714</td>
-      <td> 1001.53</td>
-      <td> 1905.09</td>
-      <td> 0.310796</td>
-      <td> 307295727</td>
-      <td> 312782628</td>
-      <td> 5.514320e+11</td>
-      <td>  482602000</td>
-      <td> 4.833410e+11</td>
-      <td>  253711000</td>
-      <td> 0.591188</td>
+      <th>4529</th>
+      <td>2</td>
+      <td>464693465</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9410</td>
+      <td>2500</td>
+      <td>9080</td>
+      <td>0.588003</td>
+      <td>0.525714</td>
+      <td>1001.53</td>
+      <td>1905.09</td>
+      <td>0.310796</td>
+      <td>307295727</td>
+      <td>312782628</td>
+      <td>5.514320e+11</td>
+      <td>482602000</td>
+      <td>4.833410e+11</td>
+      <td>253711000</td>
+      <td>0.591188</td>
     </tr>
     <tr>
-      <th>5706 </th>
-      <td> 2</td>
-      <td> 464641326</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 8600</td>
-      <td> 1320</td>
-      <td> 7920</td>
-      <td> 0.579938</td>
-      <td> 0.562626</td>
-      <td> 2394.80</td>
-      <td> 4256.47</td>
-      <td> 0.329715</td>
-      <td> 307743253</td>
-      <td>        33</td>
-      <td> 1.300680e+12</td>
-      <td>  478391000</td>
-      <td> 1.145650e+12</td>
-      <td>  269155000</td>
-      <td> 0.586029</td>
+      <th>5706</th>
+      <td>2</td>
+      <td>464641326</td>
+      <td>False</td>
+      <td>1</td>
+      <td>8600</td>
+      <td>1320</td>
+      <td>7920</td>
+      <td>0.579938</td>
+      <td>0.562626</td>
+      <td>2394.80</td>
+      <td>4256.47</td>
+      <td>0.329715</td>
+      <td>307743253</td>
+      <td>33</td>
+      <td>1.300680e+12</td>
+      <td>478391000</td>
+      <td>1.145650e+12</td>
+      <td>269155000</td>
+      <td>0.586029</td>
     </tr>
     <tr>
-      <th>5870 </th>
-      <td> 2</td>
-      <td> 464641791</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 8410</td>
-      <td> 1810</td>
-      <td> 8790</td>
-      <td> 0.850793</td>
-      <td> 0.963606</td>
-      <td> 5404.93</td>
-      <td> 5609.06</td>
-      <td> 0.483706</td>
-      <td> 307743253</td>
-      <td>       409</td>
-      <td> 2.229140e+12</td>
-      <td>  409775000</td>
-      <td> 2.214800e+12</td>
-      <td>  394862000</td>
-      <td> 0.501974</td>
+      <th>5870</th>
+      <td>2</td>
+      <td>464641791</td>
+      <td>False</td>
+      <td>1</td>
+      <td>8410</td>
+      <td>1810</td>
+      <td>8790</td>
+      <td>0.850793</td>
+      <td>0.963606</td>
+      <td>5404.93</td>
+      <td>5609.06</td>
+      <td>0.483706</td>
+      <td>307743253</td>
+      <td>409</td>
+      <td>2.229140e+12</td>
+      <td>409775000</td>
+      <td>2.214800e+12</td>
+      <td>394862000</td>
+      <td>0.501974</td>
     </tr>
     <tr>
-      <th>6163 </th>
-      <td> 2</td>
-      <td> 464612333</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 8290</td>
-      <td> 1220</td>
-      <td> 7560</td>
-      <td> 0.364743</td>
-      <td> 0.522912</td>
-      <td> 1668.58</td>
-      <td> 3190.93</td>
-      <td> 0.285784</td>
-      <td> 309113907</td>
-      <td>        33</td>
-      <td> 8.438810e+11</td>
-      <td>  446142000</td>
-      <td> 7.444220e+11</td>
-      <td>  233293000</td>
-      <td> 0.546523</td>
+      <th>6163</th>
+      <td>2</td>
+      <td>464612333</td>
+      <td>False</td>
+      <td>1</td>
+      <td>8290</td>
+      <td>1220</td>
+      <td>7560</td>
+      <td>0.364743</td>
+      <td>0.522912</td>
+      <td>1668.58</td>
+      <td>3190.93</td>
+      <td>0.285784</td>
+      <td>309113907</td>
+      <td>33</td>
+      <td>8.438810e+11</td>
+      <td>446142000</td>
+      <td>7.444220e+11</td>
+      <td>233293000</td>
+      <td>0.546523</td>
     </tr>
     <tr>
-      <th>7317 </th>
-      <td> 2</td>
-      <td> 468394758</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 8420</td>
-      <td> 1780</td>
-      <td> 8810</td>
-      <td> 0.842245</td>
-      <td> 0.643162</td>
-      <td> 1580.56</td>
-      <td> 2457.49</td>
-      <td> 0.411354</td>
-      <td> 307137980</td>
-      <td>       409</td>
-      <td> 9.416340e+11</td>
-      <td>  522107000</td>
-      <td> 8.252220e+11</td>
-      <td>  335799000</td>
-      <td> 0.639581</td>
+      <th>7317</th>
+      <td>2</td>
+      <td>468394758</td>
+      <td>False</td>
+      <td>1</td>
+      <td>8420</td>
+      <td>1780</td>
+      <td>8810</td>
+      <td>0.842245</td>
+      <td>0.643162</td>
+      <td>1580.56</td>
+      <td>2457.49</td>
+      <td>0.411354</td>
+      <td>307137980</td>
+      <td>409</td>
+      <td>9.416340e+11</td>
+      <td>522107000</td>
+      <td>8.252220e+11</td>
+      <td>335799000</td>
+      <td>0.639581</td>
     </tr>
     <tr>
-      <th>7332 </th>
-      <td> 2</td>
-      <td> 468394191</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 8850</td>
-      <td> 1390</td>
-      <td> 7770</td>
-      <td> 0.744679</td>
-      <td> 0.623297</td>
-      <td> 2194.76</td>
-      <td> 3521.20</td>
-      <td> 0.363703</td>
-      <td> 307137980</td>
-      <td>        33</td>
-      <td> 1.143760e+12</td>
-      <td>  476338000</td>
-      <td> 1.045450e+12</td>
-      <td>  296900000</td>
-      <td> 0.583515</td>
+      <th>7332</th>
+      <td>2</td>
+      <td>468394191</td>
+      <td>False</td>
+      <td>1</td>
+      <td>8850</td>
+      <td>1390</td>
+      <td>7770</td>
+      <td>0.744679</td>
+      <td>0.623297</td>
+      <td>2194.76</td>
+      <td>3521.20</td>
+      <td>0.363703</td>
+      <td>307137980</td>
+      <td>33</td>
+      <td>1.143760e+12</td>
+      <td>476338000</td>
+      <td>1.045450e+12</td>
+      <td>296900000</td>
+      <td>0.583515</td>
     </tr>
     <tr>
-      <th>8207 </th>
-      <td> 2</td>
-      <td> 464668468</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9180</td>
-      <td> 2180</td>
-      <td> 8830</td>
-      <td> 0.606213</td>
-      <td> 0.809194</td>
-      <td> 4200.65</td>
-      <td> 5191.16</td>
-      <td> 0.488059</td>
-      <td> 307321674</td>
-      <td>       409</td>
-      <td> 2.181880e+12</td>
-      <td>  492361000</td>
-      <td> 2.068240e+12</td>
-      <td>  398415000</td>
-      <td> 0.603142</td>
+      <th>8207</th>
+      <td>2</td>
+      <td>464668468</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9180</td>
+      <td>2180</td>
+      <td>8830</td>
+      <td>0.606213</td>
+      <td>0.809194</td>
+      <td>4200.65</td>
+      <td>5191.16</td>
+      <td>0.488059</td>
+      <td>307321674</td>
+      <td>409</td>
+      <td>2.181880e+12</td>
+      <td>492361000</td>
+      <td>2.068240e+12</td>
+      <td>398415000</td>
+      <td>0.603142</td>
     </tr>
     <tr>
-      <th>9425 </th>
-      <td> 2</td>
-      <td> 464692615</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 8620</td>
-      <td> 1880</td>
-      <td> 8830</td>
-      <td> 0.544465</td>
-      <td> 0.575531</td>
-      <td> 1674.43</td>
-      <td> 2909.37</td>
-      <td> 0.361219</td>
-      <td> 307297141</td>
-      <td>       409</td>
-      <td> 1.035320e+12</td>
-      <td>  512349000</td>
-      <td> 8.578950e+11</td>
-      <td>  294873000</td>
-      <td> 0.627627</td>
+      <th>9425</th>
+      <td>2</td>
+      <td>464692615</td>
+      <td>False</td>
+      <td>1</td>
+      <td>8620</td>
+      <td>1880</td>
+      <td>8830</td>
+      <td>0.544465</td>
+      <td>0.575531</td>
+      <td>1674.43</td>
+      <td>2909.37</td>
+      <td>0.361219</td>
+      <td>307297141</td>
+      <td>409</td>
+      <td>1.035320e+12</td>
+      <td>512349000</td>
+      <td>8.578950e+11</td>
+      <td>294873000</td>
+      <td>0.627627</td>
     </tr>
     <tr>
       <th>10145</th>
-      <td> 2</td>
-      <td> 464663987</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9180</td>
-      <td> 2180</td>
-      <td> 8830</td>
-      <td> 0.571475</td>
-      <td> 0.720363</td>
-      <td> 4720.18</td>
-      <td> 6552.50</td>
-      <td> 0.452388</td>
-      <td> 307296433</td>
-      <td>       409</td>
-      <td> 2.571680e+12</td>
-      <td>  512653000</td>
-      <td> 2.419820e+12</td>
-      <td>  369296000</td>
-      <td> 0.628000</td>
+      <td>2</td>
+      <td>464663987</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9180</td>
+      <td>2180</td>
+      <td>8830</td>
+      <td>0.571475</td>
+      <td>0.720363</td>
+      <td>4720.18</td>
+      <td>6552.50</td>
+      <td>0.452388</td>
+      <td>307296433</td>
+      <td>409</td>
+      <td>2.571680e+12</td>
+      <td>512653000</td>
+      <td>2.419820e+12</td>
+      <td>369296000</td>
+      <td>0.628000</td>
     </tr>
     <tr>
       <th>12237</th>
-      <td> 2</td>
-      <td> 464626025</td>
-      <td> False</td>
-      <td> 1</td>
-      <td> 9000</td>
-      <td> 1150</td>
-      <td> 7450</td>
-      <td> 0.700531</td>
-      <td> 0.683128</td>
-      <td> 2361.48</td>
-      <td> 3456.87</td>
-      <td> 0.363209</td>
-      <td> 307593747</td>
-      <td>        33</td>
-      <td> 1.113930e+12</td>
-      <td>  434029000</td>
-      <td> 1.024950e+12</td>
-      <td>  296497000</td>
-      <td> 0.531686</td>
+      <td>2</td>
+      <td>464626025</td>
+      <td>False</td>
+      <td>1</td>
+      <td>9000</td>
+      <td>1150</td>
+      <td>7450</td>
+      <td>0.700531</td>
+      <td>0.683128</td>
+      <td>2361.48</td>
+      <td>3456.87</td>
+      <td>0.363209</td>
+      <td>307593747</td>
+      <td>33</td>
+      <td>1.113930e+12</td>
+      <td>434029000</td>
+      <td>1.024950e+12</td>
+      <td>296497000</td>
+      <td>0.531686</td>
     </tr>
   </tbody>
 </table>
@@ -4035,11 +4038,13 @@ Name: name, dtype: object
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[48]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">&#39;ignore&#39;</span><span class="p">)</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 
 <span class="n">visp_experiment_ids</span> <span class="o">=</span> <span class="p">[</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">visp_experiments</span> <span class="p">]</span>
@@ -4775,7 +4780,7 @@ JUmSJEm9LB4lSZIkSb0sHiVJkiRJvSweJUmSJEm9/n/nKbxuwvLT9AAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[49]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">experiment_id</span> <span class="o">=</span> <span class="mi">181599674</span>
@@ -4810,12 +4815,7 @@ JUmSJEm9LB4lSZIkSb0sHiVJkiRJvSweJUmSJEm9/n/nKbxuwvLT9AAAAABJRU5ErkJggg==
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
-
-
-
-
-{&apos;space origin&apos;: [0.0, 0.0, 0.0], &apos;space directions&apos;: [[25.0, 0.0, 0.0], [0.0, 25.0, 0.0], [0.0, 0.0, 25.0]], &apos;sizes&apos;: [528, 320, 456], &apos;space&apos;: &apos;left-posterior-superior&apos;, &apos;encoding&apos;: &apos;gzip&apos;, &apos;keyvaluepairs&apos;: {}, &apos;endian&apos;: &apos;little&apos;, &apos;kinds&apos;: [&apos;domain&apos;, &apos;domain&apos;, &apos;domain&apos;], &apos;type&apos;: &apos;float&apos;, &apos;dimension&apos;: 3}
+<pre>{u&apos;space origin&apos;: [&apos;0&apos;, &apos;0&apos;, &apos;0&apos;], u&apos;space directions&apos;: [[&apos;25&apos;, &apos;0&apos;, &apos;0&apos;], [&apos;0&apos;, &apos;25&apos;, &apos;0&apos;], [&apos;0&apos;, &apos;0&apos;, &apos;25&apos;]], u&apos;sizes&apos;: [528, 320, 456], u&apos;space&apos;: &apos;left-posterior-superior&apos;, u&apos;encoding&apos;: &apos;gzip&apos;, u&apos;keyvaluepairs&apos;: {}, u&apos;endian&apos;: &apos;little&apos;, u&apos;kinds&apos;: [&apos;domain&apos;, &apos;domain&apos;, &apos;domain&apos;], u&apos;type&apos;: &apos;float&apos;, u&apos;dimension&apos;: 3}
 (528, 320, 456) (528, 320, 456) (528, 320, 456)
 </pre>
 </div>
@@ -4837,7 +4837,7 @@ JUmSJEm9LB4lSZIkSb0sHiVJkiRJvSweJUmSJEm9/n/nKbxuwvLT9AAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[50]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># compute the maximum intensity projection of the projection density</span>
@@ -4879,11 +4879,11 @@ JUmSJEm9LB4lSZIkSb0sHiVJkiRJvSweJUmSJEm9/n/nKbxuwvLT9AAAAABJRU5ErkJggg==
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[50]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[10]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x10da779d0&gt;</pre>
+<pre>&lt;matplotlib.text.Text at 0x7f7e2f587350&gt;</pre>
 </div>
 
 </div>
@@ -6699,7 +6699,7 @@ aDQW/P8yX/mvP9ybXwAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[51]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">isocortex_mask</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_structure_mask</span><span class="p">(</span><span class="n">isocortex</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>

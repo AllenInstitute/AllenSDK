@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Models &mdash; Allen SDK 0.10.1 documentation</title>
+    <title>Models &mdash; Allen SDK 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
     <link rel="next" title="Generalized LIF Models" href="glif_models.html" />
     <link rel="prev" title="API Access" href="data_api_client.html" /> 
   </head>
@@ -635,7 +635,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <h1>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h1>
 <p>The Allen SDK currently focuses on models generated from electrophysiology data
 in the Allen Cell Types Database.  There are two classes of models available
-for download: perisomatic biophysical models and generalize leaky integrate-and-fire
+for download: biophysical models and generalize leaky integrate-and-fire
 models.</p>
 <div class="toctree-wrapper compound">
 <ul>
@@ -647,33 +647,33 @@ models.</p>
 <li class="toctree-l2"><a class="reference internal" href="glif_models.html#built-in-reset-rules">Built-in Reset Rules</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#downloading-biophysical-models">Downloading Biophysical Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#directory-structure">Directory Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#running-the-simulation">Running the Simulation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#selecting-a-specific-sweep">Selecting a Specific Sweep</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#simulation-main-loop">Simulation Main Loop</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#customization">Customization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#examples">Examples</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#exporting-output-to-text-format-or-image">Exporting Output to Text Format or Image</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#model-description-files">Model Description Files</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="biophysical_perisomatic_script.html#basic-structure">Basic Structure</a></li>
-<li class="toctree-l3"><a class="reference internal" href="biophysical_perisomatic_script.html#objects-within-sections">Objects Within Sections</a></li>
-<li class="toctree-l3"><a class="reference internal" href="biophysical_perisomatic_script.html#comment-lines">Comment Lines</a></li>
-<li class="toctree-l3"><a class="reference internal" href="biophysical_perisomatic_script.html#split-description-files-by-section">Split Description Files by Section</a></li>
-<li class="toctree-l3"><a class="reference internal" href="biophysical_perisomatic_script.html#split-sections-between-description-files">Split Sections Between Description Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="biophysical_models.html">Biophysical</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#downloading-biophysical-models">Downloading Biophysical Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#directory-structure">Directory Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#running-the-simulation">Running the Simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#selecting-a-specific-sweep">Selecting a Specific Sweep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#simulation-main-loop">Simulation Main Loop</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#customization">Customization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#examples">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#exporting-output-to-text-format-or-image">Exporting Output to Text Format or Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#model-description-files">Model Description Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="biophysical_models.html#basic-structure">Basic Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biophysical_models.html#objects-within-sections">Objects Within Sections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biophysical_models.html#comment-lines">Comment Lines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biophysical_models.html#split-description-files-by-section">Split Description Files by Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biophysical_models.html#split-sections-between-description-files">Split Sections Between Description Files</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#resource-manifest">Resource Manifest</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="biophysical_perisomatic_script.html#a-simple-manifest">A Simple Manifest</a></li>
-<li class="toctree-l3"><a class="reference internal" href="biophysical_perisomatic_script.html#parent-child-relationships">Parent Child Relationships</a></li>
-<li class="toctree-l3"><a class="reference internal" href="biophysical_perisomatic_script.html#file-spec-patterns">File Spec Patterns</a></li>
-<li class="toctree-l3"><a class="reference internal" href="biophysical_perisomatic_script.html#split-manifest-files">Split Manifest Files</a></li>
-<li class="toctree-l3"><a class="reference internal" href="biophysical_perisomatic_script.html#extensions">Extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#resource-manifest">Resource Manifest</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="biophysical_models.html#a-simple-manifest">A Simple Manifest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biophysical_models.html#parent-child-relationships">Parent Child Relationships</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biophysical_models.html#file-spec-patterns">File Spec Patterns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biophysical_models.html#split-manifest-files">Split Manifest Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biophysical_models.html#extensions">Extensions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html#further-reading">Further Reading</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html#further-reading">Further Reading</a></li>
 </ul>
 </li>
 </ul>
@@ -699,7 +699,7 @@ models.</p>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -715,6 +715,15 @@ models.</p>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
 </ul>
 
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>

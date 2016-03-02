@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.ephys.extract_cell_features &mdash; Allen SDK 0.10.1 documentation</title>
+    <title>allensdk.ephys.extract_cell_features &mdash; Allen SDK 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.1 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
@@ -690,15 +690,27 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">long_square_features</span> <span class="o">=</span> <span class="n">analyze_long_squares</span><span class="p">(</span><span class="n">long_square_sweeps</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="p">(</span> <span class="p">(</span> <span class="s">&quot;hero_sweep_num&quot;</span> <span class="ow">in</span> <span class="n">long_square_features</span> <span class="p">)</span> <span class="ow">and</span> <span class="p">(</span> <span class="s">&quot;input_resistance&quot;</span> <span class="ow">in</span> <span class="n">long_square_features</span> <span class="p">)</span> <span class="p">):</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s">&#39;long_squares&#39;</span><span class="p">:</span> <span class="n">long_square_features</span><span class="p">,</span>
-            <span class="s">&#39;ramps&#39;</span><span class="p">:</span> <span class="n">analyze_ramps</span><span class="p">(</span><span class="n">ramp_sweeps</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">),</span>
-            <span class="s">&#39;short_squares&#39;</span><span class="p">:</span> <span class="n">analyze_short_squares</span><span class="p">(</span><span class="n">short_square_sweeps</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">)</span>
-            <span class="p">}</span>
-
-    <span class="k">else</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s">&quot;hero_sweep_num&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">long_square_features</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;could not identify a hero sweep&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="s">&quot;input_resistance&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">long_square_features</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;could not compute input resistance&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="n">short_square_features</span> <span class="o">=</span> <span class="n">analyze_short_squares</span><span class="p">(</span><span class="n">short_square_sweeps</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">short_square_features</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;up_down_ratio&quot;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;could not compute short square up/down ratio: most likely short square stimuli did not trigger a spike&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="n">ramp_features</span> <span class="o">=</span> <span class="n">analyze_ramps</span><span class="p">(</span><span class="n">ramp_sweeps</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s">&#39;long_squares&#39;</span><span class="p">:</span> <span class="n">long_square_features</span><span class="p">,</span>
+        <span class="s">&#39;ramps&#39;</span><span class="p">:</span> <span class="n">ramp_features</span><span class="p">,</span>
+        <span class="s">&#39;short_squares&#39;</span><span class="p">:</span> <span class="n">short_square_features</span>
+        <span class="p">}</span>
 
 </div>
 <div class="viewcode-block" id="extract_sweep_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.extract_cell_features.extract_sweep_features">[docs]</a><span class="k">def</span> <span class="nf">extract_sweep_features</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">):</span>
@@ -721,6 +733,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">all_sweep_features</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">for</span> <span class="n">sweep_number</span> <span class="ow">in</span> <span class="n">sweep_numbers</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;extracting features for sweep </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">)</span>
         <span class="n">sweep_features</span> <span class="o">=</span> <span class="n">extract_single_sweep_features</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">)</span>
         <span class="n">all_sweep_features</span><span class="p">[</span><span class="n">sweep_number</span><span class="p">]</span> <span class="o">=</span> <span class="n">sweep_features</span>
 
@@ -1183,27 +1196,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">return</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
         
 </div>
-<div class="viewcode-block" id="get_square_stim_characteristics"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.extract_cell_features.get_square_stim_characteristics">[docs]</a><span class="k">def</span> <span class="nf">get_square_stim_characteristics</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="get_square_stim_characteristics"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.extract_cell_features.get_square_stim_characteristics">[docs]</a><span class="k">def</span> <span class="nf">get_square_stim_characteristics</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">no_test_pulse</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Identify the start time, duration, amplitude, start index, and</span>
 <span class="sd">    end index of a square stimulus.  </span>
+<span class="sd">    This assumes that there is a test pulse followed by the stimulus square.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="c"># Assumes that there is a test pulse followed by the stimulus square</span>
     <span class="n">di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
     <span class="n">up_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">di</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">down_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">di</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">no_test_pulse</span> <span class="k">else</span> <span class="mi">1</span>
     
     <span class="c"># second square is the stimulus</span>
-    <span class="k">if</span> <span class="n">up_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">down_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="c"># positive square</span>
-        <span class="n">start_idx</span> <span class="o">=</span> <span class="n">up_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="c"># shift by one to compensate for diff()</span>
-        <span class="n">end_idx</span> <span class="o">=</span> <span class="n">down_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">up_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">down_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span> <span class="c"># positive square</span>
+        <span class="n">start_idx</span> <span class="o">=</span> <span class="n">up_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="c"># shift by one to compensate for diff()</span>
+        <span class="n">end_idx</span> <span class="o">=</span> <span class="n">down_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="k">else</span><span class="p">:</span> <span class="c"># negative square</span>
-        <span class="n">start_idx</span> <span class="o">=</span> <span class="n">down_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="n">end_idx</span> <span class="o">=</span> <span class="n">up_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">start_idx</span> <span class="o">=</span> <span class="n">down_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">end_idx</span> <span class="o">=</span> <span class="n">up_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
     <span class="n">stim_start</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">start_idx</span><span class="p">])</span>
     <span class="n">stim_dur</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">end_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">start_idx</span><span class="p">])</span>
     <span class="n">stim_amp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">start_idx</span><span class="p">])</span>
+
     <span class="k">return</span> <span class="p">(</span><span class="n">stim_start</span><span class="p">,</span> <span class="n">stim_dur</span><span class="p">,</span> <span class="n">stim_amp</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">)</span>
 
 </div>
@@ -1217,6 +1234,32 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">start_idx</span> <span class="o">=</span> <span class="n">up_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="c"># shift by one to compensate for diff()</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">start_idx</span><span class="p">],</span> <span class="n">start_idx</span><span class="p">)</span>
     
+</div>
+<div class="viewcode-block" id="get_stim_characteristics"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.extract_cell_features.get_stim_characteristics">[docs]</a><span class="k">def</span> <span class="nf">get_stim_characteristics</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">no_test_pulse</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Identify the start time, duration, amplitude, start index, and</span>
+<span class="sd">    end index of a general stimulus.  </span>
+<span class="sd">    This assumes that there is a test pulse followed by the stimulus square.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">diff_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">di</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">diff_idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="c"># skip the first up/down </span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">no_test_pulse</span> <span class="k">else</span> <span class="mi">1</span>
+    
+    <span class="c"># shift by one to compensate for diff()</span>
+    <span class="n">start_idx</span> <span class="o">=</span> <span class="n">diff_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">end_idx</span> <span class="o">=</span> <span class="n">diff_idx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">stim_start</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">start_idx</span><span class="p">])</span>
+    <span class="n">stim_dur</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">end_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">start_idx</span><span class="p">])</span>
+    <span class="n">stim_amp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">start_idx</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">stim_start</span><span class="p">,</span> <span class="n">stim_dur</span><span class="p">,</span> <span class="n">stim_amp</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="calculate_input_resistance"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.extract_cell_features.calculate_input_resistance">[docs]</a><span class="k">def</span> <span class="nf">calculate_input_resistance</span><span class="p">(</span><span class="n">subthresh_data</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; </span>
@@ -1335,7 +1378,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../glif_models.html">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
@@ -1351,6 +1394,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
 </ul>
 
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>

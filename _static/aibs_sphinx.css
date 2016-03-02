@@ -42,6 +42,7 @@ div.sphinxsidebar {
     float: left;
     margin-left: -100%;
     width: 300px;
+    font-family: Verdana, sans-serif;
 }
 
 div.clearer {
@@ -780,3 +781,47 @@ hr.docutils {
 a.current {
   
 }         
+
+div.sphinxsidebar p.questions {
+  margin-right: 15px;
+  font-size: 90%;
+}
+
+dl.class > dt {
+   background-color: #ef9c43;
+   border: 1px solid #ff9c33;
+   padding: 3px;
+}
+
+dl.method > dt, dl.classmethod > dt {
+   background-color: #add4eb;
+   border: 1px solid: #99daff;
+   padding: 3px;
+}
+
+dl.function > dt, dl.exception > dt {
+   background-color: #a0d279;
+   border: 1px solid: #9cf25a;
+   padding: 3px;
+}
+
+/*
+table.docutils tr.field th.field-name {
+   background-color: #eaeaea;
+   border-bottom: 4px solid white;
+}        
+*/
+
+table.docutils th, table.docutils td {
+   padding: 4px 8px 4px 4px;
+}
+
+table.docutils tr.field {
+   border-bottom: 3px solid white;
+}
+
+td.field-body > p > strong {
+   background-color: #eaeaea;
+   padding: 3px;
+   border-left: 2px solid #d0d0d0;
+}

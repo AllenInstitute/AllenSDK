@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>API Access &mdash; Allen SDK 0.10.1 documentation</title>
+    <title>API Access &mdash; Allen SDK 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
     <link rel="up" title="Data Resources" href="data_resources.html" />
     <link rel="next" title="Models" href="models.html" />
     <link rel="prev" title="Mouse Connectivity" href="connectivity.html" /> 
@@ -642,7 +642,7 @@ are several subclasses in Allen SDK:</p>
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi" title="allensdk.api.queries.cell_types_api.CellTypesApi"><tt class="xref py py-class docutils literal"><span class="pre">CellTypesApi</span></tt></a>: data related to the Allen Cell Types Database</li>
-<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi" title="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi"><tt class="xref py py-class docutils literal"><span class="pre">BiophysicalPerisomaticApi</span></tt></a>: data related to perisomatic biophysical models</li>
+<li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi" title="allensdk.api.queries.biophysical_api.BiophysicalApi"><tt class="xref py py-class docutils literal"><span class="pre">BiophysicalApi</span></tt></a>: data related to biophysical models</li>
 <li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi" title="allensdk.api.queries.glif_api.GlifApi"><tt class="xref py py-class docutils literal"><span class="pre">GlifApi</span></tt></a>: data related to GLIF models</li>
 <li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi" title="allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi"><tt class="xref py py-class docutils literal"><span class="pre">AnnotatedSectionDataSetsApi</span></tt></a>: search for experiments by intensity, density, pattern, and age</li>
 <li><a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.grid_data_api.GridDataApi" title="allensdk.api.queries.grid_data_api.GridDataApi"><tt class="xref py py-class docutils literal"><span class="pre">GridDataApi</span></tt></a>: used to download 3-D expression grid data</li>
@@ -738,7 +738,7 @@ for this.</p>
 <p><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/indexing.html">Indexing</a>
 subsets of the data (certain columns, certain rows) is one use of pandas:
 specifically <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/indexing.html#selection-by-label">.loc</a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">names_and_acromyms</span> <span class="o">=</span> <span class="n">structures</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;acronym&#39;</span><span class="p">]]</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">names_and_acronyms</span> <span class="o">=</span> <span class="n">structures</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;acronym&#39;</span><span class="p">]]</span>
 </pre></div>
 </div>
 <p>and <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/indexing.html#boolean-indexing">Boolean indexing</a></p>
@@ -828,7 +828,7 @@ from disk rather than executing the query.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -844,6 +844,15 @@ from disk rather than executing the query.</p>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
 </ul>
 
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>

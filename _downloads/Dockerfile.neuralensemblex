@@ -20,10 +20,10 @@ RUN apt-get install -yq \
     
 USER docker
 
-ENV ALLENSDK=AllenSDK-v0.10.1.tar.gz
+ENV ALLENSDK=AllenSDK-v0.11.0.tar.gz
 WORKDIR /home/docker/packages
 
-RUN wget https://github.com/AllenInstitute/AllenSDK/archive/v0.10.1.tar.gz
+RUN wget https://github.com/AllenInstitute/AllenSDK/archive/v0.11.0.tar.gz
 
 WORKDIR $VENV/build
 RUN tar xvzf /home/docker/packages/${ALLENSDK}

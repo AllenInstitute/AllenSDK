@@ -52,4 +52,4 @@ RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
 
 RUN pip install jupyter
 
-RUN pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.10.1.tar.gz
+RUN pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.11.0.tar.gz

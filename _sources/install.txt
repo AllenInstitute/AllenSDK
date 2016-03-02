@@ -12,19 +12,14 @@ Quick Start Using Pip
 ---------------------
 
 First ensure you have `pip <http://pypi.python.org/pypi/pip>`_ installed.
-To install the Allen SDK for a single user::
+It is included with the Anaconda distribution.
 
-    pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.10.1.tar.gz --user
+::
 
-
-.. note::
-
-    On Windows use the options '--process-dependency-links --trusted-host github.com'
-    to install the correct version of the pynrrd dependency. 
+    pip install allensdk
 
 
-
-Uninstalling the SDK is simple with pip::
+To uninstall the SDK::
 
     pip uninstall allensdk
 

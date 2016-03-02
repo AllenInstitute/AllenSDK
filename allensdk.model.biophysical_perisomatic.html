@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.model.biophysical_perisomatic package &mdash; Allen SDK 0.10.1 documentation</title>
+    <title>allensdk.model.biophysical_perisomatic package &mdash; Allen SDK 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,8 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
-    <link rel="up" title="allensdk.model package" href="allensdk.model.html" /> 
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="up" title="allensdk.model package" href="allensdk.model.html" />
+    <link rel="next" title="allensdk.model.glif package" href="allensdk.model.glif.html" />
+    <link rel="prev" title="allensdk.model.biophysical package" href="allensdk.model.biophysical.html" /> 
   </head>
   <body>
 <script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
@@ -755,33 +757,6 @@ perisomatic biophysical simulations.</p>
 </tr>
 </tbody>
 </table>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology" title="allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology"><tt class="xref py py-obj docutils literal"><span class="pre">generate_morphology</span></tt></a>(morph_filename)</td>
-<td>Load a swc-format cell morphology file.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">initialize_hoc</span></tt>()</td>
-<td>Basic setup for NEURON.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters" title="allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters"><tt class="xref py py-obj docutils literal"><span class="pre">load_cell_parameters</span></tt></a>()</td>
-<td>Configure a neuron after the cell morphology has been loaded.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus" title="allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus"><tt class="xref py py-obj docutils literal"><span class="pre">read_stimulus</span></tt></a>(stimulus_path[,&nbsp;sweep])</td>
-<td>load current values for a specific experiment sweep.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.model.biophysical_perisomatic.utils.Utils.record_values" title="allensdk.model.biophysical_perisomatic.utils.Utils.record_values"><tt class="xref py py-obj docutils literal"><span class="pre">record_values</span></tt></a>()</td>
-<td>Set up output voltage recording.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp" title="allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp"><tt class="xref py py-obj docutils literal"><span class="pre">setup_iclamp</span></tt></a>(stimulus_path[,&nbsp;sweep])</td>
-<td>Assign a current waveform as input stimulus.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology">
 <tt class="descname">generate_morphology</tt><big>(</big><em>morph_filename</em><big>)</big><a class="reference internal" href="_modules/allensdk/model/biophysical_perisomatic/utils.html#Utils.generate_morphology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology" title="Permalink to this definition">¶</a></dt>
@@ -879,7 +854,7 @@ perisomatic biophysical simulations.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -895,6 +870,15 @@ perisomatic biophysical simulations.</p>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
 </ul>
 
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>

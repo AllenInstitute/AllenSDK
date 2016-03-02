@@ -1,0 +1,30 @@
+allensdk.model.biophysical package
+==================================
+
+Submodules
+----------
+
+allensdk.model.biophysical.runner module
+----------------------------------------
+
+.. automodule:: allensdk.model.biophysical.runner
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.model.biophysical.utils module
+---------------------------------------
+
+.. automodule:: allensdk.model.biophysical.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.model.biophysical
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.10.1 documentation</title>
+    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.1 documentation" href="#" />
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="#" />
     <link rel="next" title="Install Guide" href="install.html" /> 
   </head>
   <body>
@@ -644,7 +644,7 @@ Functionality relevant to other atlases is coming in future releases.</p>
 of individual neurons in the mouse primary visual cortex.  The Allen SDK provides Python code
 for accessing electrophysiology measurements (<a class="reference external" href="cell_types.html#neurodata-without-borders">NWB files</a>)
 for all neurons and morphological reconstructions (<a class="reference external" href="cell_types.html#morphology-swc-files">SWC files</a>) for a subset of neurons.</p>
-<p>The Database also contains two classes of models fit to this data set: perisomatic biophysical
+<p>The Database also contains two classes of models fit to this data set: biophysical
 models produced using the NEURON simulator and generalized leaky integrate and fire models (GLIFs)
 produced using custom Python code provided with this toolkit.</p>
 <p>The Allen SDK provides sample code
@@ -652,7 +652,7 @@ demonstrating how to download neuronal model parameters from the Allen Brain Atl
 your own simulations using stimuli from the Allen Cell Types Database or custom current injections:</p>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference internal" href="biophysical_perisomatic_script.html"><em>Perisomatic Biophysical Models</em></a></li>
+<li><a class="reference internal" href="biophysical_models.html"><em>Biophysical Models</em></a></li>
 <li><a class="reference internal" href="glif_models.html"><em>Generalized LIF Models</em></a></li>
 </ul>
 </div></blockquote>
@@ -665,10 +665,18 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 <p>The Allen SDK provides Python code for accessing experimental metadata along with projection signal volumes registered to a common coordinate framework.  This framework has structural annotations, which allows users to compute structure-level signal statistics.</p>
 <p>See the <a class="reference external" href="connectivity.html">mouse connectivity section</a> for more details.</p>
 </div>
-<hr class="docutils" />
-<div class="section" id="developer-documentation">
-<h2>Developer Documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h2>
-<p>Please refer to the <a class="reference internal" href="py-modindex.html"><em>Module Index</em></a> for inline source code documentation.</p>
+<div class="section" id="what-s-new-release-0-11-0">
+<h2>What&#8217;s New - Release 0.11.0<a class="headerlink" href="#what-s-new-release-0-11-0" title="Permalink to this headline">¶</a></h2>
+<p>The 0.11.0 release addressed several issues raised on our Github issue tracker.  Other changes and updates include:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Cell Types Database cells can now be filtered on their reporter status (cre+ or cre-).</li>
+<li>Cell Types Database reconstructions have markers indicating truncation and tracing termination.</li>
+<li>The Morphology class has a number of new methods for tree manipulation, and slightly different internal data structure for compartments.</li>
+<li>The GLIF simulator has more standard function names for dynamics and reset rules.</li>
+</ul>
+</div></blockquote>
+<p>To find out more, take a look at our <a class="reference external" href="http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md">CHANGELOG</a>.</p>
 </div>
 </div>
 
@@ -691,7 +699,7 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -707,6 +715,15 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
 </ul>
 
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>

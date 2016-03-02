@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Generalized LIF Models &mdash; Allen SDK 0.10.1 documentation</title>
+    <title>Generalized LIF Models &mdash; Allen SDK 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,9 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
     <link rel="up" title="Models" href="models.html" />
-    <link rel="next" title="Perisomatic Biophysical Models" href="biophysical_perisomatic_script.html" />
+    <link rel="next" title="Biophysical Models" href="biophysical_models.html" />
     <link rel="prev" title="Models" href="models.html" /> 
   </head>
   <body>
@@ -704,10 +704,10 @@ class:</p>
 
 <span class="n">glif_api</span> <span class="o">=</span> <span class="n">GlifApi</span><span class="p">()</span>
 <span class="n">glif_api</span><span class="o">.</span><span class="n">get_neuronal_model</span><span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">)</span>
-<span class="n">glif_api</span><span class="o">.</span><span class="n">cache_stimulus_file</span><span class="p">(</span><span class="s">&#39;472423251.nwb&#39;</span><span class="p">)</span>
+<span class="n">glif_api</span><span class="o">.</span><span class="n">cache_stimulus_file</span><span class="p">(</span><span class="s">&#39;stimulus.nwb&#39;</span><span class="p">)</span>
 
 <span class="n">neuron_config</span> <span class="o">=</span> <span class="n">glif_api</span><span class="o">.</span><span class="n">get_neuron_config</span><span class="p">()</span>
-<span class="n">json_utilities</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;472423251_neuron_config.json&#39;</span><span class="p">,</span> <span class="n">neuron_config</span><span class="p">)</span>
+<span class="n">json_utilities</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;neuron_config.json&#39;</span><span class="p">,</span> <span class="n">neuron_config</span><span class="p">)</span>
 
 <span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="n">glif_api</span><span class="o">.</span><span class="n">get_ephys_sweeps</span><span class="p">()</span>
 <span class="n">json_utilities</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;ephys_sweeps.json&#39;</span><span class="p">,</span> <span class="n">ephys_sweeps</span><span class="p">)</span>
@@ -722,7 +722,7 @@ JSON file.  You can use this file to instantiate a simulator and feed in your ow
 <span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="kn">import</span> <span class="n">GlifNeuron</span>
 
 <span class="c"># initialize the neuron</span>
-<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;472423251_neuron_config.json&#39;</span><span class="p">)</span>
+<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;neuron_config.json&#39;</span><span class="p">)</span>
 <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
 <span class="c"># make a short square pulse. stimulus units should be in Amps.</span>
@@ -754,13 +754,14 @@ module for simulating all sweeps presented to a cell and storing them in the NWB
 <span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="kn">import</span> <span class="n">GlifNeuron</span>
 <span class="kn">from</span> <span class="nn">allensdk.model.glif.simulate_neuron</span> <span class="kn">import</span> <span class="n">simulate_neuron</span>
 
-<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;472423251_neuron_config.json&#39;</span><span class="p">)</span>
+<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;neuron_config.json&#39;</span><span class="p">)</span>
 <span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;ephys_sweeps.json&#39;</span><span class="p">)</span>
-<span class="n">ephys_file_name</span> <span class="o">=</span> <span class="s">&#39;472423251.nwb&#39;</span>
+<span class="n">ephys_file_name</span> <span class="o">=</span> <span class="s">&#39;stimulus.nwb&#39;</span>
 
 <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
-<span class="n">simulate_neuron</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">ephys_sweeps</span><span class="p">,</span> <span class="n">ephys_file_name</span><span class="p">,</span> <span class="n">ephys_file_name</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="n">sweep_numbers</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ephys_sweeps</span> <span class="p">]</span>
+<span class="n">simulate_neuron</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">,</span> <span class="n">ephys_file_name</span><span class="p">,</span> <span class="n">ephys_file_name</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition warning">
@@ -778,9 +779,9 @@ these <tt class="docutils literal"><span class="pre">NaN</span></tt> values gene
 <span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="kn">import</span> <span class="n">GlifNeuron</span>
 <span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> <span class="n">NwbDataSet</span>
 
-<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;472423251_neuron_config.json&#39;</span><span class="p">)</span>
+<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;neuron_config.json&#39;</span><span class="p">)</span>
 <span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;ephys_sweeps.json&#39;</span><span class="p">)</span>
-<span class="n">ephys_file_name</span> <span class="o">=</span> <span class="s">&#39;472423251.nwb&#39;</span>
+<span class="n">ephys_file_name</span> <span class="o">=</span> <span class="s">&#39;stimulus.nwb&#39;</span>
 
 <span class="c"># pull out the stimulus for the first sweep</span>
 <span class="n">ephys_sweep</span> <span class="o">=</span> <span class="n">ephys_sweeps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -982,7 +983,7 @@ methods, however you can supply your own custom method if you like:</p>
     <span class="k">return</span> <span class="n">custom_param_a</span> <span class="o">*</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="n">custom_param_b</span>
 
 <span class="c"># initialize a neuron from a neuron config file</span>
-<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;472423251_neuron_config.json&#39;</span><span class="p">)</span>
+<span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;neuron_config.json&#39;</span><span class="p">)</span>
 <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
 <span class="c"># configure a new method and overwrite the neuron&#39;s old method</span>
@@ -1009,24 +1010,29 @@ afterspike current vector, and current injection value to be passed in by the Gl
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an
 updated voltage value.</p>
 <blockquote>
-<div><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_forward_euler" title="allensdk.model.glif.glif_neuron_methods.dynamics_voltage_forward_euler"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_voltage_forward_euler()</span></tt></a>
-<a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_euler_exact" title="allensdk.model.glif.glif_neuron_methods.dynamics_voltage_euler_exact"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_voltage_euler_exact()</span></tt></a></div></blockquote>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler" title="allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler()</span></tt></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact" title="allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact()</span></tt></a></p>
+</div></blockquote>
 <p><strong>Threshold Dynamics Rules</strong></p>
 <p>These methods update the spike threshold of the simulation.  They all expect the current
 threshold and voltage values of the simulation to be passed in by the GlifNeuron. All
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an
 updated threshold value.</p>
 <blockquote>
-<div><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components()</span></tt></a>
-<a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf()</span></tt></a></div></blockquote>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_forward" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_forward"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_forward()</span></tt></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact()</span></tt></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component()</span></tt></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf()</span></tt></a></p>
+</div></blockquote>
 <p><strong>Afterspike Current Dynamics Rules</strong></p>
 <p>These methods expect current afterspike current coefficients, current time step,
 and time steps of all previous spikes to be passed in by the GlifNeuron. All other function
 parameters must be fixed using the GlifNeuronMethod class.  They all return an updated
 afterspike current array.</p>
 <blockquote>
-<div><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp" title="allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp()</span></tt></a>
-<a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none" title="allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none()</span></tt></a></div></blockquote>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp" title="allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp()</span></tt></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none" title="allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none()</span></tt></a></p>
+</div></blockquote>
 </div>
 <div class="section" id="built-in-reset-rules">
 <h2>Built-in Reset Rules<a class="headerlink" href="#built-in-reset-rules" title="Permalink to this headline">¶</a></h2>
@@ -1039,22 +1045,25 @@ threshold.</p>
 They all expect a voltageto be passed in by the GlifNeuron. All other function parameters must be
 fixed using the GlifNeuronMethod class.  They all return an updated voltage value.</p>
 <blockquote>
-<div><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_zero" title="allensdk.model.glif.glif_neuron_methods.reset_voltage_zero"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_voltage_zero()</span></tt></a>
-<a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_bio_rules" title="allensdk.model.glif.glif_neuron_methods.reset_voltage_bio_rules"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_voltage_bio_rules()</span></tt></a></div></blockquote>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_zero" title="allensdk.model.glif.glif_neuron_methods.reset_voltage_zero"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_voltage_zero()</span></tt></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before" title="allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before()</span></tt></a></p>
+</div></blockquote>
 <p><strong>Threshold Reset Rules</strong></p>
 <p>These methods update the spike threshold of the simulation after a spike has been detected.
 They all expect the current threshold and the reset voltage value of the simulation to be passed in by the GlifNeuron. All other function parameters must be fixed using the GlifNeuronMethod
 class.  They all return an updated threshold value.</p>
 <blockquote>
-<div><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_inf" title="allensdk.model.glif.glif_neuron_methods.reset_threshold_inf"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_threshold_inf()</span></tt></a>
-<a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components" title="allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components()</span></tt></a></div></blockquote>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_inf" title="allensdk.model.glif.glif_neuron_methods.reset_threshold_inf"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_threshold_inf()</span></tt></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components" title="allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components()</span></tt></a></p>
+</div></blockquote>
 <p><strong>Afterspike Reset Reset Rules</strong></p>
 <p>These methods expect current afterspike current coefficients to be passed in by
 the GlifNeuron. All other function parameters must be fixed using the GlifNeuronMethod
 class.  They all return an updated afterspike current array.</p>
 <blockquote>
-<div><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none" title="allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none()</span></tt></a>
-<a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum" title="allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum()</span></tt></a></div></blockquote>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none" title="allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none()</span></tt></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum" title="allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum()</span></tt></a></p>
+</div></blockquote>
 </div>
 </div>
 
@@ -1077,7 +1086,7 @@ class.  They all return an updated afterspike current array.</p>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="models.html">Models</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -1093,6 +1102,15 @@ class.  They all return an updated afterspike current array.</p>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
 </ul>
 
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>

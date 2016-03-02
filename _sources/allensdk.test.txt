@@ -19,6 +19,14 @@ allensdk.test.config_single_file_json_tests module
     :undoc-members:
     :show-inheritance:
 
+allensdk.test.glif_tests module
+-------------------------------
+
+.. automodule:: allensdk.test.glif_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.test.json_comments_test module
 ---------------------------------------
 

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.model.biophys_sim package &mdash; Allen SDK 0.10.1 documentation</title>
+    <title>allensdk.model.biophys_sim package &mdash; Allen SDK 0.11.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.10.1',
+        VERSION:     '0.11.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.10.1 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
     <link rel="up" title="allensdk.model package" href="allensdk.model.html" />
     <link rel="next" title="allensdk.model.biophys_sim.neuron package" href="allensdk.model.biophys_sim.neuron.html" />
     <link rel="prev" title="allensdk.model package" href="allensdk.model.html" /> 
@@ -640,9 +640,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.model.biophys_sim.neuron.html">allensdk.model.biophys_sim.neuron package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.biophys_sim.neuron.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.model.biophys_sim.neuron.html#module-allensdk.model.biophys_sim.neuron.hoc_utils">allensdk.model.biophys_sim.neuron.hoc_utils module</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.biophys_sim.neuron.html#module-allensdk.model.biophys_sim.neuron.hoc_utils">allensdk.model.biophys_sim.neuron.hoc_utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.biophys_sim.neuron.html#module-allensdk.model.biophys_sim.neuron">Module contents</a></li>
 </ul>
 </li>
@@ -671,45 +669,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <dt id="allensdk.model.biophys_sim.config.Config">
 <em class="property">class </em><tt class="descclassname">allensdk.model.biophys_sim.config.</tt><tt class="descname">Config</tt><a class="reference internal" href="_modules/allensdk/model/biophys_sim/config.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophys_sim.config.Config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig" title="allensdk.config.app.application_config.ApplicationConfig"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.config.app.application_config.ApplicationConfig</span></tt></a></p>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">apply_configuration_from_command_line</span></tt>(...)</td>
-<td>Read application configuration variables from the command line.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">apply_configuration_from_environment</span></tt>()</td>
-<td>Read application configuration variables from the environment.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">apply_configuration_from_file</span></tt>(config_file_path)</td>
-<td>Read application configuration variables from a .conf file.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">create_argparser</span></tt>()</td>
-<td>Initialization for the command-line parsing stage.</td>
-</tr>
-<tr class="row-odd"><td><tt class="xref py py-obj docutils literal"><span class="pre">from_json_file</span></tt>(json_path)</td>
-<td>Read an application configuration from a JSON format file.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">from_json_string</span></tt>(json_string)</td>
-<td>Read a configuration from a JSON format string.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.model.biophys_sim.config.Config.load" title="allensdk.model.biophys_sim.config.Config.load"><tt class="xref py py-obj docutils literal"><span class="pre">load</span></tt></a>(config_path[,&nbsp;disable_existing_logs])</td>
-<td>Parse the application configuration then immediately load the model configuration files.</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">parse_command_line_args</span></tt>(args)</td>
-<td>Simply call the internal argparser object.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#allensdk.model.biophys_sim.config.Config.read_model_description" title="allensdk.model.biophys_sim.config.Config.read_model_description"><tt class="xref py py-obj docutils literal"><span class="pre">read_model_description</span></tt></a>()</td>
-<td>parse the model_file field of the application configuration</td>
-</tr>
-<tr class="row-even"><td><tt class="xref py py-obj docutils literal"><span class="pre">to_config_string</span></tt>(description)</td>
-<td>Create a configuration string from a dict.</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
 <dt id="allensdk.model.biophys_sim.config.Config.load">
 <tt class="descname">load</tt><big>(</big><em>config_path</em>, <em>disable_existing_logs=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/model/biophys_sim/config.html#Config.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.biophys_sim.config.Config.load" title="Permalink to this definition">¶</a></dt>
@@ -782,7 +741,7 @@ is treated as a standard multi-section configuration file.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="biophysical_perisomatic_script.html">Perisomatic Biophysical</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
@@ -798,6 +757,15 @@ is treated as a standard multi-section configuration file.</p>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
 </ul>
 
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
