@@ -8,7 +8,7 @@ import allensdk.core.lims_utilities as lims_utilities
 import allensdk.core.json_utilities as json_utilities
 
 from allensdk.core.nwb_data_set import NwbDataSet
-from allensdk.ephys.extract_cell_features import get_ramp_stim_characteristics, get_square_stim_characteristics, exp_curve, fit_membrane_tau
+import allensdk.ephys.ephys_features as ft
 
 import sys
 import argparse
@@ -31,10 +31,13 @@ def get_time_string():
     return datetime.datetime.now().strftime("%I:%M%p %B %d, %Y")
 
 def get_spikes(sweep_features, sweep_number):
+    return get_features(sweep_features, sweep_number)["spikes"]
+
+def get_features(sweep_features, sweep_number):
     try: 
-        return sweep_features[int(sweep_number)]["mean"]["spikes"]
+        return sweep_features[int(sweep_number)]
     except KeyError:
-        return sweep_features[str(sweep_number)]["mean"]["spikes"]
+        return sweep_features[str(sweep_number)]
 
 def load_experiment(file_name, sweep_number):
     ds = NwbDataSet(file_name)
@@ -46,22 +49,20 @@ def load_experiment(file_name, sweep_number):
     dt = 1.0 / sweep['sampling_rate']
     t = np.arange(0, len(v)) * dt
 
-    return (v, i, t, r)
+    return (v, i, t, r, dt)
 
 def plot_single_ap_values(nwb_file, sweep_numbers, lims_features, sweep_features, cell_features, type_name):
     figs = [ plt.figure() for f in range(3+len(sweep_numbers)) ]
 
-    v, i, t, r = load_experiment(nwb_file, sweep_numbers[0])
+    v, i, t, r, dt = load_experiment(nwb_file, sweep_numbers[0])
     if type_name == "short_square" or type_name == "long_square":
         stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
     elif type_name == "ramp":
         stim_start, start_idx = get_ramp_stim_characteristics(i, t)
 
     gen_features = ["threshold", "peak", "trough", "fast_trough", "slow_trough"]
-    voltage_features = ["threshold_v", "f_peak", "trough_v", "f_fast_ahp_v", "f_slow_ahp"]
-    time_features = ["threshold_t", "f_peak_t", "trough_t", "f_fast_ahp_t", "f_slow_ahp_t"]
-    long_square_voltage_features = ["thresh_v", "peak_v", "trough_v", "fast_trough_v", "slow_trough_v"]
-    long_square_time_features = ["thresh_t", "peak_t", "trough_t", "fast_trough_t", "slow_trough_t"]
+    voltage_features = ["threshold_v", "peak_v", "trough_v", "fast_trough_v", "slow_trough_v"]
+    time_features = ["threshold_t", "peak_t", "trough_t", "fast_trough_t", "slow_trough_t"]
 
     for sn in sweep_numbers:
         spikes = get_spikes(sweep_features, sn)
@@ -72,10 +73,12 @@ def plot_single_ap_values(nwb_file, sweep_numbers, lims_features, sweep_features
 
         if type_name != "long_square":
             voltages = [spikes[0][f] for f in voltage_features]
-            times = [spikes[0][f] - stim_start for f in time_features]
+            times = [spikes[0][f] for f in time_features]
         else:
-            voltages = [cell_features["long_squares"]["rheo_spike_0"][f] for f in long_square_voltage_features]
-            times = [cell_features["long_squares"]["rheo_spike_0"][f] for f in long_square_time_features]
+            rheo_sn = cell_features["long_squares"]["rheobase_sweep"]["id"]
+            rheo_spike = get_spikes(sweep_features, rheo_sn)[0]
+            voltages = [ rheo_spike[f] for f in voltage_features]
+            times = [ rheo_spike[f] for f in time_features]
 
         plt.figure(figs[0].number)
         plt.scatter(range(len(voltages)), voltages, color='gray')
@@ -116,7 +119,7 @@ def plot_single_ap_values(nwb_file, sweep_numbers, lims_features, sweep_features
     for index, sn in enumerate(sweep_numbers):
         plt.figure(figs[3 + index].number)
 
-        v, i, t, r = load_experiment(nwb_file, sn)
+        v, i, t, r, dt = load_experiment(nwb_file, sn)
         plt.plot(t, v, color='black')
         plt.title(str(sn))
 
@@ -132,8 +135,10 @@ def plot_single_ap_values(nwb_file, sweep_numbers, lims_features, sweep_features
             voltages = [spikes[0][f] for f in voltage_features]
             times = [spikes[0][f] for f in time_features]
         else:
-            voltages = [cell_features["long_squares"]["rheo_spike_0"][f] for f in long_square_voltage_features]
-            times = [cell_features["long_squares"]["rheo_spike_0"][f] + stim_start for f in long_square_time_features]
+            rheo_sn = cell_features["long_squares"]["rheobase_sweep"]["id"]
+            rheo_spike = get_spikes(sweep_features, rheo_sn)[0]
+            voltages = [ rheo_spike[f] for f in voltage_features ]
+            times = [ rheo_spike[f] for f in time_features ]
 
         plt.scatter(times, voltages, color='red', zorder=20)
         
@@ -150,11 +155,11 @@ def plot_single_ap_values(nwb_file, sweep_numbers, lims_features, sweep_features
 
         if type_name == "ramp":
             if nspikes:
-                plt.xlim(spikes[0]["threshold_t"] - 0.002, spikes[0]["f_slow_ahp_t"] + 0.002)
+                plt.xlim(spikes[0]["threshold_t"] - 0.002, spikes[0]["fast_trough_t"] + 0.01)
         elif type_name == "short_square":
             plt.xlim(stim_start - 0.002, stim_start + stim_dur + 0.01)
         elif type_name == "long_square":
-            plt.xlim(times[0]- 0.002, times[-1] + 0.002)
+            plt.xlim(times[0]- 0.002, times[-2] + 0.002)
 
         plt.tight_layout()
 
@@ -180,7 +185,7 @@ def plot_sweep_figures(nwb_file, ephys_roi_result, image_dir, sizes):
     for i, sweep_number in enumerate(vclamp_sweep_numbers):
         logging.info("plotting sweep %d" %  sweep_number)
         if i == 0:
-            v_init, i_init, t_init, r_init = load_experiment(nwb_file, sweep_number)    
+            v_init, i_init, t_init, r_init, dt_init = load_experiment(nwb_file, sweep_number)    
 
             tp_fig = plt.figure()
             axTP = plt.gca()
@@ -215,7 +220,7 @@ def plot_sweep_figures(nwb_file, ephys_roi_result, image_dir, sizes):
             v_prev, i_prev, t_prev, r_prev = v_init, i_init, t_init, r_init
 
         else:
-            v, i, t, r = load_experiment(nwb_file, sweep_number)    
+            v, i, t, r, dt = load_experiment(nwb_file, sweep_number)    
 
             tp_fig = plt.figure()
             axTP = plt.gca()
@@ -319,11 +324,14 @@ def plot_images(ephys_roi_result, image_dir, sizes, image_sets):
         
 
 def plot_subthreshold_long_square_figures(nwb_file, cell_features, lims_features, sweep_features, image_dir, sizes, cell_image_files):
-    
+    lsq_sweeps = cell_features["long_squares"]["sweeps"]
+    sub_sweeps = cell_features["long_squares"]["subthreshold_sweeps"]
+    tau_sweeps = cell_features["long_squares"]["subthreshold_membrane_property_sweeps"]
+
     # 0a - Plot VI curve and linear fit, along with vrest
-    x = np.array([d['amp'] for d in cell_features["long_squares"]["subthresh"]])
-    y = np.array([d['peak'] for d in cell_features["long_squares"]["subthresh"]])
-    i = np.array([d['amp'] for d in cell_features["long_squares"]["subthresh"] if d['amp'] < 0 and d['amp'] > -100])
+    x = np.array([ s['stim_amp'] for s in sub_sweeps ])
+    y = np.array([ s['peak_deflect'][0] for s in sub_sweeps ])
+    i = np.array([ s['stim_amp'] for s in tau_sweeps ])
 
     fig = plt.figure()
     plt.scatter(x, y, color='black')
@@ -338,10 +346,10 @@ def plot_subthreshold_long_square_figures(nwb_file, cell_features, lims_features
     
     # 0b - Plot tau curve and average
     fig = plt.figure()
-    x = np.array([d['amp'] for d in cell_features["long_squares"]["subthresh"]])
-    y = np.array([d['tau'] for d in cell_features["long_squares"]["subthresh"]])
+    x = np.array([ s['stim_amp'] for s in tau_sweeps ])
+    y = np.array([ s['tau'] for s in tau_sweeps ])
     plt.scatter(x, y, color='black')
-    i = np.array([d['amp'] for d in cell_features["long_squares"]["subthresh"] if d['amp'] < 0 and d['amp'] > -100])
+    i = np.array([ s['stim_amp'] for s in tau_sweeps ])
     plt.plot([i.min(), i.max()], [cell_features["long_squares"]["tau"], cell_features["long_squares"]["tau"]], color="red", linewidth=2)
     plt.xlabel("pA")
     ylim = plt.ylim()
@@ -352,14 +360,14 @@ def plot_subthreshold_long_square_figures(nwb_file, cell_features, lims_features
 
     save_figure(fig, 'tau_curve', 'subthreshold_long_squares', image_dir, sizes, cell_image_files)
     
-    subthresh_dict = {d['sweep_num']: d for d in cell_features["long_squares"]["subthresh"]}
+    subthresh_dict = {s['id']:s for s in tau_sweeps}
 
     # 0c - Plot the subthreshold squares
-    tau_sweeps = np.array([d['sweep_num'] for d in cell_features["long_squares"]["subthresh"] if d['amp'] < 0 and d['amp'] > -100])
+    tau_sweeps = [ s['id'] for s in tau_sweeps ]
     tau_figs = [ plt.figure() for i in range(len(tau_sweeps)) ]
 
     for index, s in enumerate(tau_sweeps):
-        v, i, t, r = load_experiment(nwb_file, s)
+        v, i, t, r, dt = load_experiment(nwb_file, s)
         
         plt.figure(tau_figs[index].number)
         
@@ -376,16 +384,12 @@ def plot_subthreshold_long_square_figures(nwb_file, cell_features, lims_features
 
         stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
         plt.xlim(stim_start - 0.05, stim_start + stim_dur + 0.05)
-        plt.scatter([subthresh_dict[s]['peak_t']], [subthresh_dict[s]['peak']], color='red', zorder=10)
-        peak_idx = subthresh_dict[s]['peak_idx']
-        tenpct_idx, popt = fit_membrane_tau(v, t, start_idx, peak_idx)
+        peak_idx = subthresh_dict[s]['peak_deflect'][1]
+        peak_t = peak_idx*dt
+        plt.scatter([peak_t], [subthresh_dict[s]['peak_deflect'][0]], color='red', zorder=10)
+        popt = ft.fit_membrane_time_constant(v, t, stim_start, peak_t)
         plt.title(str(s))
-        if tenpct_idx is np.nan:
-            logging.warning("Failed to fit tau for sweep %d" % s)
-            continue
-        if abs((1 / popt[1]) * 1e3 - subthresh_dict[s]['tau']) > 1e-6:
-            logging.error("New fit tau of {:g} differs from value in JSON of {:g} for sweep {:d}".format(1 / popt[1] * 1e3, subthresh_dict[s]['tau'], s))
-        plt.plot(t[tenpct_idx:peak_idx], exp_curve(t[tenpct_idx:peak_idx] - t[tenpct_idx], *popt), color='blue')
+        plt.plot(t[start_idx:peak_idx], exp_curve(t[start_idx:peak_idx] - t[start_idx], *popt), color='blue')
 
 
     for index, s in enumerate(tau_sweeps):
@@ -397,11 +401,10 @@ def plot_subthreshold_long_square_figures(nwb_file, cell_features, lims_features
         save_figure(tau_figs[index], 'tau_%d' % index, 'subthreshold_long_squares', image_dir, sizes, cell_image_files)
 
 def plot_short_square_figures(nwb_file, cell_features, lims_features, sweep_features, image_dir, sizes, cell_image_files):
-    repeat_amp = cell_features["short_squares"].get("repeat_amp", None)
+    repeat_amp = cell_features["short_squares"].get("stimulus_amplitude", None)
 
     if repeat_amp is not None:
-        short_square_sweep_nums = [ s['sweep_num'] for s in cell_features["short_squares"]["sweep_info"] 
-                                    if s["stim_amp"] == repeat_amp and (len(get_spikes(sweep_features, s["sweep_num"])) > 0) ]
+        short_square_sweep_nums = [ s['id'] for s in cell_features["short_squares"]["common_amp_sweeps"] ]
 
         figs = plot_single_ap_values(nwb_file, short_square_sweep_nums, 
                                      lims_features, sweep_features, cell_features, 
@@ -437,7 +440,7 @@ def plot_instantaneous_threshold_thumbnail(nwb_file, sweep_numbers, cell_feature
     ax.set_xlabel('')
     ax.set_ylabel('')
 
-    v, i, t, r = load_experiment(nwb_file, sn)
+    v, i, t, r, dt = load_experiment(nwb_file, sn)
     stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
 
     tstart = stim_start - 0.002
@@ -471,14 +474,13 @@ def plot_rheo_figures(nwb_file, cell_features, lims_features, sweep_features, im
         save_figure(fig, 'rheo_%d' % index, 'rheo', image_dir, sizes, cell_image_files)            
 
 def plot_hero_figures(nwb_file, cell_features, lims_features, sweep_features, image_dir, sizes, cell_image_files):
-
     fig = plt.figure()
-    v, i, t, r = load_experiment(nwb_file, int(lims_features["thumbnail_sweep_num"]))
+    v, i, t, r, dt = load_experiment(nwb_file, int(lims_features["thumbnail_sweep_num"]))
     plt.plot(t, v, color='black')
     stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
     plt.xlim(stim_start - 0.05, stim_start + stim_dur + 0.05)
     plt.ylim(-110, 50)
-    spike_times = [spk['t'] for spk in get_spikes(sweep_features, lims_features["thumbnail_sweep_num"])]
+    spike_times = [spk['threshold_t'] for spk in get_spikes(sweep_features, lims_features["thumbnail_sweep_num"])]
     isis = np.diff(np.array(spike_times))
     plt.title("thumbnail {:d}, amp = {:.1f}".format(lims_features["thumbnail_sweep_num"], stim_amp))
     plt.tight_layout()
@@ -520,8 +522,8 @@ def plot_hero_figures(nwb_file, cell_features, lims_features, sweep_features, im
 
 
 def plot_long_square_summary(nwb_file, cell_features, lims_features, sweep_features):
-    long_square_sweeps = cell_features['long_squares']['sweep_info']
-    long_square_sweep_numbers = [ int(s['sweep_num']) for s in long_square_sweeps ]
+    long_square_sweeps = cell_features['long_squares']['sweeps']
+    long_square_sweep_numbers = [ int(s['id']) for s in long_square_sweeps ]
     
     thumbnail_summary_fig = plot_sweep_set_summary(nwb_file, int(lims_features['thumbnail_sweep_num']), long_square_sweep_numbers)
     plt.figure(thumbnail_summary_fig.number)
@@ -531,19 +533,19 @@ def plot_long_square_summary(nwb_file, cell_features, lims_features, sweep_featu
 
 def plot_fi_curve_figures(nwb_file, cell_features, lims_features, sweep_features, image_dir, sizes, cell_image_files):
     fig = plt.figure()
-    fI_sorted = sorted(cell_features["long_squares"]["fI"], key=lambda d: d[0])
-    x = [d[0] for d in fI_sorted]
-    y = [d[1] for d in fI_sorted]
+    fi_sorted = sorted(cell_features["long_squares"]["spiking_sweeps"], key=lambda s:s['stim_amp'])
+    x = [d['stim_amp'] for d in fi_sorted]
+    y = [d['avg_rate'] for d in fi_sorted]
     last_zero_idx = np.nonzero(y)[0][0] - 1    
     plt.scatter(x, y, color='black')
-    plt.plot(x[last_zero_idx:], cell_features["long_squares"]["fI_fit_slope"] * (np.array(x[last_zero_idx:]) - x[last_zero_idx]), color='red')
+    plt.plot(x[last_zero_idx:], cell_features["long_squares"]["fi_fit_slope"] * (np.array(x[last_zero_idx:]) - x[last_zero_idx]), color='red')
     plt.xlabel("pA")
     plt.ylabel("spikes/sec")
     plt.title("slope = {:.3g}".format(lims_features["f_i_curve_slope"]))
     rheo_hero_sweeps = [int(lims_features["rheobase_sweep_num"]), int(lims_features["thumbnail_sweep_num"])]
     rheo_hero_x = []
     for s in rheo_hero_sweeps:
-        v, i, t, r = load_experiment(nwb_file, s)
+        v, i, t, r, dt = load_experiment(nwb_file, s)
         stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
         rheo_hero_x.append(stim_amp)
     rheo_hero_y = [ len(get_spikes(sweep_features, s)) for s in rheo_hero_sweeps ]
@@ -554,13 +556,13 @@ def plot_fi_curve_figures(nwb_file, cell_features, lims_features, sweep_features
 
 def plot_sag_figures(nwb_file, cell_features, lims_features, sweep_features, image_dir, sizes, cell_image_files):
     fig = plt.figure()
-    for d in cell_features["long_squares"]["subthresh"]:
-        if d['peak'] == lims_features["vm_for_sag"]:
-            v, i, t, r = load_experiment(nwb_file, int(d['sweep_num']))
+    for d in cell_features["long_squares"]["subthreshold_sweeps"]:
+        if d['peak_deflect'][0] == lims_features["vm_for_sag"]:
+            v, i, t, r, dt = load_experiment(nwb_file, int(d['id']))
             stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
             plt.plot(t, v, color='black')
-            plt.scatter(d['peak_t'], d['peak'], color='red', zorder=10)
-            plt.plot([stim_start + stim_dur - 0.1, stim_start + stim_dur], [d['steady'], d['steady']], color='red', zorder=10)
+            plt.scatter(d['peak_deflect'][1], d['peak_deflect'][0], color='red', zorder=10)
+            #plt.plot([stim_start + stim_dur - 0.1, stim_start + stim_dur], [d['steady'], d['steady']], color='red', zorder=10)
     plt.xlim(stim_start - 0.25, stim_start + stim_dur + 0.25)
     plt.title("sag = {:.3g}".format(lims_features['sag']))
     plt.tight_layout()
@@ -655,10 +657,10 @@ def plot_sweep_set_summary(nwb_file, highlight_sweep_number, sweep_numbers,
     ax.set_ylabel('')
 
     for sn in sweep_numbers:
-        v, i, t, r = load_experiment(nwb_file, sn)
+        v, i, t, r, dt = load_experiment(nwb_file, sn)
         ax.plot(t, v, linewidth=0.5, color=background_color)
 
-    v, i, t, r = load_experiment(nwb_file, highlight_sweep_number)
+    v, i, t, r, dt = load_experiment(nwb_file, highlight_sweep_number)
     plt.plot(t, v, linewidth=1, color=highlight_color)
 
     stim_start, stim_dur, stim_amp, start_idx, end_idx = get_square_stim_characteristics(i, t)
@@ -761,6 +763,76 @@ def make_cell_page(nwb_file, ephys_roi_result, working_dir, save_cell_plots=True
     make_cell_html(cell_files, ephys_roi_result,
                    os.path.join(working_dir, 'index.html'),
                    relative_sweep_link)
+
+
+def get_square_stim_characteristics(i, t, no_test_pulse=False):
+    '''
+    Identify the start time, duration, amplitude, start index, and
+    end index of a square stimulus.  
+    This assumes that there is a test pulse followed by the stimulus square.
+    '''
+
+    di = np.diff(i)
+    up_idx = np.flatnonzero(di > 0)
+    down_idx = np.flatnonzero(di < 0)
+
+    idx = 0 if no_test_pulse else 1
+    
+    # second square is the stimulus
+    if up_idx[idx] < down_idx[idx]: # positive square
+        start_idx = up_idx[idx] + 1 # shift by one to compensate for diff()
+        end_idx = down_idx[idx] + 1
+    else: # negative square
+        start_idx = down_idx[idx] + 1
+        end_idx = up_idx[idx] + 1
+
+    stim_start = float(t[start_idx])
+    stim_dur = float(t[end_idx] - t[start_idx])
+    stim_amp = float(i[start_idx])
+
+    return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
+
+def get_ramp_stim_characteristics(i, t):
+    ''' Identify the start time and start index of a ramp sweep. '''
+
+    # Assumes that there is a test pulse followed by the stimulus ramp
+    di = np.diff(i)
+    up_idx = np.flatnonzero(di > 0)
+    
+    start_idx = up_idx[1] + 1 # shift by one to compensate for diff()
+    return (t[start_idx], start_idx)
+    
+
+def get_stim_characteristics(i, t, no_test_pulse=False):
+    '''
+    Identify the start time, duration, amplitude, start index, and
+    end index of a general stimulus.  
+    This assumes that there is a test pulse followed by the stimulus square.
+    '''
+
+    di = np.diff(i)
+    diff_idx = np.flatnonzero(di != 0)
+
+    if len(diff_idx) == 0:
+        return (None, None, 0.0, None, None)
+
+    # skip the first up/down 
+    idx = 0 if no_test_pulse else 1
+    
+    # shift by one to compensate for diff()
+    start_idx = diff_idx[idx] + 1
+    end_idx = diff_idx[-1] + 1
+
+    stim_start = float(t[start_idx])
+    stim_dur = float(t[end_idx] - t[start_idx])
+    stim_amp = float(i[start_idx])
+
+    return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
+
+def exp_curve(x, a, inv_tau, y0):
+    ''' Function used for tau curve fitting '''
+    return y0 + a * np.exp(-inv_tau * x)
+
 
 def main():
     parser = argparse.ArgumentParser(description='analyze specimens for cell-wide features')
