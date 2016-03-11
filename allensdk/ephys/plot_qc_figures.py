@@ -354,7 +354,7 @@ def plot_subthreshold_long_square_figures(nwb_file, cell_features, lims_features
     plt.xlabel("pA")
     ylim = plt.ylim()
     plt.ylim(0, ylim[1])
-    plt.ylabel("tau (ms)")
+    plt.ylabel("tau (s)")
     plt.tight_layout()
 
 
