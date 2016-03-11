@@ -9,6 +9,7 @@ import allensdk.core.json_utilities as json_utilities
 
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.ephys_features as ft
+from allensdk.ephys.extract_cell_features import get_square_stim_characteristics, get_ramp_stim_characteristics, get_stim_characteristics
 
 import sys
 import argparse
@@ -763,71 +764,6 @@ def make_cell_page(nwb_file, ephys_roi_result, working_dir, save_cell_plots=True
     make_cell_html(cell_files, ephys_roi_result,
                    os.path.join(working_dir, 'index.html'),
                    relative_sweep_link)
-
-
-def get_square_stim_characteristics(i, t, no_test_pulse=False):
-    '''
-    Identify the start time, duration, amplitude, start index, and
-    end index of a square stimulus.  
-    This assumes that there is a test pulse followed by the stimulus square.
-    '''
-
-    di = np.diff(i)
-    up_idx = np.flatnonzero(di > 0)
-    down_idx = np.flatnonzero(di < 0)
-
-    idx = 0 if no_test_pulse else 1
-    
-    # second square is the stimulus
-    if up_idx[idx] < down_idx[idx]: # positive square
-        start_idx = up_idx[idx] + 1 # shift by one to compensate for diff()
-        end_idx = down_idx[idx] + 1
-    else: # negative square
-        start_idx = down_idx[idx] + 1
-        end_idx = up_idx[idx] + 1
-
-    stim_start = float(t[start_idx])
-    stim_dur = float(t[end_idx] - t[start_idx])
-    stim_amp = float(i[start_idx])
-
-    return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
-
-def get_ramp_stim_characteristics(i, t):
-    ''' Identify the start time and start index of a ramp sweep. '''
-
-    # Assumes that there is a test pulse followed by the stimulus ramp
-    di = np.diff(i)
-    up_idx = np.flatnonzero(di > 0)
-    
-    start_idx = up_idx[1] + 1 # shift by one to compensate for diff()
-    return (t[start_idx], start_idx)
-    
-
-def get_stim_characteristics(i, t, no_test_pulse=False):
-    '''
-    Identify the start time, duration, amplitude, start index, and
-    end index of a general stimulus.  
-    This assumes that there is a test pulse followed by the stimulus square.
-    '''
-
-    di = np.diff(i)
-    diff_idx = np.flatnonzero(di != 0)
-
-    if len(diff_idx) == 0:
-        return (None, None, 0.0, None, None)
-
-    # skip the first up/down 
-    idx = 0 if no_test_pulse else 1
-    
-    # shift by one to compensate for diff()
-    start_idx = diff_idx[idx] + 1
-    end_idx = diff_idx[-1] + 1
-
-    stim_start = float(t[start_idx])
-    stim_dur = float(t[end_idx] - t[start_idx])
-    stim_amp = float(i[start_idx])
-
-    return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
 
 def exp_curve(x, a, inv_tau, y0):
     ''' Function used for tau curve fitting '''
