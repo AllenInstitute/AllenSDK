@@ -10,23 +10,32 @@ from allensdk.cam.Analysis.findlevel import findlevel
 class OPAnalysis(object):
     def __init__(self,
                  exptpath, h5path,
-                 datarate, LIMSID, Cre, HVA, depth, movie_name,
+                 datarate, LIMSID, depth, movie_name,
                  **kwargs):
         for k,v in kwargs.iteritems():
             setattr(self,k,v)
+        
         self.LIMSID = LIMSID
-        self.Cre = Cre
-        self.HVA = HVA
-        self.depth = depth
         self.exptpath = exptpath
-        self.h5path = h5path
-        self.datarate = datarate
-        self.movie_name = movie_name
+
         for f in os.listdir(self.exptpath):
             if f.endswith('.nwb'):
                 self.nwbpath = os.path.join(exptpath, f)
                 print "NWB file:", f
-        self.savepath = self.GetSavepath(self.exptpath)
+
+        self.meta_data = cn.get_Meta_Data(self.nwbpath)
+        self.Cre = self.meta_data['Cre']
+        self.HVA = self.meta_data['area']
+        self.specimen = self.meta_data['specimen']
+        print "Cre line:", self.Cre
+        print "Targeted area:", self.HVA
+        print "Specimen:", self.specimen
+        self.depth = depth        
+        self.h5path = h5path
+#        self.datarate = datarate
+        self.movie_name = movie_name
+        
+        self.savepath = self.GetSavepath()
         
         self.timestamps, self.celltraces = cn.get_Fluorescence_Traces(self.nwbpath)
         self.numbercells = len(self.celltraces)                         #number of cells in dataset       
@@ -35,9 +44,9 @@ class OPAnalysis(object):
 #        self.celltraces_dff = self.getGlobalDFF(percentiletosubtract=8)
 #        self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.getSpeedTuning(binsize=400)
    
-    def GetSavepath(self, exptpath):
+    def GetSavepath(self):
         '''creates path used for saving figures and data'''
-        savepath = os.path.join(exptpath, 'Data')
+        savepath = os.path.join(self.exptpath, 'Data')
         if os.path.exists(savepath) == False:
             os.mkdir(savepath)
         else:

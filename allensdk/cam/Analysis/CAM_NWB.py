@@ -67,13 +67,25 @@ def get_Meta_Data(NWB_file):
     #TODO: adapt this for current meta data    
     f = h5py.File(NWB_file, 'r')
     Cre = f['general']['specimen'].value.split('-')[0]
-    specimen = f['general']['mouse_number'].value
-    HVA = f['general']['hva'].value
-    depth = f['general']['depth_of_imaging'].value
-    system = f['general']['microscope'].value
+    try:
+        specimen = f['general']['mouse_number'].value
+    except:
+        specimen = None
+    try:
+        HVA = f['general']['hva'].value
+    except:
+        HVA = 'AL'
+    try:
+        depth = f['general']['depth_of_imaging'].value
+    except:
+        depth = 175
+    try:
+        system = f['general']['microscope'].value
+    except:
+        system = None
     lims_id = f['general']['lims_id'].value
     f.close()
-    meta ={'Cre': Cre, 'specimen':specimen, 'HVA':HVA, 'depth':depth, 'system':system, 'lims_id':lims_id}
+    meta ={'Cre': Cre, 'specimen':specimen, 'HVA':HVA, 'area': HVA, 'depth':depth, 'system':system, 'lims_id':lims_id}
     return meta
 
 def get_Running_Speed(NWB_file):
