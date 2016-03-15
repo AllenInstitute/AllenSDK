@@ -9,8 +9,8 @@ import os
 
 
 class StaticGrating(OPAnalysis):
-    def __init__(self, *args, **kwargs):
-        super(StaticGrating, self).__init__(*args, **kwargs)
+    def __init__(self, cam_analysis, **kwargs):
+        super(StaticGrating, self).__init__(cam_analysis, **kwargs)
         stimulus_table = cn.get_Stimulus_Table(self.nwbpath, 'static_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = self.stim_table['End'].iloc[1] - self.stim_table['Start'].iloc[1]
@@ -59,10 +59,10 @@ class StaticGrating(OPAnalysis):
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
         peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','SF', 'Phase', 'sg_response_variability','OSI','sg_peak_DFF','ptest'))
-        peak['LIMS'] = self.LIMSID
+        peak['LIMS'] = self.cam_analysis.lims_id
         peak['Cre'] = self.Cre   
         peak['HVA'] = self.HVA
-        peak['depth'] = self.depth
+        peak['depth'] = self.cam_analysis.depth
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,:,nc,0] == np.nanmax(self.response[:,1:,:,nc,0]))
             pref_ori = cell_peak[0][0]

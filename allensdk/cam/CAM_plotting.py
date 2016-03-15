@@ -10,6 +10,7 @@ from matplotlib.ticker import MaxNLocator
 import numpy as np
 import pandas as pd
 import os
+from numpy import arange
 
 #def plot_Drifting_Grating_All(self):
 #    '''saves figures for each cell showing ori and tf tuning'''
@@ -960,7 +961,7 @@ def plot_3SB(sg, nm1, ni):
         plt.savefig(fullfilename)   
         plt.close()
 
-def ExperimentSummary(self):
+def ExperimentSummary(self, lims_id):
     '''saves figure with summary statistics for experiment'''
     print "Plotting experiment summary"
     plt.figure(1, figsize=(20,16))
@@ -1020,7 +1021,7 @@ def ExperimentSummary(self):
     plt.tick_params(labelsize=16)
     plt.subplots_adjust(top=0.8)
     plt.tight_layout()  
-    plt.suptitle(self.LIMSID + "  " + self.startdatetime, fontsize=20)
+    plt.suptitle(lims_id + "  " + self.startdatetime, fontsize=20)
     
     plt.figtext(0.7, 0.35, "Total # cells: " + str(self.numbercells))
     plt.figtext(0.7, 0.3, "Significant cells: " + str(len(self.significant_cells)))

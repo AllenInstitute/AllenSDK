@@ -7,8 +7,8 @@ from allensdk.cam.o_p_analysis import OPAnalysis
 import os
 
 class NaturalImages(OPAnalysis):
-    def __init__(self, *args, **kwargs):
-        super(NaturalImages, self).__init__(*args, **kwargs)
+    def __init__(self, cam_analysis, **kwargs):
+        super(NaturalImages, self).__init__(cam_analysis, **kwargs)
         self.stim_table = cn.get_Stimulus_Table(self.nwbpath, 'natural_scenes')        
         self.number_images = len(np.unique(self.stim_table.Frame))
         self.sweeplength = self.stim_table.End.iloc[1] - self.stim_table.Start.iloc[1]
@@ -36,10 +36,10 @@ class NaturalImages(OPAnalysis):
         '''gets metrics about peak response, etc.'''
         print 'Calculating peak response properties'
         peak = pd.DataFrame(index=range(self.numbercells), columns=('Image', 'response_variability','peak_DFF', 'ptest', 'p_run', 'run_modulation', 'time_to_peak','duration'))
-        peak['LIMS'] = self.LIMSID
+        peak['LIMS'] = self.cam_analysis.lims_id
         peak['Cre'] = self.Cre   
         peak['HVA'] = self.HVA
-        peak['depth'] = self.depth
+        peak['depth'] = self.cam_analysis.depth
         for nc in range(self.numbercells):
             nip = np.argmax(self.response[1:,nc,0])
             peak.Image[nc] = nip

@@ -7,16 +7,16 @@ from allensdk.cam.o_p_analysis import OPAnalysis
 import os
 
 class MovieAnalysis(OPAnalysis):    
-    def __init__(self, *args, **kwargs):
-        super(MovieAnalysis, self).__init__(*args, **kwargs)                   
-        stimulus_table = cn.get_Stimulus_Table(self.nwbpath, self.movie_name)   
+    def __init__(self, cam_analysis, movie_name, **kwargs):
+        super(MovieAnalysis, self).__init__(cam_analysis, **kwargs)                   
+        stimulus_table = cn.get_Stimulus_Table(self.nwbpath, movie_name)   
         self.stim_table = stimulus_table[stimulus_table.Frame==0]
         self.celltraces_dff = self.getGlobalDFF(percentiletosubtract=8)
-        if self.movie_name == 'natural_movie_one':
+        if movie_name == 'natural_movie_one':
             self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.getSpeedTuning(binsize=800)
         self.sweeplength = self.stim_table.Start.iloc[1] - self.stim_table.Start.iloc[0]
         self.sweep_response = self.getSweepResponse()
-        self.peak = self.getPeak()     
+        self.peak = self.getPeak(movie_name)     
         
     def getSweepResponse(self):
         sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(range(self.numbercells)).astype(str))
@@ -27,7 +27,8 @@ class MovieAnalysis(OPAnalysis):
                 sweep_response[str(nc)][index] = self.celltraces_dff[nc,start:end]
         return sweep_response
     
-    def getPeak(self):
+    # TODO: remove movie_name
+    def getPeak(self, movie_name):
         peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_variability'))
         for nc in range(self.numbercells):
             meanresponse = self.sweep_response[str(nc)].mean()
@@ -47,12 +48,12 @@ class MovieAnalysis(OPAnalysis):
             else:
                 peak_movie.response_variability[nc] = ptime[0]
             peak_movie.peak[nc] = peak
-        peak_movie.to_csv(os.path.join(self.savepath, 'peak'+self.movie_name+'.csv'))
+        peak_movie.to_csv(os.path.join(self.savepath, 'peak'+movie_name+'.csv'))
         return peak_movie
 
 class LocallySN(OPAnalysis):    
-    def __init__(self, *args, **kwargs):
-        super(LocallySN, self).__init__(*args, **kwargs)        
+    def __init__(self, cam_analysis, **kwargs):
+        super(LocallySN, self).__init__(cam_analysis, **kwargs)        
         self.stim_table = cn.get_Stimulus_Table(self.nwbpath, 'locally_sparse_noise')
         self.LSN = cn.get_Stimulus_Template(self.nwbpath, 'locally_sparse_noise')
         self.sweeplength = self.stim_table['End'][1] - self.stim_table['Start'][1]
@@ -92,20 +93,16 @@ class LocallySN(OPAnalysis):
 #        return sweep_response, mean_sweep_response, pval
 #    
     def getReceptiveField(self):
-        if self.h5path != None:
-            #receptive_field = op.loadh5(self.h5path, 'receptive_field')
-            raise(Exception('no loadh5'))
-        else:
-            print "Calculating mean responses"
-            receptive_field = np.empty((16, 28, self.numbercells+1, 2))
-    #        def ptest(x):
-    #            return len(np.where(x<(0.05/(8*5)))[0])
-            for xp in range(16):
-                for yp in range(28):
-                    on_frame = np.where(self.LSN[:,xp,yp]==255)[0]
-                    off_frame = np.where(self.LSN[:,xp,yp]==0)[0]
-                    subset_on = self.mean_sweep_response[self.stim_table.Frame.isin(on_frame)]
-                    subset_off = self.mean_sweep_response[self.stim_table.Frame.isin(off_frame)]
-                    receptive_field[xp,yp,:,0] = subset_on.mean(axis=0)
-                    receptive_field[xp,yp,:,1] = subset_off.mean(axis=0)
+        print "Calculating mean responses"
+        receptive_field = np.empty((16, 28, self.numbercells+1, 2))
+#        def ptest(x):
+#            return len(np.where(x<(0.05/(8*5)))[0])
+        for xp in range(16):
+            for yp in range(28):
+                on_frame = np.where(self.LSN[:,xp,yp]==255)[0]
+                off_frame = np.where(self.LSN[:,xp,yp]==0)[0]
+                subset_on = self.mean_sweep_response[self.stim_table.Frame.isin(on_frame)]
+                subset_off = self.mean_sweep_response[self.stim_table.Frame.isin(off_frame)]
+                receptive_field[xp,yp,:,0] = subset_on.mean(axis=0)
+                receptive_field[xp,yp,:,1] = subset_off.mean(axis=0)
         return receptive_field  

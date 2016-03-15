@@ -15,11 +15,10 @@ import Analysis.CAM_NWB as cn
 import CAM_plotting as cp
 from allensdk.cam.Analysis.findlevel import *
 import os
-import time
 
 class DriftingGrating(OPAnalysis):    
-    def __init__(self, *args, **kwargs):
-        super(DriftingGrating, self).__init__(*args, **kwargs)                   
+    def __init__(self, cam_analysis, **kwargs):
+        super(DriftingGrating, self).__init__(cam_analysis, **kwargs)                   
         stimulus_table = cn.get_Stimulus_Table(self.nwbpath, 'drifting_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = 60#self.sync_table['end'][1] - self.sync_table['start'][1]
@@ -34,9 +33,6 @@ class DriftingGrating(OPAnalysis):
         self.peak = self.getPeak()
     
     def getResponse(self):
-        if self.h5path != None:
-            #response = op.loadh5(self.h5path, 'response')
-            raise(Exception('no loadh5'))
         print "Calculating mean responses"
         response = np.empty((self.number_ori, self.number_tf, self.numbercells+1, 3))
         def ptest(x):
@@ -57,10 +53,10 @@ class DriftingGrating(OPAnalysis):
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
         peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','TF','response_variability','OSI','DSI','peak_DFF', 'reliability', 'ptest'))
-        peak['LIMS'] = self.LIMSID
+        peak['LIMS'] = self.cam_analysis.lims_id
         peak['Cre'] = self.Cre   
         peak['HVA'] = self.HVA
-        peak['depth'] = self.depth
+        peak['depth'] = self.cam_analysis.depth
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,nc,0] == np.nanmax(self.response[:,1:,nc,0]))
             prefori = cell_peak[0][0]

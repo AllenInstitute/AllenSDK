@@ -8,19 +8,13 @@ import time
 from allensdk.cam.Analysis.findlevel import findlevel
 
 class OPAnalysis(object):
-    def __init__(self,
-                 exptpath, h5path,
-                 datarate, LIMSID, depth, movie_name,
+    def __init__(self, cam_analysis,
                  **kwargs):
-        for k,v in kwargs.iteritems():
-            setattr(self,k,v)
-        
-        self.LIMSID = LIMSID
-        self.exptpath = exptpath
+        self.cam_analysis = cam_analysis
 
-        for f in os.listdir(self.exptpath):
+        for f in os.listdir(self.cam_analysis.exptpath):
             if f.endswith('.nwb'):
-                self.nwbpath = os.path.join(exptpath, f)
+                self.nwbpath = os.path.join(self.cam_analysis.exptpath, f)
                 print "NWB file:", f
 
         self.meta_data = cn.get_Meta_Data(self.nwbpath)
@@ -30,10 +24,6 @@ class OPAnalysis(object):
         print "Cre line:", self.Cre
         print "Targeted area:", self.HVA
         print "Specimen:", self.specimen
-        self.depth = depth        
-        self.h5path = h5path
-#        self.datarate = datarate
-        self.movie_name = movie_name
         
         self.savepath = self.GetSavepath()
         
@@ -46,7 +36,7 @@ class OPAnalysis(object):
    
     def GetSavepath(self):
         '''creates path used for saving figures and data'''
-        savepath = os.path.join(self.exptpath, 'Data')
+        savepath = os.path.join(self.cam_analysis.exptpath, 'Data')
         if os.path.exists(savepath) == False:
             os.mkdir(savepath)
         else:
@@ -56,31 +46,24 @@ class OPAnalysis(object):
     def getGlobalDFF(self, percentiletosubtract=8):
         '''does a global DF/F using a sliding window (+/- 15 s) baseline subtraction followed by Fo=peak of histogram'''
         '''replace when DF/F added to nwb file'''        
-        if self.h5path!=None:
-            try:
-                #celltraces_dff = op.loadh5(self.h5path, 'celltraces_dff')
-                print "Loading global DF/F from Data.h5"
-            except:
-                pass
-        else:  
-            print "Calculating global DF/F ... this can take some time"
-            startTime = time.time()
-            celltraces_dff = np.zeros(self.celltraces.shape)
-            for i in range(450):
-                celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,:(i+450)], percentiletosubtract, axis=1)
-            for i in range(450, np.size(self.celltraces,1)-450):
-                celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,(i-450):(i+450)], percentiletosubtract, axis=1)
-            for i in range(np.size(self.celltraces,1)-450, np.size(self.celltraces,1)):
-                celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,(i-450):], percentiletosubtract, axis=1)
-    
-            print "we're still here"
-            for cn in range(self.numbercells):
-                (val, edges) = np.histogram(celltraces_dff[cn,:], bins=200)
-                celltraces_dff[cn,:] /= edges[np.argmax(val)+1]
-                celltraces_dff[cn,:] -= 1
-                celltraces_dff[cn,:] *= 100
-            elapsedTime = time.time() - startTime
-            print "Elapsed Time:", str(elapsedTime)
+        print "Calculating global DF/F ... this can take some time"
+        startTime = time.time()
+        celltraces_dff = np.zeros(self.celltraces.shape)
+        for i in range(450):
+            celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,:(i+450)], percentiletosubtract, axis=1)
+        for i in range(450, np.size(self.celltraces,1)-450):
+            celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,(i-450):(i+450)], percentiletosubtract, axis=1)
+        for i in range(np.size(self.celltraces,1)-450, np.size(self.celltraces,1)):
+            celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,(i-450):], percentiletosubtract, axis=1)
+
+        print "we're still here"
+        for cn in range(self.numbercells):
+            (val, edges) = np.histogram(celltraces_dff[cn,:], bins=200)
+            celltraces_dff[cn,:] /= edges[np.argmax(val)+1]
+            celltraces_dff[cn,:] -= 1
+            celltraces_dff[cn,:] *= 100
+        elapsedTime = time.time() - startTime
+        print "Elapsed Time:", str(elapsedTime)
         return celltraces_dff
     
     def getSpeedTuning(self, binsize):
@@ -90,10 +73,10 @@ class OPAnalysis(object):
         spontaneous = cn.get_Stimulus_Table(self.nwbpath, 'spontaneous')
 
         peak_run = pd.DataFrame(index=range(self.numbercells), columns=('speed_max_sp','speed_min_sp','ptest_sp', 'mod_sp','speed_max_vis','speed_min_vis','ptest_vis', 'mod_vis'))
-        peak_run['LIMS'] = self.LIMSID
+        peak_run['LIMS'] = self.cam_analysis.lims_id
         peak_run['Cre'] = self.Cre   
         peak_run['HVA'] = self.HVA
-        peak_run['depth'] = self.depth        
+        peak_run['depth'] = self.cam_analysis.depth        
         
         dx_sp = self.dxcm[spontaneous.Start.iloc[-1]:spontaneous.End.iloc[-1]]
         celltraces_sp = celltraces_trimmed[:,spontaneous.Start.iloc[-1]:spontaneous.End.iloc[-1]]
