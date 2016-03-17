@@ -12,12 +12,7 @@ class OPAnalysis(object):
                  **kwargs):
         self.cam_analysis = cam_analysis
 
-        for f in os.listdir(self.cam_analysis.exptpath):
-            if f.endswith('.nwb'):
-                self.nwbpath = os.path.join(self.cam_analysis.exptpath, f)
-                print "NWB file:", f
-
-        self.meta_data = cn.get_Meta_Data(self.nwbpath)
+        self.meta_data = cn.get_Meta_Data(self.cam_analysis.nwb_path)
         self.Cre = self.meta_data['Cre']
         self.HVA = self.meta_data['area']
         self.specimen = self.meta_data['specimen']
@@ -25,24 +20,15 @@ class OPAnalysis(object):
         print "Targeted area:", self.HVA
         print "Specimen:", self.specimen
         
-        self.savepath = self.GetSavepath()
+        self.savepath = self.cam_analysis.savepath
         
-        self.timestamps, self.celltraces = cn.get_Fluorescence_Traces(self.nwbpath)
+        self.timestamps, self.celltraces = cn.get_Fluorescence_Traces(self.cam_analysis.nwb_path)
         self.numbercells = len(self.celltraces)                         #number of cells in dataset       
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
-        self.dxcm, self.dxtime = cn.get_Running_Speed(self.nwbpath)        
+        self.dxcm, self.dxtime = cn.get_Running_Speed(self.cam_analysis.nwb_path)        
 #        self.celltraces_dff = self.getGlobalDFF(percentiletosubtract=8)
 #        self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.getSpeedTuning(binsize=400)
-   
-    def GetSavepath(self):
-        '''creates path used for saving figures and data'''
-        savepath = os.path.join(self.cam_analysis.exptpath, 'Data')
-        if os.path.exists(savepath) == False:
-            os.mkdir(savepath)
-        else:
-            print "Data folder already exists"
-        return savepath
-
+    
     def getGlobalDFF(self, percentiletosubtract=8):
         '''does a global DF/F using a sliding window (+/- 15 s) baseline subtraction followed by Fo=peak of histogram'''
         '''replace when DF/F added to nwb file'''        
@@ -70,7 +56,7 @@ class OPAnalysis(object):
         print 'Calculating speed tuning, spontaneous vs visually driven'
         celltraces_trimmed = np.delete(self.celltraces_dff, range(len(self.dxcm), np.size(self.celltraces_dff,1)), axis=1) 
         #pull out spontaneous epoch(s)        
-        spontaneous = cn.get_Stimulus_Table(self.nwbpath, 'spontaneous')
+        spontaneous = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'spontaneous')
 
         peak_run = pd.DataFrame(index=range(self.numbercells), columns=('speed_max_sp','speed_min_sp','ptest_sp', 'mod_sp','speed_max_vis','speed_min_vis','ptest_vis', 'mod_vis'))
         peak_run['LIMS'] = self.cam_analysis.lims_id
@@ -222,6 +208,8 @@ class OPAnalysis(object):
             (_ ,peak_run.ptest_vis[nc]) = st.ks_2samp(test_values, other_values)
 #             (_, peak_run.rta_ptest[nc]) = st.ks_2samp(cell_run[:,nc,:30].flatten(), cell_run[:,nc,30:].flatten())
 #             (_, peak_run.rta_modulation[nc]) = cell_run[:,nc,30:].flatten().mean() / cell_run[:,nc,:30].flatten().mean()
+        
+        # TODO, where to save this one?
         peak_run.to_csv(os.path.join(self.savepath, 'peak_Speed.csv'))             
         return binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
 

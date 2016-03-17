@@ -19,107 +19,123 @@ from movie_analysis import MovieAnalysis
 plt.ioff()
 #import Analysis.OPTools_Nikon as op
 import CAM_plotting as cp
-import os
 
 
 class CamAnalysis2Nwb(object):
-    def __init__(self, exptpath, h5path, datarate, lims_id, depth, movie_name):
-        self.exptpath = exptpath
-        self.h5path = h5path
+    def __init__(self, nwb_path, savepath, datarate, lims_id, depth):
+        self.nwb_path = nwb_path
+        self.savepath = save_path
         self.datarate = datarate
         self.lims_id = lims_id
         self.depth = depth
-        self.movie_name = movie_name
     
     
     def save_h5_a(self, dg, nm1, nm3):                
-        store = pd.HDFStore(self.h5path, mode='w')
-        store['stim_table_dg'] = dg.stim_table
-        store['sweep_response_dg'] = dg.sweep_response
-        store['mean_sweep_response_dg'] = dg.mean_sweep_response
+        store = pd.HDFStore(self.h5path, mode='a')
+        store.put('analysis/stim_table_dg', dg.stim_table)
+        store.put('analysis/sweep_response_dg', dg.sweep_response)
+        store.put('analysis/mean_sweep_response_dg', dg.mean_sweep_response)
+        store.put('analysis/peak_dg', dg.peak)
         
-        store['sweep_response_nm1'] = nm1.sweep_response
-        store['stim_table_nm1'] = nm1.stim_table
+        store.put('analysis/sweep_response_nm1', nm1.sweep_response)
+        store.put('analysis/stim_table_nm1', nm1.stim_table)
+        store.put('analysis/peak_nm1', nm1.peak)
     
-        store['sweep_response_nm3'] = nm3.sweep_response
-        store['stim_table_nm3'] = nm3.stim_table
-        #store['sweeptable'] = dg.sweeptable
+        store.put('analysis/sweep_response_nm3', nm3.sweep_response)
+        store.put('analysis/stim_table_nm3', nm3.stim_table)
+        store.put('analysis/peak_nm3', nm3.peak)
+        #store.put('analysis/sweeptable', dg.sweeptable)
         store.close()
         
         f = h5py.File(self.h5path, 'a')
-        f.create_dataset('celltraces', data=dg.celltraces)
-        #f.create_dataset('twop_frames', data=dg.twop_frames)
-        f.create_dataset('acquisition_rate', data=dg.acquisition_rate)
-        f.create_dataset('celltraces_dff', data=nm1.celltraces_dff)
-        #dset5 = f.create_dataset('dxcm', data=sg.dxcm)  
-        f.create_dataset('response_dg', data=dg.response)
+        f.create_dataset('analysis/celltraces', data=dg.celltraces)
+        #f.create_dataset('analysis/twop_frames', data=dg.twop_frames)
+        f.create_dataset('analysis/acquisition_rate', data=dg.acquisition_rate)
+        f.create_dataset('analysis/celltraces_dff', data=nm1.celltraces_dff)
+        #dset5 = f.create_dataset('analysis/dxcm', data=sg.dxcm)  
+        f.create_dataset('analysis/response_dg', data=dg.response)
     
-        f.create_dataset('binned_cells_sp', data=nm1.binned_cells_sp)
-        f.create_dataset('binned_cells_vis', data=nm1.binned_cells_vis)
-        f.create_dataset('binned_dx_sp', data=nm1.binned_dx_sp)
-        f.create_dataset('binned_dx_vis',data=nm1.binned_dx_vis)
+        f.create_dataset('analysis/binned_cells_sp', data=nm1.binned_cells_sp)
+        f.create_dataset('analysis/binned_cells_vis', data=nm1.binned_cells_vis)        
+        f.create_dataset('analysis/binned_dx_sp', data=nm1.binned_dx_sp)
+        f.create_dataset('analysis/binned_dx_vis',data=nm1.binned_dx_vis)
+        
         ##f.keys()
         f.close()
         
     
     def save_h5_b(self, sg, nm1, ni):                
-        store = pd.HDFStore(self.h5path, mode='w')
-        store['stim_table_sg'] = sg.stim_table
-        store['sweep_response_sg'] = sg.sweep_response
-        store['mean_sweep_response_sg'] = sg.mean_sweep_response
-        store['sweep_response_nm1'] = nm1.sweep_response
-        store['stim_table_nm1'] = nm1.stim_table
-        store['sweep_response_ni'] = ni.sweep_response
-        store['stim_table_ni'] = ni.stim_table
-        store['mean_sweep_response_ni'] = ni.mean_sweep_response
-        #store['sweeptable'] = dg.sweeptable
+        store = pd.HDFStore(self.h5path, mode='a')
+        store.put('analysis/stim_table_sg', sg.stim_table)
+        store.put('analysis/sweep_response_sg', sg.sweep_response)
+        store.put('analysis/mean_sweep_response_sg', sg.mean_sweep_response)
+        
+        store.put('analysis/sweep_response_nm1', nm1.sweep_response)
+        store.put('analysis/stim_table_nm1', nm1.stim_table)
+        
+        store.put('analysis/sweep_response_ni', ni.sweep_response)
+        store.put('analysis/stim_table_ni', ni.stim_table)
+        store.put('analysis/mean_sweep_response_ni', ni.mean_sweep_response)
+        #store.put('analysis/sweeptable', dg.sweeptable)
+        store.put('analysis/peak_sg', sg.peak)
+        store.put('analysis/peak_ni', ni.peak)
+        store.put('analysis/peak_nm1', nm1.peak)
+
         store.close()
+
         f = h5py.File(self.h5path, 'a')
         #dset6 = f.create_dataset('receptive_field', data=lsn.receptive_field)
         #dset = f.create_dataset('celltraces', data=sg.celltraces)
         #dset2 = f.create_dataset('twop_frames', data=sg.twop_frames)
         #dset3 = f.create_dataset('acquisition_rate', data=sg.acquisition_rate)
-        f.create_dataset('celltraces_dff', data=nm1.celltraces_dff)
-        f.create_dataset('dxcm', data=sg.dxcm)  
-        f.create_dataset('response_sg', data=sg.response)
-        f.create_dataset('response_ni', data=ni.response)
-        f.create_dataset('binned_cells_sp', data=nm1.binned_cells_sp)
-        f.create_dataset('binned_cells_vis', data=nm1.binned_cells_vis)
-        f.create_dataset('binned_dx_sp', data=nm1.binned_dx_sp)
-        f.create_dataset('binned_dx_vis',data=nm1.binned_dx_vis)
+        f.create_dataset('analysis/celltraces_dff', data=nm1.celltraces_dff)
+        f.create_dataset('analysis/dxcm', data=sg.dxcm)  
+        f.create_dataset('analysis/response_sg', data=sg.response)
+        
+        f.create_dataset('analysis/response_ni', data=ni.response)
+        
+        f.create_dataset('analysis/binned_cells_sp', data=nm1.binned_cells_sp)
+        f.create_dataset('analysis/binned_cells_vis', data=nm1.binned_cells_vis)
+        f.create_dataset('analysis/binned_dx_sp', data=nm1.binned_dx_sp)
+        f.create_dataset('analysis/binned_dx_vis',data=nm1.binned_dx_vis)
         ##f.keys()
         f.close()
     
     
     def save_h5_c(self, lsn, nm1, nm2):                
-        store = pd.HDFStore(self.h5path, mode='w')
-        store['stim_table_lsn'] = lsn.stim_table
-        store['sweep_response'] = lsn.sweep_response
-        store['mean_sweep_response'] = lsn.mean_sweep_response
+        store = pd.HDFStore(self.h5path, mode='a')
+        store.put('analysis/stim_table_lsn', lsn.stim_table)
+        store.put('analysis/sweep_response', lsn.sweep_response)
+        store.put('analysis/mean_sweep_response', lsn.mean_sweep_response)
         
-        store['sweep_response_nm1'] = nm1.sweep_response
-        #store['stim_table_nm1'] = nm1.stim_table # weren't in orig Data.h5
+        store.put('analysis/sweep_response_nm1', nm1.sweep_response)
+        #store.put('analysis/stim_table_nm1', nm1.stim_table) # weren't in orig Data.h5
+        store.put('analysis/peak_nm1', nm1.peak)
     
-        store['sweep_response_nm2'] = nm2.sweep_response
-        #store['stim_table_nm2'] = nm2.stim_table  # weren't in orig Data.h5
+        store.put('analysis/sweep_response_nm2', nm2.sweep_response)
+        store.put('analysis/peak_nm2', nm2.peak)
+        #store.put('analysis/stim_table_nm2', nm2.stim_table)  # weren't in orig Data.h5
         
-        store['sweep_response_lsn'] = lsn.sweep_response
-        store['stim_table_lsn'] = lsn.stim_table
-        store['mean_sweep_response_lsn'] = lsn.mean_sweep_response
-        #store['sweeptable'] = dg.sweeptable
+        store.put('analysis/sweep_response_lsn', lsn.sweep_response)
+        store.put('analysis/stim_table_lsn', lsn.stim_table)
+        store.put('analysis/mean_sweep_response_lsn', lsn.mean_sweep_response)  
+
         store.close()
+        
         f = h5py.File(self.h5path, 'a')
-        f.create_dataset('receptive_field_lsn', data=lsn.receptive_field)
-        f.create_dataset('celltraces', data=lsn.celltraces)
-        #f.create_dataset('twop_frames', data=lsn.twop_frames)
-        f.create_dataset('acquisition_rate', data=lsn.acquisition_rate)
-        f.create_dataset('celltraces_dff', data=nm1.celltraces_dff)
-        #f.create_dataset('dxcm', data=lsn.dxcm)  
-        #f.create_dataset('response_lsn', data=lsn.response)
-        f.create_dataset('binned_dx_sp', data=nm1.binned_dx_sp)
-        f.create_dataset('binned_dx_vis',data=nm1.binned_dx_vis)    
-        f.create_dataset('binned_cells_sp', data=nm1.binned_cells_sp)
-        f.create_dataset('binned_cells_vis', data=nm1.binned_cells_vis)
+        f.create_dataset('analysis/receptive_field_lsn', data=lsn.receptive_field)
+        f.create_dataset('analysis/celltraces', data=lsn.celltraces)
+        #f.create_dataset('analysis/twop_frames', data=lsn.twop_frames)
+        f.create_dataset('analysis/acquisition_rate', data=lsn.acquisition_rate)
+        f.create_dataset('analysis/celltraces_dff', data=nm1.celltraces_dff)
+        #f.create_dataset('analysis/dxcm', data=lsn.dxcm)  
+        #f.create_dataset('analysis/response_lsn', data=lsn.response)
+
+        f.create_dataset('analysis/binned_dx_sp', data=nm1.binned_dx_sp)
+        f.create_dataset('analysis/binned_dx_vis',data=nm1.binned_dx_vis)    
+        f.create_dataset('analysis/binned_cells_sp', data=nm1.binned_cells_sp)
+        f.create_dataset('analysis/binned_cells_vis', data=nm1.binned_cells_vis)
+
         ##f.keys()
         f.close()
     
@@ -163,27 +179,20 @@ class CamAnalysis2Nwb(object):
                     self.save_h5_c(lsn, nm1, nm2)
 
 if __name__=='__main__':
-    stimulus = sys.argv[-1]
-    
-    if 'A' == stimulus:
-        lims_id = '501836392' # A        
-    elif 'B' == stimulus:
-        lims_id = '501886692' # B
-    elif 'C' == stimulus:
-        lims_id = '501717543'  # C
-    else:
-        raise(Exception('please specify stimulus A, B or C'))
+    try:
+        (stimulus, nwb_path, save_path, lims_id) = sys.argv[-4:]  
+        # A /local1/cam_datasets/501836392/501836392.nwb /local1/cam_datasets/501836392/Data 501836392        
+        # B /local1/cam_datasets/501886692/501886692.nwb /local1/cam_datasets/501886692/Data 501886692
+        # C /local1/cam_datasets/501717543/501717543.nwb /local1/cam_datasets/501717543/Data 501717543
+    except:
+        raise(Exception('please specify stimulus A, B or C, cam_directory, lims_id'))
 
 #    Cre = 'Cux2'
 #    HVA = 'AL'
     depth= 175
-    cam_directory = '/local1/cam_datasets'               
-    exptpath = os.path.join(cam_directory, lims_id)
-    h5path = os.path.join(exptpath, 'Data', 'Data_timf.h5')
     datarate = 30    
-    movie_name = 'natural_movie_one'
 
-    cam_analysis_2_nwb = CamAnalysis2Nwb(exptpath, h5path, datarate, lims_id, depth, movie_name)
+    cam_analysis_2_nwb = CamAnalysis2Nwb(nwb_path, save_path, datarate, lims_id, depth)
 
     if 'A' == stimulus:
         cam_analysis_2_nwb.stimulus_a()

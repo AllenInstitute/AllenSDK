@@ -19,7 +19,7 @@ import os
 class DriftingGrating(OPAnalysis):    
     def __init__(self, cam_analysis, **kwargs):
         super(DriftingGrating, self).__init__(cam_analysis, **kwargs)                   
-        stimulus_table = cn.get_Stimulus_Table(self.nwbpath, 'drifting_gratings')
+        stimulus_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'drifting_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = 60#self.sync_table['end'][1] - self.sync_table['start'][1]
         self.interlength = 30#self.sync_table['start'][2] - self.sync_table['end'][1]
@@ -84,7 +84,7 @@ class DriftingGrating(OPAnalysis):
                     groups.append(self.mean_sweep_response[(self.stim_table.Temporal_frequency==tf)&(self.stim_table.Orientation==ori)][str(nc)])
             f,p = st.f_oneway(*groups)
             peak.ptest[nc] = p
-        peak.to_csv(os.path.join(self.savepath, 'peak_drifting_grating.csv'))
+
         return peak
     
     def getRunModulation(self, speed_threshold=10):

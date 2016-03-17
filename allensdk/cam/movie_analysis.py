@@ -9,14 +9,14 @@ import os
 class MovieAnalysis(OPAnalysis):    
     def __init__(self, cam_analysis, movie_name, **kwargs):
         super(MovieAnalysis, self).__init__(cam_analysis, **kwargs)                   
-        stimulus_table = cn.get_Stimulus_Table(self.nwbpath, movie_name)   
+        stimulus_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, movie_name)   
         self.stim_table = stimulus_table[stimulus_table.Frame==0]
         self.celltraces_dff = self.getGlobalDFF(percentiletosubtract=8)
         if movie_name == 'natural_movie_one':
             self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.getSpeedTuning(binsize=800)
         self.sweeplength = self.stim_table.Start.iloc[1] - self.stim_table.Start.iloc[0]
         self.sweep_response = self.getSweepResponse()
-        self.peak = self.getPeak(movie_name)     
+        self.peak = self.getPeak()     
         
     def getSweepResponse(self):
         sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(range(self.numbercells)).astype(str))
@@ -27,8 +27,7 @@ class MovieAnalysis(OPAnalysis):
                 sweep_response[str(nc)][index] = self.celltraces_dff[nc,start:end]
         return sweep_response
     
-    # TODO: remove movie_name
-    def getPeak(self, movie_name):
+    def getPeak(self):
         peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_variability'))
         for nc in range(self.numbercells):
             meanresponse = self.sweep_response[str(nc)].mean()
@@ -48,14 +47,14 @@ class MovieAnalysis(OPAnalysis):
             else:
                 peak_movie.response_variability[nc] = ptime[0]
             peak_movie.peak[nc] = peak
-        peak_movie.to_csv(os.path.join(self.savepath, 'peak'+movie_name+'.csv'))
+
         return peak_movie
 
 class LocallySN(OPAnalysis):    
     def __init__(self, cam_analysis, **kwargs):
         super(LocallySN, self).__init__(cam_analysis, **kwargs)        
-        self.stim_table = cn.get_Stimulus_Table(self.nwbpath, 'locally_sparse_noise')
-        self.LSN = cn.get_Stimulus_Template(self.nwbpath, 'locally_sparse_noise')
+        self.stim_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'locally_sparse_noise')
+        self.LSN = cn.get_Stimulus_Template(self.cam_analysis.nwb_path, 'locally_sparse_noise')
         self.sweeplength = self.stim_table['End'][1] - self.stim_table['Start'][1]
         self.interlength = self.sweeplength
         self.extralength = self.sweeplength

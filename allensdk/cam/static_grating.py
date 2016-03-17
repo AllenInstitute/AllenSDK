@@ -5,13 +5,12 @@ from math import sqrt
 #import Analysis.OPTools_Nikon as op
 from allensdk.cam.o_p_analysis import OPAnalysis
 import allensdk.cam.Analysis.CAM_NWB as cn
-import os
 
 
 class StaticGrating(OPAnalysis):
     def __init__(self, cam_analysis, **kwargs):
         super(StaticGrating, self).__init__(cam_analysis, **kwargs)
-        stimulus_table = cn.get_Stimulus_Table(self.nwbpath, 'static_gratings')
+        stimulus_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'static_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = self.stim_table['End'].iloc[1] - self.stim_table['Start'].iloc[1]
         self.interlength = 4 * self.sweeplength
@@ -63,6 +62,7 @@ class StaticGrating(OPAnalysis):
         peak['Cre'] = self.Cre   
         peak['HVA'] = self.HVA
         peak['depth'] = self.cam_analysis.depth
+
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,:,nc,0] == np.nanmax(self.response[:,1:,:,nc,0]))
             pref_ori = cell_peak[0][0]
@@ -83,7 +83,6 @@ class StaticGrating(OPAnalysis):
                         groups.append(self.mean_sweep_response[(self.stim_table.Spatial_frequency==sf)&(self.stim_table.Orientation==ori)&(self.stim_table.Phase==phase)][str(nc)])
             f,p = st.f_oneway(*groups)
             peak.ptest[nc] = p
-        peak.to_csv(os.path.join(self.savepath, 'Peak_static_grating.csv'))
             #TODO: add ptest, reliability, etc
 #        peak['ptest'] = self.ptest
         return peak

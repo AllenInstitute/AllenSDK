@@ -4,12 +4,11 @@ import pandas as pd
 #import Analysis.OPTools_Nikon as op
 import Analysis.CAM_NWB as cn
 from allensdk.cam.o_p_analysis import OPAnalysis
-import os
 
 class NaturalImages(OPAnalysis):
     def __init__(self, cam_analysis, **kwargs):
         super(NaturalImages, self).__init__(cam_analysis, **kwargs)
-        self.stim_table = cn.get_Stimulus_Table(self.nwbpath, 'natural_scenes')        
+        self.stim_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'natural_scenes')        
         self.number_images = len(np.unique(self.stim_table.Frame))
         self.sweeplength = self.stim_table.End.iloc[1] - self.stim_table.Start.iloc[1]
         self.interlength = 3 * self.sweeplength
@@ -64,5 +63,5 @@ class NaturalImages(OPAnalysis):
             peak.time_to_peak[nc] = (np.argmax(test) - self.interlength)/self.acquisition_rate
             test2 = np.where(test<(test.max()/2))[0]          
             peak.duration[nc] = np.ediff1d(test2).max()/self.acquisition_rate
-        peak.to_csv(os.path.join(self.savepath, 'peak_natural images.csv'))
+
         return peak
