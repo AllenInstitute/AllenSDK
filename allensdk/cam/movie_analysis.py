@@ -10,18 +10,18 @@ class MovieAnalysis(OPAnalysis):
     def __init__(self, cam_analysis, movie_name, **kwargs):
         super(MovieAnalysis, self).__init__(cam_analysis, **kwargs)                   
         stimulus_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, movie_name)   
-        self.stim_table = stimulus_table[stimulus_table.Frame==0]
+        self.stim_table = stimulus_table[stimulus_table.frame==0]
         self.celltraces_dff = self.getGlobalDFF(percentiletosubtract=8)
         if movie_name == 'natural_movie_one':
             self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.getSpeedTuning(binsize=800)
-        self.sweeplength = self.stim_table.Start.iloc[1] - self.stim_table.Start.iloc[0]
+        self.sweeplength = self.stim_table.start.iloc[1] - self.stim_table.start.iloc[0]
         self.sweep_response = self.getSweepResponse()
         self.peak = self.getPeak()     
         
     def getSweepResponse(self):
         sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(range(self.numbercells)).astype(str))
         for index, row in self.stim_table.iterrows():
-            start = row.Start
+            start = row.start
             end = start + self.sweeplength
             for nc in range(self.numbercells):
                 sweep_response[str(nc)][index] = self.celltraces_dff[nc,start:end]
@@ -55,7 +55,7 @@ class LocallySN(OPAnalysis):
         super(LocallySN, self).__init__(cam_analysis, **kwargs)        
         self.stim_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'locally_sparse_noise')
         self.LSN = cn.get_Stimulus_Template(self.cam_analysis.nwb_path, 'locally_sparse_noise')
-        self.sweeplength = self.stim_table['End'][1] - self.stim_table['Start'][1]
+        self.sweeplength = self.stim_table['end'][1] - self.stim_table['start'][1]
         self.interlength = self.sweeplength
         self.extralength = self.sweeplength
         self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
@@ -79,8 +79,8 @@ class LocallySN(OPAnalysis):
 #            sweep_response.rename(columns={str(self.numbercells) : 'dx'}, inplace=True)
 #            for nc in range(self.numbercells):
 #                for index, row in self.stim_table.iterrows():
-#                    start = row['Start'] - self.sweeplength
-#                    end = row['Start'] + (2*self.sweeplength)
+#                    start = row['start'] - self.sweeplength
+#                    end = row['start'] + (2*self.sweeplength)
 #    #                try:
 #                    temp = self.celltraces[nc,start:end]                                
 #                    sweep_response[str(nc)][index] = 100*((temp/np.mean(temp[:self.sweeplength]))-1)
@@ -100,8 +100,8 @@ class LocallySN(OPAnalysis):
             for yp in range(28):
                 on_frame = np.where(self.LSN[:,xp,yp]==255)[0]
                 off_frame = np.where(self.LSN[:,xp,yp]==0)[0]
-                subset_on = self.mean_sweep_response[self.stim_table.Frame.isin(on_frame)]
-                subset_off = self.mean_sweep_response[self.stim_table.Frame.isin(off_frame)]
+                subset_on = self.mean_sweep_response[self.stim_table.frame.isin(on_frame)]
+                subset_off = self.mean_sweep_response[self.stim_table.frame.isin(off_frame)]
                 receptive_field[xp,yp,:,0] = subset_on.mean(axis=0)
                 receptive_field[xp,yp,:,1] = subset_off.mean(axis=0)
         return receptive_field  

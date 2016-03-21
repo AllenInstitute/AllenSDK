@@ -24,8 +24,8 @@ class DriftingGrating(OPAnalysis):
         self.sweeplength = 60#self.sync_table['end'][1] - self.sync_table['start'][1]
         self.interlength = 30#self.sync_table['start'][2] - self.sync_table['end'][1]
         self.extralength = 0
-        self.orivals = np.unique(self.stim_table.Orientation).astype(int)
-        self.tfvals = np.unique(self.stim_table.Temporal_frequency).astype(int)
+        self.orivals = np.unique(self.stim_table.orientation).astype(int)
+        self.tfvals = np.unique(self.stim_table.temporal_frequency).astype(int)
         self.number_ori = len(self.orivals)
         self.number_tf = len(self.tfvals)            
         self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
@@ -42,8 +42,8 @@ class DriftingGrating(OPAnalysis):
             ori_pt = np.where(self.orivals == ori)[0][0]
             for tf in self.tfvals:
                 tf_pt = np.where(self.tfvals == tf)[0][0]
-                subset_response = self.mean_sweep_response[(self.stim_table.Temporal_frequency==tf)&(self.stim_table.Orientation==ori)]
-                subset_pval = self.pval[(self.stim_table.Temporal_frequency==tf)&(self.stim_table.Orientation==ori)]
+                subset_response = self.mean_sweep_response[(self.stim_table.temporal_frequency==tf)&(self.stim_table.orientation==ori)]
+                subset_pval = self.pval[(self.stim_table.temporal_frequency==tf)&(self.stim_table.orientation==ori)]
                 response[ori_pt, tf_pt, :, 0] = subset_response.mean(axis=0)
                 response[ori_pt, tf_pt, :, 1] = subset_response.std(axis=0)/sqrt(len(subset_response))
                 response[ori_pt, tf_pt, :, 2] = subset_pval.apply(ptest, axis=0)
@@ -75,13 +75,13 @@ class DriftingGrating(OPAnalysis):
             
             pref_std = self.response[prefori, preftf, nc, 1]*sqrt(15)
             blank_mean = self.response[0, 0, nc, 0]
-            blank_std = self.response[0, 0, nc, 1]*np.sqrt(len(self.stim_table[self.stim_table.Temporal_frequency==0]))
+            blank_std = self.response[0, 0, nc, 1]*np.sqrt(len(self.stim_table[self.stim_table.temporal_frequency==0]))
             peak['reliability'][nc] = (pref - blank_mean)/(pref_std + blank_std)
             
             groups = []
             for ori in self.orivals:
                 for tf in self.tfvals:
-                    groups.append(self.mean_sweep_response[(self.stim_table.Temporal_frequency==tf)&(self.stim_table.Orientation==ori)][str(nc)])
+                    groups.append(self.mean_sweep_response[(self.stim_table.temporal_frequency==tf)&(self.stim_table.orientation==ori)][str(nc)])
             f,p = st.f_oneway(*groups)
             peak.ptest[nc] = p
 

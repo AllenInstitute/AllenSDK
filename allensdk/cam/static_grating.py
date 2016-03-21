@@ -12,12 +12,12 @@ class StaticGrating(OPAnalysis):
         super(StaticGrating, self).__init__(cam_analysis, **kwargs)
         stimulus_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'static_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
-        self.sweeplength = self.stim_table['End'].iloc[1] - self.stim_table['Start'].iloc[1]
+        self.sweeplength = self.stim_table['end'].iloc[1] - self.stim_table['start'].iloc[1]
         self.interlength = 4 * self.sweeplength
         self.extralength = self.sweeplength
-        self.orivals = np.unique(self.stim_table.Orientation.dropna())
-        self.sfvals = np.unique(self.stim_table.Spatial_frequency.dropna())
-        self.phasevals = np.unique(self.stim_table.Phase.dropna())
+        self.orivals = np.unique(self.stim_table.orientation.dropna())
+        self.sfvals = np.unique(self.stim_table.spatial_frequency.dropna())
+        self.phasevals = np.unique(self.stim_table.phase.dropna())
         self.number_ori = len(self.orivals)
         self.number_sf = len(self.sfvals)
         self.number_phase = len(self.phasevals)            
@@ -42,13 +42,13 @@ class StaticGrating(OPAnalysis):
                 sf_pt = np.where(self.sfvals == sf)[0][0]
                 for phase in self.phasevals:
                     phase_pt = np.where(self.phasevals == phase)[0][0]
-                    subset_response = self.mean_sweep_response[(self.stim_table.Spatial_frequency==sf)&(self.stim_table.Orientation==ori)&(self.stim_table.Phase==phase)]
-                    subset_pval = self.pval[(self.stim_table.Spatial_frequency==sf)&(self.stim_table.Orientation==ori)&(self.stim_table.Phase==phase)]
+                    subset_response = self.mean_sweep_response[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)]
+                    subset_pval = self.pval[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)]
                     response[ori_pt, sf_pt, phase_pt, :, 0] = subset_response.mean(axis=0)
                     response[ori_pt, sf_pt, phase_pt, :, 1] = subset_response.std(axis=0)/sqrt(len(subset_response))
                     response[ori_pt, sf_pt, phase_pt, :, 2] = subset_pval.apply(ptest, axis=0)
-#        subset_response = self.mean_sweep_response[self.stim_table.Orientation.isnull()]
-#        subset_pval = self.pval[self.stim_table.Orientation.isnull()]
+#        subset_response = self.mean_sweep_response[self.stim_table.orientation.isnull()]
+#        subset_pval = self.pval[self.stim_table.orientation.isnull()]
 #        blank[:,0] = subset_response.mean(axis=0)
 #        blank[:,1] = subset_response.std(axis=0)/sqrt(len(subset_response))
 #        blank[:,2] = subset_pval.apply(ptest, axis=0)
@@ -80,7 +80,7 @@ class StaticGrating(OPAnalysis):
             for ori in self.orivals:
                 for sf in self.sfvals:
                     for phase in self.phasevals:
-                        groups.append(self.mean_sweep_response[(self.stim_table.Spatial_frequency==sf)&(self.stim_table.Orientation==ori)&(self.stim_table.Phase==phase)][str(nc)])
+                        groups.append(self.mean_sweep_response[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)][str(nc)])
             f,p = st.f_oneway(*groups)
             peak.ptest[nc] = p
             #TODO: add ptest, reliability, etc
@@ -95,7 +95,7 @@ class StaticGrating(OPAnalysis):
 #                ori=row.Ori
 #                sf=row.SF
 #                phase = row.Phase
-#                test[str(nc)][index] = self.mean_sweep_response[(self.stim_table.Spatial_frequency==sf)&(self.stim_table.Orientation==ori)&(self.stim_table.Phase==phase)][str(nc)]
+#                test[str(nc)][index] = self.mean_sweep_response[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)][str(nc)]
 #        ptest = []
 #        for nc in range(self.numbercells):
 #            groups = []

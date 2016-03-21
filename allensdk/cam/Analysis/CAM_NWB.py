@@ -31,15 +31,10 @@ def get_Stimulus_Table(NWB_file, stimulus_name):
     stim_data = f['stimulus']['presentation'][stim_name]['data'].value
     features=f['stimulus']['presentation'][stim_name]['features'].value
     f.close()
-    
-    #capitalize names of stimulus table
-    Features = []
-    for a in features:
-        Features.append(a.capitalize())
 
-    stimulus_table = pd.DataFrame(stim_data, columns=Features)
-    stimulus_table.Start = stimulus_table.Start.astype(int)
-    stimulus_table.End = stimulus_table.End.astype(int)      
+    stimulus_table = pd.DataFrame(stim_data, columns=features)
+    stimulus_table.start = stimulus_table.start.astype(int)
+    stimulus_table.end = stimulus_table.end.astype(int)      
     return stimulus_table
 
 def get_Stimulus_Template(NWB_file, stimulus_name):

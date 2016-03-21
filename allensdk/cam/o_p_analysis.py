@@ -64,15 +64,15 @@ class OPAnalysis(object):
         peak_run['HVA'] = self.HVA
         peak_run['depth'] = self.cam_analysis.depth        
         
-        dx_sp = self.dxcm[spontaneous.Start.iloc[-1]:spontaneous.End.iloc[-1]]
-        celltraces_sp = celltraces_trimmed[:,spontaneous.Start.iloc[-1]:spontaneous.End.iloc[-1]]
-        dx_vis = np.delete(self.dxcm, np.arange(spontaneous.Start.iloc[-1],spontaneous.End.iloc[-1]))
-        celltraces_vis = np.delete(celltraces_trimmed, np.arange(spontaneous.Start.iloc[-1],spontaneous.End.iloc[-1]), axis=1)
+        dx_sp = self.dxcm[spontaneous.start.iloc[-1]:spontaneous.end.iloc[-1]]
+        celltraces_sp = celltraces_trimmed[:,spontaneous.start.iloc[-1]:spontaneous.end.iloc[-1]]
+        dx_vis = np.delete(self.dxcm, np.arange(spontaneous.start.iloc[-1],spontaneous.end.iloc[-1]))
+        celltraces_vis = np.delete(celltraces_trimmed, np.arange(spontaneous.start.iloc[-1],spontaneous.end.iloc[-1]), axis=1)
         if len(spontaneous) > 1:
-            dx_sp = np.append(dx_sp, self.dxcm[spontaneous.Start.iloc[-2]:spontaneous.End.iloc[-2]], axis=0)
-            celltraces_sp = np.append(celltraces_sp,celltraces_trimmed[:,spontaneous.Start.iloc[-2]:spontaneous.End.iloc[-2]], axis=1)
-            dx_vis = np.delete(dx_vis, np.arange(spontaneous.Start.iloc[-2],spontaneous.End.iloc[-2]))
-            celltraces_vis = np.delete(celltraces_vis, np.arange(spontaneous.Start.iloc[-2],spontaneous.End.iloc[-2]), axis=1)
+            dx_sp = np.append(dx_sp, self.dxcm[spontaneous.start.iloc[-2]:spontaneous.end.iloc[-2]], axis=0)
+            celltraces_sp = np.append(celltraces_sp,celltraces_trimmed[:,spontaneous.start.iloc[-2]:spontaneous.end.iloc[-2]], axis=1)
+            dx_vis = np.delete(dx_vis, np.arange(spontaneous.start.iloc[-2],spontaneous.end.iloc[-2]))
+            celltraces_vis = np.delete(celltraces_vis, np.arange(spontaneous.start.iloc[-2],spontaneous.end.iloc[-2]), axis=1)
         celltraces_vis = celltraces_vis[:,~np.isnan(dx_vis)]
         dx_vis = dx_vis[~np.isnan(dx_vis)]  
         
@@ -230,8 +230,8 @@ class OPAnalysis(object):
         sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(range(self.numbercells+1)).astype(str))
         sweep_response.rename(columns={str(self.numbercells) : 'dx'}, inplace=True)
         for index, row in self.stim_table.iterrows():
-            start = row['Start'] - self.interlength
-            end = row['Start'] + self.sweeplength + self.interlength
+            start = row['start'] - self.interlength
+            end = row['start'] + self.sweeplength + self.interlength
             for nc in range(self.numbercells):
                 temp = self.celltraces[nc,start:end]                                
                 sweep_response[str(nc)][index] = 100*((temp/np.mean(temp[:self.interlength]))-1)
@@ -269,7 +269,7 @@ class OPAnalysis(object):
             groups = []
             for ori in self.orivals:
                 for tf in self.tfvals:
-                    groups.append(self.mean_sweep_response[(self.stim_table.Temporal_frequency==tf)&(self.stim_table.Orientation==ori)][str(nc)])
+                    groups.append(self.mean_sweep_response[(self.stim_table.temporal_frequency==tf)&(self.stim_table.orientation==ori)][str(nc)])
             f,p = st.f_oneway(*groups)
             ptest[nc] = p
         return ptest
