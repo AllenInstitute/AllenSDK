@@ -9,7 +9,7 @@ import os
 class MovieAnalysis(OPAnalysis):    
     def __init__(self, cam_analysis, movie_name, **kwargs):
         super(MovieAnalysis, self).__init__(cam_analysis, **kwargs)                   
-        stimulus_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, movie_name)   
+        stimulus_table = self.cam_analysis.nwb.get_stimulus_table(movie_name)   
         self.stim_table = stimulus_table[stimulus_table.frame==0]
         self.celltraces_dff = self.getGlobalDFF(percentiletosubtract=8)
         if movie_name == 'natural_movie_one':
@@ -53,8 +53,8 @@ class MovieAnalysis(OPAnalysis):
 class LocallySN(OPAnalysis):    
     def __init__(self, cam_analysis, **kwargs):
         super(LocallySN, self).__init__(cam_analysis, **kwargs)        
-        self.stim_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'locally_sparse_noise')
-        self.LSN = cn.get_Stimulus_Template(self.cam_analysis.nwb_path, 'locally_sparse_noise')
+        self.stim_table = self.cam_analysis.nwb.get_stimulus_table('locally_sparse_noise')
+        self.LSN = self.cam_analysis.nwb.get_stimulus_template('locally_sparse_noise')
         self.sweeplength = self.stim_table['end'][1] - self.stim_table['start'][1]
         self.interlength = self.sweeplength
         self.extralength = self.sweeplength

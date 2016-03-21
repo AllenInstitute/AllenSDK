@@ -12,6 +12,7 @@ from allensdk.cam.static_grating import StaticGrating
 from allensdk.cam.movie_analysis import LocallySN
 from allensdk.cam.natural_images import NaturalImages
 import sys
+from allensdk.cam.Analysis.CAM_NWB import CamNwbDataSet
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from drifting_grating import DriftingGrating
@@ -23,35 +24,14 @@ import CAM_plotting as cp
 
 class CamAnalysis2Nwb(object):
     def __init__(self, nwb_path, savepath, datarate, lims_id, depth):
-        self.nwb_path = nwb_path
+        self.nwb = CamNwbDataSet(nwb_path)                        
         self.savepath = save_path
         self.datarate = datarate
         self.lims_id = lims_id
         self.depth = depth
-
-
-    def save_analysis_hdf5(self, *tables):
-        store = pd.HDFStore(self.nwb_path, mode='a')
-
-        for k,v in tables:
-            store.put('analysis/%s' % (k), v)
-
-        store.close()
-        
-
-    def save_analysis_datasets(self, *datasets):    
-        f = h5py.File(self.nwb_path, 'a')
-        
-        for k,v in datasets:
-            if k in f['analysis']:
-                del f['analysis'][k]
-            f.create_dataset('analysis/%s' % k, data=v)
-        
-        ##f.keys()
-        f.close()
     
-    def save_h5_a(self, dg, nm1, nm3):                
-        self.save_analysis_hdf5(
+    def save_h5_a(self, dg, nm1, nm3):
+        self.nwb.save_analysis_hdf5(
             ('stim_table_dg', dg.stim_table),
             ('sweep_response_dg', dg.sweep_response),
             ('mean_sweep_response_dg', dg.mean_sweep_response),
@@ -63,7 +43,7 @@ class CamAnalysis2Nwb(object):
             ('stim_table_nm3', nm3.stim_table),
             ('peak_nm3', nm3.peak))
         
-        self.save_analysis_datasets(
+        self.nwb.save_analysis_datasets(
             ('celltraces', dg.celltraces),
             ('acquisition_rate', dg.acquisition_rate),
             ('celltraces_dff', nm1.celltraces_dff),
@@ -75,7 +55,7 @@ class CamAnalysis2Nwb(object):
     
         
     def save_h5_b(self, sg, nm1, ni):                
-        self.save_analysis_hdf5(
+        self.nwb.save_analysis_hdf5(
             ('stim_table_sg', sg.stim_table),
             ('sweep_response_sg', sg.sweep_response),
             ('mean_sweep_response_sg', sg.mean_sweep_response),
@@ -88,7 +68,7 @@ class CamAnalysis2Nwb(object):
             ('peak_ni', ni.peak),
             ('peak_nm1', nm1.peak))
 
-        self.save_analysis_datasets(
+        self.nwb.save_analysis_datasets(
             ('celltraces_dff', nm1.celltraces_dff),
             ('dxcm', sg.dxcm),  
             ('response_sg', sg.response),
@@ -100,7 +80,7 @@ class CamAnalysis2Nwb(object):
     
     
     def save_h5_c(self, lsn, nm1, nm2):                
-        self.save_analysis_hdf5(
+        self.nwb.save_analysis_hdf5(
             ('stim_table_lsn', lsn.stim_table),
             ('sweep_response', lsn.sweep_response),
             ('mean_sweep_response', lsn.mean_sweep_response),
@@ -112,7 +92,7 @@ class CamAnalysis2Nwb(object):
             ('stim_table_lsn', lsn.stim_table),
             ('mean_sweep_response_lsn', lsn.mean_sweep_response))  
         
-        self.save_analysis_datasets(
+        self.nwb.save_analysis_datasets(
             ('receptive_field_lsn', lsn.receptive_field),
             ('celltraces', lsn.celltraces),
             ('acquisition_rate', lsn.acquisition_rate),

@@ -4,13 +4,12 @@ import pandas as pd
 from math import sqrt
 #import Analysis.OPTools_Nikon as op
 from allensdk.cam.o_p_analysis import OPAnalysis
-import allensdk.cam.Analysis.CAM_NWB as cn
 
 
 class StaticGrating(OPAnalysis):
     def __init__(self, cam_analysis, **kwargs):
         super(StaticGrating, self).__init__(cam_analysis, **kwargs)
-        stimulus_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'static_gratings')
+        stimulus_table = self.cam_analysis.nwb.get_stimulus_table('static_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = self.stim_table['end'].iloc[1] - self.stim_table['start'].iloc[1]
         self.interlength = 4 * self.sweeplength
@@ -81,7 +80,7 @@ class StaticGrating(OPAnalysis):
                 for sf in self.sfvals:
                     for phase in self.phasevals:
                         groups.append(self.mean_sweep_response[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)][str(nc)])
-            f,p = st.f_oneway(*groups)
+            _,p = st.f_oneway(*groups)
             peak.ptest[nc] = p
             #TODO: add ptest, reliability, etc
 #        peak['ptest'] = self.ptest

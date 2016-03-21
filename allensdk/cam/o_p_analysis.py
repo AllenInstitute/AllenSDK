@@ -12,7 +12,7 @@ class OPAnalysis(object):
                  **kwargs):
         self.cam_analysis = cam_analysis
 
-        self.meta_data = cn.get_Meta_Data(self.cam_analysis.nwb_path)
+        self.meta_data = self.cam_analysis.nwb.get_meta_data()
         self.Cre = self.meta_data['Cre']
         self.HVA = self.meta_data['area']
         self.specimen = self.meta_data['specimen']
@@ -22,10 +22,10 @@ class OPAnalysis(object):
         
         self.savepath = self.cam_analysis.savepath
         
-        self.timestamps, self.celltraces = cn.get_Fluorescence_Traces(self.cam_analysis.nwb_path)
+        self.timestamps, self.celltraces = self.cam_analysis.nwb.get_fluorescence_traces()
         self.numbercells = len(self.celltraces)                         #number of cells in dataset       
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
-        self.dxcm, self.dxtime = cn.get_Running_Speed(self.cam_analysis.nwb_path)        
+        self.dxcm, self.dxtime = self.cam_analysis.nwb.get_running_speed()        
 #        self.celltraces_dff = self.getGlobalDFF(percentiletosubtract=8)
 #        self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.getSpeedTuning(binsize=400)
     
@@ -56,7 +56,7 @@ class OPAnalysis(object):
         print 'Calculating speed tuning, spontaneous vs visually driven'
         celltraces_trimmed = np.delete(self.celltraces_dff, range(len(self.dxcm), np.size(self.celltraces_dff,1)), axis=1) 
         #pull out spontaneous epoch(s)        
-        spontaneous = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'spontaneous')
+        spontaneous = self.cam_analysis.nwb.get_stimulus_table('spontaneous')
 
         peak_run = pd.DataFrame(index=range(self.numbercells), columns=('speed_max_sp','speed_min_sp','ptest_sp', 'mod_sp','speed_max_vis','speed_min_vis','ptest_vis', 'mod_vis'))
         peak_run['LIMS'] = self.cam_analysis.lims_id
@@ -219,7 +219,7 @@ class OPAnalysis(object):
             return np.mean(x[self.interlength:self.interlength+self.sweeplength+self.extralength])#+1])
             
         def doPvalue(x):
-            (f, p) = st.f_oneway(x[:self.interlength], x[self.interlength:self.interlength+self.sweeplength+self.extralength])
+            (_, p) = st.f_oneway(x[:self.interlength], x[self.interlength:self.interlength+self.sweeplength+self.extralength])
             return p
             
 #        if self.h5path != None:
@@ -255,7 +255,7 @@ class OPAnalysis(object):
             groups = []
             for index,row in test.iterrows():
                 groups.append(test[str(nc)][index])
-                (f,p) = st.f_oneway(*groups)
+                (_,p) = st.f_oneway(*groups)
             ptest.append(p)
         ptest = np.array(ptest)
         cells = list(np.where(ptest<0.01)[0])
@@ -270,6 +270,6 @@ class OPAnalysis(object):
             for ori in self.orivals:
                 for tf in self.tfvals:
                     groups.append(self.mean_sweep_response[(self.stim_table.temporal_frequency==tf)&(self.stim_table.orientation==ori)][str(nc)])
-            f,p = st.f_oneway(*groups)
+            _,p = st.f_oneway(*groups)
             ptest[nc] = p
         return ptest

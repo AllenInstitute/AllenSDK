@@ -8,7 +8,7 @@ from allensdk.cam.o_p_analysis import OPAnalysis
 class NaturalImages(OPAnalysis):
     def __init__(self, cam_analysis, **kwargs):
         super(NaturalImages, self).__init__(cam_analysis, **kwargs)
-        self.stim_table = cn.get_Stimulus_Table(self.cam_analysis.nwb_path, 'natural_scenes')        
+        self.stim_table = self.cam_analysis.nwb.get_stimulus_table('natural_scenes')        
         self.number_images = len(np.unique(self.stim_table.frame))
         self.sweeplength = self.stim_table.end.iloc[1] - self.stim_table.start.iloc[1]
         self.interlength = 3 * self.sweeplength
