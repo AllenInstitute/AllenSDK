@@ -1,10 +1,7 @@
 import scipy.stats as st
 import pandas as pd
 import numpy as np
-#import Analysis.OPTools_Nikon as op
-import Analysis.CAM_NWB as cn
 from allensdk.cam.o_p_analysis import OPAnalysis
-import os
 
 class MovieAnalysis(OPAnalysis):    
     def __init__(self, cam_analysis, movie_name, **kwargs):
@@ -36,7 +33,7 @@ class MovieAnalysis(OPAnalysis):
             for tr in range(10):
                 test = self.sweep_response[str(nc)].iloc[tr]
                 for i in range(movie_len):
-                    f,p = st.ks_2samp(test[i*30:(i+1)*30],test[(i+1)*30:(i+2)*30])
+                    _,p = st.ks_2samp(test[i*30:(i+1)*30],test[(i+1)*30:(i+2)*30])
                     output[i,tr] = p    
             output = np.where(output<0.05, 1, 0)
             ptime = np.sum(output, axis=1)

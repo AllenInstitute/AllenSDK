@@ -1,11 +1,10 @@
 import scipy.stats as st
 import numpy as np
 import pandas as pd
-#import Analysis.OPTools_Nikon as op
-import Analysis.CAM_NWB as cn
+import allensdk.cam.CAM_NWB as cn
 import os
 import time
-from allensdk.cam.Analysis.findlevel import findlevel
+from allensdk.cam.findlevel import findlevel
 
 class OPAnalysis(object):
     def __init__(self, cam_analysis,

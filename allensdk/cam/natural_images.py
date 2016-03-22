@@ -1,8 +1,6 @@
 import scipy.stats as st
 import numpy as np
 import pandas as pd
-#import Analysis.OPTools_Nikon as op
-import Analysis.CAM_NWB as cn
 from allensdk.cam.o_p_analysis import OPAnalysis
 
 class NaturalImages(OPAnalysis):
@@ -49,7 +47,7 @@ class NaturalImages(OPAnalysis):
             subset_stat = subset[subset.dx<2]
             subset_run = subset[subset.dx>=2]
             if (len(subset_run)>5) & ( len(subset_stat)>5):
-                (f, peak.p_run[nc]) = st.ks_2samp(subset_run[str(nc)], subset_stat[str(nc)])
+                (_, peak.p_run[nc]) = st.ks_2samp(subset_run[str(nc)], subset_stat[str(nc)])
                 peak.run_modulation[nc] = subset_run[str(nc)].mean()/subset_stat[str(nc)].mean()
             else:
                 peak.p_run[nc] = np.NaN
@@ -58,7 +56,7 @@ class NaturalImages(OPAnalysis):
             for im in range(self.number_images):
                 subset = self.mean_sweep_response[self.stim_table.frame==(im-1)]
                 groups.append(subset[str(nc)].values)
-            (f,peak.ptest[nc]) = st.f_oneway(*groups)
+            (_,peak.ptest[nc]) = st.f_oneway(*groups)
             test = self.sweep_response[self.stim_table.frame==nip][str(nc)].mean()
             peak.time_to_peak[nc] = (np.argmax(test) - self.interlength)/self.acquisition_rate
             test2 = np.where(test<(test.max()/2))[0]          

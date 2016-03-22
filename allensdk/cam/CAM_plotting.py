@@ -804,25 +804,26 @@ def plot_3SB(sg, nm1, ni):
         ax15.plot(xtime, sg.dxcm, color='k')
         ax15.set_xlabel("Time (s)", fontsize=20)
         ax15.set_xlabel("Speed (cm/s)", fontsize=20)
-        
-        smax = sg.binned_cells_sp[nc,np.argmax(sg.binned_cells_sp[nc,:,0]),0] + sg.binned_cells_sp[nc,np.argmax(sg.binned_cells_sp[nc,:,0]),1]
-        vmax = sg.binned_cells_vis[nc,np.argmax(sg.binned_cells_vis[nc,:,0]),0] + sg.binned_cells_vis[nc,np.argmax(sg.binned_cells_vis[nc,:,0]),1]
-        rmax = np.where(smax>vmax, smax, vmax)
-        smin = sg.binned_cells_sp[nc,np.argmin(sg.binned_cells_sp[nc,:,0]),0] - sg.binned_cells_sp[nc,np.argmin(sg.binned_cells_sp[nc,:,0]),1]
-        vmin = sg.binned_cells_vis[nc,np.argmin(sg.binned_cells_vis[nc,:,0]),0] - sg.binned_cells_vis[nc,np.argmin(sg.binned_cells_vis[nc,:,0]),1]
-        rmin = np.where(smin<vmin, smin, vmin)        
-        
-        ax14.errorbar(sg.binned_dx_sp[:,0], sg.binned_cells_sp[nc,:,0], yerr=sg.binned_cells_sp[nc,:,1], fmt='.', color='k')
-        ax14.set_ylim(rmin, rmax)        
-        ax14.set_xlabel("Speed (cm/s)", fontsize=20)
-        ax14.set_ylabel("DF/F", fontsize=20)
-        ax14.set_title("Spontaneous", fontsize=20)
-        
-        ax16.errorbar(sg.binned_dx_vis[:,0], sg.binned_cells_vis[nc,:,0], yerr=sg.binned_cells_vis[nc,:,1], fmt='.')
-        ax16.set_ylim(rmin, rmax)        
-        ax16.set_xlabel("Speed (cm/s)", fontsize=20)
-        ax16.set_ylabel("DF/F", fontsize=20)
-        ax16.set_title("Visual Stimuli", fontsize=20)
+
+        # TODO: investigate why sg.binned_.... aren't computed        
+#         smax = sg.binned_cells_sp[nc,np.argmax(sg.binned_cells_sp[nc,:,0]),0] + sg.binned_cells_sp[nc,np.argmax(sg.binned_cells_sp[nc,:,0]),1]
+#         vmax = sg.binned_cells_vis[nc,np.argmax(sg.binned_cells_vis[nc,:,0]),0] + sg.binned_cells_vis[nc,np.argmax(sg.binned_cells_vis[nc,:,0]),1]
+#         rmax = np.where(smax>vmax, smax, vmax)
+#         smin = sg.binned_cells_sp[nc,np.argmin(sg.binned_cells_sp[nc,:,0]),0] - sg.binned_cells_sp[nc,np.argmin(sg.binned_cells_sp[nc,:,0]),1]
+#         vmin = sg.binned_cells_vis[nc,np.argmin(sg.binned_cells_vis[nc,:,0]),0] - sg.binned_cells_vis[nc,np.argmin(sg.binned_cells_vis[nc,:,0]),1]
+#         rmin = np.where(smin<vmin, smin, vmin)        
+#         
+#         ax14.errorbar(sg.binned_dx_sp[:,0], sg.binned_cells_sp[nc,:,0], yerr=sg.binned_cells_sp[nc,:,1], fmt='.', color='k')
+#         ax14.set_ylim(rmin, rmax)        
+#         ax14.set_xlabel("Speed (cm/s)", fontsize=20)
+#         ax14.set_ylabel("DF/F", fontsize=20)
+#         ax14.set_title("Spontaneous", fontsize=20)
+#         
+#         ax16.errorbar(sg.binned_dx_vis[:,0], sg.binned_cells_vis[nc,:,0], yerr=sg.binned_cells_vis[nc,:,1], fmt='.')
+#         ax16.set_ylim(rmin, rmax)        
+#         ax16.set_xlabel("Speed (cm/s)", fontsize=20)
+#         ax16.set_ylabel("DF/F", fontsize=20)
+#         ax16.set_title("Visual Stimuli", fontsize=20)
         
         peakori = sg.peak.Ori[nc]
         peaksf = sg.peak.SF[nc]

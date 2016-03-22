@@ -1,20 +1,8 @@
-from pylab import *
-import matplotlib
 from o_p_analysis import OPAnalysis
-matplotlib.use('agg')
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
-plt.ioff()
 import scipy.stats as st
-import numpy as np
-import cPickle as pickle
-import h5py
 import pandas as pd
-#import Analysis.OPTools_Nikon as op
-import Analysis.CAM_NWB as cn
-import CAM_plotting as cp
-from allensdk.cam.Analysis.findlevel import *
-import os
+import numpy as np
+from math import sqrt
 
 class DriftingGrating(OPAnalysis):    
     def __init__(self, cam_analysis, **kwargs):

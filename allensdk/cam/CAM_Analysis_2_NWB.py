@@ -6,24 +6,20 @@ Created on Wed Dec 16 10:26:59 2015
 """
 
 import matplotlib
-import h5py
-import pandas as pd
 from allensdk.cam.static_grating import StaticGrating
 from allensdk.cam.movie_analysis import LocallySN
 from allensdk.cam.natural_images import NaturalImages
-import sys
-from allensdk.cam.Analysis.CAM_NWB import CamNwbDataSet
+from allensdk.cam.CAM_NWB import CamNwbDataSet
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from drifting_grating import DriftingGrating
 from movie_analysis import MovieAnalysis
 plt.ioff()
-#import Analysis.OPTools_Nikon as op
 import CAM_plotting as cp
 
 
 class CamAnalysis2Nwb(object):
-    def __init__(self, nwb_path, savepath, datarate, lims_id, depth):
+    def __init__(self, nwb_path, save_path, datarate, lims_id, depth):
         self.nwb = CamNwbDataSet(nwb_path)                        
         self.savepath = save_path
         self.datarate = datarate
@@ -140,16 +136,8 @@ class CamAnalysis2Nwb(object):
     
                 if save_flag:
                     self.save_h5_c(lsn, nm1, nm2)
-
-if __name__=='__main__':
-    try:
-        (stimulus, nwb_path, save_path, lims_id) = sys.argv[-4:]  
-        # A /local1/cam_datasets/501836392/501836392.nwb /local1/cam_datasets/501836392/Data 501836392        
-        # B /local1/cam_datasets/501886692/501886692.nwb /local1/cam_datasets/501886692/Data 501886692
-        # C /local1/cam_datasets/501717543/501717543.nwb /local1/cam_datasets/501717543/Data 501717543
-    except:
-        raise(Exception('please specify stimulus A, B or C, cam_directory, lims_id'))
-
+                    
+def main(stimulus, nwb_path, save_path, lims_id):
 #    Cre = 'Cux2'
 #    HVA = 'AL'
     depth= 175
@@ -158,11 +146,11 @@ if __name__=='__main__':
     cam_analysis_2_nwb = CamAnalysis2Nwb(nwb_path, save_path, datarate, lims_id, depth)
 
     if 'A' == stimulus:
-        cam_analysis_2_nwb.stimulus_a()
+        cam_analysis_2_nwb.stimulus_a(plot_flag=False)
     elif 'B' == stimulus:
-        cam_analysis_2_nwb.stimulus_b()
+        cam_analysis_2_nwb.stimulus_b(plot_flag=False)
     else:
-        cam_analysis_2_nwb.stimulus_c()
+        cam_analysis_2_nwb.stimulus_c(plot_flag=False)
     
 #    print "Number of cells:", str(lsn.numbercells)
 #    cp.plot_3SB(sg, nm1, ni)
@@ -177,7 +165,20 @@ if __name__=='__main__':
 #    dg.plotTraces()   
 #    dg.ExperimentSummary()
 #    dg.plotRunning()    
-    
+
+if __name__=='__main__':
+#     try:
+#         (stimulus, nwb_path, save_path, lims_id) = sys.argv[-4:]
+#         main(stimulus, nwb_path, save_path, lims_id)  
+#         # A /local1/cam_datasets/501836392/501836392.nwb /local1/cam_datasets/501836392/Data 501836392 True        
+#         # B /local1/cam_datasets/501886692/501886692.nwb /local1/cam_datasets/501886692/Data 501886692 True
+#         # C /local1/cam_datasets/501717543/501717543.nwb /local1/cam_datasets/501717543/Data 501717543 True
+#     except:
+#         raise(Exception('please specify stimulus A, B or C, cam_directory, lims_id'))
+
+    main('A', '/local1/cam_datasets/501836392/501836392.nwb', '/local1/cam_datasets/501836392/Data', '501836392')        
+    main('B', '/local1/cam_datasets/501886692/501886692.nwb', '/local1/cam_datasets/501886692/Data', '501886692')
+    main('C', '/local1/cam_datasets/501717543/501717543.nwb', '/local1/cam_datasets/501717543/Data', '501717543')
     
 #
 ##

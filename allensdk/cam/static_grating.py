@@ -2,7 +2,6 @@ import scipy.stats as st
 import numpy as np
 import pandas as pd
 from math import sqrt
-#import Analysis.OPTools_Nikon as op
 from allensdk.cam.o_p_analysis import OPAnalysis
 
 
@@ -23,7 +22,7 @@ class StaticGrating(OPAnalysis):
         self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
         self.response = self.getResponse()
         self.peak = self.getPeak()
-#        self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.getSpeedTuning(binsize=200)
+        #self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.getSpeedTuning(binsize=200)
         
 #    
     def getResponse(self):
