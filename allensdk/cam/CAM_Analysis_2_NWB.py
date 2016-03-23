@@ -26,22 +26,18 @@ class CamAnalysis2Nwb(object):
         self.lims_id = lims_id
         self.depth = depth
     
-    def save_h5_a(self, dg, nm1, nm3):
+    def save_h5_a(self, dg, nm1, nm3, peak):
         self.nwb.save_analysis_hdf5(
             ('stim_table_dg', dg.stim_table),
             ('sweep_response_dg', dg.sweep_response),
             ('mean_sweep_response_dg', dg.mean_sweep_response),
-            ('peak_dg', dg.peak),        
+            ('peak', peak),        
             ('sweep_response_nm1', nm1.sweep_response),
             ('stim_table_nm1', nm1.stim_table),
-            ('peak_nm1', nm1.peak),
             ('sweep_response_nm3', nm3.sweep_response),
-            ('stim_table_nm3', nm3.stim_table),
-            ('peak_nm3', nm3.peak))
+            ('stim_table_nm3', nm3.stim_table))
         
         self.nwb.save_analysis_datasets(
-            ('celltraces', dg.celltraces),
-            ('acquisition_rate', dg.acquisition_rate),
             ('celltraces_dff', nm1.celltraces_dff),
             ('response_dg', dg.response),
             ('binned_cells_sp', nm1.binned_cells_sp),
@@ -50,7 +46,7 @@ class CamAnalysis2Nwb(object):
             ('binned_dx_vis', nm1.binned_dx_vis))
     
         
-    def save_h5_b(self, sg, nm1, ni):                
+    def save_h5_b(self, sg, nm1, ni, peak):                
         self.nwb.save_analysis_hdf5(
             ('stim_table_sg', sg.stim_table),
             ('sweep_response_sg', sg.sweep_response),
@@ -60,13 +56,10 @@ class CamAnalysis2Nwb(object):
             ('sweep_response_ni', ni.sweep_response),
             ('stim_table_ni', ni.stim_table),
             ('mean_sweep_response_ni', ni.mean_sweep_response),
-            ('peak_sg', sg.peak),
-            ('peak_ni', ni.peak),
-            ('peak_nm1', nm1.peak))
+            ('peak', peak))
 
         self.nwb.save_analysis_datasets(
             ('celltraces_dff', nm1.celltraces_dff),
-            ('dxcm', sg.dxcm),  
             ('response_sg', sg.response),
             ('response_ni', ni.response),
             ('binned_cells_sp', nm1.binned_cells_sp),
@@ -75,23 +68,17 @@ class CamAnalysis2Nwb(object):
             ('binned_dx_vis', nm1.binned_dx_vis))
     
     
-    def save_h5_c(self, lsn, nm1, nm2):                
+    def save_h5_c(self, lsn, nm1, nm2, peak):                
         self.nwb.save_analysis_hdf5(
             ('stim_table_lsn', lsn.stim_table),
-            ('sweep_response', lsn.sweep_response),
-            ('mean_sweep_response', lsn.mean_sweep_response),
             ('sweep_response_nm1', nm1.sweep_response),
-            ('peak_nm1', nm1.peak),
+            ('peak', peak),
             ('sweep_response_nm2', nm2.sweep_response),
-            ('peak_nm2', nm2.peak),
             ('sweep_response_lsn', lsn.sweep_response),
-            ('stim_table_lsn', lsn.stim_table),
             ('mean_sweep_response_lsn', lsn.mean_sweep_response))  
         
         self.nwb.save_analysis_datasets(
             ('receptive_field_lsn', lsn.receptive_field),
-            ('celltraces', lsn.celltraces),
-            ('acquisition_rate', lsn.acquisition_rate),
             ('celltraces_dff', nm1.celltraces_dff),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),    
@@ -104,6 +91,7 @@ class CamAnalysis2Nwb(object):
             nm3 = MovieAnalysis(self, 'natural_movie_three')    
             nm1 = MovieAnalysis(self, 'natural_movie_one')        
             print "Stimulus A analyzed"
+            peak = pd.concat([nm1.peak_run, dg.peak, nm1.peak, nm3.peak], axis=1)
             if plot_flag:
                 cp.plot_3SA(dg, nm1, nm3)
                 cp.plot_Drifting_grating_Traces(dg)
@@ -116,6 +104,8 @@ class CamAnalysis2Nwb(object):
                 ni = NaturalImages(self)
                 nm1 = MovieAnalysis(self, 'natural_movie_one')            
                 print "Stimulus B analyzed"
+                peak = pd.concat([nm1.peak_run, sg.peak, ni.peak, nm1.peak], axis=1)
+                
                 if plot_flag:
                     cp.plot_3SB(sg, nm1, ni)
                     cp.plot_NI_Traces(ni)
@@ -129,6 +119,7 @@ class CamAnalysis2Nwb(object):
                 lsn = LocallySN(self)
                 nm1 = MovieAnalysis(self, 'natural_movie_one')
                 print "Stimulus C analyzed"
+                peak = pd.concat([nm1.peak_run, nm1.peak, nm2.peak], axis=1)
                 
                 if plot_flag:
                     cp.plot_3SC(lsn, nm1, nm2)

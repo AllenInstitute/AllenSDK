@@ -53,7 +53,7 @@ class LocallySN(OPAnalysis):
         self.stim_table = self.cam_analysis.nwb.get_stimulus_table('locally_sparse_noise')
         self.LSN = self.cam_analysis.nwb.get_stimulus_template('locally_sparse_noise')
         self.sweeplength = self.stim_table['end'][1] - self.stim_table['start'][1]
-        self.interlength = self.sweeplength
+        self.interlength = 4*self.sweeplength
         self.extralength = self.sweeplength
         self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
         self.receptive_field = self.getReceptiveField()
