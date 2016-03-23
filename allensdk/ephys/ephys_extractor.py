@@ -726,6 +726,10 @@ class EphysCellFeatureExtractor:
             s.set_stimulus_amplitude_calculator(_step_stim_amp)
 
         spiking_indexes = np.flatnonzero(ext.sweep_features("avg_rate"))
+
+        if len(spiking_indexes) == 0:
+            raise ft.FeatureError("No spiking sweeps, cannot compute cell features.  ")
+
         amps = ext.sweep_features("stim_amp")#self.long_squares_stim_amps()
         min_index = np.argmin(amps[spiking_indexes])
         rheobase_index = spiking_indexes[min_index]
