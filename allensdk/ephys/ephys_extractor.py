@@ -893,6 +893,13 @@ def cell_extractor_for_nwb(dataset, ramps, short_squares, long_squares):
     long_squares : list of sweep numbers of long square sweeps
     """
 
+    if len(short_squares) == 0:
+        raise ft.FeatureError("no short square sweep numbers provided")
+    if len(ramps) == 0:
+        raise ft.FeatureError("no ramp sweep numbers provided")
+    if len(long_squares) == 0:
+        raise ft.FeatureError("no long_square sweep numbers provided")
+
     ramps_ext = extractor_for_nwb_sweeps(dataset, ramps, fixed_start=RAMPS_START)
 
     temp_short_sq_ext = extractor_for_nwb_sweeps(dataset, short_squares)

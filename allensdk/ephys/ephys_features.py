@@ -982,6 +982,9 @@ def estimate_adjusted_detection_parameters(v_set, t_set, interval_start, interva
     if len(v_set) != len(t_set):
         raise FeatureError("t_set and v_set must be lists of equal size")
 
+    if len(v_set) == 0:
+        raise FeatureError("t_set and v_set are empty")
+
     start_index = find_time_index(t_set[0], interval_start)
     end_index = find_time_index(t_set[0], interval_end)
 
