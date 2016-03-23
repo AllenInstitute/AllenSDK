@@ -747,6 +747,9 @@ class EphysCellFeatureExtractor:
         subthresh_ext = EphysSweepSetFeatureExtractor.from_sweeps(subthresh_sweeps)
         self._subthreshold_long_squares_ext = subthresh_ext
         
+        if len(subthresh_ext.sweeps()) == 0:
+            raise ft.FeatureError("No subthreshold long square sweeps, cannot evaluate cell features.")
+
         peaks = subthresh_ext.sweep_features("peak_deflect")
         sags = subthresh_ext.sweep_features("sag")
         sag_eval_levels = np.array([sweep.voltage_deflection()[0] for sweep in subthresh_ext.sweeps()])
