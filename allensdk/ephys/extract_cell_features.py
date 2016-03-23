@@ -22,7 +22,7 @@ import json
 import numpy as np
 from scipy.optimize import curve_fit
 from collections import Counter
-import feature_extractor as fx
+
 import logging
 
 from allensdk.core.nwb_data_set import NwbDataSet
@@ -105,6 +105,8 @@ def extract_cell_features(data_set,
         adapt = hero_sweep.sweep_feature("adapt")
         latency = hero_sweep.sweep_feature("latency")
         mean_isi = hero_sweep.sweep_feature("mean_isi")
+    else:
+        raise ft.FeatureError("Could not find hero sweep.")  
 
     # find the mean features of the first spike for the ramps and short squares
     ramps_ms0 = mean_features_spike_zero(fex.ramps_features().sweeps())
