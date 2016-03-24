@@ -68,25 +68,27 @@ class CamNwbDataSet(object):
         f = h5py.File(self.nwb_file, 'r')
         Cre = f['general']['specimen'].value.split('-')[0]
         try:
-            specimen = f['general']['mouse_number'].value
+            specimen = f['general']['specimen'].value.split('-')[-1]
         except:
             specimen = None
         try:
-            HVA = f['general']['hva'].value
+            area = f['general']['area_targeted'].value
         except:
-            HVA = 'AL'
-        try:
-            depth = f['general']['depth_of_imaging'].value
-        except:
-            depth = 175
+            HVA = None
+#        try:
+#            depth = f['general']['depth_of_imaging'].value
+#        except:
+#            depth = None
         try:
             system = f['general']['microscope'].value
         except:
             system = None
         lims_id = f['general']['lims_id'].value
         f.close()
-        meta ={'Cre': Cre, 'specimen':specimen, 'HVA':HVA, 'area': HVA, 'depth':depth, 'system':system, 'lims_id':lims_id}
+        meta ={'Cre': Cre, 'specimen':specimen, 'area':area, 'system':system, 'lims_id':lims_id}
         return meta
+        
+
     
     def get_running_speed(self):
         '''returns the mouse running speed in cm/s'''
@@ -118,8 +120,8 @@ class CamNwbDataSet(object):
         return motion_correction
     
     
-    def save_analysis_hdf5(self, *tables):
-        store = pd.HDFStore(self.nwb_file, mode='a')
+    def save_analysis_dataframes(self, output_file, *tables):
+        store = pd.HDFStore(output_file, mode='a')
 
         for k,v in tables:
             store.put('analysis/%s' % (k), v)
@@ -127,8 +129,8 @@ class CamNwbDataSet(object):
         store.close()
         
 
-    def save_analysis_datasets(self, *datasets):    
-        f = h5py.File(self.nwb_file, 'a')
+    def save_analysis_arrays(self, output_file, *datasets):    
+        f = h5py.File(output_file, 'a')
         
         for k,v in datasets:
             if k in f['analysis']:
