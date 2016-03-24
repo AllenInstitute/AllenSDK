@@ -19,11 +19,6 @@ import CAM_plotting as cp
 import pandas as pd 
 import os
 
-def do_it(stimulus, lims_id, depth):
-    
-    
-    CamAnalysis2Nwb(nwb_path, save_path, depth)
-    
 class CamAnalysis2Nwb(object):
     def __init__(self, nwb_path, save_path, depth):
         self.nwb = CamNwbDataSet(nwb_path)                        
