@@ -243,16 +243,16 @@ def check_thresholds_and_peaks(v, t, spike_indexes, peak_indexes, upstroke_index
                 # Find the peak in a window twice the size of our allowed window
                 spike = spike_indexes[i]
                 t_0 = find_time_index(t, t[spike] + 2 * max_interval)
-                new_peak = np.argmax(v[spike:t_0])
+                new_peak = np.argmax(v[spike:t_0]) + spike
 
                 # If that peak is okay (not outside the allowed window, not past the next spike)
                 # then keep it
                 if t[new_peak] - t[spike] < max_interval and \
                    (i == len(spike_indexes) - 1 or t[new_peak] < t[spike_indexes[i + 1]]):
-                    peak_indexes[i] = new_peak + spike
+                    peak_indexes[i] = new_peak
                 else:
                     # Otherwise, log and get rid of the spike
-                    logging.info("Could not redetermine threshold-peak pair - dropping that pair", RuntimeWarning)
+                    logging.info("Could not redetermine threshold-peak pair - dropping that pair")
                     drop_spikes.append(i)
 #                     raise FeatureError("Could not redetermine threshold")
             else:
@@ -693,7 +693,7 @@ def fit_membrane_time_constant(v, t, start, end):
     try:
         popt, pcov = curve_fit(_exp_curve, t_window, v_window, p0=guess)
     except RuntimeError:
-        logging.info("Curve fit for membrane time constant failed", RuntimeWarning)
+        logging.info("Curve fit for membrane time constant failed")
         return np.nan, np.nan, np.nan
 
     return popt
