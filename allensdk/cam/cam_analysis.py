@@ -20,6 +20,10 @@ import pandas as pd
 import os, argparse
 
 class CamAnalysis(object):
+    STIMULUS_A = 'A'
+    STIMULUS_B = 'B'
+    STIMULUS_C = 'C'
+
     def __init__(self, nwb_path, save_path, depth):
         self.nwb = CamNwbDataSet(nwb_path)                        
         self.save_path = save_path
@@ -130,14 +134,16 @@ class CamAnalysis(object):
             self.save_stimulus_c(lsn, nm1, nm2, peak)
                     
 def run_cam_analysis(stimulus, nwb_path, save_path, depth):   
-    cam_analysis_2_nwb = CamAnalysis2(nwb_path, save_path, depth)
+    cam_analysis = CamAnalysis(nwb_path, save_path, depth)
 
-    if 'A' == stimulus:
-        cam_analysis_2_nwb.stimulus_a(plot_flag=False)
-    elif 'B' == stimulus:
-        cam_analysis_2_nwb.stimulus_b(plot_flag=False)
+    if stimulus == CamAnalysis.STIMULUS_A:
+        cam_analysis.stimulus_a(plot_flag=False)
+    elif stimulus == CamAnalysis.STIMULUS_B:
+        cam_analysis.stimulus_b(plot_flag=False)
+    elif stimulus == CamAnalysis.STIMULUS_C:
+        cam_analysis.stimulus_c(plot_flag=False)
     else:
-        cam_analysis_2_nwb.stimulus_c(plot_flag=False)
+        raise IndexError("Unknown stimulus: %s" % stimulus)
     
 def main():
     parser = argparse.ArgumentParser()
@@ -145,16 +151,13 @@ def main():
     parser.add_argument("--output_nwb", default=None)
 
     # TODO: unhardcode
-    parser.add_argument("--stimulus", default='A')
+    parser.add_argument("--stimulus", default=CamAnalysis.STIMULUS_A)
     parser.add_argument("--depth", type=int, default=175)
 
     args = parser.parse_args()
 
     if args.output_nwb is None:
         args.output_nwb = args.input_nwb
-
-    #nwb_path = "/projects/neuralcoding/vol1/prod6/specimen_495727026/ophys_experiment_502115959/502115959.nwb"
-    #save_path = "/data/informatics/CAM/cam_analysis/davidf/502115959.nwb"
     
     run_cam_analysis(args.stimulus, args.input_nwb, args.output_nwb, args.depth)
 
