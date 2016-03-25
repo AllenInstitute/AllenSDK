@@ -1,7 +1,6 @@
 import scipy.stats as st
 import numpy as np
 import pandas as pd
-import allensdk.cam.CAM_NWB as cn
 import os
 import time
 from allensdk.cam.findlevel import findlevel
