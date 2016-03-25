@@ -83,9 +83,11 @@ class CamNwbDataSet(object):
             system = f['general']['microscope'].value
         except:
             system = None
-        lims_id = f['general']['lims_id'].value
+
+        # TODO: this will get renamed
+        experiment_id = f['general']['lims_id'].value 
         f.close()
-        meta ={'Cre': Cre, 'specimen':specimen, 'area':area, 'system':system, 'lims_id':lims_id}
+        meta ={'Cre': Cre, 'specimen':specimen, 'area':area, 'system':system, 'experiment_id':experiment_id}
         return meta
         
 
@@ -120,8 +122,8 @@ class CamNwbDataSet(object):
         return motion_correction
     
     
-    def save_analysis_dataframes(self, output_file, *tables):
-        store = pd.HDFStore(output_file, mode='a')
+    def save_analysis_dataframes(self, *tables):
+        store = pd.HDFStore(self.nwb_file, mode='a')
 
         for k,v in tables:
             store.put('analysis/%s' % (k), v)
@@ -129,8 +131,8 @@ class CamNwbDataSet(object):
         store.close()
         
 
-    def save_analysis_arrays(self, output_file, *datasets):    
-        f = h5py.File(output_file, 'a')
+    def save_analysis_arrays(self, *datasets):    
+        f = h5py.File(self.nwb_file, 'a')
         
         for k,v in datasets:
             if k in f['analysis']:

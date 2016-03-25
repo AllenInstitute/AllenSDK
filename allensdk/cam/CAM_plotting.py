@@ -962,7 +962,7 @@ def plot_3SB(sg, nm1, ni):
         plt.savefig(fullfilename)   
         plt.close()
 
-def ExperimentSummary(self, lims_id):
+def ExperimentSummary(self, experiment_id):
     '''saves figure with summary statistics for experiment'''
     print "Plotting experiment summary"
     plt.figure(1, figsize=(20,16))
@@ -1022,7 +1022,7 @@ def ExperimentSummary(self, lims_id):
     plt.tick_params(labelsize=16)
     plt.subplots_adjust(top=0.8)
     plt.tight_layout()  
-    plt.suptitle(lims_id + "  " + self.startdatetime, fontsize=20)
+    plt.suptitle(experiment_id + "  " + self.startdatetime, fontsize=20)
     
     plt.figtext(0.7, 0.35, "Total # cells: " + str(self.numbercells))
     plt.figtext(0.7, 0.3, "Significant cells: " + str(len(self.significant_cells)))

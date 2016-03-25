@@ -9,7 +9,7 @@ Created on Wed Dec 16 10:26:59 2015
 from allensdk.cam.static_grating import StaticGrating
 from allensdk.cam.movie_analysis import LocallySN
 from allensdk.cam.natural_images import NaturalImages
-from allensdk.cam.CAM_NWB import CamNwbDataSet
+from allensdk.core.cam_nwb_data_set import CamNwbDataSet
 #matplotlib.use('agg')
 #import matplotlib.pyplot as plt
 from drifting_grating import DriftingGrating
@@ -17,15 +17,15 @@ from movie_analysis import MovieAnalysis
 #plt.ioff()
 import CAM_plotting as cp
 import pandas as pd 
-import os
+import os, argparse
 
-class CamAnalysis2Nwb(object):
+class CamAnalysis(object):
     def __init__(self, nwb_path, save_path, depth):
         self.nwb = CamNwbDataSet(nwb_path)                        
         self.save_path = save_path
         self.depth = depth
     
-    def save_h5_a(self, dg, nm1, nm3, peak):
+    def save_stimulus_a(self, dg, nm1, nm3, peak):
         nwb = CamNwbDataSet(self.save_path)
         nwb.save_analysis_dataframes(
             ('stim_table_dg', dg.stim_table),
@@ -45,7 +45,7 @@ class CamAnalysis2Nwb(object):
             ('binned_dx_vis', nm1.binned_dx_vis))
     
         
-    def save_h5_b(self, sg, nm1, ni, peak): 
+    def save_stimulus_b(self, sg, nm1, ni, peak): 
         nwb = CamNwbDataSet(self.save_path)
         nwb.save_analysis_dataframes(
             ('stim_table_sg', sg.stim_table),
@@ -68,7 +68,7 @@ class CamAnalysis2Nwb(object):
             ('binned_dx_vis', nm1.binned_dx_vis))
     
     
-    def save_h5_c(self, lsn, nm1, nm2, peak):                
+    def save_stimulus_c(self, lsn, nm1, nm2, peak):                
         nwb = CamNwbDataSet(self.save_path)
         nwb.save_analysis_dataframes(
             ('stim_table_lsn', lsn.stim_table),
@@ -98,40 +98,39 @@ class CamAnalysis2Nwb(object):
             cp.plot_Drifting_grating_Traces(dg)
     
         if save_flag:
-            self.save_h5_a(dg, nm1, nm3, peak)
+            self.save_stimulus_a(dg, nm1, nm3, peak)
     
     def stimulus_b(self, plot_flag=False, save_flag=True):
-                sg = StaticGrating(self)    
-                ni = NaturalImages(self)
-                nm1 = MovieAnalysis(self, 'natural_movie_one')            
-                print "Stimulus B analyzed"
-                peak = pd.concat([nm1.peak_run, sg.peak, ni.peak, nm1.peak], axis=1)
+        sg = StaticGrating(self)    
+        ni = NaturalImages(self)
+        nm1 = MovieAnalysis(self, 'natural_movie_one')            
+        print "Stimulus B analyzed"
+        peak = pd.concat([nm1.peak_run, sg.peak, ni.peak, nm1.peak], axis=1)
                 
-                if plot_flag:
-                    cp.plot_3SB(sg, nm1, ni)
-                    cp.plot_NI_Traces(ni)
-                    cp.plot_SG_Traces(sg)
+        if plot_flag:
+            cp.plot_3SB(sg, nm1, ni)
+            cp.plot_NI_Traces(ni)
+            cp.plot_SG_Traces(sg)
                     
-                if save_flag:
-                    self.save_h5_b(sg, nm1, ni, peak)
+        if save_flag:
+            self.save_stimulus_b(sg, nm1, ni, peak)
     
     def stimulus_c(self, plot_flag=False, save_flag=True):
-                nm2 = MovieAnalysis(self, 'natural_movie_two')
-                lsn = LocallySN(self)
-                nm1 = MovieAnalysis(self, 'natural_movie_one')
-                print "Stimulus C analyzed"
-                peak = pd.concat([nm1.peak_run, nm1.peak, nm2.peak], axis=1)
+        nm2 = MovieAnalysis(self, 'natural_movie_two')
+        lsn = LocallySN(self)
+        nm1 = MovieAnalysis(self, 'natural_movie_one')
+        print "Stimulus C analyzed"
+        peak = pd.concat([nm1.peak_run, nm1.peak, nm2.peak], axis=1)
                 
-                if plot_flag:
-                    cp.plot_3SC(lsn, nm1, nm2)
-                    cp.plot_LSN_Traces(lsn)
+        if plot_flag:
+            cp.plot_3SC(lsn, nm1, nm2)
+            cp.plot_LSN_Traces(lsn)
     
-                if save_flag:
-                    self.save_h5_c(lsn, nm1, nm2, peak)
+        if save_flag:
+            self.save_stimulus_c(lsn, nm1, nm2, peak)
                     
-def main(stimulus, nwb_path, save_path, depth):   
-
-    cam_analysis_2_nwb = CamAnalysis2Nwb(nwb_path, save_path, depth)
+def run_cam_analysis(stimulus, nwb_path, save_path, depth):   
+    cam_analysis_2_nwb = CamAnalysis2(nwb_path, save_path, depth)
 
     if 'A' == stimulus:
         cam_analysis_2_nwb.stimulus_a(plot_flag=False)
@@ -140,30 +139,25 @@ def main(stimulus, nwb_path, save_path, depth):
     else:
         cam_analysis_2_nwb.stimulus_c(plot_flag=False)
     
-   
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_nwb", required=True)
+    parser.add_argument("--output_nwb", default=None)
 
-if __name__=='__main__':
-    lims_id = 502115959
-    depth = 175
-    stimulus = 'A'
-    save_dir = r'/Users/saskiad/Documents/Data/ophysdev/'
-    nwb_path = os.path.join(save_dir, "%d/%d.nwb" % (lims_id, lims_id))
-    save_path = os.path.join(save_dir, "%d/Data/%d_analysis.nwb" % (lims_id, lims_id))
-    
-    main(stimulus, nwb_path, save_path, depth)
-#     try:
-#         (stimulus, nwb_path, save_path, lims_id) = sys.argv[-4:]
-#         main(stimulus, nwb_path, save_path, lims_id)  
-#         # A /local1/cam_datasets/501836392/501836392.nwb /local1/cam_datasets/501836392/Data 501836392 True        
-#         # B /local1/cam_datasets/501886692/501886692.nwb /local1/cam_datasets/501886692/Data 501886692 True
-#         # C /local1/cam_datasets/501717543/501717543.nwb /local1/cam_datasets/501717543/Data 501717543 True
-#     except:
-#         raise(Exception('please specify stimulus A, B or C, cam_directory, lims_id'))
+    # TODO: unhardcode
+    parser.add_argument("--stimulus", default='A')
+    parser.add_argument("--depth", type=int, default=175)
 
-#    main('A', '/Users/saskiad/Documents/Data/ophysdev/502115959/502115959.nwb', 'r/Users/saskiad/Documents/Data/ophysdev/502115959/Data', '502115959')        
-#    main('B', '/local1/cam_datasets/501886692/501886692.nwb', '/local1/cam_datasets/501886692/Data', '501886692')
-#    main('C', '/local1/cam_datasets/501717543/501717543.nwb', '/local1/cam_datasets/501717543/Data', '501717543')
+    args = parser.parse_args()
+
+    if args.output_nwb is None:
+        args.output_nwb = args.input_nwb
+
+    #nwb_path = "/projects/neuralcoding/vol1/prod6/specimen_495727026/ophys_experiment_502115959/502115959.nwb"
+    #save_path = "/data/informatics/CAM/cam_analysis/davidf/502115959.nwb"
     
-#
-##
-####            
+    run_cam_analysis(args.stimulus, args.input_nwb, args.output_nwb, args.depth)
+
+
+if __name__=='__main__': main()
+    

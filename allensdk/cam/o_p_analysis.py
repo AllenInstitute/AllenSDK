@@ -15,7 +15,7 @@ class OPAnalysis(object):
         self.Cre = self.meta_data['Cre']
         self.HVA = self.meta_data['area']
         self.specimen = self.meta_data['specimen']
-        self.id = self.meta_data['lims_id']
+        self.experiment_id = self.meta_data['experiment_id']
         print "Cre line:", self.Cre
         print "Targeted area:", self.HVA
         print "Specimen:", self.specimen
@@ -59,7 +59,7 @@ class OPAnalysis(object):
         spontaneous = self.cam_analysis.nwb.get_stimulus_table('spontaneous')
 
         peak_run = pd.DataFrame(index=range(self.numbercells), columns=('speed_max_sp','speed_min_sp','ptest_sp', 'mod_sp','speed_max_vis','speed_min_vis','ptest_vis', 'mod_vis'))
-        peak_run['ID'] = self.id
+        peak_run['ExperimentID'] = self.experiment_id
         peak_run['Cre'] = self.Cre   
         peak_run['HVA'] = self.HVA
         peak_run['depth'] = self.cam_analysis.depth        
