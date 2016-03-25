@@ -72,7 +72,7 @@ class CamNwbDataSet(object):
         except:
             specimen = None
         try:
-            area = f['general']['area_targeted'].value
+            area = str( f['general']['area_targeted'].value )
         except:
             HVA = None
 #        try:
@@ -80,12 +80,12 @@ class CamNwbDataSet(object):
 #        except:
 #            depth = None
         try:
-            system = f['general']['microscope'].value
+            system = str( f['general']['microscope'].value )
         except:
             system = None
 
         # TODO: this will get renamed
-        experiment_id = f['general']['lims_id'].value 
+        experiment_id = str( f['general']['lims_id'].value )
         f.close()
         meta ={'Cre': Cre, 'specimen':specimen, 'area':area, 'system':system, 'experiment_id':experiment_id}
         return meta
