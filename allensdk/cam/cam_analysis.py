@@ -96,7 +96,7 @@ class CamAnalysis(object):
         nm3 = MovieAnalysis(self, 'natural_movie_three')    
         nm1 = MovieAnalysis(self, 'natural_movie_one')        
         print "Stimulus A analyzed"
-        peak = pd.concat([nm1.peak_run, dg.peak, nm1.peak, nm3.peak], axis=1)
+        peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
         if plot_flag:
             cp.plot_3SA(dg, nm1, nm3)
             cp.plot_Drifting_grating_Traces(dg)
@@ -109,7 +109,7 @@ class CamAnalysis(object):
         ni = NaturalImages(self)
         nm1 = MovieAnalysis(self, 'natural_movie_one')            
         print "Stimulus B analyzed"
-        peak = pd.concat([nm1.peak_run, sg.peak, ni.peak, nm1.peak], axis=1)
+        peak = multi_dataframe_merge([nm1.peak_run, sg.peak, ni.peak, nm1.peak])
                 
         if plot_flag:
             cp.plot_3SB(sg, nm1, ni)
@@ -124,7 +124,7 @@ class CamAnalysis(object):
         lsn = LocallySN(self)
         nm1 = MovieAnalysis(self, 'natural_movie_one')
         print "Stimulus C analyzed"
-        peak = pd.concat([nm1.peak_run, nm1.peak, nm2.peak], axis=1)
+        peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
                 
         if plot_flag:
             cp.plot_3SC(lsn, nm1, nm2)
@@ -132,6 +132,16 @@ class CamAnalysis(object):
     
         if save_flag:
             self.save_stimulus_c(lsn, nm1, nm2, peak)
+
+def multi_dataframe_merge(dfs):
+    out_df = None
+    for i,df in enumerate(dfs):
+        if out_df is None:
+            out_df = df
+        else:
+            out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
+    return out_df
+    
                     
 def run_cam_analysis(stimulus, nwb_path, save_path, depth):   
     cam_analysis = CamAnalysis(nwb_path, save_path, depth)
