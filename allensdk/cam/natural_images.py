@@ -36,7 +36,7 @@ class NaturalImages(OPAnalysis):
         peak['LIMS'] = self.cam_analysis.lims_id
         peak['Cre'] = self.Cre   
         peak['HVA'] = self.HVA
-        peak['depth'] = self.cam_analysis.depth
+        peak['depth'] = self.depth
         for nc in range(self.numbercells):
             nip = np.argmax(self.response[1:,nc,0])
             peak.Image[nc] = nip
@@ -59,7 +59,10 @@ class NaturalImages(OPAnalysis):
             (_,peak.ptest[nc]) = st.f_oneway(*groups)
             test = self.sweep_response[self.stim_table.frame==nip][str(nc)].mean()
             peak.time_to_peak[nc] = (np.argmax(test) - self.interlength)/self.acquisition_rate
-            test2 = np.where(test<(test.max()/2))[0]          
-            peak.duration[nc] = np.ediff1d(test2).max()/self.acquisition_rate
+            test2 = np.where(test<(test.max()/2))[0]
+            try:          
+                peak.duration[nc] = np.ediff1d(test2).max()/self.acquisition_rate
+            except:
+                pass
 
         return peak

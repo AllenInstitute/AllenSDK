@@ -44,7 +44,7 @@ class DriftingGrating(OPAnalysis):
         peak['LIMS'] = self.cam_analysis.lims_id
         peak['Cre'] = self.Cre   
         peak['HVA'] = self.HVA
-        peak['depth'] = self.cam_analysis.depth
+        peak['depth'] = self.depth
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,nc,0] == np.nanmax(self.response[:,1:,nc,0]))
             prefori = cell_peak[0][0]

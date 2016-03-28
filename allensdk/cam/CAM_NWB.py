@@ -12,6 +12,8 @@ import numpy as np
 class CamNwbDataSet(object):
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
+        self.default_HVA = 'VISal'
+        self.default_depth = 175
         
 
     def get_fluorescence_traces(self):
@@ -74,11 +76,13 @@ class CamNwbDataSet(object):
         try:
             HVA = f['general']['hva'].value
         except:
-            HVA = 'AL'
+            HVA = self.default_HVA
+            #raise(Exception('HVA not found in NWB file'))
         try:
             depth = f['general']['depth_of_imaging'].value
         except:
-            depth = 175
+            depth = self.default_depth
+            #raise(Exception('depth not found in NWB file'))
         try:
             system = f['general']['microscope'].value
         except:

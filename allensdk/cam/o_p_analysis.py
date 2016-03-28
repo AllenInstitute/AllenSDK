@@ -14,6 +14,7 @@ class OPAnalysis(object):
         self.meta_data = self.cam_analysis.nwb.get_meta_data()
         self.Cre = self.meta_data['Cre']
         self.HVA = self.meta_data['area']
+        self.depth = self.meta_data['depth']
         self.specimen = self.meta_data['specimen']
         print "Cre line:", self.Cre
         print "Targeted area:", self.HVA
@@ -61,7 +62,7 @@ class OPAnalysis(object):
         peak_run['LIMS'] = self.cam_analysis.lims_id
         peak_run['Cre'] = self.Cre   
         peak_run['HVA'] = self.HVA
-        peak_run['depth'] = self.cam_analysis.depth        
+        peak_run['depth'] = self.depth        
         
         dx_sp = self.dxcm[spontaneous.start.iloc[-1]:spontaneous.end.iloc[-1]]
         celltraces_sp = celltraces_trimmed[:,spontaneous.start.iloc[-1]:spontaneous.end.iloc[-1]]
@@ -209,7 +210,7 @@ class OPAnalysis(object):
 #             (_, peak_run.rta_modulation[nc]) = cell_run[:,nc,30:].flatten().mean() / cell_run[:,nc,:30].flatten().mean()
         
         # TODO, where to save this one?
-        peak_run.to_csv(os.path.join(self.savepath, 'peak_Speed.csv'))             
+        #peak_run.to_csv(os.path.join(self.savepath, 'peak_Speed.csv'))             
         return binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
 
     def getSweepResponse(self):

@@ -19,12 +19,15 @@ import CAM_plotting as cp
 
 
 class CamAnalysis2Nwb(object):
-    def __init__(self, nwb_path, save_path, datarate, lims_id, depth):
-        self.nwb = CamNwbDataSet(nwb_path)                        
+    def __init__(self, nwb_path, save_path, datarate, lims_id, area, depth):
+        self.nwb = CamNwbDataSet(nwb_path)
+        self.nwb.default_HVA = area
+        self.nwb.default_depth = depth                    
         self.savepath = save_path
+        self.area = area
+        self.depth = depth
         self.datarate = datarate
         self.lims_id = lims_id
-        self.depth = depth
     
     def save_h5_a(self, dg, nm1, nm3):
         self.nwb.save_analysis_hdf5(
@@ -112,8 +115,8 @@ class CamAnalysis2Nwb(object):
                 self.save_h5_a(dg, nm1, nm3)
     
     def stimulus_b(self, plot_flag=False, save_flag=True):
-                sg = StaticGrating(self)    
                 ni = NaturalImages(self)
+                sg = StaticGrating(self)    
                 nm1 = MovieAnalysis(self, 'natural_movie_one')            
                 print "Stimulus B analyzed"
                 if plot_flag:
@@ -137,13 +140,12 @@ class CamAnalysis2Nwb(object):
                 if save_flag:
                     self.save_h5_c(lsn, nm1, nm2)
                     
-def main(stimulus, nwb_path, save_path, lims_id):
-#    Cre = 'Cux2'
-#    HVA = 'AL'
-    depth= 175
+def main(stimulus, nwb_path, save_path, lims_id, area, depth):
     datarate = 30    
 
-    cam_analysis_2_nwb = CamAnalysis2Nwb(nwb_path, save_path, datarate, lims_id, depth)
+    cam_analysis_2_nwb = CamAnalysis2Nwb(nwb_path, save_path,
+                                         datarate, lims_id,
+                                         area, depth)
 
     if 'A' == stimulus:
         cam_analysis_2_nwb.stimulus_a(plot_flag=False)
@@ -167,6 +169,7 @@ def main(stimulus, nwb_path, save_path, lims_id):
 #    dg.plotRunning()    
 
 if __name__=='__main__':
+    pass
 #     try:
 #         (stimulus, nwb_path, save_path, lims_id) = sys.argv[-4:]
 #         main(stimulus, nwb_path, save_path, lims_id)  
@@ -176,10 +179,15 @@ if __name__=='__main__':
 #     except:
 #         raise(Exception('please specify stimulus A, B or C, cam_directory, lims_id'))
 
-    main('A', '/local1/cam_datasets/501836392/501836392.nwb', '/local1/cam_datasets/501836392/Data', '501836392')        
-    main('B', '/local1/cam_datasets/501886692/501886692.nwb', '/local1/cam_datasets/501886692/Data', '501886692')
-    main('C', '/local1/cam_datasets/501717543/501717543.nwb', '/local1/cam_datasets/501717543/Data', '501717543')
+    # Saskia
+#     main('A', '/local1/cam_datasets/501836392/501836392.nwb', '/local1/cam_datasets/501836392/Data', '501836392', 'Cux2', 'Al', '175')        
+#     main('B', '/local1/cam_datasets/501886692/501886692.nwb', '/local1/cam_datasets/501886692/Data', '501886692', 'Cux2', 'Al', '175')
+#     main('C', '/local1/cam_datasets/501717543/501717543.nwb', '/local1/cam_datasets/501717543/Data', '501717543', 'Cux2', 'Al', '175')
+
+    # specimen 495726993
+    #main('A', '/local1/cam_datasets/502199136/502199136.nwb', '/local1/cam_datasets/502199136/Data', '502199136', area)        
+    #main('B', '/local1/cam_datasets/502382906/502382906.nwb', '/local1/cam_datasets/502382906/Data', '502382906')
+    #main('C', '/local1/cam_datasets/502667200/502667200.nwb', '/local1/cam_datasets/502667200/Data', '502667200')
     
-#
-##
-####            
+    # for Lydia
+    #main('C', '    ', '/local1/cam_datasets/506353473/Data', '506353473')
