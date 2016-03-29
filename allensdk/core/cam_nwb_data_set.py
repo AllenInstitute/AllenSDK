@@ -12,8 +12,6 @@ import numpy as np
 class CamNwbDataSet(object):
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
-        self.default_HVA = None
-        self.default_depth = None
         
 
     def get_fluorescence_traces(self):
@@ -76,12 +74,12 @@ class CamNwbDataSet(object):
         try:
             area = str( f['general']['area_targeted'].value )
         except:
-            HVA = self.default_HVA
+            area = None
             
         try:
             depth = f['general']['depth_of_imaging'].value
         except:
-            depth = self.default_depth
+            depth = None
 
         try:
             system = str( f['general']['microscope'].value )

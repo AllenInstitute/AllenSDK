@@ -8,17 +8,6 @@ class OPAnalysis(object):
     def __init__(self, cam_analysis,
                  **kwargs):
         self.cam_analysis = cam_analysis
-
-        self.experiment_id = self.cam_analysis.lims_id
-        self.meta_data = self.cam_analysis.nwb.get_meta_data()
-        self.Cre = self.meta_data['Cre']
-        self.HVA = self.meta_data['area']
-        self.depth = self.meta_data['depth']
-        self.specimen = self.meta_data['specimen']
-        print "Cre line:", self.Cre
-        print "Targeted area:", self.HVA
-        print "Specimen:", self.specimen
-        
         self.savepath = self.cam_analysis.save_path
         
         self.timestamps, self.celltraces = self.cam_analysis.nwb.get_fluorescence_traces()
@@ -58,10 +47,6 @@ class OPAnalysis(object):
         spontaneous = self.cam_analysis.nwb.get_stimulus_table('spontaneous')
 
         peak_run = pd.DataFrame(index=range(self.numbercells), columns=('speed_max_sp','speed_min_sp','ptest_sp', 'mod_sp','speed_max_vis','speed_min_vis','ptest_vis', 'mod_vis'))
-        peak_run['LIMS'] = self.cam_analysis.lims_id
-        peak_run['Cre'] = self.Cre   
-        peak_run['HVA'] = self.HVA
-        peak_run['depth'] = self.depth        
         
         dx_sp = self.dxcm[spontaneous.start.iloc[-1]:spontaneous.end.iloc[-1]]
         celltraces_sp = celltraces_trimmed[:,spontaneous.start.iloc[-1]:spontaneous.end.iloc[-1]]

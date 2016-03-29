@@ -41,10 +41,7 @@ class DriftingGrating(OPAnalysis):
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
         peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','TF','response_variability_dg','OSI_dg','DSI','peak_DFF_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
-        peak['ExperimentID'] = self.experiment_id
-        peak['Cre'] = self.Cre   
-        peak['HVA'] = self.HVA
-        peak['depth'] = self.depth
+
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,nc,0] == np.nanmax(self.response[:,1:,nc,0]))
             prefori = cell_peak[0][0]

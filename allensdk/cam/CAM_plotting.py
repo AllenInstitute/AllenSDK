@@ -315,8 +315,8 @@ def plot_Drifting_grating_Traces(self):
 #        plt.savefig(fullfilename)   
 #        plt.close()
 
-def plot_NI_Traces(self):
-    print "Plotting Natural Image traces for each cell"
+def plot_NS_Traces(self):
+    print "Plotting Natural Scene traces for each cell"
     xtime = np.arange(-1*self.interlength/self.acquisition_rate, (self.sweeplength+self.interlength)/self.acquisition_rate, 1/self.acquisition_rate)
     blank =  self.sweep_response[self.stim_table.frame==-1]       
     for nc in range(self.numbercells):
@@ -327,11 +327,11 @@ def plot_NI_Traces(self):
         blank_p =  blank[str(nc)].mean() + (blank[str(nc)].std()/len(blank[str(nc)]))
         blank_n =  blank[str(nc)].mean() - (blank[str(nc)].std()/len(blank[str(nc)])) 
         plt.figure(nc, figsize=(30,25))
-        for ni in range(self.number_images-1):
-            subset_response = self.sweep_response[self.stim_table.frame==ni]               
+        for ns in range(self.number_scenes-1):
+            subset_response = self.sweep_response[self.stim_table.frame==ns]               
             subset_response_p =  subset_response[str(nc)].mean() + (subset_response[str(nc)][:].std()/len(subset_response[str(nc)]))
             subset_response_n =  subset_response[str(nc)].mean() - (subset_response[str(nc)][:].std()/len(subset_response[str(nc)]))
-            ax = plt.subplot(10,12,ni+1)
+            ax = plt.subplot(10,12,ns+1)
             try:
                 ax.fill_between(xtime, subset_response_p, subset_response_n, color='b', alpha=0.5)
             except:
@@ -344,17 +344,17 @@ def plot_NI_Traces(self):
             ax.yaxis.set_major_locator(MaxNLocator(4))                 
             vmax = np.where(np.amax(subset_response_p)>vmax, np.amax(subset_response_p), vmax)
             vmin = np.where(np.amin(subset_response_n)<vmin, np.amin(subset_response_n), vmin)     
-            if ni<108:
+            if ns<108:
                 ax.set_xticks([])
-            if np.mod(ni,12):
+            if np.mod(ns,12):
                 ax.set_yticks([])
-        for i in range(1,self.number_images):
+        for i in range(1,self.number_scenes):
             ax = plt.subplot(10,12,i)
             ax.set_ylim(vmin, vmax)
         plt.tight_layout()
         plt.suptitle("Cell " + str(nc+1), fontsize=20)
         plt.subplots_adjust(top=0.9)
-        filename = 'NI Traces Cell_'+str(nc+1)+'.png'
+        filename = 'NS Traces Cell_'+str(nc+1)+'.png'
         fullfilename = os.path.join(self.savepath, filename) 
         plt.savefig(fullfilename)   
         plt.close()                
@@ -755,7 +755,7 @@ def plot_3SC(lsn, nm1, nm2):
         plt.savefig(fullfilename)   
         plt.close()
 
-def plot_3SB(sg, nm1, ni):
+def plot_3SB(sg, nm1, ns):
     print "Plotting for all cells"
     for nc in range(sg.numbercells):
         if np.mod(nc,100)==0:
@@ -775,7 +775,7 @@ def plot_3SB(sg, nm1, ni):
         ax8 = plt.subplot2grid((6,6), (3,3))
         ax9 = plt.subplot2grid((6,6),(4,0), colspan=3)  #movie
         ax10 = plt.subplot2grid((6,6),(5,0), colspan=3)
-        ax11 = plt.subplot2grid((6,6),(4,3), colspan=2) #natural images
+        ax11 = plt.subplot2grid((6,6),(4,3), colspan=2) #natural scenes
         ax12 = plt.subplot2grid((6,6),(5,3), colspan=2)
         
         
@@ -787,10 +787,10 @@ def plot_3SB(sg, nm1, ni):
         for i in range(len(test)-1): 
             ax1.axvspan(xmin=(sg.stim_table.start.iloc[test[i]].values/sg.acquisition_rate), xmax=(sg.stim_table.end.iloc[test[i+1]-1].values/sg.acquisition_rate), color='gray', alpha=0.3)
         ax1.axvspan(nm1.stim_table.start.min()/nm1.acquisition_rate, nm1.stim_table.end.max()/nm1.acquisition_rate, ymin=0, ymax=1, color='red', alpha=0.3)
-        dif = np.ediff1d(ni.stim_table.start.values, to_begin=8000, to_end=8000)
+        dif = np.ediff1d(ns.stim_table.start.values, to_begin=8000, to_end=8000)
         test = np.argwhere(dif>5000)
         for i in range(len(test)-1): 
-            ax1.axvspan(xmin=(ni.stim_table.start.iloc[test[i]].values/ni.acquisition_rate), xmax=(ni.stim_table.end.iloc[test[i+1]-1].values/ni.acquisition_rate), color='blue', alpha=0.3)
+            ax1.axvspan(xmin=(ns.stim_table.start.iloc[test[i]].values/ns.acquisition_rate), xmax=(ns.stim_table.end.iloc[test[i+1]-1].values/ns.acquisition_rate), color='blue', alpha=0.3)
         ax1.set_xlabel("Time (s)", fontsize=20)
         ax1.set_ylabel("Fluorescence", fontsize=20)
         
@@ -922,20 +922,20 @@ def plot_3SB(sg, nm1, ni):
         ax10.set_ylabel("Trials", fontsize=20)
         ax10.set_xticks([])
         
-        temp = np.copy(ni.response[1:,nc,:2])
-        image_response = pd.DataFrame(temp, columns=('response','error'))
-        image_response = image_response.sort(columns='response', ascending=False)
-        ax11.errorbar(range(ni.number_images-1), image_response.response, yerr=image_response.error, fmt='o', color='k')
-        ax11.fill_between(range(ni.number_images-1), np.repeat(ni.response[0,nc,0]+ni.response[0,nc,1], ni.number_images-1), np.repeat(ni.response[0,nc,0]-ni.response[0,nc,1], ni.number_images-1), color='gray', alpha=0.3)
-        ax11.axhline(y=ni.response[0,nc,0], ls='--', lw=2, color='k')
+        temp = np.copy(ns.response[1:,nc,:2])
+        scene_response = pd.DataFrame(temp, columns=('response','error'))
+        scene_response = scene_response.sort(columns='response', ascending=False)
+        ax11.errorbar(range(ns.number_scenes-1), scene_response.response, yerr=scene_response.error, fmt='o', color='k')
+        ax11.fill_between(range(ns.number_scenes-1), np.repeat(ns.response[0,nc,0]+ns.response[0,nc,1], ns.number_scenes-1), np.repeat(ns.response[0,nc,0]-ns.response[0,nc,1], ns.number_scenes-1), color='gray', alpha=0.3)
+        ax11.axhline(y=ns.response[0,nc,0], ls='--', lw=2, color='k')
         ax11.set_xlim(-2,120)
-        ax11.set_title("Natural Images", fontsize=20, color='blue')
-        ax11.set_xlabel("Image", fontsize=20)
+        ax11.set_title("Natural Scenes", fontsize=20, color='blue')
+        ax11.set_xlabel("Scene", fontsize=20)
         ax11.set_ylabel("DF/F (%)", fontsize=20)
         
-        xtime = np.arange(-1*ni.interlength/ni.acquisition_rate, (ni.sweeplength+ni.interlength)/ni.acquisition_rate, 1/ni.acquisition_rate)
-        nip = np.argmax(ni.response[1:,nc,0])
-        subset_response = ni.sweep_response[ni.stim_table.frame==nip]               
+        xtime = np.arange(-1*ns.interlength/ns.acquisition_rate, (ns.sweeplength+ns.interlength)/ns.acquisition_rate, 1/ns.acquisition_rate)
+        nsp = np.argmax(ns.response[1:,nc,0])
+        subset_response = ns.sweep_response[ns.stim_table.frame==nsp]               
         subset_response_p = subset_response[str(nc)].mean() + (subset_response[str(nc)][:].std()/np.sqrt(len(subset_response[str(nc)])))
         subset_response_n = subset_response[str(nc)].mean() - (subset_response[str(nc)][:].std()/np.sqrt(len(subset_response[str(nc)])))
         try:        
@@ -943,13 +943,13 @@ def plot_3SB(sg, nm1, ni):
         except:
             xtime = xtime[:-1]
             ax12.fill_between(xtime, subset_response_p, subset_response_n, color='b', alpha=0.5)
-        blank = ni.sweep_response[ni.stim_table.frame==-1]
+        blank = ns.sweep_response[ns.stim_table.frame==-1]
         blank_p = blank[str(nc)].mean() + (blank[str(nc)].std()/np.sqrt(len(blank[str(nc)])))
         blank_n = blank[str(nc)].mean() - (blank[str(nc)].std()/np.sqrt(len(blank[str(nc)])))        
         ax12.fill_between(xtime, blank_p, blank_n, color='gray', alpha=0.5)          
         ax12.plot(xtime, subset_response[str(nc)].mean(), color='b', lw=2)
         ax12.plot(xtime, blank[str(nc)].mean(), color='k', lw=2)                 
-        ax12.axvspan(0, ni.sweeplength/ni.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
+        ax12.axvspan(0, ns.sweeplength/ns.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
         ax12.yaxis.set_major_locator(MaxNLocator(4)) 
         ax12.set_xlabel("Time (s)", fontsize=20)
         ax12.set_ylabel("DF/F (%)", fontsize=20)

@@ -56,10 +56,6 @@ class StaticGrating(OPAnalysis):
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
         peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','SF', 'Phase', 'sg_response_variability','OSI','sg_peak_DFF','ptest'))
-        peak['ExperimentID'] = self.experiment_id
-        peak['Cre'] = self.Cre   
-        peak['HVA'] = self.HVA
-        peak['depth'] = self.depth
 
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,:,nc,0] == np.nanmax(self.response[:,1:,:,nc,0]))

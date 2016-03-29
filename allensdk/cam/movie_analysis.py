@@ -26,6 +26,7 @@ class MovieAnalysis(OPAnalysis):
     
     def getPeak(self, movie_name):
         peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_variability'))
+
         for nc in range(self.numbercells):
             meanresponse = self.sweep_response[str(nc)].mean()
             movie_len= len(meanresponse)/30
