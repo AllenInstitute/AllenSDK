@@ -1,0 +1,32 @@
+from allensdk.cam.cam_analysis import run_cam_analysis
+
+# params
+lims_id = 502115959
+depth = 175
+stimulus = 'A'
+
+# file names
+save_dir = r'/Users/saskiad/Documents/Data/ophysdev/'
+nwb_path = os.path.join(save_dir, "%d/%d.nwb" % (lims_id, lims_id))
+save_path  os.path.join(save_dir, "%d/Data/%d.nwb" % (lims_id, lims_id))
+
+# run the analysis
+run_cam_analysis(stimulus, nwb_path, save_path, depth)
+
+
+#     try:
+#         (stimulus, nwb_path, save_path, lims_id) = sys.argv[-4:]
+#         main(stimulus, nwb_path, save_path, lims_id)  
+#         # A /local1/cam_datasets/501836392/501836392.nwb /local1/cam_datasets/501836392/Data 501836392 True        
+#         # B /local1/cam_datasets/501886692/501886692.nwb /local1/cam_datasets/501886692/Data 501886692 True
+#         # C /local1/cam_datasets/501717543/501717543.nwb /local1/cam_datasets/501717543/Data 501717543 True
+#     except:
+#         raise(Exception('please specify stimulus A, B or C, cam_directory, lims_id'))
+
+#    main('A', '/Users/saskiad/Documents/Data/ophysdev/502115959/502115959.nwb', 'r/Users/saskiad/Documents/Data/ophysdev/502115959/Data', '502115959')        
+#    main('B', '/local1/cam_datasets/501886692/501886692.nwb', '/local1/cam_datasets/501886692/Data', '501886692')
+#    main('C', '/local1/cam_datasets/501717543/501717543.nwb', '/local1/cam_datasets/501717543/Data', '501717543')
+    
+#
+##
+####            

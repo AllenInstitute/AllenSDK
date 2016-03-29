@@ -13,7 +13,7 @@ class MovieAnalysis(OPAnalysis):
             self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.getSpeedTuning(binsize=800)
         self.sweeplength = self.stim_table.start.iloc[1] - self.stim_table.start.iloc[0]
         self.sweep_response = self.getSweepResponse()
-        self.peak = self.getPeak()     
+        self.peak = self.getPeak(movie_name=movie_name)     
         
     def getSweepResponse(self):
         sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(range(self.numbercells)).astype(str))
@@ -24,7 +24,7 @@ class MovieAnalysis(OPAnalysis):
                 sweep_response[str(nc)][index] = self.celltraces_dff[nc,start:end]
         return sweep_response
     
-    def getPeak(self):
+    def getPeak(self, movie_name):
         peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_variability'))
         for nc in range(self.numbercells):
             meanresponse = self.sweep_response[str(nc)].mean()
@@ -40,10 +40,16 @@ class MovieAnalysis(OPAnalysis):
             ptime*=10
             peak = np.argmax(meanresponse)
             if peak>30:
-                peak_movie.response_variability[nc] = ptime[(peak-30)/30]
+                peak_movie.response_variability.iloc[nc] = ptime[(peak-30)/30]
             else:
-                peak_movie.response_variability[nc] = ptime[0]
-            peak_movie.peak[nc] = peak
+                peak_movie.response_variability.iloc[nc] = ptime[0]
+            peak_movie.peak.iloc[nc] = peak
+        if movie_name=='natural_movie_one':
+            peak_movie.rename(columns={'peak':'peak_nm1','response_variability':'response_variability_nm1'}, inplace=True)
+        elif movie_name=='natural_movie_two':
+            peak_movie.rename(columns={'peak':'peak_nm2','response_variability':'response_variability_nm2'}, inplace=True)
+        elif movie_name=='natural_movie_three':
+            peak_movie.rename(columns={'peak':'peak_nm3','response_variability':'response_variability_nm3'}, inplace=True)
 
         return peak_movie
 
@@ -53,46 +59,15 @@ class LocallySN(OPAnalysis):
         self.stim_table = self.cam_analysis.nwb.get_stimulus_table('locally_sparse_noise')
         self.LSN = self.cam_analysis.nwb.get_stimulus_template('locally_sparse_noise')
         self.sweeplength = self.stim_table['end'][1] - self.stim_table['start'][1]
-        self.interlength = self.sweeplength
+        self.interlength = 4*self.sweeplength
         self.extralength = self.sweeplength
         self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
         self.receptive_field = self.getReceptiveField()
-    
-#    def getSweepResponse(self):
-#        '''calculates the response to each sweep and then for each stimulus condition'''
-#        def domean(x):
-#            return np.mean(x[self.sweeplength:(3*self.sweeplength)+1])
-#        
-#        def doPvalue(x):
-#            (f, p) = st.f_oneway(x[:self.sweeplength], x[self.sweeplength:(3*self.sweeplength)])
-#            return p
-#            
-#        if self.h5path != None:
-#            sweep_response = pd.read_hdf(self.h5path, 'sweep_response')
-#            mean_sweep_response = pd.read_hdf(self.h5path, 'mean_sweep_response')
-#        else:        
-#            print 'Calculating responses for each sweep'        
-#            sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(range(self.numbercells+1)).astype(str))
-#            sweep_response.rename(columns={str(self.numbercells) : 'dx'}, inplace=True)
-#            for nc in range(self.numbercells):
-#                for index, row in self.stim_table.iterrows():
-#                    start = row['start'] - self.sweeplength
-#                    end = row['start'] + (2*self.sweeplength)
-#    #                try:
-#                    temp = self.celltraces[nc,start:end]                                
-#                    sweep_response[str(nc)][index] = 100*((temp/np.mean(temp[:self.sweeplength]))-1)
-#    #                except:
-#    #                    sweep_response['dx'][index] = self.dxcm[start:end]
-#            mean_sweep_response = sweep_response.applymap(domean)
-##        pval = sweep_response.applymap(doPvalue)
-#        pval = []
-#        return sweep_response, mean_sweep_response, pval
-#    
+        
     def getReceptiveField(self):
         print "Calculating mean responses"
         receptive_field = np.empty((16, 28, self.numbercells+1, 2))
-#        def ptest(x):
-#            return len(np.where(x<(0.05/(8*5)))[0])
+
         for xp in range(16):
             for yp in range(28):
                 on_frame = np.where(self.LSN[:,xp,yp]==255)[0]

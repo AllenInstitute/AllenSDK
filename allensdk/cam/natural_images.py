@@ -33,7 +33,7 @@ class NaturalImages(OPAnalysis):
         '''gets metrics about peak response, etc.'''
         print 'Calculating peak response properties'
         peak = pd.DataFrame(index=range(self.numbercells), columns=('Image', 'response_variability','peak_DFF', 'ptest', 'p_run', 'run_modulation', 'time_to_peak','duration'))
-        peak['LIMS'] = self.cam_analysis.lims_id
+        peak['ExperimentID'] = self.experiment_id
         peak['Cre'] = self.Cre   
         peak['HVA'] = self.HVA
         peak['depth'] = self.depth

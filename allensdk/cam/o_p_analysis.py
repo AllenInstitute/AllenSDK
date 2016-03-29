@@ -1,8 +1,6 @@
 import scipy.stats as st
 import numpy as np
 import pandas as pd
-import allensdk.cam.CAM_NWB as cn
-import os
 import time
 from allensdk.cam.findlevel import findlevel
 
@@ -11,6 +9,7 @@ class OPAnalysis(object):
                  **kwargs):
         self.cam_analysis = cam_analysis
 
+        self.experiment_id = self.cam_analysis.lims_id
         self.meta_data = self.cam_analysis.nwb.get_meta_data()
         self.Cre = self.meta_data['Cre']
         self.HVA = self.meta_data['area']
@@ -20,7 +19,7 @@ class OPAnalysis(object):
         print "Targeted area:", self.HVA
         print "Specimen:", self.specimen
         
-        self.savepath = self.cam_analysis.savepath
+        self.savepath = self.cam_analysis.save_path
         
         self.timestamps, self.celltraces = self.cam_analysis.nwb.get_fluorescence_traces()
         self.numbercells = len(self.celltraces)                         #number of cells in dataset       
@@ -211,6 +210,7 @@ class OPAnalysis(object):
         
         # TODO, where to save this one?
         #peak_run.to_csv(os.path.join(self.savepath, 'peak_Speed.csv'))             
+        #TODO: why doesn't this save?  it says the file doesn't exist, but I'm trying to create it here.  Worked in previous version           
         return binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
 
     def getSweepResponse(self):

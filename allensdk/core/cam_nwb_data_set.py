@@ -12,8 +12,8 @@ import numpy as np
 class CamNwbDataSet(object):
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
-        self.default_HVA = 'VISal'
-        self.default_depth = 175
+        self.default_HVA = None
+        self.default_depth = None
         
 
     def get_fluorescence_traces(self):
@@ -70,27 +70,31 @@ class CamNwbDataSet(object):
         f = h5py.File(self.nwb_file, 'r')
         Cre = f['general']['specimen'].value.split('-')[0]
         try:
-            specimen = f['general']['mouse_number'].value
+            specimen = f['general']['specimen'].value.split('-')[-1]
         except:
             specimen = None
         try:
-            HVA = f['general']['hva'].value
+            area = str( f['general']['area_targeted'].value )
         except:
             HVA = self.default_HVA
-            #raise(Exception('HVA not found in NWB file'))
+            
         try:
             depth = f['general']['depth_of_imaging'].value
         except:
             depth = self.default_depth
-            #raise(Exception('depth not found in NWB file'))
+
         try:
-            system = f['general']['microscope'].value
+            system = str( f['general']['microscope'].value )
         except:
             system = None
-        lims_id = f['general']['lims_id'].value
+
+        # TODO: this will get renamed
+        experiment_id = str( f['general']['lims_id'].value )
         f.close()
-        meta ={'Cre': Cre, 'specimen':specimen, 'HVA':HVA, 'area': HVA, 'depth':depth, 'system':system, 'lims_id':lims_id}
+        meta ={'Cre': Cre, 'specimen':specimen, 'area':area, 'depth': depth, 'system':system, 'experiment_id':experiment_id}
         return meta
+        
+
     
     def get_running_speed(self):
         '''returns the mouse running speed in cm/s'''
@@ -122,7 +126,7 @@ class CamNwbDataSet(object):
         return motion_correction
     
     
-    def save_analysis_hdf5(self, *tables):
+    def save_analysis_dataframes(self, *tables):
         store = pd.HDFStore(self.nwb_file, mode='a')
 
         for k,v in tables:
@@ -131,7 +135,7 @@ class CamNwbDataSet(object):
         store.close()
         
 
-    def save_analysis_datasets(self, *datasets):    
+    def save_analysis_arrays(self, *datasets):    
         f = h5py.File(self.nwb_file, 'a')
         
         for k,v in datasets:

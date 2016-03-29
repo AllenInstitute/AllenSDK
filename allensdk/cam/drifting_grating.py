@@ -40,8 +40,8 @@ class DriftingGrating(OPAnalysis):
     def getPeak(self):
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','TF','response_variability','OSI','DSI','peak_DFF', 'reliability', 'ptest'))
-        peak['LIMS'] = self.cam_analysis.lims_id
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','TF','response_variability_dg','OSI_dg','DSI','peak_DFF_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
+        peak['ExperimentID'] = self.experiment_id
         peak['Cre'] = self.Cre   
         peak['HVA'] = self.HVA
         peak['depth'] = self.depth
@@ -49,46 +49,34 @@ class DriftingGrating(OPAnalysis):
             cell_peak = np.where(self.response[:,1:,nc,0] == np.nanmax(self.response[:,1:,nc,0]))
             prefori = cell_peak[0][0]
             preftf = cell_peak[1][0]+1
-            peak['Ori'][nc] = prefori
-            peak['TF'][nc] = preftf
-            peak['response_variability'][nc] = self.response[prefori, preftf, nc, 2]/0.15
+            peak.Ori.iloc[nc] = prefori
+            peak.TF.iloc[nc] = preftf
+            peak.response_variability_dg.iloc[nc] = self.response[prefori, preftf, nc, 2]/0.15
             pref = self.response[prefori, preftf, nc, 0]            
             orth1 = self.response[np.mod(prefori+2, 8), preftf, nc, 0]
             orth2 = self.response[np.mod(prefori-2, 8), preftf, nc, 0]
             orth = (orth1+orth2)/2
             null = self.response[np.mod(prefori+4, 8), preftf, nc, 0]
-            peak['OSI'][nc] = (pref-orth)/(pref+orth)
-            peak['DSI'][nc] = (pref-null)/(pref+null)
-            peak['peak_DFF'][nc] = pref
-            
-            pref_std = self.response[prefori, preftf, nc, 1]*sqrt(15)
-            blank_mean = self.response[0, 0, nc, 0]
-            blank_std = self.response[0, 0, nc, 1]*np.sqrt(len(self.stim_table[self.stim_table.temporal_frequency==0]))
-            peak['reliability'][nc] = (pref - blank_mean)/(pref_std + blank_std)
+            peak.OSI_dg.iloc[nc] = (pref-orth)/(pref+orth)
+            peak.DSI.iloc[nc] = (pref-null)/(pref+null)
+            peak.peak_DFF_dg.iloc[nc] = pref
             
             groups = []
             for ori in self.orivals:
-                for tf in self.tfvals:
+                for tf in self.tfvals[1:]:
                     groups.append(self.mean_sweep_response[(self.stim_table.temporal_frequency==tf)&(self.stim_table.orientation==ori)][str(nc)])
+            groups.append(self.mean_sweep_response[self.stim_table.temporal_frequency==0][str(nc)])
             f,p = st.f_oneway(*groups)
-            peak.ptest[nc] = p
-
+            peak.ptest_dg.iloc[nc] = p
+            
+            subset = self.mean_sweep_response[(self.stim_table.temporal_frequency==self.tfvals[preftf])&(self.stim_table.orientation==self.orivals[prefori])]
+            subset_stat = subset[subset.dx<1]
+            subset_run = subset[subset.dx>=1]
+            if (len(subset_run)>2) & ( len(subset_stat)>2):
+                (f, peak.p_run_dg.iloc[nc]) = st.ks_2samp(subset_run[str(nc)], subset_stat[str(nc)])
+                peak.run_modulation_dg.iloc[nc] = subset_run[str(nc)].mean()/subset_stat[str(nc)].mean()
+            else:
+                peak.p_run_dg.iloc[nc] = np.NaN
+                peak.run_modulation_dg.iloc[nc] = np.NaN
         return peak
     
-    def getRunModulation(self, speed_threshold=10):
-        print 'Calculating run modulation at peak'
-#        run_modulation = np.empty((self.numbercells,4))
-        run_modulation = pd.DataFrame(index=range(self.numbercells), columns=('stationary_mean','stationary_sem','run_mean','run_sem'))
-        
-        for nc in range(self.numbercells):
-            ori = self.orivals[self.peak['Ori'][nc]]
-            tf = self.tfvals[self.peak['TF'][nc]]
-            subset_response = self.mean_sweep_response[(self.sync_table['TF']==tf)&(self.sync_table['Ori']==ori)]
-            subset_run = subset_response[subset_response['dx'] >= speed_threshold]
-            subset_stationary = subset_response[subset_response['dx'] < speed_threshold]
-            run_modulation['stationary_mean'][nc] = subset_stationary[str(nc)].mean()
-            run_modulation['stationary_sem'][nc] = subset_stationary[str(nc)].std()/sqrt(len(subset_stationary))
-            run_modulation['run_mean'][nc] = subset_run[str(nc)].mean()
-            run_modulation['run_sem'][nc] = subset_run[str(nc)].std()/sqrt(len(subset_run))
-        
-        return run_modulation
