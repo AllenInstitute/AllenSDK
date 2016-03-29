@@ -10,6 +10,12 @@ import pandas as pd
 import numpy as np
 
 class CamNwbDataSet(object):
+    file_metadata_mapping = { 'specimen': 'specimen',
+                              'area': 'area_targeted',
+                              'depth': 'depth_of_imaging',
+                              'system': 'microscope',
+                              'experiment_id': 'lims_id' }
+    
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
         
@@ -64,32 +70,24 @@ class CamNwbDataSet(object):
     
     def get_meta_data(self):
         '''returns a dictionary of meta data associated with each experiment, including Cre line, specimen number, visual area imaged, imaging depth'''
-        #TODO: adapt this for current meta data    
-        f = h5py.File(self.nwb_file, 'r')
-        Cre = f['general']['specimen'].value.split('-')[0]
-        try:
-            specimen = f['general']['specimen'].value.split('-')[-1]
-        except:
-            specimen = None
-        try:
-            area = str( f['general']['area_targeted'].value )
-        except:
-            area = None
+        #TODO: adapt this for current meta data
+        
+        meta = {}
             
-        try:
-            depth = f['general']['depth_of_imaging'].value
-        except:
-            depth = None
+        with h5py.File(self.nwb_file, 'r') as f:
+            for memory_key, disk_key in CamNwbDataSet.file_metadata_mapping.items():
+                try:
+                    meta[memory_key] = f['general'][disk_key].value
+                except:
+                    meta[memory_key] = None
 
         try:
-            system = str( f['general']['microscope'].value )
+            meta['Cre'] = meta['specimen'].split('-')[0]
+            meta['specimen'] = meta['specimen'].split('-')[-1]            
         except:
-            system = None
+            meta['Cre'] = None
+            meta['specimen'] = None
 
-        # TODO: this will get renamed
-        experiment_id = str( f['general']['lims_id'].value )
-        f.close()
-        meta ={'Cre': Cre, 'specimen':specimen, 'area':area, 'depth': depth, 'system':system, 'experiment_id':experiment_id}
         return meta
         
 
