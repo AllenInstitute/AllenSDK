@@ -152,15 +152,15 @@ def multi_dataframe_merge(dfs):
     return out_df
     
                     
-def run_cam_analysis(stimulus, nwb_path, save_path, meta_data=None):
+def run_cam_analysis(stimulus, nwb_path, save_path, meta_data=None, plot_flag=False):
     cam_analysis = CamAnalysis(nwb_path, save_path, meta_data)
 
     if stimulus == CamAnalysis.STIMULUS_A:
-        cam_analysis.stimulus_a(plot_flag=False)
+        cam_analysis.stimulus_a(plot_flag)
     elif stimulus == CamAnalysis.STIMULUS_B:
-        cam_analysis.stimulus_b(plot_flag=False)
+        cam_analysis.stimulus_b(plot_flag)
     elif stimulus == CamAnalysis.STIMULUS_C:
-        cam_analysis.stimulus_c(plot_flag=False)
+        cam_analysis.stimulus_c(plot_flag)
     else:
         raise IndexError("Unknown stimulus: %s" % stimulus)
     
@@ -171,6 +171,7 @@ def main():
 
     # TODO: unhardcode
     parser.add_argument("--stimulus", default=CamAnalysis.STIMULUS_A)
+    parser.add_argument("--plot", action='store_true')
 
     # meta data
     # TODO: remove
@@ -191,7 +192,7 @@ def main():
     if args.depth is not None:
         meta_data['depth'] = args.depth
 
-    run_cam_analysis(args.stimulus, args.input_nwb, args.output_nwb, meta_data)
+    run_cam_analysis(args.stimulus, args.input_nwb, args.output_nwb, meta_data, args.plot)
 
 
 if __name__=='__main__': main()
