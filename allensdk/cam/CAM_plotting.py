@@ -101,7 +101,7 @@ from numpy import arange
 #        plt.figtext(0.7, 0.21, "p = " + str(self.ptest[nc]))
 #        plt.figtext(0.7, 0.18, "% significant trials at peak:" + str(round(rv,2)))
 #        filename = 'Cell_'+str(nc+1)+'.png'
-#        fullfilename = os.path.join(self.savepath, filename) 
+#        fullfilename = os.path.join(self.save_dir, filename) 
 #        plt.savefig(fullfilename)   
 #        plt.close()
 
@@ -181,7 +181,7 @@ def plot_Drifting_grating_Traces(self):
         plt.suptitle("Cell " + str(nc+1), fontsize=20)
         plt.subplots_adjust(top=0.9)
         filename = 'Traces DG Cell_'+str(nc+1)+'.png'
-        fullfilename = os.path.join(self.savepath, filename) 
+        fullfilename = os.path.join(self.save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()                 
 
@@ -266,7 +266,7 @@ def plot_Drifting_grating_Traces(self):
 #        plt.tight_layout()
 #        plt.suptitle("Cell " + str(sp+1), fontsize=20)
 #        filename = 'Cell_'+str(sp+1)+'.png'
-#        fullfilename = os.path.join(self.savepath, filename) 
+#        fullfilename = os.path.join(self.save_dir, filename) 
 #        plt.savefig(fullfilename)   
 #        plt.close()
 #
@@ -311,7 +311,7 @@ def plot_Drifting_grating_Traces(self):
 #        plt.tick_params(labelsize=16)    
 #        plt.tight_layout()
 #        filename = 'Cell_'+str(nc+1)+'_Movie_1.png'
-#        fullfilename = os.path.join(self.savepath, filename) 
+#        fullfilename = os.path.join(self.save_dir, filename) 
 #        plt.savefig(fullfilename)   
 #        plt.close()
 
@@ -355,7 +355,7 @@ def plot_NS_Traces(self):
         plt.suptitle("Cell " + str(nc+1), fontsize=20)
         plt.subplots_adjust(top=0.9)
         filename = 'NS Traces Cell_'+str(nc+1)+'.png'
-        fullfilename = os.path.join(self.savepath, filename) 
+        fullfilename = os.path.join(self.save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()                
 
@@ -417,7 +417,7 @@ def plot_SG_Traces(self):
         plt.suptitle("Cell " + str(nc+1), fontsize=20)
         plt.subplots_adjust(top=0.9)
         filename = 'SG Traces Cell_'+str(nc+1)+'.png'
-        fullfilename = os.path.join(self.savepath, filename) 
+        fullfilename = os.path.join(self.save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()                
 
@@ -460,7 +460,7 @@ def plot_LSN_Traces(self):
         plt.suptitle("Cell " + str(nc+1), fontsize=20)
         plt.subplots_adjust(top=0.9)
         filename = 'Traces LSN Cell_'+str(nc+1)+'.png'
-        fullfilename = os.path.join(self.savepath, filename) 
+        fullfilename = os.path.join(self.save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()          
 
@@ -612,7 +612,7 @@ def plot_3SA(dg, nm1, nm3):
         plt.tick_params(labelsize=16)    
         plt.tight_layout()
         filename = 'Cell_'+str(nc+1)+'_3SA.png'
-        fullfilename = os.path.join(dg.savepath, filename) 
+        fullfilename = os.path.join(dg.save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()      
 
@@ -751,7 +751,7 @@ def plot_3SC(lsn, nm1, nm2):
         plt.tick_params(labelsize=16)    
         plt.tight_layout()
         filename = 'Cell_'+str(nc+1)+'_3SC.png'
-        fullfilename = os.path.join(lsn.savepath, filename) 
+        fullfilename = os.path.join(lsn.save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()
 
@@ -958,7 +958,7 @@ def plot_3SB(sg, nm1, ns):
         plt.tick_params(labelsize=16)    
         plt.tight_layout()
         filename = 'Cell_'+str(nc+1)+'_3SB.png'
-        fullfilename = os.path.join(sg.savepath, filename) 
+        fullfilename = os.path.join(sg.save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()
 
@@ -1028,7 +1028,7 @@ def ExperimentSummary(self, experiment_id):
     plt.figtext(0.7, 0.3, "Significant cells: " + str(len(self.significant_cells)))
     
     filename = "Experiment Summary.png"
-    fullfilename = os.path.join(self.savepath, filename) 
+    fullfilename = os.path.join(self.save_dir, filename) 
     plt.savefig(fullfilename)   
     plt.close()      
         
@@ -1136,6 +1136,6 @@ def plot_Running_A(dg, nm1, nm3):
     plt.suptitle("Running Summary", fontsize=20)
     plt.subplots_adjust(top=0.9)
     filename = 'Running Summary.png'
-    fullfilename = os.path.join(dg.savepath, filename) 
+    fullfilename = os.path.join(dg.save_dir, filename) 
     plt.savefig(fullfilename)   
     plt.close()              
