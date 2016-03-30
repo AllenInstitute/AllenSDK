@@ -1,7 +1,7 @@
 from neuron import h
 import logging
 
-_neuron_parallel_log = logging.getLogger('allensdk.model.biophysical_perisomatic.neuron_parallel')
+_neuron_parallel_log = logging.getLogger('allensdk.model.biophysical.neuron_parallel')
 
 _pc = h.ParallelContext()
 

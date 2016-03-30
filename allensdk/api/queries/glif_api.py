@@ -68,7 +68,7 @@ class GlifApi(RmaApi):
         try:
             specimen = self.neuronal_model['specimen']
             self.ephys_sweeps = specimen['ephys_sweeps']
-        except Exception, e:
+        except Exception as e:
             print e.message
             self.ephys_sweeps = None
             
@@ -82,7 +82,7 @@ class GlifApi(RmaApi):
                 if wkf['path'].endswith('neuron_config.json'):
                     self.neuron_config_url = wkf['download_link']
                     break
-        except Exception, e:
+        except Exception as e:
             self.neuron_config_url = None
 
         if self.neuron_config_url is None:
@@ -92,10 +92,10 @@ class GlifApi(RmaApi):
         try:
             ephys_result = specimen['ephys_result']
             for wkf in ephys_result['well_known_files']:
-                if wkf['well_known_file_type']['name'] == 'NWB':
+                if wkf['well_known_file_type']['name'] == 'NWBDownload':
                     self.stimulus_url = wkf['download_link']
                     break
-        except Exception, e:
+        except Exception as e:
             self.stimulus_url = None
 
         if self.stimulus_url is None:

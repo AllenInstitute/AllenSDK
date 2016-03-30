@@ -1,5 +1,5 @@
 from mpi4py import MPI #@UnusedImport
-from allensdk.model.biophysical_perisomatic.deap_utils import Utils
+from allensdk.model.biophysical.deap_utils import Utils
 import neuron_parallel
 import logging, argparse, random
 import numpy as np
@@ -8,7 +8,7 @@ from allensdk.model.biophys_sim.config import Config
 
 BOUND_LOWER, BOUND_UPPER = 0.0, 1.0
 
-_optimize_log = logging.getLogger('allensdk.model.biophysical_perisomatic.optimize')
+_optimize_log = logging.getLogger('allensdk.model.biophysical.optimize')
 
 utils = None
 h = None

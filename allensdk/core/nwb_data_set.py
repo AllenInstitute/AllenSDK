@@ -206,7 +206,7 @@ class NwbDataSet(object):
                 # rewriting data -- delete old dataset
                 del spike_dir[sweep_name]
             
-            spike_dir.create_dataset(sweep_name, data=spike_times, dtype='f8')
+            spike_dir.create_dataset(sweep_name, data=spike_times, dtype='f8', maxshape=(None,))
 
 
     def get_sweep_numbers(self):
@@ -254,9 +254,11 @@ class NwbDataSet(object):
         Includes information on stimulus parameters like its name and amplitude 
         as well as recording quality metadata, like access resistance and 
         seal quality.
+
         Parameters
         ----------
         sweep_number: int
+
         Returns
         -------
         dict

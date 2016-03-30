@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -16,19 +16,22 @@
 from allensdk.api.api import Api
 import os, json
 from collections import OrderedDict
+from allensdk.config.manifest import Manifest
 
-class BiophysicalPerisomaticApi(Api):
-    _NWB_file_type = 'NWB'
+class BiophysicalApi(Api):
+    _NWB_file_type = 'NWBDownload'
     _SWC_file_type = '3DNeuronReconstruction'
     _MOD_file_type = 'BiophysicalModelDescription'
     _FIT_file_type = 'NeuronalModelParameters'
+    _MARKER_file_type = '3DNeuronMarker'
     
     def __init__(self, base_uri=None):
-        super(BiophysicalPerisomaticApi, self).__init__(base_uri)
+        super(BiophysicalApi, self).__init__(base_uri)
         self.cache_stimulus = True
         self.ids = {}
         self.sweeps = []
         self.manifest = {}
+        self.model_type = None
     
     
     def build_rma(self, neuronal_model_id, fmt='json'):
@@ -85,6 +88,7 @@ class BiophysicalPerisomaticApi(Api):
         self.ids = {
             'stimulus': {},
             'morphology': {},
+            'marker': {},
             'modfiles': {},
             'fit': {}
         }
@@ -97,18 +101,19 @@ class BiophysicalPerisomaticApi(Api):
                         if ('id' in well_known_file and
                             'path' in well_known_file and
                             self.is_well_known_file_type(well_known_file,
-                                                         BiophysicalPerisomaticApi._FIT_file_type)):
+                                                         BiophysicalApi._FIT_file_type)):
                             self.ids['fit'][str(well_known_file['id'])] = \
                                 os.path.split(well_known_file['path'])[1]
                 
                 if 'neuronal_model_template' in neuronal_model:
                     neuronal_model_template = neuronal_model['neuronal_model_template']
+                    self.model_type = neuronal_model_template['name']
                     if 'well_known_files' in neuronal_model_template:
                         for well_known_file in neuronal_model_template['well_known_files']:
                             if ('id' in well_known_file and
                                 'path' in well_known_file and
                                 self.is_well_known_file_type(well_known_file,
-                                                             BiophysicalPerisomaticApi._MOD_file_type)):
+                                                             BiophysicalApi._MOD_file_type)):
                                 self.ids['modfiles'][str(well_known_file['id'])] = \
                                     os.path.join('modfiles',
                                                  os.path.split(well_known_file['path'])[1])
@@ -120,12 +125,13 @@ class BiophysicalPerisomaticApi(Api):
                         for neuron_reconstruction in specimen['neuron_reconstructions']:
                             if 'well_known_files' in neuron_reconstruction:
                                 for well_known_file in neuron_reconstruction['well_known_files']:
-                                    if ('id' in well_known_file and
-                                        'path' in well_known_file and
-                                        self.is_well_known_file_type(well_known_file,
-                                                                     BiophysicalPerisomaticApi._SWC_file_type)):
-                                        self.ids['morphology'][str(well_known_file['id'])] = \
-                                            os.path.split(well_known_file['path'])[1]
+                                    if ('id' in well_known_file and 'path' in well_known_file):
+                                        if self.is_well_known_file_type(well_known_file, BiophysicalApi._SWC_file_type):
+                                            self.ids['morphology'][str(well_known_file['id'])] = \
+                                                os.path.split(well_known_file['path'])[1]
+                                        elif self.is_well_known_file_type(well_known_file, BiophysicalApi._MARKER_file_type):
+                                            self.ids['marker'][str(well_known_file['id'])] = \
+                                                os.path.split(well_known_file['path'])[1]
                     
                     if 'ephys_result' in specimen:
                         ephys_result = specimen['ephys_result']
@@ -133,8 +139,7 @@ class BiophysicalPerisomaticApi(Api):
                             for well_known_file in ephys_result['well_known_files']:
                                 if ('id' in well_known_file and
                                     'path' in well_known_file and
-                                    self.is_well_known_file_type(well_known_file,
-                                                                 BiophysicalPerisomaticApi._NWB_file_type)):
+                                    self.is_well_known_file_type(well_known_file, BiophysicalApi._NWB_file_type)):
                                         self.ids['stimulus'][str(well_known_file['id'])] = \
                                             "%d.nwb" % (ephys_result['id'])
                     
@@ -183,8 +188,10 @@ class BiophysicalPerisomaticApi(Api):
     
     def create_manifest(self,
                         fit_path='',
+                        model_type='',
                         stimulus_filename='',
                         swc_morphology_path='',
+                        marker_path='',
                         sweeps=[]):
         '''Generate a json configuration file with parameters for a 
         a biophysical experiment.
@@ -202,7 +209,8 @@ class BiophysicalPerisomaticApi(Api):
         '''
         self.manifest = OrderedDict()
         self.manifest['biophys'] = [{
-                'model_file': [ 'manifest.json',  fit_path ]
+                'model_file': [ 'manifest.json',  fit_path ],
+                'model_type': model_type
             }]
         self.manifest['runs'] = [{
                 'sweeps': sweeps
@@ -228,6 +236,11 @@ class BiophysicalPerisomaticApi(Api):
                     'key': 'MORPHOLOGY'
                 },
                 {
+                    'type': 'file',
+                    'spec': marker_path,
+                    'key': 'MARKER'
+                },
+                {
                     'type': 'dir',
                     'spec': 'modfiles',
                     'key': 'MODFILE_DIR'
@@ -243,7 +256,7 @@ class BiophysicalPerisomaticApi(Api):
                   'type': 'file', 
                   'format': 'NWB',
                   'spec': stimulus_filename, 
-                  'key': 'output'
+                  'key': 'output_path'
                 }
             ]
     
@@ -263,26 +276,21 @@ class BiophysicalPerisomaticApi(Api):
         '''
         if working_directory is None:
             working_directory = self.default_working_directory
-        try:
-            os.stat(working_directory)
-        except:
-            os.mkdir(working_directory)
-        
-        
-        work_dir = os.path.join(working_directory, 'work')
-        try:
-            os.stat(work_dir)
-        except:
-            os.mkdir(work_dir)
-        
-        modfile_dir = os.path.join(working_directory, 'modfiles')
-        try:
-            os.stat(modfile_dir)
-        except:
-            os.mkdir(modfile_dir)
-        
+
         well_known_file_id_dict = self.get_well_known_file_ids(neuronal_model_id)
         
+        if not well_known_file_id_dict or \
+           (not any(well_known_file_id_dict.values())):
+            raise(Exception("No data found for neuronal model id %d" % (neuronal_model_id)))
+            
+        Manifest.safe_mkdir(working_directory)
+        
+        work_dir = os.path.join(working_directory, 'work')        
+        Manifest.safe_mkdir(work_dir)
+        
+        modfile_dir = os.path.join(working_directory, 'modfiles')       
+        Manifest.safe_mkdir(modfile_dir)
+                
         for key, id_dict in well_known_file_id_dict.items():
             if (not self.cache_stimulus) and (key == 'stimulus'):
                 continue
@@ -295,11 +303,14 @@ class BiophysicalPerisomaticApi(Api):
         fit_path = self.ids['fit'].values()[0]
         stimulus_filename = self.ids['stimulus'].values()[0]
         swc_morphology_path = self.ids['morphology'].values()[0]
+        marker_path = self.ids['marker'].values()[0] if 'marker' in self.ids else ''
         sweeps = sorted(self.sweeps)
         
         self.create_manifest(fit_path,
+                             self.model_type,
                              stimulus_filename,
                              swc_morphology_path,
+                             marker_path,
                              sweeps)
         
         manifest_path = os.path.join(working_directory, 'manifest.json')

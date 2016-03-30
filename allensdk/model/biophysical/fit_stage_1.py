@@ -9,7 +9,7 @@ import subprocess
 from allensdk.ephys.feature_extractor import EphysFeatureExtractor, EphysFeatures
 import allensdk.core.json_utilities as ju
 from allensdk.core.nwb_data_set import NwbDataSet
-import allensdk.model.biophysical_perisomatic.optimize
+import allensdk.model.biophysical.optimize
 import logging
 
 SEEDS = [1234, 1001, 4321, 1024, 2048]
@@ -18,7 +18,7 @@ APICAL_DENDRITE_TYPE = 4
 OPTIMIZE_SCRIPT = os.path.abspath(os.path.join(os.path.dirname(__file__), 'optimize.py'))
 MPIEXEC = 'mpiexec'
 
-_fit_stage_1_log = logging.getLogger('allensdk.model.biophysical_perisomatic.fit_stage_1')
+_fit_stage_1_log = logging.getLogger('allensdk.model.biophysical.fit_stage_1')
 
 def find_core1_trace(data_set, all_sweeps):
     sweep_type = "C1LSCOARSE"
@@ -343,7 +343,7 @@ def run_stage_1(jobs):
                 '240',
                 sys.executable,
                 '-m',
-                allensdk.model.biophysical_perisomatic.optimize.__name__,
+                allensdk.model.biophysical.optimize.__name__,
                 str(job['seed']),
                 job['config_path']]
         _fit_stage_1_log.debug(args)

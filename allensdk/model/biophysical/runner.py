@@ -14,15 +14,16 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.model.biophys_sim.config import Config
-from allensdk.model.biophysical_perisomatic.utils import create_utils
+from allensdk.model.biophysical.utils import create_utils
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
 from shutil import copy
 import numpy
 import logging
 import time
+import os
 
-_runner_log = logging.getLogger('allensdk.model.biophysical_perisomatic.runner')
+_runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 
 
 def run(description, sweeps=None):
@@ -86,6 +87,11 @@ def prepare_nwb_output(nwb_stimulus_path,
     nwb_result_path : string
         NWB file name
     '''
+
+    output_dir = os.path.dirname(nwb_result_path)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     copy(nwb_stimulus_path, nwb_result_path)
     data_set = NwbDataSet(nwb_result_path)
     data_set.fill_sweep_responses(0.0)

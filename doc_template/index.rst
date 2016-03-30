@@ -19,13 +19,14 @@ Welcome to the Allen SDK
    examples
    Source Documentation <allensdk>
    Github Profile <https://github.com/AllenInstitute/AllenSDK>
+   
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
 The Allen SDK focuses the Allen Cell Types Database and the Allen Mouse Brain Connectivity Atlas.  
 Functionality relevant to other atlases is coming in future releases.  
 
 .. image:: /_static/ccf_v3_sdk.png
-    :align: right
+   :align: right
 
 
 Allen Cell Types Database
@@ -36,7 +37,7 @@ of individual neurons in the mouse primary visual cortex.  The Allen SDK provide
 for accessing electrophysiology measurements (`NWB files <cell_types.html#neurodata-without-borders>`_) 
 for all neurons and morphological reconstructions (`SWC files <cell_types.html#morphology-swc-files>`_) for a subset of neurons.
 
-The Database also contains two classes of models fit to this data set: perisomatic biophysical 
+The Database also contains two classes of models fit to this data set: biophysical
 models produced using the NEURON simulator and generalized leaky integrate and fire models (GLIFs) 
 produced using custom Python code provided with this toolkit. 
 
@@ -44,14 +45,14 @@ The Allen SDK provides sample code
 demonstrating how to download neuronal model parameters from the Allen Brain Atlas API and run 
 your own simulations using stimuli from the Allen Cell Types Database or custom current injections:
 
-    * :doc:`biophysical_perisomatic_script`
-    * :doc:`glif_models`
+   * :doc:`biophysical_models`
+   * :doc:`glif_models`
 
 
 ....
 
 .. image:: /_static/connectivity.png
-    :align: right
+   :align: right
 
 Allen Mouse Brain Connectivity Atlas
 ------------------------------------
@@ -62,9 +63,14 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-....
+What's New - Release 0.11.0
+---------------------------
 
-Developer Documentation
------------------------
+The 0.11.0 release addressed several issues raised on our Github issue tracker.  Other changes and updates include:
 
-Please refer to the :ref:`modindex` for inline source code documentation. 
+    * Cell Types Database cells can now be filtered on their reporter status (cre+ or cre-).
+    * Cell Types Database reconstructions have markers indicating truncation and tracing termination.
+    * The Morphology class has a number of new methods for tree manipulation, and slightly different internal data structure for compartments.
+    * The GLIF simulator has more standard function names for dynamics and reset rules.
+
+To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

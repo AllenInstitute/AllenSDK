@@ -5,7 +5,7 @@ from fit_stage_1 import SEEDS, FIT_BASE_DIR, OPTIMIZE_SCRIPT, MPIEXEC
 
 FIT_TYPES = {"f6": "f9", "f12": "f13"}
 
-_fit_stage_2_log = logging.getLogger('allensdk.model.biophysical_perisomatic.fit_stage_2')
+_fit_stage_2_log = logging.getLogger('allensdk.model.biophysical.fit_stage_2')
 
 def prepare_stage_2(output_directory):
     config_base_data = json_utilities.read(os.path.join(FIT_BASE_DIR, 'config_base.json'))

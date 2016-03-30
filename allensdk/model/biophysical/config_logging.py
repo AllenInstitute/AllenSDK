@@ -2,7 +2,7 @@ import logging
 
 def config_logging(loggers=['allensdk'],
                    level=logging.DEBUG,
-                   log_file = 'biophysical_perisomatic.log'):    
+                   log_file = 'biophysical.log'):    
     if config_logging.logging_configured == False:
         fh = logging.FileHandler(log_file)            
         formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

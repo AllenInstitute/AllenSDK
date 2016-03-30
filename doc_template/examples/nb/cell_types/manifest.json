@@ -38,6 +38,12 @@
     {
       "parent_key": "BASEDIR", 
       "type": "file", 
+      "spec": "specimen_%d/reconstruction.marker", 
+      "key": "MARKER"
+    }, 
+    {
+      "parent_key": "BASEDIR", 
+      "type": "file", 
       "spec": "specimen_%d/ephys_sweeps.json", 
       "key": "EPHYS_SWEEPS"
     }

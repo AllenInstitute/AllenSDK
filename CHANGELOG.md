@@ -1,6 +1,32 @@
 # Change Log
 All notable changes to this projection will be documented in this file.
 
+## [0.11.0] - 2016-3-3
+
+### Added
+
+- CellTypesCache.get_cells has a new argument 'reporter_status', which accepts one or more ReporterStatus values.
+- CellTypesApi.save_reconstruction_marker and CellTypesCache.get_reconstruction_marker download and open files containing positions that mark special points in reconstruction (truncation, early termination of reconstruction, etc).
+- swc.read_marker_file for reading in marker files 
+- Morphology has new methods for manipulating the morphology tree structure
+- allensdk.model.biophysical package supports active and passive models
+
+### Changed
+
+- Morphology compartments are now Compartment objects that behave like dictionaries
+- Compartment.children stores references to immediate descendant Compartments
+- spike times in NWB files are stored in "analysis/spike_times" instead of "analysis/aibs_spike_times"
+- NwbDataSet looks for spike times in both locations ("spike_times" first)
+- glif_neuron_methods.py function names have been changed to be more standardized
+- allensdk.model.biophysical_perisomatic package renamed to allensdk.model.biophysical
+- NEURON dependency updated to 7.4 release 1370
+
+### Fixed
+
+- MouseConnectivityCache.get_structure_mask bug fixed (github issue 8)
+- CellTypesApi.get_ephys_sweeps returns sweeps in sweep number order (github issue 11)
+- NwbDataSet.set_spike_times added maxshape(None,) to create_dataset (github issue 7)
+
 ## [0.10.1] - 2015-9-24
 
 ### Added
@@ -22,6 +48,7 @@ All notable changes to this projection will be documented in this file.
 - API Access/Data API Client documentation better reflects new 0.10.x allensdk.api.query modules.
 - Cache.wrap method defaults to save_as_json=False.
 - Cache.wrap method defaults to returning json rather than a pandas dataframe (new parameter return_dataframe=False).
+- BiophysicalApi.cache_data throws an exception if no data is found for a neuronal model id.
 - Replaced brainscales Dockerfile with neuralenseble Dockerfiles.
 
 

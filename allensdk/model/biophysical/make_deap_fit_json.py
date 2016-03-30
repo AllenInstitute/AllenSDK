@@ -4,11 +4,11 @@ import json, logging
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.core.json_utilities as ju
 from allensdk.model.biophys_sim.config import Config
-from allensdk.model.biophysical_perisomatic import ephys_utils
-from allensdk.model.biophysical_perisomatic.deap_utils import Utils
+from allensdk.model.biophysical import ephys_utils
+from allensdk.model.biophysical.deap_utils import Utils
 
 class Report:
-    _log = logging.getLogger('allensdk.model.biophysical_perisomatic.make_deap_fit_json')
+    _log = logging.getLogger('allensdk.model.biophysical.make_deap_fit_json')
 
     def __init__(self,
                  top_level_description,

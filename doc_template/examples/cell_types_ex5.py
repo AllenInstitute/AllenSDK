@@ -3,7 +3,8 @@ from allensdk.core.nwb_data_set import NwbDataSet
 file_name = 'example.nwb'
 data_set = NwbDataSet(file_name)
 
-sweep_number = 61
+sweep_numbers = data_set.get_sweep_numbers()
+sweep_number = sweep_numbers[0] 
 sweep_data = data_set.get_sweep(sweep_number)
 
 # spike times are in seconds relative to the start of the sweep

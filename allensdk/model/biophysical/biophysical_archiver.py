@@ -1,11 +1,11 @@
-from allensdk.api.queries.biophysical_perisomatic_api import \
-    BiophysicalPerisomaticApi
+from allensdk.api.queries.biophysical_api import \
+    BiophysicalApi
 from allensdk.api.queries.cell_types_api import CellTypesApi
 from allensdk.api.queries.rma_api import RmaApi
 import os
 import shutil
 
-bp = BiophysicalPerisomaticApi('http://api.brain-map.org')
+bp = BiophysicalApi('http://api.brain-map.org')
 bp.cache_stimulus = True # change to False to not download the large stimulus NWB file
 neuronal_model_id = 472451419    # get this from the web site as above
 bp.cache_data(neuronal_model_id, working_directory='neuronal_model')
@@ -17,7 +17,7 @@ bp.cache_data(neuronal_model_id, working_directory='neuronal_model')
 
 class BiophysicalArchiver(object):
     def __init__(self, archive_dir=None):
-        self.bp = BiophysicalPerisomaticApi('http://api.brain-map.org')
+        self.bp = BiophysicalApi('http://api.brain-map.org')
         bp.cache_stimulus = True # change to False to not download the large stimulus NWB file
         self.cta = CellTypesApi()
         self.rma = RmaApi()
