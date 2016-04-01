@@ -55,7 +55,7 @@ class StaticGrating(OPAnalysis):
     def getPeak(self):    
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_variability_sg','osi_sg','peak_dff_sg','ptest_sg'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_variability_sg','osi_sg','peak_dff_sg','ptest_sg','time_to_peak_sg','duration_sg'))
 
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,:,nc,0] == np.nanmax(self.response[:,1:,:,nc,0]))
@@ -79,6 +79,19 @@ class StaticGrating(OPAnalysis):
 
             _,p = st.f_oneway(*groups)
             peak.ptest_sg[nc] = p
+            
+            print
+            test_rows = (self.stim_table.orientation==self.orivals[pref_ori]) & \
+                (self.stim_table.spatial_frequency==self.sfvals[pref_sf-1]) & \
+                (self.stim_table.phase==self.phasevals[pref_phase])
+
+            test = self.sweep_response[test_rows][str(nc)].mean()
+            peak.time_to_peak_sg[nc] = (np.argmax(test) - self.interlength)/self.acquisition_rate
+            test2 = np.where(test<(test.max()/2))[0]
+            try:          
+                peak.duration_sg[nc] = np.ediff1d(test2).max()/self.acquisition_rate
+            except:
+                pass
 
         return peak
     
