@@ -55,30 +55,31 @@ class StaticGrating(OPAnalysis):
     def getPeak(self):    
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','SF', 'Phase', 'sg_response_variability','OSI','sg_peak_DFF','ptest'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_variability_sg','osi_sg','peak_dff_sg','ptest_sg'))
 
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,:,nc,0] == np.nanmax(self.response[:,1:,:,nc,0]))
             pref_ori = cell_peak[0][0]
             pref_sf = cell_peak[1][0]+1
             pref_phase = cell_peak[2][0]
-            peak.Ori[nc] = pref_ori
-            peak.SF[nc] = pref_sf
-            peak.Phase[nc] = pref_phase
-            peak.sg_response_variability[nc] = self.response[pref_ori, pref_sf, pref_phase, nc, 2]/0.48  #TODO: check number of trials
+            peak.ori_sg[nc] = pref_ori
+            peak.sf_sg[nc] = pref_sf
+            peak.phase_sg[nc] = pref_phase
+            peak.response_variability_sg[nc] = self.response[pref_ori, pref_sf, pref_phase, nc, 2]/0.48  #TODO: check number of trials
             pref = self.response[pref_ori, pref_sf, pref_phase, nc, 0]
             orth = self.response[np.mod(pref_ori+3, 6), pref_sf, pref_phase, nc, 0]
-            peak.OSI[nc] = (pref-orth)/(pref+orth)
-            peak.sg_peak_DFF[nc] = pref
+            peak.osi_sg[nc] = (pref-orth)/(pref+orth)
+            peak.peak_dff_sg[nc] = pref
             groups = []
             for ori in self.orivals:
-                for sf in self.sfvals:
+                for sf in self.sfvals[1:]:
                     for phase in self.phasevals:
                         groups.append(self.mean_sweep_response[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)][str(nc)])
+            groups.append(self.mean_sweep_response[self.stim_table.spatial_frequency==0][str(nc)])
+
             _,p = st.f_oneway(*groups)
-            peak.ptest[nc] = p
-            #TODO: add ptest, reliability, etc
-#        peak['ptest'] = self.ptest
+            peak.ptest_sg[nc] = p
+
         return peak
     
 #    def Ptest(self):
@@ -86,9 +87,9 @@ class StaticGrating(OPAnalysis):
 #        test = pd.DataFrame(index=self.sweeptable.index.values, columns=np.array(range(self.numbercells)).astype(str))
 #        for nc in range(self.numbercells):        
 #            for index, row in self.sweeptable.iterrows():
-#                ori=row.Ori
-#                sf=row.SF
-#                phase = row.Phase
+#                ori=row.ori_sg
+#                sf=row.sf_sg
+#                phase = row.phase_sg
 #                test[str(nc)][index] = self.mean_sweep_response[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)][str(nc)]
 #        ptest = []
 #        for nc in range(self.numbercells):

@@ -40,23 +40,23 @@ class DriftingGrating(OPAnalysis):
     def getPeak(self):
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','TF','response_variability_dg','OSI_dg','DSI','peak_DFF_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_variability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
 
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,nc,0] == np.nanmax(self.response[:,1:,nc,0]))
             prefori = cell_peak[0][0]
             preftf = cell_peak[1][0]+1
-            peak.Ori.iloc[nc] = prefori
-            peak.TF.iloc[nc] = preftf
+            peak.ori_dg.iloc[nc] = prefori
+            peak.tf_dg.iloc[nc] = preftf
             peak.response_variability_dg.iloc[nc] = self.response[prefori, preftf, nc, 2]/0.15
             pref = self.response[prefori, preftf, nc, 0]            
             orth1 = self.response[np.mod(prefori+2, 8), preftf, nc, 0]
             orth2 = self.response[np.mod(prefori-2, 8), preftf, nc, 0]
             orth = (orth1+orth2)/2
             null = self.response[np.mod(prefori+4, 8), preftf, nc, 0]
-            peak.OSI_dg.iloc[nc] = (pref-orth)/(pref+orth)
-            peak.DSI.iloc[nc] = (pref-null)/(pref+null)
-            peak.peak_DFF_dg.iloc[nc] = pref
+            peak.osi_dg.iloc[nc] = (pref-orth)/(pref+orth)
+            peak.dsi_dg.iloc[nc] = (pref-null)/(pref+null)
+            peak.peak_dff_dg.iloc[nc] = pref
             
             groups = []
             for ori in self.orivals:

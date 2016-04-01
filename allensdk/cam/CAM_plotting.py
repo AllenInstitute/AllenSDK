@@ -19,8 +19,8 @@ from numpy import arange
 #        if np.mod(nc,100)==0:
 #            print "Cell #", str(nc)
 ##            peak = np.where(self.response[:,:,nc,0] == np.nanmax(self.response[:,:,nc,0]))
-#        peakori = self.peak['Ori'][nc]#peak[0][0]
-#        peaktf = self.peak['TF'][nc]#peak[1][0]
+#        peakori = self.peak['ori_dg'][nc]#peak[0][0]
+#        peaktf = self.peak['tf_dg'][nc]#peak[1][0]
 #        rv = self.peak['response_variability'][nc]#self.response[peakori, peaktf, nc, 2]/0.15
 #        subset = self.sweep_response[(self.stim_table['Ori']==self.orivals[peakori])&(self.stim_table['TF']==self.tfvals[peaktf])]
 #        plt.figure(nc, figsize=(14,14))
@@ -96,8 +96,8 @@ from numpy import arange
 #        else:
 #            plt.suptitle("Cell " + str(nc+1), fontsize=20)
 #        plt.figtext(0.7, 0.3, "PeakOri: " + str(self.orivals[peakori]) + " Deg / PeakTF: " + str(self.tfvals[peaktf]) + " Hz")
-#        plt.figtext(0.7, 0.27, "OSI: " + str(round(self.peak['OSI'][nc],2)))
-#        plt.figtext(0.7, 0.24, "DSI: " + str(round(self.peak['DSI'][nc],2)))                        
+#        plt.figtext(0.7, 0.27, "OSI: " + str(round(self.peak['osi_dg'][nc],2)))
+#        plt.figtext(0.7, 0.24, "DSI: " + str(round(self.peak['dsg_dg'][nc],2)))                        
 #        plt.figtext(0.7, 0.21, "p = " + str(self.ptest[nc]))
 #        plt.figtext(0.7, 0.18, "% significant trials at peak:" + str(round(rv,2)))
 #        filename = 'Cell_'+str(nc+1)+'.png'
@@ -530,8 +530,8 @@ def plot_3SA(dg, nm1, nm3):
         ax5.set_ylabel("DF/F", fontsize=20)
         ax5.set_title("Visual Stimuli", fontsize=20)
         
-        peakori = dg.peak.Ori[nc]
-        peaktf = dg.peak.TF[nc]
+        peakori = dg.peak.ori_dg[nc]
+        peaktf = dg.peak.tf_dg[nc]
         ax6.errorbar(dg.orivals, dg.response[:,peaktf,nc,0], yerr=dg.response[:,peaktf,nc,1], fmt='bo-', lw=2)
         ax6.fill_between(dg.orivals, np.repeat(dg.response[0,0,nc,0]+dg.response[0,0,nc,1], dg.number_ori), np.repeat(dg.response[0,0,nc,0]-dg.response[0,0,nc,1], dg.number_ori), color='gray', alpha=0.5)
         ax6.axhline(y=dg.response[0,0,nc,0], ls='--', color='k')
@@ -825,8 +825,8 @@ def plot_3SB(sg, nm1, ns):
 #         ax16.set_ylabel("DF/F", fontsize=20)
 #         ax16.set_title("Visual Stimuli", fontsize=20)
         
-        peakori = sg.peak.Ori[nc]
-        peaksf = sg.peak.SF[nc]
+        peakori = sg.peak.ori_sg[nc]
+        peaksf = sg.peak.sf_sg[nc]
         ax3.errorbar(sg.orivals, sg.response[:,peaksf,0,nc,0], yerr=sg.response[:,peaksf,0,nc,1], color='blue', fmt='o-', lw=2)
         ax3.errorbar(sg.orivals, sg.response[:,peaksf,1,nc,0], yerr=sg.response[:,peaksf,1,nc,1], color='cornflowerblue', fmt='o-', lw=2)
         ax3.errorbar(sg.orivals, sg.response[:,peaksf,2,nc,0], yerr=sg.response[:,peaksf,2,nc,1], color='steelblue', fmt='o-', lw=2)
@@ -850,9 +850,9 @@ def plot_3SB(sg, nm1, ns):
         ax4.set_xlabel("Spatial frequency (cpd)", fontsize=20)
         
         xtime = np.arange(-1*sg.interlength/sg.acquisition_rate, (sg.sweeplength+sg.interlength)/sg.acquisition_rate, 1/sg.acquisition_rate)
-        peakori = sg.peak.Ori[nc]
-        peaksf = sg.peak.SF[nc]
-        peakphase = sg.peak.Phase[nc]
+        peakori = sg.peak.ori_sg[nc]
+        peaksf = sg.peak.sf_sg[nc]
+        peakphase = sg.peak.phase_sg[nc]
         subset = sg.sweep_response[(sg.stim_table.orientation==sg.orivals[peakori])&(sg.stim_table.spatial_frequency==sg.sfvals[peaksf])&(sg.stim_table.phase==sg.phasevals[peakphase])]
         subset_p =  subset[str(nc)].mean() + (subset[str(nc)].std()/np.sqrt(len(subset[str(nc)])))
         subset_n =  subset[str(nc)].mean() - (subset[str(nc)].std()/np.sqrt(len(subset[str(nc)])))
@@ -974,31 +974,31 @@ def ExperimentSummary(self, experiment_id):
     ax6 = plt.subplot(337)
     ax7 = plt.subplot(338)
     
-    ax1.hist(self.peak['Ori'][self.significant_cells].values,range=(0,self.number_ori), bins=self.number_ori, rwidth=0.8, color='gray')
+    ax1.hist(self.peak['ori_dg'][self.significant_cells].values,range=(0,self.number_ori), bins=self.number_ori, rwidth=0.8, color='gray')
     ax1.set_xticks(arange(0.5, 8, 1))
     ax1.set_xticklabels(self.orivals)
     ax1.set_xlabel("Direction (deg)", fontsize=14)
     ax1.set_ylabel("# Cells", fontsize=14)
     ax1.set_title("Preferred direction", fontsize=14)
     
-    ax2.hist(self.peak['TF'][self.significant_cells].values, range=(1,self.number_tf), bins=self.number_tf-1, rwidth=0.8, color='gray')
+    ax2.hist(self.peak['tf_dg'][self.significant_cells].values, range=(1,self.number_tf), bins=self.number_tf-1, rwidth=0.8, color='gray')
     ax2.set_xticks(arange(1.5,6,1))        
     ax2.set_xticklabels(self.tfvals[1:])
     ax2.set_xlabel("Temporal frequency (Hz)", fontsize=14)
     ax2.set_ylabel("# Cells", fontsize=14)
     ax2.set_title("Preferred TF", fontsize=14)
     
-    ax3.hist(self.peak['response_variability'][self.significant_cells].values, range=(0,100), bins=15, color='gray')        
+    ax3.hist(self.peak['response_variability_dg'][self.significant_cells].values, range=(0,100), bins=15, color='gray')        
     ax3.set_xlabel("% Significant trials", fontsize=14)
     ax3.set_ylabel("# Cells", fontsize=14)
     ax3.set_title("Significant trials", fontsize=14)
     
-    ax4.hist(self.peak['OSI'][self.significant_cells].values, range=(0,1.5), bins=15, color='gray')
+    ax4.hist(self.peak['osi_dg'][self.significant_cells].values, range=(0,1.5), bins=15, color='gray')
     ax4.set_xlabel("Orientation selectivity index", fontsize=14)
     ax4.set_ylabel("# Cells", fontsize=14)
     ax4.set_title("OSI", fontsize=14)
     
-    ax5.hist(self.peak['DSI'][self.significant_cells].values, range=(0,1.5), bins=15, color='gray')
+    ax5.hist(self.peak['dsi_dg'][self.significant_cells].values, range=(0,1.5), bins=15, color='gray')
     ax5.set_xlabel("Direction selectivity index", fontsize=14)
     ax5.set_ylabel("# Cells", fontsize=14)
     ax5.set_title("DSI", fontsize=14)
