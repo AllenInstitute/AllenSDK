@@ -16,6 +16,7 @@
 import os
 import re
 import logging
+import pandas as pd
 
 class Manifest(object):
     """Manages the location of external files 
@@ -286,6 +287,7 @@ class Manifest(object):
             if do_exit == True:
                 quit()
     
+    
     def resolve_paths(self, description_dict, suffix='_key'):
         '''Walk input items and expand those that refer to a manifest entry.
         
@@ -305,3 +307,7 @@ class Manifest(object):
                 filename = self.get_path(manifest_key)
                 description_dict[real_key] = filename
                 del description_dict[description_key]
+
+    def as_dataframe(self):
+        return pd.DataFrame.from_dict(self.path_info,
+                                      orient='index')

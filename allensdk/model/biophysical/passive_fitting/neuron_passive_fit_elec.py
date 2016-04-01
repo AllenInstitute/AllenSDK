@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import allensdk.model.biophysical_perisomatic.passive_fitting.neuron_utils as neuron_utils
+import allensdk.model.biophysical.passive_fitting.neuron_utils as neuron_utils
 import numpy as np
 import os
 import allensdk.core.json_utilities as json_utilities

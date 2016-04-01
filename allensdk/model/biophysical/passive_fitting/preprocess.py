@@ -1,9 +1,9 @@
-import allensdk.model.biophysical_perisomatic.ephys_utils as ephys_utils
+import allensdk.model.biophysical.ephys_utils as ephys_utils
 import logging
 import numpy as np
 import pandas as pd
 
-_passive_fit_log = logging.getLogger('allensdk.model.biophysical_perisomatic.passive_fitting.preprocess')  
+_passive_fit_log = logging.getLogger('allensdk.model.biophysical.passive_fitting.preprocess')  
 
 def get_passive_fit_data(cap_check_sweeps, data_set):
     bridge_balances = [s['bridge_balance_mohm'] for s in cap_check_sweeps]

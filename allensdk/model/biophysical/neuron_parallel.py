@@ -33,3 +33,14 @@ def done():
 
 def pc_time():
     return _pc.time()
+
+def reset_neuron_library():
+    '''
+    See Also: https://www.neuron.yale.edu/phpBB/viewtopic.php?f=2&t=2367
+    '''
+    _pc.gid_clear()
+    
+    for sec in h.allsec():
+        h("%s{delete_section()}" % (sec.name()) )
+    
+    

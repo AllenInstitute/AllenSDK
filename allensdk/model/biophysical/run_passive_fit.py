@@ -7,8 +7,11 @@ import passive_fitting.preprocess as passive_prep
 import allensdk.core.json_utilities as ju
 from allensdk.model.biophys_sim.config import Config
 from allensdk.core.nwb_data_set import NwbDataSet
-import allensdk.model.biophysical.passive_fitting.neuron_passive_fit
+from allensdk.model.biophysical.passive_fitting import neuron_passive_fit
+from allensdk.model.biophysical.passive_fitting import neuron_passive_fit2
+from allensdk.model.biophysical.passive_fitting import neuron_passive_fit_elec
 import logging
+import allensdk
 
 _run_passive_fit_log = logging.getLogger('allensdk.model.biophysical.run_passive_fit')
 
@@ -44,21 +47,22 @@ def run_passive_fit(description):
 
         fit_1_file = description.manifest.get_path('fit_1_file')
         fit_1_params = subprocess.check_output([sys.executable,
-                                                '-m', allensdk.model.biophysical.passive_fitting.neuron_passive_fit.__name__, 
+                                                '-m', neuron_passive_fit.__name__, 
                                                 str(d['escape_t']),
                                                 os.path.realpath(description.manifest.get_path('manifest')) ])
         passive_fit_data['fit_1'] = ju.read(fit_1_file)
 
         fit_2_file = description.manifest.get_path('fit_2_file')
+
         fit_2_params = subprocess.check_output([sys.executable,
-                                                '-m', 'allensdk.model.biophysical.passive_fitting.neuron_passive_fit2',
+                                                '-m', neuron_passive_fit2.__name__,
                                                 str(d['escape_t']),
                                                 os.path.realpath(description.manifest.get_path('manifest')) ])
         passive_fit_data['fit_2'] = ju.read(fit_2_file)
 
         fit_3_file = description.manifest.get_path('fit_3_file')
         fit_3_params = subprocess.check_output([sys.executable,
-                                                '-m', 'allensdk.model.biophysical.passive_fitting.neuron_passive_fit_elec',
+                                                '-m', neuron_passive_fit_elec.__name__,
                                                 str(d['escape_t']),
                                                 str(d['bridge_avg']),
                                                 str(1.0),
