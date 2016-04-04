@@ -11,11 +11,11 @@ class NaturalScenes(OPAnalysis):
         self.sweeplength = self.stim_table.end.iloc[1] - self.stim_table.start.iloc[1]
         self.interlength = 3 * self.sweeplength
         self.extralength = self.sweeplength
-        self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
-        self.response = self.getResponse()
-        self.peak = self.getPeak()
+        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
+        self.response = self.get_response()
+        self.peak = self.get_peak()
         
-    def getResponse(self):
+    def get_response(self):
         print "Calculating mean responses"
         response = np.empty((self.number_scenes, self.numbercells+1, 3))
         def ptest(x):
@@ -29,7 +29,7 @@ class NaturalScenes(OPAnalysis):
             response[ns,:,2] = subset_pval.apply(ptest, axis=0)
         return response
     
-    def getPeak(self):    
+    def get_peak(self):    
         '''gets metrics about peak response, etc.'''
         print 'Calculating peak response properties'
         peak = pd.DataFrame(index=range(self.numbercells), columns=('scene_ns', 'response_variability_ns','peak_dff_ns', 'ptest_ns', 'p_run_ns', 'run_modulation_ns', 'time_to_peak_ns','duration_ns'))

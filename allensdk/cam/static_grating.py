@@ -20,13 +20,13 @@ class StaticGrating(OPAnalysis):
         self.number_ori = len(self.orivals)
         self.number_sf = len(self.sfvals)
         self.number_phase = len(self.phasevals)            
-        self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
-        self.response = self.getResponse()
-        self.peak = self.getPeak()
-        #self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.getSpeedTuning(binsize=200)
+        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
+        self.response = self.get_response()
+        self.peak = self.get_peak()
+        #self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.get_speed_tuning(binsize=200)
         
 #    
-    def getResponse(self):
+    def get_response(self):
 #        if self.h5path != None:
 #            response = op.loadh5(self.h5path, 'response')
         print "Calculating mean responses"
@@ -53,7 +53,7 @@ class StaticGrating(OPAnalysis):
 #        blank[:,2] = subset_pval.apply(ptest, axis=0)
         return response#, blank
     
-    def getPeak(self):    
+    def get_peak(self):    
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_variability_sg','osi_sg','peak_dff_sg','ptest_sg','time_to_peak_sg','duration_sg'))

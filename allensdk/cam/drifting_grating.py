@@ -16,11 +16,11 @@ class DriftingGrating(OPAnalysis):
         self.tfvals = np.unique(self.stim_table.temporal_frequency).astype(int)
         self.number_ori = len(self.orivals)
         self.number_tf = len(self.tfvals)            
-        self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
-        self.response = self.getResponse()
-        self.peak = self.getPeak()
+        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
+        self.response = self.get_response()
+        self.peak = self.get_peak()
     
-    def getResponse(self):
+    def get_response(self):
         print "Calculating mean responses"
         response = np.empty((self.number_ori, self.number_tf, self.numbercells+1, 3))
         def ptest(x):
@@ -37,7 +37,7 @@ class DriftingGrating(OPAnalysis):
                 response[ori_pt, tf_pt, :, 2] = subset_pval.apply(ptest, axis=0)
         return response
     
-    def getPeak(self):
+    def get_peak(self):
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_variability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
