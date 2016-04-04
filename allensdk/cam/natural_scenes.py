@@ -17,8 +17,11 @@ import scipy.stats as st
 import numpy as np
 import pandas as pd
 from allensdk.cam.o_p_analysis import OPAnalysis
+import logging
 
 class NaturalScenes(OPAnalysis):
+    _log = logging.getLogger('allensdk.cam.natural_scenes')    
+    
     def __init__(self, cam_analysis, **kwargs):
         super(NaturalScenes, self).__init__(cam_analysis, **kwargs)
         self.stim_table = self.cam_analysis.nwb.get_stimulus_table('natural_scenes')        
@@ -31,8 +34,10 @@ class NaturalScenes(OPAnalysis):
         self.peak = self.getPeak()
         
     def getResponse(self):
-        print "Calculating mean responses"
+        NaturalScenes._log.info("Calculating mean responses")
+        
         response = np.empty((self.number_scenes, self.numbercells+1, 3))
+        
         def ptest(x):
             return len(np.where(x<(0.05/(self.number_scenes-1)))[0])
             
@@ -42,11 +47,14 @@ class NaturalScenes(OPAnalysis):
             response[ns,:,0] = subset_response.mean(axis=0)
             response[ns,:,1] = subset_response.std(axis=0)/np.sqrt(len(subset_response))
             response[ns,:,2] = subset_pval.apply(ptest, axis=0)
+        
         return response
+    
     
     def getPeak(self):    
         '''gets metrics about peak response, etc.'''
-        print 'Calculating peak response properties'
+        NaturalScenes._log.info('Calculating peak response properties')
+        
         peak = pd.DataFrame(index=range(self.numbercells), columns=('Scene', 'response_variability','peak_DFF', 'ptest', 'p_run', 'run_modulation', 'time_to_peak','duration'))
 
         for nc in range(self.numbercells):
@@ -55,7 +63,6 @@ class NaturalScenes(OPAnalysis):
             peak.response_variability[nc] = self.response[nsp+1,nc,2]/0.50 #assume 50 trials
             peak.peak_DFF[nc] = self.response[nsp+1,nc,0]
             subset = self.mean_sweep_response[self.stim_table.frame==nsp]
-#            blank = self.mean_sweep_response[self.stim_table.frame==-1]
             subset_stat = subset[subset.dx<2]
             subset_run = subset[subset.dx>=2]
             if (len(subset_run)>5) & ( len(subset_stat)>5):

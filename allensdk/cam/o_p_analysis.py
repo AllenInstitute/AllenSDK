@@ -16,12 +16,13 @@
 import scipy.stats as st
 import numpy as np
 import pandas as pd
-import time
-import os
+import time, os, logging
 
 from allensdk.cam.findlevel import findlevel
 
 class OPAnalysis(object):
+    _log = logging.getLogger('allensdk.cam.o_p_analysis')    
+    
     def __init__(self, cam_analysis,
                  **kwargs):
         self.cam_analysis = cam_analysis
@@ -31,13 +32,13 @@ class OPAnalysis(object):
         self.numbercells = len(self.celltraces)                         #number of cells in dataset       
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
         self.dxcm, self.dxtime = self.cam_analysis.nwb.get_running_speed()        
-#        self.celltraces_dff = self.getGlobalDFF(percentiletosubtract=8)
-#        self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.getSpeedTuning(binsize=400)
     
+        
     def getGlobalDFF(self, percentiletosubtract=8):
         '''does a global DF/F using a sliding window (+/- 15 s) baseline subtraction followed by Fo=peak of histogram'''
         '''replace when DF/F added to nwb file'''        
-        print "Calculating global DF/F ... this can take some time"
+        OPAnalysis._log.info("Calculating global DF/F ... this can take some time")
+        
         startTime = time.time()
         celltraces_dff = np.zeros(self.celltraces.shape)
         for i in range(450):
@@ -47,20 +48,22 @@ class OPAnalysis(object):
         for i in range(np.size(self.celltraces,1)-450, np.size(self.celltraces,1)):
             celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,(i-450):], percentiletosubtract, axis=1)
 
-        print "we're still here"
+        OPAnalysis._log.info("we're still here")
         for cn in range(self.numbercells):
             (val, edges) = np.histogram(celltraces_dff[cn,:], bins=200)
             celltraces_dff[cn,:] /= edges[np.argmax(val)+1]
             celltraces_dff[cn,:] -= 1
             celltraces_dff[cn,:] *= 100
         elapsedTime = time.time() - startTime
-        print "Elapsed Time:", str(elapsedTime)
+        OPAnalysis._log.info("Elapsed Time:", str(elapsedTime))
+        
         return celltraces_dff
     
     def getSpeedTuning(self, binsize):
-        print 'Calculating speed tuning, spontaneous vs visually driven'
+        OPAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')
         celltraces_trimmed = np.delete(self.celltraces_dff, range(len(self.dxcm), np.size(self.celltraces_dff,1)), axis=1) 
-        #pull out spontaneous epoch(s)        
+
+        # pull out spontaneous epoch(s)        
         spontaneous = self.cam_analysis.nwb.get_stimulus_table('spontaneous')
 
         peak_run = pd.DataFrame(index=range(self.numbercells), columns=('speed_max_sp','speed_min_sp','ptest_sp', 'mod_sp','speed_max_vis','speed_min_vis','ptest_vis', 'mod_vis'))
@@ -221,11 +224,7 @@ class OPAnalysis(object):
             (_, p) = st.f_oneway(x[:self.interlength], x[self.interlength:self.interlength+self.sweeplength+self.extralength])
             return p
             
-#        if self.h5path != None:
-#            sweep_response = pd.read_hdf(self.h5path, 'sweep_response')
-#            mean_sweep_response = pd.read_hdf(self.h5path, 'mean_sweep_response')
-#        else:
-        print 'Calculating responses for each sweep'        
+        OPAnalysis._log.info('Calculating responses for each sweep')        
         sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(range(self.numbercells+1)).astype(str))
         sweep_response.rename(columns={str(self.numbercells) : 'dx'}, inplace=True)
         for index, row in self.stim_table.iterrows():
@@ -258,8 +257,9 @@ class OPAnalysis(object):
             ptest.append(p)
         ptest = np.array(ptest)
         cells = list(np.where(ptest<0.01)[0])
-        print "# cells: " + str(len(ptest))
-        print "# significant cells: " + str(len(cells))
+        OPAnalysis._log.info("# cells: " + str(len(ptest)))
+        OPAnalysis._log.info("# significant cells: " + str(len(cells)))
+        
         return ptest, cells
     
     def Ptest(self):

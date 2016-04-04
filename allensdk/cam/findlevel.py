@@ -21,9 +21,6 @@ def findlevelbuffer(inwave, threshold, direction, endbuffer):
     inwave = append(inwave,endbuffer)
     temp = findlevel(inwave, threshold, direction)
     return (temp-1)
-#    for i in range(1,(size(inwave))):
-#        if (inwave[i]) >= threshold and (inwave[(i-1)]) < threshold:            
-#            return i-1
     
 
 def findlevel(inwave, threshold, direction='both'):
@@ -78,45 +75,3 @@ def findlevels_OLD(inwave, threshold, window, direction='both'):
         levels = np.delete(crossings, duplicates)
     
     return levels
-
-
-            
-            
-            
-#def findlevelsold(inwave, threshold, window):
-#    '''script to find a multiple threshold crossing'''
-#    '''as written, window in points, not time'''
-#    levels = []
-#    i = 1
-#    while i < size(inwave):
-#        if (inwave[i]) >= threshold and (inwave[(i-1)]) < threshold:            
-#            levels.append(i)
-#            i += window
-#        else:
-#            i += 1
-#    return levels
-#       
-#def findlevelsolddown(inwave, threshold, window):
-#    '''script to find a multiple downward threshold crossing'''
-#    '''as written, window in points, not time'''
-#    levels = []
-#    i = 1
-#    while i < size(inwave):
-#        if (inwave[i]) <= threshold and (inwave[(i-1)]) > threshold:            
-#            levels.append(i)
-#            i += window
-#        else:
-#            i += 1
-#    return levels
-#
-#def findlevelold(inwave, threshold):
-#    '''script to find a single upward threshold crossing'''
-#    for i in range(0,(size(inwave))):
-#        if np.logical_and(((inwave[i]) >= threshold),((inwave[(i-1)]) < threshold)):            
-#            return i
-#
-#def findlevelolddown(inwave, threshold):
-#    '''script to find a single downward threshold crossing'''
-#    for i in range(0,(size(inwave)-1)):
-#        if inwave[i] <= threshold and inwave[(i-1)] > threshold:
-#            return i

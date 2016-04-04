@@ -81,7 +81,8 @@ class LocallySN(OPAnalysis):
         self.receptive_field = self.getReceptiveField()
         
     def getReceptiveField(self):
-        print "Calculating mean responses"
+        MovieAnalysis._log.info("Calculating mean responses")
+        
         receptive_field = np.empty((16, 28, self.numbercells+1, 2))
 
         for xp in range(16):

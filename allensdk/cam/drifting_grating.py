@@ -18,8 +18,11 @@ import scipy.stats as st
 import pandas as pd
 import numpy as np
 from math import sqrt
+import logging
 
-class DriftingGrating(OPAnalysis):    
+class DriftingGrating(OPAnalysis):
+    _log = logging.getLogger('allensdk.cam.drifting_grating')    
+
     def __init__(self, cam_analysis, **kwargs):
         super(DriftingGrating, self).__init__(cam_analysis, **kwargs)                   
         stimulus_table = self.cam_analysis.nwb.get_stimulus_table('drifting_gratings')
@@ -36,7 +39,8 @@ class DriftingGrating(OPAnalysis):
         self.peak = self.getPeak()
     
     def getResponse(self):
-        print "Calculating mean responses"
+        DriftingGrating._log.info("Calculating mean responses")
+        
         response = np.empty((self.number_ori, self.number_tf, self.numbercells+1, 3))
         def ptest(x):
             return len(np.where(x<(0.05/(8*5)))[0])
@@ -54,7 +58,8 @@ class DriftingGrating(OPAnalysis):
     
     def getPeak(self):
         '''finds the peak response for each cell'''
-        print 'Calculating peak response properties'
+        DriftingGrating._log.info('Calculating peak response properties')
+        
         peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','TF','response_variability_dg','OSI_dg','DSI','peak_DFF_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
 
         for nc in range(self.numbercells):

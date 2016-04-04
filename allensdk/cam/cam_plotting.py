@@ -17,110 +17,17 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import numpy as np
 import pandas as pd
-import os
+import os, logging
 from numpy import arange
-
-#def plot_Drifting_Grating_All(self):
-#    '''saves figures for each cell showing ori and tf tuning'''
-#    print "Plotting Ori and TF tuning curves for all cells"
-#    for nc in range(self.numbercells):
-#        if np.mod(nc,100)==0:
-#            print "Cell #", str(nc)
-##            peak = np.where(self.response[:,:,nc,0] == np.nanmax(self.response[:,:,nc,0]))
-#        peakori = self.peak['Ori'][nc]#peak[0][0]
-#        peaktf = self.peak['TF'][nc]#peak[1][0]
-#        rv = self.peak['response_variability'][nc]#self.response[peakori, peaktf, nc, 2]/0.15
-#        subset = self.sweep_response[(self.stim_table['Ori']==self.orivals[peakori])&(self.stim_table['TF']==self.tfvals[peaktf])]
-#        plt.figure(nc, figsize=(14,14))
-#        ax1 = plt.subplot2grid((3,4), (0,0), colspan=3)
-#        ax6 = plt.subplot2grid((3,4), (0,3))
-#        ax2 = plt.subplot2grid((3,4), (1,0))
-#        ax3 = plt.subplot2grid((3,4), (1,1))
-#        ax4 = plt.subplot2grid((3,4), (1,2))
-#        ax7 = plt.subplot2grid((3,4), (1,3))
-#        ax5 = plt.subplot2grid((3,4), (2,0), colspan=2)
-#        
-#        ax1.plot(self.celltraces[nc,:])        #first point is absurdly large for all traces
-#        ax1.set_xlabel("Time (s)", fontsize=20)
-#        ax1.set_ylabel("Fluorescence", fontsize=20)
-#        
-#        ax6.hist(self.celltraces[nc,:], bins=70)
-#        ax6.set_yscale('log')
-#        ax6.set_xlabel("Fluorescence", fontsize=20)
-#        ax6.set_ylabel("Count", fontsize=20)
-#        
-#        ax2.errorbar(self.orivals, self.response[:,peaktf,nc,0], yerr=self.response[:,peaktf,nc,1], fmt='b.-', lw=2)
-#        ax2.fill_between(self.orivals, np.repeat(self.response[0,0,nc,0]+self.response[0,0,nc,1], self.number_ori), np.repeat(self.response[0,0,nc,0]-self.response[0,0,nc,1], self.number_ori), color='gray', alpha=0.5)
-#        ax2.axhline(y=self.response[0,0,nc,0], ls='--', color='k')
-#        ax2.annotate(str(self.tfvals[peaktf]) + " Hz", xy=(0,0.9), xycoords='axes fraction', fontsize=14)
-#        ax2.set_xtick = (self.orivals)
-#        ax2.set_xlabel("Orientation (deg)", fontsize=20)
-#        ax2.set_ylabel("Mean DF/F (%)", fontsize=20)
-#        ax2.yaxis.set_major_locator(MaxNLocator(6))
-#        
-#        ax3.errorbar(self.tfvals[1:], self.response[peakori,1:,nc,0], yerr=self.response[peakori,1:,nc,1], fmt='b.-', lw=2)
-#        ax3.fill_between(self.tfvals[1:], np.repeat(self.response[0,0,nc,0]+self.response[0,0,nc,1], self.number_tf-1), np.repeat(self.response[0,0,nc,0]-self.response[0,0,nc,1], self.number_tf-1), color='gray', alpha=0.5)
-#        ax3.axhline(y=self.response[0,0,nc,0], ls='--', color='k')  
-#        ax3.annotate(str(self.orivals[peakori]) + " Deg", xy=(0,0.9), xycoords='axes fraction', fontsize=14)
-#        ax3.set_xticks = (self.tfvals[1:])
-#        ax3.set_xlabel("Temporal frequency (Hz)", fontsize=20)
-#        ax3.yaxis.set_major_locator(MaxNLocator(6))
-#        
-#        im = ax4.imshow(self.response[:,1:,nc,0], cmap='gray', interpolation='none')
-#        ax4.set_ylabel("Ori", fontsize=16)
-#        ax4.set_xlabel("TF", fontsize=16)
-#        ax4.set_yticks(range(self.number_ori))
-#        ax4.set_yticklabels(list(self.orivals.astype(int).astype(str)))
-#        ax4.set_xticks(range(self.number_tf-1))
-#        ax4.set_xticklabels(list(self.tfvals[1:].astype(int).astype(str)))
-#        cbar = plt.colorbar(im, ax=ax4)
-#        cbar.ax.set_ylabel('DF/F (%)', fontsize=8)
-#        for t in cbar.ax.get_yticklabels():
-#            t.set_fontsize(8)
-#            
-##            ax7.errorbar(self.binned_dx[:,0], self.binned_cells[nc,:,0], yerr=self.binned_cells[nc,:,1], fmt='.')
-##            ax7.set_xlabel("Speed (cm/s)", fontsize=16)
-##            ax7.set_ylabel("DF/F", fontsize=16)
-##                
-#        xtime = arange(-1*self.interlength/self.acquisition_rate, (self.sweeplength+self.interlength)/self.acquisition_rate, 1/self.acquisition_rate)
-#        for index, row in subset.iterrows():
-#            try:
-#                ax5.plot(xtime, subset[str(nc)][index], lw=2)
-#            except:
-#                ax5.plot(xtime[:-1], subset[str(nc)][index], lw=2)
-#                print "trace not long enough, cell: ", str(nc)
-#        ax5.set_xlim(-1,3)
-#        ax5.annotate(str(self.orivals[peakori])+" Deg / "+str(self.tfvals[peaktf])+" Hz", xy=(0,0.9), xycoords='axes fraction', fontsize=14)
-#        ax5.set_xlabel("Time (s)", fontsize=20)
-#        ax5.set_ylabel("DF/F (%)", fontsize=20)
-#        ax5.axvspan(0, self.sweeplength/self.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
-#        ax5.yaxis.set_major_locator(MaxNLocator(6))
-#        ax5.set_title("Trial responses to prefered ori/tf", fontsize=20)            
-#        
-#        plt.tick_params(labelsize=16)    
-#        plt.tight_layout()
-#        if self.ptest[nc]<0.01:
-#            plt.suptitle("Cell " + str(nc+1) + " Significant", fontsize=20)
-#        else:
-#            plt.suptitle("Cell " + str(nc+1), fontsize=20)
-#        plt.figtext(0.7, 0.3, "PeakOri: " + str(self.orivals[peakori]) + " Deg / PeakTF: " + str(self.tfvals[peaktf]) + " Hz")
-#        plt.figtext(0.7, 0.27, "OSI: " + str(round(self.peak['OSI'][nc],2)))
-#        plt.figtext(0.7, 0.24, "DSI: " + str(round(self.peak['DSI'][nc],2)))                        
-#        plt.figtext(0.7, 0.21, "p = " + str(self.ptest[nc]))
-#        plt.figtext(0.7, 0.18, "% significant trials at peak:" + str(round(rv,2)))
-#        filename = 'Cell_'+str(nc+1)+'.png'
-#        fullfilename = os.path.join(self.save_dir, filename) 
-#        plt.savefig(fullfilename)   
-#        plt.close()
 
 def plot_Drifting_grating_Traces(self):
     '''saves figures with a Ori X TF grid of mean resposes'''
-    print "Plotting Ori and TF mean response for all cells"
+    logging.info("Plotting Ori and TF mean response for all cells")
     
     blank =  self.sweep_response[self.stim_table.temporal_frequency==0]          
     for nc in range(self.numbercells):
         if np.mod(nc,100)==0:
-            print "Cell #", str(nc)
+            logging.info("Cell #", str(nc))
         xtime = np.arange(-1*self.interlength/self.acquisition_rate, (self.sweeplength+self.interlength)/self.acquisition_rate, 1/self.acquisition_rate)
         plt.figure(nc, figsize=(20,16))
         vmax=0
@@ -155,9 +62,9 @@ def plot_Drifting_grating_Traces(self):
                 except:
                     pass
                 try:
-                	ax.plot(xtime, subset_response[str(nc)].mean(), color='b', lw=2)
+                    ax.plot(xtime, subset_response[str(nc)].mean(), color='b', lw=2)
                 except:
-					pass
+                    pass
                 ax.plot(xtime, subset_response[str(nc)].mean(), color='b', lw=2)
                 #TODO: remove the [:119]  and [:-1] and the try/except                 
                 ax.plot(xtime, blank[str(nc)].mean(), color='k', lw=2)
@@ -167,9 +74,7 @@ def plot_Drifting_grating_Traces(self):
                 ax.yaxis.set_major_locator(MaxNLocator(4))                 
                 vmax = np.where(np.amax(subset_response_p)>vmax, np.amax(subset_response_p), vmax)
                 vmin = np.where(np.amin(subset_response_n)<vmin, np.amin(subset_response_n), vmin)                 
-                
-#                    vmax = np.where(np.amax(subset_response[str(nc)].mean())>vmax, np.amax(subset_response[str(nc)].mean()), vmax)
-#                    vmin = np.where(np.amin(subset_response[str(nc)].mean())<vmin, np.amin(subset_response[str(nc)].mean()), vmin)
+
                 if ori_pt<7:
                     ax.set_xticks([])
                 else:
@@ -193,143 +98,14 @@ def plot_Drifting_grating_Traces(self):
         plt.savefig(fullfilename)   
         plt.close()                 
 
-#def plot_RF_All(self):
-#    print "Plotting Receptive Fields for all cells"
-#    for sp in range(self.numbercells):
-#        if np.mod(sp,100)==0:
-#            print "Cell #", str(sp)
-#        vMax = np.where(amax(self.receptive_field[:,:,sp,0])>amax(self.receptive_field[:,:,sp,1]), amax(self.receptive_field[:,:,sp,0]), amax(self.receptive_field[:,:,sp,1]))
-#        vMin = np.where(amin(self.receptive_field[:,:,sp,0])<amin(self.receptive_field[:,:,sp,1]), amin(self.receptive_field[:,:,sp,0]), amin(self.receptive_field[:,:,sp,1]))
-#        plt.figure(sp, figsize=(14,14))
-#        ax1 = plt.subplot2grid((3,5), (0,0), colspan=4)
-#        ax6 = plt.subplot2grid((3,5), (0,4))
-#        ax2 = plt.subplot2grid((3,5), (1,0), colspan=2)
-#        ax3 = plt.subplot2grid((3,5), (1,2), colspan=2)
-#        ax4 = plt.subplot2grid((3,5), (2,0), colspan=2)
-#        ax5 = plt.subplot2grid((3,5), (2,2), colspan=2)
-#        ax7 = plt.subplot2grid((3,5), (1,4))
-#        
-#        xtime = np.arange(0,size(self.celltraces,1),1.)
-#        xtime /= self.acquisition_rate
-#        dif = np.ediff1d(self.stim_table.start.values, to_begin=8000, to_end=8000)
-#        test = np.argwhere(dif>5000)
-#        ax1.plot(xtime, self.celltraces[sp,:])        #first point is absurdly large for all traces
-#        for i in range(len(test)-1): 
-#            ax1.axvspan(xmin=(self.stim_table.start.iloc[test[i]].values/self.acquisition_rate), xmax=(self.stim_table.end.iloc[test[i+1]-1].values/self.acquisition_rate), color='gray', alpha=0.3)
-#        ax1.set_xlabel("Time (s)", fontsize=20)
-#        ax1.set_ylabel("Fluorescence", fontsize=20)
-#        
-#        
-#        ax6.hist(self.celltraces[sp,:], bins=70)
-#        ax6.set_yscale('log')
-#        ax6.set_xlabel("Fluorescence", fontsize=20)
-#        ax6.set_ylabel("Count", fontsize=20)
-#        
-#        try:
-#            ax7.errorbar(self.binned_dx[:,0], self.binned_cells[sp,:,0], yerr=self.binned_cells[sp,:,1], fmt='.')
-#            ax7.set_xlabel("Speed (cm/s)", fontsize=16)
-#            ax7.set_ylabel("DF/F", fontsize=16)
-#        except:
-#            pass
-#        
-#        imon = ax2.imshow(self.receptive_field[:,:,sp,0], cmap='gray', interpolation='None', vmin=vMin, vmax=vMax)
-#        ax2.set_title("ON", fontsize=20)
-#        ax2.set_xticks([])
-#        ax2.set_yticks([])
-#        cbar = plt.colorbar(imon, ax=ax2, fraction=0.046, pad=0.04)
-#        cbar.ax.set_ylabel('DF/F (%)', fontsize=10)
-#        for t in cbar.ax.get_yticklabels():
-#            t.set_fontsize(8)
-#        
-#        imoff = ax3.imshow(self.receptive_field[:,:,sp,1], cmap='gray', interpolation='None', vmin=vMin, vmax=vMax)
-#        ax3.set_title("OFF", fontsize=20)
-#        ax3.set_xticks([])
-#        ax3.set_yticks([])
-#        cbar = plt.colorbar(imoff, ax=ax3, fraction=0.046, pad=0.04)
-#        cbar.ax.set_ylabel('DF/F (%)', fontsize=10)
-#        for t in cbar.ax.get_yticklabels():
-#            t.set_fontsize(8)
-#            
-#        zon = (self.receptive_field[:,:,sp,0]-np.mean(self.receptive_field[:,:,sp,0]))/np.std(self.receptive_field[:,:,sp,0])
-#        zon = np.where(abs(zon)>2, zon, 0)
-#        Vmax_on = np.where(abs(amax(zon))>abs(amin(zon)), amax(zon), -1*amin(zon))
-#        zoff = (self.receptive_field[:,:,sp,1]-np.mean(self.receptive_field[:,:,sp,1]))/np.std(self.receptive_field[:,:,sp,1])
-#        zoff = np.where(abs(zoff)>2, zoff, 0)
-#        Vmax_off = np.where(abs(amax(zoff))>abs(amin(zoff)), amax(zoff), -1*amin(zoff))
-#        Vmax = np.where(Vmax_on>Vmax_off, Vmax_on, Vmax_off)
-#        imzon = ax4.imshow(zon, cmap='RdBu_r', interpolation='none', vmin=-1*Vmax, vmax=Vmax)
-#        ax4.set_title("On Z-score", fontsize=20)
-#        ax4.set_xticks([])
-#        ax4.set_yticks([])
-#        cbar = plt.colorbar(imzon, ax=ax4, fraction=0.046, pad=0.04)
-#        
-#        zoff = (self.receptive_field[:,:,sp,1]-np.mean(self.receptive_field[:,:,sp,1]))/np.std(self.receptive_field[:,:,sp,1])
-#        zoff = np.where(abs(zoff)>2, zoff, 0)
-#        imzoff = ax5.imshow(zoff, cmap='RdBu', interpolation='none', vmin=-1*Vmax, vmax=Vmax)
-#        ax5.set_title("Off Z-score", fontsize=20)
-#        ax5.set_xticks([])
-#        ax5.set_yticks([])
-#        cbar = plt.colorbar(imzoff, ax=ax5, fraction=0.046, pad=0.04)
-#        
-#        plt.tight_layout()
-#        plt.suptitle("Cell " + str(sp+1), fontsize=20)
-#        filename = 'Cell_'+str(sp+1)+'.png'
-#        fullfilename = os.path.join(self.save_dir, filename) 
-#        plt.savefig(fullfilename)   
-#        plt.close()
-#
-#def plot_Movie_All(self):
-#    print "Plotting movie responses" 
-#    xtime = np.arange(0, self.sweeplength/self.acquisition_rate, 1/self.acquisition_rate)       
-#    for nc in range(self.numbercells):
-#        if np.mod(nc,100)==0:
-#            print "Cell #", str(nc)
-#        plt.figure(nc, figsize=(20,16)) 
-#        ax1 = plt.subplot2grid((3,4), (0,0), colspan=3)
-#        ax2 = plt.subplot2grid((3,4), (0,3))
-#        ax3 = plt.subplot2grid((3,4), (1,0), colspan=3)
-#        ax4 = plt.subplot2grid((3,4), (1,3))
-#        ax5 = plt.subplot2grid((3,4), (2,0), colspan=3)
-#        
-#        ax1.plot(self.celltraces[nc,:])        
-#        ax1.axvspan(self.stim_table.start.min(), self.stim_table.end.max(), ymin=0, ymax=1, color='red', alpha=0.3)
-#        ax1.set_xlabel("Time (s)", fontsize=20)
-#        ax1.set_ylabel("Fluorescence", fontsize=20) 
-#        
-#        ax2.hist(self.celltraces[nc,:], bins=70)
-#        ax2.set_yscale('log')
-#        ax2.set_xlabel("Fluorescence", fontsize=20)
-#        ax2.set_ylabel("Count", fontsize=20)
-#        
-#        for index, row in self.sweep_response.iterrows():
-#            ax3.plot(xtime, self.sweep_response[str(nc)][index], lw=2)
-#        ax3.set_xlabel("Time (s)", fontsize=20)
-#        ax3.set_ylabel("DF/F", fontsize=20)
-#        
-#        #ax4 for running tuning
-#        
-#        temp = np.empty((len(self.stim_table), self.sweeplength))
-#        for i in range(len(self.stim_table)):
-#            temp[i,:] = self.sweep_response[str(nc)].iloc[i]
-#        ax5.imshow(temp, cmap='gray', interpolation='none', aspect=40)
-#        ax5.set_ylabel("Trials", fontsize=20)
-#        ax5.set_xticks([])
-#        
-#        
-#        plt.tick_params(labelsize=16)    
-#        plt.tight_layout()
-#        filename = 'Cell_'+str(nc+1)+'_Movie_1.png'
-#        fullfilename = os.path.join(self.save_dir, filename) 
-#        plt.savefig(fullfilename)   
-#        plt.close()
 
 def plot_NS_Traces(self):
-    print "Plotting Natural Scene traces for each cell"
+    logging.info("Plotting Natural Scene traces for each cell")
     xtime = np.arange(-1*self.interlength/self.acquisition_rate, (self.sweeplength+self.interlength)/self.acquisition_rate, 1/self.acquisition_rate)
     blank =  self.sweep_response[self.stim_table.frame==-1]       
     for nc in range(self.numbercells):
         if np.mod(nc,100)==0:
-            print "Cell #", str(nc)
+            logging.info("Cell #", str(nc))
         vmax=0
         vmin=0
         blank_p =  blank[str(nc)].mean() + (blank[str(nc)].std()/len(blank[str(nc)]))
@@ -368,12 +144,12 @@ def plot_NS_Traces(self):
         plt.close()                
 
 def plot_SG_Traces(self):
-    print "Plotting Static Grating traces for each cell"
+    logging.info("Plotting Static Grating traces for each cell")
     xtime = np.arange(-1*self.interlength/self.acquisition_rate, (self.sweeplength+self.interlength)/self.acquisition_rate, 1/self.acquisition_rate)     
     blank = self.sweep_response[self.stim_table.spatial_frequency==0]
     for nc in range(self.numbercells):
         if np.mod(nc,100)==0:
-            print "Cell #", str(nc)
+            logging.info("Cell #", str(nc))
         vmax=0
         vmin=0
         blank_p =  blank[str(nc)].mean() + (blank[str(nc)].std()/len(blank[str(nc)]))
@@ -430,17 +206,19 @@ def plot_SG_Traces(self):
         plt.close()                
 
 def plot_LSN_Traces(self):
-    print "Plotting LSN traces for all cells"
+    logging.info("Plotting LSN traces for all cells")
     xtime = np.arange(-1*self.sweeplength/self.acquisition_rate, (2*self.sweeplength)/self.acquisition_rate, 1/self.acquisition_rate)
     while len(xtime)>(3*self.sweeplength):
         xtime = np.delete(xtime, -1)
     for nc in range(self.numbercells):
         if np.mod(nc,100)==0:
-            print "Cell #", str(nc)
+            logging.info("Cell #", str(nc))
+            
         plt.figure(nc, figsize=(24,20))
         vmax=0
         vmin=0
         one_cell = self.sweep_response[str(nc)]
+        
         for yp in range(16):
             for xp in range(28):
                 sp_pt = (yp*28)+xp+1
@@ -448,8 +226,7 @@ def plot_LSN_Traces(self):
                 off_frame = np.where(self.LSN[:,yp,xp]==0)[0]
                 subset_on = one_cell[self.stim_table.frame.isin(on_frame)]
                 subset_off = one_cell[self.stim_table.frame.isin(off_frame)]
-#                subset_on = one_cell.iloc[on_frame]
-#                subset_off = one_cell.iloc[off_frame]
+
                 ax = plt.subplot(16,28,sp_pt)
                 ax.plot(xtime, subset_on.mean(), color='r', lw=2)
                 ax.plot(xtime, subset_off.mean(), color='b', lw=2)
@@ -460,6 +237,7 @@ def plot_LSN_Traces(self):
                 vmin = np.where(np.amin(subset_off.mean())<vmin, np.amin(subset_off.mean()), vmin)
                 ax.set_xticks([])
                 ax.set_yticks([])
+                
         for i in range(1,sp_pt+1):
             ax = plt.subplot(16,28,i)
             ax.set_ylim(vmin, vmax)
@@ -474,10 +252,10 @@ def plot_LSN_Traces(self):
 
 
 def plot_3SA(dg, nm1, nm3):
-    print "Plotting for all cell"
+    logging.info("Plotting for all cell")
     for nc in range(dg.numbercells):
         if np.mod(nc,100)==0:
-            print "Cell #", str(nc)
+            logging.info("Cell #", str(nc))
         plt.figure(nc, figsize=(20,20))
         ax1 = plt.subplot2grid((6,6), (0,0), colspan=4) #full trace
         ax2 = plt.subplot2grid((6,6), (0,4))            #histogram of F
@@ -625,10 +403,11 @@ def plot_3SA(dg, nm1, nm3):
         plt.close()      
 
 def plot_3SC(lsn, nm1, nm2):
-    print "Plotting for all cells"
+    logging.info("Plotting for all cells")
     for nc in range(lsn.numbercells):
         if np.mod(nc,100)==0:
-            print "Cell #", str(nc)
+            logging.info("Cell #", str(nc))
+                         
         plt.figure(nc, figsize=(20,20)) 
         ax1 = plt.subplot2grid((6,6), (0,0), colspan=4) #full trace
         ax2 = plt.subplot2grid((6,6), (0,4))            #histogram of F
@@ -764,10 +543,10 @@ def plot_3SC(lsn, nm1, nm2):
         plt.close()
 
 def plot_3SB(sg, nm1, ns):
-    print "Plotting for all cells"
+    logging.info("Plotting for all cells")
     for nc in range(sg.numbercells):
         if np.mod(nc,100)==0:
-            print "Cell #", str(nc)
+            logging.info("Cell #", str(nc))
         plt.figure(nc, figsize=(20,24)) 
         ax1 = plt.subplot2grid((6,6), (0,0), colspan=4) #full trace
         ax2 = plt.subplot2grid((6,6), (0,4))            #histogram of F
@@ -812,26 +591,6 @@ def plot_3SB(sg, nm1, ns):
         ax15.plot(xtime, sg.dxcm, color='k')
         ax15.set_xlabel("Time (s)", fontsize=20)
         ax15.set_xlabel("Speed (cm/s)", fontsize=20)
-
-        # TODO: investigate why sg.binned_.... aren't computed        
-#         smax = sg.binned_cells_sp[nc,np.argmax(sg.binned_cells_sp[nc,:,0]),0] + sg.binned_cells_sp[nc,np.argmax(sg.binned_cells_sp[nc,:,0]),1]
-#         vmax = sg.binned_cells_vis[nc,np.argmax(sg.binned_cells_vis[nc,:,0]),0] + sg.binned_cells_vis[nc,np.argmax(sg.binned_cells_vis[nc,:,0]),1]
-#         rmax = np.where(smax>vmax, smax, vmax)
-#         smin = sg.binned_cells_sp[nc,np.argmin(sg.binned_cells_sp[nc,:,0]),0] - sg.binned_cells_sp[nc,np.argmin(sg.binned_cells_sp[nc,:,0]),1]
-#         vmin = sg.binned_cells_vis[nc,np.argmin(sg.binned_cells_vis[nc,:,0]),0] - sg.binned_cells_vis[nc,np.argmin(sg.binned_cells_vis[nc,:,0]),1]
-#         rmin = np.where(smin<vmin, smin, vmin)        
-#         
-#         ax14.errorbar(sg.binned_dx_sp[:,0], sg.binned_cells_sp[nc,:,0], yerr=sg.binned_cells_sp[nc,:,1], fmt='.', color='k')
-#         ax14.set_ylim(rmin, rmax)        
-#         ax14.set_xlabel("Speed (cm/s)", fontsize=20)
-#         ax14.set_ylabel("DF/F", fontsize=20)
-#         ax14.set_title("Spontaneous", fontsize=20)
-#         
-#         ax16.errorbar(sg.binned_dx_vis[:,0], sg.binned_cells_vis[nc,:,0], yerr=sg.binned_cells_vis[nc,:,1], fmt='.')
-#         ax16.set_ylim(rmin, rmax)        
-#         ax16.set_xlabel("Speed (cm/s)", fontsize=20)
-#         ax16.set_ylabel("DF/F", fontsize=20)
-#         ax16.set_title("Visual Stimuli", fontsize=20)
         
         peakori = sg.peak.Ori[nc]
         peaksf = sg.peak.SF[nc]
@@ -972,7 +731,7 @@ def plot_3SB(sg, nm1, ns):
 
 def ExperimentSummary(self, experiment_id):
     '''saves figure with summary statistics for experiment'''
-    print "Plotting experiment summary"
+    logging.info("Plotting experiment summary")
     plt.figure(1, figsize=(20,16))
     ax1 = plt.subplot(331)
     ax2 = plt.subplot(332)
@@ -1042,7 +801,7 @@ def ExperimentSummary(self, experiment_id):
         
 
 def plot_Running_A(dg, nm1, nm3):
-    print "Plotting running data summary"
+    logging.info("Plotting running data summary")
     nc = -1
     plt.figure(1, figsize=(10,8))
     ax1 = plt.subplot2grid((4,4),(0,0), colspan=3)
