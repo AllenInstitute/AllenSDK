@@ -54,9 +54,16 @@ class DriftingGrating(OPAnalysis):
             orth2 = self.response[np.mod(prefori-2, 8), preftf, nc, 0]
             orth = (orth1+orth2)/2
             null = self.response[np.mod(prefori+4, 8), preftf, nc, 0]
+<<<<<<< HEAD
+            peak.OSI_dg.iloc[nc] = (pref-orth)/(pref+orth)
+#            peak.OSI_dg.iloc[nc]
+            peak.DSI.iloc[nc] = (pref-null)/(pref+null)
+            peak.peak_DFF_dg.iloc[nc] = pref
+=======
             peak.osi_dg.iloc[nc] = (pref-orth)/(pref+orth)
             peak.dsi_dg.iloc[nc] = (pref-null)/(pref+null)
             peak.peak_dff_dg.iloc[nc] = pref
+>>>>>>> e370880df134a29d763b83ec866b8ae90b9164b1
             
             groups = []
             for ori in self.orivals:
