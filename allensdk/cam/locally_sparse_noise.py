@@ -5,7 +5,7 @@ from allensdk.cam.o_p_analysis import OPAnalysis
 
 class LocallySparseNoise(OPAnalysis):    
     def __init__(self, cam_analysis, **kwargs):
-        super(LocallySN, self).__init__(cam_analysis, **kwargs)        
+        super(LocallySparseNoise, self).__init__(cam_analysis, **kwargs)        
         self.stim_table = self.cam_analysis.nwb.get_stimulus_table('locally_sparse_noise')
         self.LSN = self.cam_analysis.nwb.get_stimulus_template('locally_sparse_noise')
         self.sweeplength = self.stim_table['end'][1] - self.stim_table['start'][1]

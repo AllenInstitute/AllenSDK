@@ -9,7 +9,7 @@ class NaturalScenes(OPAnalysis):
         self.stim_table = self.cam_analysis.nwb.get_stimulus_table('natural_scenes')        
         self.number_scenes = len(np.unique(self.stim_table.frame))
         self.sweeplength = self.stim_table.end.iloc[1] - self.stim_table.start.iloc[1]
-        self.interlength = 3 * self.sweeplength
+        self.interlength = 4 * self.sweeplength
         self.extralength = self.sweeplength
         self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
         self.response = self.get_response()
