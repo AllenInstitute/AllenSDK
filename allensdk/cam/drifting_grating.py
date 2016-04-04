@@ -60,7 +60,7 @@ class DriftingGrating(OPAnalysis):
             CV_top = np.empty((8))
             for i in range(8):
                 CV_top[i] = (tuning[i]*np.exp(1j*2*orivals_rad[i])).real
-            peak.cv_dg.iloc[nc] = CV_top.sum()/tuning.sum()
+            peak.cv_dg.iloc[nc] = np.abs(CV_top.sum()/tuning.sum())
             
             peak.osi_dg.iloc[nc] = (pref-orth)/(pref+orth) 
             peak.dsi_dg.iloc[nc] = (pref-null)/(pref+null)

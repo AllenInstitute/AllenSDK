@@ -233,34 +233,4 @@ class OPAnalysis(object):
         pval = sweep_response.applymap(doPvalue)
         return sweep_response, mean_sweep_response, pval            
         
-    def testPtest(self):
-        '''running new ptest'''
-        test = pd.DataFrame(index=self.sweeptable.index.values, columns=np.array(range(self.numbercells)).astype(str))
-        for nc in range(self.numbercells):        
-            for index, row in self.sweeptable.iterrows():
-                ori=row['Ori']
-                tf=row['TF']
-                test[str(nc)][index] = self.mean_sweep_response[(self.sync_table['TF']==tf)&(self.sync_table['Ori']==ori)][str(nc)]
-        ptest = []
-        for nc in range(self.numbercells):
-            groups = []
-            for index,row in test.iterrows():
-                groups.append(test[str(nc)][index])
-                (_,p) = st.f_oneway(*groups)
-            ptest.append(p)
-        ptest = np.array(ptest)
-        cells = list(np.where(ptest<0.01)[0])
-        print "# cells: " + str(len(ptest))
-        print "# significant cells: " + str(len(cells))
-        return ptest, cells
-    
-    def Ptest(self):
-        ptest = np.empty((self.numbercells))
-        for nc in range(self.numbercells):
-            groups = []
-            for ori in self.orivals:
-                for tf in self.tfvals:
-                    groups.append(self.mean_sweep_response[(self.stim_table.temporal_frequency==tf)&(self.stim_table.orientation==ori)][str(nc)])
-            _,p = st.f_oneway(*groups)
-            ptest[nc] = p
-        return ptest
+
