@@ -40,8 +40,9 @@ class DriftingGrating(OPAnalysis):
     def get_peak(self):
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_variability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_variability_dg','cv_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
 
+        orivals_rad = np.deg2rad(self.orivals)
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,nc,0] == np.nanmax(self.response[:,1:,nc,0]))
             prefori = cell_peak[0][0]
@@ -54,16 +55,16 @@ class DriftingGrating(OPAnalysis):
             orth2 = self.response[np.mod(prefori-2, 8), preftf, nc, 0]
             orth = (orth1+orth2)/2
             null = self.response[np.mod(prefori+4, 8), preftf, nc, 0]
-<<<<<<< HEAD
-            peak.OSI_dg.iloc[nc] = (pref-orth)/(pref+orth)
-#            peak.OSI_dg.iloc[nc]
-            peak.DSI.iloc[nc] = (pref-null)/(pref+null)
-            peak.peak_DFF_dg.iloc[nc] = pref
-=======
-            peak.osi_dg.iloc[nc] = (pref-orth)/(pref+orth)
+            
+            tuning = self.response[:, preftf, nc, 0]                
+            CV_top = np.empty((8))
+            for i in range(8):
+                CV_top[i] = (tuning[i]*np.exp(1j*2*orivals_rad[i])).real
+            peak.cv_dg.iloc[nc] = CV_top.sum()/tuning.sum()
+            
+            peak.osi_dg.iloc[nc] = (pref-orth)/(pref+orth) 
             peak.dsi_dg.iloc[nc] = (pref-null)/(pref+null)
             peak.peak_dff_dg.iloc[nc] = pref
->>>>>>> e370880df134a29d763b83ec866b8ae90b9164b1
             
             groups = []
             for ori in self.orivals:
