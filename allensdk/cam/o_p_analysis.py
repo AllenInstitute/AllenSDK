@@ -5,6 +5,7 @@ import time
 import os
 
 from allensdk.cam.findlevel import findlevel
+from cam_exceptions import CamAnalysisException
 
 class OPAnalysis(object):
     def __init__(self, cam_analysis,
@@ -16,10 +17,16 @@ class OPAnalysis(object):
         self.numbercells = len(self.celltraces)                         #number of cells in dataset       
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
         self.dxcm, self.dxtime = self.cam_analysis.nwb.get_running_speed()        
-#        self.celltraces_dff = self.getGlobalDFF(percentiletosubtract=8)
-#        self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.getSpeedTuning(binsize=400)
-    
-    def getGlobalDFF(self, percentiletosubtract=8):
+#        self.celltraces_dff = self.get_global_dff(percentiletosubtract=8)
+#        self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.get_speed_tuning(binsize=400)
+
+    def get_response(self):
+        raise CamAnalysisException("get_response not implemented")
+
+    def get_peak(self):
+        raise CamAnalysisException("get_peak not implemented")
+
+    def get_global_dff(self, percentiletosubtract=8):
         '''does a global DF/F using a sliding window (+/- 15 s) baseline subtraction followed by Fo=peak of histogram'''
         '''replace when DF/F added to nwb file'''        
         print "Calculating global DF/F ... this can take some time"
@@ -42,7 +49,7 @@ class OPAnalysis(object):
         print "Elapsed Time:", str(elapsedTime)
         return celltraces_dff
     
-    def getSpeedTuning(self, binsize):
+    def get_speed_tuning(self, binsize):
         print 'Calculating speed tuning, spontaneous vs visually driven'
         celltraces_trimmed = np.delete(self.celltraces_dff, range(len(self.dxcm), np.size(self.celltraces_dff,1)), axis=1) 
         #pull out spontaneous epoch(s)        
@@ -197,7 +204,7 @@ class OPAnalysis(object):
         
         return binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
 
-    def getSweepResponse(self):
+    def get_sweep_response(self):
         '''calculates the response to each sweep and then for each stimulus condition'''
         def domean(x):
             return np.mean(x[self.interlength:self.interlength+self.sweeplength+self.extralength])#+1])

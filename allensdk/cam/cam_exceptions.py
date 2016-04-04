@@ -1,0 +1,2 @@
+class CamAnalysisException(Exception): pass
+

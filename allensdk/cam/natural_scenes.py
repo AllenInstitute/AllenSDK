@@ -11,11 +11,11 @@ class NaturalScenes(OPAnalysis):
         self.sweeplength = self.stim_table.end.iloc[1] - self.stim_table.start.iloc[1]
         self.interlength = 3 * self.sweeplength
         self.extralength = self.sweeplength
-        self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
-        self.response = self.getResponse()
-        self.peak = self.getPeak()
+        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
+        self.response = self.get_response()
+        self.peak = self.get_peak()
         
-    def getResponse(self):
+    def get_response(self):
         print "Calculating mean responses"
         response = np.empty((self.number_scenes, self.numbercells+1, 3))
         def ptest(x):
@@ -29,36 +29,36 @@ class NaturalScenes(OPAnalysis):
             response[ns,:,2] = subset_pval.apply(ptest, axis=0)
         return response
     
-    def getPeak(self):    
+    def get_peak(self):    
         '''gets metrics about peak response, etc.'''
         print 'Calculating peak response properties'
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('Scene', 'response_variability','peak_DFF', 'ptest', 'p_run', 'run_modulation', 'time_to_peak','duration'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('scene_ns', 'response_variability_ns','peak_dff_ns', 'ptest_ns', 'p_run_ns', 'run_modulation_ns', 'time_to_peak_ns','duration_ns'))
 
         for nc in range(self.numbercells):
             nsp = np.argmax(self.response[1:,nc,0])
-            peak.Scene[nc] = nsp
-            peak.response_variability[nc] = self.response[nsp+1,nc,2]/0.50 #assume 50 trials
-            peak.peak_DFF[nc] = self.response[nsp+1,nc,0]
+            peak.scene_ns[nc] = nsp
+            peak.response_variability_ns[nc] = self.response[nsp+1,nc,2]/0.50 #assume 50 trials
+            peak.peak_dff_ns[nc] = self.response[nsp+1,nc,0]
             subset = self.mean_sweep_response[self.stim_table.frame==nsp]
 #            blank = self.mean_sweep_response[self.stim_table.frame==-1]
             subset_stat = subset[subset.dx<2]
             subset_run = subset[subset.dx>=2]
             if (len(subset_run)>5) & ( len(subset_stat)>5):
-                (_, peak.p_run[nc]) = st.ks_2samp(subset_run[str(nc)], subset_stat[str(nc)])
-                peak.run_modulation[nc] = subset_run[str(nc)].mean()/subset_stat[str(nc)].mean()
+                (_, peak.p_run_ns[nc]) = st.ks_2samp(subset_run[str(nc)], subset_stat[str(nc)])
+                peak.run_modulation_ns[nc] = subset_run[str(nc)].mean()/subset_stat[str(nc)].mean()
             else:
-                peak.p_run[nc] = np.NaN
-                peak.run_modulation[nc] = np.NaN
+                peak.p_run_ns[nc] = np.NaN
+                peak.run_modulation_ns[nc] = np.NaN
             groups = []
             for im in range(self.number_scenes):
                 subset = self.mean_sweep_response[self.stim_table.frame==(im-1)]
                 groups.append(subset[str(nc)].values)
-            (_,peak.ptest[nc]) = st.f_oneway(*groups)
+            (_,peak.ptest_ns[nc]) = st.f_oneway(*groups)
             test = self.sweep_response[self.stim_table.frame==nsp][str(nc)].mean()
-            peak.time_to_peak[nc] = (np.argmax(test) - self.interlength)/self.acquisition_rate
+            peak.time_to_peak_ns[nc] = (np.argmax(test) - self.interlength)/self.acquisition_rate
             test2 = np.where(test<(test.max()/2))[0]
             try:          
-                peak.duration[nc] = np.ediff1d(test2).max()/self.acquisition_rate
+                peak.duration_ns[nc] = np.ediff1d(test2).max()/self.acquisition_rate
             except:
                 pass
 

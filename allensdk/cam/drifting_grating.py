@@ -16,11 +16,11 @@ class DriftingGrating(OPAnalysis):
         self.tfvals = np.unique(self.stim_table.temporal_frequency).astype(int)
         self.number_ori = len(self.orivals)
         self.number_tf = len(self.tfvals)            
-        self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
-        self.response = self.getResponse()
-        self.peak = self.getPeak()
+        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
+        self.response = self.get_response()
+        self.peak = self.get_peak()
     
-    def getResponse(self):
+    def get_response(self):
         print "Calculating mean responses"
         response = np.empty((self.number_ori, self.number_tf, self.numbercells+1, 3))
         def ptest(x):
@@ -37,27 +37,33 @@ class DriftingGrating(OPAnalysis):
                 response[ori_pt, tf_pt, :, 2] = subset_pval.apply(ptest, axis=0)
         return response
     
-    def getPeak(self):
+    def get_peak(self):
         '''finds the peak response for each cell'''
         print 'Calculating peak response properties'
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','TF','response_variability_dg','OSI_dg','DSI','peak_DFF_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_variability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
 
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,nc,0] == np.nanmax(self.response[:,1:,nc,0]))
             prefori = cell_peak[0][0]
             preftf = cell_peak[1][0]+1
-            peak.Ori.iloc[nc] = prefori
-            peak.TF.iloc[nc] = preftf
+            peak.ori_dg.iloc[nc] = prefori
+            peak.tf_dg.iloc[nc] = preftf
             peak.response_variability_dg.iloc[nc] = self.response[prefori, preftf, nc, 2]/0.15
             pref = self.response[prefori, preftf, nc, 0]            
             orth1 = self.response[np.mod(prefori+2, 8), preftf, nc, 0]
             orth2 = self.response[np.mod(prefori-2, 8), preftf, nc, 0]
             orth = (orth1+orth2)/2
             null = self.response[np.mod(prefori+4, 8), preftf, nc, 0]
+<<<<<<< HEAD
             peak.OSI_dg.iloc[nc] = (pref-orth)/(pref+orth)
 #            peak.OSI_dg.iloc[nc]
             peak.DSI.iloc[nc] = (pref-null)/(pref+null)
             peak.peak_DFF_dg.iloc[nc] = pref
+=======
+            peak.osi_dg.iloc[nc] = (pref-orth)/(pref+orth)
+            peak.dsi_dg.iloc[nc] = (pref-null)/(pref+null)
+            peak.peak_dff_dg.iloc[nc] = pref
+>>>>>>> e370880df134a29d763b83ec866b8ae90b9164b1
             
             groups = []
             for ori in self.orivals:
