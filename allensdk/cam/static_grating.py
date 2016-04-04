@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from math import sqrt
 from allensdk.cam.o_p_analysis import OPAnalysis
+from allensdk.cam.cam_exceptions import CamAnalysisException
 
 
 class StaticGrating(OPAnalysis):
@@ -80,10 +81,17 @@ class StaticGrating(OPAnalysis):
             _,p = st.f_oneway(*groups)
             peak.ptest_sg[nc] = p
             
-            print
             test_rows = (self.stim_table.orientation==self.orivals[pref_ori]) & \
-                (self.stim_table.spatial_frequency==self.sfvals[pref_sf-1]) & \
+                (self.stim_table.spatial_frequency==self.sfvals[pref_sf]) & \
                 (self.stim_table.phase==self.phasevals[pref_phase])
+
+            if len(test_rows) < 2:
+                msg = "Static grating p value requires at least 2 trials at the preferred " 
+                "orientation/spatial frequency/phase. Cell %d (%f, %f, %f) has %d." % \
+                    (int(nc), self.orivals[pref_ori], self.sfvals[pref_sf], 
+                     self.phasevals[pref_phase], len(test_rows))
+
+                raise CamAnalysisException(msg)
 
             test = self.sweep_response[test_rows][str(nc)].mean()
             peak.time_to_peak_sg[nc] = (np.argmax(test) - self.interlength)/self.acquisition_rate
