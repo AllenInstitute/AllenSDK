@@ -84,7 +84,13 @@ class EphysSweepFeatureExtractor:
         thresholds = ft.refine_threshold_indexes(v, t, upstrokes, self.thresh_frac,
                                                  self.filter, dvdt)
         thresholds, peaks, upstrokes = ft.check_thresholds_and_peaks(v, t, thresholds, peaks,
-                                                          upstrokes, self.max_interval)
+                                                                     upstrokes, self.max_interval)
+
+        if not thresholds.size:
+            # Save time if no spikes detected
+            self._spikes_df = DataFrame()
+            return
+
 
         # Spike list and thresholds have been refined - now find other features
         upstrokes = ft.find_upstroke_indexes(v, t, thresholds, peaks, self.filter, dvdt)
@@ -160,7 +166,8 @@ class EphysSweepFeatureExtractor:
                     spikes_df.ix[~np.isnan(vals), k + "_i"] = self.i[vals[~np.isnan(vals)].astype(int)]
 
         spikes_df["width"] = np.nan
-        spikes_df.ix[:len(widths) - 1, "width"] = widths
+        spikes_df.ix[:len(widths)-1, "width"] = widths
+
 
         spikes_df["upstroke_downstroke_ratio"] = spikes_df["upstroke"] / -spikes_df["downstroke"]
 
