@@ -359,7 +359,7 @@ def find_widths(v, t, spike_indexes, peak_indexes, trough_indexes):
     """
 
     if not spike_indexes.size or not peak_indexes.size:
-        return np.array([]), np.array([])
+        return np.array([])
 
     if len(spike_indexes) < len(trough_indexes):
         raise FeatureError("Cannot have more troughs than spikes")
