@@ -21,7 +21,7 @@ from allensdk.cam.natural_movie import NaturalMovie
 
 from allensdk.core.cam_nwb_data_set import CamNwbDataSet
 
-import CAM_plotting as cp
+import allensdk.cam.cam_plotting as cp
 import argparse, logging
 
 class CamAnalysis(object):
@@ -117,7 +117,7 @@ class CamAnalysis(object):
 
         if plot_flag:
             cp.plot_3sa(dg, nm1, nm3)
-            cp.plot_drifting_grating_traces(dg)
+            cp.plot_drifting_grating_traces()(dg)
     
         if save_flag:
             self.save_stimulus_a(dg, nm1, nm3, peak)
