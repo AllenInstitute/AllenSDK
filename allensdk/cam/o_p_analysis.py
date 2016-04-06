@@ -33,8 +33,6 @@ class OPAnalysis(object):
         self.numbercells = len(self.celltraces)                         #number of cells in dataset       
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
         self.dxcm, self.dxtime = self.cam_analysis.nwb.get_running_speed()        
-#        self.celltraces_dff = self.get_global_dff(percentiletosubtract=8)
-#        self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.get_speed_tuning(binsize=400)
 
     def get_response(self):
         raise CamAnalysisException("get_response not implemented")
@@ -68,7 +66,8 @@ class OPAnalysis(object):
         return celltraces_dff
     
     def get_speed_tuning(self, binsize):
-        print 'Calculating speed tuning, spontaneous vs visually driven'
+        OPAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')
+        
         celltraces_trimmed = np.delete(self.celltraces_dff, range(len(self.dxcm), np.size(self.celltraces_dff,1)), axis=1) 
 
         # pull out spontaneous epoch(s)        
@@ -163,26 +162,6 @@ class OPAnalysis(object):
         shuffled_variance_vis = binned_cells_shuffled_vis[:,:,0,:].std(axis=1)**2
         variance_threshold_vis = np.percentile(shuffled_variance_vis, 99.9, axis=1)
         response_variance_vis = binned_cells_vis[:,:,0].std(axis=1)**2
-#        for nc in range(self.numbercells):
-#            if response_variance_vis[nc]>variance_threshold_vis[nc]:
-#                peak.mod_vis[nc] = True
-#            if response_variance_vis[nc]<=variance_threshold_vis[nc]:
-#                peak.mod_vis[nc] = False
-#            if response_variance_sp[nc]>variance_threshold_sp[nc]:
-#                peak.mod_sp[nc] = True
-#            if repsonse_variance_sp[nc]<=variance_threshold_sp[nc]:
-#                peak.mod_sp[nc] = False
-        
-#        if (100*float(len(np.where(self.dxcm>2)[0]))/len(self.dxcm))>2.:
-#             run_start = findlevels(self.dxcm, threshold=2, window=10, direction='up')
-#             cell_run = np.empty((len(run_start),self.numbercells,60))
-#             del_pts = []
-#             for i,v in enumerate(run_start):
-#                 if v>30:
-#                     cell_run[i,:,:] = self.celltraces_dff[:,v-30:v+30]
-#                 else:
-#                     del_pts.append(i)
-#             cell_run = np.delete(cell_run,del_pts,axis=0)
          
         for nc in range(self.numbercells):
             if response_variance_vis[nc]>variance_threshold_vis[nc]:
@@ -218,17 +197,15 @@ class OPAnalysis(object):
                 test_values = celltraces_sorted_vis[nc,start_min*binsize:(start_min+1)*binsize]
                 other_values = np.delete(celltraces_sorted_vis[nc,:], range(start_min*binsize, (start_min+1)*binsize))
             (_ ,peak_run.ptest_vis[nc]) = st.ks_2samp(test_values, other_values)
-#             (_, peak_run.rta_ptest[nc]) = st.ks_2samp(cell_run[:,nc,:30].flatten(), cell_run[:,nc,30:].flatten())
-#             (_, peak_run.rta_modulation[nc]) = cell_run[:,nc,30:].flatten().mean() / cell_run[:,nc,:30].flatten().mean()
         
         return binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
 
     def get_sweep_response(self):
         '''calculates the response to each sweep and then for each stimulus condition'''
-        def domean(x):
+        def do_mean(x):
             return np.mean(x[self.interlength:self.interlength+self.sweeplength+self.extralength])#+1])
             
-        def doPvalue(x):
+        def do_p_value(x):
             (_, p) = st.f_oneway(x[:self.interlength], x[self.interlength:self.interlength+self.sweeplength+self.extralength])
             return p
             
@@ -243,9 +220,9 @@ class OPAnalysis(object):
                 sweep_response[str(nc)][index] = 100*((temp/np.mean(temp[:self.interlength]))-1)
             sweep_response['dx'][index] = self.dxcm[start:end]   
         
-        mean_sweep_response = sweep_response.applymap(domean)
+        mean_sweep_response = sweep_response.applymap(do_mean)
         
-        pval = sweep_response.applymap(doPvalue)
+        pval = sweep_response.applymap(do_p_value)
         return sweep_response, mean_sweep_response, pval            
         
 

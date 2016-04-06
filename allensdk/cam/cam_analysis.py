@@ -22,7 +22,7 @@ from allensdk.cam.natural_movie import NaturalMovie
 from allensdk.core.cam_nwb_data_set import CamNwbDataSet
 
 import CAM_plotting as cp
-import argparse
+import argparse, logging
 
 class CamAnalysis(object):
     _log = logging.getLogger('allensdk.cam.cam_analysis')    
@@ -111,13 +111,13 @@ class CamAnalysis(object):
         dg = DriftingGrating(self)
         nm3 = NaturalMovie(self, 'natural_movie_three')    
         nm1 = NaturalMovie(self, 'natural_movie_one')        
-        print "Stimulus A analyzed"
+        CamAnalysis._log.info("Stimulus A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
         self.append_meta_data(peak)
 
         if plot_flag:
-            cp.plot_3SA(dg, nm1, nm3)
-            cp.plot_Drifting_grating_Traces(dg)
+            cp.plot_3sa(dg, nm1, nm3)
+            cp.plot_drifting_grating_traces(dg)
     
         if save_flag:
             self.save_stimulus_a(dg, nm1, nm3, peak)
@@ -126,29 +126,29 @@ class CamAnalysis(object):
         sg = StaticGrating(self)    
         ns = NaturalScenes(self)
         nm1 = NaturalMovie(self, 'natural_movie_one')            
-        print "Stimulus B analyzed"
+        CamAnalysis._log.info("Stimulus B analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, sg.peak, ns.peak, nm1.peak])
         self.append_meta_data(peak)
                 
         if plot_flag:
-            cp.plot_3SB(sg, nm1, ns)
-            cp.plot_NS_Traces(ns)
-            cp.plot_SG_Traces(sg)
+            cp.plot_3sb(sg, nm1, ns)
+            cp.plot_ns_traces(ns)
+            cp.plot_sg_traces(sg)
                     
         if save_flag:
             self.save_stimulus_b(sg, nm1, ns, peak)
     
     def stimulus_c(self, plot_flag=False, save_flag=True):
         nm2 = NaturalMovie(self, 'natural_movie_two')
-        lsn = LocallySparseNoise(self)
-        nm1 = NaturalMovie(self, 'natural_movie_one')
-        print "Stimulus C analyzed"
+        lsn = LocallySN(self)
+        nm1 = MovieAnalysis(self, 'natural_movie_one')
+        CamAnalysis._log.info("Stimulus C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_meta_data(peak)
                 
         if plot_flag:
-            cp.plot_3SC(lsn, nm1, nm2)
-            cp.plot_LSN_Traces(lsn)
+            cp.plot_3sc(lsn, nm1, nm2)
+            cp.plot_lsn_traces(lsn)
     
         if save_flag:
             self.save_stimulus_c(lsn, nm1, nm2, peak)

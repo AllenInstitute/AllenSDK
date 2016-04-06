@@ -14,6 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.cam.cam_analysis import run_cam_analysis
+import os
 
 # params
 lims_id = 502115959
@@ -23,7 +24,7 @@ stimulus = 'A'
 # file names
 save_dir = r'/Users/saskiad/Documents/Data/ophysdev/'
 nwb_path = os.path.join(save_dir, "%d/%d.nwb" % (lims_id, lims_id))
-save_path  os.path.join(save_dir, "%d/Data/%d.nwb" % (lims_id, lims_id))
+save_path = os.path.join(save_dir, "%d/Data/%d.nwb" % (lims_id, lims_id))
 
 # run the analysis
 run_cam_analysis(stimulus, nwb_path, save_path, depth)

@@ -34,7 +34,8 @@ class NaturalScenes(OPAnalysis):
         self.peak = self.get_peak()
         
     def get_response(self):
-        print "Calculating mean responses"
+        NaturalScenes._log.info("Calculating mean responses")
+        
         response = np.empty((self.number_scenes, self.numbercells+1, 3))
         
         def ptest(x):
@@ -51,7 +52,7 @@ class NaturalScenes(OPAnalysis):
     
     def get_peak(self):    
         '''gets metrics about peak response, etc.'''
-        print 'Calculating peak response properties'
+        NaturalScenes._log.info('Calculating peak response properties')
         peak = pd.DataFrame(index=range(self.numbercells), columns=('scene_ns', 'response_variability_ns','peak_dff_ns', 'ptest_ns', 'p_run_ns', 'run_modulation_ns', 'time_to_peak_ns','duration_ns'))
 
         for nc in range(self.numbercells):

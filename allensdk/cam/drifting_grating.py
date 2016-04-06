@@ -39,7 +39,8 @@ class DriftingGrating(OPAnalysis):
         self.peak = self.get_peak()
     
     def get_response(self):
-        print "Calculating mean responses"
+        DriftingGrating._log.info("Calculating mean responses")
+        
         response = np.empty((self.number_ori, self.number_tf, self.numbercells+1, 3))
         def ptest(x):
             return len(np.where(x<(0.05/(8*5)))[0])
@@ -57,8 +58,9 @@ class DriftingGrating(OPAnalysis):
     
     def get_peak(self):
         '''finds the peak response for each cell'''
-        print 'Calculating peak response properties'
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_variability_dg','cv_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
+        DriftingGrating._log.info('Calculating peak response properties')
+        
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','TF','response_variability_dg','OSI_dg','DSI','peak_DFF_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
 
         orivals_rad = np.deg2rad(self.orivals)
         for nc in range(self.numbercells):

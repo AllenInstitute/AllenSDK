@@ -43,13 +43,10 @@ class StaticGrating(OPAnalysis):
         self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
         self.response = self.get_response()
         self.peak = self.get_peak()
-        #self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.get_speed_tuning(binsize=200)
         
-#    
     def get_response(self):
-#        if self.h5path != None:
-#            response = op.loadh5(self.h5path, 'response')
-        print "Calculating mean responses"
+        StaticGrating._log.info("Calculating mean responses")
+        
         response = np.empty((self.number_ori, self.number_sf, self.number_phase, self.numbercells+1, 3))
 
         
@@ -75,7 +72,8 @@ class StaticGrating(OPAnalysis):
     
     def get_peak(self):    
         '''finds the peak response for each cell'''
-        print 'Calculating peak response properties'
+        StaticGrating._log.info('Calculating peak response properties')
+
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_variability_sg','osi_sg','peak_dff_sg','ptest_sg','time_to_peak_sg','duration_sg'))
 
         for nc in range(self.numbercells):
@@ -123,25 +121,3 @@ class StaticGrating(OPAnalysis):
                 pass
 
         return peak
-    
-#    def Ptest(self):
-#        '''running new ptest'''
-#        test = pd.DataFrame(index=self.sweeptable.index.values, columns=np.array(range(self.numbercells)).astype(str))
-#        for nc in range(self.numbercells):        
-#            for index, row in self.sweeptable.iterrows():
-#                ori=row.ori_sg
-#                sf=row.sf_sg
-#                phase = row.phase_sg
-#                test[str(nc)][index] = self.mean_sweep_response[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)][str(nc)]
-#        ptest = []
-#        for nc in range(self.numbercells):
-#            groups = []
-#            for index,row in test.iterrows():
-#                groups.append(test[str(nc)][index])
-#                (f,p) = st.f_oneway(*groups)
-#            ptest.append(p)
-#        ptest = np.array(ptest)
-#        cells = list(np.where(ptest<0.01)[0])
-#        print "# cells: " + str(len(ptest))
-#        print "# significant cells: " + str(len(cells))
-#        return ptest, cells
