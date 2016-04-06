@@ -140,8 +140,8 @@ class CamAnalysis(object):
     
     def stimulus_c(self, plot_flag=False, save_flag=True):
         nm2 = NaturalMovie(self, 'natural_movie_two')
-        lsn = LocallySN(self)
-        nm1 = MovieAnalysis(self, 'natural_movie_one')
+        lsn = LocallySparseNoise(self)
+        nm1 = NaturalScenes(self, 'natural_movie_one')
         CamAnalysis._log.info("Stimulus C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_meta_data(peak)

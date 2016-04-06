@@ -96,8 +96,7 @@ def plot_Drifting_grating_Traces(self):
         filename = 'Traces DG Cell_'+str(nc+1)+'.png'
         fullfilename = os.path.join(self.save_dir, filename) 
         plt.savefig(fullfilename)   
-        plt.close()                 
-
+        plt.close()
 
 def plot_ns_traces(self):
     logging.info("Plotting Natural Scene traces for each cell")
