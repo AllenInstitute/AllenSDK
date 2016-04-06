@@ -424,7 +424,7 @@ def plot_SG_Traces(self):
 def plot_LSN_Traces(self):
     print "Plotting LSN traces for all cells"
     xtime = np.arange(-1*self.sweeplength/self.acquisition_rate, (2*self.sweeplength)/self.acquisition_rate, 1/self.acquisition_rate)
-    while len(xtime)>(3*self.sweeplength):
+    while len(xtime)>(4*self.sweeplength):
         xtime = np.delete(xtime, -1)
     for nc in range(self.numbercells):
         if np.mod(nc,100)==0:
