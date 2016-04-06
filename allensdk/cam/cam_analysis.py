@@ -14,13 +14,15 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.cam.static_grating import StaticGrating
-from allensdk.cam.movie_analysis import LocallySN
+from allensdk.cam.locally_sparse_noise import LocallySparseNoise
 from allensdk.cam.natural_scenes import NaturalScenes
+from allensdk.cam.drifting_grating import DriftingGrating
+from allensdk.cam.natural_movie import NaturalMovie
+
 from allensdk.core.cam_nwb_data_set import CamNwbDataSet
-from drifting_grating import DriftingGrating
-from movie_analysis import MovieAnalysis
-import cam_plotting as cp
-import argparse, logging
+
+import CAM_plotting as cp
+import argparse
 
 class CamAnalysis(object):
     _log = logging.getLogger('allensdk.cam.cam_analysis')    
@@ -107,9 +109,9 @@ class CamAnalysis(object):
     
     def stimulus_a(self, plot_flag=False, save_flag=True):
         dg = DriftingGrating(self)
-        nm3 = MovieAnalysis(self, 'natural_movie_three')    
-        nm1 = MovieAnalysis(self, 'natural_movie_one')        
-        CamAnalysis._log.info("Stimulus A analyzed")
+        nm3 = NaturalMovie(self, 'natural_movie_three')    
+        nm1 = NaturalMovie(self, 'natural_movie_one')        
+        print "Stimulus A analyzed"
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
         self.append_meta_data(peak)
 
@@ -123,8 +125,8 @@ class CamAnalysis(object):
     def stimulus_b(self, plot_flag=False, save_flag=True):
         sg = StaticGrating(self)    
         ns = NaturalScenes(self)
-        nm1 = MovieAnalysis(self, 'natural_movie_one')            
-        CamAnalysis._log.info("Stimulus B analyzed")
+        nm1 = NaturalMovie(self, 'natural_movie_one')            
+        print "Stimulus B analyzed"
         peak = multi_dataframe_merge([nm1.peak_run, sg.peak, ns.peak, nm1.peak])
         self.append_meta_data(peak)
                 
@@ -137,10 +139,10 @@ class CamAnalysis(object):
             self.save_stimulus_b(sg, nm1, ns, peak)
     
     def stimulus_c(self, plot_flag=False, save_flag=True):
-        nm2 = MovieAnalysis(self, 'natural_movie_two')
-        lsn = LocallySN(self)
-        nm1 = MovieAnalysis(self, 'natural_movie_one')
-        CamAnalysis._log.info("Stimulus C analyzed")
+        nm2 = NaturalMovie(self, 'natural_movie_two')
+        lsn = LocallySparseNoise(self)
+        nm1 = NaturalMovie(self, 'natural_movie_one')
+        print "Stimulus C analyzed"
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_meta_data(peak)
                 

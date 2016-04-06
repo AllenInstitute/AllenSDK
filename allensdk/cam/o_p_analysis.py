@@ -19,6 +19,7 @@ import pandas as pd
 import time, os, logging
 
 from allensdk.cam.findlevel import findlevel
+from cam_exceptions import CamAnalysisException
 
 class OPAnalysis(object):
     _log = logging.getLogger('allensdk.cam.o_p_analysis')    
@@ -32,9 +33,16 @@ class OPAnalysis(object):
         self.numbercells = len(self.celltraces)                         #number of cells in dataset       
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
         self.dxcm, self.dxtime = self.cam_analysis.nwb.get_running_speed()        
-    
-        
-    def getGlobalDFF(self, percentiletosubtract=8):
+#        self.celltraces_dff = self.get_global_dff(percentiletosubtract=8)
+#        self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.get_speed_tuning(binsize=400)
+
+    def get_response(self):
+        raise CamAnalysisException("get_response not implemented")
+
+    def get_peak(self):
+        raise CamAnalysisException("get_peak not implemented")
+
+    def get_global_dff(self, percentiletosubtract=8):
         '''does a global DF/F using a sliding window (+/- 15 s) baseline subtraction followed by Fo=peak of histogram'''
         '''replace when DF/F added to nwb file'''        
         OPAnalysis._log.info("Calculating global DF/F ... this can take some time")
@@ -59,8 +67,8 @@ class OPAnalysis(object):
         
         return celltraces_dff
     
-    def getSpeedTuning(self, binsize):
-        OPAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')
+    def get_speed_tuning(self, binsize):
+        print 'Calculating speed tuning, spontaneous vs visually driven'
         celltraces_trimmed = np.delete(self.celltraces_dff, range(len(self.dxcm), np.size(self.celltraces_dff,1)), axis=1) 
 
         # pull out spontaneous epoch(s)        
@@ -89,9 +97,9 @@ class OPAnalysis(object):
             offset = findlevel(dx_sorted,1,'up')        
             if i==0:
                 binned_dx_sp[i,0] = np.mean(dx_sorted[:offset])
-                binned_dx_sp[i,1] = np.std(dx_sorted[:offset])            
+                binned_dx_sp[i,1] = np.std(dx_sorted[:offset]) / np.sqrt(offset)            
                 binned_cells_sp[:,i,0] = np.mean(celltraces_sorted_sp[:,:offset], axis=1)
-                binned_cells_sp[:,i,1] = np.std(celltraces_sorted_sp[:,:offset], axis=1)
+                binned_cells_sp[:,i,1] = np.std(celltraces_sorted_sp[:,:offset], axis=1) / np.sqrt(offset)
             else:
                 start = offset + (i-1)*binsize
                 binned_dx_sp[i,0] = np.mean(dx_sorted[start:start+binsize])
@@ -123,9 +131,9 @@ class OPAnalysis(object):
             offset = findlevel(dx_sorted,1,'up')        
             if i==0:
                 binned_dx_vis[i,0] = np.mean(dx_sorted[:offset])
-                binned_dx_vis[i,1] = np.std(dx_sorted[:offset])            
+                binned_dx_vis[i,1] = np.std(dx_sorted[:offset]) / np.sqrt(offset)
                 binned_cells_vis[:,i,0] = np.mean(celltraces_sorted_vis[:,:offset], axis=1)
-                binned_cells_vis[:,i,1] = np.std(celltraces_sorted_vis[:,:offset], axis=1)
+                binned_cells_vis[:,i,1] = np.std(celltraces_sorted_vis[:,:offset], axis=1) / np.sqrt(offset)
             else:
                 start = offset + (i-1)*binsize
                 binned_dx_vis[i,0] = np.mean(dx_sorted[start:start+binsize])
@@ -215,7 +223,7 @@ class OPAnalysis(object):
         
         return binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
 
-    def getSweepResponse(self):
+    def get_sweep_response(self):
         '''calculates the response to each sweep and then for each stimulus condition'''
         def domean(x):
             return np.mean(x[self.interlength:self.interlength+self.sweeplength+self.extralength])#+1])
@@ -240,35 +248,4 @@ class OPAnalysis(object):
         pval = sweep_response.applymap(doPvalue)
         return sweep_response, mean_sweep_response, pval            
         
-    def testPtest(self):
-        '''running new ptest'''
-        test = pd.DataFrame(index=self.sweeptable.index.values, columns=np.array(range(self.numbercells)).astype(str))
-        for nc in range(self.numbercells):        
-            for index, row in self.sweeptable.iterrows():
-                ori=row['Ori']
-                tf=row['TF']
-                test[str(nc)][index] = self.mean_sweep_response[(self.sync_table['TF']==tf)&(self.sync_table['Ori']==ori)][str(nc)]
-        ptest = []
-        for nc in range(self.numbercells):
-            groups = []
-            for index,row in test.iterrows():
-                groups.append(test[str(nc)][index])
-                (_,p) = st.f_oneway(*groups)
-            ptest.append(p)
-        ptest = np.array(ptest)
-        cells = list(np.where(ptest<0.01)[0])
-        OPAnalysis._log.info("# cells: " + str(len(ptest)))
-        OPAnalysis._log.info("# significant cells: " + str(len(cells)))
-        
-        return ptest, cells
-    
-    def Ptest(self):
-        ptest = np.empty((self.numbercells))
-        for nc in range(self.numbercells):
-            groups = []
-            for ori in self.orivals:
-                for tf in self.tfvals:
-                    groups.append(self.mean_sweep_response[(self.stim_table.temporal_frequency==tf)&(self.stim_table.orientation==ori)][str(nc)])
-            _,p = st.f_oneway(*groups)
-            ptest[nc] = p
-        return ptest
+

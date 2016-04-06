@@ -20,6 +20,99 @@ import pandas as pd
 import os, logging
 from numpy import arange
 
+#def plot_Drifting_Grating_All(self):
+#    '''saves figures for each cell showing ori and tf tuning'''
+#    print "Plotting Ori and TF tuning curves for all cells"
+#    for nc in range(self.numbercells):
+#        if np.mod(nc,100)==0:
+#            print "Cell #", str(nc)
+##            peak = np.where(self.response[:,:,nc,0] == np.nanmax(self.response[:,:,nc,0]))
+#        peakori = self.peak['ori_dg'][nc]#peak[0][0]
+#        peaktf = self.peak['tf_dg'][nc]#peak[1][0]
+#        rv = self.peak['response_variability'][nc]#self.response[peakori, peaktf, nc, 2]/0.15
+#        subset = self.sweep_response[(self.stim_table['Ori']==self.orivals[peakori])&(self.stim_table['TF']==self.tfvals[peaktf])]
+#        plt.figure(nc, figsize=(14,14))
+#        ax1 = plt.subplot2grid((3,4), (0,0), colspan=3)
+#        ax6 = plt.subplot2grid((3,4), (0,3))
+#        ax2 = plt.subplot2grid((3,4), (1,0))
+#        ax3 = plt.subplot2grid((3,4), (1,1))
+#        ax4 = plt.subplot2grid((3,4), (1,2))
+#        ax7 = plt.subplot2grid((3,4), (1,3))
+#        ax5 = plt.subplot2grid((3,4), (2,0), colspan=2)
+#        
+#        ax1.plot(self.celltraces[nc,:])        #first point is absurdly large for all traces
+#        ax1.set_xlabel("Time (s)", fontsize=20)
+#        ax1.set_ylabel("Fluorescence", fontsize=20)
+#        
+#        ax6.hist(self.celltraces[nc,:], bins=70)
+#        ax6.set_yscale('log')
+#        ax6.set_xlabel("Fluorescence", fontsize=20)
+#        ax6.set_ylabel("Count", fontsize=20)
+#        
+#        ax2.errorbar(self.orivals, self.response[:,peaktf,nc,0], yerr=self.response[:,peaktf,nc,1], fmt='b.-', lw=2)
+#        ax2.fill_between(self.orivals, np.repeat(self.response[0,0,nc,0]+self.response[0,0,nc,1], self.number_ori), np.repeat(self.response[0,0,nc,0]-self.response[0,0,nc,1], self.number_ori), color='gray', alpha=0.5)
+#        ax2.axhline(y=self.response[0,0,nc,0], ls='--', color='k')
+#        ax2.annotate(str(self.tfvals[peaktf]) + " Hz", xy=(0,0.9), xycoords='axes fraction', fontsize=14)
+#        ax2.set_xtick = (self.orivals)
+#        ax2.set_xlabel("Orientation (deg)", fontsize=20)
+#        ax2.set_ylabel("Mean DF/F (%)", fontsize=20)
+#        ax2.yaxis.set_major_locator(MaxNLocator(6))
+#        
+#        ax3.errorbar(self.tfvals[1:], self.response[peakori,1:,nc,0], yerr=self.response[peakori,1:,nc,1], fmt='b.-', lw=2)
+#        ax3.fill_between(self.tfvals[1:], np.repeat(self.response[0,0,nc,0]+self.response[0,0,nc,1], self.number_tf-1), np.repeat(self.response[0,0,nc,0]-self.response[0,0,nc,1], self.number_tf-1), color='gray', alpha=0.5)
+#        ax3.axhline(y=self.response[0,0,nc,0], ls='--', color='k')  
+#        ax3.annotate(str(self.orivals[peakori]) + " Deg", xy=(0,0.9), xycoords='axes fraction', fontsize=14)
+#        ax3.set_xticks = (self.tfvals[1:])
+#        ax3.set_xlabel("Temporal frequency (Hz)", fontsize=20)
+#        ax3.yaxis.set_major_locator(MaxNLocator(6))
+#        
+#        im = ax4.imshow(self.response[:,1:,nc,0], cmap='gray', interpolation='none')
+#        ax4.set_ylabel("Ori", fontsize=16)
+#        ax4.set_xlabel("TF", fontsize=16)
+#        ax4.set_yticks(range(self.number_ori))
+#        ax4.set_yticklabels(list(self.orivals.astype(int).astype(str)))
+#        ax4.set_xticks(range(self.number_tf-1))
+#        ax4.set_xticklabels(list(self.tfvals[1:].astype(int).astype(str)))
+#        cbar = plt.colorbar(im, ax=ax4)
+#        cbar.ax.set_ylabel('DF/F (%)', fontsize=8)
+#        for t in cbar.ax.get_yticklabels():
+#            t.set_fontsize(8)
+#            
+##            ax7.errorbar(self.binned_dx[:,0], self.binned_cells[nc,:,0], yerr=self.binned_cells[nc,:,1], fmt='.')
+##            ax7.set_xlabel("Speed (cm/s)", fontsize=16)
+##            ax7.set_ylabel("DF/F", fontsize=16)
+##                
+#        xtime = arange(-1*self.interlength/self.acquisition_rate, (self.sweeplength+self.interlength)/self.acquisition_rate, 1/self.acquisition_rate)
+#        for index, row in subset.iterrows():
+#            try:
+#                ax5.plot(xtime, subset[str(nc)][index], lw=2)
+#            except:
+#                ax5.plot(xtime[:-1], subset[str(nc)][index], lw=2)
+#                print "trace not long enough, cell: ", str(nc)
+#        ax5.set_xlim(-1,3)
+#        ax5.annotate(str(self.orivals[peakori])+" Deg / "+str(self.tfvals[peaktf])+" Hz", xy=(0,0.9), xycoords='axes fraction', fontsize=14)
+#        ax5.set_xlabel("Time (s)", fontsize=20)
+#        ax5.set_ylabel("DF/F (%)", fontsize=20)
+#        ax5.axvspan(0, self.sweeplength/self.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
+#        ax5.yaxis.set_major_locator(MaxNLocator(6))
+#        ax5.set_title("Trial responses to prefered ori/tf", fontsize=20)            
+#        
+#        plt.tick_params(labelsize=16)    
+#        plt.tight_layout()
+#        if self.ptest[nc]<0.01:
+#            plt.suptitle("Cell " + str(nc+1) + " Significant", fontsize=20)
+#        else:
+#            plt.suptitle("Cell " + str(nc+1), fontsize=20)
+#        plt.figtext(0.7, 0.3, "PeakOri: " + str(self.orivals[peakori]) + " Deg / PeakTF: " + str(self.tfvals[peaktf]) + " Hz")
+#        plt.figtext(0.7, 0.27, "OSI: " + str(round(self.peak['osi_dg'][nc],2)))
+#        plt.figtext(0.7, 0.24, "DSI: " + str(round(self.peak['dsg_dg'][nc],2)))                        
+#        plt.figtext(0.7, 0.21, "p = " + str(self.ptest[nc]))
+#        plt.figtext(0.7, 0.18, "% significant trials at peak:" + str(round(rv,2)))
+#        filename = 'Cell_'+str(nc+1)+'.png'
+#        fullfilename = os.path.join(self.save_dir, filename) 
+#        plt.savefig(fullfilename)   
+#        plt.close()
+
 def plot_Drifting_grating_Traces(self):
     '''saves figures with a Ori X TF grid of mean resposes'''
     logging.info("Plotting Ori and TF mean response for all cells")
@@ -316,8 +409,8 @@ def plot_3SA(dg, nm1, nm3):
         ax5.set_ylabel("DF/F", fontsize=20)
         ax5.set_title("Visual Stimuli", fontsize=20)
         
-        peakori = dg.peak.Ori[nc]
-        peaktf = dg.peak.TF[nc]
+        peakori = dg.peak.ori_dg[nc]
+        peaktf = dg.peak.tf_dg[nc]
         ax6.errorbar(dg.orivals, dg.response[:,peaktf,nc,0], yerr=dg.response[:,peaktf,nc,1], fmt='bo-', lw=2)
         ax6.fill_between(dg.orivals, np.repeat(dg.response[0,0,nc,0]+dg.response[0,0,nc,1], dg.number_ori), np.repeat(dg.response[0,0,nc,0]-dg.response[0,0,nc,1], dg.number_ori), color='gray', alpha=0.5)
         ax6.axhline(y=dg.response[0,0,nc,0], ls='--', color='k')
@@ -592,8 +685,8 @@ def plot_3SB(sg, nm1, ns):
         ax15.set_xlabel("Time (s)", fontsize=20)
         ax15.set_xlabel("Speed (cm/s)", fontsize=20)
         
-        peakori = sg.peak.Ori[nc]
-        peaksf = sg.peak.SF[nc]
+        peakori = sg.peak.ori_sg[nc]
+        peaksf = sg.peak.sf_sg[nc]
         ax3.errorbar(sg.orivals, sg.response[:,peaksf,0,nc,0], yerr=sg.response[:,peaksf,0,nc,1], color='blue', fmt='o-', lw=2)
         ax3.errorbar(sg.orivals, sg.response[:,peaksf,1,nc,0], yerr=sg.response[:,peaksf,1,nc,1], color='cornflowerblue', fmt='o-', lw=2)
         ax3.errorbar(sg.orivals, sg.response[:,peaksf,2,nc,0], yerr=sg.response[:,peaksf,2,nc,1], color='steelblue', fmt='o-', lw=2)
@@ -617,9 +710,9 @@ def plot_3SB(sg, nm1, ns):
         ax4.set_xlabel("Spatial frequency (cpd)", fontsize=20)
         
         xtime = np.arange(-1*sg.interlength/sg.acquisition_rate, (sg.sweeplength+sg.interlength)/sg.acquisition_rate, 1/sg.acquisition_rate)
-        peakori = sg.peak.Ori[nc]
-        peaksf = sg.peak.SF[nc]
-        peakphase = sg.peak.Phase[nc]
+        peakori = sg.peak.ori_sg[nc]
+        peaksf = sg.peak.sf_sg[nc]
+        peakphase = sg.peak.phase_sg[nc]
         subset = sg.sweep_response[(sg.stim_table.orientation==sg.orivals[peakori])&(sg.stim_table.spatial_frequency==sg.sfvals[peaksf])&(sg.stim_table.phase==sg.phasevals[peakphase])]
         subset_p =  subset[str(nc)].mean() + (subset[str(nc)].std()/np.sqrt(len(subset[str(nc)])))
         subset_n =  subset[str(nc)].mean() - (subset[str(nc)].std()/np.sqrt(len(subset[str(nc)])))
@@ -741,31 +834,31 @@ def ExperimentSummary(self, experiment_id):
     ax6 = plt.subplot(337)
     ax7 = plt.subplot(338)
     
-    ax1.hist(self.peak['Ori'][self.significant_cells].values,range=(0,self.number_ori), bins=self.number_ori, rwidth=0.8, color='gray')
+    ax1.hist(self.peak['ori_dg'][self.significant_cells].values,range=(0,self.number_ori), bins=self.number_ori, rwidth=0.8, color='gray')
     ax1.set_xticks(arange(0.5, 8, 1))
     ax1.set_xticklabels(self.orivals)
     ax1.set_xlabel("Direction (deg)", fontsize=14)
     ax1.set_ylabel("# Cells", fontsize=14)
     ax1.set_title("Preferred direction", fontsize=14)
     
-    ax2.hist(self.peak['TF'][self.significant_cells].values, range=(1,self.number_tf), bins=self.number_tf-1, rwidth=0.8, color='gray')
+    ax2.hist(self.peak['tf_dg'][self.significant_cells].values, range=(1,self.number_tf), bins=self.number_tf-1, rwidth=0.8, color='gray')
     ax2.set_xticks(arange(1.5,6,1))        
     ax2.set_xticklabels(self.tfvals[1:])
     ax2.set_xlabel("Temporal frequency (Hz)", fontsize=14)
     ax2.set_ylabel("# Cells", fontsize=14)
     ax2.set_title("Preferred TF", fontsize=14)
     
-    ax3.hist(self.peak['response_variability'][self.significant_cells].values, range=(0,100), bins=15, color='gray')        
+    ax3.hist(self.peak['response_variability_dg'][self.significant_cells].values, range=(0,100), bins=15, color='gray')        
     ax3.set_xlabel("% Significant trials", fontsize=14)
     ax3.set_ylabel("# Cells", fontsize=14)
     ax3.set_title("Significant trials", fontsize=14)
     
-    ax4.hist(self.peak['OSI'][self.significant_cells].values, range=(0,1.5), bins=15, color='gray')
+    ax4.hist(self.peak['osi_dg'][self.significant_cells].values, range=(0,1.5), bins=15, color='gray')
     ax4.set_xlabel("Orientation selectivity index", fontsize=14)
     ax4.set_ylabel("# Cells", fontsize=14)
     ax4.set_title("OSI", fontsize=14)
     
-    ax5.hist(self.peak['DSI'][self.significant_cells].values, range=(0,1.5), bins=15, color='gray')
+    ax5.hist(self.peak['dsi_dg'][self.significant_cells].values, range=(0,1.5), bins=15, color='gray')
     ax5.set_xlabel("Direction selectivity index", fontsize=14)
     ax5.set_ylabel("# Cells", fontsize=14)
     ax5.set_title("DSI", fontsize=14)

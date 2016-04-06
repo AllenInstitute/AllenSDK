@@ -20,6 +20,7 @@ import pandas as pd
 from math import sqrt
 import logging
 from allensdk.cam.o_p_analysis import OPAnalysis
+from allensdk.cam.cam_exceptions import CamAnalysisException
 
 
 class StaticGrating(OPAnalysis):
@@ -39,14 +40,16 @@ class StaticGrating(OPAnalysis):
         self.number_ori = len(self.orivals)
         self.number_sf = len(self.sfvals)
         self.number_phase = len(self.phasevals)            
-        self.sweep_response, self.mean_sweep_response, self.pval = self.getSweepResponse()
-        self.response = self.getResponse()
-        self.peak = self.getPeak()
-
+        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
+        self.response = self.get_response()
+        self.peak = self.get_peak()
+        #self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis = self.get_speed_tuning(binsize=200)
         
-    def getResponse(self):
-        StaticGrating._log.info("Calculating mean responses")
-        
+#    
+    def get_response(self):
+#        if self.h5path != None:
+#            response = op.loadh5(self.h5path, 'response')
+        print "Calculating mean responses"
         response = np.empty((self.number_ori, self.number_sf, self.number_phase, self.numbercells+1, 3))
 
         
@@ -70,34 +73,75 @@ class StaticGrating(OPAnalysis):
         return response
     
     
-    def getPeak(self):    
+    def get_peak(self):    
         '''finds the peak response for each cell'''
-        StaticGrating._log.info('Calculating peak response properties')
-        
-        peak = pd.DataFrame(index=range(self.numbercells),
-                            columns=('Ori','SF', 'Phase', 'sg_response_variability','OSI','sg_peak_DFF','ptest'))
+        print 'Calculating peak response properties'
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_variability_sg','osi_sg','peak_dff_sg','ptest_sg','time_to_peak_sg','duration_sg'))
 
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,:,nc,0] == np.nanmax(self.response[:,1:,:,nc,0]))
             pref_ori = cell_peak[0][0]
             pref_sf = cell_peak[1][0]+1
             pref_phase = cell_peak[2][0]
-            peak.Ori[nc] = pref_ori
-            peak.SF[nc] = pref_sf
-            peak.Phase[nc] = pref_phase
-            peak.sg_response_variability[nc] = self.response[pref_ori, pref_sf, pref_phase, nc, 2]/0.48  #TODO: check number of trials
+            peak.ori_sg[nc] = pref_ori
+            peak.sf_sg[nc] = pref_sf
+            peak.phase_sg[nc] = pref_phase
+            peak.response_variability_sg[nc] = self.response[pref_ori, pref_sf, pref_phase, nc, 2]/0.48  #TODO: check number of trials
             pref = self.response[pref_ori, pref_sf, pref_phase, nc, 0]
             orth = self.response[np.mod(pref_ori+3, 6), pref_sf, pref_phase, nc, 0]
-            peak.OSI[nc] = (pref-orth)/(pref+orth)
-            peak.sg_peak_DFF[nc] = pref
+            peak.osi_sg[nc] = (pref-orth)/(pref+orth)
+            peak.peak_dff_sg[nc] = pref
             groups = []
             
             for ori in self.orivals:
-                for sf in self.sfvals:
+                for sf in self.sfvals[1:]:
                     for phase in self.phasevals:
                         groups.append(self.mean_sweep_response[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)][str(nc)])
-            
+            groups.append(self.mean_sweep_response[self.stim_table.spatial_frequency==0][str(nc)])
+
             _,p = st.f_oneway(*groups)
-            peak.ptest[nc] = p
+            peak.ptest_sg[nc] = p
+            
+            test_rows = (self.stim_table.orientation==self.orivals[pref_ori]) & \
+                (self.stim_table.spatial_frequency==self.sfvals[pref_sf]) & \
+                (self.stim_table.phase==self.phasevals[pref_phase])
+
+            if len(test_rows) < 2:
+                msg = "Static grating p value requires at least 2 trials at the preferred " 
+                "orientation/spatial frequency/phase. Cell %d (%f, %f, %f) has %d." % \
+                    (int(nc), self.orivals[pref_ori], self.sfvals[pref_sf], 
+                     self.phasevals[pref_phase], len(test_rows))
+
+                raise CamAnalysisException(msg)
+
+            test = self.sweep_response[test_rows][str(nc)].mean()
+            peak.time_to_peak_sg[nc] = (np.argmax(test) - self.interlength)/self.acquisition_rate
+            test2 = np.where(test<(test.max()/2))[0]
+            try:          
+                peak.duration_sg[nc] = np.ediff1d(test2).max()/self.acquisition_rate
+            except:
+                pass
 
         return peak
+    
+#    def Ptest(self):
+#        '''running new ptest'''
+#        test = pd.DataFrame(index=self.sweeptable.index.values, columns=np.array(range(self.numbercells)).astype(str))
+#        for nc in range(self.numbercells):        
+#            for index, row in self.sweeptable.iterrows():
+#                ori=row.ori_sg
+#                sf=row.sf_sg
+#                phase = row.phase_sg
+#                test[str(nc)][index] = self.mean_sweep_response[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)][str(nc)]
+#        ptest = []
+#        for nc in range(self.numbercells):
+#            groups = []
+#            for index,row in test.iterrows():
+#                groups.append(test[str(nc)][index])
+#                (f,p) = st.f_oneway(*groups)
+#            ptest.append(p)
+#        ptest = np.array(ptest)
+#        cells = list(np.where(ptest<0.01)[0])
+#        print "# cells: " + str(len(ptest))
+#        print "# significant cells: " + str(len(cells))
+#        return ptest, cells
