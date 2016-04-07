@@ -61,7 +61,7 @@ class OPAnalysis(object):
             celltraces_dff[cn,:] -= 1
             celltraces_dff[cn,:] *= 100
         elapsedTime = time.time() - startTime
-        OPAnalysis._log.info("Elapsed Time:", str(elapsedTime))
+        OPAnalysis._log.info("Elapsed Time: %f", elapsedTime)
         
         return celltraces_dff
     
