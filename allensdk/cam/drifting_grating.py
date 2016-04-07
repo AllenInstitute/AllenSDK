@@ -60,7 +60,7 @@ class DriftingGrating(OPAnalysis):
         '''finds the peak response for each cell'''
         DriftingGrating._log.info('Calculating peak response properties')
         
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('Ori','TF','response_variability_dg','OSI_dg','DSI','peak_DFF_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_variability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg'))
 
         orivals_rad = np.deg2rad(self.orivals)
         for nc in range(self.numbercells):
