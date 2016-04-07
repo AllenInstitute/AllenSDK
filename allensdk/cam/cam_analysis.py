@@ -22,7 +22,7 @@ from allensdk.cam.natural_movie import NaturalMovie
 from allensdk.core.cam_nwb_data_set import CamNwbDataSet
 
 import allensdk.cam.cam_plotting as cp
-import argparse, logging
+import argparse, logging, os
 
 class CamAnalysis(object):
     _log = logging.getLogger('allensdk.cam.cam_analysis')    
@@ -164,6 +164,11 @@ def multi_dataframe_merge(dfs):
     
                     
 def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=False):
+    save_dir = os.path.dirname(save_path)
+
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
     cam_analysis = CamAnalysis(nwb_path, save_path, meta_data)
 
     if session == CamAnalysis.SESSION_A:
