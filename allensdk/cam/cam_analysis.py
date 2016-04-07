@@ -26,9 +26,9 @@ import argparse, logging
 
 class CamAnalysis(object):
     _log = logging.getLogger('allensdk.cam.cam_analysis')    
-    STIMULUS_A = 'A'
-    STIMULUS_B = 'B'
-    STIMULUS_C = 'C'
+    SESSION_A = 'three_session_A'
+    SESSION_B = 'three_session_B'
+    SESSION_C = 'three_session_C'
 
     def __init__(self, nwb_path, save_path, meta_data=None):
         self.nwb = CamNwbDataSet(nwb_path)                        
@@ -45,7 +45,7 @@ class CamAnalysis(object):
         for k,v in self.meta_data.iteritems():
             df[k] = v
 
-    def save_stimulus_a(self, dg, nm1, nm3, peak):
+    def save_session_a(self, dg, nm1, nm3, peak):
         nwb = CamNwbDataSet(self.save_path)
         nwb.save_analysis_dataframes(
             ('stim_table_dg', dg.stim_table),
@@ -65,7 +65,7 @@ class CamAnalysis(object):
             ('binned_dx_vis', nm1.binned_dx_vis))
     
         
-    def save_stimulus_b(self, sg, nm1, ns, peak): 
+    def save_session_b(self, sg, nm1, ns, peak): 
         nwb = CamNwbDataSet(self.save_path)
         nwb.save_analysis_dataframes(
             ('stim_table_sg', sg.stim_table),
@@ -88,7 +88,7 @@ class CamAnalysis(object):
             ('binned_dx_vis', nm1.binned_dx_vis))
     
     
-    def save_stimulus_c(self, lsn, nm1, nm2, peak):                
+    def save_session_c(self, lsn, nm1, nm2, peak):                
         nwb = CamNwbDataSet(self.save_path)
         nwb.save_analysis_dataframes(
             ('stim_table_lsn', lsn.stim_table),
@@ -107,11 +107,11 @@ class CamAnalysis(object):
             ('binned_cells_vis', nm1.binned_cells_vis))
     
     
-    def stimulus_a(self, plot_flag=False, save_flag=True):
+    def session_a(self, plot_flag=False, save_flag=True):
         dg = DriftingGrating(self)
         nm3 = NaturalMovie(self, 'natural_movie_three')    
         nm1 = NaturalMovie(self, 'natural_movie_one')        
-        CamAnalysis._log.info("Stimulus A analyzed")
+        CamAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
         self.append_meta_data(peak)
 
@@ -120,13 +120,13 @@ class CamAnalysis(object):
             cp.plot_drifting_grating_traces(dg)
     
         if save_flag:
-            self.save_stimulus_a(dg, nm1, nm3, peak)
+            self.save_session_a(dg, nm1, nm3, peak)
     
-    def stimulus_b(self, plot_flag=False, save_flag=True):
+    def session_b(self, plot_flag=False, save_flag=True):
         sg = StaticGrating(self)    
         ns = NaturalScenes(self)
         nm1 = NaturalMovie(self, 'natural_movie_one')            
-        CamAnalysis._log.info("Stimulus B analyzed")
+        CamAnalysis._log.info("Session B analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, sg.peak, ns.peak, nm1.peak])
         self.append_meta_data(peak)
                 
@@ -136,13 +136,13 @@ class CamAnalysis(object):
             cp.plot_sg_traces(sg)
                     
         if save_flag:
-            self.save_stimulus_b(sg, nm1, ns, peak)
+            self.save_session_b(sg, nm1, ns, peak)
     
-    def stimulus_c(self, plot_flag=False, save_flag=True):
+    def session_c(self, plot_flag=False, save_flag=True):
         nm2 = NaturalMovie(self, 'natural_movie_two')
         lsn = LocallySparseNoise(self)
         nm1 = NaturalScenes(self, 'natural_movie_one')
-        CamAnalysis._log.info("Stimulus C analyzed")
+        CamAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_meta_data(peak)
                 
@@ -151,7 +151,7 @@ class CamAnalysis(object):
             cp.plot_lsn_traces(lsn)
     
         if save_flag:
-            self.save_stimulus_c(lsn, nm1, nm2, peak)
+            self.save_session_c(lsn, nm1, nm2, peak)
 
 def multi_dataframe_merge(dfs):
     out_df = None
@@ -163,17 +163,17 @@ def multi_dataframe_merge(dfs):
     return out_df
     
                     
-def run_cam_analysis(stimulus, nwb_path, save_path, meta_data=None, plot_flag=False):
+def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=False):
     cam_analysis = CamAnalysis(nwb_path, save_path, meta_data)
 
-    if stimulus == CamAnalysis.STIMULUS_A:
-        cam_analysis.stimulus_a(plot_flag)
-    elif stimulus == CamAnalysis.STIMULUS_B:
-        cam_analysis.stimulus_b(plot_flag)
-    elif stimulus == CamAnalysis.STIMULUS_C:
-        cam_analysis.stimulus_c(plot_flag)
+    if session == CamAnalysis.SESSION_A:
+        cam_analysis.session_a(plot_flag)
+    elif session == CamAnalysis.SESSION_B:
+        cam_analysis.session_b(plot_flag)
+    elif session == CamAnalysis.SESSION_C:
+        cam_analysis.session_c(plot_flag)
     else:
-        raise IndexError("Unknown stimulus: %s" % stimulus)
+        raise IndexError("Unknown session: %s" % session)
     
 def main():
     parser = argparse.ArgumentParser()
@@ -181,7 +181,7 @@ def main():
     parser.add_argument("--output_nwb", default=None)
 
     # TODO: unhardcode
-    parser.add_argument("--stimulus", default=CamAnalysis.STIMULUS_A)
+    parser.add_argument("--session", default=CamAnalysis.SESSION_A)
     parser.add_argument("--plot", action='store_true')
 
     # meta data
@@ -203,7 +203,7 @@ def main():
     if args.depth is not None:
         meta_data['depth'] = args.depth
 
-    run_cam_analysis(args.stimulus, args.input_nwb, args.output_nwb, meta_data, args.plot)
+    run_cam_analysis(args.session, args.input_nwb, args.output_nwb, meta_data, args.plot)
 
 
 if __name__=='__main__': main()
