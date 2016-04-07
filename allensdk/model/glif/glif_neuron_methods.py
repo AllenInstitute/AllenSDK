@@ -170,7 +170,7 @@ def dynamics_AScurrent_vector(neuron, AScurrents_t0, time_step, spike_time_steps
     for spike_time_step in spike_time_steps:
         try:
             total += vector[:, time_step - spike_time_step]
-        except Exception, e:
+        except Exception as e:
             pass
         
     return total
@@ -710,7 +710,7 @@ METHOD_LIBRARY = {
         'piecewise_linear_exact':         dynamics_voltage_piecewise_linear_exact,
         },
     'threshold_dynamics_method': {
-        'spike_component':          dynamics_threshold_spike_component, #note cant just use dynamics_threshold_three_sep_components_exact b/c of a zero division error.
+        'spike_component':          dynamics_threshold_spike_component, 
         'inf':                      dynamics_threshold_inf,
         'three_components_forward': dynamics_threshold_three_components_forward, 
         'three_components_exact':   dynamics_threshold_three_components_exact 

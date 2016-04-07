@@ -15,9 +15,12 @@
 
 import allensdk.core.json_utilities as ju
 import logging
-
+from allensdk.config.manifest import Manifest
+import pandas as pd
 
 class ManifestBuilder(object):
+    df_columns = ['key','parent_key','spec','type','format']
+
     def __init__(self):
         self._log = logging.getLogger(__name__)
         self.path_info = []
@@ -59,6 +62,23 @@ class ManifestBuilder(object):
         return wrapper
     
     
+    def get_manifest(self):
+        return Manifest(self.path_info)
+
+    
     def write_json_string(self):
         config = self.get_config()
         return ju.write_string(config)
+
+    
+    def as_dataframe(self):
+        return pd.DataFrame(self.path_info,
+                            columns=ManifestBuilder.df_columns)
+    
+    def from_dataframe(self, df):
+        self.path_info = {}
+        
+        for _,k,p,s,t,f in df.loc[:,ManifestBuilder.df_columns].iteritems():
+            self.add_path(k, s, typename=t, parent=p, format=f)
+            
+            

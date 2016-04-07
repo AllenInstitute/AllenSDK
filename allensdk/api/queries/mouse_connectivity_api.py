@@ -278,6 +278,13 @@ class MouseConnectivityApi(RmaApi):
                                                       release,
                                                       coordinate_framework)
         
+        if save_file_path == None:
+            save_file_path = file_name
+        
+        if save_file_path == None:
+            save_file_path = 'volumetric_data.nrrd'
+        
+        
         self.retrieve_file_over_http(url, save_file_path)
     
     
@@ -363,6 +370,8 @@ class MouseConnectivityApi(RmaApi):
         injection_domain : list of integers or strings, optional
              Integer Structure.id or String Structure.acronym.
         primary_structure_only : boolean, optional
+        product_ids : list of integers, optional
+            Integer Product.id
         start_row : integer, optional
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
@@ -398,6 +407,8 @@ class MouseConnectivityApi(RmaApi):
         injection_structures : list of integers or strings, optional
             Integer Structure.id or String Structure.acronym.
         primary_structure_only : boolean, optional
+        product_ids : list of integers, optional
+            Integer Product.id
         start_row : integer, optional
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
@@ -429,6 +440,8 @@ class MouseConnectivityApi(RmaApi):
         injection_structures : list of integers or strings, optional
             Integer Structure.id or String Structure.acronym.
         primary_structure_only : boolean, optional
+        product_ids : list of integers, optional
+            Integer Product.id        
         start_row : integer, optional
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
@@ -463,6 +476,8 @@ class MouseConnectivityApi(RmaApi):
         injection_structures : list of integers or strings, optional
             Integer Structure.id or String Structure.acronym.
         primary_structure_only : boolean, optional
+        product_ids : list of integers, optional
+            Integer Product.id
         start_row : integer, optional
             For paging purposes. Defaults to 0.
         num_rows : integer, optional

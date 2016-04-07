@@ -16,6 +16,7 @@
 import os
 import re
 import logging
+import pandas as pd
 
 class Manifest(object):
     """Manages the location of external files 
@@ -241,6 +242,21 @@ class Manifest(object):
         return path_format
     
     
+    @classmethod
+    def safe_mkdir(cls, directory):
+        '''Create path if not already there.
+        
+        Parameters
+        ----------
+        directory : string
+            create it if it doesn't exist
+        '''        
+        try:
+            os.makedirs(directory)
+        except Exception as e:
+            print e.message
+                
+    
     def create_dir(self, path_key):
         '''Make a directory for an entry.
         
@@ -250,11 +266,7 @@ class Manifest(object):
             Reference to the entry.
         '''
         dir_path = self.get_path(path_key)
-        
-        try:
-            os.stat(dir_path)
-        except:
-            os.mkdir(dir_path)
+        Manifest.safe_mkdir(dir_path)
     
     
     def check_dir(self, path_key, do_exit=False):
@@ -275,6 +287,7 @@ class Manifest(object):
             if do_exit == True:
                 quit()
     
+    
     def resolve_paths(self, description_dict, suffix='_key'):
         '''Walk input items and expand those that refer to a manifest entry.
         
@@ -294,3 +307,7 @@ class Manifest(object):
                 filename = self.get_path(manifest_key)
                 description_dict[real_key] = filename
                 del description_dict[description_key]
+
+    def as_dataframe(self):
+        return pd.DataFrame.from_dict(self.path_info,
+                                      orient='index')

@@ -1,14 +1,46 @@
-# DOCKER-VERSION 0.3.4
 #
-# https://hub.docker.com/r/neuralensemble/simulation/
+# A Docker image for running allensdk with neuronal network simulations
 #
 # docker build --tag alleninstitute/allensdk:neuralensemble .
 # docker run -it alleninstitute/allensdk:neuralensemble /bin/bash
-# source ~/env/simulation/bin/activate
+# source ~/env/neurosci/bin/activate
 #
-FROM neuralensemble/simulation
-
+FROM neuralensemble/base
 MAINTAINER Tim Fliss <timf@alleninstitute.org>
+
+RUN $VENV/bin/pip install --upgrade
+
+ENV NEST=nest-2.6.0 NEST_VERSION=2.6.0 NRN=nrn-7.4 NRN_VERSION=7.4 NRN_RELEASE=7.4.rel-1370
+
+WORKDIR /home/docker/packages
+RUN wget http://www.github.com/nest/nest-simulator/releases/download/v$NEST_VERSION/$NEST.tar.gz
+RUN wget https://www.neuron.yale.edu/ftp/neuron/versions/v$NRN_VERSION/v$NRN_RELEASE/nrn-$NRN_RELEASE.tar.gz
+RUN tar xzf $NEST.tar.gz; tar xzf nrn-$NRN_RELEASE.tar.gz; rm $NEST.tar.gz nrn-$NRN_RELEASE.tar.gz
+RUN svn co --username Anonymous --password Anonymous --non-interactive http://svn.incf.org/svn/libneurosim/trunk libneurosim
+RUN cd libneurosim; ./autogen.sh
+
+RUN mkdir $VENV/build
+WORKDIR $VENV/build
+RUN mkdir libneurosim; \
+    cd libneurosim; \
+    PYTHON=$VENV/bin/python $HOME/packages/libneurosim/configure --prefix=$VENV; \
+    make; make install; ls $VENV/lib $VENV/include
+RUN mkdir $NEST; \
+    cd $NEST; \
+    PYTHON=$VENV/bin/python $HOME/packages/$NEST/configure --with-mpi --prefix=$VENV --with-libneurosim=$VENV; \
+    make; make install
+RUN mkdir $NRN; \
+    cd $NRN; \
+    $HOME/packages/$NRN/configure --with-paranrn --with-nrnpython=$VENV/bin/python --without-iv --disable-rx3d --prefix=$VENV; \
+    make; make install; \
+    cd src/nrnpython; $VENV/bin/python setup.py install; \
+    cd $VENV/bin; ln -s ../x86_64/bin/nrnivmodl
+
+RUN $VENV/bin/pip install lazyarray brian nrnutils
+RUN wget https://github.com/NeuralEnsemble/PyNN/archive/0.8.0rc1.tar.gz -O /home/docker/packages/PyNN-0.8.0rc1.tar.gz
+RUN PATH=$PATH:$VENV/bin $VENV/bin/pip install /home/docker/packages/PyNN-0.8.0rc1.tar.gz
+
+WORKDIR /home/docker/
 
 USER root
 
@@ -29,5 +61,7 @@ WORKDIR $VENV/build
 RUN tar xvzf /home/docker/packages/${ALLENSDK}
 RUN $VENV/bin/pip install /home/docker/packages/${ALLENSDK}
 
-RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv
+RUN $VENV/bin/pip install jupyter
+RUN jupyter-notebook --generate-config
 
+RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv
