@@ -20,7 +20,7 @@ import pandas as pd
 import os, logging
 from numpy import arange
 
-def plot_Drifting_grating_Traces(self):
+def plot_drifting_grating_traces(self):
     '''saves figures with a Ori X TF grid of mean resposes'''
     logging.info("Plotting Ori and TF mean response for all cells")
     
