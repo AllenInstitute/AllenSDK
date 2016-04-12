@@ -27,7 +27,7 @@ def plot_drifting_grating_traces(self):
     blank =  self.sweep_response[self.stim_table.temporal_frequency==0]          
     for nc in range(self.numbercells):
         if np.mod(nc,100)==0:
-            logging.info("Cell #", str(nc))
+            logging.info("Cell #%s", str(nc))
         xtime = np.arange(-1*self.interlength/self.acquisition_rate, (self.sweeplength+self.interlength)/self.acquisition_rate, 1/self.acquisition_rate)
         plt.figure(nc, figsize=(20,16))
         vmax=0
@@ -104,7 +104,7 @@ def plot_ns_traces(self):
     blank =  self.sweep_response[self.stim_table.frame==-1]       
     for nc in range(self.numbercells):
         if np.mod(nc,100)==0:
-            logging.info("Cell #", str(nc))
+            logging.info("Cell #%s", str(nc))
         vmax=0
         vmin=0
         blank_p =  blank[str(nc)].mean() + (blank[str(nc)].std()/len(blank[str(nc)]))
@@ -148,7 +148,7 @@ def plot_sg_traces(self):
     blank = self.sweep_response[self.stim_table.spatial_frequency==0]
     for nc in range(self.numbercells):
         if np.mod(nc,100)==0:
-            logging.info("Cell #", str(nc))
+            logging.info("Cell #%s", str(nc))
         vmax=0
         vmin=0
         blank_p =  blank[str(nc)].mean() + (blank[str(nc)].std()/len(blank[str(nc)]))
@@ -210,7 +210,7 @@ def plot_lsn_traces(self):
         xtime = np.delete(xtime, -1)
     for nc in range(self.numbercells):
         if np.mod(nc,100)==0:
-            logging.info("Cell #", str(nc))
+            logging.info("Cell #%s", str(nc))
             
         plt.figure(nc, figsize=(24,20))
         vmax=0
@@ -253,7 +253,7 @@ def plot_3sa(dg, nm1, nm3):
     logging.info("Plotting for all cell")
     for nc in range(dg.numbercells):
         if np.mod(nc,100)==0:
-            logging.info("Cell #", str(nc))
+            logging.info("Cell #%s", str(nc))
         plt.figure(nc, figsize=(20,20))
         ax1 = plt.subplot2grid((6,6), (0,0), colspan=4) #full trace
         ax2 = plt.subplot2grid((6,6), (0,4))            #histogram of F
@@ -404,7 +404,7 @@ def plot_3sc(lsn, nm1, nm2):
     logging.info("Plotting for all cells")
     for nc in range(lsn.numbercells):
         if np.mod(nc,100)==0:
-            logging.info("Cell #", str(nc))
+            logging.info("Cell #%s", str(nc))
                          
         plt.figure(nc, figsize=(20,20)) 
         ax1 = plt.subplot2grid((6,6), (0,0), colspan=4) #full trace
@@ -544,7 +544,7 @@ def plot_3sb(sg, nm1, ns):
     logging.info("Plotting for all cells")
     for nc in range(sg.numbercells):
         if np.mod(nc,100)==0:
-            logging.info("Cell #", str(nc))
+            logging.info("Cell #%s", str(nc))
         plt.figure(nc, figsize=(20,24)) 
         ax1 = plt.subplot2grid((6,6), (0,0), colspan=4) #full trace
         ax2 = plt.subplot2grid((6,6), (0,4))            #histogram of F
