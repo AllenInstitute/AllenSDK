@@ -179,6 +179,8 @@ def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled):
     T = len(F_M_unscaled)
     assert T == len(F_N_unscaled), "Input arrays of different dimension"
     T_cross_val = int(T/2)
+    if T - T_cross_val > T_cross_val:
+        T = T - 1
     ns = NeuropilSubtract(T_cross_val, lam=0.05)
     F_M_unscaled_cross_val = np.copy(F_M_unscaled)
     F_N_unscaled_cross_val = np.copy(F_N_unscaled)

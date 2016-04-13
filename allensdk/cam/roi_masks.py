@@ -6,7 +6,7 @@ from motion_border import *
 # TODO document and format for SDK
 
 class Mask(object):
-    def __init__(self, image_w, image_h, label):
+    def __init__(self, image_w, image_h, label, mask_group):
         self.img_rows = image_h
         self.img_cols = image_w
         # initialize to invalid state. Mask must be manually initialized 
@@ -20,13 +20,16 @@ class Mask(object):
         # label is for distinguishing neuropil from ROI, in case 
         #   these masks are mixed together
         self.label = label
+        # auxiliary metadata. if a particula mask is part of an group,
+        #   that data can be stored here
+        self.mask_group = mask_group
 
     def __str__(self):
         return "%s: TL=%d,%d w,h=%d,%d\n%s" % (self.label, self.x, self.y, self.width, self.height, str(self.mask))
 
 
-def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, label=None):
-    m = ROI_Mask(image_w, image_h, label)
+def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, label=None, mask_group=-1):
+    m = ROI_Mask(image_w, image_h, label, mask_group)
     if pix_list is not None:
         m.init_by_pixels(border, pix_list)
     elif roi_mask is not None:
@@ -37,8 +40,8 @@ def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, labe
 
 
 class ROI_Mask(Mask):
-    def __init__(self, image_w, image_h, label):
-        super(ROI_Mask, self).__init__(image_w, image_h, label)
+    def __init__(self, image_w, image_h, label, mask_group):
+        super(ROI_Mask, self).__init__(image_w, image_h, label, mask_group)
 
     def init_by_pixels(self, border, pix_list):
         assert pix_list.shape[1] == 2, "Pixel list not properly formed"
@@ -98,15 +101,14 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
     # eliminate ROIs from the dilation
     binary_mask_dilated = binary_mask_dilated > combined_binary_mask
     # create mask from binary dilation
-    m = Neuropil_Mask(w=roi.img_cols, h=roi.img_rows, label=label)
+    m = Neuropil_Mask(w=roi.img_cols, h=roi.img_rows, label=label, mask_group=roi.mask_group)
     m.init_by_mask(border, binary_mask_dilated)
     return m
 
 
 class Neuropil_Mask(Mask):
-    def __init__(self, w, h, label):
-        super(Neuropil_Mask, self).__init__(w, h, label)
-
+    def __init__(self, w, h, label, mask_group):
+        super(Neuropil_Mask, self).__init__(w, h, label, mask_group)
 
 
     def init_by_pixels(self, border, pix_list):
