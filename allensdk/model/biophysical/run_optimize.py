@@ -18,10 +18,14 @@ class RunOptimize(object):
                  output_json):
         self.input_json = input_json
         self.output_json = output_json
+        self.app_config = None
+        self.manifest = None
+        self.data_set = None
         
+
+    def load_manifest(self):
         self.app_config = Config().load(input_json)
-        self.manifest = self.app_config.manifest
-        
+        self.manifest = self.app_config.manifest                
         self.data_set = NwbDataSet(self.manifest.get_path('stimulus_path'))
     
     
@@ -35,16 +39,11 @@ class RunOptimize(object):
         ''' return a string that a bash script can use
         to find the working directory, etc. to clean up.
         '''
+        self.load_manifest()
+        
         print(self.app_config.data['runs'][0]['specimen_id'])
         print(self.manifest.get_path('BASEDIR'))
     
-    
-    def validate_config(self):
-        specimen_config = self.config_from_lims.lims_data['specimen']
-        
-        if not 'specimen_tags' in specimen_config:
-            raise(Exception('could not find speciment tags'))
-
     
     def copy_local(self):
         '''
@@ -52,6 +51,8 @@ class RunOptimize(object):
         ----
         For files that aren't needed for local debugging, use write_manifest instead.
         '''
+        self.load_manifest()
+
         modfile_dir = self.manifest.get_path('MODFILE_DIR')
             
         if not os.path.exists(modfile_dir):
@@ -89,7 +90,7 @@ class RunOptimize(object):
         '''
         import json
         from allensdk.api.api import Api    
-        #Api.default_api_url = 'http://axon:3000'
+        Api.default_api_url = 'http://axon:3000'
         
         bma = BiophysicalModuleApi()
         data = bma.get_neuronal_models(neuronal_model_id)
@@ -102,11 +103,27 @@ class RunOptimize(object):
         
         ocr.to_manifest(manifest_path)
         
+
+    def generate_manifest_lims(self,
+                               lims_json_path,
+                               manifest_path):
+        '''
+        Note
+        ----
+        Other necessary files are also written.
+        '''
+        ocr = OptimizeConfigReader()
+        ocr.read_lims_file(lims_json_path)
+                
+        ocr.to_manifest(manifest_path)
     
+        
     def start_specimen(self):
         import allensdk.model.biophysical.run_passive_fit as run_passive_fit
         import allensdk.model.biophysical.fit_stage_1 as fit_stage_1
         import allensdk.model.biophysical.fit_stage_2 as fit_stage_2
+
+        self.load_manifest()
         
         self.passive_fit_data = \
             run_passive_fit.run_passive_fit(self.app_config)
@@ -128,6 +145,8 @@ class RunOptimize(object):
     
     
     def make_fit(self):
+        self.load_manifest()
+        
         fit_types = ["f9", "f13"]
         
         best_fit_values = { fit_type: None for fit_type in fit_types }
@@ -169,6 +188,7 @@ def main(command, input_json, output_json):
         :param lims_response_json: path to json file returned to lims.
         :type lims_response_json: string
     '''
+    
     o = RunOptimize(input_json,
                     output_json)
 
@@ -183,9 +203,10 @@ def main(command, input_json, output_json):
         o.info()
     elif 'generate_manifest_rma' == command:
         o.generate_manifest_rma(input_json, output_json)
+    elif 'generate_manifest_lims' == command:
+        o.generate_manifest_lims(input_json, output_json)
     elif 'write_manifest' == command:
         o.write_manifest()
-        o.validate_config()                        
     elif 'copy_local' == command:
         o.copy_local()
     elif 'start_specimen' == command:
@@ -194,11 +215,12 @@ def main(command, input_json, output_json):
         o.make_fit()
     else:
         RunOptimize._log.error("no command")
+        
+    print('done')
 
 
 if __name__ == '__main__':
     import sys
-    import allensdk.eclipse_debug
     
     command, input_json, output_json = sys.argv[-3:]
     
