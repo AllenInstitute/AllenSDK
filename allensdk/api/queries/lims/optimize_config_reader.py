@@ -4,6 +4,7 @@ import allensdk.core.lims_utilities as lims_utilities
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.config.manifest import Manifest
 import json
+import traceback
 
 class OptimizeConfigReader(object):
     _log = logging.getLogger('allensdk.api.queries.lims.optimize_config_reader')
@@ -24,12 +25,27 @@ class OptimizeConfigReader(object):
         self.lims_data = message[0]
         self.lims_update_data = dict(self.lims_data)
     
-        
+
+    def read_lims_file(self, lims_path):
+        self.lims_path = lims_path
+        self.read_json(lims_path)
+        self.lims_update_data = dict(self.lims_data)
+    
+            
     def read_json(self, path):
         self.lims_path = os.path.realpath(path)
         
-        with open(path, 'rb') as f:
-            self.read_json_string(f.read())
+        try:
+            f = open(self.lims_path)
+            json_string = f.read()
+            
+            self.read_json_string(json_string)
+        except Exception:
+            traceback.print_exc()
+        finally:
+            f.close()
+            
+        return self.lims_data
     
     
     def read_json_string(self, json_string):
@@ -332,9 +348,9 @@ class OptimizeConfigReader(object):
         
         OptimizeConfigReader._log.info("Result paths; %s" % (result_paths))
         return result_paths
+
     
-        
-    def to_manifest(self, manifest_path=None):
+    def build_manifest(self, manifest_path=None):
         b = ManifestBuilder()
         
         b.add_path('BASEDIR', os.path.realpath(os.curdir))
@@ -441,7 +457,12 @@ class OptimizeConfigReader(object):
         b.add_section('hoc_conf',
                       {"neuron" : [{"hoc": [ "stdgui.hoc", "import3d.hoc", "cell.hoc" ]
                                     }]}) 
-        
+
+        return b
+    
+    
+    def to_manifest(self, manifest_path=None):
+        b = self.build_manifest(manifest_path)
         
         m = Manifest(config=b.path_info)
         
