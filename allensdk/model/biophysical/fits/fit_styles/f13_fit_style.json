@@ -1,18 +1,18 @@
 {
   "fit_name": "f13",
   "features": [
-    "rate", 
-    "f_peak", 
-    "f_fast_ahp", 
-    "f_slow_ahp", 
-    "f_slow_ahp_time", 
-    "base_v", 
+    "avg_rate",
+    "peak_v",
+    "fast_trough_v",
+    "slow_trough_delta_v",
+    "slow_trough_delta_time",
+    "v_baseline",
     "width",
     "adapt",
     "latency",
-    "ISICV",
-    "isi_avg",
-    "doublet"
+    "isi_cv",
+    "mean_isi",
+    "first_isi"
   ],
   "channels": [
     { "mechanism": "Ih", "section": "soma", "parameter": "gbar", "min": 0, "max": 1e-1 },

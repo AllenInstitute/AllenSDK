@@ -88,8 +88,7 @@ class OptimizeConfigReader(object):
             directory, it can be mocked out for testing if the
             optimize directory is write only.
         '''
-        return '/home/timf/lims_sdk'
-        #return self.neuronal_model_optimize_dir()
+        return self.neuronal_model_optimize_dir()
     
     
     def output_directory(self):

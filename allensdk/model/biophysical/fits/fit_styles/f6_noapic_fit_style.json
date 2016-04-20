@@ -73,12 +73,12 @@
     }
   ], 
   "features": [
-    "rate", 
-    "f_peak", 
-    "f_fast_ahp", 
-    "f_slow_ahp", 
-    "f_slow_ahp_time", 
-    "base_v", 
+    "avg_rate",
+    "peak_v",
+    "fast_trough_v",
+    "slow_trough_delta_v",
+    "slow_trough_delta_time",
+    "v_baseline",
     "width"
   ],
   "addl_params": [

@@ -1,5 +1,5 @@
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
-from allensdk.ephys.feature_extractor import EphysFeatureExtractor
+from allensdk.ephys.ephys_extractor import EphysSweepFeatureExtractor
 import logging
 
 import numpy as np
@@ -145,22 +145,22 @@ class Utils(HocUtils):
         if np.abs(v[-1] - v[:start_index].mean()) > 2.0:
             fail_trace = True
         else:
-            prefeat_fx = EphysFeatureExtractor()
-            prefeat_fx.process_instance("", v, i, t, 0, delay, "")
-            if prefeat_fx.feature_list[0].mean['n_spikes'] > 0:
+            swp = EphysSweepFeatureExtractor(t, v, i, start=0, end=delay, filter=None)
+            swp.process_spikes()
+            if swp.sweep_feature("avg_rate") > 0:
                 fail_trace = True
 
         target_features = self.description.data['target_features']
         target_features_dict = {f["name"]: {"mean": f["mean"], "stdev": f["stdev"]} for f in target_features}
 
         if not fail_trace:
-            fx = EphysFeatureExtractor()
-            fx.process_instance("", v, i, t, delay, duration, "")
-            if fx.feature_list[0].mean['n_spikes'] < minimum_num_spikes: # Enough spikes?
+            swp = EphysSweepFeatureExtractor(t, v, i, start=delay, end=(delay + duration), filter=None)
+            swp.process_spikes()
+            if len(swp.spikes()) < minimum_num_spikes: # Enough spikes?
                 fail_trace = True
             else:
-                avg_per_spike_peak_error = np.mean([abs(spk["f_peak"] - target_features_dict["f_peak"]["mean"]) for spk in fx.feature_list[0].mean["spikes"]])
-                avg_overall_error = abs(target_features_dict["f_peak"]["mean"] - fx.feature_list[0].mean["f_peak"])
+                avg_per_spike_peak_error = np.mean([abs(spk["peak_v"] - target_features_dict["peak_v"]["mean"]) for spk in swp.spikes()])
+                avg_overall_error = abs(target_features_dict["peak_v"]["mean"] - swp.spike_feature("peak_v").mean())
                 if avg_per_spike_peak_error > 3.0 * avg_overall_error: # Weird bi-modality of spikes; 3.0 is arbitrary
                     fail_trace = True
 
@@ -172,14 +172,45 @@ class Utils(HocUtils):
             errs = np.ones(len(feature_names)) * error_value
         else:
             errs = []
+
+            # Calculate additional features not done by swp.process_spikes()
+            baseline_v = swp.sweep_feature("v_baseline")
+            other_features = {}
+            threshold_t = swp.spike_feature("threshold_t")
+            fast_trough_t = swp.spike_feature("fast_trough_t")
+            slow_trough_t = swp.spike_feature("slow_trough_t")
+
+            delta_t = slow_trough_t - fast_trough_t
+            delta_t[np.isnan(delta_t)] = 0.
+            other_features["slow_trough_delta_time"] = np.mean(delta_t[:-1] / np.diff(threshold_t))
+
+            fast_trough_v = swp.spike_feature("fast_trough_v")
+            slow_trough_v = swp.spike_feature("slow_trough_v")
+            delta_v = fast_trough_v - slow_trough_v
+            delta_v[np.isnan(delta_v)] = 0.
+            other_features["slow_trough_delta_v"] = delta_v.mean()
+
             for f in feature_names:
-                if f in fx.feature_list[0].mean and fx.feature_list[0].mean[f] is not None:
                     target_mean = target_features_dict[f]['mean']
                     target_stdev = target_features_dict[f]['stdev']
-                    model_mean = fx.feature_list[0].mean[f]
-                    errs.append(np.abs((model_mean - target_mean) / target_stdev))
+
+                if target_stdev == 0:
+                    print "Feature with 0 stdev: ", f
+
+                if f in swp.spike_feature_keys():
+                    model_mean = swp.spike_feature(f).mean()
+                elif f in swp.sweep_feature_keys():
+                    model_mean = swp.sweep_feature(f)
+                elif f in other_features:
+                    model_mean = other_features[f]
                 else:
+                    model_mean = np.nan
+
+                if np.isnan(model_mean):
                     errs.append(missing_penalty_value)
+                else:
+                    errs.append(np.abs((model_mean - target_mean) / target_stdev))
+
             errs = np.array(errs)
         return errs
 
