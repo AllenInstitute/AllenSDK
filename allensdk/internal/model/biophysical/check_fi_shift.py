@@ -1,7 +1,7 @@
 import numpy as np
 from collections import Counter
 from allensdk.ephys.feature_extractor import EphysFeatureExtractor
-import ephys_utils
+import allensdk.model.biophysical.ephys_utils as ephys_utils
 
 def calculate_fi_curves(data_set, sweeps):
 

@@ -1,19 +1,19 @@
 import os, sys
 import subprocess
 import numpy as np
-import ephys_utils
+import allensdk.model.biophysical.ephys_utils as ephys_utils
 import passive_fitting.preprocess as passive_prep
 
 import allensdk.core.json_utilities as ju
 from allensdk.model.biophys_sim.config import Config
 from allensdk.core.nwb_data_set import NwbDataSet
-from allensdk.model.biophysical.passive_fitting import neuron_passive_fit
-from allensdk.model.biophysical.passive_fitting import neuron_passive_fit2
-from allensdk.model.biophysical.passive_fitting import neuron_passive_fit_elec
+from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit
+from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit2
+from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit_elec
 import logging
 import allensdk
 
-_run_passive_fit_log = logging.getLogger('allensdk.model.biophysical.run_passive_fit')
+_run_passive_fit_log = logging.getLogger('allensdk.internal.model.biophysical.run_passive_fit')
 
 def run_passive_fit(description):
     output_directory = description.manifest.get_path('WORKDIR')
