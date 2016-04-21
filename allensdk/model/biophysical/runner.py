@@ -117,12 +117,17 @@ def save_nwb(output_path, v, sweep, sweeps_by_type):
     output = NwbDataSet(output_path)
     output.set_sweep(sweep, None, v)
     
-    sweep_by_type = {t: [ sweep ] for t, ss in sweeps_by_type.items() if sweep in ss }
-    sweep_features = extract_cell_features.extract_sweep_features(output,
-                                                                  sweep_by_type)
-    spikes = sweep_features[sweep]['spikes']
-    spike_times = [ s['peak_t'] for s in spikes ]
-    output.set_spike_times(sweep, spike_times)
+    sweep_type = [t for t, ss in sweeps_by_type.items() if sweep in ss ][0]
+    sweep_features = extract_cell_features.extract_sweep_features_for_type(output,
+                                                                           [sweep],
+                                                                           sweep_type)
+    try:
+        spikes = sweep_features[sweep]['spikes']
+        spike_times = [ s['threshold_t'] for s in spikes ]
+        output.set_spike_times(sweep, spike_times)
+    except Exception, e:
+        logging.info("sweep %d has no sweep features. %s" % (sweep, e.message) )
+        
 
 
 def load_description(manifest_json_path):

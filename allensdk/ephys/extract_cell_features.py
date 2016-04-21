@@ -51,6 +51,13 @@ def extract_sweep_features(data_set, sweeps_by_type):
     sweep_features = {}
 
     for stimulus_type, sweep_numbers in sweeps_by_type.iteritems():
+        fex = extract_sweep_features_for_type(data_set, sweep_numbers, stimulus_type)
+        sweep_features.update({ f.id:f.as_dict() for f in fex.sweeps() })
+        
+    return sweep_features
+
+
+def extract_sweep_features_for_type(data_set, sweep_numbers, stimulus_type):
         logging.debug("%s:%s" % (stimulus_type, ','.join(map(str, sweep_numbers))))
 
         if stimulus_type in SHORT_SQUARE_TYPES:
@@ -70,9 +77,8 @@ def extract_sweep_features(data_set, sweeps_by_type):
 
         fex.process_spikes()
         
-        sweep_features.update({ f.id:f.as_dict() for f in fex.sweeps() })            
-
-    return sweep_features
+        return fex            
+    
 
 def extract_cell_features(data_set,
                           ramp_sweep_numbers, 
