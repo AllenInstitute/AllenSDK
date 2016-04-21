@@ -220,8 +220,6 @@ def main(command, input_json, output_json):
 
 
 if __name__ == '__main__':
-    import allensdk.eclipse_debug
-    import allensdk.workdir_shim
     import sys
     
     command, input_json, output_json = sys.argv[-3:]

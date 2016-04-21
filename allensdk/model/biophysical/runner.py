@@ -51,6 +51,7 @@ def run(description, sweeps=None):
     run_params = description.data['runs'][0]
     if sweeps == None:
         sweeps = run_params['sweeps']
+    sweeps_by_type = run_params['sweeps_by_type']
     junction_potential = description.data['fitting'][0]['junction_potential']
     mV = 1.0e-3
     
@@ -73,7 +74,8 @@ def run(description, sweeps=None):
         output_data = (numpy.array(vec['v']) - junction_potential) * mV
         
         output_path = manifest.get_path("output_path")
-        save_nwb(output_path, output_data, sweep)
+        
+        #save_nwb(output_path, output_data, sweep, sweeps_by_type)
 
 
 def prepare_nwb_output(nwb_stimulus_path,
@@ -99,7 +101,7 @@ def prepare_nwb_output(nwb_stimulus_path,
         data_set.set_spike_times(sweep, [])
 
 
-def save_nwb(output_path, v, sweep):
+def save_nwb(output_path, v, sweep, sweeps_by_type):
     '''Save a single voltage output result into an existing sweep in a NWB file.
     This is intended to overwrite a recorded trace with a simulated voltage.
     
@@ -115,8 +117,9 @@ def save_nwb(output_path, v, sweep):
     output = NwbDataSet(output_path)
     output.set_sweep(sweep, None, v)
     
+    sweep_by_type = {t: [ sweep ] for t, ss in sweeps_by_type.items() if sweep in ss }
     sweep_features = extract_cell_features.extract_sweep_features(output_path,
-                                                                  [sweep])
+                                                                  sweep_by_type)
     spikes = sweep_features[sweep]['mean']['spikes']
     spike_times = [ s['t'] for s in spikes ]
     output.set_spike_times(sweep, spike_times)

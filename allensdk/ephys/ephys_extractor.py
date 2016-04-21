@@ -15,7 +15,7 @@ SHORT_SQUARES_WINDOW_START = 1.02
 SHORT_SQUARES_WINDOW_END = 1.021
 
 
-class EphysSweepFeatureExtractor:
+class EphysSweepFeatureExtractor:    
     """Feature calculation for a sweep (voltage and/or current time series)."""
 
     def __init__(self, t=None, v=None, i=None, start=None, end=None, filter=10.,

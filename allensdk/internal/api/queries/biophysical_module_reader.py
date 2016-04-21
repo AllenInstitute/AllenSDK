@@ -205,6 +205,18 @@ class BiophysicalModuleReader(object):
         return sweeps
     
     
+    def sweep_numbers_by_type(self):
+        sweeps = self.sweep_entries()
+        
+        d = {s['ephys_stimulus']['ephys_stimulus_type']['name']: [] for s in sweeps}        
+        
+        for n, s in enumerate(sweeps):
+            t = s['ephys_stimulus']['ephys_stimulus_type']['name']
+            d[t].append(n)
+        
+        return d
+      
+    
     def sweep_numbers(self):
         ''' Get the stimulus sweep numbers from the lims result
             :return: list of sweep numbers
@@ -366,7 +378,8 @@ class BiophysicalModuleReader(object):
                                     "model_type": self.model_type()}]})
         
         b.add_section('stimulus_conf',
-                      {"runs": [{"sweeps": self.sweep_numbers()
+                      {"runs": [{"sweeps": self.sweep_numbers(),
+                                 "sweeps_by_type": self.sweep_numbers_by_type()
                                  }]})
         
         b.add_section('hoc_conf',

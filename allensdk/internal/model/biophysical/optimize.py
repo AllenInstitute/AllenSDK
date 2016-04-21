@@ -217,7 +217,4 @@ def main():
     h.quit()
 
 if __name__ == "__main__":
-    import allensdk.eclipse_debug
-    import allensdk.workdir_shim
-    
     main()

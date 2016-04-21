@@ -97,7 +97,7 @@ class RunSimulate(object):
                     workdir)
         
         shutil.copyfile(self.manifest.get_path('stimulus_path'),
-                        self.manifest.get_path('output'))
+                        self.manifest.get_path('output_path'))
         
         shutil.copy(resource_filename(allensdk.model.biophysical.run_simulate.__name__,
                                       'cell.hoc'),
@@ -121,7 +121,7 @@ class RunSimulate(object):
             raise Exception('Could not read input stimulus path from input config.')
         
         try:
-            out_path = self.manifest.get_path('output')
+            out_path = self.manifest.get_path('output_path')
             RunSimulate._log.info("result NWB file: %s" % (out_path))
         except:
             raise Exception('Could not read output path from input config.')
@@ -183,7 +183,6 @@ def main(command, lims_strategy_json, lims_response_json):
 
 
 if __name__ == '__main__':
-    import allensdk.eclipse_debug
     command, input_json, output_json = sys.argv[-3:]
     
     try:
