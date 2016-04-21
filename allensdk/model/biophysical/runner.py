@@ -75,7 +75,7 @@ def run(description, sweeps=None):
         
         output_path = manifest.get_path("output_path")
         
-        #save_nwb(output_path, output_data, sweep, sweeps_by_type)
+        save_nwb(output_path, output_data, sweep, sweeps_by_type)
 
 
 def prepare_nwb_output(nwb_stimulus_path,
@@ -118,10 +118,10 @@ def save_nwb(output_path, v, sweep, sweeps_by_type):
     output.set_sweep(sweep, None, v)
     
     sweep_by_type = {t: [ sweep ] for t, ss in sweeps_by_type.items() if sweep in ss }
-    sweep_features = extract_cell_features.extract_sweep_features(output_path,
+    sweep_features = extract_cell_features.extract_sweep_features(output,
                                                                   sweep_by_type)
-    spikes = sweep_features[sweep]['mean']['spikes']
-    spike_times = [ s['t'] for s in spikes ]
+    spikes = sweep_features[sweep]['spikes']
+    spike_times = [ s['peak_t'] for s in spikes ]
     output.set_spike_times(sweep, spike_times)
 
 
