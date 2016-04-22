@@ -108,16 +108,17 @@ class CamAnalysis(object):
     
     
     def session_a(self, plot_flag=False, save_flag=True):
+        nm1 = NaturalMovie(self, 'natural_movie_one')        
         dg = DriftingGrating(self)
         nm3 = NaturalMovie(self, 'natural_movie_three')    
-        nm1 = NaturalMovie(self, 'natural_movie_one')        
+
         CamAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
         self.append_meta_data(peak)
 
         if plot_flag:
             cp.plot_3sa(dg, nm1, nm3)
-            cp.plot_drifting_grating_traces()(dg)
+            cp.plot_drifting_grating_traces(dg)
     
         if save_flag:
             self.save_session_a(dg, nm1, nm3, peak)
@@ -141,7 +142,7 @@ class CamAnalysis(object):
     def session_c(self, plot_flag=False, save_flag=True):
         nm2 = NaturalMovie(self, 'natural_movie_two')
         lsn = LocallySparseNoise(self)
-        nm1 = NaturalScenes(self, 'natural_movie_one')
+        nm1 = NaturalMovie(self, 'natural_movie_one')
         CamAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_meta_data(peak)
