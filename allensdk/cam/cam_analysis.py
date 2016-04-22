@@ -206,19 +206,7 @@ class CamAnalysis(object):
     
         if save_flag:
             self.save_session_c(lsn, nm1, nm2, peak)
-<<<<<<< HEAD
-
-def multi_dataframe_merge(dfs):
-    out_df = None
-    for i,df in enumerate(dfs):
-        if out_df is None:
-            out_df = df
-        else:
-            out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
-    return out_df
-=======
->>>>>>> 903397fcc5109844ee44322531124d8987e787b4
-    
+                
                     
 def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=False):
     save_dir = os.path.dirname(save_path)
@@ -230,7 +218,6 @@ def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=Fal
 
     if session == CamAnalysis.SESSION_A:
         cam_analysis.session_a(plot_flag)
-<<<<<<< HEAD
         metrics = cam_analysis.metrics_a
     elif session == CamAnalysis.SESSION_B:
         cam_analysis.session_b(plot_flag)
@@ -242,14 +229,7 @@ def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=Fal
         raise IndexError("Unknown session: %s" % session)
 
     return metrics
-=======
-    elif session == CamAnalysis.SESSION_B:
-        cam_analysis.session_b(plot_flag)
-    elif session == CamAnalysis.SESSION_C:
-        cam_analysis.session_c(plot_flag)
-    else:
-        raise IndexError("Unknown session: %s" % session)
->>>>>>> 903397fcc5109844ee44322531124d8987e787b4
+
     
 def main():
     parser = argparse.ArgumentParser()
