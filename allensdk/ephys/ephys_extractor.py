@@ -298,10 +298,6 @@ class EphysSweepFeatureExtractor:
 
         # Look at baseline interval before start if start is defined
         if self.start is not None:
-            ti_0 = ft.find_time_index(t, self.start - self.baseline_interval)
-            ti_1 = ft.find_time_index(t, self.start)
-
-            dv = ft.calculate_dvdt(v[ti_0:ti_1], t[ti_0:ti_1], filter_frequency)
             return ft.average_voltage(v, t, self.start - self.baseline_interval, self.start)
 
         # Otherwise try to find an interval where things are pretty flat
@@ -699,6 +695,9 @@ class EphysCellFeatureExtractor:
 
         # Need to count how many had spikes at each amplitude; find most; ties go to lower amplitude
         spiking_sweeps = [sweep for sweep in ext.sweeps() if sweep.sweep_feature("avg_rate") > 0]
+
+        if len(spiking_sweeps) == 0:
+            raise ft.FeatureError("No spiking short square sweeps, cannot compute cell features.")
 
         most_common = Counter(map(_short_step_stim_amp, spiking_sweeps)).most_common()
         common_amp, common_count = most_common[0]
