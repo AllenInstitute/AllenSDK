@@ -23,6 +23,9 @@ from allensdk.core.cam_nwb_data_set import CamNwbDataSet
 
 import allensdk.cam.cam_plotting as cp
 import argparse, logging, os
+<<<<<<< HEAD
+import sys
+=======
 
 def multi_dataframe_merge(dfs):
     out_df = None
@@ -32,6 +35,7 @@ def multi_dataframe_merge(dfs):
         else:
             out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
     return out_df
+>>>>>>> 903397fcc5109844ee44322531124d8987e787b4
 
 class CamAnalysis(object):
     _log = logging.getLogger('allensdk.cam.cam_analysis')    
@@ -42,6 +46,10 @@ class CamAnalysis(object):
     def __init__(self, nwb_path, save_path, meta_data=None):
         self.nwb = CamNwbDataSet(nwb_path)                        
         self.save_path = save_path
+
+        self.metrics_a = {}
+        self.metrics_b = {}
+        self.metrics_c = {}
 
         if meta_data is None:
             meta_data = {}
@@ -115,13 +123,51 @@ class CamAnalysis(object):
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis))
     
+    def append_metrics_drifting_grating(self, metrics, dg):
+        metrics["osi_dg"] = dg.peak["osi_dg"]
+        metrics["dsi_dg"] = dg.peak["dsi_dg"]
+        metrics["pref_dir_dg"] = dg.peak["ori_dg"]
+        metrics["pref_tf_dg"] = dg.peak["tf_dg"]
+        metrics["p_dg"] = dg.peak["ptest_dg"]
+    
+    def append_metrics_static_grating(self, metrics, sg):
+        metrics["osi_sg"] = sg.peak["osi_sg"]
+        metrics["pref_ori_sg"] = sg.peak["ori_sg"]
+        metrics["pref_sf_sg"] = sg.peak["sf_sg"]
+        metrics["pref_phase_sg"] = sg.peak["phase_sg"]
+        metrics["p_sg"] = sg.peak["ptest_sg"]
+
+    def append_metrics_natural_scene(self, metrics, ns):
+        metrics["pref_image_ns"] = ns.peak["scene_ns"]
+        metrics["p_ns"] = ns.peak["ptest_ns"]
+        metrics["time_to_peak_ns"] = ns.peak["time_to_peak_ns"]
+
+    def verify_roi_lists_equal(self, roi1, roi2):
+        if len(roi1) != len(roi2):
+            print("Error -- ROI lists are of different length")
+            sys.exit(1)
+        for i in range(len(roi1)):
+            if roi1[i] != roi2[i]:
+                print("Error -- ROI lists have different entries")
+                sys.exit(1)
     
     def session_a(self, plot_flag=False, save_flag=True):
+<<<<<<< HEAD
+        nm1 = NaturalMovie(self, 'natural_movie_one')        
+        dg = DriftingGrating(self)
+        nm3 = NaturalMovie(self, 'natural_movie_three')    
+
+=======
         dg = DriftingGrating(self)
         nm3 = NaturalMovie(self, 'natural_movie_three')    
         nm1 = NaturalMovie(self, 'natural_movie_one')        
+>>>>>>> 903397fcc5109844ee44322531124d8987e787b4
         CamAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
+
+        self.append_metrics_drifting_grating(self.metrics_a, dg)
+        self.metrics_a["roi_id"] = dg.roi_id
+
         self.append_meta_data(peak)
 
         if plot_flag:
@@ -138,6 +184,11 @@ class CamAnalysis(object):
         CamAnalysis._log.info("Session B analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, sg.peak, ns.peak, nm1.peak])
         self.append_meta_data(peak)
+
+        self.append_metrics_static_grating(self.metrics_b, sg)
+        self.append_metrics_natural_scene(self.metrics_b, ns)
+        self.verify_roi_lists_equal(sg.roi_id, ns.roi_id)
+        self.metrics_b["roi_id"] = sg.roi_id
                 
         if plot_flag:
             cp.plot_3sb(sg, nm1, ns)
@@ -155,12 +206,27 @@ class CamAnalysis(object):
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_meta_data(peak)
                 
+        #self.append_metrics_natural_scene(self.metrics_c, nm1)
+        #self.metrics_c["roi_id"] = ns.roi_id
+                
         if plot_flag:
             cp.plot_3sc(lsn, nm1, nm2)
             cp.plot_lsn_traces(lsn)
     
         if save_flag:
             self.save_session_c(lsn, nm1, nm2, peak)
+<<<<<<< HEAD
+
+def multi_dataframe_merge(dfs):
+    out_df = None
+    for i,df in enumerate(dfs):
+        if out_df is None:
+            out_df = df
+        else:
+            out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
+    return out_df
+=======
+>>>>>>> 903397fcc5109844ee44322531124d8987e787b4
     
                     
 def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=False):
@@ -173,12 +239,26 @@ def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=Fal
 
     if session == CamAnalysis.SESSION_A:
         cam_analysis.session_a(plot_flag)
+<<<<<<< HEAD
+        metrics = cam_analysis.metrics_a
+    elif session == CamAnalysis.SESSION_B:
+        cam_analysis.session_b(plot_flag)
+        metrics = cam_analysis.metrics_b
+    elif session == CamAnalysis.SESSION_C:
+        cam_analysis.session_c(plot_flag)
+        metrics = cam_analysis.metrics_c
+    else:
+        raise IndexError("Unknown session: %s" % session)
+
+    return metrics
+=======
     elif session == CamAnalysis.SESSION_B:
         cam_analysis.session_b(plot_flag)
     elif session == CamAnalysis.SESSION_C:
         cam_analysis.session_c(plot_flag)
     else:
         raise IndexError("Unknown session: %s" % session)
+>>>>>>> 903397fcc5109844ee44322531124d8987e787b4
     
 def main():
     parser = argparse.ArgumentParser()
