@@ -82,8 +82,3 @@ def lims_manifest(input_config):
     b.write_json_file('manifest.json')
     
     return m
-    
-if __name__ == '__main__':
-    lims_json_path = 'from_lims/first_cluster_run/EPHYS_BIOPHYS_SIMULATE_QUEUE_397352299_input.js'
-    config_from_lims = lims_config(lims_json_path)
-    lims_manifest(config_from_lims)

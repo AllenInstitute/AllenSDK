@@ -131,14 +131,7 @@ class RunSimulate(object):
             RunSimulate._log.info("morphology path: %s" % (morphology_path))
         except:
             raise Exception('Could not read morphology path from input config.')
-        
-        try:
-            sweeps = self.app_config.sweep_numbers()
-            RunSimulate._log.info("sweeps from input: %s" % (','.join(str(s) for s in sweeps)))
-        except:
-            RunSimulate._log.warn('Could not read sweep numbers from input config.')
-        
-        
+                
         single_cell.run(self.app_config)
         
         lims_upload_config = BiophysicalModuleReader()
