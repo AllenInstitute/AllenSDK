@@ -23,9 +23,7 @@ from allensdk.core.cam_nwb_data_set import CamNwbDataSet
 
 import allensdk.cam.cam_plotting as cp
 import argparse, logging, os
-<<<<<<< HEAD
 import sys
-=======
 
 def multi_dataframe_merge(dfs):
     out_df = None
@@ -35,7 +33,7 @@ def multi_dataframe_merge(dfs):
         else:
             out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
     return out_df
->>>>>>> 903397fcc5109844ee44322531124d8987e787b4
+
 
 class CamAnalysis(object):
     _log = logging.getLogger('allensdk.cam.cam_analysis')    
@@ -152,16 +150,9 @@ class CamAnalysis(object):
                 sys.exit(1)
     
     def session_a(self, plot_flag=False, save_flag=True):
-<<<<<<< HEAD
         nm1 = NaturalMovie(self, 'natural_movie_one')        
         dg = DriftingGrating(self)
         nm3 = NaturalMovie(self, 'natural_movie_three')    
-
-=======
-        dg = DriftingGrating(self)
-        nm3 = NaturalMovie(self, 'natural_movie_three')    
-        nm1 = NaturalMovie(self, 'natural_movie_one')        
->>>>>>> 903397fcc5109844ee44322531124d8987e787b4
         CamAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
 
