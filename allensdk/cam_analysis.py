@@ -25,6 +25,15 @@ import allensdk.cam.cam_plotting as cp
 import argparse, logging, os
 import sys
 
+def multi_dataframe_merge(dfs):
+    out_df = None
+    for i,df in enumerate(dfs):
+        if out_df is None:
+            out_df = df
+        else:
+            out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
+    return out_df
+
 class CamAnalysis(object):
     _log = logging.getLogger('allensdk.cam.cam_analysis')    
     SESSION_A = 'three_session_A'
@@ -197,15 +206,6 @@ class CamAnalysis(object):
     
         if save_flag:
             self.save_session_c(lsn, nm1, nm2, peak)
-
-def multi_dataframe_merge(dfs):
-    out_df = None
-    for i,df in enumerate(dfs):
-        if out_df is None:
-            out_df = df
-        else:
-            out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
-    return out_df
     
                     
 def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=False):

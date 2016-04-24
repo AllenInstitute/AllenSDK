@@ -48,10 +48,9 @@ class OPAnalysis(object):
 
     def get_peak(self):
         raise CamAnalysisException("get_peak not implemented")
-        
+
     def get_global_dff(self, percentiletosubtract=8):
-        '''does a global DF/F using a sliding window (+/- 15 s) baseline subtraction followed by Fo=peak of histogram'''
-        '''replace when DF/F added to nwb file'''        
+        return self.dfftraces
 #        OPAnalysis._log.info("Calculating global DF/F ... this can take some time")
 #        
 #        startTime = time.time()
@@ -73,7 +72,6 @@ class OPAnalysis(object):
 #        OPAnalysis._log.info("Elapsed Time: %f", elapsedTime)
 #        
 #        return celltraces_dff
-        return self.dfftraces
     
     def get_speed_tuning(self, binsize):
         OPAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')
@@ -226,7 +224,7 @@ class OPAnalysis(object):
             start = row['start'] - self.interlength
             end = row['start'] + self.sweeplength + self.interlength
             for nc in range(self.numbercells):
-                temp = self.celltraces[nc,start:end]
+                temp = self.celltraces[nc,start:end]                                
                 sweep_response[str(nc)][index] = 100*((temp/np.mean(temp[:self.interlength]))-1)
             sweep_response['dx'][index] = self.dxcm[start:end]   
         
