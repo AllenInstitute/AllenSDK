@@ -27,7 +27,7 @@ _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 
 
 def run(description, sweeps=None):
-    '''Main function for running a biophysical experiment.
+    '''Main function for running a perisomatic biophysical experiment.
     
     Parameters
     ----------

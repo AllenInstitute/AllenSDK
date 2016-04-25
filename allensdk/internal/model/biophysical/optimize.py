@@ -136,8 +136,8 @@ def main():
     _optimize_log.debug("Setting up genetic algorithm")
     random.seed(seed)
 
-    ngen = 500 
-    mu = 1200
+    ngen = 5 
+    mu = 12
     cxpb = 0.1
     mtpb = 0.35
     eta = 10.0

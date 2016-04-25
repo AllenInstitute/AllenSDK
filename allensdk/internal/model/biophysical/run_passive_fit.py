@@ -1,7 +1,7 @@
 import os, sys
 import subprocess
 import numpy as np
-import allensdk.model.biophysical.ephys_utils as ephys_utils
+import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
 import passive_fitting.preprocess as passive_prep
 
 import allensdk.core.json_utilities as ju
@@ -11,7 +11,6 @@ from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_f
 from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit2
 from allensdk.internal.model.biophysical.passive_fitting import neuron_passive_fit_elec
 import logging
-import allensdk
 
 _run_passive_fit_log = logging.getLogger('allensdk.internal.model.biophysical.run_passive_fit')
 

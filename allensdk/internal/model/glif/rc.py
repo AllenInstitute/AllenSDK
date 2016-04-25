@@ -1,7 +1,7 @@
 import numpy as np
 import logging
 
-from allensdk.model.glif.find_spikes import find_spikes, find_spikes_list
+from allensdk.internal.model.glif.find_spikes import find_spikes, find_spikes_list
 
 from allensdk.ephys.extract_cell_features import get_stim_characteristics
 

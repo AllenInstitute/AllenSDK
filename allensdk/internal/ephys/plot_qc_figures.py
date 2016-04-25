@@ -4,7 +4,7 @@ matplotlib.use('agg')
 
 import logging
 
-import allensdk.core.lims_utilities as lims_utilities
+import allensdk.internal.core.lims_utilities as lims_utilities
 import allensdk.core.json_utilities as json_utilities
 
 from allensdk.core.nwb_data_set import NwbDataSet

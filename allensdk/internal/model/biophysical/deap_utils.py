@@ -191,8 +191,8 @@ class Utils(HocUtils):
             other_features["slow_trough_delta_v"] = delta_v.mean()
 
             for f in feature_names:
-                    target_mean = target_features_dict[f]['mean']
-                    target_stdev = target_features_dict[f]['stdev']
+                target_mean = target_features_dict[f]['mean']
+                target_stdev = target_features_dict[f]['stdev']
 
                 if target_stdev == 0:
                     print "Feature with 0 stdev: ", f

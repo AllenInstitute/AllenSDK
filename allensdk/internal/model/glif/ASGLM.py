@@ -1,6 +1,6 @@
 import numpy as np
 import itertools
-import allensdk.model.GLM as GLM
+import allensdk.internal.model.GLM as GLM
 import logging
 import statsmodels.api as sm
 

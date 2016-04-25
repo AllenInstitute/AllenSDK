@@ -4,7 +4,7 @@ import json, logging
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.core.json_utilities as ju
 from allensdk.model.biophys_sim.config import Config
-from allensdk.model.biophysical import ephys_utils
+from allensdk.internal.model.biophysical import ephys_utils
 from allensdk.internal.model.biophysical.deap_utils import Utils
 
 class Report:

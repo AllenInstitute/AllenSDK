@@ -7,18 +7,18 @@ import numpy as np
 import allensdk.core.json_utilities as ju
 from allensdk.core.nwb_data_set import NwbDataSet
 
-import find_sweeps as fs
-from find_sweeps import MissingSweepException
+import allensdk.internal.model.glif.find_sweeps as fs
+from allensdk.internal.model.glif.find_sweeps import MissingSweepException
 
-from find_spikes import find_spikes, find_spikes_list
-from spike_cutting import calc_spike_cut_and_v_reset_via_expvar_residuals
-from rc import least_squares_simple_circuit_fit_RCEl
+from allensdk.internal.model.glif.find_spikes import find_spikes, find_spikes_list
+from allensdk.internal.model.glif.spike_cutting import calc_spike_cut_and_v_reset_via_expvar_residuals
+from allensdk.internal.model.glif.rc import least_squares_simple_circuit_fit_RCEl
 
-from ASGLM import ASGLM_pairwise
+from allensdk.internal.model.glif.ASGLM import ASGLM_pairwise
 
-from threshold_adaptation import calc_a_b_from_multiblip, err_fix_th
-from nonlinearity_parameters import R2R_subthresh_nonlinearity
-from MLIN import MLIN
+from allensdk.internal.model.glif.threshold_adaptation import calc_a_b_from_multiblip, err_fix_th
+from allensdk.internal.model.glif.nonlinearity_parameters import R2R_subthresh_nonlinearity
+from allensdk.internal.model.glif.MLIN import MLIN
 
 RESTING_POTENTIAL = 'slow_vm_mv'
 DEFAULT_DT = 5e-05

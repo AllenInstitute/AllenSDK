@@ -1,5 +1,5 @@
 import os, sys
-import ephys_utils
+import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
 import check_fi_shift
 import pandas as pd
 import numpy as np
@@ -9,7 +9,7 @@ import subprocess
 from allensdk.ephys.ephys_extractor import EphysSweepFeatureExtractor, EphysSweepSetFeatureExtractor
 import allensdk.core.json_utilities as ju
 from allensdk.core.nwb_data_set import NwbDataSet
-import allensdk.model.biophysical.optimize
+import allensdk.internal.model.biophysical.optimize
 import logging
 
 SEEDS = [1234, 1001, 4321, 1024, 2048]
@@ -266,7 +266,7 @@ def prepare_stage_1(description, passive_fit_data):
         pair = {}
         pair["mean"] = float(ext.sweep_features(k).mean())
         pair["stdev"] = float(ext.sweep_features(k).std())
-            ft[k] = pair
+        ft[k] = pair
 
     # Determine highest step to check for depolarization block
     noise_1_sweeps, _, _ = ephys_utils.get_sweeps_of_type("C1NSSEED_1", all_sweeps)
@@ -380,10 +380,10 @@ def run_stage_1(jobs):
     for job in jobs:
         args = [MPIEXEC,
                 '-np',
-                '240',
+                '24',
                 sys.executable,
                 '-m',
-                allensdk.model.biophysical.optimize.__name__,
+                allensdk.internal.model.biophysical.optimize.__name__,
                 str(job['seed']),
                 job['config_path']]
         _fit_stage_1_log.debug(args)

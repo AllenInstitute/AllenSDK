@@ -1,4 +1,4 @@
-import allensdk.model.biophysical.ephys_utils as ephys_utils
+import allensdk.internal.model.biophysical.ephys_utils as ephys_utils
 import logging
 import numpy as np
 import pandas as pd

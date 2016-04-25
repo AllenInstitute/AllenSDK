@@ -7,7 +7,7 @@ from scipy.optimize import curve_fit
 
 from rc import least_squares_simple_circuit_fit_REl
 
-from glif_neuron_methods import max_of_line_and_const, min_of_line_and_zero
+from allensdk.model.glif.glif_neuron_methods import max_of_line_and_const, min_of_line_and_zero
 
 import matplotlib.pyplot as plt
 

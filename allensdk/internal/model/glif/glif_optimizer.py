@@ -11,7 +11,7 @@ import json
 
 from uuid import uuid4
 
-import allensdk.model.glif.error_functions as error_functions
+import allensdk.internal.model.glif.error_functions as error_functions
 
 # TODO: clean up
 # TODO: license

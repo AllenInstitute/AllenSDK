@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import stats
 from scipy.optimize import curve_fit, fmin
-from allensdk.model.glif.find_spikes import align_and_cut_spikes, ALIGN_CUT_WINDOW
+from allensdk.internal.model.glif.find_spikes import align_and_cut_spikes, ALIGN_CUT_WINDOW
 import logging
 
 import matplotlib.pyplot as plt 

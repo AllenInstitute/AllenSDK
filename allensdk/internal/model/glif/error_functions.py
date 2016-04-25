@@ -6,8 +6,8 @@ from scipy.stats import norm
 
 import numpy as np
 
-from allensdk.model.glif.glif_optimizer_neuron import GlifNeuronException
-from allensdk.model.glif.glif_optimizer_neuron import GlifBadInitializationException
+from allensdk.internal.model.glif.glif_optimizer_neuron import GlifNeuronException
+from allensdk.internal.model.glif.glif_optimizer_neuron import GlifBadInitializationException
 from allensdk.model.glif.glif_neuron import GlifBadResetException
 
 # TODO: clean up

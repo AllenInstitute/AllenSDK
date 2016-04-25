@@ -1,14 +1,14 @@
 import argparse, sys, logging
 
 import allensdk.core.json_utilities as ju
-import allensdk.model.glif.find_sweeps as fs
+import allensdk.internal.model.glif.find_sweeps as fs
 
-from allensdk.model.glif.glif_optimizer_neuron import GlifOptimizerNeuron
-from allensdk.model.glif.glif_experiment import GlifExperiment
-from allensdk.model.glif.glif_optimizer import GlifOptimizer
+from allensdk.internal.model.glif.glif_optimizer_neuron import GlifOptimizerNeuron
+from allensdk.internal.model.glif.glif_experiment import GlifExperiment
+from allensdk.internal.model.glif.glif_optimizer import GlifOptimizer
 
-from allensdk.model.glif.preprocess_neuron import load_sweeps
-from allensdk.model.glif.find_spikes import find_spikes_list
+from allensdk.internal.model.glif.preprocess_neuron import load_sweeps
+from allensdk.internal.model.glif.find_spikes import find_spikes_list
 import allensdk.core.json_utilities as ju
 
 def get_optimize_sweep_numbers(sweep_index): 
