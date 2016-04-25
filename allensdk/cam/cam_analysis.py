@@ -181,8 +181,8 @@ class CamAnalysis(object):
             self.save_session_b(sg, nm1, ns, peak)
     
     def session_c(self, plot_flag=False, save_flag=True):
-        nm2 = NaturalMovie(self, 'natural_movie_two')
         lsn = LocallySparseNoise(self)
+        nm2 = NaturalMovie(self, 'natural_movie_two')
         nm1 = NaturalMovie(self, 'natural_movie_one')
         CamAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
