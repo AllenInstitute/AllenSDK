@@ -34,7 +34,6 @@ def multi_dataframe_merge(dfs):
             out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
     return out_df
 
-
 class CamAnalysis(object):
     _log = logging.getLogger('allensdk.cam.cam_analysis')    
     SESSION_A = 'three_session_A'
@@ -190,8 +189,8 @@ class CamAnalysis(object):
             self.save_session_b(sg, nm1, ns, peak)
     
     def session_c(self, plot_flag=False, save_flag=True):
-        lsn = LocallySparseNoise(self)
         nm2 = NaturalMovie(self, 'natural_movie_two')
+        lsn = LocallySparseNoise(self)
         nm1 = NaturalMovie(self, 'natural_movie_one')
         CamAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
@@ -206,7 +205,6 @@ class CamAnalysis(object):
     
         if save_flag:
             self.save_session_c(lsn, nm1, nm2, peak)
-                
                     
 def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=False):
     save_dir = os.path.dirname(save_path)
@@ -229,7 +227,6 @@ def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=Fal
         raise IndexError("Unknown session: %s" % session)
 
     return metrics
-
     
 def main():
     parser = argparse.ArgumentParser()

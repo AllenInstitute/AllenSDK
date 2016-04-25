@@ -1,7 +1,24 @@
 .settings
+.gitignore
 cell_types
 dist
 doc_template/examples/nb/connectivity/experiment_*
 doc_template/examples/nb/Website_Inquiry_RT_45792 /experiment_*
+doc
+htmlcov
+.coverage
+.ipynb_checkpoints
+.project
+nb/connectivity/experiment_*
+embedded_d3_example-master
+Website_Inquiry_RT_45792
+*.nrrd
+LIMS_RMA
 *.pyc
 *~
+/ng_changes_20160419.patch
+/oatest.py
+/t.py
+/xyz
+/ctc_test.py
+/.pydevproject
