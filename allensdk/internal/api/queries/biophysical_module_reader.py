@@ -1,61 +1,39 @@
-import os, logging
+import json, os, logging
 
 import allensdk.core.lims_utilities as lims_utilities
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.config.manifest import Manifest
-import json
-import traceback
 
-class OptimizeConfigReader(object):
-    _log = logging.getLogger('allensdk.api.queries.lims.optimize_config_reader')
-    
+class BiophysicalModuleReader(object):
     STIMULUS_CONTENT_TYPE = None
     MORPHOLOGY_TYPE_ID = 303941301
     MOD_FILE_TYPE_ID = 292178729
-    NEURONAL_MODEL_PARAMETERS = 329230374 # fit.json file.
         
     def __init__(self):
+        self._log = logging.getLogger(__name__)
         self.lims_path = None
         self.lims_data = None
         self.lims_update_data = None
-    
     
     def read_lims_message(self, message, lims_path):
         self.lims_path = lims_path
         self.lims_data = message[0]
         self.lims_update_data = dict(self.lims_data)
     
-
     def read_lims_file(self, lims_path):
         self.lims_path = lims_path
         self.read_json(lims_path)
         self.lims_update_data = dict(self.lims_data)
     
-            
+    
     def read_json(self, path):
-        self.lims_path = os.path.realpath(path)
-        
-        try:
-            f = open(self.lims_path)
-            json_string = f.read()
-            
-            self.read_json_string(json_string)
-        except Exception:
-            traceback.print_exc()
-        finally:
-            f.close()
-            
-        return self.lims_data
+        with open(path, 'rb') as f:
+            self.read_json_string(f.read())
     
     
     def read_json_string(self, json_string):
         self.lims_data = json.loads(json_string)
         self.lims_update_data = dict(self.lims_data)
-    
-    
-    def write_file(self, path):
-        with open(path, 'wb') as f:
-            f.write(json.dumps(self.lims_update_data, indent=2))
     
     
     def stimulus_file_entries(self):
@@ -64,7 +42,7 @@ class OptimizeConfigReader(object):
             :return: well_known_file entries
             :rtype: array of dicts
         '''
-        neuronal_model = self.lims_data
+        neuronal_model = self.lims_data['neuronal_model']
         specimen = neuronal_model['specimen']
         roi_result = specimen['ephys_roi_result']
         well_known_files = roi_result['well_known_files']
@@ -78,23 +56,10 @@ class OptimizeConfigReader(object):
                 if file_type_id == lims_utilities.NWB_FILE_TYPE_ID:
                     stimulus_file_entries.append(well_known_file)
             except:
-                OptimizeConfigReader._log.warn('skipping well known file record with no well known file type.')
+                self._log.warn('skipping well known file record with no well known file type.')
         
         return stimulus_file_entries
-
-
-    def lims_working_directory(self):
-        ''' While this is the same directory as the optimize
-            directory, it can be mocked out for testing if the
-            optimize directory is write only.
-        '''
-        return '/home/timf/lims_sdk'
-        #return self.neuronal_model_optimize_dir()
     
-    
-    def output_directory(self):
-        return os.path.join(self.lims_working_directory(), 'work')
-
     
     def stimulus_path(self):
         ''' Get the path to the stimulus file from the lims result.
@@ -104,7 +69,7 @@ class OptimizeConfigReader(object):
         file_entries = self.stimulus_file_entries()
         
         if len(file_entries) > 1:
-            OptimizeConfigReader._log.warning('More than one stimulus file found.')
+            self._log.warning('More than one stimulus file found.')
         
         file_entry = file_entries[0]
         
@@ -114,7 +79,14 @@ class OptimizeConfigReader(object):
         return stimulus_path
     
     
-    def neuronal_model_optimize_dir(self):
+    def lims_working_directory(self):
+        ''' While this is the same directory as the neuronal_model_run
+            directory, it can be mocked out for testing if the
+            other directory is read only.
+        '''
+        return self.neuronal_model_run_dir()    
+    
+    def neuronal_model_run_dir(self):
         ''' read the directory path where
             output goes from the lims optimization config json
             
@@ -135,7 +107,7 @@ class OptimizeConfigReader(object):
             :return: well_known_file entries
             :rtype: array of dicts
         '''
-        neuronal_model = self.lims_data
+        neuronal_model = self.lims_data['neuronal_model']
         well_known_files = neuronal_model['well_known_files']
         
         fit_parameter_file_entries = []
@@ -157,15 +129,19 @@ class OptimizeConfigReader(object):
         file_entries = self.fit_parameters_file_entries()
         
         if len(file_entries) > 1:
-            OptimizeConfigReader._log.warning('More than one fit parameter file found.')
+            self._log.warning('More than one fit parameter file found.')
         
         file_entry = file_entries[0]
         
         fit_parameter_path = os.path.join(file_entry['storage_directory'],
                                           file_entry['filename'])
-        
+ 
         return fit_parameter_path
     
+    def model_type(self):
+        ''' TODO: comment
+        '''
+        return self.lims_data['neuronal_model']['neuronal_model_template']['name']
     
     def morphology_file_entries(self):
         ''' read the well known file paths
@@ -176,7 +152,7 @@ class OptimizeConfigReader(object):
             arrary of dicts:
                 well known file entries
         '''
-        neuronal_model = self.lims_data
+        neuronal_model = self.lims_data['neuronal_model']
         specimen = neuronal_model['specimen']
         reconstructions = specimen['neuron_reconstructions']
         
@@ -192,7 +168,7 @@ class OptimizeConfigReader(object):
                 for well_known_file in well_known_files:
                     file_type_id = well_known_file['well_known_file_type_id']
                     
-                    if file_type_id == OptimizeConfigReader.MORPHOLOGY_TYPE_ID:
+                    if file_type_id == BiophysicalModuleReader.MORPHOLOGY_TYPE_ID:
                         morphology_file_entries.append(well_known_file)
         
         return morphology_file_entries
@@ -206,7 +182,7 @@ class OptimizeConfigReader(object):
         file_entries = self.morphology_file_entries()
         
         if len(file_entries) > 1:
-            OptimizeConfigReader._log.warning('More than one morphology file found.')
+            self._log.warning('More than one morphology file found.')
         
         file_entry = file_entries[0]
         
@@ -222,12 +198,24 @@ class OptimizeConfigReader(object):
             :return: stimulus sweep entries
             :rtype: array of dicts
         '''
-        neuronal_model = self.lims_data
+        neuronal_model = self.lims_data['neuronal_model']
         specimen = neuronal_model['specimen']
         sweeps = specimen['ephys_sweeps']
         
         return sweeps
     
+    
+    def sweep_numbers_by_type(self):
+        sweeps = self.sweep_entries()
+        
+        d = {s['ephys_stimulus']['ephys_stimulus_type']['name']: [] for s in sweeps}        
+        
+        for n, s in enumerate(sweeps):
+            t = s['ephys_stimulus']['ephys_stimulus_type']['name']
+            d[t].append(n)
+        
+        return d
+      
     
     def sweep_numbers(self):
         ''' Get the stimulus sweep numbers from the lims result
@@ -237,7 +225,7 @@ class OptimizeConfigReader(object):
         sweep_entries = self.sweep_entries()
         
         if not sweep_entries or len(sweep_entries) < 1:
-            OptimizeConfigReader._log.warning('No sweeps found.')
+            self._log.warning('No sweeps found.')
         
         sweeps = [sweep_entry['sweep_number'] \
                   for sweep_entry in sweep_entries \
@@ -253,7 +241,7 @@ class OptimizeConfigReader(object):
             :return: well known file entries
             :rtype: array of dicts
         '''
-        neuronal_model = self.lims_data
+        neuronal_model = self.lims_data['neuronal_model']
         model_template = neuronal_model['neuronal_model_template']
         well_known_files = model_template['well_known_files']
         
@@ -262,7 +250,7 @@ class OptimizeConfigReader(object):
         for well_known_file in well_known_files:
             file_type_id = well_known_file['well_known_file_type_id']
                             
-            if file_type_id == OptimizeConfigReader.MOD_FILE_TYPE_ID:
+            if file_type_id == BiophysicalModuleReader.MOD_FILE_TYPE_ID:
                 mod_file_entries.append(well_known_file)
                 
         return mod_file_entries
@@ -276,36 +264,33 @@ class OptimizeConfigReader(object):
         file_entries = self.mod_file_entries()
         
         if not file_entries or len(file_entries) < 1:
-            OptimizeConfigReader._log.warning('No mod files found.')
+            self._log.warning('No mod files found.')
         
         mod_file_paths = []
         
         for file_entry in file_entries:
             mod_path = os.path.join(file_entry['storage_directory'],
                                     file_entry['filename'])
-            OptimizeConfigReader._log.info(mod_path)
+            self._log.info(mod_path)
             mod_file_paths.append(mod_path)
         
         return mod_file_paths
     
     
-    def add_well_known_file(self,
-                            content_type,
-                            path,
-                            well_known_file_type_id=None):
+    def add_well_known_file(self, content_type, path):
         if path in self.result_paths():
-            OptimizeConfigReader._log.warn("Previously existing result file %s, not adding new well-known-file relation." % (path))
+            self._log.warn("Previously existing result file %s, not adding new well-known-file relation." % (path))
         
         (dirname, filename) = os.path.split(os.path.abspath(path))
-        new_entry = {
+        self.lims_update_data['well_known_files'] += [{
                 'content_type': content_type,
                 'filename': filename,
                 'storage_directory': dirname
-            }
-        if well_known_file_type_id != None:
-            new_entry['well_known_file_type_id'] = well_known_file_type_id
-        
-        self.lims_update_data['well_known_files'].append(new_entry)
+            }]
+    
+    
+    def set_workflow_state(self, state):
+        self.lims_update_data['workflow_state'] = 'success'
     
     
     def result_file_entries(self):
@@ -320,12 +305,12 @@ class OptimizeConfigReader(object):
         
         for well_known_file in well_known_files:
             try:
-                file_type_id = well_known_file['well_known_file_type_id']
+                file_type_id = well_known_file['well_known_file_type_idn']
                 
                 if file_type_id == lims_utilities.NWB_FILE_TYPE_ID:
                     result_file_entries.append(well_known_file)
             except:
-                OptimizeConfigReader._log.warn('skipping well known file record with no well known file type.')
+                self._log.warn('skipping well known file record with no well known file type.')
         
         return result_file_entries
     
@@ -338,7 +323,7 @@ class OptimizeConfigReader(object):
         file_entries = self.result_file_entries()
         
         if len(file_entries) > 0:
-            OptimizeConfigReader._log.warning('Previously existing result file found.')
+            self._log.warning('Previously existing result file found.')
         
         result_paths = []
         
@@ -346,22 +331,23 @@ class OptimizeConfigReader(object):
             result_paths.append(os.path.join(file_entry['storage_directory'],
                                              file_entry['filename']))
         
-        OptimizeConfigReader._log.info("Result paths; %s" % (result_paths))
+        self._log.info("Result paths; %s" % (result_paths))
         return result_paths
-
     
-    def build_manifest(self, manifest_path=None):
+    
+    def write_file(self, path):
+        with open(path, 'wb') as f:
+            f.write(json.dumps(self.lims_update_data, indent=2))
+    
+    
+    def to_manifest(self, manifest_path=None):
         b = ManifestBuilder()
-        
         b.add_path('BASEDIR', os.path.realpath(os.curdir))
-        
-        b.add_path('WORKDIR',
-                   self.output_directory())
-        
+        b.add_path('WORKDIR', 'workdir')
         b.add_path('MORPHOLOGY',
-                   self.morphology_path(),
-                   typename='file')
-        
+                       self.morphology_path(),
+                       typename='file')
+        b.add_path('CODE_DIR', 'templates')
         b.add_path('MODFILE_DIR', 'modfiles')
         
         for modfile in self.mod_file_entries():
@@ -371,98 +357,35 @@ class OptimizeConfigReader(object):
                        typename='file',
                        format='MODFILE')
         
+        b.add_path('neuronal_model_run_data',
+                   self.lims_path,
+                   typename='file')
         b.add_path('stimulus_path',
                    self.stimulus_path(),
                    typename='file',
                    format='NWB')
-
-        b.add_path('manifest',
-                   os.path.join(os.path.realpath(os.curdir),
-                                manifest_path),
-                   typename='file')
-        
-        b.add_path('output',
+        b.add_path('output_path',
                    os.path.basename(self.stimulus_path()),
                    typename='file',
                    parent_key='WORKDIR',
                    format='NWB')
-
-        b.add_path('neuronal_model_data',
-                   self.lims_path,
-                   typename='file')
+        b.add_path('fit_parameters',
+                   self.fit_parameters_path())
         
-        b.add_path('upfile',
-                   'upbase.dat',
-                   typename='file',
-                   parent_key='WORKDIR')
-        b.add_path('downfile',
-                   'downbase.dat',
-                   typename='file',
-                   parent_key='WORKDIR')
-        b.add_path('passive_fit_data',
-                   'passive_fit_data.json',
-                   typename='file',
-                   parent_key='WORKDIR')
-        b.add_path('stage_1_jobs',
-                   'stage_1_jobs.json',
-                   typename='file',
-                   parent_key='WORKDIR')        
-        b.add_path('fit_1_file',
-                   'fit_1_data.json',
-                   typename='file',
-                   parent_key='WORKDIR')
-        b.add_path('fit_2_file',
-                   'fit_2_data.json',
-                   typename='file',
-                   parent_key='WORKDIR')
-        b.add_path('fit_3_file',
-                   'fit_3_data.json',
-                   typename='file',
-                   parent_key='WORKDIR')
-        b.add_path('fit_type_path',
-                   typename='file',
-                   spec='%s',
-                   parent_key='WORKDIR')
-        b.add_path('target_path',
-                   typename='file',
-                   spec='target.json',
-                   parent_key='WORKDIR')
-        b.add_path('fit_parameters_path',
-                   typename='file',
-                   spec=self.fit_parameters_path())
-        b.add_path('fit_config_json',
-                   typename='file',
-                   spec='%s/config.json',
-                   parent_key='WORKDIR')
-        b.add_path('final_hof_fit',
-                   typename='file',
-                   spec='%s/s%d/final_hof_fit.txt',
-                   parent_key='WORKDIR')
-        b.add_path('final_hof',
-                   typename='file',
-                   spec='%s/s%d/final_hof.txt',
-                   parent_key='WORKDIR')
-        b.add_path('output_fit_file',
-                   typename='file',
-                   spec='fit_%s_%s.json')
-        
-        b.add_section('biophys',  {"biophys": [
-            {"model_file": [ manifest_path ] }]})
+        b.add_section('bps_cfg',
+                      {"biophys": [{"model_file": [ manifest_path,
+                                    self.fit_parameters_path() ],
+                                    "model_type": self.model_type()}]})
         
         b.add_section('stimulus_conf',
                       {"runs": [{"sweeps": self.sweep_numbers(),
-                                 "specimen_id": self.lims_data['specimen_id']
+                                 "sweeps_by_type": self.sweep_numbers_by_type()
                                  }]})
         
         b.add_section('hoc_conf',
-                      {"neuron" : [{"hoc": [ "stdgui.hoc", "import3d.hoc", "cell.hoc" ]
+                      {"neuron" : [{"hoc": [ "stdgui.hoc", "import3d.hoc" ]
                                     }]}) 
-
-        return b
-    
-    
-    def to_manifest(self, manifest_path=None):
-        b = self.build_manifest(manifest_path)
+        
         
         m = Manifest(config=b.path_info)
         

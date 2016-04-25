@@ -6,7 +6,7 @@ import numpy as np
 from collections import Counter
 import subprocess
 
-from allensdk.ephys.feature_extractor import EphysFeatureExtractor, EphysFeatures
+from allensdk.ephys.ephys_extractor import EphysSweepFeatureExtractor, EphysSweepSetFeatureExtractor
 import allensdk.core.json_utilities as ju
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.model.biophysical.optimize
@@ -24,7 +24,6 @@ def find_core1_trace(data_set, all_sweeps):
     sweep_type = "C1LSCOARSE"
     _, sweeps, statuses = ephys_utils.get_sweeps_of_type(sweep_type, all_sweeps)
     sweep_status = dict(zip(sweeps, statuses))
-    features = EphysFeatureExtractor()
 
     sweep_info = {}
     for s in sweeps:
@@ -34,12 +33,13 @@ def find_core1_trace(data_set, all_sweeps):
         if np.all(v[-100:] == 0): # Check for early termination of sweep
             continue
         stim_start, stim_dur, stim_amp, start_idx, end_idx = ephys_utils.get_step_stim_characteristics(i, t)
-        features.process_instance(s, v, i, t, stim_start, stim_dur, "")
-        if "ISICV" in features.feature_list[-1].mean.keys():
-            isi_cv = features.feature_list[-1].mean["ISICV"]
-        else:
-            isi_cv = np.nan
-        sweep_info[s] = {"amp": stim_amp, "n_spikes": features.feature_list[-1].mean["n_spikes"], "quality": is_trace_good_quality(v, i, t), "isi_cv": isi_cv }
+        swp = EphysSweepFeatureExtractor(t, v, i, start=stim_start, end=(stim_start + stim_dur))
+        swp.process_spikes()
+        isi_cv = swp.sweep_feature("isi_cv", allow_missing=True)
+        sweep_info[s] = {"amp": stim_amp,
+                         "n_spikes": len(swp.spikes()),
+                         "quality": is_trace_good_quality(v, i, t),
+                         "isi_cv": isi_cv}
     
     rheobase_amp = 1e12
     for s in sweep_info:
@@ -112,22 +112,23 @@ def find_core2_trace(data_set, all_sweeps):
 
 def is_trace_good_quality(v, i, t):
     stim_start, stim_dur, stim_amp, start_idx, end_idx = ephys_utils.get_step_stim_characteristics(i, t)
-    features = EphysFeatureExtractor()
-    features.process_instance("", v, i, t, stim_start, stim_dur, "")
+    swp = EphysSweepFeatureExtractor(t, v, i, start=stim_start, end=(stim_start + stim_dur))
+    swp.process_spikes()
 
-    spikes = features.feature_list[0].mean["spikes"]
-    rate = features.feature_list[0].mean["rate"]
+    spikes = swp.spikes()
+    rate = swp.sweep_feature("avg_rate")
 
     if rate < 5.0:
         return False
 
-    time_to_end = stim_start + stim_dur - spikes[-1]["t"]
-    avg_end_isi = ((spikes[-1]["t"] - spikes[-2]["t"]) + (spikes[-2]["t"] - spikes[-3]["t"])) / 2.0
+    time_to_end = stim_start + stim_dur - spikes[-1]["threshold_t"]
+    avg_end_isi = (((spikes[-1]["threshold_t"] - spikes[-2]["threshold_t"]) +
+                   (spikes[-2]["threshold_t"] - spikes[-3]["threshold_t"])) / 2.0)
 
     if time_to_end > 2 * avg_end_isi:
         return False
 
-    isis = np.diff([spk["t"] for spk in spikes])
+    isis = np.diff([spk["threshold_t"] for spk in spikes])
     if check_for_pause(isis):
         return False
 
@@ -146,26 +147,27 @@ def check_for_pause(isis):
 
 def collect_target_features(ft):
     min_std_dict = {
-        'rate': 0.5,
+        'avg_rate': 0.5,
         'adapt': 0.001,
-        'f_peak': 2.0,
-        'f_trough': 2.0,
-        'f_fast_ahp': 2.0,
-        'f_slow_ahp': 2.0,
-        'f_slow_ahp_time': 0.05,
+        'peak_v': 2.0,
+        'trough_v': 2.0,
+        'fast_trough_v': 2.0,
+        'slow_trough_delta_v': 2.0,
+        'slow_trough_delta_time': 0.05,
         'latency': 5.0,
-        'ISICV': 0.1,
-        'isi_avg': 0.5,
-        'doublet': 1.0,
+        'isi_cv': 0.1,
+        'mean_isi': 0.5,
+        'first_isi': 1.0,
         'time_to_end': 50.0,
-        'base_v': 2.0,
-        'width': 0.1,
-        'upstroke': 5.0,
-        'downstroke': 5.0,
+        'v_baseline': 2.0,
+        'width': 0.0001,
+        'upstroke': 50.0,
+        'downstroke': 50.0,
         'upstroke_v': 2.0,
         'downstroke_v': 2.0,
-        'threshold': 2.0,
-        'thresh_ramp': 5.0,
+        'threshold_v': 2.0,
+        'peak_to_fast_tr_time': 0.0005,
+        'phase_slope': 5.0,
     }
 
     target_features = []
@@ -212,21 +214,59 @@ def prepare_stage_1(description, passive_fit_data):
 
     jxn = -14.0
 
-    features = EphysFeatureExtractor()
+    t_set = []
+    v_set = []
+    i_set = []
     for s in sweeps_to_fit:
         v, i, t = ephys_utils.get_sweep_v_i_t_from_set(data_set, s)
         v += jxn
         stim_start, stim_dur, stim_amp, start_idx, end_idx = ephys_utils.get_step_stim_characteristics(i, t)
-        features.process_instance(s, v, i, t, stim_start, stim_dur, "")
-    features.summarize(EphysFeatures("Summary"))
-    ft = {}
-    for k in features.summary.stdev.keys():
-        if k in features.summary.glossary:
-            pair = {}
-            pair["mean"] = features.summary.mean[k]
-            pair["stdev"] = features.summary.stdev[k]
-            ft[k] = pair
+    ext = EphysSweepSetFeatureExtractor(t_set, v_set, i_set, start=stim_start, end=(stim_start + stim_dur))
+    ext.process_spikes()
 
+    ext = EphysSweepSetFeatureExtractor([t], [v], start=stim_start, end=(stim_start + stim_dur))
+    ext.process_spikes()
+    ft = {}
+    blacklist = ["isi_type"]
+    for k in ext.sweeps()[0].spike_feature_keys():
+        if k in blacklist:
+        	continue
+        pair = {}
+        pair["mean"] = float(ext.spike_feature_averages(k).mean())
+        pair["stdev"] = float(ext.spike_feature_averages(k).std())
+        ft[k] = pair
+
+    # "Delta" features
+    sweep_avg_slow_trough_delta_time = []
+    sweep_avg_slow_trough_delta_v = []
+    sweep_avg_peak_trough_delta_time = []
+    for swp in ext.sweeps():
+        threshold_t = swp.spike_feature("threshold_t")
+        fast_trough_t = swp.spike_feature("fast_trough_t")
+        slow_trough_t = swp.spike_feature("slow_trough_t")
+
+        delta_t = slow_trough_t - fast_trough_t
+        delta_t[np.isnan(delta_t)] = 0.
+        sweep_avg_slow_trough_delta_time.append(np.mean(delta_t[:-1] / np.diff(threshold_t)))
+
+        fast_trough_v = swp.spike_feature("fast_trough_v")
+        slow_trough_v = swp.spike_feature("slow_trough_v")
+        delta_v = fast_trough_v - slow_trough_v
+        delta_v[np.isnan(delta_v)] = 0.
+        sweep_avg_slow_trough_delta_v.append(delta_v.mean())
+
+    ft["slow_trough_delta_time"] = {"mean": float(np.mean(sweep_avg_slow_trough_delta_time)),
+                                    "stdev": float(np.std(sweep_avg_slow_trough_delta_time))}
+    ft["slow_trough_delta_v"] = {"mean": float(np.mean(sweep_avg_slow_trough_delta_v)),
+                                 "stdev": float(np.std(sweep_avg_slow_trough_delta_v))}
+
+    baseline_v = float(ext.sweep_features("v_baseline").mean())
+    passive_fit_data["e_pas"] = baseline_v
+    for k in ext.sweeps()[0].sweep_feature_keys():
+        pair = {}
+        pair["mean"] = float(ext.sweep_features(k).mean())
+        pair["stdev"] = float(ext.sweep_features(k).std())
+            ft[k] = pair
 
     # Determine highest step to check for depolarization block
     noise_1_sweeps, _, _ = ephys_utils.get_sweeps_of_type("C1NSSEED_1", all_sweeps)
@@ -269,7 +309,7 @@ def prepare_stage_1(description, passive_fit_data):
     target_dict["passive"] = [{
         "ra": ra,
         "cm": { "soma": cm1, "axon": cm1, "dend": cm2 },
-        "e_pas": ft['base_v']["mean"]
+        "e_pas": baseline_v
     }]
 
     swc_data = pd.read_table(swc_path, sep='\s', comment='#', header=None)

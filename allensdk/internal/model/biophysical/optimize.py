@@ -1,5 +1,5 @@
 from mpi4py import MPI #@UnusedImport
-from allensdk.model.biophysical.deap_utils import Utils
+from allensdk.internal.model.biophysical.deap_utils import Utils
 import neuron_parallel
 import logging, argparse, random
 import numpy as np

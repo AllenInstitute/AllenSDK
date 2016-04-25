@@ -14,7 +14,6 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.api.queries.rma_template import RmaTemplate
-from allensdk.api.queries.lims.optimize_config_reader import OptimizeConfigReader
 
 class BiophysicalModuleApi(RmaTemplate):
     ''''''
@@ -109,32 +108,4 @@ class BiophysicalModuleApi(RmaTemplate):
                                    'neuronal_models_by_ids',
                                    neuronal_model_ids=neuronal_model_ids)
         
-        return data
-
-if __name__ == '__main__':
-    import json
-    from allensdk.api.api import Api    
-    Api.default_api_url = 'http://axon:3000'
-    
-    bma = BiophysicalModuleApi()
-    neuronal_model_run_id = 464137111
-    data = bma.get_neuronal_model_runs(neuronal_model_run_id)
-    
-    filename = 'lims_message.json'
-    with open(filename, 'w') as f:
-        f.write(json.dumps(data, sort_keys=True, indent=2))
-
-    bma2 = BiophysicalModuleApi()
-    
-    neuronal_model_id = 329322394
-    data2 = bma2.get_neuronal_models(neuronal_model_id)    
- 
-    print(json.dumps(data2, sort_keys=True, indent=2))
-    
-    ocr = OptimizeConfigReader()
-    ocr.read_lims_message(data2, 'lims_message.json')
-    ocr.to_manifest('/home/timf/lims_sdk/manifest_lims_sdk.json')
-    pass
-    
-    
-    
+        return data    

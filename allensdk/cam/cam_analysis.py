@@ -152,7 +152,6 @@ class CamAnalysis(object):
         nm1 = NaturalMovie(self, 'natural_movie_one')        
         dg = DriftingGrating(self)
         nm3 = NaturalMovie(self, 'natural_movie_three')    
-
         CamAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
 
@@ -206,7 +205,6 @@ class CamAnalysis(object):
     
         if save_flag:
             self.save_session_c(lsn, nm1, nm2, peak)
-    
                     
 def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=False):
     save_dir = os.path.dirname(save_path)

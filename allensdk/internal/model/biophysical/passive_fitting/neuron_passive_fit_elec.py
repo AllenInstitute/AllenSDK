@@ -1,17 +1,22 @@
+#!/usr/bin/env python
+
+import allensdk.internal.model.biophysical.passive_fitting.neuron_utils as neuron_utils
 import numpy as np
-import argparse
 import os
-import allensdk.model.biophysical.passive_fitting.neuron_utils as neuron_utils
 import allensdk.core.json_utilities as json_utilities
 from allensdk.model.biophys_sim.config import Config
 
 # Load the morphology
 
-BASEDIR = os.path.dirname(__file__)#"/data/mat/nathang/deap_optimize/passive_fitting"
-
+BASEDIR = os.path.dirname(__file__)
 
 @neuron_utils.read_neuron_fit_stdout
-def neuron_passive_fit(up_data, down_data, swc_path, limit):
+def neuron_passive_fit_elec(up_data,
+                            down_data,
+                            swc_path,
+                            limit,
+                            bridge,
+                            elec_cap):
     h = neuron_utils.get_h()
     h.load_file("stdgui.hoc")
     h.load_file("import3d.hoc")
@@ -23,15 +28,20 @@ def neuron_passive_fit(up_data, down_data, swc_path, limit):
             seg.pas.e = 0
 
     h.load_file(os.path.join(BASEDIR, "passive", "fixnseg.hoc"))
-    h.load_file(os.path.join(BASEDIR, "passive", "iclamp.ses"))
     h.load_file(os.path.join(BASEDIR, "passive", "params.hoc"))
-    h.load_file(os.path.join(BASEDIR, "passive", "mrf.ses"))
+    h.load_file(os.path.join(BASEDIR, "passive", "circuit.ses"))
+    h.load_file(os.path.join(BASEDIR, "passive", "mrf3.ses"))
 
     h.v_init = 0
     h.tstop = 100
     h.dt = 0.005
 
     fit_start = 4.0025
+
+    circuit = h.LinearCircuit[0]
+    circuit.R2 = bridge / 2.0
+    circuit.R3 = bridge / 2.0
+    circuit.C4 = elec_cap * 1e-3
 
     v_rec = h.Vector()
     t_rec = h.Vector()
@@ -78,7 +88,6 @@ def neuron_passive_fit(up_data, down_data, swc_path, limit):
             minerr = mrf.opt.minerr
 
     h.region_areas()
-
     return {
         'Ri': fit_Ri,
         'Cm': fit_Cm,
@@ -86,45 +95,27 @@ def neuron_passive_fit(up_data, down_data, swc_path, limit):
         'err': minerr
         }
 
-def arg_parser():
-    parser = argparse.ArgumentParser(description='analyze cap check sweep')
-    parser.add_argument('--up_file')
-    parser.add_argument('--down_file')
-    parser.add_argument('--swc_path')
-    parser.add_argument('--specimen_id', type=int, required=True)
-    parser.add_argument('--limit', type=float, required=True)
-    parser.add_argument('--output_file', required=True)
-    return parser
-
-
-def process_inputs(parser):
-    args = parser.parse_args()
-    swc_path = args.swc_path
-    up_data = np.loadtxt(args.up_file)
-    down_data = np.loadtxt(args.down_file)
-    
-    return args, up_data, down_data, swc_path
-
-
 def main():
     import sys
     
     manifest_path = sys.argv[-1]
-    limit = float(sys.argv[-2])
+    elec_cap = float(sys.argv[-2])
+    bridge = float(sys.argv[-3])
+    limit = float(sys.argv[-4])
     os.chdir(os.path.dirname(manifest_path))
     app_config = Config()
     description = app_config.load(manifest_path)
-    
+
     upfile = description.manifest.get_path('upfile')
     up_data =  np.loadtxt(upfile)
     downfile = description.manifest.get_path('downfile')
     down_data = np.loadtxt(downfile)
     swc_path = description.manifest.get_path('MORPHOLOGY')
-    
-    data = neuron_passive_fit(up_data, down_data, swc_path, limit)
-    output_file = description.manifest.get_path('fit_1_file')
-    
+
+    data = neuron_passive_fit_elec(up_data, down_data, swc_path, limit, bridge, elec_cap)
+
+    output_file = description.manifest.get_path('fit_3_file')
     json_utilities.write(output_file, data)
 
-if __name__ == "__main__":
-    main()
+
+if __name__ == '__main__': main()
