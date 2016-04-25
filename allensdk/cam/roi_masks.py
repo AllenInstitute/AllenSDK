@@ -1,5 +1,4 @@
 import numpy as np
-import math
 import scipy.ndimage.measurements as measurements
 import scipy.ndimage.morphology as morphology
 from motion_border import *
@@ -71,11 +70,11 @@ class ROI_Mask(Mask):
                     if right is None or c > right:
                         right = c
         # left and right border insets
-        l_inset = math.ceil(border[RIGHT_SHIFT])
-        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT])
+        l_inset = border[RIGHT_SHIFT]
+        r_inset = self.img_cols - border[LEFT_SHIFT]
         # top and bottom border insets
-        t_inset = math.ceil(border[DOWN_SHIFT])
-        b_inset = math.floor(self.img_rows - border[UP_SHIFT])
+        t_inset = border[DOWN_SHIFT]
+        b_inset = self.img_rows - border[UP_SHIFT]
         # if ROI crosses border, it's considered invalid
         if left < l_inset or right > r_inset:
             self.valid = False
@@ -140,11 +139,11 @@ class Neuropil_Mask(Mask):
                     if bottom is None or r > bottom:
                         bottom = r
         # left and right border insets
-        l_inset = math.ceil(border[RIGHT_SHIFT])
-        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT])
+        l_inset = border[RIGHT_SHIFT]
+        r_inset = self.img_cols - border[LEFT_SHIFT]
         # top and bottom border insets
-        t_inset = math.ceil(border[DOWN_SHIFT])
-        b_inset = math.floor(self.img_rows - border[UP_SHIFT])
+        t_inset = border[DOWN_SHIFT]
+        b_inset = self.img_rows - border[UP_SHIFT]
         # restrict neuropil masks to center area of frame (ie, exclude 
         #   areas that overlap with movement correction buffer)
         if left < l_inset:
