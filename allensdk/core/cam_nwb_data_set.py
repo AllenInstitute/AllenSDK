@@ -28,7 +28,7 @@ class CamNwbDataSet(object):
         cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
         roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
         f.close()
-        return timestamps, celltraces, cell_id
+        return timestamps, celltraces, roi_id, cell_id
         
     def get_dff_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
