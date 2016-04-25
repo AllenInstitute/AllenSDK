@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import scipy.ndimage.measurements as measurements
 import scipy.ndimage.morphology as morphology
 from motion_border import *
@@ -6,7 +7,7 @@ from motion_border import *
 # TODO document and format for SDK
 
 class Mask(object):
-    def __init__(self, image_w, image_h, label):
+    def __init__(self, image_w, image_h, label, mask_group):
         self.img_rows = image_h
         self.img_cols = image_w
         # initialize to invalid state. Mask must be manually initialized 
@@ -20,13 +21,16 @@ class Mask(object):
         # label is for distinguishing neuropil from ROI, in case 
         #   these masks are mixed together
         self.label = label
+        # auxiliary metadata. if a particula mask is part of an group,
+        #   that data can be stored here
+        self.mask_group = mask_group
 
     def __str__(self):
         return "%s: TL=%d,%d w,h=%d,%d\n%s" % (self.label, self.x, self.y, self.width, self.height, str(self.mask))
 
 
-def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, label=None):
-    m = ROI_Mask(image_w, image_h, label)
+def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, label=None, mask_group=-1):
+    m = ROI_Mask(image_w, image_h, label, mask_group)
     if pix_list is not None:
         m.init_by_pixels(border, pix_list)
     elif roi_mask is not None:
@@ -37,8 +41,8 @@ def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, labe
 
 
 class ROI_Mask(Mask):
-    def __init__(self, image_w, image_h, label):
-        super(ROI_Mask, self).__init__(image_w, image_h, label)
+    def __init__(self, image_w, image_h, label, mask_group):
+        super(ROI_Mask, self).__init__(image_w, image_h, label, mask_group)
 
     def init_by_pixels(self, border, pix_list):
         assert pix_list.shape[1] == 2, "Pixel list not properly formed"
@@ -67,11 +71,11 @@ class ROI_Mask(Mask):
                     if right is None or c > right:
                         right = c
         # left and right border insets
-        l_inset = border[RIGHT_SHIFT]
-        r_inset = self.img_cols - border[LEFT_SHIFT]
+        l_inset = math.ceil(border[RIGHT_SHIFT])
+        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT])
         # top and bottom border insets
-        t_inset = border[DOWN_SHIFT]
-        b_inset = self.img_rows - border[UP_SHIFT]
+        t_inset = math.ceil(border[DOWN_SHIFT])
+        b_inset = math.floor(self.img_rows - border[UP_SHIFT])
         # if ROI crosses border, it's considered invalid
         if left < l_inset or right > r_inset:
             self.valid = False
@@ -98,15 +102,14 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
     # eliminate ROIs from the dilation
     binary_mask_dilated = binary_mask_dilated > combined_binary_mask
     # create mask from binary dilation
-    m = Neuropil_Mask(w=roi.img_cols, h=roi.img_rows, label=label)
+    m = Neuropil_Mask(w=roi.img_cols, h=roi.img_rows, label=label, mask_group=roi.mask_group)
     m.init_by_mask(border, binary_mask_dilated)
     return m
 
 
 class Neuropil_Mask(Mask):
-    def __init__(self, w, h, label):
-        super(Neuropil_Mask, self).__init__(w, h, label)
-
+    def __init__(self, w, h, label, mask_group):
+        super(Neuropil_Mask, self).__init__(w, h, label, mask_group)
 
 
     def init_by_pixels(self, border, pix_list):
@@ -137,11 +140,11 @@ class Neuropil_Mask(Mask):
                     if bottom is None or r > bottom:
                         bottom = r
         # left and right border insets
-        l_inset = border[RIGHT_SHIFT]
-        r_inset = self.img_cols - border[LEFT_SHIFT]
+        l_inset = math.ceil(border[RIGHT_SHIFT])
+        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT])
         # top and bottom border insets
-        t_inset = border[DOWN_SHIFT]
-        b_inset = self.img_rows - border[UP_SHIFT]
+        t_inset = math.ceil(border[DOWN_SHIFT])
+        b_inset = math.floor(self.img_rows - border[UP_SHIFT])
         # restrict neuropil masks to center area of frame (ie, exclude 
         #   areas that overlap with movement correction buffer)
         if left < l_inset:
@@ -181,12 +184,24 @@ def calculate_traces(stack, mask_list):
         if frame_num % 1000 == 0 :
             print "frame " + str(frame_num) + " of " + str(num_frames)
         frame = stack[frame_num]
-        for i in range(len(mask_list)):
-            mask = mask_list[i]
-            subframe = frame[mask.y:mask.y+mask.height, mask.x:mask.x+mask.width]
-            total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
-            area = (mask.mask).sum(axis=-1).sum(axis=-1)
-            tvals = total/area
-            traces[i][frame_num] = tvals
+        mask = None
+        try:
+            for i in range(len(mask_list)):
+                    mask = mask_list[i]
+                    subframe = frame[mask.y:mask.y+mask.height, mask.x:mask.x+mask.width]
+                    total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
+                    area = (mask.mask).sum(axis=-1).sum(axis=-1)
+                    if area == 0:
+                        raise ValueError("Numerical error in mask %d" % i)
+
+                    tvals = total/area
+                    traces[i][frame_num] = tvals
+        except:
+            print("Error encountered processing mask during frame %d" % frame_num)
+            if mask is not None:
+                print subframe.shape
+                print mask.mask.shape
+                print mask
+            raise
     return traces
 

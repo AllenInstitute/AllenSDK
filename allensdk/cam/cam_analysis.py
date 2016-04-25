@@ -23,9 +23,7 @@ from allensdk.core.cam_nwb_data_set import CamNwbDataSet
 
 import allensdk.cam.cam_plotting as cp
 import argparse, logging, os
-<<<<<<< HEAD
 import sys
-=======
 
 def multi_dataframe_merge(dfs):
     out_df = None
@@ -35,7 +33,6 @@ def multi_dataframe_merge(dfs):
         else:
             out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
     return out_df
->>>>>>> 903397fcc5109844ee44322531124d8987e787b4
 
 class CamAnalysis(object):
     _log = logging.getLogger('allensdk.cam.cam_analysis')    
@@ -152,16 +149,10 @@ class CamAnalysis(object):
                 sys.exit(1)
     
     def session_a(self, plot_flag=False, save_flag=True):
-<<<<<<< HEAD
         nm1 = NaturalMovie(self, 'natural_movie_one')        
         dg = DriftingGrating(self)
         nm3 = NaturalMovie(self, 'natural_movie_three')    
 
-=======
-        dg = DriftingGrating(self)
-        nm3 = NaturalMovie(self, 'natural_movie_three')    
-        nm1 = NaturalMovie(self, 'natural_movie_one')        
->>>>>>> 903397fcc5109844ee44322531124d8987e787b4
         CamAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
 
@@ -215,18 +206,6 @@ class CamAnalysis(object):
     
         if save_flag:
             self.save_session_c(lsn, nm1, nm2, peak)
-<<<<<<< HEAD
-
-def multi_dataframe_merge(dfs):
-    out_df = None
-    for i,df in enumerate(dfs):
-        if out_df is None:
-            out_df = df
-        else:
-            out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
-    return out_df
-=======
->>>>>>> 903397fcc5109844ee44322531124d8987e787b4
     
                     
 def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=False):
@@ -239,7 +218,6 @@ def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=Fal
 
     if session == CamAnalysis.SESSION_A:
         cam_analysis.session_a(plot_flag)
-<<<<<<< HEAD
         metrics = cam_analysis.metrics_a
     elif session == CamAnalysis.SESSION_B:
         cam_analysis.session_b(plot_flag)
@@ -251,14 +229,6 @@ def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=Fal
         raise IndexError("Unknown session: %s" % session)
 
     return metrics
-=======
-    elif session == CamAnalysis.SESSION_B:
-        cam_analysis.session_b(plot_flag)
-    elif session == CamAnalysis.SESSION_C:
-        cam_analysis.session_c(plot_flag)
-    else:
-        raise IndexError("Unknown session: %s" % session)
->>>>>>> 903397fcc5109844ee44322531124d8987e787b4
     
 def main():
     parser = argparse.ArgumentParser()
