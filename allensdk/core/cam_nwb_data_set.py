@@ -38,7 +38,7 @@ class CamNwbDataSet(object):
         cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
         roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
         f.close()
-        return timestamps, celltraces, cell_id
+        return timestamps, celltraces, roi_id, cell_id
         
     def get_max_projection(self):
         '''returns the maximum projection image for the 2P data'''
