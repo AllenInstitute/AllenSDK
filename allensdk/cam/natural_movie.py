@@ -23,7 +23,7 @@ class NaturalMovie(OPAnalysis):
         super(NaturalMovie, self).__init__(cam_analysis, **kwargs)                   
         stimulus_table = self.cam_analysis.nwb.get_stimulus_table(movie_name)   
         self.stim_table = stimulus_table[stimulus_table.frame==0]
-        _, self.celltraces_dff, _ = self.cam_analysis.nwb.get_dff_traces()
+        self.celltraces_dff = self.get_global_dff()
         if movie_name == 'natural_movie_one':
             self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.get_speed_tuning(binsize=800)
         self.sweeplength = self.stim_table.start.iloc[1] - self.stim_table.start.iloc[0]

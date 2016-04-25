@@ -49,29 +49,8 @@ class OPAnalysis(object):
     def get_peak(self):
         raise CamAnalysisException("get_peak not implemented")
         
-    def get_global_dff(self, percentiletosubtract=8):
+    def get_global_dff(self):
         return self.dfftraces
-#        OPAnalysis._log.info("Calculating global DF/F ... this can take some time")
-#        
-#        startTime = time.time()
-#        celltraces_dff = np.zeros(self.celltraces.shape)
-#        for i in range(450):
-#            celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,:(i+450)], percentiletosubtract, axis=1)
-#        for i in range(450, np.size(self.celltraces,1)-450):
-#            celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,(i-450):(i+450)], percentiletosubtract, axis=1)
-#        for i in range(np.size(self.celltraces,1)-450, np.size(self.celltraces,1)):
-#            celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,(i-450):], percentiletosubtract, axis=1)
-#
-#        OPAnalysis._log.info("we're still here")
-#        for cn in range(self.numbercells):
-#            (val, edges) = np.histogram(celltraces_dff[cn,:], bins=200)
-#            celltraces_dff[cn,:] /= edges[np.argmax(val)+1]
-#            celltraces_dff[cn,:] -= 1
-#            celltraces_dff[cn,:] *= 100
-#        elapsedTime = time.time() - startTime
-#        OPAnalysis._log.info("Elapsed Time: %f", elapsedTime)
-#        
-#        return celltraces_dff
     
     def get_speed_tuning(self, binsize):
         OPAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')
