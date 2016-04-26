@@ -25,20 +25,8 @@ class CamNwbDataSet(object):
         f = h5py.File(self.nwb_file, 'r')
         timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value
         celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['data'].value 
-        cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
-        roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
         f.close()
-        return timestamps, celltraces, roi_id, cell_id
-        
-    def get_dff_traces(self):
-        '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
-        f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['data'].value 
-        cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
-        roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
-        f.close()
-        return timestamps, celltraces, roi_id, cell_id
+        return timestamps, celltraces
         
     def get_dff_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
