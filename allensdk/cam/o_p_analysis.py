@@ -30,11 +30,11 @@ class OPAnalysis(object):
         self.save_dir = os.path.dirname(self.cam_analysis.save_path)
         
         # get fluorescence 
-        self.timestamps, self.celltraces, self.roi_id, self.cell_id = self.cam_analysis.nwb.get_fluorescence_traces()
+        self.timestamps, self.celltraces = self.cam_analysis.nwb.get_fluorescence_traces()
         self.numbercells = len(self.celltraces)    #number of cells in dataset
-        # get dF/F 
-        _1, self.dfftraces, _2, _3 = self.cam_analysis.nwb.get_dff_traces()
-        #
+        self.roi_id = self.cam_analysis.nwb.get_roi_ids()
+        self.cell_specimen_id = self.cam_analysis.nwb.get_cell_specimen_ids()
+        _, self.dff_traces = self.cam_analysis.nwb.get_dff_traces()
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
         self.dxcm, self.dxtime = self.cam_analysis.nwb.get_running_speed()        
 
@@ -45,7 +45,7 @@ class OPAnalysis(object):
         raise CamAnalysisException("get_peak not implemented")
         
     def get_global_dff(self):
-        return self.dfftraces
+        return self.dff_traces
     
     def get_speed_tuning(self, binsize):
         OPAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')

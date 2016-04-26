@@ -141,12 +141,10 @@ class CamAnalysis(object):
 
     def verify_roi_lists_equal(self, roi1, roi2):
         if len(roi1) != len(roi2):
-            print("Error -- ROI lists are of different length")
-            sys.exit(1)
+            raise CamAnalysisException("Error -- ROI lists are of different length")
         for i in range(len(roi1)):
             if roi1[i] != roi2[i]:
-                print("Error -- ROI lists have different entries")
-                sys.exit(1)
+                raise CamAnlysisException("Error -- ROI lists have different entries")
     
     def session_a(self, plot_flag=False, save_flag=True):
         nm1 = NaturalMovie(self, 'natural_movie_one')        

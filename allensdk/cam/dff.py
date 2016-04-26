@@ -150,7 +150,7 @@ def main():
 
     # read from "data"
     if args.input_h5.endswith("nwb"):
-        timestamps, traces, _ = CamNwbDataSet(args.input_h5).get_fluorescence_traces()
+        timestamps, traces = CamNwbDataSet(args.input_h5).get_fluorescence_traces()
         print traces.shape
     else:
         input_h5 = h5py.File(args.input_h5, "r")
