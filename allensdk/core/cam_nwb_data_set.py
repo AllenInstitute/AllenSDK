@@ -26,7 +26,7 @@ class CamNwbDataSet(object):
         timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value
         celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['data'].value 
         f.close()
-        return timestamps, celltraces, roi_id, cell_id
+        return timestamps, celltraces
         
     def get_dff_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
@@ -34,7 +34,7 @@ class CamNwbDataSet(object):
         timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['timestamps'].value
         celltraces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['data'].value 
         f.close()
-        return timestamps, celltraces, roi_id, cell_id
+        return timestamps, celltraces
 
     def get_roi_ids(self):
         f = h5py.File(self.nwb_file, 'r')
