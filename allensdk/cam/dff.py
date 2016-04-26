@@ -57,16 +57,16 @@ def movingaverage(x, kernelsize, y):
     sumkernel = np.sum(x[0:halfsize])
     for m in range (0,halfsize):
         sumkernel = sumkernel + x[m+halfsize]
-      	y[m] = sumkernel/(halfsize+m)
+        y[m] = sumkernel/(halfsize+m)
 
     sumkernel = np.sum(x[0:kernelsize])
     for m in range (halfsize,x.shape[0]-halfsize):
         sumkernel = sumkernel - x[m-halfsize] + x[m+halfsize]
-      	y[m] = sumkernel/kernelsize
+        y[m] = sumkernel/kernelsize
 
     for m in range (x.shape[0]-halfsize,x.shape[0]):
         sumkernel = sumkernel - x[m-halfsize]
-      	y[m] = sumkernel/(halfsize-1+(x.shape[0]-m))
+        y[m] = sumkernel/(halfsize-1+(x.shape[0]-m))
 
     return 0
 
@@ -123,7 +123,7 @@ def compute_dff(traces, save_plot_dir=None):
     for n in range(0,traces.shape[0]):
         movingmode_fast(traces[n,:], 5400, modeline[:])
         movingaverage(modeline[:], 3000, modelineLP[:])
-	dff[n,:] = (traces[n,:] - modelineLP[:]) / modelineLP[:]
+        dff[n,:] = (traces[n,:] - modelineLP[:]) / modelineLP[:]
 
         logging.debug("finished trace %d/%d" % (n+1, traces.shape[0]))
 
@@ -150,7 +150,7 @@ def main():
 
     # read from "data"
     if args.input_h5.endswith("nwb"):
-        timestamps, traces, _ = CamNwbDataSet(args.input_h5).get_fluorescence_traces()
+        timestamps, traces = CamNwbDataSet(args.input_h5).get_fluorescence_traces()
         print traces.shape
     else:
         input_h5 = h5py.File(args.input_h5, "r")
