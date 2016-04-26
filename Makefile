@@ -15,7 +15,7 @@ DOC_URL=http://alleninstitute.github.io/AllenSDK
 build:
 	mkdir -p $(DISTDIR)/$(PROJECTNAME) 
 	cp -r allensdk setup.py README.md $(DISTDIR)/$(PROJECTNAME)/
-	cd $(DISTDIR); tar czvf $(PROJECTNAME).tgz $(PROJECTNAME)
+	cd $(DISTDIR); tar czvf $(PROJECTNAME).tgz --exclude .git $(PROJECTNAME)
 	
 
 distutils_build: clean
