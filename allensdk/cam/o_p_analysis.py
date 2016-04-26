@@ -33,7 +33,7 @@ class OPAnalysis(object):
         self.timestamps, self.celltraces = self.cam_analysis.nwb.get_fluorescence_traces()
         self.numbercells = len(self.celltraces)    #number of cells in dataset
         self.roi_id = self.cam_analysis.nwb.get_roi_ids()
-        self.cell_id = self.cam_analysis.nwb.get_cell_ids()
+        self.cell_id = self.cam_analysis.nwb.get_cell_specimen_ids()
         
         # get dF/F 
         _, self.dfftraces = self.cam_analysis.nwb.get_dff_traces()
