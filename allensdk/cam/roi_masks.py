@@ -1,9 +1,15 @@
 import numpy as np
 import scipy.ndimage.measurements as measurements
 import scipy.ndimage.morphology as morphology
-from motion_border import *
 
 # TODO document and format for SDK
+
+# constants used for accessing border array
+RIGHT_SHIFT = 0
+LEFT_SHIFT = 1
+DOWN_SHIFT = 2
+UP_SHIFT = 3
+
 
 class Mask(object):
     def __init__(self, image_w, image_h, label, mask_group):
