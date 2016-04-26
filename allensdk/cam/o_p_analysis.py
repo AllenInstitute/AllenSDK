@@ -30,23 +30,13 @@ class OPAnalysis(object):
         self.save_dir = os.path.dirname(self.cam_analysis.save_path)
         
         # get fluorescence 
-        self.timestamps, self.celltraces, roi_id, cell_id = self.cam_analysis.nwb.get_fluorescence_traces()
+        self.timestamps, self.celltraces = self.cam_analysis.nwb.get_fluorescence_traces()
         self.numbercells = len(self.celltraces)    #number of cells in dataset
-        self.roi_id = roi_id
-        self.cell_id = cell_id
+        self.roi_id = self.cam_analysis.nwb.get_roi_ids()
+        self.cell_id = self.cam_analysis.nwb.get_cell_ids()
         
         # get dF/F 
-        _, self.dfftraces, dff_roi_id, dff_cell_id = self.cam_analysis.nwb.get_dff_traces()
-
-        # sanity check ROIs
-        assert len(roi_id) == len(dff_roi_id), "Different number of F and dF/F traces"
-        for i in range(len(roi_id)):
-            assert roi_id[i] == dff_roi_id[i], "F and dF/F are for different ROIs"
-
-        # sanity check cells
-        assert len(cell_id) == len(dff_cell_id), "Different number of F and dF/F traces"
-        for i in range(len(cell_id)):
-            assert cell_id[i] == dff_cell_id[i], "F and dF/F are for different cells"
+        _, self.dfftraces = self.cam_analysis.nwb.get_dff_traces()
 
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
         self.dxcm, self.dxtime = self.cam_analysis.nwb.get_running_speed()        
