@@ -28,6 +28,7 @@ class CamNwbDataSet(object):
         cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
         roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
         f.close()
+<<<<<<< HEAD
         return timestamps, celltraces, roi_id, cell_id
         
     def get_dff_traces(self):
@@ -39,6 +40,19 @@ class CamNwbDataSet(object):
         roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
         f.close()
         return timestamps, celltraces, roi_id, cell_id
+=======
+        return timestamps, celltraces, cell_id
+        
+    def get_dff_traces(self):
+        '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
+        f = h5py.File(self.nwb_file, 'r')
+        timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['timestamps'].value
+        celltraces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['data'].value 
+        cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
+        roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
+        f.close()
+        return timestamps, celltraces, cell_id
+>>>>>>> refs/remotes/origin/lims2_modules_dev
         
     def get_max_projection(self):
         '''returns the maximum projection image for the 2P data'''
