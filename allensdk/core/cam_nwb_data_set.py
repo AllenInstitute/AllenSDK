@@ -25,8 +25,6 @@ class CamNwbDataSet(object):
         f = h5py.File(self.nwb_file, 'r')
         timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value
         celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['data'].value 
-        cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
-        roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
         f.close()
         return timestamps, celltraces, roi_id, cell_id
         
@@ -35,10 +33,20 @@ class CamNwbDataSet(object):
         f = h5py.File(self.nwb_file, 'r')
         timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['timestamps'].value
         celltraces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['data'].value 
-        cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
-        roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
         f.close()
         return timestamps, celltraces, roi_id, cell_id
+
+    def get_roi_ids(self):
+        f = h5py.File(self.nwb_file, 'r')
+        roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
+        f.close()
+        return roi_id
+
+    def get_cell_specimen_ids(self):
+        f = h5py.File(self.nwb_file, 'r')
+        cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
+        f.close()
+        return cell_id
         
     def get_max_projection(self):
         '''returns the maximum projection image for the 2P data'''
