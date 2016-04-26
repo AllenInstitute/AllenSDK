@@ -141,12 +141,10 @@ class CamAnalysis(object):
 
     def verify_roi_lists_equal(self, roi1, roi2):
         if len(roi1) != len(roi2):
-            print("Error -- ROI lists are of different length")
-            sys.exit(1)
+            raise CamAnalysisException("Error -- ROI lists are of different length")
         for i in range(len(roi1)):
             if roi1[i] != roi2[i]:
-                print("Error -- ROI lists have different entries")
-                sys.exit(1)
+                raise CamAnalysisException("Error -- ROI lists have different entries")
     
     def session_a(self, plot_flag=False, save_flag=True):
         nm1 = NaturalMovie(self, 'natural_movie_one')        
@@ -190,8 +188,8 @@ class CamAnalysis(object):
             self.save_session_b(sg, nm1, ns, peak)
     
     def session_c(self, plot_flag=False, save_flag=True):
-        nm2 = NaturalMovie(self, 'natural_movie_two')
         lsn = LocallySparseNoise(self)
+        nm2 = NaturalMovie(self, 'natural_movie_two')
         nm1 = NaturalMovie(self, 'natural_movie_one')
         CamAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])

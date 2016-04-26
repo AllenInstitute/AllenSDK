@@ -205,9 +205,10 @@ def plot_sg_traces(self):
 
 def plot_lsn_traces(self):
     logging.info("Plotting LSN traces for all cells")
-    xtime = np.arange(-1*self.sweeplength/self.acquisition_rate, (2*self.sweeplength)/self.acquisition_rate, 1/self.acquisition_rate)
-    while len(xtime)>(3*self.sweeplength):
-        xtime = np.delete(xtime, -1)
+    xtime = np.arange(-self.interlength/self.acquisition_rate, 
+                       (self.interlength + self.sweeplength)/self.acquisition_rate, 
+                       1.0/self.acquisition_rate)
+
     for nc in range(self.numbercells):
         if np.mod(nc,100)==0:
             logging.info("Cell #%s", str(nc))
@@ -225,14 +226,17 @@ def plot_lsn_traces(self):
                 subset_on = one_cell[self.stim_table.frame.isin(on_frame)]
                 subset_off = one_cell[self.stim_table.frame.isin(off_frame)]
 
+                subset_on_mean = subset_on.mean()
+                subset_off_mean = subset_off.mean()
+
                 ax = plt.subplot(16,28,sp_pt)
-                ax.plot(xtime, subset_on.mean(), color='r', lw=2)
-                ax.plot(xtime, subset_off.mean(), color='b', lw=2)
+                ax.plot(xtime, subset_on_mean, color='r', lw=2)
+                ax.plot(xtime, subset_off_mean, color='b', lw=2)
                 ax.axvspan(0, self.sweeplength/self.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
-                vmax = np.where(np.amax(subset_on.mean())>vmax, np.amax(subset_on.mean()), vmax)
-                vmax = np.where(np.amax(subset_off.mean())>vmax, np.amax(subset_off.mean()), vmax)
-                vmin = np.where(np.amin(subset_on.mean())<vmin, np.amin(subset_on.mean()), vmin)
-                vmin = np.where(np.amin(subset_off.mean())<vmin, np.amin(subset_off.mean()), vmin)
+                vmax = np.where(np.amax(subset_on_mean)>vmax, np.amax(subset_on_mean), vmax)
+                vmax = np.where(np.amax(subset_off_mean)>vmax, np.amax(subset_off_mean), vmax)
+                vmin = np.where(np.amin(subset_on_mean)<vmin, np.amin(subset_on_mean), vmin)
+                vmin = np.where(np.amin(subset_off_mean)<vmin, np.amin(subset_off_mean), vmin)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 

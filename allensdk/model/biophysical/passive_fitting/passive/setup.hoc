@@ -1,3 +1,0 @@
-load_file("iclamp.ses")
-load_file("params.hoc")
-load_file("mrf.ses")

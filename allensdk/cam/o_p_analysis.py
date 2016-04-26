@@ -30,16 +30,14 @@ class OPAnalysis(object):
         self.save_dir = os.path.dirname(self.cam_analysis.save_path)
         
         # get fluorescence 
-        self.timestamps, self.celltraces, f_id = self.cam_analysis.nwb.get_fluorescence_traces()
+        self.timestamps, self.celltraces = self.cam_analysis.nwb.get_fluorescence_traces()
         self.numbercells = len(self.celltraces)    #number of cells in dataset
-        self.roi_id = f_id
+        self.roi_id = self.cam_analysis.nwb.get_roi_ids()
+        self.cell_id = self.cam_analysis.nwb.get_cell_specimen_ids()
+        
         # get dF/F 
-        _, self.dfftraces, dff_id = self.cam_analysis.nwb.get_dff_traces()
-        # sanity check
-        assert len(f_id) == len(dff_id), "Different number of F and dF/F traces"
-        for i in range(len(f_id)):
-            assert f_id[i] == dff_id[i], "F and dF/F are for different ROIs"
-        #
+        _, self.dfftraces = self.cam_analysis.nwb.get_dff_traces()
+
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
         self.dxcm, self.dxtime = self.cam_analysis.nwb.get_running_speed()        
 
@@ -48,30 +46,9 @@ class OPAnalysis(object):
 
     def get_peak(self):
         raise CamAnalysisException("get_peak not implemented")
-
-    def get_global_dff(self, percentiletosubtract=8):
+        
+    def get_global_dff(self):
         return self.dfftraces
-#        OPAnalysis._log.info("Calculating global DF/F ... this can take some time")
-#        
-#        startTime = time.time()
-#        celltraces_dff = np.zeros(self.celltraces.shape)
-#        for i in range(450):
-#            celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,:(i+450)], percentiletosubtract, axis=1)
-#        for i in range(450, np.size(self.celltraces,1)-450):
-#            celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,(i-450):(i+450)], percentiletosubtract, axis=1)
-#        for i in range(np.size(self.celltraces,1)-450, np.size(self.celltraces,1)):
-#            celltraces_dff[:,i] = self.celltraces[:,i] - np.percentile(self.celltraces[:,(i-450):], percentiletosubtract, axis=1)
-#
-#        OPAnalysis._log.info("we're still here")
-#        for cn in range(self.numbercells):
-#            (val, edges) = np.histogram(celltraces_dff[cn,:], bins=200)
-#            celltraces_dff[cn,:] /= edges[np.argmax(val)+1]
-#            celltraces_dff[cn,:] -= 1
-#            celltraces_dff[cn,:] *= 100
-#        elapsedTime = time.time() - startTime
-#        OPAnalysis._log.info("Elapsed Time: %f", elapsedTime)
-#        
-#        return celltraces_dff
     
     def get_speed_tuning(self, binsize):
         OPAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')
@@ -224,7 +201,7 @@ class OPAnalysis(object):
             start = row['start'] - self.interlength
             end = row['start'] + self.sweeplength + self.interlength
             for nc in range(self.numbercells):
-                temp = self.celltraces[nc,start:end]                                
+                temp = self.celltraces[nc,start:end]
                 sweep_response[str(nc)][index] = 100*((temp/np.mean(temp[:self.interlength]))-1)
             sweep_response['dx'][index] = self.dxcm[start:end]   
         

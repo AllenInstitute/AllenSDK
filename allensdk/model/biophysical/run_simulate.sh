@@ -1,3 +1,4 @@
+set -x
 set -o errexit
 
 export ALLENSDK_PATH=/local1/git/allensdk
@@ -11,12 +12,11 @@ export PYTHON=${PYTHON_HOME}/bin/python
 export PATH=${PYTHON_HOME}/bin:${NEURON_HOME}/x86_64/bin:${IV_HOME}/x86_64/bin:${PATH}
 
 export SPECIMEN_ID=$1
-export RUN_OPTIMIZE="${PYTHON} -W ignore -m allensdk.model.biophysical.run_optimize"
+export SIMULATE="${PYTHON} -W ignore -m allensdk.model.biophysical.run_simulate"
 MANIFEST=manifest_sdk.json
 OUT_JSON=out.json
 
-${RUN_OPTIMIZE} generate_manifest_rma ${SPECIMEN_ID} ${MANIFEST}
-${RUN_OPTIMIZE} copy_local ${MANIFEST} ${OUT_JSON}
-${RUN_OPTIMIZE} nrnivmodl ${MANIFEST} ${OUT_JSON} 
-${RUN_OPTIMIZE} start_specimen ${MANIFEST} ${OUT_JSON}
-${RUN_OPTIMIZE} make_fit ${MANIFEST} ${OUT_JSON}
+${RUN_SIMULATE} generate_manifest_rma ${SPECIMEN_ID} ${MANIFEST}
+${RUN_SIMULATE} copy_local ${MANIFEST} ${OUT_JSON}
+${RUN_SIMULATE} nrnivmodl ${MANIFEST} ${OUT_JSON} 
+${RUN_SIMULATE} start_specimen ${MANIFEST} ${OUT_JSON}
