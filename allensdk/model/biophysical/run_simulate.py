@@ -20,90 +20,10 @@ class RunSimulate(object):
     def load_manifest(self):
         self.app_config = Config().load(self.input_json)
         self.manifest = self.app_config.manifest
-        #combined_manifest = 'manifest.json'
         fix_sections = ['passive', 'axon_morph,', 'conditions', 'fitting']
-        #self.description = self.app_config.load(combined_manifest)
         self.app_config.fix_unary_sections(fix_sections)
-    
-    
-    def generate_manifest_rma(self,
-                              neuronal_model_run_id,
-                              manifest_path):
-        '''
-        Note
-        ----
-        Other necessary files are also written.
-        '''
-        import json
-        from allensdk.api.api import Api
-        from allensdk.internal.api.queries.biophysical_module_api import BiophysicalModuleApi
-        from allensdk.internal.api.queries.biophysical_module_reader import BiophysicalModuleReader        
-        Api.default_api_url = 'http://axon:3000'
-        
-        bma = BiophysicalModuleApi()
-        data = bma.get_neuronal_model_runs(neuronal_model_run_id)
-        
-        lr = BiophysicalModuleReader()
-        lr.read_lims_message(data, 'lims_message.json')
-        
-        with open('lims_message.json', 'w') as f:
-            f.write(json.dumps(data[0], sort_keys=True, indent=2))
-        
-        lr.to_manifest(manifest_path) 
 
-
-    def generate_manifest_lims(self,
-                               lims_data_path,
-                               manifest_path):
-        '''
-        Note
-        ----
-        Other necessary files are also written.
-        '''
-        from allensdk.internal.api.queries.biophysical_module_reader import BiophysicalModuleReader
-            
-        self.lims_json = lims_data_path
-                       
-        lr = BiophysicalModuleReader()
-        lr.read_lims_file(self.lims_json)
-        
-        lr.to_manifest(manifest_path) 
-
-
-    def copy_local(self):
-        import allensdk.model.biophysical.run_simulate
-        
-        self.load_manifest()
-        
-        modfile_dir = self.manifest.get_path('MODFILE_DIR')
-        
-        if not os.path.exists(modfile_dir):
-            os.mkdir(modfile_dir)
-                    
-        workdir = self.manifest.get_path('WORKDIR')        
-        
-        if not os.path.exists(workdir):
-            os.mkdir(workdir)
-
-        modfiles = [self.manifest.get_path(key) for key,info
-                    in self.manifest.path_info.items()
-                    if 'format' in info and info['format'] == 'MODFILE']
-        
-        for from_file in modfiles:             
-            RunSimulate._log.debug("copying %s to %s" % (from_file, modfile_dir))
-            shutil.copy(from_file, modfile_dir)
-        
-        shutil.copy(self.manifest.get_path('fit_parameters'),
-                    workdir)
-        
-        shutil.copyfile(self.manifest.get_path('stimulus_path'),
-                        self.manifest.get_path('output_path'))
-        
-        shutil.copy(resource_filename(allensdk.model.biophysical.run_simulate.__name__,
-                                      'cell.hoc'),
-                    os.curdir)
-    
-        
+     
     def nrnivmodl(self):
         RunSimulate._log.debug("nrnivmodl")
         
@@ -161,16 +81,10 @@ def main(command, lims_strategy_json, lims_response_json):
     log_config = resource_filename('allensdk.model.biophysical.run_simulate',
                                     'logging.conf')
     lc.fileConfig(log_config)
-    os.environ['LOG_CFG'] = log_config    
+    os.environ['LOG_CFG'] = log_config
     
     if 'nrnivmodl' == command:
         rs.nrnivmodl()
-    elif 'copy_local' == command:
-        rs.copy_local()        
-    elif 'generate_manifest_rma' == command:
-        rs.generate_manifest_rma(input_json, output_json)
-    elif 'generate_manifest_lims' == command:
-        rs.generate_manifest_lims(input_json, output_json)        
     else:
         rs.simulate()
 
