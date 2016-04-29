@@ -24,6 +24,7 @@ from allensdk.core.cam_nwb_data_set import CamNwbDataSet
 import allensdk.cam.cam_plotting as cp
 import argparse, logging, os
 import sys
+import numpy as np
 
 def multi_dataframe_merge(dfs):
     out_df = None
@@ -123,15 +124,15 @@ class CamAnalysis(object):
     def append_metrics_drifting_grating(self, metrics, dg):
         metrics["osi_dg"] = dg.peak["osi_dg"]
         metrics["dsi_dg"] = dg.peak["dsi_dg"]
-        metrics["pref_dir_dg"] = dg.peak["ori_dg"]
-        metrics["pref_tf_dg"] = dg.peak["tf_dg"]
+        metrics["pref_dir_dg"] = [ dg.orivals[i] for i in dg.peak["ori_dg"].values ]
+        metrics["pref_tf_dg"] = [ dg.tfvals[i] for i in dg.peak["tf_dg"].values ]
         metrics["p_dg"] = dg.peak["ptest_dg"]
     
     def append_metrics_static_grating(self, metrics, sg):
         metrics["osi_sg"] = sg.peak["osi_sg"]
-        metrics["pref_ori_sg"] = sg.peak["ori_sg"]
-        metrics["pref_sf_sg"] = sg.peak["sf_sg"]
-        metrics["pref_phase_sg"] = sg.peak["phase_sg"]
+        metrics["pref_ori_sg"] = [ sg.orivals[i] for i in sg.peak["ori_sg"].values ]
+        metrics["pref_sf_sg"] = [ sg.sfvals[i] for i in sg.peak["sf_sg"].values ]
+        metrics["pref_phase_sg"] = [ sg.phasevals[i] for i in sg.peak["phase_sg"].values ]
         metrics["p_sg"] = sg.peak["ptest_sg"]
 
     def append_metrics_natural_scene(self, metrics, ns):
@@ -147,12 +148,13 @@ class CamAnalysis(object):
                 raise CamAnalysisException("Error -- ROI lists have different entries")
     
     def session_a(self, plot_flag=False, save_flag=True):
-        nm1 = NaturalMovie(self, 'natural_movie_one')        
         dg = DriftingGrating(self)
+        nm1 = NaturalMovie(self, 'natural_movie_one')      
         nm3 = NaturalMovie(self, 'natural_movie_three')    
 
         CamAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
+        
 
         self.append_metrics_drifting_grating(self.metrics_a, dg)
         self.metrics_a["roi_id"] = dg.roi_id
