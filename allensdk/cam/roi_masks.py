@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import scipy.ndimage.measurements as measurements
 import scipy.ndimage.morphology as morphology
 
@@ -76,11 +77,11 @@ class ROI_Mask(Mask):
                     if right is None or c > right:
                         right = c
         # left and right border insets
-        l_inset = border[RIGHT_SHIFT]
-        r_inset = self.img_cols - border[LEFT_SHIFT]
+        l_inset = math.ceil(border[RIGHT_SHIFT])
+        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT])
         # top and bottom border insets
-        t_inset = border[DOWN_SHIFT]
-        b_inset = self.img_rows - border[UP_SHIFT]
+        t_inset = math.ceil(border[DOWN_SHIFT])
+        b_inset = math.floor(self.img_rows - border[UP_SHIFT])
         # if ROI crosses border, it's considered invalid
         if left < l_inset or right > r_inset:
             self.valid = False
@@ -145,11 +146,11 @@ class Neuropil_Mask(Mask):
                     if bottom is None or r > bottom:
                         bottom = r
         # left and right border insets
-        l_inset = border[RIGHT_SHIFT]
-        r_inset = self.img_cols - border[LEFT_SHIFT]
+        l_inset = math.ceil(border[RIGHT_SHIFT])
+        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT])
         # top and bottom border insets
-        t_inset = border[DOWN_SHIFT]
-        b_inset = self.img_rows - border[UP_SHIFT]
+        t_inset = math.ceil(border[DOWN_SHIFT])
+        b_inset = math.floor(self.img_rows - border[UP_SHIFT])
         # restrict neuropil masks to center area of frame (ie, exclude 
         #   areas that overlap with movement correction buffer)
         if left < l_inset:
@@ -189,12 +190,21 @@ def calculate_traces(stack, mask_list):
         if frame_num % 1000 == 0 :
             print "frame " + str(frame_num) + " of " + str(num_frames)
         frame = stack[frame_num]
-        for i in range(len(mask_list)):
-            mask = mask_list[i]
-            subframe = frame[mask.y:mask.y+mask.height, mask.x:mask.x+mask.width]
-            total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
-            area = (mask.mask).sum(axis=-1).sum(axis=-1)
-            tvals = total/area
-            traces[i][frame_num] = tvals
+        mask = None
+        try:
+            for i in range(len(mask_list)):
+                    mask = mask_list[i]
+                    subframe = frame[mask.y:mask.y+mask.height, mask.x:mask.x+mask.width]
+                    total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
+                    area = (mask.mask).sum(axis=-1).sum(axis=-1)
+                    tvals = total/area
+                    traces[i][frame_num] = tvals
+        except:
+            print("Error encountered processing mask during frame %d" % frame_num)
+            if mask is not None:
+                print subframe.shape
+                print mask.mask.shape
+                print mask
+            raise
     return traces
 
