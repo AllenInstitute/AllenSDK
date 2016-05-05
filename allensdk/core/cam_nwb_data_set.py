@@ -83,9 +83,9 @@ class CamNwbDataSet(object):
         template = self.get_stimulus_template("locally_sparse_noise")
         
         # build mapping from template coordinates to display coordinates
-        template_shape = (28,16)
+        template_shape = (28, 16)
         template_display_shape = (1260, 720)
-        display_shape = (1920,1200)
+        display_shape = (1920, 1200)
 
         scale = [
             float(template_shape[0]) / float(template_display_shape[0]),
@@ -99,7 +99,7 @@ class CamNwbDataSet(object):
         x,y = np.meshgrid(np.arange(display_shape[0]), np.arange(display_shape[1]), indexing='ij')
         template_display_coords = np.array([(x + offset[0]) * scale[0] - 0.5, 
                                             (y + offset[1]) * scale[1] - 0.5], 
-                                           dtype=int)
+                                           dtype=float)
         template_display_coords = np.rint(template_display_coords).astype(int)
 
         # build mask
