@@ -8,6 +8,9 @@ Functions to extract relevant data from the CAM NWB files
 import h5py
 import pandas as pd
 import numpy as np
+import itertools
+from collections import defaultdict
+from allensdk.cam.locally_sparse_noise import LocallySparseNoise
 
 class CamNwbDataSet(object):
     file_metadata_mapping = { 'specimen': 'specimen',
@@ -75,6 +78,34 @@ class CamNwbDataSet(object):
         image_stack = f['stimulus']['templates'][stim_name]['data'].value
         f.close()
         return image_stack
+
+    def get_locally_sparse_noise_stimulus_template(self, mask_off_screen=True):
+        template = self.get_stimulus_template("locally_sparse_noise")
+        
+        # build mapping from template coordinates to display coordinates
+        template_shape = (28,16)
+        template_display_shape = (1260, 720)
+        display_shape = (1920,1200)
+
+        scale = [
+            float(template_shape[0]) / float(template_display_shape[0]),
+            float(template_shape[1]) / float(template_display_shape[1])
+            ]
+        offset = [
+            -(display_shape[0] - template_display_shape[0]) * 0.5,
+             -(display_shape[1] - template_display_shape[1]) * 0.5
+             ]
+
+        x,y = np.meshgrid(np.arange(display_shape[0]), np.arange(display_shape[1]), indexing='ij')
+        template_display_coords = np.array([(x + offset[0]) * scale[0], (y + offset[1]) * scale[1]], dtype=int)
+
+        # build mask
+        template_mask, template_frac = mask_stimulus_template(template_display_coords, template_shape)
+
+        if mask_off_screen:
+            template[:,~template_mask.T] = LocallySparseNoise.LSN_OFF_SCREEN
+
+        return template, template_mask.T
     
     def get_roi_mask(self):
         '''returns an array of all the ROI masks'''
@@ -161,6 +192,130 @@ class CamNwbDataSet(object):
         
         ##f.keys()
         f.close()
+
+
+def warp_stimulus_coords(vertices,
+                         distance=15.0,
+                         mon_height_cm=32.5,
+                         mon_width_cm=51.0,
+                         mon_res=(1920,1200),
+                         eyepoint=(0.5,0.5)):
+    """
+    For a list of screen vertices, provides a corresponding list of texture
+        coordinates.
+
+    Args:
+        vertices (numpy.ndarray): [[x0,y0], [x1,y1], ...]  A set of vertices to
+            convert to texture positions.
+        distance (float): distance from the monitor in cm.
+        mon_height_cm (float): monitor height in cm
+        mon_width_cm (float): monitor width in cm
+        mon_res (tuple): monitor resolution (x,y)
+        eyepoint (tuple): eye position relative to monitor bottom left. center
+            is (0.5, 0.5)
+    """
+
+    mon_width_cm = float(mon_width_cm)
+    mon_height_cm = float(mon_height_cm)
+    distance = float(distance)
+    mon_res_x, mon_res_y = float(mon_res[0]), float(mon_res[1])
+
+    vertices = vertices.astype(np.float)
+
+    # from pixels (-1920/2 -> 1920/2) to stimulus space (-0.5->0.5)
+    vertices[:, 0] = vertices[:, 0] / mon_res_x
+    vertices[:, 1] = vertices[:, 1] / mon_res_y
+
+    x = (vertices[:,0] + 0.5) * mon_width_cm
+    y = (vertices[:,1] + 0.5) * mon_height_cm
+
+    xEye = eyepoint[0] * mon_width_cm
+    yEye = eyepoint[1] * mon_height_cm
+
+    x = x - xEye
+    y = y - yEye
+
+    r = np.sqrt(np.square(x) + np.square(y) + np.square(distance))
+
+    azimuth = np.arctan(x / distance)
+    altitude = np.arcsin(y / r)
+
+    # calculate the texture coordinates
+    tx = distance * (1 + x / r) - distance
+    ty = distance * (1 + y / r) - distance
+
+    # prevent div0
+    azimuth[azimuth == 0] = np.finfo(np.float32).eps
+    altitude[altitude == 0] = np.finfo(np.float32).eps
+
+    # the texture coordinates (which are now lying on the sphere)
+    # need to be remapped back onto the plane of the display.
+    # This effectively stretches the coordinates away from the eyepoint.
+
+    centralAngle = np.arccos(np.cos(altitude) * np.cos(np.abs(azimuth)))
+    # distance from eyepoint to texture vertex
+    arcLength = centralAngle * distance
+    # remap the texture coordinate
+    theta = np.arctan2(ty, tx)
+    tx = arcLength * np.cos(theta)
+    ty = arcLength * np.sin(theta)
+
+    u_coords = tx / mon_width_cm 
+    v_coords = ty / mon_height_cm
+
+    retCoords = np.column_stack((u_coords, v_coords))
+
+    # back to pixels
+    retCoords[:, 0] = retCoords[:, 0] * mon_res_x
+    retCoords[:, 1] = retCoords[:, 1] * mon_res_y
+
+    return retCoords
+
+def make_display_mask(display_shape=(1920,1200)):
+    x = np.array(range(display_shape[0])) - display_shape[0]/2
+    y = np.array(range(display_shape[1])) - display_shape[1]/2
+    display_coords = np.array(list(itertools.product(x,y)))
+                                                     
+    warped_coords = warp_stimulus_coords(display_coords).astype(int)
+
+    off_warped_coords = np.array([ warped_coords[:,0] + display_shape[0]/2,
+                                   warped_coords[:,1] + display_shape[1]/2 ])
+
+    
+    used_coords = set()
+    for i in range(off_warped_coords.shape[1]):
+        used_coords.add((off_warped_coords[0,i], off_warped_coords[1,i]))
+
+    used_coords = ( np.array([x for (x,y) in used_coords ]),
+                    np.array([y for (x,y) in used_coords ]) )
+
+    mask = np.zeros(display_shape)
+    mask[used_coords] = 1
+
+    return mask
+
+def mask_stimulus_template(template_display_coords, template_shape, display_mask=None, threshold=1.0):
+   
+    if display_mask is None:
+        display_mask = make_display_mask()
+
+    frac = np.zeros(template_shape)
+    mask = np.zeros(template_shape, dtype=bool)
+    for y in range(template_shape[1]):
+        for x in range(template_shape[0]):
+            tdcm = np.where((template_display_coords[0,:,:] == x) & (template_display_coords[1,:,:] == y))
+            v = display_mask[tdcm]
+            f = np.sum(v) / len(v)
+            frac[x,y] = f
+            mask[x,y] = f >= threshold
+    
+    return mask, frac
+
+    
+
+    
+    
+                      
 
     
 #def getMovieShape(NWB_file):
