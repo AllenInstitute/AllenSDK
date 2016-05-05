@@ -1,8 +1,21 @@
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
+import math
 import scipy.ndimage.measurements as measurements
 import scipy.ndimage.morphology as morphology
-
-# TODO document and format for SDK
 
 # constants used for accessing border array
 RIGHT_SHIFT = 0
@@ -12,7 +25,36 @@ UP_SHIFT = 3
 
 
 class Mask(object):
+    '''
+    Abstract class to represent image segmentation mask. Its two
+    main subclasses are ROI_Mask and Neuropil_Mask. The former represents
+    the mask of a region of interest (ROI), such as a cell observed in 
+    2-photon imaging. The latter represents the neuropil around that cell,
+    and is useful when subtracting the neuropil signal from the measured
+    ROI signal.
+
+    This class should not be instantiated directly.
+    
+    '''
     def __init__(self, image_w, image_h, label, mask_group):
+        '''
+        Mask class constructor. The Mask class is designed to be abstract
+        and it should not be instantiated directly.
+
+        Arguments
+        ---------
+        image_w: integer
+        Width of image that ROI resides in
+
+        image_h: integer
+        Height of image that ROI resides in
+
+        label: text
+        User-defined text label to identify mask
+
+        mask_group: integer
+        User-defined number to help put masks into different categories
+        '''
         self.img_rows = image_h
         self.img_cols = image_w
         # initialize to invalid state. Mask must be manually initialized 
@@ -35,6 +77,50 @@ class Mask(object):
 
 
 def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, label=None, mask_group=-1):
+    '''
+    Conveninece function to create and initializes an ROI_Mask
+
+    Arguments
+    ---------
+
+        image_w: integer
+        Width of image that ROI resides in
+
+        image_h: integer
+        Height of image that ROI resides in
+
+        border: float[4]
+        Coordinates defining useable area of image. If the entire image
+        is usable, and masks are valid anywhere in the image, this should
+        be [(image_w-1), 0, (image_h-1), 0]. The following constants
+        help describe the array order:
+
+            RIGHT_SHIFT = 0
+            LEFT_SHIFT = 1
+            DOWN_SHIFT = 2
+            UP_SHIFT = 3
+
+        When parts of the image are unusable, for example due motion
+        correction shifting of different image frames, the border array
+        should store the usable image area
+
+        pix_list: integer[][2]
+        List of pixel coordinates (x,y) that define the mask
+
+        roi_mask: integer[image_h][image_w]
+        Image-sized array that describes the mask. Active parts of the
+        mask should have values >0. Background pixels must be zero
+
+        label: text
+        User-defined text label to identify mask
+
+        mask_group: integer
+        User-defined number to help put masks into different categories
+
+    Returns
+    -------
+    ROI_Mask object
+    '''
     m = ROI_Mask(image_w, image_h, label, mask_group)
     if pix_list is not None:
         m.init_by_pixels(border, pix_list)
@@ -47,9 +133,41 @@ def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, labe
 
 class ROI_Mask(Mask):
     def __init__(self, image_w, image_h, label, mask_group):
+        '''
+        ROI_Mask class constructor
+
+        Arguments
+        ---------
+        image_w: integer
+        Width of image that ROI resides in
+
+        image_h: integer
+        Height of image that ROI resides in
+
+        label: text
+        User-defined text label to identify mask
+
+        mask_group: integer
+        User-defined number to help put masks into different categories
+        '''
         super(ROI_Mask, self).__init__(image_w, image_h, label, mask_group)
 
     def init_by_pixels(self, border, pix_list):
+        '''
+        Initialize mask using a list of mask pixels
+
+        Arguments:
+        ----------
+        border: float[4]
+        Coordinates defining useable area of image. See create_roi_mask()
+
+        pix_list: integer[][2]
+        List of pixel coordinates (x,y) that define the mask
+
+        Returns
+        -------
+        nothing
+        '''
         assert pix_list.shape[1] == 2, "Pixel list not properly formed"
         array = np.zeros((self.img_rows, self.img_cols))
         # pix_list stores array of [x,y] coordinates
@@ -58,6 +176,22 @@ class ROI_Mask(Mask):
         self.init_by_mask(border, array)
 
     def init_by_mask(self, border, array):
+        '''
+        Initialize mask using spatial mask
+
+        Arguments:
+        ----------
+        border: float[4]
+        Coordinates defining useable area of image. See create_roi_mask().
+
+        roi_mask: integer[image height][image width]
+        Image-sized array that describes the mask. Active parts of the
+        mask should have values >0. Background pixels must be zero
+
+        Returns
+        -------
+        nothing
+        '''
         # find lowest and highest non-zero indices on each axis
         left = None
         right = None
@@ -76,11 +210,11 @@ class ROI_Mask(Mask):
                     if right is None or c > right:
                         right = c
         # left and right border insets
-        l_inset = border[RIGHT_SHIFT]
-        r_inset = self.img_cols - border[LEFT_SHIFT]
+        l_inset = math.ceil(border[RIGHT_SHIFT])
+        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT])
         # top and bottom border insets
-        t_inset = border[DOWN_SHIFT]
-        b_inset = self.img_rows - border[UP_SHIFT]
+        t_inset = math.ceil(border[DOWN_SHIFT])
+        b_inset = math.floor(self.img_rows - border[UP_SHIFT])
         # if ROI crosses border, it's considered invalid
         if left < l_inset or right > r_inset:
             self.valid = False
@@ -96,8 +230,37 @@ class ROI_Mask(Mask):
 
 
 def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
+    '''
+    Conveninece function to create and initializes a Neuropil mask.
+    Neuropil masks are defined as the region around an ROI, up to 13
+    pixels out, that does not include other ROIs
+
+    Arguments
+    ---------
+
+        roi: ROI_Mask object
+        The ROI that the neuropil masks will be based on
+
+        border: float[4]
+        Coordinates defining useable area of image. See create_roi_mask().
+
+        combined_binary_mask
+        List of pixel coordinates (x,y) that define the mask
+
+        combined_binary_mask: integer[image_h][image_w]
+        Image-sized array that shows the position of all ROIs in the
+        image. ROI masks should have a value of one. Background pixels 
+        must be zero. In other words, ithe combined_binary_mask is a 
+        bitmap union of all ROI masks
+
+        label: text
+        User-defined text label to identify the mask
+
+    Returns
+    -------
+    Neuropil_Mask object
+    '''
     # combined_binary_mask is a bitmap union of ALL ROI masks
-    
     # create a binary mask of the ROI
     binary_mask = np.zeros((roi.img_rows, roi.img_cols))
     binary_mask[roi.y:roi.y+roi.height, roi.x:roi.x+roi.width] = roi.mask
@@ -114,10 +277,37 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
 
 class Neuropil_Mask(Mask):
     def __init__(self, w, h, label, mask_group):
+        '''
+        Neuropil_Mask class constructor. This class should be created by
+        calling create_neuropil_mask()
+
+        Arguments
+        ---------
+        label: text
+        User-defined text label to identify mask
+
+        mask_group: integer
+        User-defined number to help put masks into different categories
+        '''
         super(Neuropil_Mask, self).__init__(w, h, label, mask_group)
 
 
     def init_by_pixels(self, border, pix_list):
+        '''
+        Initialize mask using a list of mask pixels
+
+        Arguments:
+        ----------
+        border: float[4]
+        Coordinates defining useable area of image. See create_roi_mask()
+
+        pix_list: integer[][2]
+        List of pixel coordinates (x,y) that define the mask
+
+        Returns
+        -------
+        nothing
+        '''
         assert pix_list.shape[1] == 2, "Pixel list not properly formed"
         array = np.zeros((self.img_rows, self.img_cols))
         # pix_list stores array of [x,y] coordinates
@@ -127,6 +317,22 @@ class Neuropil_Mask(Mask):
 
 
     def init_by_mask(self, border, array):
+        '''
+        Initialize mask using spatial mask
+
+        Arguments:
+        ----------
+        border: float[4]
+        Coordinates defining useable area of image. See create_roi_mask().
+
+        array: integer[image height][image width]
+        Image-sized array that describes the mask. Active parts of the
+        mask should have values >0. Background pixels must be zero
+
+        Returns
+        -------
+        nothing
+        '''
         # find lowest and highest non-zero indices on each axis
         left = None
         right = None
@@ -145,11 +351,11 @@ class Neuropil_Mask(Mask):
                     if bottom is None or r > bottom:
                         bottom = r
         # left and right border insets
-        l_inset = border[RIGHT_SHIFT]
-        r_inset = self.img_cols - border[LEFT_SHIFT]
+        l_inset = math.ceil(border[RIGHT_SHIFT])
+        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT])
         # top and bottom border insets
-        t_inset = border[DOWN_SHIFT]
-        b_inset = self.img_rows - border[UP_SHIFT]
+        t_inset = math.ceil(border[DOWN_SHIFT])
+        b_inset = math.floor(self.img_rows - border[UP_SHIFT])
         # restrict neuropil masks to center area of frame (ie, exclude 
         #   areas that overlap with movement correction buffer)
         if left < l_inset:
@@ -178,6 +384,25 @@ class Neuropil_Mask(Mask):
 
 
 def calculate_traces(stack, mask_list):
+    '''
+    Calculates the average response of the specified masks in the
+    image stack
+
+    Arguments
+    ---------
+
+        stack: float[image height][image width]
+        Image stack that masks are applied to
+
+        mask_list: list<Mask>
+        List of masks
+
+    Returns
+    -------
+        
+        float[number masks][number frames]
+        This is the average response for each Mask in each image frame
+    '''
     traces = np.zeros((len(mask_list), stack.shape[0]))
     num_frames = stack.shape[0]
     # make sure masks are numpy objects
@@ -189,12 +414,21 @@ def calculate_traces(stack, mask_list):
         if frame_num % 1000 == 0 :
             print "frame " + str(frame_num) + " of " + str(num_frames)
         frame = stack[frame_num]
-        for i in range(len(mask_list)):
-            mask = mask_list[i]
-            subframe = frame[mask.y:mask.y+mask.height, mask.x:mask.x+mask.width]
-            total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
-            area = (mask.mask).sum(axis=-1).sum(axis=-1)
-            tvals = total/area
-            traces[i][frame_num] = tvals
+        mask = None
+        try:
+            for i in range(len(mask_list)):
+                    mask = mask_list[i]
+                    subframe = frame[mask.y:mask.y+mask.height, mask.x:mask.x+mask.width]
+                    total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
+                    area = (mask.mask).sum(axis=-1).sum(axis=-1)
+                    tvals = total/area
+                    traces[i][frame_num] = tvals
+        except:
+            print("Error encountered processing mask during frame %d" % frame_num)
+            if mask is not None:
+                print subframe.shape
+                print mask.mask.shape
+                print mask
+            raise
     return traces
 
