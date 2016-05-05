@@ -97,7 +97,10 @@ class CamNwbDataSet(object):
              ]
 
         x,y = np.meshgrid(np.arange(display_shape[0]), np.arange(display_shape[1]), indexing='ij')
-        template_display_coords = np.array([(x + offset[0]) * scale[0], (y + offset[1]) * scale[1]], dtype=int)
+        template_display_coords = np.array([(x + offset[0]) * scale[0] - 0.5, 
+                                            (y + offset[1]) * scale[1] - 0.5], 
+                                           dtype=int)
+        template_display_coords = np.rint(template_display_coords).astype(int)
 
         # build mask
         template_mask, template_frac = mask_stimulus_template(template_display_coords, template_shape)
