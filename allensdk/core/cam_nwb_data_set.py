@@ -30,6 +30,19 @@ class CamNwbDataSet(object):
         celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['data'].value 
         f.close()
         return timestamps, celltraces
+
+    def get_corrected_fluorescence_traces(self):
+        '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
+        f = h5py.File(self.nwb_file, 'r')
+        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value
+        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['data'].value 
+        np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['neuropil_traces'].value 
+        r = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['r'].value 
+        f.close()
+
+        fc = celltraces - np_traces * r[:, np.newaxis]
+
+        return timestamps, fc
         
     def get_dff_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
@@ -57,20 +70,80 @@ class CamNwbDataSet(object):
         max_projection = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['ROI Masks']['reference_images']['maximum_intensity_projection_image']['data'].value
         f.close()
         return max_projection
-    
-    def get_stimulus_table(self, stimulus_name):
-        '''returns a DataFrame of the stimulus table for a specified stimulus'''
-        stim_name = stimulus_name + "_stimulus"    
+
+    def get_drifting_gratings_stimulus_table(self):
+        ''' TODO '''
+        return self.get_abstract_feature_series_stimulus_table("drifting_gratings_stimulus")
+
+    def get_natural_movie_stimulus_table(self, movie_name):
+        ''' TODO '''
+        return self.get_indexed_time_series_stimulus_table(movie_name + "_stimulus")
+
+    def get_natural_scenes_stimulus_table(self):
+        ''' TODO '''
+        return self.get_indexed_time_series_stimulus_table("natural_scenes_stimulus")
+
+    def get_static_gratings_stimulus_table(self):
+        ''' TODO '''
+        return self.get_abstract_feature_series_stimulus_table("static_gratings_stimulus")
+
+    def get_locally_sparse_noise_stimulus_table(self):
+        ''' TODO '''
+        return self.get_indexed_time_series_stimulus_table("locally_sparse_noise_stimulus")
+
+    def get_spontaneous_activity_stimulus_table(self):
+        ''' TODO '''
+        k = "stimulus/presentation/spontaneous_stimulus"
         f = h5py.File(self.nwb_file, 'r')    
-        stim_data = f['stimulus']['presentation'][stim_name]['data'].value
-        features=f['stimulus']['presentation'][stim_name]['features'].value
+        events = f[k + '/data'].value
+        frame_dur = f[k + '/frame_duration'].value
         f.close()
-    
-        stimulus_table = pd.DataFrame(stim_data, columns=features)
-        stimulus_table.start = stimulus_table.start.astype(int)
-        stimulus_table.end = stimulus_table.end.astype(int)      
+
+        start_inds = np.where(events == 1)
+        stop_inds = np.where(events == -1)
+
+        if len(start_inds) != len(stop_inds):
+            raise Exception("inconsistent start and time times in spontaneous activity stimulus table")
+
+        stim_data = np.column_stack([frame_dur[start_inds,0], frame_dur[stop_inds,0]]).astype(int)
+
+        stimulus_table = pd.DataFrame(stim_data, columns=['start','end'])
+
         return stimulus_table
-    
+
+    def get_indexed_time_series_stimulus_table(self, stimulus_name):
+        ''' TODO '''
+        
+        k = "stimulus/presentation/%s" % stimulus_name
+
+        f = h5py.File(self.nwb_file, 'r')    
+        inds = f[k + '/data'].value
+        frame_dur = f[k + '/frame_duration'].value
+        f.close()
+
+        stimulus_table = pd.DataFrame(inds, columns=['frame'])
+        stimulus_table.loc[:,'start'] = frame_dur[:,0].astype(int)
+        stimulus_table.loc[:,'end'] = frame_dur[:,1].astype(int)
+
+        return stimulus_table
+
+    def get_abstract_feature_series_stimulus_table(self, stimulus_name):
+        '''returns a DataFrame of the stimulus table for a specified stimulus'''
+
+        k = "stimulus/presentation/%s" % stimulus_name
+
+        f = h5py.File(self.nwb_file, 'r')    
+        stim_data = f[k + '/data'].value
+        features = f[k + '/features'].value
+        frame_dur = f[k + '/frame_duration'].value
+        f.close()
+
+        stimulus_table = pd.DataFrame(stim_data, columns=features)
+        stimulus_table.loc[:,'start'] = frame_dur[:,0].astype(int)
+        stimulus_table.loc[:,'end'] = frame_dur[:,1].astype(int)
+
+        return stimulus_table
+
     def get_stimulus_template(self, stimulus_name):
         '''returns an array of the stimulus template for a specified stimulus'''
         stim_name = stimulus_name + "_image_stack"
@@ -153,6 +226,7 @@ class CamNwbDataSet(object):
         dxtime = f['processing']['cortical_activity_map_pipeline']['BehavioralTimeSeries']['running_speed']['timestamps'].value
         timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value    
         f.close()   
+
         dxcm = dxcm[:,0]
         if dxtime[0] != timestamps[0]:
             adjust = np.where(timestamps==dxtime[0])[0][0]

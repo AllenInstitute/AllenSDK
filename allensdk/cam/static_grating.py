@@ -29,7 +29,7 @@ class StaticGrating(OPAnalysis):
     def __init__(self, cam_analysis, **kwargs):
         super(StaticGrating, self).__init__(cam_analysis, **kwargs)
         
-        stimulus_table = self.cam_analysis.nwb.get_stimulus_table('static_gratings')
+        stimulus_table = self.cam_analysis.nwb.get_static_gratings_stimulus_table()
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = self.stim_table['end'].iloc[1] - self.stim_table['start'].iloc[1]
         self.interlength = 4 * self.sweeplength

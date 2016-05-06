@@ -148,9 +148,9 @@ class CamAnalysis(object):
                 raise CamAnalysisException("Error -- ROI lists have different entries")
     
     def session_a(self, plot_flag=False, save_flag=True):
-        dg = DriftingGrating(self)
         nm1 = NaturalMovie(self, 'natural_movie_one')      
         nm3 = NaturalMovie(self, 'natural_movie_three')    
+        dg = DriftingGrating(self)
 
         CamAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])

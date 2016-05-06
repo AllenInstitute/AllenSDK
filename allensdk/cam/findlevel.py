@@ -23,4 +23,8 @@ def findlevel(inwave, threshold, direction='both'):
         crossings = np.nonzero(np.ediff1d(np.sign(temp), to_begin=0)<0)
     else:
         crossings = np.nonzero(np.ediff1d(np.sign(temp), to_begin=0))
+
+    if len(crossings) == 0 or len(crossings[0]) == 0:
+        return None
+
     return crossings[0][0]
