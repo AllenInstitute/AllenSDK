@@ -30,7 +30,7 @@ class OPAnalysis(object):
         self.save_dir = os.path.dirname(self.cam_analysis.save_path)
         
         # get fluorescence 
-        self.timestamps, self.celltraces = self.cam_analysis.nwb.get_fluorescence_traces()
+        self.timestamps, self.celltraces = self.cam_analysis.nwb.get_corrected_fluorescence_traces()
         self.numbercells = len(self.celltraces)    #number of cells in dataset
         self.roi_id = self.cam_analysis.nwb.get_roi_ids()
         self.cell_id = self.cam_analysis.nwb.get_cell_specimen_ids()
@@ -56,10 +56,10 @@ class OPAnalysis(object):
         celltraces_trimmed = np.delete(self.celltraces_dff, range(len(self.dxcm), np.size(self.celltraces_dff,1)), axis=1) 
 
         # pull out spontaneous epoch(s)        
-        spontaneous = self.cam_analysis.nwb.get_stimulus_table('spontaneous')
+        spontaneous = self.cam_analysis.nwb.get_spontaneous_activity_stimulus_table()
 
         peak_run = pd.DataFrame(index=range(self.numbercells), columns=('speed_max_sp','speed_min_sp','ptest_sp', 'mod_sp','speed_max_vis','speed_min_vis','ptest_vis', 'mod_vis'))
-        
+
         dx_sp = self.dxcm[spontaneous.start.iloc[-1]:spontaneous.end.iloc[-1]]
         celltraces_sp = celltraces_trimmed[:,spontaneous.start.iloc[-1]:spontaneous.end.iloc[-1]]
         dx_vis = np.delete(self.dxcm, np.arange(spontaneous.start.iloc[-1],spontaneous.end.iloc[-1]))
@@ -71,14 +71,21 @@ class OPAnalysis(object):
             celltraces_vis = np.delete(celltraces_vis, np.arange(spontaneous.start.iloc[-2],spontaneous.end.iloc[-2]), axis=1)
         celltraces_vis = celltraces_vis[:,~np.isnan(dx_vis)]
         dx_vis = dx_vis[~np.isnan(dx_vis)]  
-        
+
         nbins = 1 + len(np.where(dx_sp>=1)[0])/binsize
         dx_sorted = dx_sp[np.argsort(dx_sp)]
         celltraces_sorted_sp = celltraces_sp[:, np.argsort(dx_sp)]
         binned_cells_sp = np.zeros((self.numbercells, nbins, 2))
         binned_dx_sp = np.zeros((nbins,2))
         for i in range(nbins):
-            offset = findlevel(dx_sorted,1,'up')        
+            if np.all(np.isnan(dx_sorted)):
+                raise CamAnalysisException("dx is filled with NaNs")
+
+            offset = findlevel(dx_sorted,1,'up')
+
+            if offset is None:
+                raise CamAnalysisException("Could not find crossing in dx")
+
             if i==0:
                 binned_dx_sp[i,0] = np.mean(dx_sorted[:offset])
                 binned_dx_sp[i,1] = np.std(dx_sorted[:offset]) / np.sqrt(offset)            
