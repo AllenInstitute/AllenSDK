@@ -8,6 +8,7 @@ Functions to extract relevant data from the CAM NWB files
 import h5py
 import pandas as pd
 import numpy as np
+import allensdk.cam.roi_masks as roi
 
 class CamNwbDataSet(object):
     file_metadata_mapping = { 'specimen': 'specimen',
@@ -82,9 +83,10 @@ class CamNwbDataSet(object):
         mask_loc = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['ROI Masks']
         roi_list = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['ROI Masks']['roi_list'].value
         
-        roi_array = np.empty((len(roi_list),512,512))    
+        roi_array = []
         for i,v in enumerate(roi_list):
-            roi_array[i,:,:] = mask_loc[v]['img_mask']
+            m = roi.create_roi_mask(512, 512, [0,0,0,0], pix_list=mask_loc[v]["pix_mask"].value, label=v)
+            roi_array.append(m)
         f.close()
         return roi_array
     
