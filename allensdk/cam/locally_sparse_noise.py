@@ -11,7 +11,7 @@ class LocallySparseNoise(OPAnalysis):
 
     def __init__(self, cam_analysis, **kwargs):
         super(LocallySparseNoise, self).__init__(cam_analysis, **kwargs)        
-        self.stim_table = self.cam_analysis.nwb.get_stimulus_table('locally_sparse_noise')
+        self.stim_table = self.cam_analysis.nwb.get_locally_sparse_noise_stimulus_table()
         self.LSN, self.LSN_mask = self.cam_analysis.nwb.get_locally_sparse_noise_stimulus_template()
         self.sweeplength = self.stim_table['end'][1] - self.stim_table['start'][1]
         self.interlength = 4*self.sweeplength
