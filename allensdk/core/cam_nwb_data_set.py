@@ -14,11 +14,13 @@ from collections import defaultdict
 from allensdk.cam.locally_sparse_noise import LocallySparseNoise
 
 class CamNwbDataSet(object):
-    file_metadata_mapping = { 'specimen': 'specimen',
-                              'area': 'area_targeted',
-                              'depth': 'depth_of_imaging',
-                              'system': 'microscope',
-                              'experiment_id': 'lims_id' }
+    file_metadata_mapping = { 'imaging_depth': 'optophysiology/imaging_plane_1/imaging depth',
+                              'targeted_structure': 'optophysiology/imaging_plane_1/location',
+                              'ophys_experiment_id': 'session_id',
+                              'experiment_container_id': 'experiment_container_id',
+                              'device': 'optophysiology/imaging_plane_1/device',
+                              'cre_line': 'subject/genotype'
+                              }
     
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
@@ -197,7 +199,7 @@ class CamNwbDataSet(object):
         f.close()
         return roi_array
     
-    def get_meta_data(self):
+    def get_metadata(self):
         '''returns a dictionary of meta data associated with each experiment, including Cre line, specimen number, visual area imaged, imaging depth'''
         #TODO: adapt this for current meta data
         
@@ -205,17 +207,12 @@ class CamNwbDataSet(object):
             
         with h5py.File(self.nwb_file, 'r') as f:
             for memory_key, disk_key in CamNwbDataSet.file_metadata_mapping.items():
-                try:
-                    meta[memory_key] = f['general'][disk_key].value
-                except:
-                    meta[memory_key] = None
+                meta[memory_key] = f['general'][disk_key].value
 
-        try:
-            meta['Cre'] = meta['specimen'].split('-')[0]
-            meta['specimen'] = meta['specimen'].split('-')[-1]            
-        except:
-            meta['Cre'] = None
-            meta['specimen'] = None
+        meta['cre_line'] = meta['cre_line'].split(';')[0]
+        meta['imaging_depth'] = int(meta['imaging_depth'].split()[0])
+        meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
+        meta['experiment_container_id'] = int(meta['experiment_container_id'])
 
         return meta
         
