@@ -108,7 +108,7 @@ class CamNwbDataSet(object):
         if len(start_inds) != len(stop_inds):
             raise Exception("inconsistent start and time times in spontaneous activity stimulus table")
 
-        stim_data = np.column_stack([frame_dur[start_inds,0], frame_dur[stop_inds,0]]).astype(int)
+        stim_data = np.column_stack([frame_dur[start_inds,0].T, frame_dur[stop_inds,0].T]).astype(int)
 
         stimulus_table = pd.DataFrame(stim_data, columns=['start','end'])
 
