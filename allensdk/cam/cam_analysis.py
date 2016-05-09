@@ -134,6 +134,7 @@ class CamAnalysis(object):
         metrics["pref_sf_sg"] = [ sg.sfvals[i] for i in sg.peak["sf_sg"].values ]
         metrics["pref_phase_sg"] = [ sg.phasevals[i] for i in sg.peak["phase_sg"].values ]
         metrics["p_sg"] = sg.peak["ptest_sg"]
+        metrics["time_to_peak_sg"] = sg.peak["time_to_peak_sg"]
 
     def append_metrics_natural_scene(self, metrics, ns):
         metrics["pref_image_ns"] = ns.peak["scene_ns"]
