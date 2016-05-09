@@ -198,7 +198,7 @@ class CamAnalysis(object):
         self.append_metadata(peak)
                 
         #self.append_metrics_natural_scene(self.metrics_c, nm1)
-        self.metrics_c["roi_id"] = ns.roi_id
+        self.metrics_c["roi_id"] = nm1.roi_id
                 
         if plot_flag:
             cp.plot_3sc(lsn, nm1, nm2)
