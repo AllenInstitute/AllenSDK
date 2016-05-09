@@ -29,18 +29,18 @@ class CamNwbDataSet(object):
     def get_fluorescence_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['data'].value 
+        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data'].value 
         f.close()
         return timestamps, celltraces
 
     def get_corrected_fluorescence_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['data'].value 
-        np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['neuropil_traces'].value 
-        r = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['r'].value 
+        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data'].value 
+        np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces'].value 
+        r = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['r'].value 
         f.close()
 
         fc = celltraces - np_traces * r[:, np.newaxis]
@@ -50,8 +50,8 @@ class CamNwbDataSet(object):
     def get_dff_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['data'].value 
+        timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['timestamps'].value
+        celltraces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['data'].value 
         f.close()
         return timestamps, celltraces
 
@@ -70,7 +70,7 @@ class CamNwbDataSet(object):
     def get_max_projection(self):
         '''returns the maximum projection image for the 2P data'''
         f = h5py.File(self.nwb_file, 'r')
-        max_projection = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['ROI Masks']['reference_images']['maximum_intensity_projection_image']['data'].value
+        max_projection = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']['reference_images']['maximum_intensity_projection_image']['data'].value
         f.close()
         return max_projection
 
@@ -189,8 +189,8 @@ class CamNwbDataSet(object):
     def get_roi_mask(self):
         '''returns an array of all the ROI masks'''
         f = h5py.File(self.nwb_file, 'r')
-        mask_loc = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['ROI Masks']
-        roi_list = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['ROI Masks']['roi_list'].value
+        mask_loc = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']
+        roi_list = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']['roi_list'].value
         
         roi_array = []
         for i,v in enumerate(roi_list):
@@ -223,7 +223,7 @@ class CamNwbDataSet(object):
         f = h5py.File(self.nwb_file, 'r')
         dxcm = f['processing']['cortical_activity_map_pipeline']['BehavioralTimeSeries']['running_speed']['data'].value
         dxtime = f['processing']['cortical_activity_map_pipeline']['BehavioralTimeSeries']['running_speed']['timestamps'].value
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value    
+        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value    
         f.close()   
 
         dxcm = dxcm[:,0]
