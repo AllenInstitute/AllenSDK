@@ -25,7 +25,7 @@ class DriftingGrating(OPAnalysis):
 
     def __init__(self, cam_analysis, **kwargs):
         super(DriftingGrating, self).__init__(cam_analysis, **kwargs)                   
-        stimulus_table = self.cam_analysis.nwb.get_stimulus_table('drifting_gratings')
+        stimulus_table = self.cam_analysis.nwb.get_drifting_gratings_stimulus_table()
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = 60#self.sync_table['end'][1] - self.sync_table['start'][1]
         self.interlength = 30#self.sync_table['start'][2] - self.sync_table['end'][1]
