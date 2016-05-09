@@ -14,11 +14,13 @@ from collections import defaultdict
 from allensdk.cam.locally_sparse_noise import LocallySparseNoise
 
 class CamNwbDataSet(object):
-    file_metadata_mapping = { 'specimen': 'specimen',
-                              'area': 'area_targeted',
-                              'depth': 'depth_of_imaging',
-                              'system': 'microscope',
-                              'experiment_id': 'lims_id' }
+    file_metadata_mapping = { 'imaging_depth': 'optophysiology/imaging_plane_1/imaging depth',
+                              'targeted_structure': 'optophysiology/imaging_plane_1/location',
+                              'ophys_experiment_id': 'session_id',
+                              'experiment_container_id': 'experiment_container_id',
+                              'device': 'optophysiology/imaging_plane_1/device',
+                              'cre_line': 'subject/genotype'
+                              }
     
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
@@ -27,18 +29,18 @@ class CamNwbDataSet(object):
     def get_fluorescence_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['data'].value 
+        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data'].value 
         f.close()
         return timestamps, celltraces
 
     def get_corrected_fluorescence_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['data'].value 
-        np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['neuropil_traces'].value 
-        r = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['r'].value 
+        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data'].value 
+        np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces'].value 
+        r = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['r'].value 
         f.close()
 
         fc = celltraces - np_traces * r[:, np.newaxis]
@@ -48,8 +50,8 @@ class CamNwbDataSet(object):
     def get_dff_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['ROI Masks']['data'].value 
+        timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['timestamps'].value
+        celltraces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['data'].value 
         f.close()
         return timestamps, celltraces
 
@@ -68,7 +70,7 @@ class CamNwbDataSet(object):
     def get_max_projection(self):
         '''returns the maximum projection image for the 2P data'''
         f = h5py.File(self.nwb_file, 'r')
-        max_projection = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['ROI Masks']['reference_images']['maximum_intensity_projection_image']['data'].value
+        max_projection = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']['reference_images']['maximum_intensity_projection_image']['data'].value
         f.close()
         return max_projection
 
@@ -106,7 +108,7 @@ class CamNwbDataSet(object):
         if len(start_inds) != len(stop_inds):
             raise Exception("inconsistent start and time times in spontaneous activity stimulus table")
 
-        stim_data = np.column_stack([frame_dur[start_inds,0], frame_dur[stop_inds,0]]).astype(int)
+        stim_data = np.column_stack([frame_dur[start_inds,0].T, frame_dur[stop_inds,0].T]).astype(int)
 
         stimulus_table = pd.DataFrame(stim_data, columns=['start','end'])
 
@@ -187,8 +189,8 @@ class CamNwbDataSet(object):
     def get_roi_mask(self):
         '''returns an array of all the ROI masks'''
         f = h5py.File(self.nwb_file, 'r')
-        mask_loc = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['ROI Masks']
-        roi_list = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['ROI Masks']['roi_list'].value
+        mask_loc = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']
+        roi_list = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']['roi_list'].value
         
         roi_array = []
         for i,v in enumerate(roi_list):
@@ -197,7 +199,7 @@ class CamNwbDataSet(object):
         f.close()
         return roi_array
     
-    def get_meta_data(self):
+    def get_metadata(self):
         '''returns a dictionary of meta data associated with each experiment, including Cre line, specimen number, visual area imaged, imaging depth'''
         #TODO: adapt this for current meta data
         
@@ -205,17 +207,12 @@ class CamNwbDataSet(object):
             
         with h5py.File(self.nwb_file, 'r') as f:
             for memory_key, disk_key in CamNwbDataSet.file_metadata_mapping.items():
-                try:
-                    meta[memory_key] = f['general'][disk_key].value
-                except:
-                    meta[memory_key] = None
+                meta[memory_key] = f['general'][disk_key].value
 
-        try:
-            meta['Cre'] = meta['specimen'].split('-')[0]
-            meta['specimen'] = meta['specimen'].split('-')[-1]            
-        except:
-            meta['Cre'] = None
-            meta['specimen'] = None
+        meta['cre_line'] = meta['cre_line'].split(';')[0]
+        meta['imaging_depth'] = int(meta['imaging_depth'].split()[0])
+        meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
+        meta['experiment_container_id'] = int(meta['experiment_container_id'])
 
         return meta
         
@@ -226,7 +223,7 @@ class CamNwbDataSet(object):
         f = h5py.File(self.nwb_file, 'r')
         dxcm = f['processing']['cortical_activity_map_pipeline']['BehavioralTimeSeries']['running_speed']['data'].value
         dxtime = f['processing']['cortical_activity_map_pipeline']['BehavioralTimeSeries']['running_speed']['timestamps'].value
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['ROI Masks']['timestamps'].value    
+        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value    
         f.close()   
 
         dxcm = dxcm[:,0]

@@ -41,7 +41,7 @@ class CamAnalysis(object):
     SESSION_B = 'three_session_B'
     SESSION_C = 'three_session_C'
 
-    def __init__(self, nwb_path, save_path, meta_data=None):
+    def __init__(self, nwb_path, save_path, metadata=None):
         self.nwb = CamNwbDataSet(nwb_path)                        
         self.save_path = save_path
 
@@ -49,15 +49,15 @@ class CamAnalysis(object):
         self.metrics_b = {}
         self.metrics_c = {}
 
-        if meta_data is None:
-            meta_data = {}
+        if metadata is None:
+            metadata = {}
 
-        self.meta_data = self.nwb.get_meta_data()
-        for k,v in meta_data.iteritems():
-            self.meta_data[k] = v
+        self.metadata = self.nwb.get_metadata()
+        for k,v in metadata.iteritems():
+            self.metadata[k] = v
 
-    def append_meta_data(self, df):
-        for k,v in self.meta_data.iteritems():
+    def append_metadata(self, df):
+        for k,v in self.metadata.iteritems():
             df[k] = v
 
     def save_session_a(self, dg, nm1, nm3, peak):
@@ -160,7 +160,7 @@ class CamAnalysis(object):
         self.append_metrics_drifting_grating(self.metrics_a, dg)
         self.metrics_a["roi_id"] = dg.roi_id
 
-        self.append_meta_data(peak)
+        self.append_metadata(peak)
 
         if plot_flag:
             cp.plot_3sa(dg, nm1, nm3)
@@ -175,7 +175,7 @@ class CamAnalysis(object):
         nm1 = NaturalMovie(self, 'natural_movie_one')            
         CamAnalysis._log.info("Session B analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, sg.peak, ns.peak, nm1.peak])
-        self.append_meta_data(peak)
+        self.append_metadata(peak)
 
         self.append_metrics_static_grating(self.metrics_b, sg)
         self.append_metrics_natural_scene(self.metrics_b, ns)
@@ -196,10 +196,10 @@ class CamAnalysis(object):
         nm1 = NaturalMovie(self, 'natural_movie_one')
         CamAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
-        self.append_meta_data(peak)
+        self.append_metadata(peak)
                 
         #self.append_metrics_natural_scene(self.metrics_c, nm1)
-        #self.metrics_c["roi_id"] = ns.roi_id
+        self.metrics_c["roi_id"] = nm1.roi_id
                 
         if plot_flag:
             cp.plot_3sc(lsn, nm1, nm2)
@@ -209,13 +209,13 @@ class CamAnalysis(object):
             self.save_session_c(lsn, nm1, nm2, peak)
     
                     
-def run_cam_analysis(session, nwb_path, save_path, meta_data=None, plot_flag=False):
+def run_cam_analysis(session, nwb_path, save_path, metadata=None, plot_flag=False):
     save_dir = os.path.dirname(save_path)
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    cam_analysis = CamAnalysis(nwb_path, save_path, meta_data)
+    cam_analysis = CamAnalysis(nwb_path, save_path, metadata)
 
     if session == CamAnalysis.SESSION_A:
         cam_analysis.session_a(plot_flag)
@@ -251,15 +251,15 @@ def main():
     if args.output_nwb is None:
         args.output_nwb = args.input_nwb
 
-    meta_data = {}
+    metadata = {}
     if args.experiment_id is not None:
-        meta_data['experiment_id'] = args.experiment_id
+        metadata['experiment_id'] = args.experiment_id
     if args.area is not None:
-        meta_data['area'] = args.area
+        metadata['area'] = args.area
     if args.depth is not None:
-        meta_data['depth'] = args.depth
+        metadata['depth'] = args.depth
 
-    run_cam_analysis(args.session, args.input_nwb, args.output_nwb, meta_data, args.plot)
+    run_cam_analysis(args.session, args.input_nwb, args.output_nwb, metadata, args.plot)
 
 
 if __name__=='__main__': main()
