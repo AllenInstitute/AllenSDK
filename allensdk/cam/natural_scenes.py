@@ -24,7 +24,7 @@ class NaturalScenes(OPAnalysis):
     
     def __init__(self, cam_analysis, **kwargs):
         super(NaturalScenes, self).__init__(cam_analysis, **kwargs)
-        self.stim_table = self.cam_analysis.nwb.get_stimulus_table('natural_scenes')        
+        self.stim_table = self.cam_analysis.nwb.get_natural_scenes_stimulus_table()
         self.number_scenes = len(np.unique(self.stim_table.frame))
         self.sweeplength = self.stim_table.end.iloc[1] - self.stim_table.start.iloc[1]
         self.interlength = 4 * self.sweeplength
