@@ -34,6 +34,14 @@ class CamNwbDataSet(object):
         f.close()
         return timestamps, celltraces
 
+    def get_neuropil_traces(self):
+        '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
+        f = h5py.File(self.nwb_file, 'r')
+        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+        np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces'].value 
+        f.close()
+        return timestamps, np_traces
+
     def get_corrected_fluorescence_traces(self):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
