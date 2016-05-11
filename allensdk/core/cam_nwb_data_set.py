@@ -14,6 +14,7 @@ from collections import defaultdict
 from allensdk.cam.locally_sparse_noise import LocallySparseNoise
 
 class CamNwbDataSet(object):
+    MOVIE_FOV_PX = (512, 512)
     file_metadata_mapping = { 'imaging_depth': 'optophysiology/imaging_plane_1/imaging depth',
                               'targeted_structure': 'optophysiology/imaging_plane_1/location',
                               'ophys_experiment_id': 'session_id',
@@ -194,15 +195,24 @@ class CamNwbDataSet(object):
 
         return template, template_mask.T
     
-    def get_roi_mask(self):
+    def get_roi_mask(self, cell_specimen_ids=None):
         '''returns an array of all the ROI masks'''
+
         f = h5py.File(self.nwb_file, 'r')
         mask_loc = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']
         roi_list = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']['roi_list'].value
         
+        all_cell_specimen_ids = self.get_cell_specimen_ids()
+        inds = None
+        if cell_specimen_ids is None:
+            inds = range(len(all_cell_specimen_ids))
+        else:
+            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+
         roi_array = []
-        for i,v in enumerate(roi_list):
-            m = roi.create_roi_mask(512, 512, [0,0,0,0], pix_list=mask_loc[v]["pix_mask"].value, label=v)
+        for i in inds:
+            v = roi_list[i]
+            m = roi.create_roi_mask(self.MOVIE_FOV_PX[0], self.MOVIE_FOV_PX[1], [0,0,0,0], pix_list=mask_loc[v]["pix_mask"].value, label=v)
             roi_array.append(m)
         f.close()
         return roi_array
