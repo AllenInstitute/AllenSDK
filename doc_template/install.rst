@@ -42,7 +42,7 @@ Required Dependencies
 Optional Dependencies
 ---------------------
 
- * `nose <https://nose.readthedocs.org/en/latest>`_ is nicer testing for python
+ * `pytest <http://pytest.org/latest>`_
  * `coverage <http://nedbatchelder.com/code/coverage>`_
  * `matplotlib <http://matplotlib.org/>`_
  * `h5py <http://www.h5py.org>`_

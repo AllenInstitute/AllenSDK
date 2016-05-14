@@ -31,7 +31,7 @@ setup(
                         'numpy>=1.8.2',
                         'six>=1.8.0',
                         'pynrrd >= 0.2.1'],
-    tests_require=['nose>=1.2.1',
+    tests_require=['pytest>=2.7.1',
                    'coverage>=3.7.1',
                    'mock'],
     setup_requires=['setuptools', 'sphinx', 'numpydoc'],
