@@ -27,42 +27,97 @@ class CamNwbDataSet(object):
         self.nwb_file = nwb_file
         
 
-    def get_fluorescence_traces(self):
+    def get_fluorescence_traces(self, cell_specimen_ids=None):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data'].value 
+        all_timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+        all_cell_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data'].value 
         f.close()
-        return timestamps, celltraces
 
-    def get_neuropil_traces(self):
+        all_cell_specimen_ids = self.get_cell_specimen_ids()
+        inds = None
+        if cell_specimen_ids is None:
+            inds = range(len(all_cell_specimen_ids))
+        else:
+            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+
+        cell_traces = []
+        timestamps = []
+        for i in inds:
+            cell_traces.append(all_cell_traces[i])
+            timestamps.append(all_timestamps[i])
+
+        return timestamps, cell_traces
+
+    def get_neuropil_traces(self, cell_specimen_ids=None):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
-        np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces'].value 
+        all_timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+        all_np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces'].value 
         f.close()
+
+        all_cell_specimen_ids = self.get_cell_specimen_ids()
+        inds = None
+        if cell_specimen_ids is None:
+            inds = range(len(all_cell_specimen_ids))
+        else:
+            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+
+        np_traces = []
+        timestamps = []
+        for i in inds:
+            np_traces.append(all_np_traces[i])
+            timestamps.append(all_timestamps[i])
+
         return timestamps, np_traces
 
-    def get_corrected_fluorescence_traces(self):
+    def get_corrected_fluorescence_traces(self, cell_specimen_ids=None):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+        all_timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
         celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data'].value 
         np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces'].value 
         r = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['r'].value 
         f.close()
 
-        fc = celltraces - np_traces * r[:, np.newaxis]
+        all_fc = celltraces - np_traces * r[:, np.newaxis]
+
+        all_cell_specimen_ids = self.get_cell_specimen_ids()
+        inds = None
+        if cell_specimen_ids is None:
+            inds = range(len(all_cell_specimen_ids))
+        else:
+            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+
+        fc = []
+        timestamps = []
+        for i in inds:
+            fc.append(all_fc[i])
+            timestamps.append(all_timestamps[i])
 
         return timestamps, fc
         
-    def get_dff_traces(self):
+    def get_dff_traces(self, cell_specimen_ids=None):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['data'].value 
+        all_timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['timestamps'].value
+        all_cell_traces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['data'].value 
         f.close()
-        return timestamps, celltraces
+
+        all_cell_specimen_ids = self.get_cell_specimen_ids()
+        inds = None
+        if cell_specimen_ids is None:
+            inds = range(len(all_cell_specimen_ids))
+        else:
+            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+
+        cell_traces = []
+        timestamps = []
+        for i in inds:
+            cell_traces.append(all_cell_traces[i])
+            timestamps.append(all_timestamps[i])
+
+        return timestamps, cell_traces
 
     def get_roi_ids(self):
         f = h5py.File(self.nwb_file, 'r')
@@ -196,7 +251,19 @@ class CamNwbDataSet(object):
         return template, template_mask.T
     
     def get_roi_mask(self, cell_specimen_ids=None):
-        '''returns an array of all the ROI masks'''
+        '''
+        Returns an array of all the ROI masks
+
+        Parameters
+        ----------
+            cell_specimen_id: list (or array)
+            List of cell IDs to return the masks for. If this is None (default)
+            then all are returned
+
+        Returns
+        -------
+            List of ROI_Mask objects
+        '''
 
         f = h5py.File(self.nwb_file, 'r')
         mask_loc = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']
