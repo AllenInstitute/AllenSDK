@@ -34,20 +34,13 @@ class CamNwbDataSet(object):
         all_cell_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data'].value 
         f.close()
 
-        all_cell_specimen_ids = self.get_cell_specimen_ids()
-        inds = None
         if cell_specimen_ids is None:
-            inds = range(len(all_cell_specimen_ids))
-        else:
-            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+            return all_timestamps, all_cell_traces
 
-        cell_traces = []
-        timestamps = []
-        for i in inds:
-            cell_traces.append(all_cell_traces[i])
-            timestamps.append(all_timestamps[i])
+        all_cell_specimen_ids = list(self.get_cell_specimen_ids())
+        inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
 
-        return timestamps, cell_traces
+        return all_timestamps, cell_traces[inds,:] 
 
     def get_neuropil_traces(self, cell_specimen_ids=None):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
@@ -56,20 +49,13 @@ class CamNwbDataSet(object):
         all_np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces'].value 
         f.close()
 
-        all_cell_specimen_ids = self.get_cell_specimen_ids()
-        inds = None
         if cell_specimen_ids is None:
-            inds = range(len(all_cell_specimen_ids))
-        else:
-            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+            return all_timestamps, all_np_traces
 
-        np_traces = []
-        timestamps = []
-        for i in inds:
-            np_traces.append(all_np_traces[i])
-            timestamps.append(all_timestamps[i])
+        all_cell_specimen_ids = self.get_cell_specimen_ids()
+        inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
 
-        return timestamps, np_traces
+        return timestamps, all_np_traces[inds, :]
 
     def get_corrected_fluorescence_traces(self, cell_specimen_ids=None):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
@@ -82,20 +68,13 @@ class CamNwbDataSet(object):
 
         all_fc = celltraces - np_traces * r[:, np.newaxis]
 
-        all_cell_specimen_ids = self.get_cell_specimen_ids()
-        inds = None
         if cell_specimen_ids is None:
-            inds = range(len(all_cell_specimen_ids))
-        else:
-            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+            return all_timestamps, all_fc
 
-        fc = []
-        timestamps = []
-        for i in inds:
-            fc.append(all_fc[i])
-            timestamps.append(all_timestamps[i])
-
-        return timestamps, fc
+        all_cell_specimen_ids = list(self.get_cell_specimen_ids())
+        inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
+ 
+        return all_timestamps, all_fc[inds,:]
         
     def get_dff_traces(self, cell_specimen_ids=None):
         '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
@@ -104,20 +83,13 @@ class CamNwbDataSet(object):
         all_cell_traces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['data'].value 
         f.close()
 
-        all_cell_specimen_ids = self.get_cell_specimen_ids()
-        inds = None
         if cell_specimen_ids is None:
-            inds = range(len(all_cell_specimen_ids))
-        else:
-            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+            return all_timestamps, all_cell_traces
+        
+        all_cell_specimen_ids = list(self.get_cell_specimen_ids())
+        inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
 
-        cell_traces = []
-        timestamps = []
-        for i in inds:
-            cell_traces.append(all_cell_traces[i])
-            timestamps.append(all_timestamps[i])
-
-        return timestamps, cell_traces
+        return all_timestamps, all_cell_traces[inds,:]
 
     def get_roi_ids(self):
         f = h5py.File(self.nwb_file, 'r')
@@ -286,7 +258,6 @@ class CamNwbDataSet(object):
     
     def get_metadata(self):
         '''returns a dictionary of meta data associated with each experiment, including Cre line, specimen number, visual area imaged, imaging depth'''
-        #TODO: adapt this for current meta data
         
         meta = {}
             
@@ -361,19 +332,29 @@ def warp_stimulus_coords(vertices,
                          mon_width_cm=51.0,
                          mon_res=(1920,1200),
                          eyepoint=(0.5,0.5)):
-    """
-    For a list of screen vertices, provides a corresponding list of texture
-        coordinates.
+    """  
+    For a list of screen vertices, provides a corresponding list of texture coordinates.
 
-    Args:
-        vertices (numpy.ndarray): [[x0,y0], [x1,y1], ...]  A set of vertices to
-            convert to texture positions.
-        distance (float): distance from the monitor in cm.
-        mon_height_cm (float): monitor height in cm
-        mon_width_cm (float): monitor width in cm
-        mon_res (tuple): monitor resolution (x,y)
-        eyepoint (tuple): eye position relative to monitor bottom left. center
-            is (0.5, 0.5)
+    Parameters
+    ----------
+    vertices: numpy.ndarray
+        [[x0,y0], [x1,y1], ...] A set of vertices to  convert to texture positions.
+    distance: float
+        distance from the monitor in cm.
+    mon_height_cm: float
+        monitor height in cm
+    mon_width_cm: float
+        monitor width in cm
+    mon_res: tuple
+        monitor resolution (x,y)
+    eyepoint: tuple
+        eye position relative to monitor bottom left. center is (0.5, 0.5)
+
+    Returns
+    -------
+    np.ndarray
+        x,y coordinates shaped like the input that describe what pixel coordinates
+        are displayed an the input coordinates after warping the stimulus.
     """
 
     mon_width_cm = float(mon_width_cm)
