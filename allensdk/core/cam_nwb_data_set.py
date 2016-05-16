@@ -196,8 +196,7 @@ class CamNwbDataSet(object):
         return cell_id
 
     def get_session_type(self):
-        '''
-        Returns the type of experimental session, presently one of the
+        ''' Returns the type of experimental session, presently one of the
         following: three_session_A, three_session_B, three_session_C
 
         Returns
