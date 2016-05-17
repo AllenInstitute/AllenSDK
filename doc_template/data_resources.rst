@@ -7,6 +7,7 @@ come in future updates.
 
 .. toctree::
 
+   cam
    cell_types
    connectivity
    data_api_client 
