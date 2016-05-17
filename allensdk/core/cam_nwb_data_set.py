@@ -12,16 +12,27 @@ import allensdk.cam.roi_masks as roi
 import itertools
 from collections import defaultdict
 from allensdk.cam.locally_sparse_noise import LocallySparseNoise
+import dateutil
+import re
 
 class CamNwbDataSet(object):
     MOVIE_FOV_PX = (512, 512)
-    file_metadata_mapping = { 'imaging_depth': 'optophysiology/imaging_plane_1/imaging depth',
-                              'targeted_structure': 'optophysiology/imaging_plane_1/location',
-                              'ophys_experiment_id': 'session_id',
-                              'experiment_container_id': 'experiment_container_id',
-                              'device': 'optophysiology/imaging_plane_1/device',
-                              'cre_line': 'subject/genotype'
-                              }
+    
+    FILE_METADATA_MAPPING = { 
+        'imaging_depth': 'general/optophysiology/imaging_plane_1/imaging depth',
+        'targeted_structure': 'general/optophysiology/imaging_plane_1/location',
+        'ophys_experiment_id': 'general/session_id',
+        'experiment_container_id': 'general/experiment_container_id',
+        'device_string': 'general/devices/2-photon microscope',
+        'excitation_lambda': 'general/optophysiology/imaging_plane_1/excitation_lambda',
+        'imaging_rate': 'general/optophysiology/imaging_plane_1/imaging_rate',
+        'indicator': 'general/optophysiology/imaging_plane_1/indicator',
+        'fov': 'general/fov',
+        'genotype': 'general/subject/genotype',
+        'session_start_time': 'session_start_time',
+        'session_type': 'general/session_type',
+        'specimen_name': 'general/specimen_name'
+        }
     
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
@@ -374,13 +385,29 @@ class CamNwbDataSet(object):
         meta = {}
             
         with h5py.File(self.nwb_file, 'r') as f:
-            for memory_key, disk_key in CamNwbDataSet.file_metadata_mapping.items():
-                meta[memory_key] = f['general'][disk_key].value
+            for memory_key, disk_key in CamNwbDataSet.FILE_METADATA_MAPPING.items():
+                v = f[disk_key].value
+                if v.dtype.type is np.string_:
+                    v = str(v)
+                meta[memory_key] = v
 
-        meta['cre_line'] = meta['cre_line'].split(';')[0]
+        meta['cre_line'] = meta['genotype'].split(';')[0]
         meta['imaging_depth'] = int(meta['imaging_depth'].split()[0])
         meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
         meta['experiment_container_id'] = int(meta['experiment_container_id'])
+        meta['session_start_time'] = dateutil.parser.parse(meta['session_start_time'])
+
+        # parse the device string (ugly, sorry)
+        device_string = meta['device_string']
+        del meta['device_string']
+
+        m = re.match("(.*?)\.\s(.*?)\sPlease*", device_string)
+        if m:
+            device, device_name = m.groups()
+            meta['device'] = device
+            meta['device_name'] = device_name
+        else:
+            raise IOError("Could not find device.")
 
         return meta
         

@@ -17,3 +17,10 @@ started with analysis:
     - `Plot raw fluorescences traces, neuropil-corrected traces, and dF/F <_static/examples/nb/cam.html#Fluorescence-Traces>`_
     - `Run neuropil correction <_static/examples/nb/cam.html#Neuropil-Correction>`_
 
+
+
+NWB File
+--------
+
+details here
+
