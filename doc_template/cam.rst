@@ -1,7 +1,29 @@
 Cortical Activity Map
 =====================
 
-The Allen Cortical Activity Map doop a doo.
+The `Allen Cortical Activity Map <http://activity.brain-map.org/visualcoding>`_ is database of the visually-evoked functional
+responses neurons in mouse visual cortex based on 2-photo fluorescence imaging.  Characterized responses include orientation 
+tuning, spatial and temporal frequency tuning, temporal dynamics, and spatial receptive field structure. 
+
+The data is primarily organized into experiments and experiment containers.  An experiment container represents a group of 
+experiments imaged at the same location (cortical area, and depth).  The individual experiments within 
+an experiment container have different stimulus protocols, but cover the same field of view.  For example, the static grating
+stimulus is presented in a different experiment than the natural scene stimulus.  
+
+Because different stimuli may evoke responses from disjoint sets of cells, cells are segmented separately in each 
+experiment. Segmented cells for experiments belonging to the same experiment container are then associated
+with each other in a post-process.  
+
+All traces for segmented cells in a single experiment are stored in the Neurodata Without Borders (NWB) format.
+Traces include every cell's mean fluoresence trace, neuropil trace, and dF/F trace.  Code for extracted neuropil-corrected
+traces is available in the SDK. 
+
+For more details on experimental design and data processing, please refer to the technical whitepapers (TODO).
+
+Visual Stimuli
+--------------
+
+
 
 Code Samples
 ------------
