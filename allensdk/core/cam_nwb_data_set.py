@@ -27,54 +27,187 @@ class CamNwbDataSet(object):
         self.nwb_file = nwb_file
         
 
-    def get_fluorescence_traces(self):
-        '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
-        f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data'].value 
-        f.close()
-        return timestamps, celltraces
+    def get_fluorescence_traces(self, cell_specimen_ids=None):
+        ''' Returns an array of fluorescence traces for all ROI and 
+        the timestamps for each datapoint
 
-    def get_neuropil_traces(self):
-        '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
+        Parameters
+        ----------
+        cell_specimen_ids: list or array (optional)
+            List of cell IDs to return traces for. If this is None (default)
+            then all are returned
+
+        Returns
+        -------
+        timestamps: 2D numpy array
+            Timestamp for each fluorescence sample
+
+        traces: 2D numpy array
+            Fluorescence traces for each cell
+        '''
+        all_cell_specimen_ids = list(self.get_cell_specimen_ids())
+
         f = h5py.File(self.nwb_file, 'r')
         timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
-        np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces'].value 
+
+        ds = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data']
+        if cell_specimen_ids is None:
+            cell_traces = ds.value 
+        else:
+            inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
+            cell_traces = ds[inds,:]
         f.close()
+
+        return timestamps, cell_traces
+
+    def get_neuropil_traces(self, cell_specimen_ids=None):
+        ''' Returns an array of fluorescence traces for all ROIs 
+        and the timestamps for each datapoint
+
+        Parameters
+        ----------
+        cell_specimen_ids: list or array (optional)
+            List of cell IDs to return traces for. If this is None (default)
+            then all are returned
+
+        Returns
+        -------
+        timestamps: 2D numpy array
+            Timestamp for each fluorescence sample
+
+        traces: 2D numpy array
+            Neuropil fluorescence traces for each cell
+        '''
+        all_cell_specimen_ids = self.get_cell_specimen_ids()
+
+        f = h5py.File(self.nwb_file, 'r')
+        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+
+        ds = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces']
+        if cell_specimen_ids is None:
+            np_traces = ds.value 
+        else:
+            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+            np_traces = ds[inds,:]
+
+        f.close()
+
         return timestamps, np_traces
 
-    def get_corrected_fluorescence_traces(self):
-        '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
+    def get_corrected_fluorescence_traces(self, cell_specimen_ids=None):
+        ''' Returns an array of neuropil-corrected fluorescence traces 
+        for all ROIs and the timestamps for each datapoint
+
+        Parameters
+        ----------
+        cell_specimen_ids: list or array (optional)
+            List of cell IDs to return traces for. If this is None (default)
+            then all are returned
+
+        Returns
+        -------
+        timestamps: 2D numpy array
+            Timestamp for each fluorescence sample
+
+        traces: 2D numpy array
+            Corrected fluorescence traces for each cell
+        '''
+        all_cell_specimen_ids = list(self.get_cell_specimen_ids())
+
         f = h5py.File(self.nwb_file, 'r')
         timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data'].value 
-        np_traces = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces'].value 
-        r = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['r'].value 
+        cell_traces_ds = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data']
+        np_traces_ds = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces']
+        r_ds = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['r']
+
+        if cell_specimen_ids is None:
+            cell_traces = cell_traces_ds.value 
+            np_traces = np_traces_ds.value 
+            r = r_ds.value 
+        else:
+            inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
+            cell_traces = cell_traces_ds[inds,:]
+            np_traces = np_traces_ds[inds,:]
+            r = r_ds[inds]
+
         f.close()
 
-        fc = celltraces - np_traces * r[:, np.newaxis]
+        fc = cell_traces - np_traces * r[:, np.newaxis]
 
         return timestamps, fc
+
         
-    def get_dff_traces(self):
-        '''returns an array of fluorescence traces for all ROI and the timestamps for each datapoint'''
+    def get_dff_traces(self, cell_specimen_ids=None):
+        ''' Returns an array of dF/F traces for all ROIs and 
+        the timestamps for each datapoint
+
+        Parameters
+        ----------
+        cell_specimen_ids: list or array (optional)
+            List of cell IDs to return data for. If this is None (default)
+            then all are returned
+
+        Returns
+        -------
+        timestamps: 2D numpy array
+            Timestamp for each fluorescence sample
+
+        dF/F: 2D numpy array
+            dF/F values for each cell
+        '''
+        all_cell_specimen_ids = list(self.get_cell_specimen_ids())
+
         f = h5py.File(self.nwb_file, 'r')
         timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['timestamps'].value
-        celltraces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['data'].value 
+
+        if cell_specimen_ids is None:
+            cell_traces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['data'].value 
+        else:
+            inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
+            cell_traces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['data'][inds,:]
+            
         f.close()
-        return timestamps, celltraces
+
+        return timestamps, cell_traces
+
 
     def get_roi_ids(self):
+        ''' Returns an array of IDs for all ROIs in the file
+
+        Returns
+        -------
+        ROI IDs: list
+        '''
         f = h5py.File(self.nwb_file, 'r')
         roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
         f.close()
         return roi_id
 
     def get_cell_specimen_ids(self):
+        ''' Returns an array of cell IDs for all cells in the file
+
+        Returns
+        -------
+        cell specimen IDs: list
+        '''
         f = h5py.File(self.nwb_file, 'r')
         cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
         f.close()
         return cell_id
+
+    def get_session_type(self):
+        ''' Returns the type of experimental session, presently one of the
+        following: three_session_A, three_session_B, three_session_C
+
+        Returns
+        -------
+        session type: string
+        '''
+        f = h5py.File(self.nwb_file, 'r')
+        session_type = f['general/session_type'].value
+        f.close()
+        return session_type
+
         
     def get_max_projection(self):
         '''returns the maximum projection image for the 2P data'''
@@ -196,7 +329,18 @@ class CamNwbDataSet(object):
         return template, template_mask.T
     
     def get_roi_mask(self, cell_specimen_ids=None):
-        '''returns an array of all the ROI masks'''
+        ''' Returns an array of all the ROI masks
+
+        Parameters
+        ----------
+        cell specimen IDs: list or array (optional)
+            List of cell IDs to return traces for. If this is None (default)
+            then all are returned
+
+        Returns
+        -------
+            List of ROI_Mask objects
+        '''
 
         f = h5py.File(self.nwb_file, 'r')
         mask_loc = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']
@@ -218,8 +362,14 @@ class CamNwbDataSet(object):
         return roi_array
     
     def get_metadata(self):
-        '''returns a dictionary of meta data associated with each experiment, including Cre line, specimen number, visual area imaged, imaging depth'''
-        #TODO: adapt this for current meta data
+        ''' Returns a dictionary of meta data associated with each 
+        experiment, including Cre line, specimen number, 
+        visual area imaged, imaging depth
+
+        Returns
+        -------
+        metadata: dictionary
+        '''
         
         meta = {}
             
@@ -294,19 +444,27 @@ def warp_stimulus_coords(vertices,
                          mon_width_cm=51.0,
                          mon_res=(1920,1200),
                          eyepoint=(0.5,0.5)):
-    """
-    For a list of screen vertices, provides a corresponding list of texture
-        coordinates.
+    """  
+    For a list of screen vertices, provides a corresponding list of texture coordinates.
 
-    Args:
-        vertices (numpy.ndarray): [[x0,y0], [x1,y1], ...]  A set of vertices to
-            convert to texture positions.
-        distance (float): distance from the monitor in cm.
-        mon_height_cm (float): monitor height in cm
-        mon_width_cm (float): monitor width in cm
-        mon_res (tuple): monitor resolution (x,y)
-        eyepoint (tuple): eye position relative to monitor bottom left. center
-            is (0.5, 0.5)
+    Parameters
+    ----------
+    vertices: numpy.ndarray
+        [[x0,y0], [x1,y1], ...] A set of vertices to  convert to texture positions.
+    distance: float
+        distance from the monitor in cm.
+    mon_height_cm: float
+        monitor height in cm
+    mon_width_cm: float
+        monitor width in cm
+    mon_res: tuple
+        monitor resolution (x,y)
+    eyepoint: tuple
+    Returns
+    -------
+    np.ndarray
+        x,y coordinates shaped like the input that describe what pixel coordinates
+        are displayed an the input coordinates after warping the stimulus.
     """
 
     mon_width_cm = float(mon_width_cm)

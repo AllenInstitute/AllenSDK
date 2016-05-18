@@ -216,6 +216,11 @@ def run_cam_analysis(session, nwb_path, save_path, metadata=None, plot_flag=Fals
         os.makedirs(save_dir)
 
     cam_analysis = CamAnalysis(nwb_path, save_path, metadata)
+    try:
+        session = cam_analysis.nwb.get_session_type()
+        print("** Able to read session type from NWB file. Deprecate 'session' argument from run_cam_analysis()")
+    except:
+        pass
 
     if session == CamAnalysis.SESSION_A:
         cam_analysis.session_a(plot_flag)

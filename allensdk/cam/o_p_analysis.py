@@ -207,6 +207,7 @@ class OPAnalysis(object):
         for index, row in self.stim_table.iterrows():
             start = row['start'] - self.interlength
             end = row['start'] + self.sweeplength + self.interlength
+
             for nc in range(self.numbercells):
                 temp = self.celltraces[nc,start:end]
                 sweep_response[str(nc)][index] = 100*((temp/np.mean(temp[:self.interlength]))-1)
