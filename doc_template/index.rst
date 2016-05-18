@@ -31,8 +31,20 @@ The Allen SDK focuses the Allen Cell Types Database, Mouse Brain Connectivity At
 Allen Cortical Activity Map
 ---------------------------
 
-The `Allen Cortical Activity Map <http://cam.brain-map.org>`_ dooby doo.
+The `Allen Cortical Activity Map <http://activity.brain-map.org/visualcoding>`_ is data resource for
+understanding sensory processing in the mouse visual cortex.  This study systematically measures visual
+responses in multiple cortical areas and layers using two-photon calcium imaging of GCaMP6-labeled neurons 
+targeted using Cre driver lines.  Characterized responses include orientation tuning, spatial and temporal
+frequency tuning, temporal dynamics, and spatial receptive field structure.
+ 
+The mean fluorescence traces for all segmented cells are available as (`NWB files <cam.html#neurodata-without-borders>`_).  
+These files also contain standardized descriptions of visual stimuli to support stimulus-specific tuning analysis.  
+The Allen SDK provides code to:
 
+   * download and organize experiment data according to cortical area, imaging depth, and Cre line
+   * remove the contribution of neuropil signal from fluorescence traces
+   * access (or compute) dF/F traces based on the neuropil-corrected traces
+   * perform stimulus-specific tuning analysis (e.g. drifting grating direction tuning)
 
 ....
 
