@@ -15,11 +15,9 @@
 
 from allensdk.api.queries.rma_template import RmaTemplate
 
-class CorticalActivityMapApi(RmaTemplate):
-    ''''''
-    
+class BrainObservatoryApi(RmaTemplate):
     rma_templates = \
-        {"cortical_activity_map_queries": [
+        {"brain_observatory_queries": [
             {'name': 'list_isi_experiments',
              'description': 'see name',
              'model': 'IsiExperiment',
@@ -71,8 +69,9 @@ class CorticalActivityMapApi(RmaTemplate):
             {'name': 'experiment_container',
              'description': 'see name',
              'model': 'ExperimentContainer',
-             'criteria': '[id$in{{ experiment_container_ids }}]',
+             'criteria': '{% if experiment_container_ids is defined %}[id$in{{ experiment_container_ids }}]{%endif%}',
              'include': 'ophys_experiments,isi_experiment,specimen,targeted_structure',
+             'num_rows': 'all',
              'count': False, 
              'criteria_params': ['experiment_container_ids']
             },
@@ -96,8 +95,8 @@ class CorticalActivityMapApi(RmaTemplate):
     
     
     def __init__(self, base_uri=None):
-        super(CorticalActivityMapApi, self).__init__(base_uri,
-                                                     query_manifest=CorticalActivityMapApi.rma_templates)
+        super(BrainObservatoryApi, self).__init__(base_uri,
+                                                     query_manifest=BrainObservatoryApi.rma_templates)
     
     
     def get_ophys_experiments(self, ophys_experiment_ids=None):
@@ -112,7 +111,7 @@ class CorticalActivityMapApi(RmaTemplate):
         -------
         dict : ophys experiment metadata        
         '''
-        data = self.template_query('cortical_activity_map_queries',
+        data = self.template_query('brain_observatory_queries',
                                    'ophys_experiment_by_ids',
                                    ophys_experiment_ids=ophys_experiment_ids)
         
@@ -131,7 +130,7 @@ class CorticalActivityMapApi(RmaTemplate):
         -------
         dict : isi experiment metadata        
         '''
-        data = self.template_query('cortical_activity_map_queries',
+        data = self.template_query('brain_observatory_queries',
                                    'isi_experiment_by_ids',
                                    isi_experiment_ids=isi_experiment_ids)
         
@@ -150,7 +149,7 @@ class CorticalActivityMapApi(RmaTemplate):
         -------
         dict : neuronal model metadata        
         '''
-        data = self.template_query('cortical_activity_map_queries',
+        data = self.template_query('brain_observatory_queries',
                                    'list_isi_experiments')
         
         return data
@@ -166,7 +165,7 @@ class CorticalActivityMapApi(RmaTemplate):
         -------
         list : api class name strings        
         '''
-        data = self.template_query('cortical_activity_map_queries',
+        data = self.template_query('brain_observatory_queries',
                                    'column_definition_class_names')
         
         names = list(set([n['api_class_name'] for n in data]))
@@ -186,7 +185,7 @@ class CorticalActivityMapApi(RmaTemplate):
         -------
         dict : column definition metadata        
         '''
-        data = self.template_query('cortical_activity_map_queries',
+        data = self.template_query('brain_observatory_queries',
                                    'column_definitions',
                                    api_class_name=api_class_name)
         
@@ -206,7 +205,7 @@ class CorticalActivityMapApi(RmaTemplate):
         -------
         dict : stimulus mapping metadata        
         '''
-        data = self.template_query('cortical_activity_map_queries',
+        data = self.template_query('brain_observatory_queries',
                                    'stimulus_mapping',
                                    stimulus_mapping_ids=stimulus_mapping_ids)
         
@@ -225,7 +224,7 @@ class CorticalActivityMapApi(RmaTemplate):
         -------
         dict : cell metric metadata        
         '''
-        data = self.template_query('cortical_activity_map_queries',
+        data = self.template_query('brain_observatory_queries',
                                    'cell_metric',
                                    cell_specimen_ids=cell_specimen_ids)
         
@@ -244,7 +243,7 @@ class CorticalActivityMapApi(RmaTemplate):
         -------
         dict : experiment container metadata        
         '''
-        data = self.template_query('cortical_activity_map_queries',
+        data = self.template_query('brain_observatory_queries',
                                    'experiment_container',
                                    experiment_container_ids=experiment_container_ids)
         
@@ -263,7 +262,7 @@ class CorticalActivityMapApi(RmaTemplate):
         -------
         dict : isi experiment metadata        
         '''
-        data = self.template_query('cortical_activity_map_queries',
+        data = self.template_query('brain_observatory_queries',
                                    'experiment_container_metric',
                                    experiment_container_metric_ids=experiment_container_metric_ids)
         
@@ -271,18 +270,18 @@ class CorticalActivityMapApi(RmaTemplate):
     
 if __name__ == '__main__':
     from allensdk.api.api import Api
-    from allensdk.internal.api.queries.cortical_activity_map_api \
-        import CorticalActivityMapApi
+    from allensdk.api.queries.brain_observatory_api \
+        import BrainObservatoryApi
     import pandas as pd
         
     host = 'http://testwarehouse:9000'
     Api.default_api_url = host
-    cam_api = CorticalActivityMapApi()
+    bapi = BrainObservatoryApi()
     
     
-    names = cam_api.list_column_definition_class_names()
+    #names = cam_api.list_column_definition_class_names()
     
-    print(names)
+    print(len(bapi.get_experiment_container()))
     
 
 

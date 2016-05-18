@@ -51,10 +51,10 @@ class RmaTemplate(RmaApi):
             if 'criteria_params' in template:
                 criteria_params = { key: self.to_filter_rhs(kwargs.get(key))
                                     for key in template['criteria_params']
-                                    if key in kwargs and kwargs.get(key) != None }
+                                    if key in kwargs and kwargs.get(key) is not None }
             else:
                 criteria_params = {}
-            
+                
             query_args['criteria'] = \
                 str(criteria_template.render(**criteria_params))
         
@@ -64,7 +64,7 @@ class RmaTemplate(RmaApi):
             if 'include_params' in template:
                 include_params = { key: self.to_filter_rhs(kwargs.get(key))
                                    for key in template['include_params']
-                                   if key in kwargs and kwargs.get(key) != None}
+                                   if key in kwargs and kwargs.get(key) is not None}
             else:
                 include_params = {}
             
