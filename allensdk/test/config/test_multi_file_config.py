@@ -17,9 +17,10 @@
 import pytest
 from mock import patch, mock_open
 from allensdk.config.model.description_parser import DescriptionParser
+from _pytest.monkeypatch import monkeypatch
+import __builtin__
 
-@pytest.fixture
-def multi_config():
+def multi_config(monkeypatch):
     description = None
     
     file_1 = ("{\n"
@@ -33,6 +34,7 @@ def multi_config():
               "           \"prop_d\": \"val_d\"\n"
               "       }\n"
               "    ],\n"
+
               "    \"section_B\": [\n"
               "       {\n"
               "           \"prop_e\": \"val_e\",\n"
@@ -60,56 +62,56 @@ def multi_config():
               "    ]\n"
               "}\n"
               )
-    
-    with patch("__builtin__.open",
-               mock_open(
-                   read_data=file_1)):
-        parser = DescriptionParser()
-        description = parser.read("mock_1.json")
-    
-    with patch("__builtin__.open",
-               mock_open(
-                   read_data=file_2)):
-        parser = DescriptionParser()
-        parser.read("mock_2.json",
-                    description)
+
+    monkeypatch.setattr(__builtin__, 'open', mock_open(read_data=file_1))
+    parser = DescriptionParser()
+    description = parser.read("mock_1.json")
+    monkeypatch.undo()
+        
+    monkeypatch.setattr(__builtin__, 'open', mock_open(read_data=file_2))
+    parser = DescriptionParser()
+    parser.read("mock_2.json", description)    
     
     return description
 
 
-def testAllSectionsPresent(multi_config):
-    assert('section_A' in multi_config.data and
-           'section_B' in multi_config.data and
-           'section_C' in multi_config.data)
-    assert(len(multi_config.data.keys()) == 3)
+def testAllSectionsPresent(monkeypatch):
+    multiconfig = multi_config(monkeypatch)
+    assert('section_A' in multiconfig.data and
+           'section_B' in multiconfig.data and
+           'section_C' in multiconfig.data)
+    assert(len(multiconfig.data.keys()) == 3)
 
 
-def testSectionA(multi_config):
-    assert(len(multi_config.data['section_A']) == 2)
-    assert(multi_config.data['section_A'][0] ==
+def testSectionA(monkeypatch):
+    multiconfig = multi_config(monkeypatch)    
+    assert(len(multiconfig.data['section_A']) == 2)
+    assert(multiconfig.data['section_A'][0] ==
         { 'prop_a': 'val_a',
           'prop_b': 'val_b' })
-    assert(multi_config.data['section_A'][1],
+    assert(multiconfig.data['section_A'][1],
         { 'prop_c': 'val_c',
           'prop_d': 'val_d' })
-  
-  
-def testSectionB(multi_config):
-    assert(len(multi_config.data['section_B']) == 3)
-    assert(multi_config.data['section_B'][0] ==
+    
+    
+def testSectionB(monkeypatch):
+    multiconfig = multi_config(monkeypatch)        
+    assert(len(multiconfig.data['section_B']) == 3)
+    assert(multiconfig.data['section_B'][0] ==
         { 'prop_e': 'val_e',
           'prop_f': 'val_f' })
-    assert(multi_config.data['section_B'][1] ==
+    assert(multiconfig.data['section_B'][1] ==
         { 'prop_g': 'val_g',
           'prop_h': 'val_h' })
-    assert(multi_config.data['section_B'][2] ==
+    assert(multiconfig.data['section_B'][2] ==
         { 'prop_i': 'val_i',
           'prop_j': 'val_j' })
-  
-  
-def testSectionC(multi_config):
-    assert(len(multi_config.data['section_C']) == 1)
-    assert(multi_config.data['section_C'][0] ==
+    
+    
+def testSectionC(monkeypatch):
+    multiconfig = multi_config(monkeypatch)        
+    assert(len(multiconfig.data['section_C']) == 1)
+    assert(multiconfig.data['section_C'][0] ==
         { 'prop_k': 'val_k',
           'prop_l': 'val_l' })
 
