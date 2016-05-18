@@ -38,7 +38,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'OphysExperiment',
              'criteria': '{% if ophys_experiment_ids is defined %}[id$in{{ ophys_experiment_ids }}]{%endif%}',
-             'include': 'well_known_files(well_known_file_type)',
+             'include': 'well_known_files(well_known_file_type),targeted_structure,specimen(donor(transgenic_lines))',
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['ophys_experiment_ids']
@@ -70,7 +70,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'ExperimentContainer',
              'criteria': '{% if experiment_container_ids is defined %}[id$in{{ experiment_container_ids }}]{%endif%}',
-             'include': 'ophys_experiments,isi_experiment,specimen,targeted_structure',
+             'include': 'ophys_experiments,isi_experiment,specimen(donor(transgenic_lines)),targeted_structure',
              'num_rows': 'all',
              'count': False, 
              'criteria_params': ['experiment_container_ids']
@@ -78,7 +78,7 @@ class BrainObservatoryApi(RmaTemplate):
             {'name': 'experiment_container_metric',
              'description': 'see name',
              'model': 'ApiCamExperimentContainerMetric',
-             'criteria': '[id$in{{ experiment_container_metric_ids }}]',
+             'criteria': '{% if experiment_container_metric_ids is defined %}[id$in{{ experiment_container_metric_ids }}]{%endif%}',
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['experiment_container_metric_ids']
@@ -96,7 +96,7 @@ class BrainObservatoryApi(RmaTemplate):
     
     def __init__(self, base_uri=None):
         super(BrainObservatoryApi, self).__init__(base_uri,
-                                                     query_manifest=BrainObservatoryApi.rma_templates)
+                                                  query_manifest=BrainObservatoryApi.rma_templates)
     
     
     def get_ophys_experiments(self, ophys_experiment_ids=None):
@@ -193,7 +193,7 @@ class BrainObservatoryApi(RmaTemplate):
     
     
     # TODO: search by item type and level
-    def get_stimulus_mapping(self, stimulus_mapping_ids=None):
+    def get_stimulus_mappings(self, stimulus_mapping_ids=None):
         ''' Get stimulus mappings by id
         
         Parameters
@@ -212,7 +212,7 @@ class BrainObservatoryApi(RmaTemplate):
         return data
     
     
-    def get_cell_metric(self, cell_specimen_ids=None):
+    def get_cell_metrics(self, cell_specimen_ids=None):
         ''' Get cell metrics by id
         
         Parameters
@@ -231,7 +231,7 @@ class BrainObservatoryApi(RmaTemplate):
         return data
     
     
-    def get_experiment_container(self, experiment_container_ids=None):
+    def get_experiment_containers(self, experiment_container_ids=None):
         ''' Get experiment container by id
         
         Parameters
@@ -250,7 +250,7 @@ class BrainObservatoryApi(RmaTemplate):
         return data
     
     
-    def get_experiment_container_metric(self, experiment_container_metric_ids=None):
+    def get_experiment_container_metrics(self, experiment_container_metric_ids=None):
         ''' Get experiment container metrics by id
         
         Parameters
@@ -267,6 +267,24 @@ class BrainObservatoryApi(RmaTemplate):
                                    experiment_container_metric_ids=experiment_container_metric_ids)
         
         return data
+
+
+    def filter_experiment_containers(self, containers, targeted_structures=None, imaging_depths=None, transgenic_lines=None):
+        if targeted_structures is not None:
+            containers = [ c for c in containers if c['targeted_structure']['acronym'] in targeted_structures ]
+
+        if imaging_depths is not None:
+            containers = [ c for c in containers if c['imaging_depth'] in imaging_depths ]
+        
+        if transgenic_lines is not None:
+            containers = [ c for c in containers for tl in c['specimen']['donor']['transgenic_lines'] if tl['name'] in transgenic_lines ]
+
+        return containers
+
+
+    def filter_ophys_experiments(self, experiments, experiment_container_ids=None):
+        return experiments
+
     
 if __name__ == '__main__':
     from allensdk.api.api import Api
@@ -281,7 +299,7 @@ if __name__ == '__main__':
     
     #names = cam_api.list_column_definition_class_names()
     
-    print(len(bapi.get_experiment_container()))
+    print(len(bapi.get_experiment_containers()))
     
 
 
