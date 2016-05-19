@@ -13,9 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 from allensdk.api.queries.rma_template import RmaTemplate
+from allensdk.config.manifest import Manifest
 
 class BrainObservatoryApi(RmaTemplate):
+    NWB_FILE_TYPE = 'NWBOphys'
+
     rma_templates = \
         {"brain_observatory_queries": [
             {'name': 'list_isi_experiments',
@@ -42,7 +46,15 @@ class BrainObservatoryApi(RmaTemplate):
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['ophys_experiment_ids']
-            },                                           
+             },                
+            {'name': 'ophys_experiment_data',
+             'description': 'see name',
+             'model': 'WellKnownFile',
+             'criteria': '[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eq%s]' % NWB_FILE_TYPE,
+             'num_rows': 'all',
+             'count': False,
+             'criteria_params': [ 'ophys_experiment_id' ]
+            },
             {'name': 'column_definitions',
              'description': 'see name',
              'model': 'ApiColumnDefinition',
@@ -268,6 +280,22 @@ class BrainObservatoryApi(RmaTemplate):
         
         return data
 
+    def save_ophys_experiment_data(self, ophys_experiment_id, file_name):
+        dirname = os.path.dirname(file_name)
+        Manifest.safe_mkdir(dirname)
+
+
+        data = self.template_query('brain_observatory_queries',
+                                   'ophys_experiment_data',
+                                   ophys_experiment_id=ophys_experiment_id)
+        
+        try:
+            file_url = data[0]['download_link']
+        except Exception as _:
+            raise Exception("ophys experiment %d has no data file" % ophys_experiment_id)
+
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
+        
 
     def filter_experiment_containers(self, containers, targeted_structures=None, imaging_depths=None, transgenic_lines=None):
         if targeted_structures is not None:
@@ -282,7 +310,16 @@ class BrainObservatoryApi(RmaTemplate):
         return containers
 
 
-    def filter_ophys_experiments(self, experiments, experiment_container_ids=None):
+    def filter_ophys_experiments(self, experiments, experiment_container_ids=None,
+                                 targeted_structures=None, imaging_depths=None, 
+                                 transgenic_lines=None):
+
+        # re-using the code from above
+        experiments = self.filter_experiment_containers(experiments, targeted_structures, imaging_depths, transgenic_lines)
+
+        if experiment_container_ids is not None:
+            experiments = [ e for e in experiments if e['experiment_container_id'] in experiment_container_ids ]
+
         return experiments
 
     
