@@ -123,7 +123,7 @@ class Api(object):
         dict or DataFrame
             returned data; type depends on dataframe option
         '''
-        
+
         data = self.do_query(lambda *a, **k:  url,
                              self.read_data)
         

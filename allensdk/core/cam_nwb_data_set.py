@@ -17,6 +17,7 @@ import re
 
 class CamNwbDataSet(object):
     MOVIE_FOV_PX = (512, 512)
+    PIPELINE_DATASET = 'brain_observatory_pipeline'
     
     FILE_METADATA_MAPPING = { 
         'imaging_depth': 'general/optophysiology/imaging_plane_1/imaging depth',
@@ -59,9 +60,9 @@ class CamNwbDataSet(object):
         all_cell_specimen_ids = list(self.get_cell_specimen_ids())
 
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+        timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
 
-        ds = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data']
+        ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['data']
         if cell_specimen_ids is None:
             cell_traces = ds.value 
         else:
@@ -92,9 +93,9 @@ class CamNwbDataSet(object):
         all_cell_specimen_ids = self.get_cell_specimen_ids()
 
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
+        timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
 
-        ds = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces']
+        ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['neuropil_traces']
         if cell_specimen_ids is None:
             np_traces = ds.value 
         else:
@@ -126,10 +127,10 @@ class CamNwbDataSet(object):
         all_cell_specimen_ids = list(self.get_cell_specimen_ids())
 
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value
-        cell_traces_ds = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['data']
-        np_traces_ds = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['neuropil_traces']
-        r_ds = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['r']
+        timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
+        cell_traces_ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['data']
+        np_traces_ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['neuropil_traces']
+        r_ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['r']
 
         if cell_specimen_ids is None:
             cell_traces = cell_traces_ds.value 
@@ -169,13 +170,13 @@ class CamNwbDataSet(object):
         all_cell_specimen_ids = list(self.get_cell_specimen_ids())
 
         f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['timestamps'].value
+        timestamps = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['timestamps'].value
 
         if cell_specimen_ids is None:
-            cell_traces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['data'].value 
+            cell_traces = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['data'].value 
         else:
             inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
-            cell_traces = f['processing']['cortical_activity_map_pipeline']['DfOverF']['imaging_plane_1']['data'][inds,:]
+            cell_traces = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['data'][inds,:]
             
         f.close()
 
@@ -190,7 +191,7 @@ class CamNwbDataSet(object):
         ROI IDs: list
         '''
         f = h5py.File(self.nwb_file, 'r')
-        roi_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['roi_ids'].value 
+        roi_id = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['roi_ids'].value 
         f.close()
         return roi_id
 
@@ -202,7 +203,7 @@ class CamNwbDataSet(object):
         cell specimen IDs: list
         '''
         f = h5py.File(self.nwb_file, 'r')
-        cell_id = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['cell_specimen_ids'].value 
+        cell_id = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['cell_specimen_ids'].value 
         f.close()
         return cell_id
 
@@ -223,7 +224,7 @@ class CamNwbDataSet(object):
     def get_max_projection(self):
         '''returns the maximum projection image for the 2P data'''
         f = h5py.File(self.nwb_file, 'r')
-        max_projection = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']['reference_images']['maximum_intensity_projection_image']['data'].value
+        max_projection = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']['reference_images']['maximum_intensity_projection_image']['data'].value
         f.close()
         return max_projection
 
@@ -354,8 +355,8 @@ class CamNwbDataSet(object):
         '''
 
         f = h5py.File(self.nwb_file, 'r')
-        mask_loc = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']
-        roi_list = f['processing']['cortical_activity_map_pipeline']['ImageSegmentation']['imaging_plane_1']['roi_list'].value
+        mask_loc = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']
+        roi_list = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']['roi_list'].value
         
         all_cell_specimen_ids = self.get_cell_specimen_ids()
         inds = None
@@ -416,9 +417,9 @@ class CamNwbDataSet(object):
     def get_running_speed(self):
         '''returns the mouse running speed in cm/s'''
         f = h5py.File(self.nwb_file, 'r')
-        dxcm = f['processing']['cortical_activity_map_pipeline']['BehavioralTimeSeries']['running_speed']['data'].value
-        dxtime = f['processing']['cortical_activity_map_pipeline']['BehavioralTimeSeries']['running_speed']['timestamps'].value
-        timestamps = f['processing']['cortical_activity_map_pipeline']['Fluorescence']['imaging_plane_1']['timestamps'].value    
+        dxcm = f['processing'][self.PIPELINE_DATASET]['BehavioralTimeSeries']['running_speed']['data'].value
+        dxtime = f['processing'][self.PIPELINE_DATASET]['BehavioralTimeSeries']['running_speed']['timestamps'].value
+        timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value    
         f.close()   
 
         dxcm = dxcm[:,0]
@@ -435,9 +436,9 @@ class CamNwbDataSet(object):
     def get_motion_correction(self):
         '''returns a DataFrame containing the x- and y- translation of each image used for image alignment'''
         f = h5py.File(self.nwb_file, 'r')
-        motion_log = f['processing']['cortical_activity_map_pipeline']['MotionCorrection']['2p_image_series']['xy_translations']['data'].value
-        motion_time = f['processing']['cortical_activity_map_pipeline']['MotionCorrection']['2p_image_series']['xy_translations']['timestamps'].value
-        motion_names = f['processing']['cortical_activity_map_pipeline']['MotionCorrection']['2p_image_series']['xy_translations']['feature_description'].value
+        motion_log = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['data'].value
+        motion_time = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['timestamps'].value
+        motion_names = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['feature_description'].value
         motion_correction = pd.DataFrame(motion_log, columns=motion_names)
         motion_correction['timestamp'] = motion_time    
         f.close()

@@ -109,6 +109,6 @@ class RmaTemplate(RmaApi):
             query_args['order'] = template['order']
 
         data = self.model_query(**query_args)
-        
+
         return data
 
