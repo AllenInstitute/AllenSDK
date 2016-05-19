@@ -89,7 +89,7 @@ def testSectionA(monkeypatch):
     assert(multiconfig.data['section_A'][0] ==
         { 'prop_a': 'val_a',
           'prop_b': 'val_b' })
-    assert(multiconfig.data['section_A'][1],
+    assert(multiconfig.data['section_A'][1] ==
         { 'prop_c': 'val_c',
           'prop_d': 'val_d' })
     
