@@ -150,8 +150,7 @@ def main():
 
     # read from "data"
     if args.input_h5.endswith("nwb"):
-        timestamps, traces = CamNwbDataSet(args.input_h5).get_fluorescence_traces()
-        print traces.shape
+        timestamps, traces = CamNwbDataSet(args.input_h5).get_corrected_fluorescence_traces()
     else:
         input_h5 = h5py.File(args.input_h5, "r")
         traces = input_h5["data"].value
@@ -161,7 +160,7 @@ def main():
     
     # write to "data"
     output_h5 = h5py.File(args.output_h5, "w")
-    output_h5["analysis/celltraces_dff"] = dff
+    output_h5["data"] = dff
     output_h5.close()
 
 if __name__ == "__main__": main()

@@ -86,7 +86,7 @@ def testSectionA(pyconfig):
     assert(pyconfig.data['section_A'][0] ==
         { 'prop_a': 'val_a',
           'prop_b': 'val_b' })
-    assert( pyconfig.data['section_A'][1],
+    assert( pyconfig.data['section_A'][1] ==
         { 'prop_c': 'val_c',
           'prop_d': 'val_d' })
 
@@ -99,7 +99,7 @@ def testSectionB(pyconfig):
     assert(pyconfig.data['section_B'][1] ==
         { 'prop_g': 'val_g',
           'prop_h': 'val_h' })
-    assert(pyconfig.data['section_B'][2],
+    assert(pyconfig.data['section_B'][2] ==
         { 'prop_i': 'val_i',
           'prop_j': 'val_j' })
 
