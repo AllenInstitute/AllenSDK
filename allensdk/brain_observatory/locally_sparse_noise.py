@@ -1,9 +1,9 @@
 import scipy.stats as st
 import pandas as pd
 import numpy as np
-from allensdk.brain_observatory.o_p_analysis import OPAnalysis
+from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 
-class LocallySparseNoise(OPAnalysis):    
+class LocallySparseNoise(StimulusAnalysis):    
     LSN_ON = 255
     LSN_OFF = 0
     LSN_GREY = 127
