@@ -1,2 +1,2 @@
-class CamAnalysisException(Exception): pass
+class BrainObservatoryAnalysisException(Exception): pass
 

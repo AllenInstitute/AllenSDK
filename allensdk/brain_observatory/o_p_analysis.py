@@ -18,34 +18,35 @@ import numpy as np
 import pandas as pd
 import time, os, logging
 
-from allensdk.cam.findlevel import findlevel
-from cam_exceptions import CamAnalysisException
+from allensdk.brain_observatory.findlevel import findlevel
+from allensdk.brain_observatory.brain_observatory_exceptions import \
+    BrainObservatoryAnalysisException
 
 class OPAnalysis(object):
-    _log = logging.getLogger('allensdk.cam.o_p_analysis')    
+    _log = logging.getLogger('allensdk.brain_observatory.o_p_analysis')    
     
-    def __init__(self, cam_analysis,
+    def __init__(self, brain_observatory_analysis,
                  **kwargs):
-        self.cam_analysis = cam_analysis
-        self.save_dir = os.path.dirname(self.cam_analysis.save_path)
+        self.brain_observatory_analysis = brain_observatory_analysis
+        self.save_dir = os.path.dirname(self.brain_observatory_analysis.save_path)
         
         # get fluorescence 
-        self.timestamps, self.celltraces = self.cam_analysis.nwb.get_corrected_fluorescence_traces()
+        self.timestamps, self.celltraces = self.brain_observatory_analysis.nwb.get_corrected_fluorescence_traces()
         self.numbercells = len(self.celltraces)    #number of cells in dataset
-        self.roi_id = self.cam_analysis.nwb.get_roi_ids()
-        self.cell_id = self.cam_analysis.nwb.get_cell_specimen_ids()
+        self.roi_id = self.brain_observatory_analysis.nwb.get_roi_ids()
+        self.cell_id = self.brain_observatory_analysis.nwb.get_cell_specimen_ids()
         
         # get dF/F 
-        _, self.dfftraces = self.cam_analysis.nwb.get_dff_traces()
+        _, self.dfftraces = self.brain_observatory_analysis.nwb.get_dff_traces()
 
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
-        self.dxcm, self.dxtime = self.cam_analysis.nwb.get_running_speed()        
+        self.dxcm, self.dxtime = self.brain_observatory_analysis.nwb.get_running_speed()        
 
     def get_response(self):
-        raise CamAnalysisException("get_response not implemented")
+        raise BrainObservatoryAnalysisException("get_response not implemented")
 
     def get_peak(self):
-        raise CamAnalysisException("get_peak not implemented")
+        raise BrainObservatoryAnalysisException("get_peak not implemented")
         
     def get_global_dff(self):
         return self.dfftraces
@@ -56,7 +57,7 @@ class OPAnalysis(object):
         celltraces_trimmed = np.delete(self.celltraces_dff, range(len(self.dxcm), np.size(self.celltraces_dff,1)), axis=1) 
 
         # pull out spontaneous epoch(s)        
-        spontaneous = self.cam_analysis.nwb.get_spontaneous_activity_stimulus_table()
+        spontaneous = self.brain_observatory_analysis.nwb.get_spontaneous_activity_stimulus_table()
 
         peak_run = pd.DataFrame(index=range(self.numbercells), columns=('speed_max_sp','speed_min_sp','ptest_sp', 'mod_sp','speed_max_vis','speed_min_vis','ptest_vis', 'mod_vis'))
 
@@ -79,12 +80,12 @@ class OPAnalysis(object):
         binned_dx_sp = np.zeros((nbins,2))
         for i in range(nbins):
             if np.all(np.isnan(dx_sorted)):
-                raise CamAnalysisException("dx is filled with NaNs")
+                raise BrainObservatoryAnalysisException("dx is filled with NaNs")
 
             offset = findlevel(dx_sorted,1,'up')
 
             if offset is None:
-                raise CamAnalysisException("Could not find crossing in dx")
+                raise BrainObservatoryAnalysisException("Could not find crossing in dx")
 
             if i==0:
                 binned_dx_sp[i,0] = np.mean(dx_sorted[:offset])

@@ -8,14 +8,14 @@ Functions to extract relevant data from the CAM NWB files
 import h5py
 import pandas as pd
 import numpy as np
-import allensdk.cam.roi_masks as roi
+import allensdk.brain_observatory.roi_masks as roi
 import itertools
 from collections import defaultdict
-from allensdk.cam.locally_sparse_noise import LocallySparseNoise
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 import dateutil
 import re
 
-class CamNwbDataSet(object):
+class BrainObservatoryNwbDataSet(object):
     MOVIE_FOV_PX = (512, 512)
     PIPELINE_DATASET = 'brain_observatory_pipeline'
     
@@ -386,7 +386,7 @@ class CamNwbDataSet(object):
         meta = {}
             
         with h5py.File(self.nwb_file, 'r') as f:
-            for memory_key, disk_key in CamNwbDataSet.FILE_METADATA_MAPPING.items():
+            for memory_key, disk_key in BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING.items():
                 v = f[disk_key].value
                 if v.dtype.type is np.string_:
                     v = str(v)

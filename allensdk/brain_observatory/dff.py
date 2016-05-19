@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import h5py 
 import numpy as np
 
-from allensdk.core.cam_nwb_data_set import CamNwbDataSet
+from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 
 def movingmode_fast(x, kernelsize, y):
     histo = np.zeros(4096)
@@ -150,7 +150,7 @@ def main():
 
     # read from "data"
     if args.input_h5.endswith("nwb"):
-        timestamps, traces = CamNwbDataSet(args.input_h5).get_corrected_fluorescence_traces()
+        timestamps, traces = BrainObservatoryNwbDataSet(args.input_h5).get_corrected_fluorescence_traces()
     else:
         input_h5 = h5py.File(args.input_h5, "r")
         traces = input_h5["data"].value

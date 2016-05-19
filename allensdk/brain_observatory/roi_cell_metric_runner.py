@@ -14,7 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import json, sys, traceback
-from allensdk.cam.cam_analysis import run_cam_analysis
+from allensdk.brain_observatory.brain_observatory_analysis import run_brain_observatory_analysis
 
 def read_json(json_filename):
 
@@ -35,7 +35,7 @@ def read_json(json_filename):
                           'area': None,
                           'depth': depth }]
                         
-                run_cam_analysis(*args)
+                run_brain_observatory_analysis(*args)
     except Exception as error:
         print traceback.print_exc(file=sys.stderr)
 

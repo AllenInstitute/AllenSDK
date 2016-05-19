@@ -16,12 +16,12 @@
 import scipy.stats as st
 import pandas as pd
 import numpy as np
-from allensdk.cam.o_p_analysis import OPAnalysis
+from allensdk.brain_observatory.o_p_analysis import OPAnalysis
 
 class NaturalMovie(OPAnalysis):    
-    def __init__(self, cam_analysis, movie_name, **kwargs):
-        super(NaturalMovie, self).__init__(cam_analysis, **kwargs)                   
-        stimulus_table = self.cam_analysis.nwb.get_natural_movie_stimulus_table(movie_name)
+    def __init__(self, brain_observatory_analysis, movie_name, **kwargs):
+        super(NaturalMovie, self).__init__(brain_observatory_analysis, **kwargs)                   
+        stimulus_table = self.brain_observatory_analysis.nwb.get_natural_movie_stimulus_table(movie_name)
         self.stim_table = stimulus_table[stimulus_table.frame==0]
         self.celltraces_dff = self.get_global_dff()
         if movie_name == 'natural_movie_one':

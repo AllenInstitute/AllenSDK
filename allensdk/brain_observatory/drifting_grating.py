@@ -21,11 +21,11 @@ from math import sqrt
 import logging
 
 class DriftingGrating(OPAnalysis):
-    _log = logging.getLogger('allensdk.cam.drifting_grating')    
+    _log = logging.getLogger('allensdk.brain_observatory.drifting_grating')    
 
-    def __init__(self, cam_analysis, **kwargs):
-        super(DriftingGrating, self).__init__(cam_analysis, **kwargs)                   
-        stimulus_table = self.cam_analysis.nwb.get_drifting_gratings_stimulus_table()
+    def __init__(self, brain_observatory_analysis, **kwargs):
+        super(DriftingGrating, self).__init__(brain_observatory_analysis, **kwargs)                   
+        stimulus_table = self.brain_observatory_analysis.nwb.get_drifting_gratings_stimulus_table()
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = 60#self.sync_table['end'][1] - self.sync_table['start'][1]
         self.interlength = 30#self.sync_table['start'][2] - self.sync_table['end'][1]

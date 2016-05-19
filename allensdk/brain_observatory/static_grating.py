@@ -19,17 +19,18 @@ import numpy as np
 import pandas as pd
 from math import sqrt
 import logging
-from allensdk.cam.o_p_analysis import OPAnalysis
-from allensdk.cam.cam_exceptions import CamAnalysisException
+from allensdk.brain_observatory.o_p_analysis import OPAnalysis
+from allensdk.brain_observatory.brain_observatory_exceptions \
+    import BrainObservatoryAnalysisException
 
 
 class StaticGrating(OPAnalysis):
-    _log = logging.getLogger('allensdk.cam.static_grating')        
+    _log = logging.getLogger('allensdk.brain_observatory.static_grating')        
     
-    def __init__(self, cam_analysis, **kwargs):
-        super(StaticGrating, self).__init__(cam_analysis, **kwargs)
+    def __init__(self, brain_observatory_analysis, **kwargs):
+        super(StaticGrating, self).__init__(brain_observatory_analysis, **kwargs)
         
-        stimulus_table = self.cam_analysis.nwb.get_static_gratings_stimulus_table()
+        stimulus_table = self.brain_observatory_analysis.nwb.get_static_gratings_stimulus_table()
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = self.stim_table['end'].iloc[1] - self.stim_table['start'].iloc[1]
         self.interlength = 4 * self.sweeplength
@@ -110,7 +111,7 @@ class StaticGrating(OPAnalysis):
                     (int(nc), self.orivals[pref_ori], self.sfvals[pref_sf], 
                      self.phasevals[pref_phase], len(test_rows))
 
-                raise CamAnalysisException(msg)
+                raise BrainObservatoryAnalysisException(msg)
 
             test = self.sweep_response[test_rows][str(nc)].mean()
             peak.time_to_peak_sg[nc] = (np.argmax(test) - self.interlength)/self.acquisition_rate

@@ -340,7 +340,7 @@ if __name__ == '__main__':
     bapi = BrainObservatoryApi()
     
     
-    #names = cam_api.list_column_definition_class_names()
+    #names = brain_observatory_api.list_column_definition_class_names()
     
     print(len(bapi.get_experiment_containers()))
     

@@ -27,7 +27,7 @@ def test_get_isi_experiments(bo_api):
  
  
 def test_get_ophys_experiments_one_id(bo_api):
-    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::OphysExperiment,rma::criteria,[id$in502066273],rma::include,well_known_files(well_known_file_type),targeted_structure,specimen(donor(transgenic_lines)),rma::options[num_rows$eq'all'][count$eqfalse]"
+    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::OphysExperiment,rma::criteria,[id$in502066273],rma::include,well_known_files(well_known_file_type),targeted_structure,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD])),rma::options[num_rows$eq'all'][count$eqfalse]"
       
     ophys_experiment_id = 502066273
     bo_api.get_ophys_experiments(ophys_experiment_id)     
@@ -36,16 +36,16 @@ def test_get_ophys_experiments_one_id(bo_api):
 def test_get_experiment_container_metrics(bo_api):
     expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ApiCamExperimentContainerMetric,rma::criteria,[id$in511510627],rma::options[num_rows$eq'all'][count$eqfalse]"
       
-    id = 511510627
+    tid = 511510627
       
-    bo_api.get_experiment_container_metrics(id)
+    bo_api.get_experiment_container_metrics(tid)
     bo_api.json_msg_query.assert_called_once_with(expected)
 
 
 def test_get_experiment_containers(bo_api):
-    id = 511510753
-    bo_api.get_experiment_containers(id)
-    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ExperimentContainer,rma::criteria,[id$in511510753],rma::include,ophys_experiments,isi_experiment,specimen(donor(transgenic_lines)),targeted_structure,rma::options[num_rows$eq'all'][count$eqfalse]"
+    tid = 511510753
+    bo_api.get_experiment_containers(tid)
+    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ExperimentContainer,rma::criteria,[id$in511510753],rma::include,ophys_experiments,isi_experiment,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD])),targeted_structure,rma::options[num_rows$eq'all'][count$eqfalse]"
     bo_api.json_msg_query.assert_called_once_with(expected)
  
      
@@ -89,8 +89,8 @@ def test_get_cell_metrics_no_ids(bo_api):
 
 
 def test_get_cell_metrics_one_ids(bo_api):
-    id = 517394843
-    bo_api.get_cell_metrics(cell_specimen_ids=id)
+    tid = 517394843
+    bo_api.get_cell_metrics(cell_specimen_ids=tid)
     expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ApiCamCellMetric,rma::criteria,[cell_specimen_id$in517394843],rma::options[num_rows$eq'all'][count$eqfalse]"      
     bo_api.json_msg_query.assert_called_once_with(expected)    
 

@@ -13,15 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.cam.static_grating import StaticGrating
-from allensdk.cam.locally_sparse_noise import LocallySparseNoise
-from allensdk.cam.natural_scenes import NaturalScenes
-from allensdk.cam.drifting_grating import DriftingGrating
-from allensdk.cam.natural_movie import NaturalMovie
+from allensdk.brain_observatory.static_grating import StaticGrating
+from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
+from allensdk.brain_observatory.natural_scenes import NaturalScenes
+from allensdk.brain_observatory.drifting_grating import DriftingGrating
+from allensdk.brain_observatory.natural_movie import NaturalMovie
 
-from allensdk.core.cam_nwb_data_set import CamNwbDataSet
+from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 
-import allensdk.cam.cam_plotting as cp
+import allensdk.brain_observatory.brain_observatory_plotting as cp
 import argparse, logging, os
 import sys
 import numpy as np
@@ -35,14 +35,14 @@ def multi_dataframe_merge(dfs):
             out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
     return out_df
 
-class CamAnalysis(object):
-    _log = logging.getLogger('allensdk.cam.cam_analysis')    
+class BrainObservatoryAnalysis(object):
+    _log = logging.getLogger('allensdk.brain_observatory.brain_observatory_analysis')    
     SESSION_A = 'three_session_A'
     SESSION_B = 'three_session_B'
     SESSION_C = 'three_session_C'
 
     def __init__(self, nwb_path, save_path, metadata=None):
-        self.nwb = CamNwbDataSet(nwb_path)                        
+        self.nwb = BrainObservatoryNwbDataSet(nwb_path)                        
         self.save_path = save_path
 
         self.metrics_a = {}
@@ -61,7 +61,7 @@ class CamAnalysis(object):
             df[k] = v
 
     def save_session_a(self, dg, nm1, nm3, peak):
-        nwb = CamNwbDataSet(self.save_path)
+        nwb = BrainObservatoryNwbDataSet(self.save_path)
         nwb.save_analysis_dataframes(
             ('stim_table_dg', dg.stim_table),
             ('sweep_response_dg', dg.sweep_response),
@@ -81,7 +81,7 @@ class CamAnalysis(object):
     
         
     def save_session_b(self, sg, nm1, ns, peak): 
-        nwb = CamNwbDataSet(self.save_path)
+        nwb = BrainObservatoryNwbDataSet(self.save_path)
         nwb.save_analysis_dataframes(
             ('stim_table_sg', sg.stim_table),
             ('sweep_response_sg', sg.sweep_response),
@@ -104,7 +104,7 @@ class CamAnalysis(object):
     
     
     def save_session_c(self, lsn, nm1, nm2, peak):                
-        nwb = CamNwbDataSet(self.save_path)
+        nwb = BrainObservatoryNwbDataSet(self.save_path)
         nwb.save_analysis_dataframes(
             ('stim_table_lsn', lsn.stim_table),
             ('sweep_response_nm1', nm1.sweep_response),
@@ -143,17 +143,17 @@ class CamAnalysis(object):
 
     def verify_roi_lists_equal(self, roi1, roi2):
         if len(roi1) != len(roi2):
-            raise CamAnalysisException("Error -- ROI lists are of different length")
+            raise BrainObservatoryAnalysisException("Error -- ROI lists are of different length")
         for i in range(len(roi1)):
             if roi1[i] != roi2[i]:
-                raise CamAnalysisException("Error -- ROI lists have different entries")
+                raise BrainObservatoryAnalysisException("Error -- ROI lists have different entries")
     
     def session_a(self, plot_flag=False, save_flag=True):
         nm1 = NaturalMovie(self, 'natural_movie_one')      
         nm3 = NaturalMovie(self, 'natural_movie_three')    
         dg = DriftingGrating(self)
 
-        CamAnalysis._log.info("Session A analyzed")
+        BrainObservatoryAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
         
 
@@ -173,7 +173,7 @@ class CamAnalysis(object):
         sg = StaticGrating(self)    
         ns = NaturalScenes(self)
         nm1 = NaturalMovie(self, 'natural_movie_one')            
-        CamAnalysis._log.info("Session B analyzed")
+        BrainObservatoryAnalysis._log.info("Session B analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, sg.peak, ns.peak, nm1.peak])
         self.append_metadata(peak)
 
@@ -194,7 +194,7 @@ class CamAnalysis(object):
         lsn = LocallySparseNoise(self)
         nm2 = NaturalMovie(self, 'natural_movie_two')
         nm1 = NaturalMovie(self, 'natural_movie_one')
-        CamAnalysis._log.info("Session C analyzed")
+        BrainObservatoryAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_metadata(peak)
                 
@@ -209,28 +209,28 @@ class CamAnalysis(object):
             self.save_session_c(lsn, nm1, nm2, peak)
     
                     
-def run_cam_analysis(session, nwb_path, save_path, metadata=None, plot_flag=False):
+def run_brain_observatory_analysis(session, nwb_path, save_path, metadata=None, plot_flag=False):
     save_dir = os.path.dirname(save_path)
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    cam_analysis = CamAnalysis(nwb_path, save_path, metadata)
+    brain_observatory_analysis = BrainObservatoryAnalysis(nwb_path, save_path, metadata)
     try:
-        session = cam_analysis.nwb.get_session_type()
-        print("** Able to read session type from NWB file. Deprecate 'session' argument from run_cam_analysis()")
+        session = brain_observatory_analysis.nwb.get_session_type()
+        print("** Able to read session type from NWB file. Deprecate 'session' argument from run_brain_observatory_analysis()")
     except:
         pass
 
-    if session == CamAnalysis.SESSION_A:
-        cam_analysis.session_a(plot_flag)
-        metrics = cam_analysis.metrics_a
-    elif session == CamAnalysis.SESSION_B:
-        cam_analysis.session_b(plot_flag)
-        metrics = cam_analysis.metrics_b
-    elif session == CamAnalysis.SESSION_C:
-        cam_analysis.session_c(plot_flag)
-        metrics = cam_analysis.metrics_c
+    if session == BrainObservatoryAnalysis.SESSION_A:
+        brain_observatory_analysis.session_a(plot_flag)
+        metrics = brain_observatory_analysis.metrics_a
+    elif session == BrainObservatoryAnalysis.SESSION_B:
+        brain_observatory_analysis.session_b(plot_flag)
+        metrics = brain_observatory_analysis.metrics_b
+    elif session == BrainObservatoryAnalysis.SESSION_C:
+        brain_observatory_analysis.session_c(plot_flag)
+        metrics = brain_observatory_analysis.metrics_c
     else:
         raise IndexError("Unknown session: %s" % session)
 
@@ -242,7 +242,7 @@ def main():
     parser.add_argument("--output_nwb", default=None)
 
     # TODO: unhardcode
-    parser.add_argument("--session", default=CamAnalysis.SESSION_A)
+    parser.add_argument("--session", default=BrainObservatoryAnalysis.SESSION_A)
     parser.add_argument("--plot", action='store_true')
 
     # meta data
@@ -264,7 +264,7 @@ def main():
     if args.depth is not None:
         metadata['depth'] = args.depth
 
-    run_cam_analysis(args.session, args.input_nwb, args.output_nwb, metadata, args.plot)
+    run_brain_observatory_analysis(args.session, args.input_nwb, args.output_nwb, metadata, args.plot)
 
 
 if __name__=='__main__': main()

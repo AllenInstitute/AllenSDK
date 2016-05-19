@@ -3,7 +3,7 @@ import allensdk.core.json_utilities as ju
 from allensdk.api.cache import Cache
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.core.cam_nwb_data_set import CamNwbDataSet
+from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import pandas as pd
 
 class BrainObservatoryCache(Cache):
@@ -110,7 +110,7 @@ class BrainObservatoryCache(Cache):
         if not os.path.exists(file_name):
             self.api.save_ophys_experiment_data(ophys_experiment_id, file_name)
 
-        return CamNwbDataSet(file_name)
+        return BrainObservatoryNwbDataSet(file_name)
 
     
     def build_manifest(self, file_name):

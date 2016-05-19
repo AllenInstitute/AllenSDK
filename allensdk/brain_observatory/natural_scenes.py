@@ -13,18 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import scipy.stats as st
 import numpy as np
 import pandas as pd
-from allensdk.cam.o_p_analysis import OPAnalysis
+from allensdk.brain_observatory.o_p_analysis import OPAnalysis
 import logging
 
 class NaturalScenes(OPAnalysis):
-    _log = logging.getLogger('allensdk.cam.natural_scenes')    
+    _log = logging.getLogger('allensdk.brain_observatory.natural_scenes')    
     
-    def __init__(self, cam_analysis, **kwargs):
-        super(NaturalScenes, self).__init__(cam_analysis, **kwargs)
-        self.stim_table = self.cam_analysis.nwb.get_natural_scenes_stimulus_table()
+    def __init__(self, brain_observatory_analysis, **kwargs):
+        super(NaturalScenes, self).__init__(brain_observatory_analysis, **kwargs)
+        self.stim_table = self.brain_observatory_analysis.nwb.get_natural_scenes_stimulus_table()
         self.number_scenes = len(np.unique(self.stim_table.frame))
         self.sweeplength = self.stim_table.end.iloc[1] - self.stim_table.start.iloc[1]
         self.interlength = 4 * self.sweeplength
