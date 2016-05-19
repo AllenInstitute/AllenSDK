@@ -27,7 +27,7 @@ UP_SHIFT = 3
 class Mask(object):
     '''
     Abstract class to represent image segmentation mask. Its two
-    main subclasses are ROI_Mask and Neuropil_Mask. The former represents
+    main subclasses are RoiMask and NeuropilMask. The former represents
     the mask of a region of interest (ROI), such as a cell observed in 
     2-photon imaging. The latter represents the neuropil around that cell,
     and is useful when subtracting the neuropil signal from the measured
@@ -95,7 +95,7 @@ class Mask(object):
 
 def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, label=None, mask_group=-1):
     '''
-    Conveninece function to create and initializes an ROI_Mask
+    Conveninece function to create and initializes an RoiMask
 
     Arguments
     ---------
@@ -136,9 +136,9 @@ def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, labe
 
     Returns
     -------
-        ROI_Mask object
+        RoiMask object
     '''
-    m = ROI_Mask(image_w, image_h, label, mask_group)
+    m = RoiMask(image_w, image_h, label, mask_group)
     if pix_list is not None:
         m.init_by_pixels(border, pix_list)
     elif roi_mask is not None:
@@ -148,10 +148,10 @@ def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, labe
     return m
 
 
-class ROI_Mask(Mask):
+class RoiMask(Mask):
     def __init__(self, image_w, image_h, label, mask_group):
         '''
-        ROI_Mask class constructor
+        RoiMask class constructor
 
         Arguments
         ---------
@@ -167,7 +167,7 @@ class ROI_Mask(Mask):
             mask_group: integer
             User-defined number to help put masks into different categories
         '''
-        super(ROI_Mask, self).__init__(image_w, image_h, label, mask_group)
+        super(RoiMask, self).__init__(image_w, image_h, label, mask_group)
 
     def init_by_pixels(self, border, pix_list):
         '''
@@ -255,7 +255,7 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
     Arguments
     ---------
 
-        roi: ROI_Mask object
+        roi: RoiMask object
         The ROI that the neuropil masks will be based on
 
         border: float[4]
@@ -275,7 +275,7 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
 
     Returns
     -------
-        Neuropil_Mask object
+        NeuropilMask object
     '''
     # combined_binary_mask is a bitmap union of ALL ROI masks
     # create a binary mask of the ROI
@@ -287,15 +287,15 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
     # eliminate ROIs from the dilation
     binary_mask_dilated = binary_mask_dilated > combined_binary_mask
     # create mask from binary dilation
-    m = Neuropil_Mask(w=roi.img_cols, h=roi.img_rows, label=label, mask_group=roi.mask_group)
+    m = NeuropilMask(w=roi.img_cols, h=roi.img_rows, label=label, mask_group=roi.mask_group)
     m.init_by_mask(border, binary_mask_dilated)
     return m
 
 
-class Neuropil_Mask(Mask):
+class NeuropilMask(Mask):
     def __init__(self, w, h, label, mask_group):
         '''
-        Neuropil_Mask class constructor. This class should be created by
+        NeuropilMask class constructor. This class should be created by
         calling create_neuropil_mask()
 
         Arguments
@@ -306,7 +306,7 @@ class Neuropil_Mask(Mask):
             mask_group: integer
             User-defined number to help put masks into different categories
         '''
-        super(Neuropil_Mask, self).__init__(w, h, label, mask_group)
+        super(NeuropilMask, self).__init__(w, h, label, mask_group)
 
 
     def init_by_pixels(self, border, pix_list):
