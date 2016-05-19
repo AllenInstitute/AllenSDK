@@ -23,6 +23,37 @@ For more details on experimental design and data processing, please refer to the
 Visual Stimuli
 --------------
 
+**Locally sparse noise**
+
+Locally sparse noise stimuli consist of several black and/or white squares placed in random locations on a gray background.
+The displayed image was warped when displayed to help compensate for angular differences in square size when displayed on a flat monitor (e.g., the left and right edges of the display were magnified to compensate for this part of the monitor being further way from the mouse).
+
+.. image:: images/locally_sparse_noise.png
+
+**Natural scenes**
+
+A variety of natural images were presented. These include things like flowers, animals and outdoor scenes.
+
+.. image:: images/natural_scenes.png
+
+**Natural movie**
+
+Parts of the Orson Welles movie 'Touch of Evil' were shown. Popcorn was not provided.
+
+.. image:: images/natural_movie.png
+
+**Drifting grating**
+
+Moving gratings with different orientation, spatial and temporal frequency were presented.
+
+.. image:: images/animated_drifting_grating.gif
+
+**Static grating**
+
+Non-moving gratings with similar variation in orientation, spatial and temporal frequency were also shown.
+
+.. image:: images/static_250px_sfreq_0.04.png
+
 
 
 Code Samples
@@ -44,5 +75,6 @@ started with analysis:
 NWB File
 --------
 
-details here
+Details about the data files available for download is `here <cam_nwb.html>`_.
+
 
