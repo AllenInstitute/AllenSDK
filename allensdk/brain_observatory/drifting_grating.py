@@ -13,14 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from o_p_analysis import OPAnalysis
+from stimulus_analysis import StimulusAnalysis
 import scipy.stats as st
 import pandas as pd
 import numpy as np
 from math import sqrt
 import logging
 
-class DriftingGrating(OPAnalysis):
+class DriftingGrating(StimulusAnalysis):
     _log = logging.getLogger('allensdk.brain_observatory.drifting_grating')    
 
     def __init__(self, brain_observatory_analysis, **kwargs):

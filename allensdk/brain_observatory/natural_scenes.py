@@ -17,10 +17,10 @@
 import scipy.stats as st
 import numpy as np
 import pandas as pd
-from allensdk.brain_observatory.o_p_analysis import OPAnalysis
+from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 import logging
 
-class NaturalScenes(OPAnalysis):
+class NaturalScenes(StimulusAnalysis):
     _log = logging.getLogger('allensdk.brain_observatory.natural_scenes')    
     
     def __init__(self, brain_observatory_analysis, **kwargs):

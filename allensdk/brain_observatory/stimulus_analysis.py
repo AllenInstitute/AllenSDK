@@ -22,8 +22,8 @@ from allensdk.brain_observatory.findlevel import findlevel
 from allensdk.brain_observatory.brain_observatory_exceptions import \
     BrainObservatoryAnalysisException
 
-class OPAnalysis(object):
-    _log = logging.getLogger('allensdk.brain_observatory.o_p_analysis')    
+class StimulusAnalysis(object):
+    _log = logging.getLogger('allensdk.brain_observatory.stimulus_analysis')
     
     def __init__(self, brain_observatory_analysis,
                  **kwargs):
@@ -52,7 +52,7 @@ class OPAnalysis(object):
         return self.dfftraces
     
     def get_speed_tuning(self, binsize):
-        OPAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')
+        StimulusAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')
         
         celltraces_trimmed = np.delete(self.celltraces_dff, range(len(self.dxcm), np.size(self.celltraces_dff,1)), axis=1) 
 
@@ -202,7 +202,7 @@ class OPAnalysis(object):
             (_, p) = st.f_oneway(x[:self.interlength], x[self.interlength:self.interlength+self.sweeplength+self.extralength])
             return p
             
-        OPAnalysis._log.info('Calculating responses for each sweep')        
+        StimulusAnalysis._log.info('Calculating responses for each sweep')        
         sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(range(self.numbercells+1)).astype(str))
         sweep_response.rename(columns={str(self.numbercells) : 'dx'}, inplace=True)
         for index, row in self.stim_table.iterrows():

@@ -19,12 +19,12 @@ import numpy as np
 import pandas as pd
 from math import sqrt
 import logging
-from allensdk.brain_observatory.o_p_analysis import OPAnalysis
+from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 from allensdk.brain_observatory.brain_observatory_exceptions \
     import BrainObservatoryAnalysisException
 
 
-class StaticGrating(OPAnalysis):
+class StaticGrating(StimulusAnalysis):
     _log = logging.getLogger('allensdk.brain_observatory.static_grating')        
     
     def __init__(self, brain_observatory_analysis, **kwargs):

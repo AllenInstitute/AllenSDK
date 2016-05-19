@@ -16,9 +16,9 @@
 import scipy.stats as st
 import pandas as pd
 import numpy as np
-from allensdk.brain_observatory.o_p_analysis import OPAnalysis
+from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 
-class NaturalMovie(OPAnalysis):    
+class NaturalMovie(StimulusAnalysis):    
     def __init__(self, brain_observatory_analysis, movie_name, **kwargs):
         super(NaturalMovie, self).__init__(brain_observatory_analysis, **kwargs)                   
         stimulus_table = self.brain_observatory_analysis.nwb.get_natural_movie_stimulus_table(movie_name)
