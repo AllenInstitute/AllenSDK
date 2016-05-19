@@ -42,7 +42,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'OphysExperiment',
              'criteria': '{% if ophys_experiment_ids is defined %}[id$in{{ ophys_experiment_ids }}]{%endif%}',
-             'include': 'well_known_files(well_known_file_type),targeted_structure,specimen(donor(transgenic_lines))',
+             'include': 'well_known_files(well_known_file_type),targeted_structure,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD]))',
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['ophys_experiment_ids']
@@ -82,7 +82,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'ExperimentContainer',
              'criteria': '{% if experiment_container_ids is defined %}[id$in{{ experiment_container_ids }}]{%endif%}',
-             'include': 'ophys_experiments,isi_experiment,specimen(donor(transgenic_lines)),targeted_structure',
+             'include': 'ophys_experiments,isi_experiment,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD])),targeted_structure',
              'num_rows': 'all',
              'count': False, 
              'criteria_params': ['experiment_container_ids']
@@ -239,7 +239,7 @@ class BrainObservatoryApi(RmaTemplate):
         data = self.template_query('brain_observatory_queries',
                                    'cell_metric',
                                    cell_specimen_ids=cell_specimen_ids)
-        
+
         return data
     
     
@@ -312,15 +312,21 @@ class BrainObservatoryApi(RmaTemplate):
 
     def filter_ophys_experiments(self, experiments, experiment_container_ids=None,
                                  targeted_structures=None, imaging_depths=None, 
-                                 transgenic_lines=None):
+                                 transgenic_lines=None, stimulus_names=None):
 
         # re-using the code from above
         experiments = self.filter_experiment_containers(experiments, targeted_structures, imaging_depths, transgenic_lines)
 
         if experiment_container_ids is not None:
             experiments = [ e for e in experiments if e['experiment_container_id'] in experiment_container_ids ]
+            
+        if stimulus_names is not None:
+            experiments = [ e for e in experiments if e['stimulus_name'] in stimulus_names ]
 
         return experiments
+
+    def filter_cell_specimens(self, cell_specimens):
+        return cell_specimens
 
     
 if __name__ == '__main__':
