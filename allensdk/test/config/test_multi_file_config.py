@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-#import allensdk.eclipse_debug
 import pytest
 from mock import patch, mock_open
 from allensdk.config.model.description_parser import DescriptionParser
