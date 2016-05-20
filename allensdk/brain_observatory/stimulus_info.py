@@ -28,3 +28,6 @@ def stimuli_in_session(session):
         Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C]
     """
     return SESSION_STIMULUS_MAP[session]
+
+def all_stimuli():
+    return set([ v for k,vl in SESSION_STIMULUS_MAP.iteritems() for v in vl ])

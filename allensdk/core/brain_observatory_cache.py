@@ -4,6 +4,7 @@ from allensdk.api.cache import Cache
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+import allensdk.brain_observatory.stimulus_info as stim_info
 import pandas as pd
 
 
@@ -58,16 +59,56 @@ class BrainObservatoryCache(Cache):
         return sorted(list(cre_lines))
 
 
+    def get_imaging_depths(self):
+        """ Return a list of all imaging depths in the data set. """
+        containers = self.get_experiment_containers(simple=False)
+        imaging_depths = set([ c['imaging_depth'] for c in containers ])
+        return sorted(list(imaging_depths))
+
+
     def get_stimulus_session_names(self):
         """ Return a list of all stimulus sessions in the data set. """
         exps = self.get_ophys_experiments()
         names = set([ exp['stimulus_name'] for exp in exps ])
         return sorted(list(names))
 
+
+    def get_stimuli(self):
+        """ Return a list of all stimuli in the data set. """
+        return sorted(list(stim_info.all_stimuli()))
     
+
     def get_experiment_containers(self, file_name=None, targeted_structures=None, 
                                   imaging_depths=None, cre_lines=None, simple=True):
-        """ Get a list of experiment containers matching certain criteria """
+        """ Get a list of experiment containers matching certain criteria.
+        
+        Parameters
+        ----------
+        file_name: string
+            File name to save/read the experiment containers.  If file_name is None, 
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+
+        targeted_structures: list
+            List of structure acronyms.  Must be in the list returned by 
+            BrainObservatoryCache.get_targeted_structures().
+
+        imaging_depths: list
+            List of imaging depths.  Must be in the list returned by 
+            BrainObservatoryCache.get_imaging_depths().
+
+        cre_lines: list
+            List of cre lines.  Must be in the list returned by 
+            BrainObservatoryCache.get_cre_lines().
+
+        simple: boolean
+            Whether or not to simplify the dictionary properties returned by this method
+            to a more concise subset.
+
+        Returns
+        -------
+        list of dictionaries
+        """
         file_name = self.get_cache_path(file_name, self.EXPERIMENT_CONTAINERS_KEY)
 
         if os.path.exists(file_name):
@@ -95,7 +136,46 @@ class BrainObservatoryCache(Cache):
     def get_ophys_experiments(self, file_name=None, experiment_container_ids=None,
                               targeted_structures=None, imaging_depths=None, cre_lines=None,
                               stimuli=None, stimulus_sessions=None, simple=True):
+        """ Get a list of ophys experiments matching certain criteria.
+        
+        Parameters
+        ----------
+        file_name: string
+            File name to save/read the ophys experiments.  If file_name is None, 
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
 
+        experiment_container_ids: list
+            List of experiment container ids.
+
+        targeted_structures: list
+            List of structure acronyms.  Must be in the list returned by 
+            BrainObservatoryCache.get_targeted_structures().
+
+        imaging_depths: list
+            List of imaging depths.  Must be in the list returned by 
+            BrainObservatoryCache.get_imaging_depths().
+
+        cre_lines: list
+            List of cre lines.  Must be in the list returned by 
+            BrainObservatoryCache.get_cre_lines().
+
+        stimuli: list
+            List of stimulus names.  Must be in the list returned by 
+            BrainObservatoryCache.get_stimuli().
+
+        stimulus_sessions: list
+            List of stimulus session names.  Must be in the list returned by 
+            BrainObservatoryCache.get_stimulus_session_names().
+
+        simple: boolean
+            Whether or not to simplify the dictionary properties returned by this method
+            to a more concise subset.
+
+        Returns
+        -------
+        list of dictionaries
+        """
         file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
 
         if os.path.exists(file_name):
@@ -123,6 +203,9 @@ class BrainObservatoryCache(Cache):
 
 
     def get_stimulus_mappings(self, file_name=None):
+        """ Returns a mapping of which metrics are related to which stimuli. 
+        Primarily for internal use. """
+
         file_name = self.get_cache_path(file_name, self.STIMULUS_MAPPINGS_KEY)
 
         if os.path.exists(file_name):
@@ -137,6 +220,27 @@ class BrainObservatoryCache(Cache):
 
 
     def get_cell_specimens(self, file_name=None, ophys_experiment_ids=None, simple=True):
+        """ Return cell specimens that have certain properies.
+        
+        Parameters
+        ----------
+        file_name: string
+            File name to save/read the cell specimens.  If file_name is None, 
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+
+        ophys_experiment_ids: list
+            List of ophys experiment ids.
+            
+        simple: boolean
+            Whether or not to simplify the dictionary properties returned by this method
+            to a more concise subset.
+            
+        Returns
+        -------
+        list of dictionaries
+        """
+
         file_name = self.get_cache_path(file_name, self.CELL_SPECIMENS_KEY)
 
         if os.path.exists(file_name):
@@ -161,6 +265,23 @@ class BrainObservatoryCache(Cache):
 
     
     def get_ophys_experiment_data(self, ophys_experiment_id, file_name=None):
+        """ Download the NWB file for an ophys_experiment (if it hasn't already been
+        downloaded) and return a data accessor object.
+
+        Parameters
+        ----------
+        file_name: string
+            File name to save/read the data set.  If file_name is None, 
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.        
+
+        ophys_experiment_id: integer
+            id of the ophys_experiment to retrieve
+            
+        Returns
+        -------
+        BrainObservatoryNwbDataSet
+        """
         file_name = self.get_cache_path(file_name, self.EXPERIMENT_DATA_KEY, ophys_experiment_id)
 
         if not os.path.exists(file_name):
