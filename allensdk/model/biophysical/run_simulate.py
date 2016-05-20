@@ -56,8 +56,7 @@ class RunSimulate(object):
         
         lims_upload_config = BiophysicalModuleReader()
         lims_upload_config.read_json(self.manifest.get_path('neuronal_model_run_data'))
-        lims_upload_config.update_well_known_file(BiophysicalModuleReader.STIMULUS_CONTENT_TYPE,
-                                                  out_path)
+        lims_upload_config.update_well_known_file(out_path)
         lims_upload_config.set_workflow_state('passed')
         lims_upload_config.write_file(self.output_json)
     
