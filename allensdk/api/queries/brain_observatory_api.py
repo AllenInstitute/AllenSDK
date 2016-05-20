@@ -16,9 +16,33 @@
 import os
 from allensdk.api.queries.rma_template import RmaTemplate
 from allensdk.config.manifest import Manifest
+import logging
 
 class BrainObservatoryApi(RmaTemplate):
+    _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')
+
     NWB_FILE_TYPE = 'NWBOphys'
+
+    # some handles for stimulus types
+    DRIFTING_GRATINGS = 'drifting_gratings'
+    STATIC_GRATINGS = 'static_gratings'
+    NATURAL_MOVIE_ONE = 'natural_movie_one'
+    NATURAL_MOVIE_TWO = 'natural_movie_two'
+    NATURAL_MOVIE_THREE = 'natural_movie_three'
+    NATURAL_SCENES = 'natural_scenes'
+    LOCALLY_SPARSE_NOISE = 'locally_sparse_noise'
+    SPONTANEOUS_ACTIVITY = 'spontaneous_activity'
+
+    # handles for stimulus names
+    THREE_SESSION_A = 'three_session_A'
+    THREE_SESSION_B = 'three_session_B'
+    THREE_SESSION_C = 'three_session_C'
+
+    SESSION_STIMULUS_MAP = {
+        THREE_SESSION_A: [ DRIFTING_GRATINGS, NATURAL_MOVIE_ONE, NATURAL_MOVIE_THREE, SPONTANEOUS_ACTIVITY ],
+        THREE_SESSION_B: [ STATIC_GRATINGS, NATURAL_SCENES, NATURAL_MOVIE_ONE, SPONTANEOUS_ACTIVITY ],
+        THREE_SESSION_C: [ LOCALLY_SPARSE_NOISE, NATURAL_MOVIE_ONE, NATURAL_MOVIE_TWO, SPONTANEOUS_ACTIVITY ]
+        }
 
     rma_templates = \
         {"brain_observatory_queries": [
@@ -294,6 +318,8 @@ class BrainObservatoryApi(RmaTemplate):
         except Exception as _:
             raise Exception("ophys experiment %d has no data file" % ophys_experiment_id)
 
+        self._log.warning("Downloading ophys_experiment %d NWB." % ophys_experiment_id)
+
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
         
 
@@ -312,7 +338,7 @@ class BrainObservatoryApi(RmaTemplate):
 
     def filter_ophys_experiments(self, experiments, experiment_container_ids=None,
                                  targeted_structures=None, imaging_depths=None, 
-                                 transgenic_lines=None, stimulus_names=None):
+                                 transgenic_lines=None, stimuli=None):
 
         # re-using the code from above
         experiments = self.filter_experiment_containers(experiments, targeted_structures, imaging_depths, transgenic_lines)
@@ -320,8 +346,9 @@ class BrainObservatoryApi(RmaTemplate):
         if experiment_container_ids is not None:
             experiments = [ e for e in experiments if e['experiment_container_id'] in experiment_container_ids ]
             
-        if stimulus_names is not None:
-            experiments = [ e for e in experiments if e['stimulus_name'] in stimulus_names ]
+        if stimuli is not None:
+            experiments = [ e for e in experiments 
+                            if len(set(stimuli) & set(self.SESSION_STIMULUS_MAP[e['stimulus_name']])) > 0 ]
 
         return experiments
 

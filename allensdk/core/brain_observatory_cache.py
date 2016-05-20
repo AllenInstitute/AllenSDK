@@ -6,13 +6,16 @@ from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import pandas as pd
 
+
+
+
 class BrainObservatoryCache(Cache):
     EXPERIMENT_CONTAINERS_KEY = 'EXPERIMENT_CONTAINERS'
     EXPERIMENTS_KEY = 'EXPERIMENTS'
     CELL_SPECIMENS_KEY = 'CELL_SPECIMENS'
     EXPERIMENT_DATA_KEY = 'EXPERIMENT_DATA'
     STIMULUS_MAPPINGS_KEY = 'STIMULUS_MAPPINGS'
-
+    
     def __init__(self, cache=True, manifest_file='brain_observatory_manifest.json', base_uri=None):
         super(BrainObservatoryCache, self).__init__(manifest=manifest_file, cache=cache)
         self.api = BrainObservatoryApi(base_uri=base_uri)
@@ -52,7 +55,7 @@ class BrainObservatoryCache(Cache):
 
     def get_ophys_experiments(self, file_name=None, experiment_container_ids=None,
                               targeted_structures=None, imaging_depths=None, transgenic_lines=None,
-                              stimulus_names=None):
+                              stimuli=None):
         file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
 
         if os.path.exists(file_name):
@@ -64,7 +67,7 @@ class BrainObservatoryCache(Cache):
                 ju.write(file_name, exps)
 
         return self.api.filter_ophys_experiments(exps, experiment_container_ids, targeted_structures, 
-                                                 imaging_depths, transgenic_lines, stimulus_names)
+                                                 imaging_depths, transgenic_lines, stimuli)
 
 
     def get_stimulus_mappings(self, file_name=None):
