@@ -303,7 +303,8 @@ class BrainObservatoryApi(RmaTemplate):
                                    experiment_container_metric_ids=experiment_container_metric_ids)
         
         return data
-
+    
+    
     def save_ophys_experiment_data(self, ophys_experiment_id, file_name):
         dirname = os.path.dirname(file_name)
         Manifest.safe_mkdir(dirname)
@@ -322,7 +323,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
         
-
+    
     def filter_experiment_containers(self, containers, targeted_structures=None, imaging_depths=None, transgenic_lines=None):
         if targeted_structures is not None:
             containers = [ c for c in containers if c['targeted_structure']['acronym'] in targeted_structures ]
@@ -334,8 +335,8 @@ class BrainObservatoryApi(RmaTemplate):
             containers = [ c for c in containers for tl in c['specimen']['donor']['transgenic_lines'] if tl['name'] in transgenic_lines ]
 
         return containers
-
-
+    
+    
     def filter_ophys_experiments(self, experiments, experiment_container_ids=None,
                                  targeted_structures=None, imaging_depths=None, 
                                  transgenic_lines=None, stimuli=None):
@@ -354,23 +355,3 @@ class BrainObservatoryApi(RmaTemplate):
 
     def filter_cell_specimens(self, cell_specimens):
         return cell_specimens
-
-    
-if __name__ == '__main__':
-    from allensdk.api.api import Api
-    from allensdk.api.queries.brain_observatory_api \
-        import BrainObservatoryApi
-    import pandas as pd
-        
-    host = 'http://testwarehouse:9000'
-    Api.default_api_url = host
-    bapi = BrainObservatoryApi()
-    
-    
-    #names = brain_observatory_api.list_column_definition_class_names()
-    
-    print(len(bapi.get_experiment_containers()))
-    
-
-
-    

@@ -1,10 +1,25 @@
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 from allensdk.api.queries.brain_observatory_api \
     import BrainObservatoryApi
 
 import pytest
-from mock import MagicMock
-    
-    
+from mock import patch, MagicMock
+
+
 @pytest.fixture
 def bo_api():
     bo = BrainObservatoryApi('http://testwarehouse:9000')
@@ -12,6 +27,57 @@ def bo_api():
     
     return bo
 
+
+@pytest.fixture
+def bo_api_save_ophys():
+    bo = BrainObservatoryApi('http://testwarehouse:9000')
+    bo.json_msg_query = MagicMock(name='json_msg_query', return_value=[ {'download_link': '/url/path/to/file' } ])
+    
+    return bo
+
+
+@pytest.fixture
+def mock_containers():
+    containers = [
+            { 'targeted_structure': { 'acronym': 'CBS' },
+              'imaging_depth': 100,
+              'specimen': { 'donor' : { 'transgenic_lines': [ { 'name': 'Shiny' }] } }
+            },
+            { 'targeted_structure': { 'acronym': 'NBC' },
+              'imaging_depth': 200,
+              'specimen': { 'donor' : { 'transgenic_lines': [ { 'name': 'Don' }] } }
+            }
+        ]
+
+    return containers
+
+
+@pytest.fixture
+def mock_ophys_experiments():
+    containers = [
+            { 'experiment_container_id': 1,
+              'targeted_structure': { 'acronym': 'CBS' },
+              'imaging_depth': 100,
+              'specimen': { 'donor' : { 'transgenic_lines': [ { 'name': 'Shiny' }] } },
+              'stimulus_name': 'three_session_B'
+            },
+            { 'experiment_container_id': 2,
+              'targeted_structure': { 'acronym': 'NBC' },
+              'imaging_depth': 200,
+              'specimen': { 'donor' : { 'transgenic_lines': [ { 'name': 'Don' }] } },
+              'stimulus_name': 'three_session_C'              
+            }
+        ]
+
+    return containers
+
+
+@pytest.fixture
+def mock_specimens():
+    specimens = [ 'stub']
+    
+    return specimens
+    
     
 def test_list_isi_experiments(bo_api):
     bo_api.list_isi_experiments()
@@ -99,4 +165,61 @@ def test_get_cell_metrics_two_ids(bo_api):
     ids = [517394843,517394850]
     bo_api.get_cell_metrics(cell_specimen_ids=ids)
     expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ApiCamCellMetric,rma::criteria,[cell_specimen_id$in517394843,517394850],rma::options[num_rows$eq'all'][count$eqfalse]"     
-    bo_api.json_msg_query.assert_called_once_with(expected)    
+    bo_api.json_msg_query.assert_called_once_with(expected)
+    
+    
+def test_filter_experiment_containers_no_filters(bo_api, mock_containers):
+    containers = bo_api.filter_experiment_containers(mock_containers)
+    assert len(containers) == 2
+
+    
+def test_filter_experiment_containers_depth_filter(bo_api, mock_containers):
+    containers = bo_api.filter_experiment_containers(mock_containers, imaging_depths=[100])
+    assert len(containers) == 1
+
+
+def test_filter_experiment_containers_structures_filter(bo_api, mock_containers):
+    containers = bo_api.filter_experiment_containers(mock_containers, targeted_structures=['CBS'])
+    assert len(containers) == 1
+
+
+def test_filter_experiment_containers_lines_all_filters(bo_api, mock_containers):
+    containers = bo_api.filter_experiment_containers(mock_containers,
+                                                     imaging_depths=[200],
+                                                     targeted_structures=['NBC'],
+                                                     transgenic_lines=['Don'])
+    assert len(containers) == 1
+
+
+def test_filter_ophys_experiments_no_filters(bo_api, mock_ophys_experiments):
+    experiments = bo_api.filter_ophys_experiments(mock_ophys_experiments)
+    assert len(experiments) == 2
+    
+    
+def test_filter_ophys_experiments_container_id(bo_api, mock_ophys_experiments):
+    experiments = bo_api.filter_ophys_experiments(mock_ophys_experiments, experiment_container_ids=[1])
+    assert len(experiments) == 1
+
+
+def test_filter_ophys_experiments_stimuli(bo_api, mock_ophys_experiments):
+    experiments = bo_api.filter_ophys_experiments(mock_ophys_experiments, stimuli=['static_gratings'])
+    assert len(experiments) == 1
+
+
+def test_filter_cell_specimens(bo_api, mock_specimens):
+    specimens = bo_api.filter_cell_specimens(mock_specimens)
+    assert specimens == mock_specimens
+
+
+def test_save_ophys_experiment_data(bo_api_save_ophys):
+    bo_api = bo_api_save_ophys
+    
+    with patch('allensdk.config.manifest.Manifest.safe_mkdir') as mkdir:
+        bo_api.retrieve_file_over_http = MagicMock(name='retrieve_file_over_http')
+        bo_api.save_ophys_experiment_data(1, '/path/to/filename')
+        
+        mkdir.assert_called_once_with('/path/to')
+    
+    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::WellKnownFile,rma::criteria,[attachable_id$eq1],well_known_file_type[name$eqNWBOphys],rma::options[num_rows$eq'all'][count$eqfalse]"
+    bo_api.json_msg_query.assert_called_once_with(expected)
+    bo_api.retrieve_file_over_http.assert_called_with('http://testwarehouse:9000/url/path/to/file', '/path/to/filename')
