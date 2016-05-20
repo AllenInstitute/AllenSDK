@@ -6,7 +6,16 @@ from scipy.stats import linregress as linregress
 
 
 def get_diagonals_from_sparse(mat):
-    '''assume mat is a scipy.sparse matrix, return dictionary of diagonals keyed by offsets'''
+    ''' Returns a dictionary of diagonals keyed by offsets
+
+    Parameters
+    ----------
+    mat: scipy.sparse matrix
+
+    Returns
+    -------
+    dictionary: diagonals keyed by offsets
+    '''
 
     mat_dia = mat.todia()  #make sure the matrix is in diagonal format
 
@@ -21,8 +30,16 @@ def get_diagonals_from_sparse(mat):
     return mat_dict
 
 def ab_from_diagonals(mat_dict):
-    '''use a dictionary of diagonals keyed by offsets to construct 'ab' for scipy.linalg.solve_banded'''
+    ''' Constructs value for scipy.linalg.solve_banded
 
+    Parameters
+    ----------
+    mat_dict: dictionary of diagonals keyed by offsets
+
+    Returns
+    -------
+    ab: value for scipy.linalg.solve_banded
+    '''
     offsets = mat_dict.keys()
     l = -np.min(offsets)
     u = np.max(offsets)
@@ -78,6 +95,8 @@ class NeuropilSubtract (object):
         self.ab = ab
         
     def set_F(self,F_M,F_N,F_M_crossval,F_N_crossval):
+        ''' Internal initializatin routine
+        '''
         self.F_M = F_M
         self.F_N = F_N
         self.F_M_crossval = F_M_crossval
@@ -86,8 +105,9 @@ class NeuropilSubtract (object):
     
     #def fit_grad_desc_early_stop(self,r_init=0.001,learning_rate=0.1):
     def fit_grad_descent(self,r_init=0.001,learning_rate=0.1):
-        '''fit using gradient descent instead of iteratively computing exact solutions'''
-
+        ''' Calculate fit using gradient decent, as opposed to iteratively
+        computing exact solutions
+        '''
         delta_r = 1
         r = r_init
 
@@ -143,6 +163,22 @@ class NeuropilSubtract (object):
 # 'M' denotes ROI trace
 # 'N' denotes neuropil trace
 def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled):
+    ''' Calculates neuropil contamination of ROI
+
+    Parameters
+    ----------
+    F_M_unscaled: ROI trace
+
+    F_N_unscaled: Neuropil trace
+
+    Returns
+    -------
+    dictionary: key-value pairs
+        * 'r': the contamination ratio -- corrected trace = M - r*N
+        * 'err': RMS error
+        * 'min_error': minimum error
+        * 'bounds_error': boolean. True if error or R are outside tolerance
+    '''
 
     T = len(F_M_unscaled)
     assert T == len(F_N_unscaled), "Input arrays of different dimension"
