@@ -7,9 +7,32 @@ from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbData
 import pandas as pd
 
 
-
-
 class BrainObservatoryCache(Cache):
+    """
+    Cache class for storing and accessing data from the Brain Observatory.
+    By default, this class will cache any downloaded metadata or files in 
+    well known locations defined in a manifest file.  This behavior can be
+    disabled.
+
+    Attributes
+    ----------
+    
+    api: BrainObservatoryApi instance
+        The object used for making API queries related to the Brain Observatory.
+
+    Parameters
+    ----------
+    
+    cache: boolean
+        Whether the class should save results of API queries to locations specified
+        in the manifest file.  Queries for files (as opposed to metadata) must have a
+        file location.  If caching is disabled, those locations must be specified
+        in the function call (e.g. get_ophys_experiment_data(file_name='file.nwb')).
+
+    manifest_file: string
+       File name of the manifest to be read.  Default is "brain_observatory_manifest.json".
+    """
+
     EXPERIMENT_CONTAINERS_KEY = 'EXPERIMENT_CONTAINERS'
     EXPERIMENTS_KEY = 'EXPERIMENTS'
     CELL_SPECIMENS_KEY = 'CELL_SPECIMENS'
@@ -22,24 +45,29 @@ class BrainObservatoryCache(Cache):
         
 
     def get_targeted_structures(self):
-        containers = self.get_experiment_containers()
+        """ Return a list of all targeted structures in the data set. """
+        containers = self.get_experiment_containers(simple=False)
         targeted_structures = set([ c['targeted_structure']['acronym'] for c in containers])
         return sorted(list(targeted_structures))
 
 
-    def get_transgenic_lines(self):
-        containers = self.get_experiment_containers()
-        transgenic_lines = set([ tl['name'] for c in containers for tl in c['specimen']['donor']['transgenic_lines']])
-        return sorted(list(transgenic_lines))
+    def get_cre_lines(self):
+        """ Return a list of all cre driver lines in the data set. """
+        containers = self.get_experiment_containers(simple=False)
+        cre_lines = set([ _find_specimen_cre_line(c['specimen']) for c in containers ])
+        return sorted(list(cre_lines))
 
 
-    def get_stimulus_names(self):
+    def get_stimulus_session_names(self):
+        """ Return a list of all stimulus sessions in the data set. """
         exps = self.get_ophys_experiments()
-        stimulus_names = set([ exp['stimulus_name'] for exp in exps ])
-        return sorted(list(stimulus_names))
+        names = set([ exp['stimulus_name'] for exp in exps ])
+        return sorted(list(names))
 
-
-    def get_experiment_containers(self, file_name=None, targeted_structures=None, imaging_depths=None, transgenic_lines=None):
+    
+    def get_experiment_containers(self, file_name=None, targeted_structures=None, 
+                                  imaging_depths=None, cre_lines=None, simple=True):
+        """ Get a list of experiment containers matching certain criteria """
         file_name = self.get_cache_path(file_name, self.EXPERIMENT_CONTAINERS_KEY)
 
         if os.path.exists(file_name):
@@ -50,12 +78,23 @@ class BrainObservatoryCache(Cache):
             if self.cache:
                 ju.write(file_name, containers)
 
-        return self.api.filter_experiment_containers(containers, targeted_structures, imaging_depths, transgenic_lines)
+        containers = self.api.filter_experiment_containers(containers, targeted_structures, imaging_depths, cre_lines)
+
+        if simple:
+            containers = [ {
+                    'id': c['id'],
+                    'imaging_depth': c['imaging_depth'],
+                    'targeted_structure': c['targeted_structure']['acronym'],
+                    'cre_line': _find_specimen_cre_line(c['specimen']),
+                    'age_days': c['specimen']['donor']['age']['days']
+                    } for c in containers ]
+
+        return containers
 
 
     def get_ophys_experiments(self, file_name=None, experiment_container_ids=None,
-                              targeted_structures=None, imaging_depths=None, transgenic_lines=None,
-                              stimuli=None, sessions=None):
+                              targeted_structures=None, imaging_depths=None, cre_lines=None,
+                              stimuli=None, stimulus_sessions=None, simple=True):
 
         file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
 
@@ -67,8 +106,20 @@ class BrainObservatoryCache(Cache):
             if self.cache:
                 ju.write(file_name, exps)
 
-        return self.api.filter_ophys_experiments(exps, experiment_container_ids, targeted_structures, 
-                                                 imaging_depths, transgenic_lines, stimuli, sessions)
+        exps = self.api.filter_ophys_experiments(exps, experiment_container_ids, targeted_structures, 
+                                                 imaging_depths, cre_lines, stimuli, stimulus_sessions)
+
+        if simple:
+            exps = [ {
+                    'id': e['id'],
+                    'imaging_depth': e['imaging_depth'],
+                    'targeted_structure': e['targeted_structure']['acronym'],
+                    'cre_line': _find_specimen_cre_line(e['specimen']),
+                    'age_days': e['specimen']['donor']['age']['days'],
+                    'experiment_container_id': e['experiment_container_id'],
+                    'session_type': e['stimulus_name']
+                    } for e in exps ]
+        return exps
 
 
     def get_stimulus_mappings(self, file_name=None):
@@ -85,7 +136,7 @@ class BrainObservatoryCache(Cache):
         return mappings
 
 
-    def get_cell_specimens(self, file_name=None, ophys_experiment_ids=None):
+    def get_cell_specimens(self, file_name=None, ophys_experiment_ids=None, simple=True):
         file_name = self.get_cache_path(file_name, self.CELL_SPECIMENS_KEY)
 
         if os.path.exists(file_name):
@@ -96,16 +147,17 @@ class BrainObservatoryCache(Cache):
             if self.cache:
                 ju.write(file_name, cell_specimens)
 
-        # drop the thumbnail columns
-        mappings = self.get_stimulus_mappings()
-        thumbnails = [ m['item'] for m in mappings if m['item_type'] == 'T' and m['level'] == 'R']
-
         cell_specimens = self.api.filter_cell_specimens(cell_specimens)
         
-        df = pd.DataFrame.from_dict(cell_specimens)
-        df = df.drop(thumbnails, axis=1)
-
-        return df
+        # drop the thumbnail columns
+        if simple:
+            mappings = self.get_stimulus_mappings()
+            thumbnails = [ m['item'] for m in mappings if m['item_type'] == 'T' and m['level'] == 'R']
+            for cs in cell_specimens:
+                for t in thumbnails:
+                    del cs[t]
+                
+        return cell_specimens
 
     
     def get_ophys_experiment_data(self, ophys_experiment_id, file_name=None):
@@ -132,14 +184,16 @@ class BrainObservatoryCache(Cache):
         mb = ManifestBuilder()
 
         mb.add_path('BASEDIR', '.')
-        mb.add_path(self.EXPERIMENT_CONTAINERS_KEY, 'experiment_containers.csv', typename='file', parent_key='BASEDIR')
-        mb.add_path(self.EXPERIMENTS_KEY, 'ophys_experiments.csv', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.EXPERIMENT_CONTAINERS_KEY, 'experiment_containers.json', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.EXPERIMENTS_KEY, 'ophys_experiments.json', typename='file', parent_key='BASEDIR')
         mb.add_path(self.EXPERIMENT_DATA_KEY, 'ophys_experiment_data/%d.nwb', typename='file', parent_key='BASEDIR')
-        mb.add_path(self.CELL_SPECIMENS_KEY, 'cell_specimens.csv', typename='file', parent_key='BASEDIR')
-        mb.add_path(self.STIMULUS_MAPPINGS_KEY, 'stimulus_mappings.csv', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.CELL_SPECIMENS_KEY, 'cell_specimens.json', typename='file', parent_key='BASEDIR')
+        mb.add_path(self.STIMULUS_MAPPINGS_KEY, 'stimulus_mappings.json', typename='file', parent_key='BASEDIR')
 
         mb.write_json_file(file_name)
 
+def _find_specimen_cre_line(specimen):
+    return next(tl['name'] for tl in specimen['donor']['transgenic_lines'] if 'Cre' in tl['name'])
 
 def main():
     from allensdk.api.api import Api

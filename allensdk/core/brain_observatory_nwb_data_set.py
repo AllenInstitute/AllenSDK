@@ -15,6 +15,8 @@ from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 import dateutil
 import re
 
+class MissingStimulusException(Exception): pass
+
 class BrainObservatoryNwbDataSet(object):
     MOVIE_FOV_PX = (512, 512)
     PIPELINE_DATASET = 'brain_observatory_pipeline'
@@ -59,16 +61,15 @@ class BrainObservatoryNwbDataSet(object):
         '''
         all_cell_specimen_ids = list(self.get_cell_specimen_ids())
 
-        f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
+        with h5py.File(self.nwb_file, 'r') as f:
+            timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
+            ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['data']
 
-        ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['data']
-        if cell_specimen_ids is None:
-            cell_traces = ds.value 
-        else:
-            inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
-            cell_traces = ds[inds,:]
-        f.close()
+            if cell_specimen_ids is None:
+                cell_traces = ds.value 
+            else:
+                inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
+                cell_traces = ds[inds,:]
 
         return timestamps, cell_traces
 
@@ -92,17 +93,15 @@ class BrainObservatoryNwbDataSet(object):
         '''
         all_cell_specimen_ids = self.get_cell_specimen_ids()
 
-        f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
+        with h5py.File(self.nwb_file, 'r') as f:
+            timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
 
-        ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['neuropil_traces']
-        if cell_specimen_ids is None:
-            np_traces = ds.value 
-        else:
-            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
-            np_traces = ds[inds,:]
-
-        f.close()
+            ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['neuropil_traces']
+            if cell_specimen_ids is None:
+                np_traces = ds.value 
+            else:
+                inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+                np_traces = ds[inds,:]
 
         return timestamps, np_traces
 
@@ -126,23 +125,21 @@ class BrainObservatoryNwbDataSet(object):
         '''
         all_cell_specimen_ids = list(self.get_cell_specimen_ids())
 
-        f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
-        cell_traces_ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['data']
-        np_traces_ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['neuropil_traces']
-        r_ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['r']
+        with h5py.File(self.nwb_file, 'r') as f:
+            timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
+            cell_traces_ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['data']
+            np_traces_ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['neuropil_traces']
+            r_ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['r']
 
-        if cell_specimen_ids is None:
-            cell_traces = cell_traces_ds.value 
-            np_traces = np_traces_ds.value 
-            r = r_ds.value 
-        else:
-            inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
-            cell_traces = cell_traces_ds[inds,:]
-            np_traces = np_traces_ds[inds,:]
-            r = r_ds[inds]
-
-        f.close()
+            if cell_specimen_ids is None:
+                cell_traces = cell_traces_ds.value 
+                np_traces = np_traces_ds.value 
+                r = r_ds.value 
+            else:
+                inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
+                cell_traces = cell_traces_ds[inds,:]
+                np_traces = np_traces_ds[inds,:]
+                r = r_ds[inds]
 
         fc = cell_traces - np_traces * r[:, np.newaxis]
 
@@ -169,16 +166,14 @@ class BrainObservatoryNwbDataSet(object):
         '''
         all_cell_specimen_ids = list(self.get_cell_specimen_ids())
 
-        f = h5py.File(self.nwb_file, 'r')
-        timestamps = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['timestamps'].value
+        with h5py.File(self.nwb_file, 'r') as f:
+            timestamps = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['timestamps'].value
 
-        if cell_specimen_ids is None:
-            cell_traces = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['data'].value 
-        else:
-            inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
-            cell_traces = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['data'][inds,:]
-            
-        f.close()
+            if cell_specimen_ids is None:
+                cell_traces = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['data'].value 
+            else:
+                inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
+                cell_traces = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['data'][inds,:]
 
         return timestamps, cell_traces
 
@@ -190,9 +185,8 @@ class BrainObservatoryNwbDataSet(object):
         -------
         ROI IDs: list
         '''
-        f = h5py.File(self.nwb_file, 'r')
-        roi_id = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['roi_ids'].value 
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f:
+            roi_id = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['roi_ids'].value 
         return roi_id
 
     def get_cell_specimen_ids(self):
@@ -202,9 +196,8 @@ class BrainObservatoryNwbDataSet(object):
         -------
         cell specimen IDs: list
         '''
-        f = h5py.File(self.nwb_file, 'r')
-        cell_id = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['cell_specimen_ids'].value 
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f:
+            cell_id = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['cell_specimen_ids'].value 
         return cell_id
 
     def get_session_type(self):
@@ -215,9 +208,8 @@ class BrainObservatoryNwbDataSet(object):
         -------
         session type: string
         '''
-        f = h5py.File(self.nwb_file, 'r')
-        session_type = f['general/session_type'].value
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f:
+            session_type = f['general/session_type'].value
         return session_type
 
         
@@ -229,9 +221,8 @@ class BrainObservatoryNwbDataSet(object):
         max projection: np.ndarray
         '''
 
-        f = h5py.File(self.nwb_file, 'r')
-        max_projection = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']['reference_images']['maximum_intensity_projection_image']['data'].value
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f:
+            max_projection = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']['reference_images']['maximum_intensity_projection_image']['data'].value
         return max_projection
 
     def list_stimuli(self):
@@ -242,9 +233,8 @@ class BrainObservatoryNwbDataSet(object):
         stimuli: list of strings
         '''
 
-        f = h5py.File(self.nwb_file, 'r')    
-        keys = f["stimulus/presentation/"].keys()
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f:
+            keys = f["stimulus/presentation/"].keys()
         return [ k.replace('_stimulus','') for k in keys ]
 
     def get_drifting_gratings_stimulus_table(self):
@@ -305,10 +295,9 @@ class BrainObservatoryNwbDataSet(object):
         stimulus table: pd.DataFrame
         '''
         k = "stimulus/presentation/spontaneous_stimulus"
-        f = h5py.File(self.nwb_file, 'r')    
-        events = f[k + '/data'].value
-        frame_dur = f[k + '/frame_duration'].value
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f:
+            events = f[k + '/data'].value
+            frame_dur = f[k + '/frame_duration'].value
 
         start_inds = np.where(events == 1)
         stop_inds = np.where(events == -1)
@@ -332,10 +321,11 @@ class BrainObservatoryNwbDataSet(object):
         
         k = "stimulus/presentation/%s" % stimulus_name
 
-        f = h5py.File(self.nwb_file, 'r')    
-        inds = f[k + '/data'].value
-        frame_dur = f[k + '/frame_duration'].value
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f: 
+            if k not in f:
+                raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)    
+            inds = f[k + '/data'].value
+            frame_dur = f[k + '/frame_duration'].value
 
         stimulus_table = pd.DataFrame(inds, columns=['frame'])
         stimulus_table.loc[:,'start'] = frame_dur[:,0].astype(int)
@@ -353,11 +343,12 @@ class BrainObservatoryNwbDataSet(object):
 
         k = "stimulus/presentation/%s" % stimulus_name
 
-        f = h5py.File(self.nwb_file, 'r')    
-        stim_data = f[k + '/data'].value
-        features = f[k + '/features'].value
-        frame_dur = f[k + '/frame_duration'].value
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f:
+            if k not in f:
+                raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
+            stim_data = f[k + '/data'].value
+            features = f[k + '/features'].value
+            frame_dur = f[k + '/frame_duration'].value
 
         stimulus_table = pd.DataFrame(stim_data, columns=features)
         stimulus_table.loc[:,'start'] = frame_dur[:,0].astype(int)
@@ -378,9 +369,8 @@ class BrainObservatoryNwbDataSet(object):
         stimulus table: pd.DataFrame
         '''
         stim_name = stimulus_name + "_image_stack"
-        f = h5py.File(self.nwb_file, 'r')
-        image_stack = f['stimulus']['templates'][stim_name]['data'].value
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f:
+            image_stack = f['stimulus']['templates'][stim_name]['data'].value
         return image_stack
 
     def get_locally_sparse_noise_stimulus_template(self, mask_off_screen=True):
@@ -440,23 +430,24 @@ class BrainObservatoryNwbDataSet(object):
             List of ROI_Mask objects
         '''
 
-        f = h5py.File(self.nwb_file, 'r')
-        mask_loc = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']
-        roi_list = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']['roi_list'].value
-        
         all_cell_specimen_ids = self.get_cell_specimen_ids()
-        inds = None
-        if cell_specimen_ids is None:
-            inds = range(len(all_cell_specimen_ids))
-        else:
-            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
 
-        roi_array = []
-        for i in inds:
-            v = roi_list[i]
-            m = roi.create_roi_mask(self.MOVIE_FOV_PX[0], self.MOVIE_FOV_PX[1], [0,0,0,0], pix_list=mask_loc[v]["pix_mask"].value, label=v)
-            roi_array.append(m)
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f:
+            mask_loc = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']
+            roi_list = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']['roi_list'].value
+        
+            inds = None
+            if cell_specimen_ids is None:
+                inds = range(len(all_cell_specimen_ids))
+            else:
+                inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+
+            roi_array = []
+            for i in inds:
+                v = roi_list[i]
+                m = roi.create_roi_mask(self.MOVIE_FOV_PX[0], self.MOVIE_FOV_PX[1], [0,0,0,0], pix_list=mask_loc[v]["pix_mask"].value, label=v)
+                roi_array.append(m)
+
         return roi_array
     
     def get_metadata(self):
@@ -511,11 +502,10 @@ class BrainObservatoryNwbDataSet(object):
     
     def get_running_speed(self):
         '''returns the mouse running speed in cm/s'''
-        f = h5py.File(self.nwb_file, 'r')
-        dxcm = f['processing'][self.PIPELINE_DATASET]['BehavioralTimeSeries']['running_speed']['data'].value
-        dxtime = f['processing'][self.PIPELINE_DATASET]['BehavioralTimeSeries']['running_speed']['timestamps'].value
-        timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value    
-        f.close()   
+        with h5py.File(self.nwb_file, 'r') as f:
+            dxcm = f['processing'][self.PIPELINE_DATASET]['BehavioralTimeSeries']['running_speed']['data'].value
+            dxtime = f['processing'][self.PIPELINE_DATASET]['BehavioralTimeSeries']['running_speed']['timestamps'].value
+            timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value    
 
         dxcm = dxcm[:,0]
         if dxtime[0] != timestamps[0]:
@@ -530,13 +520,13 @@ class BrainObservatoryNwbDataSet(object):
     
     def get_motion_correction(self):
         '''returns a DataFrame containing the x- and y- translation of each image used for image alignment'''
-        f = h5py.File(self.nwb_file, 'r')
-        motion_log = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['data'].value
-        motion_time = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['timestamps'].value
-        motion_names = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['feature_description'].value
-        motion_correction = pd.DataFrame(motion_log, columns=motion_names)
-        motion_correction['timestamp'] = motion_time    
-        f.close()
+        with h5py.File(self.nwb_file, 'r') as f:
+            motion_log = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['data'].value
+            motion_time = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['timestamps'].value
+            motion_names = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['feature_description'].value
+            motion_correction = pd.DataFrame(motion_log, columns=motion_names)
+            motion_correction['timestamp'] = motion_time    
+
         return motion_correction
     
     
@@ -550,15 +540,11 @@ class BrainObservatoryNwbDataSet(object):
         
 
     def save_analysis_arrays(self, *datasets):    
-        f = h5py.File(self.nwb_file, 'a')
-        
-        for k,v in datasets:
-            if k in f['analysis']:
-                del f['analysis'][k]
-            f.create_dataset('analysis/%s' % k, data=v)
-        
-        ##f.keys()
-        f.close()
+        with h5py.File(self.nwb_file, 'a') as f:
+            for k,v in datasets:
+                if k in f['analysis']:
+                    del f['analysis'][k]
+                f.create_dataset('analysis/%s' % k, data=v)
 
 
 def warp_stimulus_coords(vertices,

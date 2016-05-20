@@ -757,7 +757,7 @@ def experiment_summary(self, experiment_id):
     ax2.set_ylabel("# Cells", fontsize=14)
     ax2.set_title("Preferred TF", fontsize=14)
     
-    ax3.hist(self.peak['response_variability_dg'][self.significant_cells].values, range=(0,100), bins=15, color='gray')        
+    ax3.hist(self.peak['response_reliability_dg'][self.significant_cells].values, range=(0,100), bins=15, color='gray')        
     ax3.set_xlabel("% Significant trials", fontsize=14)
     ax3.set_ylabel("# Cells", fontsize=14)
     ax3.set_title("Significant trials", fontsize=14)

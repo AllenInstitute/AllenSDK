@@ -75,7 +75,7 @@ class StaticGrating(StimulusAnalysis):
         '''finds the peak response for each cell'''
         StaticGrating._log.info('Calculating peak response properties')
 
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_variability_sg','osi_sg','peak_dff_sg','ptest_sg','time_to_peak_sg','duration_sg'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_reliability_sg','osi_sg','peak_dff_sg','ptest_sg','time_to_peak_sg','duration_sg'))
 
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,:,nc,0] == np.nanmax(self.response[:,1:,:,nc,0]))
@@ -85,7 +85,7 @@ class StaticGrating(StimulusAnalysis):
             peak.ori_sg[nc] = pref_ori
             peak.sf_sg[nc] = pref_sf
             peak.phase_sg[nc] = pref_phase
-            peak.response_variability_sg[nc] = self.response[pref_ori, pref_sf, pref_phase, nc, 2]/0.48  #TODO: check number of trials
+            peak.response_reliability_sg[nc] = self.response[pref_ori, pref_sf, pref_phase, nc, 2]/0.48  #TODO: check number of trials
             pref = self.response[pref_ori, pref_sf, pref_phase, nc, 0]
             orth = self.response[np.mod(pref_ori+3, 6), pref_sf, pref_phase, nc, 0]
             peak.osi_sg[nc] = (pref-orth)/(pref+orth)

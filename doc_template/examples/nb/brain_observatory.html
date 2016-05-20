@@ -193,6 +193,8 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_cache</span> <span class="kn">import</span> <span class="n">BrainObservatoryCache</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 
 <span class="c"># Download a list of all targeted areas</span>
 <span class="n">boc</span> <span class="o">=</span> <span class="n">BrainObservatoryCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;boc/manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="s">&#39;http://testwarehouse:9000&#39;</span><span class="p">)</span>
@@ -203,13 +205,16 @@ div#notebook {
 <span class="n">visp_ecs</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">targeted_structures</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;VISp&#39;</span><span class="p">])</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;visp experiment containers: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">visp_ecs</span><span class="p">))</span>
 
-<span class="c"># Download a list of all transgenic driver lines </span>
-<span class="n">tls</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_transgenic_lines</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;transgenic_lines: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tls</span><span class="p">))</span>
+<span class="c"># Download a list of all cre driver lines </span>
+<span class="n">cre_lines</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_cre_lines</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;cre lines: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">))</span>
 
 <span class="c"># Download experiment containers for Cux2 experiments</span>
-<span class="n">cux2_ecs</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">transgenic_lines</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Cux2-CreERT2&#39;</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;cux2 experiments: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">cux2_ecs</span><span class="p">))</span>
+<span class="n">cux2_ecs</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">cre_lines</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Cux2-CreERT2&#39;</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Cux2 experiments: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">cux2_ecs</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Example experiment container record:&quot;</span><span class="p">)</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cux2_ecs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -224,8 +229,14 @@ div#notebook {
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>targeted structures: [u&apos;VISal&apos;, u&apos;VISl&apos;, u&apos;VISp&apos;, u&apos;VISpm&apos;]
 visp experiment containers: 25
-transgenic_lines: [u&apos;Camk2a-tTA&apos;, u&apos;Cux2-CreERT2&apos;, u&apos;Rbp4-Cre&apos;, u&apos;Rorb-IRES2-Cre&apos;, u&apos;Scnn1a-Tg3-Cre&apos;]
-cux2 experiments: 42
+cre lines: [u&apos;Cux2-CreERT2&apos;, u&apos;Rbp4-Cre&apos;, u&apos;Rorb-IRES2-Cre&apos;, u&apos;Scnn1a-Tg3-Cre&apos;]
+Cux2 experiments: 42
+Example experiment container record:
+{&apos;age_days&apos;: 143.0,
+ &apos;cre_line&apos;: u&apos;Cux2-CreERT2&apos;,
+ &apos;id&apos;: 511510695,
+ &apos;imaging_depth&apos;: 175,
+ &apos;targeted_structure&apos;: u&apos;VISal&apos;}
 </pre>
 </div>
 </div>
@@ -248,8 +259,9 @@ cux2 experiments: 42
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="c"># Download cells for a set of experiments</span>
+<div class=" highlight hl-ipython2"><pre><span class="c"># Download cells for a set of experiments and convert to DataFrame</span>
 <span class="n">cells</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_cell_specimens</span><span class="p">()</span>
+<span class="n">cells</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;total cells: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">))</span>
 
 <span class="c"># find direction selective cells in VISp</span>
@@ -273,13 +285,6 @@ cux2 experiments: 42
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading cell metrics and metadata for all cells. This can take some time.
-</pre>
-</div>
-</div>
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
@@ -318,6 +323,9 @@ direction-selective cells: 2257
 <span class="c"># Download the ophys experiments containing the drifting gratings stimulus for VISp experiment containers</span>
 <span class="n">dsi_exps</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">(</span><span class="n">experiment_container_ids</span><span class="o">=</span><span class="n">dsi_ec_ids</span><span class="p">,</span> <span class="n">stimuli</span><span class="o">=</span><span class="p">[</span><span class="n">stim_info</span><span class="o">.</span><span class="n">DRIFTING_GRATINGS</span><span class="p">])</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;VISp drifting gratings ophys experiments: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">dsi_exps</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Example ophys experiment:&quot;</span><span class="p">)</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">dsi_exps</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -332,6 +340,14 @@ direction-selective cells: 2257
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>total dsi experiment containers: 25
 VISp drifting gratings ophys experiments: 25
+Example ophys experiment:
+{&apos;age_days&apos;: 123.0,
+ &apos;cre_line&apos;: u&apos;Rorb-IRES2-Cre&apos;,
+ &apos;experiment_container_id&apos;: 511507144,
+ &apos;id&apos;: 501724959,
+ &apos;imaging_depth&apos;: 275,
+ &apos;session_type&apos;: u&apos;three_session_A&apos;,
+ &apos;targeted_structure&apos;: u&apos;VISp&apos;}
 </pre>
 </div>
 </div>
@@ -354,8 +370,7 @@ VISp drifting gratings ophys experiments: 25
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">pprint</span>
-<span class="c"># pick a direction-selective cell and find its NWB file</span>
+<div class=" highlight hl-ipython2"><pre><span class="c"># pick a direction-selective cell and find its NWB file</span>
 <span class="n">dsi_cell</span> <span class="o">=</span> <span class="n">dsi_cells</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c"># figure out which ophys experiment has the drifting gratings stimulus for the cell&#39;s experiment container</span>
@@ -364,7 +379,11 @@ VISp drifting gratings ophys experiments: 25
 
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="n">cell_exp</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
 
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Metadata from NWB file:&quot;</span><span class="p">)</span>
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">data_set</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">())</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;stimuli available:&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">data_set</span><span class="o">.</span><span class="n">list_stimuli</span><span class="p">())</span>
 </pre></div>
 
 </div>
@@ -376,15 +395,9 @@ VISp drifting gratings ophys experiments: 25
 
 
 <div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 511534603 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>{&apos;age_days&apos;: 93,
+<pre>Metadata from NWB file:
+{&apos;age_days&apos;: 93,
  &apos;cre_line&apos;: &apos;Scnn1a-Tg3-Cre&apos;,
  &apos;device&apos;: &apos;Nikon A1R-MP multiphoton microscope&apos;,
  &apos;device_name&apos;: &apos;CAM2P.2&apos;,
@@ -399,6 +412,8 @@ VISp drifting gratings ophys experiments: 25
  &apos;session_type&apos;: &apos;three_session_A&apos;,
  &apos;sex&apos;: &apos;male&apos;,
  &apos;targeted_structure&apos;: &apos;VISp&apos;}
+stimuli available:
+[u&apos;drifting_gratings&apos;, u&apos;natural_movie_one&apos;, u&apos;natural_movie_three&apos;, u&apos;spontaneous&apos;]
 </pre>
 </div>
 </div>
@@ -1817,20 +1832,6 @@ REREREREVYeBEBERERERVZ3/B5ztsuILAbGYAAAAAElFTkSuQmCC
 
 
 <div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 510221121 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
 
 
 <div class="output_png output_subarea ">
@@ -2586,16 +2587,8 @@ QRAEQVjkiHATBEEQBEEQBEFY5IhwEwRBEARBEARBWOSIcBMEQRAEQRAEQVjkiHATBEEQBEEQBEFY
 
 
 <div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 512326618 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
-done analyzing drifting grating
+<pre>done analyzing drifting grating
 </pre>
 </div>
 </div>
@@ -2964,20 +2957,6 @@ max error = 0.013380
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 501940850 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-</pre>
-</div>
-</div>
 
 <div class="output_area"><div class="prompt"></div>
 

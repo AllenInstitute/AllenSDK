@@ -40,7 +40,7 @@ class NaturalMovie(StimulusAnalysis):
         return sweep_response
     
     def get_peak(self, movie_name):
-        peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_variability'))
+        peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_reliability'))
 
         for nc in range(self.numbercells):
             meanresponse = self.sweep_response[str(nc)].mean()
@@ -56,15 +56,15 @@ class NaturalMovie(StimulusAnalysis):
             ptime*=10
             peak = np.argmax(meanresponse)
             if peak>30:
-                peak_movie.response_variability.iloc[nc] = ptime[(peak-30)/30]
+                peak_movie.response_reliability.iloc[nc] = ptime[(peak-30)/30]
             else:
-                peak_movie.response_variability.iloc[nc] = ptime[0]
+                peak_movie.response_reliability.iloc[nc] = ptime[0]
             peak_movie.peak.iloc[nc] = peak
         if movie_name=='natural_movie_one':
-            peak_movie.rename(columns={'peak':'peak_nm1','response_variability':'response_variability_nm1'}, inplace=True)
+            peak_movie.rename(columns={'peak':'peak_nm1','response_reliability':'response_reliability_nm1'}, inplace=True)
         elif movie_name=='natural_movie_two':
-            peak_movie.rename(columns={'peak':'peak_nm2','response_variability':'response_variability_nm2'}, inplace=True)
+            peak_movie.rename(columns={'peak':'peak_nm2','response_reliability':'response_reliability_nm2'}, inplace=True)
         elif movie_name=='natural_movie_three':
-            peak_movie.rename(columns={'peak':'peak_nm3','response_variability':'response_variability_nm3'}, inplace=True)
+            peak_movie.rename(columns={'peak':'peak_nm3','response_reliability':'response_reliability_nm3'}, inplace=True)
 
         return peak_movie
