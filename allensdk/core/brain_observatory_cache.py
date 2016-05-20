@@ -55,7 +55,8 @@ class BrainObservatoryCache(Cache):
 
     def get_ophys_experiments(self, file_name=None, experiment_container_ids=None,
                               targeted_structures=None, imaging_depths=None, transgenic_lines=None,
-                              stimuli=None):
+                              stimuli=None, sessions=None):
+
         file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
 
         if os.path.exists(file_name):
@@ -67,7 +68,7 @@ class BrainObservatoryCache(Cache):
                 ju.write(file_name, exps)
 
         return self.api.filter_ophys_experiments(exps, experiment_container_ids, targeted_structures, 
-                                                 imaging_depths, transgenic_lines, stimuli)
+                                                 imaging_depths, transgenic_lines, stimuli, sessions)
 
 
     def get_stimulus_mappings(self, file_name=None):

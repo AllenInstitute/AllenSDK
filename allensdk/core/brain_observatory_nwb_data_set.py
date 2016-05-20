@@ -20,19 +20,19 @@ class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
     
     FILE_METADATA_MAPPING = { 
+        'age': 'general/subject/age',
+        'sex': 'general/subject/sex',
         'imaging_depth': 'general/optophysiology/imaging_plane_1/imaging depth',
         'targeted_structure': 'general/optophysiology/imaging_plane_1/location',
         'ophys_experiment_id': 'general/session_id',
         'experiment_container_id': 'general/experiment_container_id',
         'device_string': 'general/devices/2-photon microscope',
         'excitation_lambda': 'general/optophysiology/imaging_plane_1/excitation_lambda',
-        'imaging_rate': 'general/optophysiology/imaging_plane_1/imaging_rate',
         'indicator': 'general/optophysiology/imaging_plane_1/indicator',
         'fov': 'general/fov',
         'genotype': 'general/subject/genotype',
         'session_start_time': 'session_start_time',
-        'session_type': 'general/session_type',
-        'specimen_name': 'general/specimen_name'
+        'session_type': 'general/session_type'
         }
     
     def __init__(self, nwb_file):
@@ -228,6 +228,12 @@ class BrainObservatoryNwbDataSet(object):
         f.close()
         return max_projection
 
+    def list_stimuli(self):
+        f = h5py.File(self.nwb_file, 'r')    
+        keys = f["stimulus/presentation/"].keys()
+        f.close()
+        return [ k.replace('_stimulus','') for k in keys ]
+
     def get_drifting_gratings_stimulus_table(self):
         ''' TODO '''
         return self.get_abstract_feature_series_stimulus_table("drifting_gratings_stimulus")
@@ -393,10 +399,19 @@ class BrainObservatoryNwbDataSet(object):
                 meta[memory_key] = v
 
         meta['cre_line'] = meta['genotype'].split(';')[0]
-        meta['imaging_depth'] = int(meta['imaging_depth'].split()[0])
+        meta['imaging_depth_um'] = int(meta['imaging_depth'].split()[0])
+        del meta['imaging_depth']
         meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
         meta['experiment_container_id'] = int(meta['experiment_container_id'])
         meta['session_start_time'] = dateutil.parser.parse(meta['session_start_time'])
+
+        # parse the age in days
+        m = re.match("(.*?) days", meta['age'])
+        if m:
+            meta['age_days'] = int(m.groups()[0])
+            del meta['age']
+        else:
+            raise IOError("Could not find device.")
 
         # parse the device string (ugly, sorry)
         device_string = meta['device_string']
