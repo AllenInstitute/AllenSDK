@@ -27,7 +27,7 @@ def test_get_isi_experiments(bo_api):
  
  
 def test_get_ophys_experiments_one_id(bo_api):
-    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::OphysExperiment,rma::criteria,[id$in502066273],rma::include,well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines[transgenic_line_type_code$eqD])),rma::options[num_rows$eq'all'][count$eqfalse]"
+    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::OphysExperiment,rma::criteria,[id$in502066273],rma::include,well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines)),rma::options[num_rows$eq'all'][count$eqfalse]"
       
     ophys_experiment_id = 502066273
     bo_api.get_ophys_experiments(ophys_experiment_id)     
@@ -45,7 +45,7 @@ def test_get_experiment_container_metrics(bo_api):
 def test_get_experiment_containers(bo_api):
     tid = 511510753
     bo_api.get_experiment_containers(tid)
-    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ExperimentContainer,rma::criteria,[id$in511510753],rma::include,ophys_experiments,isi_experiment,specimen(donor(age,transgenic_lines[transgenic_line_type_code$eqD])),targeted_structure,rma::options[num_rows$eq'all'][count$eqfalse]"
+    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ExperimentContainer,rma::criteria,[id$in511510753],rma::include,ophys_experiments,isi_experiment,specimen(donor(age,transgenic_lines)),targeted_structure,rma::options[num_rows$eq'all'][count$eqfalse]"
     bo_api.json_msg_query.assert_called_once_with(expected)
  
      
