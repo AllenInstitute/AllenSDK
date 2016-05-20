@@ -20,6 +20,7 @@ from allensdk.brain_observatory.drifting_grating import DriftingGrating
 from allensdk.brain_observatory.natural_movie import NaturalMovie
 
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+import allensdk.brain_observatory.stimulus_info as stimulus_info
 
 import allensdk.brain_observatory.brain_observatory_plotting as cp
 import argparse, logging, os
@@ -37,9 +38,6 @@ def multi_dataframe_merge(dfs):
 
 class BrainObservatoryAnalysis(object):
     _log = logging.getLogger('allensdk.brain_observatory.brain_observatory_analysis')    
-    SESSION_A = 'three_session_A'
-    SESSION_B = 'three_session_B'
-    SESSION_C = 'three_session_C'
 
     def __init__(self, nwb_path, save_path, metadata=None):
         self.nwb = BrainObservatoryNwbDataSet(nwb_path)                        
@@ -222,13 +220,13 @@ def run_brain_observatory_analysis(session, nwb_path, save_path, metadata=None, 
     except:
         pass
 
-    if session == BrainObservatoryAnalysis.SESSION_A:
+    if session == stimulus_info.THREE_SESSION_A:
         brain_observatory_analysis.session_a(plot_flag)
         metrics = brain_observatory_analysis.metrics_a
-    elif session == BrainObservatoryAnalysis.SESSION_B:
+    elif session == stimulus_info.THREE_SESSION_B:
         brain_observatory_analysis.session_b(plot_flag)
         metrics = brain_observatory_analysis.metrics_b
-    elif session == BrainObservatoryAnalysis.SESSION_C:
+    elif session == stimulus_info.THREE_SESSION_C:
         brain_observatory_analysis.session_c(plot_flag)
         metrics = brain_observatory_analysis.metrics_c
     else:

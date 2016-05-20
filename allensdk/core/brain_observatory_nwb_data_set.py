@@ -20,19 +20,19 @@ class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
     
     FILE_METADATA_MAPPING = { 
+        'age': 'general/subject/age',
+        'sex': 'general/subject/sex',
         'imaging_depth': 'general/optophysiology/imaging_plane_1/imaging depth',
         'targeted_structure': 'general/optophysiology/imaging_plane_1/location',
         'ophys_experiment_id': 'general/session_id',
         'experiment_container_id': 'general/experiment_container_id',
         'device_string': 'general/devices/2-photon microscope',
         'excitation_lambda': 'general/optophysiology/imaging_plane_1/excitation_lambda',
-        'imaging_rate': 'general/optophysiology/imaging_plane_1/imaging_rate',
         'indicator': 'general/optophysiology/imaging_plane_1/indicator',
         'fov': 'general/fov',
         'genotype': 'general/subject/genotype',
         'session_start_time': 'session_start_time',
-        'session_type': 'general/session_type',
-        'specimen_name': 'general/specimen_name'
+        'session_type': 'general/session_type'
         }
     
     def __init__(self, nwb_file):
@@ -222,34 +222,88 @@ class BrainObservatoryNwbDataSet(object):
 
         
     def get_max_projection(self):
-        '''returns the maximum projection image for the 2P data'''
+        '''Returns the maximum projection image for the 2P movie.
+        
+        Returns
+        -------
+        max projection: np.ndarray
+        '''
+
         f = h5py.File(self.nwb_file, 'r')
         max_projection = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']['reference_images']['maximum_intensity_projection_image']['data'].value
         f.close()
         return max_projection
 
+    def list_stimuli(self):
+        ''' Return a list of the stimuli presented in the experiment. 
+        
+        Returns
+        -------
+        stimuli: list of strings
+        '''
+
+        f = h5py.File(self.nwb_file, 'r')    
+        keys = f["stimulus/presentation/"].keys()
+        f.close()
+        return [ k.replace('_stimulus','') for k in keys ]
+
     def get_drifting_gratings_stimulus_table(self):
-        ''' TODO '''
+        ''' Return the drifting gratings stimulus table, if it exists.
+
+        Returns
+        -------
+        stimulus table: pd.DataFrame
+        '''
         return self.get_abstract_feature_series_stimulus_table("drifting_gratings_stimulus")
 
     def get_natural_movie_stimulus_table(self, movie_name):
-        ''' TODO '''
+        ''' Return the natural movie stimulus table, if it exists.  
+
+        Parameters
+        ----------
+        movie_name: string
+             One of 'natural_movie_one', 'natural_movie_two', or 'natural_movie_three'.
+
+        Returns
+        -------
+        stimulus table: pd.DataFrame
+        '''
         return self.get_indexed_time_series_stimulus_table(movie_name + "_stimulus")
 
     def get_natural_scenes_stimulus_table(self):
-        ''' TODO '''
+        ''' Return the natural scenes stimulus table, if it exists.
+
+        Returns
+        -------
+        stimulus table: pd.DataFrame
+        '''
         return self.get_indexed_time_series_stimulus_table("natural_scenes_stimulus")
 
     def get_static_gratings_stimulus_table(self):
-        ''' TODO '''
+        ''' Return the static gratings stimulus table, if it exists.
+
+        Returns
+        -------
+        stimulus table: pd.DataFrame
+        '''
         return self.get_abstract_feature_series_stimulus_table("static_gratings_stimulus")
 
     def get_locally_sparse_noise_stimulus_table(self):
-        ''' TODO '''
+        ''' Return the locally sparse noise stimulus table, if it exists.
+
+        Returns
+        -------
+        stimulus table: pd.DataFrame
+        '''
         return self.get_indexed_time_series_stimulus_table("locally_sparse_noise_stimulus")
 
     def get_spontaneous_activity_stimulus_table(self):
-        ''' TODO '''
+        ''' Return the spontaneous activity stimulus table, if it exists.
+
+        Returns
+        -------
+        stimulus table: pd.DataFrame
+        '''
         k = "stimulus/presentation/spontaneous_stimulus"
         f = h5py.File(self.nwb_file, 'r')    
         events = f[k + '/data'].value
@@ -269,7 +323,12 @@ class BrainObservatoryNwbDataSet(object):
         return stimulus_table
 
     def get_indexed_time_series_stimulus_table(self, stimulus_name):
-        ''' TODO '''
+        ''' Return the a stimulus table for an indexed time series.
+
+        Returns
+        -------
+        stimulus table: pd.DataFrame
+        '''
         
         k = "stimulus/presentation/%s" % stimulus_name
 
@@ -285,7 +344,12 @@ class BrainObservatoryNwbDataSet(object):
         return stimulus_table
 
     def get_abstract_feature_series_stimulus_table(self, stimulus_name):
-        '''returns a DataFrame of the stimulus table for a specified stimulus'''
+        ''' Return the a stimulus table for an abstract feature series.
+
+        Returns
+        -------
+        stimulus table: pd.DataFrame
+        '''
 
         k = "stimulus/presentation/%s" % stimulus_name
 
@@ -302,7 +366,17 @@ class BrainObservatoryNwbDataSet(object):
         return stimulus_table
 
     def get_stimulus_template(self, stimulus_name):
-        '''returns an array of the stimulus template for a specified stimulus'''
+        ''' Return an array of the stimulus template for the specified stimulus.
+
+        Parameters
+        ----------
+        stimulus_name: string
+            Must be one of the strings returned by list_stimuli().
+
+        Returns
+        -------
+        stimulus table: pd.DataFrame
+        '''
         stim_name = stimulus_name + "_image_stack"
         f = h5py.File(self.nwb_file, 'r')
         image_stack = f['stimulus']['templates'][stim_name]['data'].value
@@ -310,6 +384,18 @@ class BrainObservatoryNwbDataSet(object):
         return image_stack
 
     def get_locally_sparse_noise_stimulus_template(self, mask_off_screen=True):
+        ''' Return an array of the stimulus template for the specified stimulus.
+
+        Parameters
+        ----------
+        mask_off_screen: boolean
+           Set off-screen regions of the stimulus to LocallySparseNoise.LSN_OFF_SCREEN.
+
+        Returns
+        -------
+        tuple: (template, off-screen mask)
+        '''
+        
         template = self.get_stimulus_template("locally_sparse_noise")
         
         # build mapping from template coordinates to display coordinates
@@ -393,10 +479,19 @@ class BrainObservatoryNwbDataSet(object):
                 meta[memory_key] = v
 
         meta['cre_line'] = meta['genotype'].split(';')[0]
-        meta['imaging_depth'] = int(meta['imaging_depth'].split()[0])
+        meta['imaging_depth_um'] = int(meta['imaging_depth'].split()[0])
+        del meta['imaging_depth']
         meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
         meta['experiment_container_id'] = int(meta['experiment_container_id'])
         meta['session_start_time'] = dateutil.parser.parse(meta['session_start_time'])
+
+        # parse the age in days
+        m = re.match("(.*?) days", meta['age'])
+        if m:
+            meta['age_days'] = int(m.groups()[0])
+            del meta['age']
+        else:
+            raise IOError("Could not find device.")
 
         # parse the device string (ugly, sorry)
         device_string = meta['device_string']
@@ -552,6 +647,7 @@ def warp_stimulus_coords(vertices,
     return retCoords
 
 def make_display_mask(display_shape=(1920,1200)):
+    ''' Build a display-shaped mask that indicates which pixels are on screen after warping the stimulus. '''
     x = np.array(range(display_shape[0])) - display_shape[0]/2
     y = np.array(range(display_shape[1])) - display_shape[1]/2
     display_coords = np.array(list(itertools.product(x,y)))
@@ -575,7 +671,28 @@ def make_display_mask(display_shape=(1920,1200)):
     return mask
 
 def mask_stimulus_template(template_display_coords, template_shape, display_mask=None, threshold=1.0):
-   
+    ''' Build a mask for a stimulus template of a given shape and display coordinates that indicates
+    which part of the template is on screen after warping.
+
+    Parameters
+    ----------
+    template_display_coords: list
+        list of (x,y) display coordinates
+
+    template_shape: tuple
+        (width,height) of the display template  
+
+    display_mask: np.ndarray
+        boolean 2D mask indicating which display coordinates are on screen after warping.
+
+    threshold: float
+        Fraction of pixels associated with a template display coordinate that should remain
+        on screen to count as belonging to the mask. 
+
+    Returns
+    -------
+    tuple: (template mask, pixel fraction)
+    '''
     if display_mask is None:
         display_mask = make_display_mask()
 
@@ -591,25 +708,6 @@ def mask_stimulus_template(template_display_coords, template_shape, display_mask
     
     return mask, frac
 
-    
-
-    
-    
                       
 
     
-#def getMovieShape(NWB_file):
-#    '''returns the shape of the hdf5 movie file'''
-#    f = h5py.File(NWB_file, 'r')
-#    print f['acquisition']['timeseries']['2p_image_series']['data'].shape
-#    f.close()
-#    return
-#
-#def getMovieSlice(NWB_file, t_values, x_values, y_values):
-#    '''returns a slice of the hdf5 movie file. Must provide list of '''
-#    f = h5py.File(NWB_file, 'r')
-#    temp = f['acquisition']['timeseries']['2p_image_series']['data'][t_values,:,:]
-#    temp2 = temp[:,x_values,:]
-#    movie_slice = temp2[:,:,y_values]
-#    f.close()
-#    return movie_slice
