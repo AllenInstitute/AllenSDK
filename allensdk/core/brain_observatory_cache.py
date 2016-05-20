@@ -1,3 +1,18 @@
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 import os
 import allensdk.core.json_utilities as ju
 from allensdk.api.cache import Cache
@@ -315,29 +330,3 @@ class BrainObservatoryCache(Cache):
 
 def _find_specimen_cre_line(specimen):
     return next(tl['name'] for tl in specimen['donor']['transgenic_lines'] if 'Cre' in tl['name'])
-
-def main():
-    from allensdk.api.api import Api
-    import pandas as pd
-        
-    host = 'http://testwarehouse:9000'
-    Api.default_api_url = host
-    boc = BrainObservatoryCache()
-
-    ecs = boc.get_experiment_containers()
-    print "all ecs", len(ecs)
-
-    ecs = boc.get_experiment_containers(imaging_depths=[350])
-    print "depth 350 experiment containers", len(ecs)
-
-    ecs = boc.get_experiment_containers(targeted_structures=['VISp'])
-    print "visp experiment containers", len(ecs)
-
-    ecs = boc.get_experiment_containers(transgenic_lines=['Cux2-CreERT2'])
-    print "cux2 experiment containers", len(ecs)
-
-    exps = boc.get_ophys_experiments(experiment_container_ids=[ ec['id'] for ec in ecs ])
-    print len(exps)
-
-    ds = boc.get_ophys_experiment_data(exps[0]['id'])
-if __name__ == "__main__": main()
