@@ -22,16 +22,16 @@ Welcome to the Allen SDK
    
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
-The Allen SDK focuses the Allen Cell Types Database, Mouse Brain Connectivity Atlas, and Cortical Activity Map.  
+The Allen SDK focuses the Allen Cell Types Database, Mouse Brain Connectivity Atlas, and Brain Observatory.  
 
 .. image:: /_static/sdk_cam.png
    :align: right
 
 
-Allen Cortical Activity Map
----------------------------
+Allen Brain Observatory
+-----------------------
 
-The `Allen Cortical Activity Map <http://activity.brain-map.org/visualcoding>`_ is data resource for
+The `Allen Brain Observatory <http://activity.brain-map.org/visualcoding>`_ is data resource for
 understanding sensory processing in the mouse visual cortex.  This study systematically measures visual
 responses in multiple cortical areas and layers using two-photon calcium imaging of GCaMP6-labeled neurons 
 targeted using Cre driver lines.  Characterized responses include orientation tuning, spatial and temporal
