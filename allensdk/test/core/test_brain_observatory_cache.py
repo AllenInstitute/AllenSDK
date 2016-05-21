@@ -156,17 +156,17 @@ def test_get_stimulus_mappings(brain_observatory_cache):
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(expected)
 
 
-def test_get_cell_specimens(brain_observatory_cache):
-    with patch('os.path.exists') as m:
-        m.return_value = False
-         
-        with patch('allensdk.core.json_utilities.write',
-                   MagicMock(name='write_json')):   
-            # Download a list of all transgenic driver lines 
-            tls = brain_observatory_cache.get_cell_specimens()
-             
-    expected = "http://testwarehouse:9000/api/v2/data/query.json?q="    
-    brain_observatory_cache.api.json_msg_query.assert_called_once_with(expected)
+#def test_get_cell_specimens(brain_observatory_cache):
+#    with patch('os.path.exists') as m:
+#        m.return_value = False
+#         
+#        with patch('allensdk.core.json_utilities.write',
+#                   MagicMock(name='write_json')):   
+#            # Download a list of all transgenic driver lines 
+#            tls = brain_observatory_cache.get_cell_specimens()
+#             
+#    expected = "http://testwarehouse:9000/api/v2/data/query.json?q="    
+#    brain_observatory_cache.api.json_msg_query.assert_called_once_with(expected)
     
 
 def test_build_manifest():
