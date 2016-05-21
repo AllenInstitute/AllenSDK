@@ -1,7 +1,7 @@
-Cortical Activity Map
-=====================
+Brain Observatory
+=================
 
-The `Allen Cortical Activity Map <http://activity.brain-map.org/visualcoding>`_ is database of the visually-evoked functional
+The `Allen Brain Observatory <http://activity.brain-map.org/visualcoding>`_ is database of the visually-evoked functional
 responses neurons in mouse visual cortex based on 2-photo fluorescence imaging.  Characterized responses include orientation 
 tuning, spatial and temporal frequency tuning, temporal dynamics, and spatial receptive field structure. 
 
@@ -59,22 +59,22 @@ Non-moving gratings with similar variation in orientation, spatial and temporal 
 Code Samples
 ------------
 
-The Cortical Activity Map `Jupyter notebook <_static/examples/nb/cam.html>`_ has many code samples to help get
+The Brain Observatory `Jupyter notebook <_static/examples/nb/brain_observatory.html>`_ has many code samples to help get
 started with analysis:
 
-    - `Download experimental metadata by visual area, imaging depth, and transgenic line <_static/examples/nb/cam.html#Download-Experiments>`_
-    - `Find cells with specific response properties, like direction tuning <_static/examples/nb/cam.html#Filtering-Cells>`_
-    - `Visualize the experiment by stimulus type <_static/examples/nb/cam.html#Drifting-Gratings-Stimulus>`_
-    - `Find the ROI mask for a given cell <_static/examples/nb/cam.html#ROI-Masks>`_
-    - `Run drifting gratings tuning analysis <_static/examples/nb/cam.html#ROI-Analysis>`_
-    - `Plot raw fluorescences traces, neuropil-corrected traces, and dF/F <_static/examples/nb/cam.html#Fluorescence-Traces>`_
-    - `Run neuropil correction <_static/examples/nb/cam.html#Neuropil-Correction>`_
+    - `Download experimental metadata by visual area, imaging depth, and transgenic line <_static/examples/nb/brain_observatory.html#Experiment-Containers>`_
+    - `Find cells with specific response properties, like direction tuning <_static/examples/nb/brain_observatory.html#Find-Cells-of-Interest>`_
+    - `Visualize the experiment by stimulus type <_static/examples/nb/brain_observatory_stimuli.html#Drifting-Gratings-Stimulus>`_
+    - `Find the ROI mask for a given cell <_static/examples/nb/brain_observatory.html#ROI-Masks>`_
+    - `Run drifting gratings tuning analysis <_static/examples/nb/brain_observatory.html#ROI-Analysis>`_
+    - `Plot raw fluorescences traces, neuropil-corrected traces, and dF/F <_static/examples/nb/brain_observatory.html#Fluorescence-Traces>`_
+    - `Run neuropil correction <_static/examples/nb/brain_observatory.html#Neuropil-Correction>`_
 
 
 
 NWB File
 --------
 
-Details about the data files available for download is `here <cam_nwb.html>`_.
+Details about the data files available for download is `here <brain_observatory_nwb.html>`_.
 
 

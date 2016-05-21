@@ -34,7 +34,9 @@ class BrainObservatoryCache(Cache):
     ----------
     
     api: BrainObservatoryApi instance
-        The object used for making API queries related to the Brain Observatory.
+        The object used for making API queries related to the Brain
+
+ Observatory.
 
     Parameters
     ----------
