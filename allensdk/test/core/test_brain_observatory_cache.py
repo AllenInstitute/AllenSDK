@@ -31,13 +31,13 @@ CACHE_MANIFEST = """
     {
       "parent_key": "BASEDIR",
       "type": "file",
-      "spec": "experiment_containers.csv",
+      "spec": "experiment_containers.json",
       "key": "EXPERIMENT_CONTAINERS"
     },
     {
       "parent_key": "BASEDIR",
       "type": "file",
-      "spec": "ophys_experiments.csv",
+      "spec": "ophys_experiments.json",
       "key": "EXPERIMENTS"
     },
     {
@@ -49,13 +49,13 @@ CACHE_MANIFEST = """
     {
       "parent_key": "BASEDIR",
       "type": "file",
-      "spec": "cell_specimens.csv",
+      "spec": "cell_specimens.json",
       "key": "CELL_SPECIMENS"
     },
     {
       "parent_key": "BASEDIR",
       "type": "file",
-      "spec": "stimulus_mappings.csv",
+      "spec": "stimulus_mappings.json",
       "key": "STIMULUS_MAPPINGS"
     }
   ]
@@ -87,7 +87,7 @@ def test_get_targeted_structures(brain_observatory_cache):
                    MagicMock(name='write_json')):
             targeted_structures = brain_observatory_cache.get_targeted_structures()
         
-        expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ExperimentContainer,rma::include,ophys_experiments,isi_experiment,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD])),targeted_structure,rma::options[num_rows$eq'all'][count$eqfalse]"    
+        expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ExperimentContainer,rma::include,ophys_experiments,isi_experiment,specimen(donor(age,transgenic_lines)),targeted_structure,rma::options[num_rows$eq'all'][count$eqfalse]"    
         brain_observatory_cache.api.json_msg_query.assert_called_once_with(expected)
     
     
@@ -100,20 +100,20 @@ def test_get_experiment_containers(brain_observatory_cache):
             # Download experiment containers for VISp experiments
             visp_ecs = brain_observatory_cache.get_experiment_containers(targeted_structures=['VISp'])
 
-    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ExperimentContainer,rma::include,ophys_experiments,isi_experiment,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD])),targeted_structure,rma::options[num_rows$eq'all'][count$eqfalse]"    
+    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ExperimentContainer,rma::include,ophys_experiments,isi_experiment,specimen(donor(age,transgenic_lines)),targeted_structure,rma::options[num_rows$eq'all'][count$eqfalse]"    
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(expected)
 
 
-def test_get_transgenic_lines(brain_observatory_cache):
+def test_get_cre_lines(brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
         
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):   
-            # Download a list of all transgenic driver lines 
-            tls = brain_observatory_cache.get_transgenic_lines()
+            # Download a list of all cre lines 
+            tls = brain_observatory_cache.get_cre_lines()
             
-    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ExperimentContainer,rma::include,ophys_experiments,isi_experiment,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD])),targeted_structure,rma::options[num_rows$eq'all'][count$eqfalse]"    
+    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::ExperimentContainer,rma::include,ophys_experiments,isi_experiment,specimen(donor(age,transgenic_lines)),targeted_structure,rma::options[num_rows$eq'all'][count$eqfalse]"    
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(expected)
     
     
@@ -126,20 +126,20 @@ def test_get_ophys_experiments(brain_observatory_cache):
             # Download a list of all transgenic driver lines 
             tls = brain_observatory_cache.get_ophys_experiments()
             
-    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::OphysExperiment,rma::include,well_known_files(well_known_file_type),targeted_structure,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD])),rma::options[num_rows$eq'all'][count$eqfalse]"    
+    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::OphysExperiment,rma::include,well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines)),rma::options[num_rows$eq'all'][count$eqfalse]"    
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(expected)
 
 
-def test_get_stimulus_names(brain_observatory_cache):
+def test_get_stimulus_session_names(brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
         
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):   
             # Download a list of all transgenic driver lines 
-            tls = brain_observatory_cache.get_stimulus_names()
+            tls = brain_observatory_cache.get_stimulus_session_names()
             
-    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::OphysExperiment,rma::include,well_known_files(well_known_file_type),targeted_structure,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD])),rma::options[num_rows$eq'all'][count$eqfalse]"    
+    expected = "http://testwarehouse:9000/api/v2/data/query.json?q=model::OphysExperiment,rma::include,well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines)),rma::options[num_rows$eq'all'][count$eqfalse]"    
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(expected)
 
 
