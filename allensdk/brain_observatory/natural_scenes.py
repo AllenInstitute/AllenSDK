@@ -54,12 +54,12 @@ class NaturalScenes(StimulusAnalysis):
     def get_peak(self):    
         '''gets metrics about peak response, etc.'''
         NaturalScenes._log.info('Calculating peak response properties')
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('scene_ns', 'response_variability_ns','peak_dff_ns', 'ptest_ns', 'p_run_ns', 'run_modulation_ns', 'time_to_peak_ns','duration_ns'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('scene_ns', 'response_reliability_ns','peak_dff_ns', 'ptest_ns', 'p_run_ns', 'run_modulation_ns', 'time_to_peak_ns','duration_ns'))
 
         for nc in range(self.numbercells):
             nsp = np.argmax(self.response[1:,nc,0])
             peak.scene_ns[nc] = nsp
-            peak.response_variability_ns[nc] = self.response[nsp+1,nc,2]/0.50 #assume 50 trials
+            peak.response_reliability_ns[nc] = self.response[nsp+1,nc,2]/0.50 #assume 50 trials
             peak.peak_dff_ns[nc] = self.response[nsp+1,nc,0]
             subset = self.mean_sweep_response[self.stim_table.frame==nsp]
             subset_stat = subset[subset.dx<2]

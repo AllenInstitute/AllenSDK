@@ -7,7 +7,7 @@ come in future updates.
 
 .. toctree::
 
-   cam
+   brain_observatory
    cell_types
    connectivity
    data_api_client 

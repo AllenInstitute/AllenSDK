@@ -174,7 +174,8 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Brain-Observatory-Example-Code">Brain Observatory Example Code<a class="anchor-link" href="#Brain-Observatory-Example-Code">&#182;</a></h1>
+<h1 id="Brain-Observatory">Brain Observatory<a class="anchor-link" href="#Brain-Observatory">&#182;</a></h1><p>This notebook documents some classes and functions in the AllenSDK that help manipulate files and data structures in the Allen Brain Observatory.  The main entry point in the <code>BrainObservatoryCache</code> class.  This class is responsible for downloading any requested data or metadata on request and storing it in well known locations.</p>
+
 </div>
 </div>
 </div>
@@ -183,7 +184,8 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Experiment-Containers">Experiment Containers<a class="anchor-link" href="#Experiment-Containers">&#182;</a></h2>
+<h2 id="Experiment-Containers">Experiment Containers<a class="anchor-link" href="#Experiment-Containers">&#182;</a></h2><p>The experiment container describes a set of experiments performed with the same targeted area, imaging depth, and Cre line.  The <code>BrainObservatoryCache</code> has a number of functions for figuring out what experiment containers are available at the moment.</p>
+
 </div>
 </div>
 </div>
@@ -193,6 +195,8 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_cache</span> <span class="kn">import</span> <span class="n">BrainObservatoryCache</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 
 <span class="c"># Download a list of all targeted areas</span>
 <span class="n">boc</span> <span class="o">=</span> <span class="n">BrainObservatoryCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;boc/manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="s">&#39;http://testwarehouse:9000&#39;</span><span class="p">)</span>
@@ -203,13 +207,24 @@ div#notebook {
 <span class="n">visp_ecs</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">targeted_structures</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;VISp&#39;</span><span class="p">])</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;visp experiment containers: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">visp_ecs</span><span class="p">))</span>
 
-<span class="c"># Download a list of all transgenic driver lines </span>
-<span class="n">tls</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_transgenic_lines</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;transgenic_lines: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">tls</span><span class="p">))</span>
+<span class="c"># Download a list of all cre driver lines </span>
+<span class="n">cre_lines</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_cre_lines</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;cre lines: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">))</span>
+
+<span class="c"># Download a list of all imaging depths</span>
+<span class="n">depths</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_imaging_depths</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;imaging depths: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">depths</span><span class="p">))</span>
+
+<span class="c"># Download a list of all stimuli</span>
+<span class="n">stims</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_stimuli</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;stimuli: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">stims</span><span class="p">))</span>
 
 <span class="c"># Download experiment containers for Cux2 experiments</span>
-<span class="n">cux2_ecs</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">transgenic_lines</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Cux2-CreERT2&#39;</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;cux2 experiments: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">cux2_ecs</span><span class="p">))</span>
+<span class="n">cux2_ecs</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">cre_lines</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Cux2-CreERT2&#39;</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Cux2 experiments: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">cux2_ecs</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Example experiment container record:&quot;</span><span class="p">)</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cux2_ecs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -224,8 +239,16 @@ div#notebook {
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>targeted structures: [u&apos;VISal&apos;, u&apos;VISl&apos;, u&apos;VISp&apos;, u&apos;VISpm&apos;]
 visp experiment containers: 25
-transgenic_lines: [u&apos;Camk2a-tTA&apos;, u&apos;Cux2-CreERT2&apos;, u&apos;Rbp4-Cre&apos;, u&apos;Rorb-IRES2-Cre&apos;, u&apos;Scnn1a-Tg3-Cre&apos;]
-cux2 experiments: 42
+cre lines: [u&apos;Cux2-CreERT2&apos;, u&apos;Rbp4-Cre&apos;, u&apos;Rorb-IRES2-Cre&apos;, u&apos;Scnn1a-Tg3-Cre&apos;]
+imaging depths: [175, 275, 350, 375]
+stimuli: [&apos;drifting_gratings&apos;, &apos;locally_sparse_noise&apos;, &apos;natural_movie_one&apos;, &apos;natural_movie_three&apos;, &apos;natural_movie_two&apos;, &apos;natural_scenes&apos;, &apos;spontaneous&apos;, &apos;static_gratings&apos;]
+Cux2 experiments: 42
+Example experiment container record:
+{&apos;age_days&apos;: 143.0,
+ &apos;cre_line&apos;: u&apos;Cux2-CreERT2&apos;,
+ &apos;id&apos;: 511510695,
+ &apos;imaging_depth&apos;: 175,
+ &apos;targeted_structure&apos;: u&apos;VISal&apos;}
 </pre>
 </div>
 </div>
@@ -239,7 +262,8 @@ cux2 experiments: 42
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Find-Cells-of-Interest">Find Cells of Interest<a class="anchor-link" href="#Find-Cells-of-Interest">&#182;</a></h2>
+<h2 id="Finding-Experiments-with-a-Particular-Stimulus">Finding Experiments with a Particular Stimulus<a class="anchor-link" href="#Finding-Experiments-with-a-Particular-Stimulus">&#182;</a></h2><p>The experiments described by an experiment container will have different stimulus protocols.  For example, one experiment protocol contains the static gratings stimulus and another has the natural scenes stimulus.  The <code>BrainObservatoryCache</code> helps you find out which experiment associated with a container has the stimuli you are interested in.</p>
+
 </div>
 </div>
 </div>
@@ -248,8 +272,143 @@ cux2 experiments: 42
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="c"># Download cells for a set of experiments</span>
+<div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stim_info</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;all stimuli: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">stim_info</span><span class="o">.</span><span class="n">all_stimuli</span><span class="p">())))</span>
+
+<span class="c"># Find the experiment with the static static gratings stimulus for a Cux2 container</span>
+<span class="n">cux2_ec_id</span> <span class="o">=</span> <span class="n">cux2_ecs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">]</span>
+<span class="n">exp</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">(</span><span class="n">experiment_container_ids</span><span class="o">=</span><span class="p">[</span><span class="n">cux2_ec_id</span><span class="p">],</span> <span class="n">stimuli</span><span class="o">=</span><span class="p">[</span><span class="n">stim_info</span><span class="o">.</span><span class="n">STATIC_GRATINGS</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Cux2 experiment with static gratings:&quot;</span><span class="p">)</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>all stimuli: [&apos;natural_movie_two&apos;, &apos;natural_movie_three&apos;, &apos;natural_movie_one&apos;, &apos;locally_sparse_noise&apos;, &apos;drifting_gratings&apos;, &apos;spontaneous&apos;, &apos;static_gratings&apos;, &apos;natural_scenes&apos;]
+Cux2 experiment with static gratings:
+{&apos;age_days&apos;: 143.0,
+ &apos;cre_line&apos;: u&apos;Cux2-CreERT2&apos;,
+ &apos;experiment_container_id&apos;: 511510695,
+ &apos;id&apos;: 503820068,
+ &apos;imaging_depth&apos;: 175,
+ &apos;session_type&apos;: u&apos;three_session_B&apos;,
+ &apos;targeted_structure&apos;: u&apos;VISal&apos;}
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Find-Cells-of-Interest">Find Cells of Interest<a class="anchor-link" href="#Find-Cells-of-Interest">&#182;</a></h2><p>Another way to look for data is to search for cells with interesting tuning properties.  We have pre-computed a set of cell metrics, including:</p>
+<table>
+<thead><tr>
+<th>stimulus</th>
+<th>metric</th>
+<th>field name </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>drifting gratings</td>
+<td>orientation selectivity</td>
+<td>osi_dg </td>
+</tr>
+<tr>
+<td></td>
+<td>direction selectivity</td>
+<td>dsi_dg </td>
+</tr>
+<tr>
+<td></td>
+<td>preferred direction</td>
+<td>pref_dir_dg </td>
+</tr>
+<tr>
+<td></td>
+<td>preferred temporal frequency</td>
+<td>pref_tf_dg </td>
+</tr>
+<tr>
+<td></td>
+<td>response p value</td>
+<td>p_dg </td>
+</tr>
+<tr>
+<td>static gratings</td>
+<td>orientation selectivity</td>
+<td>osi_sg </td>
+</tr>
+<tr>
+<td></td>
+<td>preferred orientation</td>
+<td>pref_ori_sg </td>
+</tr>
+<tr>
+<td></td>
+<td>preferred spatial frequency</td>
+<td>pref_sf_sg </td>
+</tr>
+<tr>
+<td></td>
+<td>preferred phase</td>
+<td>pref_phase_sg </td>
+</tr>
+<tr>
+<td></td>
+<td>mean time to peak response</td>
+<td>ttp_sg </td>
+</tr>
+<tr>
+<td></td>
+<td>response p value</td>
+<td>p_sg </td>
+</tr>
+<tr>
+<td>natural scenes</td>
+<td>mean time to peak response</td>
+<td>ttp_ns </td>
+</tr>
+<tr>
+<td></td>
+<td>preferred scene index</td>
+<td>pref_scene_ns </td>
+</tr>
+<tr>
+<td></td>
+<td>response p value</td>
+<td>p_ns </td>
+</tr>
+</tbody>
+</table>
+<p>You can use these properties to filter the full set of cells down to the set your are interested in.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="c"># Download cells for a set of experiments and convert to DataFrame</span>
 <span class="n">cells</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_cell_specimens</span><span class="p">()</span>
+<span class="n">cells</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;total cells: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">))</span>
 
 <span class="c"># find direction selective cells in VISp</span>
@@ -275,13 +434,6 @@ cux2 experiments: 42
 
 
 <div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading cell metrics and metadata for all cells. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>total cells: 18260
 VISp cells: 7167
@@ -300,13 +452,14 @@ direction-selective cells: 2257
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Find-Experiments-for-Cells">Find Experiments for Cells<a class="anchor-link" href="#Find-Experiments-for-Cells">&#182;</a></h2>
+<h2 id="Find-Experiments-for-Cells">Find Experiments for Cells<a class="anchor-link" href="#Find-Experiments-for-Cells">&#182;</a></h2><p>Once you have found a set of cells you would like to investigate, you can use the <code>BrainObservatoryCache</code> to find the experiments for those cells that contain the relevant stimulus.</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stim_info</span>
@@ -318,6 +471,9 @@ direction-selective cells: 2257
 <span class="c"># Download the ophys experiments containing the drifting gratings stimulus for VISp experiment containers</span>
 <span class="n">dsi_exps</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">(</span><span class="n">experiment_container_ids</span><span class="o">=</span><span class="n">dsi_ec_ids</span><span class="p">,</span> <span class="n">stimuli</span><span class="o">=</span><span class="p">[</span><span class="n">stim_info</span><span class="o">.</span><span class="n">DRIFTING_GRATINGS</span><span class="p">])</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;VISp drifting gratings ophys experiments: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">dsi_exps</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Example ophys experiment:&quot;</span><span class="p">)</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">dsi_exps</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -332,6 +488,14 @@ direction-selective cells: 2257
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>total dsi experiment containers: 25
 VISp drifting gratings ophys experiments: 25
+Example ophys experiment:
+{&apos;age_days&apos;: 123.0,
+ &apos;cre_line&apos;: u&apos;Rorb-IRES2-Cre&apos;,
+ &apos;experiment_container_id&apos;: 511507144,
+ &apos;id&apos;: 501724959,
+ &apos;imaging_depth&apos;: 275,
+ &apos;session_type&apos;: u&apos;three_session_A&apos;,
+ &apos;targeted_structure&apos;: u&apos;VISp&apos;}
 </pre>
 </div>
 </div>
@@ -345,17 +509,17 @@ VISp drifting gratings ophys experiments: 25
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Download-Experiment-Data-for-a-Cell">Download Experiment Data for a Cell<a class="anchor-link" href="#Download-Experiment-Data-for-a-Cell">&#182;</a></h2>
+<h2 id="Download-Experiment-Data-for-a-Cell">Download Experiment Data for a Cell<a class="anchor-link" href="#Download-Experiment-Data-for-a-Cell">&#182;</a></h2><p>Once you have some experiments, you can download the NWB files that contain the fluorescence traces for segmented cells in those experiments.</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">pprint</span>
-<span class="c"># pick a direction-selective cell and find its NWB file</span>
+<div class=" highlight hl-ipython2"><pre><span class="c"># pick a direction-selective cell and find its NWB file</span>
 <span class="n">dsi_cell</span> <span class="o">=</span> <span class="n">dsi_cells</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c"># figure out which ophys experiment has the drifting gratings stimulus for the cell&#39;s experiment container</span>
@@ -364,7 +528,11 @@ VISp drifting gratings ophys experiments: 25
 
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="n">cell_exp</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
 
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Metadata from NWB file:&quot;</span><span class="p">)</span>
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">data_set</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">())</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;stimuli available in this file:&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">data_set</span><span class="o">.</span><span class="n">list_stimuli</span><span class="p">())</span>
 </pre></div>
 
 </div>
@@ -376,15 +544,9 @@ VISp drifting gratings ophys experiments: 25
 
 
 <div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 511534603 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>{&apos;age_days&apos;: 93,
+<pre>Metadata from NWB file:
+{&apos;age_days&apos;: 93,
  &apos;cre_line&apos;: &apos;Scnn1a-Tg3-Cre&apos;,
  &apos;device&apos;: &apos;Nikon A1R-MP multiphoton microscope&apos;,
  &apos;device_name&apos;: &apos;CAM2P.2&apos;,
@@ -399,6 +561,8 @@ VISp drifting gratings ophys experiments: 25
  &apos;session_type&apos;: &apos;three_session_A&apos;,
  &apos;sex&apos;: &apos;male&apos;,
  &apos;targeted_structure&apos;: &apos;VISp&apos;}
+stimuli available in this file:
+[u&apos;drifting_gratings&apos;, u&apos;natural_movie_one&apos;, u&apos;natural_movie_three&apos;, u&apos;spontaneous&apos;]
 </pre>
 </div>
 </div>
@@ -419,7 +583,7 @@ VISp drifting gratings ophys experiments: 25
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">dsi_cell_id</span> <span class="o">=</span> <span class="n">dsi_cell</span><span class="p">[</span><span class="s">&#39;cell_specimen_id&#39;</span><span class="p">]</span>
@@ -437,7 +601,7 @@ VISp drifting gratings ophys experiments: 25
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -1764,13 +1928,14 @@ REREREREVYeBEBERERERVZ3/B5ztsuILAbGYAAAAAElFTkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="ROI-Masks">ROI Masks<a class="anchor-link" href="#ROI-Masks">&#182;</a></h2>
+<h2 id="ROI-Masks">ROI Masks<a class="anchor-link" href="#ROI-Masks">&#182;</a></h2><p>If you want to take a look at the cell visually, you can open the NWB file and extract a pixel mask.  You can also pull out the maximum intensity projection of the movie for context.</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
@@ -1815,20 +1980,6 @@ REREREREVYeBEBERERERVZ3/B5ztsuILAbGYAAAAAElFTkSuQmCC
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 510221121 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-</pre>
-</div>
-</div>
 
 <div class="output_area"><div class="prompt"></div>
 
@@ -2557,13 +2708,14 @@ QRAEQVjkiHATBEEQBEEQBEFY5IhwEwRBEARBEARBWOSIcBMEQRAEQRAEQVjkiHATBEEQBEEQBEFY
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="ROI-Analysis">ROI Analysis<a class="anchor-link" href="#ROI-Analysis">&#182;</a></h2>
+<h2 id="ROI-Analysis">ROI Analysis<a class="anchor-link" href="#ROI-Analysis">&#182;</a></h2><p>The code to compute all of the cell metrics available for download (along with several others we haven't put in our database yet) is in the AllenSDK.  All you need is an NWB file.  For example, this is how you compute metrics for the drifting gratings stimulus and plot some results.</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.drifting_grating</span> <span class="kn">import</span> <span class="n">DriftingGrating</span>
@@ -2586,16 +2738,8 @@ QRAEQVjkiHATBEEQBEEQBEFY5IhwEwRBEARBEARBWOSIcBMEQRAEQRAEQVjkiHATBEEQBEEQBEFY
 
 
 <div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 512326618 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
-done analyzing drifting grating
+<pre>done analyzing drifting grating
 </pre>
 </div>
 </div>
@@ -2606,7 +2750,7 @@ done analyzing drifting grating
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -2895,13 +3039,14 @@ mTWGCzUzM2sMF2pmZtYYLtTMzKwx/h8MPrlDg1gttQAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Neuropil-Correction">Neuropil Correction<a class="anchor-link" href="#Neuropil-Correction">&#182;</a></h2>
+<h2 id="Neuropil-Correction">Neuropil Correction<a class="anchor-link" href="#Neuropil-Correction">&#182;</a></h2><p>All of the raw fluorescence traces are available in NWB files, but some of these signals are contaminated by nearby neuropil signal.  The code to perform neuropil correction is available in the AllenSDK and can be used as follows:</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.r_neuropil</span> <span class="kn">import</span> <span class="n">estimate_contamination_ratios</span>
@@ -2937,13 +3082,362 @@ max error = 0.013380
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Running-Speed">Running Speed<a class="anchor-link" href="#Running-Speed">&#182;</a></h2>
+<p>The NWB files contain the neuropil and 'r' values needed to perform this correction, so you don't need to recompute them.  The corrected trace can be computed on the fly like this:</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">time</span><span class="p">,</span> <span class="n">corrected_traces</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_corrected_fluorescence_traces</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&quot;Neuropil-corrected Fluorescence Trace&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">corrected_traces</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+z76h8vWvS3/4Q/On1dg2OHiwdO65SfcNNzT+0bJ2y92rrpHk8eXTiy+6J5dSjTcNDe7nn9+8YTfa
+KDftd7/jxWJbAAAgAElEQVRzv+yy0P7QQ0n6BRe4jx/v/re/uV97rfuvftX8PBVq3Js33Lx5SfvG
+G2f2e/755s/v/vvdjzgiWbaGhsbzsvnmyTotVBb33ef/07Nnkv7aa/mnefHF7m++6f7007n95s/P
+n+986e7u//pX4WX9yU+S8d5+OzMvH3zgeT39tPummybTv/lm91dfzV2O4cPdp0/PnWddXRj23XfD
+79SpYT3H28qttybD/vWv7kuWuH/zm7nT2X//zO5HHsnMw+DBmf133dV90qRQTu7us2Yly9DQ4P75
+50n7M8+4f/ZZ7rp87bXQ/uabucu7+eaZ62n4cPerr3a/557Qf8iQkL54cdg/JPeRI92XLUvGiac1
+Y4b79tu7/+xn7t/7Xkg74ICk/yabZM7rW9/KXA/pbSw2ZEiSNmRIWM5rry28bV91Vfjdbrvc9ZAt
+7nfjjbnpd98d2l9/PXTH23S8zcTr/MILQ/ry5WH5LrnEvW/fkHbsseF3hx3cp0zJn9+33y68nW+3
+XVLe+ZoddnB/7rnc9CFD3D/+OBwTCo2bXoeTJ2eue8m9f//c9Re3P/xw7nKk9xn3sF2ecEJo/9Wv
+3H/966bLw939ww/DvhYPN3t2SB8zxv2NN9y//e2Q/s477itWuA8aFLbVzTYL6bfcEn7nzAnDNjSE
+dZTO78qV7tOm5W4HcZPv3HHccZnDDh9eeN3Gx/GttnL/6U+T9F69wu+AAWFaq64aum+6KXMdLFgQ
+0hsa3Dt3TtbX5Zcn0xoxIml/9dXcdbveeu4vvJDsB/Hxyz3sv4sXh2PokiXuv/lN4TKZNy8c6956
+KzN9v/3Ccm60kfs3vpG5LnffPWyD8XJ873uZ486YkRwfHnjA/eCDc+c/e7b7mWdmpm20kfuOO+bP
+Z2Mk9+7d86f/+c8tn567+xdfhN+77grbpbv7//1fmObChaHJnpcUju+FzJ3b/Pln70dTpiTngthL
+L4XjUWzFCvcvv8wcd8KE5DwgZZ6PTz01DHPqqe6XXhrGbantt2/eMXjMmNB9/fWhe+TI/MN9/HHL
+89AUKZy/jzsu2e/WXjszz1K4vomvkQpZsMD9rLOSa6Ri/fGPmft2XMa77pqkHXJI49NIj99YGfbu
+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
+qYMAAAAASUVORK5CYII=
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Running-Speed">Running Speed<a class="anchor-link" href="#Running-Speed">&#182;</a></h2><p>We recorded the animal's running speed during the course of the experiment and made it available in the NWB file.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -2964,20 +3458,6 @@ max error = 0.013380
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 501940850 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-</pre>
-</div>
-</div>
 
 <div class="output_area"><div class="prompt"></div>
 
@@ -3345,13 +3825,14 @@ iIiIiCoCgx8iIiIiIqoIDH6IiIiIiKgiMPghIiIiIqKK8P96pfFI+uzIxQAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Motion-Correction">Motion Correction<a class="anchor-link" href="#Motion-Correction">&#182;</a></h2>
+<h2 id="Motion-Correction">Motion Correction<a class="anchor-link" href="#Motion-Correction">&#182;</a></h2><p>X and Y translation values in pixels required to correct for motion artifacts during the experiment are available as well.</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>

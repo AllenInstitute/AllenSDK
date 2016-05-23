@@ -46,7 +46,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'OphysExperiment',
              'criteria': '{% if ophys_experiment_ids is defined %}[id$in{{ ophys_experiment_ids }}]{%endif%}',
-             'include': 'well_known_files(well_known_file_type),targeted_structure,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD]))',
+             'include': 'well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines))',
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['ophys_experiment_ids']
@@ -86,7 +86,7 @@ class BrainObservatoryApi(RmaTemplate):
              'description': 'see name',
              'model': 'ExperimentContainer',
              'criteria': '{% if experiment_container_ids is defined %}[id$in{{ experiment_container_ids }}]{%endif%}',
-             'include': 'ophys_experiments,isi_experiment,specimen(donor(transgenic_lines[transgenic_line_type_code$eqD])),targeted_structure',
+             'include': 'ophys_experiments,isi_experiment,specimen(donor(age,transgenic_lines)),targeted_structure',
              'num_rows': 'all',
              'count': False, 
              'criteria_params': ['experiment_container_ids']
@@ -285,7 +285,8 @@ class BrainObservatoryApi(RmaTemplate):
                                    experiment_container_metric_ids=experiment_container_metric_ids)
         
         return data
-
+    
+    
     def save_ophys_experiment_data(self, ophys_experiment_id, file_name):
         dirname = os.path.dirname(file_name)
         Manifest.safe_mkdir(dirname)
@@ -304,7 +305,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
         
-
+    
     def filter_experiment_containers(self, containers, targeted_structures=None, imaging_depths=None, transgenic_lines=None):
         if targeted_structures is not None:
             containers = [ c for c in containers if c['targeted_structure']['acronym'] in targeted_structures ]
@@ -316,11 +317,11 @@ class BrainObservatoryApi(RmaTemplate):
             containers = [ c for c in containers for tl in c['specimen']['donor']['transgenic_lines'] if tl['name'] in transgenic_lines ]
 
         return containers
-
-
+    
+    
     def filter_ophys_experiments(self, experiments, experiment_container_ids=None,
                                  targeted_structures=None, imaging_depths=None, 
-                                 transgenic_lines=None, stimuli=None, sessions=None):
+                                 transgenic_lines=None, stimuli=None, stimulus_sessions=None):
 
         # re-using the code from above
         experiments = self.filter_experiment_containers(experiments, targeted_structures, imaging_depths, transgenic_lines)
@@ -328,34 +329,14 @@ class BrainObservatoryApi(RmaTemplate):
         if experiment_container_ids is not None:
             experiments = [ e for e in experiments if e['experiment_container_id'] in experiment_container_ids ]
             
-        if sessions is not None:
-            experiments = [ e for e in experiments if e['stimulus_name'] in sessions ]
+        if stimulus_sessions is not None:
+            experiments = [ e for e in experiments if e['stimulus_name'] in stimulus_sessions ]
 
         if stimuli is not None:
             experiments = [ e for e in experiments 
-                            if len(set(stimuli) & set(stimulus_info.SESSION_STIMULUS_MAP[e['stimulus_name']])) > 0 ]
+                            if len(set(stimuli) & set(stimulus_info.stimuli_in_session(e['stimulus_name']))) > 0 ]
 
         return experiments
 
     def filter_cell_specimens(self, cell_specimens):
         return cell_specimens
-
-    
-if __name__ == '__main__':
-    from allensdk.api.api import Api
-    from allensdk.api.queries.brain_observatory_api \
-        import BrainObservatoryApi
-    import pandas as pd
-        
-    host = 'http://testwarehouse:9000'
-    Api.default_api_url = host
-    bapi = BrainObservatoryApi()
-    
-    
-    #names = brain_observatory_api.list_column_definition_class_names()
-    
-    print(len(bapi.get_experiment_containers()))
-    
-
-
-    

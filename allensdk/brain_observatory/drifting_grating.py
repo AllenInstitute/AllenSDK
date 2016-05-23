@@ -60,7 +60,7 @@ class DriftingGrating(StimulusAnalysis):
         '''finds the peak response for each cell'''
         DriftingGrating._log.info('Calculating peak response properties')
         
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_variability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg','cv_dg'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_reliability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg','cv_dg'))
 
         orivals_rad = np.deg2rad(self.orivals)
         for nc in range(self.numbercells):
@@ -69,7 +69,7 @@ class DriftingGrating(StimulusAnalysis):
             preftf = cell_peak[1][0]+1
             peak.ori_dg.iloc[nc] = prefori
             peak.tf_dg.iloc[nc] = preftf
-            peak.response_variability_dg.iloc[nc] = self.response[prefori, preftf, nc, 2]/0.15
+            peak.response_reliability_dg.iloc[nc] = self.response[prefori, preftf, nc, 2]/0.15
             pref = self.response[prefori, preftf, nc, 0]            
             orth1 = self.response[np.mod(prefori+2, 8), preftf, nc, 0]
             orth2 = self.response[np.mod(prefori-2, 8), preftf, nc, 0]
