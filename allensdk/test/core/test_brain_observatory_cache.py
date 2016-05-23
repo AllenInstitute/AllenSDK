@@ -175,7 +175,7 @@ def test_get_stimulus_mappings(brain_observatory_cache):
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):   
             # Download a list of all transgenic driver lines 
-            tls = brain_observatory_cache.get_stimulus_mappings()
+            tls = brain_observatory_cache._get_stimulus_mappings()
             
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
@@ -183,7 +183,7 @@ def test_get_stimulus_mappings(brain_observatory_cache):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-@pytest.mark.skip(reason="need to develop mocks")
+@pytest.mark.skipif(True, reason="need to develop mocks")
 def test_get_cell_specimens(brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
