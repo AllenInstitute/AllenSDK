@@ -86,14 +86,13 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.11.0
----------------------------
+What's New - Release 0.12.0 (June 9, 2016)
+------------------------------------------
 
-The 0.11.0 release addressed several issues raised on our Github issue tracker.  Other changes and updates include:
+The 0.12.0 release debuts functionality related to the Allen Brain Observatory.  Changes include:
 
-    * Cell Types Database cells can now be filtered on their reporter status (cre+ or cre-).
-    * Cell Types Database reconstructions have markers indicating truncation and tracing termination.
-    * The Morphology class has a number of new methods for tree manipulation, and slightly different internal data structure for compartments.
-    * The GLIF simulator has more standard function names for dynamics and reset rules.
+    * BrainObservatoryCache and BrainObservatoryApi data/file manipulation classes
+    * Code for neurpil subtraction, dF/F estimation, and tuning analysis.
+    * New ephys feature extractor: ephys_features.py, ephys_extractor.py.  The old one is still there (feature_extractor.py) but should be considered deprecated.
 
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 
