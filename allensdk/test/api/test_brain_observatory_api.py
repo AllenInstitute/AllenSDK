@@ -65,14 +65,14 @@ def mock_ophys_experiments():
           'targeted_structure': { 'acronym': 'CBS' },
           'imaging_depth': 100,
           'specimen': { 'donor': {
-            'transgenic_lines': [ { 'name': 'Shiny' }] } },
+              'transgenic_lines': [ { 'name': 'Shiny' }] } },
           'stimulus_name': 'three_session_B'
         },
         { 'experiment_container_id': 2,
           'targeted_structure': { 'acronym': 'NBC' },
           'imaging_depth': 200,
           'specimen': { 'donor': {
-            'transgenic_lines': [ { 'name': 'Don' }] } },
+              'transgenic_lines': [ { 'name': 'Don' }] } },
           'stimulus_name': 'three_session_C'
         }
     ]
