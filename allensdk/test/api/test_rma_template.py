@@ -3,6 +3,7 @@ from mock import MagicMock
 import allensdk.core.json_utilities as ju
 from allensdk.api.queries.rma_template import RmaTemplate
 
+
 @pytest.fixture
 def rma():
     templates = \
@@ -76,14 +77,14 @@ def rma():
              'criteria': 'structure_graph(ontology),graphic_group_labels',
              'include': 'structure_graph(ontology),graphic_group_labels',
              'only': ['atlases.id',
-                       'atlases.name',
-                       'atlases.image_type',
-                       'ontologies.id',
-                       'ontologies.name',
-                       'structure_graphs.id',
-                       'structure_graphs.name',
-                       'graphic_group_labels.id',
-                       'graphic_group_labels.name'],
+                      'atlases.name',
+                      'atlases.image_type',
+                      'ontologies.id',
+                      'ontologies.name',
+                      'structure_graphs.id',
+                      'structure_graphs.name',
+                      'graphic_group_labels.id',
+                      'graphic_group_labels.name'],
              'num_rows': 'all',
              'count': False
             }
@@ -101,7 +102,10 @@ def test_atlases_list(rma):
     rma.template_query('ontology_queries',
                        'atlases_list')
     
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::options%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D')
+    ju.read_url_get.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::Atlas,rma::options"
+        "%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")
 
 
 def test_structure_graphs_list(rma):
@@ -112,7 +116,10 @@ def test_structure_graphs_list(rma):
     rma.template_query('ontology_queries',
                        'structure_graphs_list')
     
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::StructureGraph,rma::options%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D')
+    ju.read_url_get.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::StructureGraph,rma::options"
+        "%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")
 
 
 def test_structure_sets_list(rma):
@@ -123,7 +130,10 @@ def test_structure_sets_list(rma):
     rma.template_query('ontology_queries',
                        'structure_sets_list')
     
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::StructureSet,rma::options%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D')
+    ju.read_url_get.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::StructureSet,rma::options"
+        "%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")
 
 
 def test_structures_by_graph_ids(rma):
@@ -135,7 +145,12 @@ def test_structures_by_graph_ids(rma):
                        'structures_by_graph_ids',
                        graph_ids='1')
     
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,%5Bgraph_id$in1%5D,rma::options%5Bnum_rows$eq%27all%27%5D%5Border$eqstructures.graph_order%5D%5Bcount$eqfalse%5D')
+    ju.read_url_get.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::Structure,rma::criteria,"
+        "%5Bgraph_id$in1%5D,rma::options"
+        "%5Bnum_rows$eq%27all%27%5D%5Border$eqstructures.graph_order%5D"
+        "%5Bcount$eqfalse%5D")
 
 
 def test_structures_by_two_graph_ids(rma):
@@ -147,7 +162,13 @@ def test_structures_by_two_graph_ids(rma):
                        'structures_by_graph_ids',
                        graph_ids=[1, 2])
     
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,%5Bgraph_id$in1,2%5D,rma::options%5Bnum_rows$eq%27all%27%5D%5Border$eqstructures.graph_order%5D%5Bcount$eqfalse%5D')
+    ju.read_url_get.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::Structure,rma::criteria,"
+        "%5Bgraph_id$in1,2%5D,"
+        "rma::options"
+        "%5Bnum_rows$eq%27all%27%5D"
+        "%5Border$eqstructures.graph_order%5D%5Bcount$eqfalse%5D")
 
 
 def test_structures_by_graph_names(rma):
@@ -159,7 +180,13 @@ def test_structures_by_graph_names(rma):
                        'structures_by_graph_names',
                        graph_names=rma.quote_string('Human+Brain+Atlas'))
     
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,graph%5Bstructure_graphs.name$in%27Human+Brain+Atlas%27%5D,rma::options%5Bnum_rows$eq%27all%27%5D%5Border$eqstructures.graph_order%5D%5Bcount$eqfalse%5D')
+    ju.read_url_get.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::Structure,rma::criteria,"
+        "graph%5Bstructure_graphs.name$in%27Human+Brain+Atlas%27%5D,"
+        "rma::options"
+        "%5Bnum_rows$eq%27all%27%5D"
+        "%5Border$eqstructures.graph_order%5D%5Bcount$eqfalse%5D")
 
 
 def test_structures_by_set_ids(rma):
@@ -171,7 +198,11 @@ def test_structures_by_set_ids(rma):
                        'structures_by_graph_ids',
                        graph_ids='1')
     
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::Structure,rma::criteria,%5Bgraph_id$in1%5D,rma::options%5Bnum_rows$eq%27all%27%5D%5Border$eqstructures.graph_order%5D%5Bcount$eqfalse%5D')
+    ju.read_url_get.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::Structure,rma::criteria,"
+        "%5Bgraph_id$in1%5D,rma::options%5Bnum_rows$eq%27all%27%5D"
+        "%5Border$eqstructures.graph_order%5D%5Bcount$eqfalse%5D")
 
 
 def test_atlases_table(rma):
@@ -182,7 +213,12 @@ def test_atlases_table(rma):
     rma.template_query('ontology_queries',
                        'atlases_table')
     
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::criteria,structure_graph%28ontology%29,graphic_group_labels,rma::include,%5Bstructure_graph%28ontology%29,graphic_group_labels,rma::options%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D')
+    ju.read_url_get.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::Atlas,rma::criteria,"
+        "structure_graph%28ontology%29,graphic_group_labels,"
+        "rma::include,%5Bstructure_graph%28ontology%29,graphic_group_labels,"
+        "rma::options%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")
 
 
 def test_atlases_table_one_graph(rma):
@@ -194,7 +230,12 @@ def test_atlases_table_one_graph(rma):
                        'atlases_table',
                        graph_ids=1)
     
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::criteria,%5Bgraph_id$in1%5D,structure_graph%28ontology%29,graphic_group_labels,rma::include,%5Bstructure_graph%28ontology%29,graphic_group_labels,rma::options%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D')
+    ju.read_url_get.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::Atlas,rma::criteria,"
+        "%5Bgraph_id$in1%5D,structure_graph%28ontology%29,graphic_group_labels,"
+        "rma::include,%5Bstructure_graph%28ontology%29,graphic_group_labels,"
+        "rma::options%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")
 
 
 def test_atlases_table_brief(rma):
@@ -205,4 +246,12 @@ def test_atlases_table_brief(rma):
     rma.template_query('ontology_queries',
                        'atlases_table_brief')
     
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/query.json?q=model::Atlas,rma::criteria,structure_graph%28ontology%29,graphic_group_labels,rma::include,structure_graph%28ontology%29,graphic_group_labels,rma::options%5Bonly$eq%27atlases.id,atlases.name,atlases.image_type,ontologies.id,ontologies.name,structure_graphs.id,structure_graphs.name,graphic_group_labels.id,graphic_group_labels.name%27%5D%5Bnum_rows$eq%27all%27%5D%5Bcount$eqfalse%5D')
+    ju.read_url_get.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/data/query.json?q="
+        "model::Atlas,"
+        "rma::criteria,structure_graph%28ontology%29,graphic_group_labels,"
+        "rma::include,structure_graph%28ontology%29,graphic_group_labels,"
+        "rma::options%5Bonly$eq%27atlases.id,atlases.name,atlases.image_type,"
+        "ontologies.id,ontologies.name,structure_graphs.id,structure_graphs.name,"
+        "graphic_group_labels.id,graphic_group_labels.name%27%5D%5B"
+        "num_rows$eq%27all%27%5D%5Bcount$eqfalse%5D")

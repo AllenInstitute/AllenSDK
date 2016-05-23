@@ -1,6 +1,23 @@
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
+
 import pytest
 from mock import MagicMock
 from allensdk.api.queries.grid_data_api import GridDataApi
+
 
 @pytest.fixture
 def grid_data():
@@ -12,7 +29,8 @@ def grid_data():
 
 
 def test_api_doc_url_download_expression_grid(grid_data):
-    '''Url to download the 200um density volume for the Mouse Brain Atlas SectionDataSet 69816930.
+    '''Url to download the 200um density volume 
+       for the Mouse Brain Atlas SectionDataSet 69816930.
     
     Notes
     -----
@@ -40,9 +58,12 @@ def test_api_doc_url_download_expression_grid_energy_intensity(grid_data):
     section_data_set_id = 183282970
     include = ['energy', 'intensity']
     grid_data.download_expression_grid_data(section_data_set_id,
-                                           include=include)
-    expected = 'http://api.brain-map.org/grid_data/download/183282970?include=energy,intensity'
-    grid_data.retrieve_file_over_http.assert_called_once_with(expected, path)
+                                            include=include)
+    
+    grid_data.retrieve_file_over_http.assert_called_once_with(
+        "http://api.brain-map.org/grid_data/download/183282970"
+        "?include=energy,intensity",
+        path)
 
 
 def test_api_doc_url_projection_grid(grid_data):
@@ -71,8 +92,11 @@ def test_api_doc_url_projection_grid_injection_fraction_resolution(grid_data):
     section_data_set_id = 181777177
     path = 'id.nrrd'
     grid_data.download_projection_grid_data(section_data_set_id,
-                                           [grid_data.INJECTION_FRACTION],
-                                           resolution=25,
-                                           save_file_path=path)
-    expected = 'http://api.brain-map.org/grid_data/download_file/181777177?image=injection_fraction&resolution=25'     
-    grid_data.retrieve_file_over_http.assert_called_once_with(expected, path)
+                                            [grid_data.INJECTION_FRACTION],
+                                            resolution=25,
+                                            save_file_path=path)
+    
+    grid_data.retrieve_file_over_http.assert_called_once_with(
+        "http://api.brain-map.org/grid_data/download_file/181777177"
+        "?image=injection_fraction&resolution=25",
+        path)
