@@ -501,7 +501,8 @@ class BrainObservatoryNwbDataSet(object):
 
     
     def get_running_speed(self):
-        '''returns the mouse running speed in cm/s'''
+        ''' Returns the mouse running speed in cm/s
+        '''
         with h5py.File(self.nwb_file, 'r') as f:
             dxcm = f['processing'][self.PIPELINE_DATASET]['BehavioralTimeSeries']['running_speed']['data'].value
             dxtime = f['processing'][self.PIPELINE_DATASET]['BehavioralTimeSeries']['running_speed']['timestamps'].value
@@ -519,7 +520,8 @@ class BrainObservatoryNwbDataSet(object):
         return dxcm, dxtime
     
     def get_motion_correction(self):
-        '''returns a DataFrame containing the x- and y- translation of each image used for image alignment'''
+        ''' Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment
+        '''
         with h5py.File(self.nwb_file, 'r') as f:
             motion_log = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['data'].value
             motion_time = f['processing'][self.PIPELINE_DATASET]['MotionCorrection']['2p_image_series']['xy_translations']['timestamps'].value
@@ -531,6 +533,9 @@ class BrainObservatoryNwbDataSet(object):
     
     
     def save_analysis_dataframes(self, *tables):
+        # NOTE: should use NWB library to write data to NWB file. It is 
+        #   designed to avoid possible corruption of the file in event
+        #   of a failed write
         store = pd.HDFStore(self.nwb_file, mode='a')
 
         for k,v in tables:
@@ -540,6 +545,9 @@ class BrainObservatoryNwbDataSet(object):
         
 
     def save_analysis_arrays(self, *datasets):    
+        # NOTE: should use NWB library to write data to NWB file. It is 
+        #   designed to avoid possible corruption of the file in event
+        #   of a failed write
         with h5py.File(self.nwb_file, 'a') as f:
             for k,v in datasets:
                 if k in f['analysis']:
@@ -569,6 +577,7 @@ def warp_stimulus_coords(vertices,
     mon_res: tuple
         monitor resolution (x,y)
     eyepoint: tuple
+
     Returns
     -------
     np.ndarray

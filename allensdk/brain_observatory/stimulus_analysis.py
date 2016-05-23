@@ -49,12 +49,16 @@ class StimulusAnalysis(object):
         raise BrainObservatoryAnalysisException("get_peak not implemented")
         
     def get_global_dff(self):
+        ''' Returns dF/F traces
+        '''
         return self.dfftraces
     
     def get_speed_tuning(self, binsize):
+        ''' Calculates speed tuning, spontaneous versus visually driven
+        '''
         StimulusAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')
         
-        celltraces_trimmed = np.delete(self.celltraces_dff, range(len(self.dxcm), np.size(self.celltraces_dff,1)), axis=1) 
+        celltraces_trimmed = np.delete(self.dfftraces, range(len(self.dxcm), np.size(self.dfftraces,1)), axis=1) 
 
         # pull out spontaneous epoch(s)        
         spontaneous = self.brain_observatory_analysis.nwb.get_spontaneous_activity_stimulus_table()
@@ -194,7 +198,10 @@ class StimulusAnalysis(object):
         return binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
 
     def get_sweep_response(self):
-        '''calculates the response to each sweep and then for each stimulus condition'''
+        ''' Calculates the response to each sweep and then for each 
+        stimulus condition
+        
+        '''
         def do_mean(x):
             return np.mean(x[self.interlength:self.interlength+self.sweeplength+self.extralength])#+1])
             

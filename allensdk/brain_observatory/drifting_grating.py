@@ -39,6 +39,12 @@ class DriftingGrating(StimulusAnalysis):
         self.peak = self.get_peak()
     
     def get_response(self):
+        ''' Computes the response for each cell
+
+        Returns
+        -------
+        Numpy array storing cell responses
+        '''
         DriftingGrating._log.info("Calculating mean responses")
         
         response = np.empty((self.number_ori, self.number_tf, self.numbercells+1, 3))
@@ -57,7 +63,23 @@ class DriftingGrating(StimulusAnalysis):
         return response
     
     def get_peak(self):
-        '''finds the peak response for each cell'''
+        ''' Computes the peak response for each cell
+        
+        Returns
+        -------
+        Pnada data frame containing the following columns (_dg suffix is
+        for drifting grating):
+            * ori_dg (orientation)
+            * tf_dg (temporal frequency)
+            * response_reliability_dg
+            * osi_dg (orientation selectivity index)
+            * dsi_dg (direction selectivity index)
+            * peak_dff_dg (peak dF/F)
+            * ptest_dg
+            * p_run_dg
+            * run_modulation_dg
+            * cv_dg (coefficient of variance?)
+        '''
         DriftingGrating._log.info('Calculating peak response properties')
         
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_reliability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg','cv_dg'))
