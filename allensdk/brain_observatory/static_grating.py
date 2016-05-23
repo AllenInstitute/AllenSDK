@@ -36,7 +36,7 @@ class StaticGrating(StimulusAnalysis):
         '''
         super(StaticGrating, self).__init__(brain_observatory_analysis, **kwargs)
         
-        stimulus_table = self.brain_observatory_analysis.nwb.get_static_gratings_stimulus_table()
+        stimulus_table = self.brain_observatory_analysis.nwb.get_stimulus_table('static_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = self.stim_table['end'].iloc[1] - self.stim_table['start'].iloc[1]
         self.interlength = 4 * self.sweeplength

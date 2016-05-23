@@ -219,9 +219,8 @@ class BrainObservatoryCache(Cache):
         return exps
 
 
-    def get_stimulus_mappings(self, file_name=None):
-        """ Returns a mapping of which metrics are related to which stimuli. 
-        Primarily for internal use. """
+    def _get_stimulus_mappings(self, file_name=None):
+        """ Returns a mapping of which metrics are related to which stimuli. Internal use only. """
 
         file_name = self.get_cache_path(file_name, self.STIMULUS_MAPPINGS_KEY)
 
@@ -272,7 +271,7 @@ class BrainObservatoryCache(Cache):
         
         # drop the thumbnail columns
         if simple:
-            mappings = self.get_stimulus_mappings()
+            mappings = self._get_stimulus_mappings()
             thumbnails = [ m['item'] for m in mappings if m['item_type'] == 'T' and m['level'] == 'R']
             for cs in cell_specimens:
                 for t in thumbnails:

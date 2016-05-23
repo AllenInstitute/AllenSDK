@@ -61,7 +61,7 @@ class StimulusAnalysis(object):
         celltraces_trimmed = np.delete(self.dfftraces, range(len(self.dxcm), np.size(self.dfftraces,1)), axis=1) 
 
         # pull out spontaneous epoch(s)        
-        spontaneous = self.brain_observatory_analysis.nwb.get_spontaneous_activity_stimulus_table()
+        spontaneous = self.brain_observatory_analysis.nwb.get_stimulus_table('spontaneous')
 
         peak_run = pd.DataFrame(index=range(self.numbercells), columns=('speed_max_sp','speed_min_sp','ptest_sp', 'mod_sp','speed_max_vis','speed_min_vis','ptest_vis', 'mod_vis'))
 

@@ -36,6 +36,11 @@ class BrainObservatoryNwbDataSet(object):
         'session_start_time': 'session_start_time',
         'session_type': 'general/session_type'
         }
+
+    STIMULUS_TABLE_TYPES = {
+        'abstract_feature_series': [ 'drifting_gratings', 'static_gratings' ],
+        'indexed_time_series': [ 'natural_movie_one', 'natural_movie_two', 'natural_movie_three', 'natural_scenes', 'locally_sparse_noise' ]
+        }
     
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
@@ -237,55 +242,16 @@ class BrainObservatoryNwbDataSet(object):
             keys = f["stimulus/presentation/"].keys()
         return [ k.replace('_stimulus','') for k in keys ]
 
-    def get_drifting_gratings_stimulus_table(self):
-        ''' Return the drifting gratings stimulus table, if it exists.
-
-        Returns
-        -------
-        stimulus table: pd.DataFrame
-        '''
-        return self.get_abstract_feature_series_stimulus_table("drifting_gratings_stimulus")
-
-    def get_natural_movie_stimulus_table(self, movie_name):
-        ''' Return the natural movie stimulus table, if it exists.  
-
-        Parameters
-        ----------
-        movie_name: string
-             One of 'natural_movie_one', 'natural_movie_two', or 'natural_movie_three'.
-
-        Returns
-        -------
-        stimulus table: pd.DataFrame
-        '''
-        return self.get_indexed_time_series_stimulus_table(movie_name + "_stimulus")
-
-    def get_natural_scenes_stimulus_table(self):
-        ''' Return the natural scenes stimulus table, if it exists.
-
-        Returns
-        -------
-        stimulus table: pd.DataFrame
-        '''
-        return self.get_indexed_time_series_stimulus_table("natural_scenes_stimulus")
-
-    def get_static_gratings_stimulus_table(self):
-        ''' Return the static gratings stimulus table, if it exists.
-
-        Returns
-        -------
-        stimulus table: pd.DataFrame
-        '''
-        return self.get_abstract_feature_series_stimulus_table("static_gratings_stimulus")
-
-    def get_locally_sparse_noise_stimulus_table(self):
-        ''' Return the locally sparse noise stimulus table, if it exists.
-
-        Returns
-        -------
-        stimulus table: pd.DataFrame
-        '''
-        return self.get_indexed_time_series_stimulus_table("locally_sparse_noise_stimulus")
+    def get_stimulus_table(self, stimulus_name):
+        ''' Return a stimulus table given a stimulus name '''
+        if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
+            return self.get_abstract_feature_series_stimulus_table(stimulus_name + "_stimulus")
+        elif stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
+            return self.get_indexed_time_series_stimulus_table(stimulus_name + "_stimulus")
+        elif stimulus_name == 'spontaneous':
+            return self.get_spontaneous_activity_stimulus_table()
+        else:
+            raise IOError("Could not find a stimulus table named '%s'" % stimulus_name)
 
     def get_spontaneous_activity_stimulus_table(self):
         ''' Return the spontaneous activity stimulus table, if it exists.
