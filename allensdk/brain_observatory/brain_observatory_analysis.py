@@ -21,7 +21,7 @@ from allensdk.brain_observatory.natural_movie import NaturalMovie
 
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import allensdk.brain_observatory.stimulus_info as stimulus_info
-
+from allensdk.brain_observatory.brain_observatory_exceptions import BrainObservatoryAnalysisException
 import allensdk.brain_observatory.brain_observatory_plotting as cp
 import argparse, logging, os
 import sys

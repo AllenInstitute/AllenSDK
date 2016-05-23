@@ -269,7 +269,7 @@ Example experiment container record:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stim_info</span>
@@ -369,7 +369,7 @@ Example experiment container record:
 <tr>
 <td></td>
 <td>mean time to peak response</td>
-<td>ttp_sg </td>
+<td>time_to_peak_sg </td>
 </tr>
 <tr>
 <td></td>
@@ -379,7 +379,7 @@ Example experiment container record:
 <tr>
 <td>natural scenes</td>
 <td>mean time to peak response</td>
-<td>ttp_ns </td>
+<td>time_to_peak_ns </td>
 </tr>
 <tr>
 <td></td>
@@ -407,7 +407,6 @@ Example experiment container record:
 <span class="n">cells</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_cell_specimens</span><span class="p">()</span>
 <span class="n">cells</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;total cells: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">))</span>
-
 <span class="c"># find direction selective cells in VISp</span>
 <span class="n">visp_ec_ids</span> <span class="o">=</span> <span class="p">[</span> <span class="n">ec</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">ec</span> <span class="ow">in</span> <span class="n">visp_ecs</span> <span class="p">]</span>
 <span class="n">visp_cells</span> <span class="o">=</span> <span class="n">cells</span><span class="p">[</span><span class="n">cells</span><span class="p">[</span><span class="s">&#39;experiment_container_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">visp_ec_ids</span><span class="p">)]</span>
