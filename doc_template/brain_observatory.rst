@@ -2,7 +2,7 @@ Brain Observatory
 =================
 
 The `Allen Brain Observatory <http://activity.brain-map.org/visualcoding>`_ is database of the visually-evoked functional
-responses neurons in mouse visual cortex based on 2-photo fluorescence imaging.  Characterized responses include orientation 
+responses neurons in mouse visual cortex based on 2-photon fluorescence imaging.  Characterized responses include orientation 
 tuning, spatial and temporal frequency tuning, temporal dynamics, and spatial receptive field structure. 
 
 The data is primarily organized into experiments and experiment containers.  An experiment container represents a group of 
@@ -15,7 +15,7 @@ experiment. Segmented cells for experiments belonging to the same experiment con
 with each other in a post-process.  
 
 All traces for segmented cells in a single experiment are stored in the Neurodata Without Borders (NWB) format.
-Traces include every cell's mean fluoresence trace, neuropil trace, and dF/F trace.  Code for extracted neuropil-corrected
+Traces include every cell's mean fluoresence trace, neuropil trace, and dF/F trace.  Code for extracting neuropil-corrected
 traces is available in the SDK. 
 
 For more details on experimental design and data processing, please refer to the technical whitepapers (TODO).
