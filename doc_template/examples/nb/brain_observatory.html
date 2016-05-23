@@ -269,12 +269,10 @@ Example experiment container record:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stim_info</span>
-
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;all stimuli: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">stim_info</span><span class="o">.</span><span class="n">all_stimuli</span><span class="p">())))</span>
 
 <span class="c"># Find the experiment with the static static gratings stimulus for a Cux2 container</span>
 <span class="n">cux2_ec_id</span> <span class="o">=</span> <span class="n">cux2_ecs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">]</span>
@@ -293,8 +291,7 @@ Example experiment container record:
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>all stimuli: [&apos;natural_movie_two&apos;, &apos;natural_movie_three&apos;, &apos;natural_movie_one&apos;, &apos;locally_sparse_noise&apos;, &apos;drifting_gratings&apos;, &apos;spontaneous&apos;, &apos;static_gratings&apos;, &apos;natural_scenes&apos;]
-Cux2 experiment with static gratings:
+<pre>Cux2 experiment with static gratings:
 {&apos;age_days&apos;: 143.0,
  &apos;cre_line&apos;: u&apos;Cux2-CreERT2&apos;,
  &apos;experiment_container_id&apos;: 511510695,
