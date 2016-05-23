@@ -39,7 +39,8 @@ class BrainObservatoryNwbDataSet(object):
 
     STIMULUS_TABLE_TYPES = {
         'abstract_feature_series': [ 'drifting_gratings', 'static_gratings' ],
-        'indexed_time_series': [ 'natural_movie_one', 'natural_movie_two', 'natural_movie_three', 'natural_scenes', 'locally_sparse_noise' ]
+        'indexed_time_series': [ 'natural_movie_one', 'natural_movie_two', 'natural_movie_three', 
+                                 'natural_scenes', 'locally_sparse_noise' ]
         }
     
     def __init__(self, nwb_file):

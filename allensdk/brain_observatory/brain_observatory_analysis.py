@@ -39,7 +39,7 @@ def multi_dataframe_merge(dfs):
 class BrainObservatoryAnalysis(object):
     _log = logging.getLogger('allensdk.brain_observatory.brain_observatory_analysis')    
 
-    def __init__(self, nwb_path, save_path, metadata=None):
+    def __init__(self, nwb_path, save_path):
         self.nwb = BrainObservatoryNwbDataSet(nwb_path)                        
         self.save_path = save_path
 
@@ -47,12 +47,7 @@ class BrainObservatoryAnalysis(object):
         self.metrics_b = {}
         self.metrics_c = {}
 
-        if metadata is None:
-            metadata = {}
-
         self.metadata = self.nwb.get_metadata()
-        for k,v in metadata.iteritems():
-            self.metadata[k] = v
 
     def append_metadata(self, df):
         for k,v in self.metadata.iteritems():
@@ -207,18 +202,15 @@ class BrainObservatoryAnalysis(object):
             self.save_session_c(lsn, nm1, nm2, peak)
     
                     
-def run_brain_observatory_analysis(session, nwb_path, save_path, metadata=None, plot_flag=False):
+def run_brain_observatory_analysis(nwb_path, save_path, plot_flag=False):
     save_dir = os.path.dirname(save_path)
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    brain_observatory_analysis = BrainObservatoryAnalysis(nwb_path, save_path, metadata)
-    try:
-        session = brain_observatory_analysis.nwb.get_session_type()
-        print("** Able to read session type from NWB file. Deprecate 'session' argument from run_brain_observatory_analysis()")
-    except:
-        pass
+    brain_observatory_analysis = BrainObservatoryAnalysis(nwb_path, save_path)
+
+    session = brain_observatory_analysis.nwb.get_session_type()
 
     if session == stimulus_info.THREE_SESSION_A:
         brain_observatory_analysis.session_a(plot_flag)
@@ -236,33 +228,16 @@ def run_brain_observatory_analysis(session, nwb_path, save_path, metadata=None, 
     
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_nwb", required=True)
-    parser.add_argument("--output_nwb", default=None)
+    parser.add_argument("input_nwb")
+    parser.add_argument("output_h5")
 
-    # TODO: unhardcode
-    parser.add_argument("--session", default=BrainObservatoryAnalysis.SESSION_A)
     parser.add_argument("--plot", action='store_true')
 
-    # meta data
-    # TODO: remove
-    parser.add_argument("--depth", type=int, default=None)
-    parser.add_argument("--experiment_id", type=int, default=None)
-    parser.add_argument("--area", type=str, default=None)
-
     args = parser.parse_args()
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.DEBUG)
 
-    if args.output_nwb is None:
-        args.output_nwb = args.input_nwb
-
-    metadata = {}
-    if args.experiment_id is not None:
-        metadata['experiment_id'] = args.experiment_id
-    if args.area is not None:
-        metadata['area'] = args.area
-    if args.depth is not None:
-        metadata['depth'] = args.depth
-
-    run_brain_observatory_analysis(args.session, args.input_nwb, args.output_nwb, metadata, args.plot)
+    run_brain_observatory_analysis(args.input_nwb, args.output_h5, args.plot)
 
 
 if __name__=='__main__': main()
