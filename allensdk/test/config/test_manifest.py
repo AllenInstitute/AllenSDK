@@ -13,17 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import pytest
 from allensdk.config.manifest_builder import ManifestBuilder
+
 
 @pytest.fixture
 def builder():
     b = ManifestBuilder()
     b.add_path('BASEDIR', '/home/username/example')
-
+    
     return b
 
-    
+
 def testManifestConstructor(builder):
     manifest = builder.get_manifest()
     expected = '/home/username/example'
@@ -66,6 +68,3 @@ def testManifestDataFrame(builder):
     assert('type' in df.keys())
     assert('spec' in df.keys())
     assert(2 == len(df.keys()))
-    
-
-    

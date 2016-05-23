@@ -2,6 +2,7 @@ import pytest
 from mock import MagicMock
 from allensdk.api.queries.synchronization_api import SynchronizationApi
 
+
 @pytest.fixture
 def synch():
     sa = SynchronizationApi()
@@ -24,8 +25,8 @@ def test_image_to_image(synch):
     section_data_set_ids = [113887162, 116903968]
     
     _ = synch.get_image_to_image(section_image_id,
-                                   x, y,
-                                   section_data_set_ids)
+                                 x, y,
+                                 section_data_set_ids)
     expected = 'http://api.brain-map.org/api/v2/image_to_image/114754496.json?x=18232.000000&y=10704.000000&section_data_set_ids=113887162,116903968'    
     synch.json_msg_query.assert_called_once_with(expected)
 

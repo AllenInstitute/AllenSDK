@@ -13,9 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import pytest
 from mock import patch, mock_open
 from allensdk.config.model.description_parser import DescriptionParser
+
 
 @pytest.fixture
 def pyconfig():
@@ -82,30 +84,30 @@ def testAllSectionsPresent(pyconfig):
 
 
 def testSectionA(pyconfig):
-    assert(len(pyconfig.data['section_A']) == 2)
-    assert(pyconfig.data['section_A'][0] ==
-        { 'prop_a': 'val_a',
-          'prop_b': 'val_b' })
-    assert( pyconfig.data['section_A'][1] ==
-        { 'prop_c': 'val_c',
-          'prop_d': 'val_d' })
+    assert len(pyconfig.data['section_A']) == 2
+    assert pyconfig.data['section_A'][0] == {
+        'prop_a': 'val_a',
+        'prop_b': 'val_b' }
+    assert pyconfig.data['section_A'][1] == {
+        'prop_c': 'val_c',
+        'prop_d': 'val_d' }
 
 
 def testSectionB(pyconfig):
-    assert(len(pyconfig.data['section_B']) == 3)
-    assert(pyconfig.data['section_B'][0] == 
-        { 'prop_e': 'val_e',
-          'prop_f': 'val_f' })
-    assert(pyconfig.data['section_B'][1] ==
-        { 'prop_g': 'val_g',
-          'prop_h': 'val_h' })
-    assert(pyconfig.data['section_B'][2] ==
-        { 'prop_i': 'val_i',
-          'prop_j': 'val_j' })
+    assert len(pyconfig.data['section_B']) == 3
+    assert pyconfig.data['section_B'][0] == {
+        'prop_e': 'val_e',
+        'prop_f': 'val_f' }
+    assert pyconfig.data['section_B'][1] == {
+        'prop_g': 'val_g',
+        'prop_h': 'val_h' }
+    assert pyconfig.data['section_B'][2] == {
+        'prop_i': 'val_i',
+        'prop_j': 'val_j' }
 
 
 def testSectionC(pyconfig):
-    assert(len(pyconfig.data['section_C']) == 1)
-    assert(pyconfig.data['section_C'][0] ==
-        { 'prop_k': 'val_k',
-          'prop_l': 'val_l' })
+    assert len(pyconfig.data['section_C']) == 1
+    assert pyconfig.data['section_C'][0] == {
+        'prop_k': 'val_k',
+        'prop_l': 'val_l' }

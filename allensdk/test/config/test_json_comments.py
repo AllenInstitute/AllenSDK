@@ -13,9 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import pytest
 from mock import patch, mock_open
 from allensdk.core.json_utilities import JsonComments
+
 
 @pytest.fixture
 def commented_json():
@@ -34,6 +36,7 @@ def blank_line_json():
             "    \"color\": \"blue\"\n"
             "}")
 
+
 @pytest.fixture
 def multi_line_json():
     return ("{\n"
@@ -42,6 +45,7 @@ def multi_line_json():
             " */\n"
             "    \"color\": \"blue\"\n"
             "}")
+
 
 @pytest.fixture
 def two_multi_line_json():
@@ -68,7 +72,7 @@ def testSingleLineComment(commented_json):
     assert('color' in parsed_json and
            parsed_json['color'] == 'blue')
 
-    
+
 def testBlankLines(blank_line_json):
     parsed_json = JsonComments.read_string(
         blank_line_json)

@@ -44,4 +44,5 @@ def test_load_api_schema(api):
             
     api.load_api_schema()
      
-    ju.read_url_get.assert_called_once_with('http://api.brain-map.org/api/v2/data/enumerate.json')
+    ju.read_url_get.assert_called_once_with(
+        'http://api.brain-map.org/api/v2/data/enumerate.json')
