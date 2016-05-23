@@ -232,7 +232,7 @@ div#notebook {
 <span class="c"># this is a pandas DataFrame. find trials with a given stimulus condition.</span>
 <span class="n">temporal_frequency</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">orientation</span> <span class="o">=</span> <span class="mi">225</span>
-<span class="n">stim_table</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_drifting_gratings_stimulus_table</span><span class="p">()</span>
+<span class="n">stim_table</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="s">&#39;drifting_gratings&#39;</span><span class="p">)</span>
 <span class="n">stim_table</span> <span class="o">=</span> <span class="n">stim_table</span><span class="p">[(</span><span class="n">stim_table</span><span class="o">.</span><span class="n">temporal_frequency</span> <span class="o">==</span> <span class="n">temporal_frequency</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">stim_table</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="n">orientation</span><span class="p">)]</span>
 
 <span class="c"># plot the trials</span>
@@ -334,7 +334,7 @@ TnADAABYOMENAABg4QQ3AACAhft/kUpEocz0/EIAAAAASUVORK5CYII=
 <span class="n">spatial_frequency</span> <span class="o">=</span> <span class="mf">0.02</span>
 <span class="n">orientation</span> <span class="o">=</span> <span class="mi">30</span>
 <span class="n">phase</span> <span class="o">=</span> <span class="mf">0.0</span>
-<span class="n">stim_table</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_static_gratings_stimulus_table</span><span class="p">()</span>
+<span class="n">stim_table</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="s">&#39;static_gratings&#39;</span><span class="p">)</span>
 <span class="n">stim_table</span> <span class="o">=</span> <span class="n">stim_table</span><span class="p">[(</span><span class="n">stim_table</span><span class="o">.</span><span class="n">spatial_frequency</span> <span class="o">==</span> <span class="n">spatial_frequency</span><span class="p">)</span> <span class="o">&amp;</span> \
                         <span class="p">(</span><span class="n">stim_table</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="n">orientation</span><span class="p">)</span> <span class="o">&amp;</span> \
                         <span class="p">(</span><span class="n">stim_table</span><span class="o">.</span><span class="n">phase</span> <span class="o">==</span> <span class="n">phase</span><span class="p">)</span> <span class="p">]</span>
@@ -350,20 +350,6 @@ TnADAABYOMENAABg4QQ3AACAhft/kUpEocz0/EIAAAAASUVORK5CYII=
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 501498760 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-</pre>
-</div>
-</div>
 
 <div class="output_area"><div class="prompt"></div>
 
@@ -1714,7 +1700,7 @@ j+cg6sm8HvWoRz2eg6gn83rUox71eA7ifwBk1Arn2SRJwgAAAABJRU5ErkJggg==
 <div class=" highlight hl-ipython3"><pre><span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">501498760</span><span class="p">)</span>
 
 <span class="c"># the natural scenes stimulus table describes when each scene is on the screen</span>
-<span class="n">stim_table</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_natural_scenes_stimulus_table</span><span class="p">()</span>
+<span class="n">stim_table</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="s">&#39;natural_scenes&#39;</span><span class="p">)</span>
 
 <span class="c"># build up a mask of trials for which one of a list of scenes is visible</span>
 <span class="n">trial_mask</span> <span class="o">=</span> <span class="n">stim_table</span><span class="o">.</span><span class="n">frame</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span>
@@ -2668,7 +2654,7 @@ ohX9gLQS7ita0YpW9APSSrivaEUrWtEPSP8fSOhJUDpFF/kAAAAASUVORK5CYII=
 <div class=" highlight hl-ipython3"><pre><span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">501498760</span><span class="p">)</span>
 
 <span class="c"># read in the stimulus table, which describes when a given frame is displayed</span>
-<span class="n">stim_table</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_natural_movie_stimulus_table</span><span class="p">(</span><span class="s">&#39;natural_movie_one&#39;</span><span class="p">)</span>
+<span class="n">stim_table</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="s">&#39;natural_movie_one&#39;</span><span class="p">)</span>
 
 <span class="c"># find out when a particular frame range is displayed</span>
 <span class="n">frame_range</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">120</span> <span class="p">]</span>
@@ -2777,7 +2763,7 @@ kiRJkjrEECdJkiRJHWKIkyRJkqQO+T8gmNIRJOph0wAAAABJRU5ErkJggg==
 <div class=" highlight hl-ipython3"><pre><span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">505693621</span><span class="p">)</span>
 
 <span class="c"># read in the locally sparse noise stimulus movie.  </span>
-<span class="c"># the &#39;mask_offscreen&#39; command will set off-screen grid locations to LocallySparseNoise.LSN_OFF_SCREEN</span>
+<span class="c"># the &#39;mask_offscreen&#39; argument will set off-screen grid locations to LocallySparseNoise.LSN_OFF_SCREEN</span>
 <span class="n">lsn_movie</span><span class="p">,</span> <span class="n">offscreen_mask</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_locally_sparse_noise_stimulus_template</span><span class="p">(</span><span class="n">mask_off_screen</span><span class="o">=</span><span class="k">True</span><span class="p">)</span>
 
 <span class="c"># show a single frame of the stimulus for reference</span>
@@ -2795,20 +2781,6 @@ kiRJkjrEECdJkiRJHWKIkyRJkqQO+T8gmNIRJOph0wAAAABJRU5ErkJggg==
 <div class="output_wrapper">
 <div class="output">
 
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 505693621 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-</pre>
-</div>
-</div>
 
 <div class="output_area"><div class="prompt"></div>
 
@@ -2886,7 +2858,7 @@ DdCEYAM0IdgATQg2QBOCDdCEYAM0IdgATQg2QBOCDdCEYAM0IdgATQg2QBOCDdCEYAM08W/HOX5f
 <span class="n">on_frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lsn_movie</span><span class="p">[:,</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">==</span> <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">LSN_ON</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c"># pull these trials out of the stimulus table</span>
-<span class="n">stim_table</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_locally_sparse_noise_stimulus_table</span><span class="p">()</span>
+<span class="n">stim_table</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_stimulus_table</span><span class="p">(</span><span class="s">&#39;locally_sparse_noise&#39;</span><span class="p">)</span>
 <span class="n">stim_table</span> <span class="o">=</span> <span class="n">stim_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">on_frames</span><span class="p">]</span>
 
 <span class="n">plot_stimulus_table</span><span class="p">(</span><span class="n">stim_table</span><span class="p">,</span> <span class="s">&quot;loc (%d,%d) &quot;</span> <span class="o">%</span> <span class="n">loc</span><span class="p">)</span>
