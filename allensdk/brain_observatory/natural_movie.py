@@ -31,6 +31,12 @@ class NaturalMovie(StimulusAnalysis):
         self.peak = self.get_peak(movie_name=movie_name)     
         
     def get_sweep_response(self):
+        ''' Returns the dF/F response for each cell
+
+        Returns
+        -------
+        Numpy array
+        '''
         sweep_response = pd.DataFrame(index=self.stim_table.index.values, columns=np.array(range(self.numbercells)).astype(str))
         for index, row in self.stim_table.iterrows():
             start = row.start
@@ -40,6 +46,14 @@ class NaturalMovie(StimulusAnalysis):
         return sweep_response
     
     def get_peak(self, movie_name):
+        ''' Computes the peak response for each cell
+        
+        Returns
+        -------
+        Panda data frame with the following fields
+            * peak
+            * response_variability
+        '''
         peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_reliability'))
 
         for nc in range(self.numbercells):

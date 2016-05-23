@@ -35,6 +35,12 @@ class NaturalScenes(StimulusAnalysis):
         self.peak = self.get_peak()
         
     def get_response(self):
+        ''' Computes the resonse for each cell
+
+        Returns
+        -------
+        Numpy array storing the response of each cell
+        '''
         NaturalScenes._log.info("Calculating mean responses")
         
         response = np.empty((self.number_scenes, self.numbercells+1, 3))
@@ -52,7 +58,21 @@ class NaturalScenes(StimulusAnalysis):
         return response
     
     def get_peak(self):    
-        '''gets metrics about peak response, etc.'''
+        ''' Computes metrics about peak response for each cell
+        
+        Returns
+        -------
+        Panda data frame with the following fields ('_ns' suffix is for
+        natural scene):
+            * scene_ns (scene number)
+            * response_reliability_ns
+            * peak_dff_ns (peak dF/F)
+            * ptest_ns
+            * p_run_ns
+            * run_modulation_ns
+            * time_to_peak_ns
+            * duration_ns
+        '''
         NaturalScenes._log.info('Calculating peak response properties')
         peak = pd.DataFrame(index=range(self.numbercells), columns=('scene_ns', 'response_reliability_ns','peak_dff_ns', 'ptest_ns', 'p_run_ns', 'run_modulation_ns', 'time_to_peak_ns','duration_ns'))
 

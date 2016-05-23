@@ -28,6 +28,12 @@ class StaticGrating(StimulusAnalysis):
     _log = logging.getLogger('allensdk.brain_observatory.static_grating')        
     
     def __init__(self, brain_observatory_analysis, **kwargs):
+        ''' Analysis object for static grating experiments.
+
+        Arguments
+        ---------
+        brain_observatory_analysis: BrainObservatoryAnalysis object
+        '''
         super(StaticGrating, self).__init__(brain_observatory_analysis, **kwargs)
         
         stimulus_table = self.brain_observatory_analysis.nwb.get_static_gratings_stimulus_table()
@@ -46,6 +52,12 @@ class StaticGrating(StimulusAnalysis):
         self.peak = self.get_peak()
         
     def get_response(self):
+        ''' Computes the response for each cell
+        
+        Returns
+        -------
+        Numpy array storing the response of each cell
+        '''
         StaticGrating._log.info("Calculating mean responses")
         
         response = np.empty((self.number_ori, self.number_sf, self.number_phase, self.numbercells+1, 3))
@@ -72,7 +84,22 @@ class StaticGrating(StimulusAnalysis):
     
     
     def get_peak(self):    
-        '''finds the peak response for each cell'''
+        ''' Computes the peak response for each cell
+        
+        Returns
+        -------
+        Panda data frame with the following fields (_sg suffix is 
+        for static grating):
+            * ori_sg (orientation)
+            * sf_sg (spatial frequency)
+            * phase_sg 
+            * response_variability_sg
+            * osi_sg (orientation selectivity index)
+            * peak_dff_sg (peak dF/F)
+            * ptest_sg
+            * time_to_peak_sg
+            * duration_sg
+        '''
         StaticGrating._log.info('Calculating peak response properties')
 
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_reliability_sg','osi_sg','peak_dff_sg','ptest_sg','time_to_peak_sg','duration_sg'))
