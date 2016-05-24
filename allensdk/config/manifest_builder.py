@@ -49,7 +49,12 @@ class ManifestBuilder(object):
         self.sections[name] = contents
     
     
-    def write_json_file(self, path):
+    def write_json_file(self, path, overwrite=False):
+        mode = 'wb'
+        
+        if overwrite == True:
+            mode = 'wb+'
+        
         with open(path, 'wb') as f:
             f.write(self.write_json_string())
     
