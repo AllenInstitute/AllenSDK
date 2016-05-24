@@ -27,7 +27,7 @@ NWB file organization
 
 Each NWB file is organized into six sections. These sections store acquired data ('acquisition'), stimulus data ('stimulus'), general metadata about the experiment ('general'), experiment organization ('epochs'), processed data ('processing') and a free-form area for storing analysis data ('analysis'). 
 
-.. figure:: images/fig-1.png
+.. figure:: /_static/fig-1.png
 
    **Figure 1. An NWB file, viewed in HDFView**
 
@@ -48,7 +48,7 @@ Stimulus data
 
 Within an NWB file, stimulus data is organized into 'templates', which are stimulus descriptions that can be used one or more times, and 'presentation', which stores the time-series data about what was presented and when. 
 
-.. figure:: images/fig-2.png
+.. figure:: /_static/fig-2.png
 
    **Figure 2. Stimuli presented during the experiment**
 
@@ -63,7 +63,7 @@ Processing
 In the NWB file, the processing folder is designed to store the contents the different levels of intermediate processing of data that are necessary to convert raw data into something that can be used for scientific analysis. 
 In the Allen Institute's NWB file, these levels of processing include motion correction of the acquired 2-photon move frames, image segmentation into regions of interest, the fluorescence signal for each of these regions, and the dF/F signal that is useful for correlating cell activity with presented stimuli. 
 
-.. figure:: images/fig-3.png
+.. figure:: /_static/fig-3.png
 
    **Figure 3. Location of dF/F data**
 
