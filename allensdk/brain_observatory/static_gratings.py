@@ -24,8 +24,8 @@ from allensdk.brain_observatory.brain_observatory_exceptions \
     import BrainObservatoryAnalysisException
 
 
-class StaticGrating(StimulusAnalysis):
-    _log = logging.getLogger('allensdk.brain_observatory.static_grating')        
+class StaticGratings(StimulusAnalysis):
+    _log = logging.getLogger('allensdk.brain_observatory.static_gratings')        
     
     def __init__(self, data_set, **kwargs):
         ''' Analysis object for static grating experiments.
@@ -34,7 +34,7 @@ class StaticGrating(StimulusAnalysis):
         ---------
         data_set: BrainObservatoryNwbDataSet object
         '''
-        super(StaticGrating, self).__init__(data_set, **kwargs)
+        super(StaticGratings, self).__init__(data_set, **kwargs)
         
         stimulus_table = self.data_set.get_stimulus_table('static_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
@@ -58,7 +58,7 @@ class StaticGrating(StimulusAnalysis):
         -------
         Numpy array storing the response of each cell
         '''
-        StaticGrating._log.info("Calculating mean responses")
+        StaticGratings._log.info("Calculating mean responses")
         
         response = np.empty((self.number_ori, self.number_sf, self.number_phase, self.numbercells+1, 3))
 
@@ -100,7 +100,7 @@ class StaticGrating(StimulusAnalysis):
             * time_to_peak_sg
             * duration_sg
         '''
-        StaticGrating._log.info('Calculating peak response properties')
+        StaticGratings._log.info('Calculating peak response properties')
 
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_reliability_sg','osi_sg','peak_dff_sg','ptest_sg','time_to_peak_sg','duration_sg'))
 

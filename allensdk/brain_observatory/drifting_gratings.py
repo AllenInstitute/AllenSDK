@@ -20,11 +20,11 @@ import numpy as np
 from math import sqrt
 import logging
 
-class DriftingGrating(StimulusAnalysis):
-    _log = logging.getLogger('allensdk.brain_observatory.drifting_grating')    
+class DriftingGratings(StimulusAnalysis):
+    _log = logging.getLogger('allensdk.brain_observatory.drifting_gratings')
 
     def __init__(self, data_set, **kwargs):
-        super(DriftingGrating, self).__init__(data_set, **kwargs)                   
+        super(DriftingGratings, self).__init__(data_set, **kwargs)                   
         stimulus_table = self.data_set.get_stimulus_table('drifting_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = 60#self.sync_table['end'][1] - self.sync_table['start'][1]
@@ -45,7 +45,7 @@ class DriftingGrating(StimulusAnalysis):
         -------
         Numpy array storing cell responses
         '''
-        DriftingGrating._log.info("Calculating mean responses")
+        DriftingGratings._log.info("Calculating mean responses")
         
         response = np.empty((self.number_ori, self.number_tf, self.numbercells+1, 3))
         def ptest(x):
@@ -80,7 +80,7 @@ class DriftingGrating(StimulusAnalysis):
             * run_modulation_dg
             * cv_dg (coefficient of variance?)
         '''
-        DriftingGrating._log.info('Calculating peak response properties')
+        DriftingGratings._log.info('Calculating peak response properties')
         
         peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_reliability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg','cv_dg'))
 

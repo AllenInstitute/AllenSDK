@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.brain_observatory.static_grating import StaticGrating
+from allensdk.brain_observatory.static_gratings import StaticGratings
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 from allensdk.brain_observatory.natural_scenes import NaturalScenes
-from allensdk.brain_observatory.drifting_grating import DriftingGrating
+from allensdk.brain_observatory.drifting_gratings import DriftingGratings
 from allensdk.brain_observatory.natural_movie import NaturalMovie
 
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
@@ -144,7 +144,7 @@ class SessionAnalysis(object):
     def session_a(self, plot_flag=False, save_flag=True):
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one', speed_tuning=True)
         nm3 = NaturalMovie(self.nwb, 'natural_movie_three')
-        dg = DriftingGrating(self.nwb)
+        dg = DriftingGratings(self.nwb)
 
         SessionAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
@@ -163,7 +163,7 @@ class SessionAnalysis(object):
             self.save_session_a(dg, nm1, nm3, peak)
     
     def session_b(self, plot_flag=False, save_flag=True):
-        sg = StaticGrating(self.nwb)
+        sg = StaticGratings(self.nwb)
         ns = NaturalScenes(self.nwb)
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one', speed_tuning=True)
         SessionAnalysis._log.info("Session B analyzed")

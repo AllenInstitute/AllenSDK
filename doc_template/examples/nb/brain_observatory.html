@@ -2714,14 +2714,11 @@ QRAEQVjkiHATBEEQBEEQBEFY5IhwEwRBEARBEARBWOSIcBMEQRAEQRAEQVjkiHATBEEQBEEQBEFY
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.drifting_grating</span> <span class="kn">import</span> <span class="n">DriftingGrating</span>
-<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.brain_observatory_analysis</span> <span class="kn">import</span> <span class="n">BrainObservatoryAnalysis</span>
+<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.drifting_gratings</span> <span class="kn">import</span> <span class="n">DriftingGratings</span>
 
 <span class="c"># example loading drifing grating data</span>
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">512326618</span><span class="p">)</span>
-<span class="n">analysis</span> <span class="o">=</span> <span class="n">BrainObservatoryAnalysis</span><span class="p">(</span><span class="n">data_set</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&quot;./&quot;</span><span class="p">)</span>
-
-<span class="n">dg</span> <span class="o">=</span> <span class="n">DriftingGrating</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
+<span class="n">dg</span> <span class="o">=</span> <span class="n">DriftingGratings</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;done analyzing drifting grating&quot;</span><span class="p">)</span>
 </pre></div>
 
