@@ -23,6 +23,21 @@ from allensdk.brain_observatory.brain_observatory_exceptions import \
     BrainObservatoryAnalysisException
 
 class StimulusAnalysis(object):
+    """ Base class for all response analysis code. Subclasses are responsible
+    for computing metrics and traces relevant to a particular stimulus.  
+    The base class contains methods for organizing sweep responses row of 
+    a stimulus stable (get_sweep_response).  Subclasses implement the
+    get_response method, computes the mean sweep response to all sweeps for
+    a each stimulus condition.    
+
+    Parameters
+    ----------
+    data_set: BrainObservatoryNwbDataSet instance
+
+    speed_tuning: boolean
+       Whether or not to compute speed tuning histograms
+
+    """
     _log = logging.getLogger('allensdk.brain_observatory.stimulus_analysis')
     
     def __init__(self, data_set, speed_tuning=False):
@@ -44,14 +59,35 @@ class StimulusAnalysis(object):
             self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.get_speed_tuning(binsize=800)
 
     def get_response(self):
+        """ Implemented by subclasses."""
         raise BrainObservatoryAnalysisException("get_response not implemented")
 
     def get_peak(self):
+        """ Implemented by subclasses."""
         raise BrainObservatoryAnalysisException("get_peak not implemented")
         
     def get_speed_tuning(self, binsize):
-        ''' Calculates speed tuning, spontaneous versus visually driven
-        '''
+        """ Calculates speed tuning, spontaneous versus visually driven.  The return is a 5-tuple 
+        of speed and dF/F histograms.  
+            * binned_dx_sp: (bins,2) np.ndarray of running speeds binned during spontaneous activity stimulus.  
+            The first bin contains all speeds below 1 cm/s.  Dimension 0 is mean running speed in the bin.
+            Dimension 1 is the standard deviation.
+            * binned_cells_sp: (bins,2) np.ndarray of fluorescence during spontaneous activity stimulus.  
+            First bin contains all data for speeds below 1 cm/s. Dimension 0 is mean fluorescence in the bin.
+            Dimension 1 is the standard deviation.
+            * binned_dx_vis: (bins,2) np.ndarray of running speeds outside of spontaneous activity stimulus.
+            The first bin contains all speeds below 1 cm/s.  Dimension 0 is mean running speed in the bin.
+            Dimension 1 is the standard deviation.
+            * binned_cells_vis: np.ndarray of fluorescence outside of spontaneous activity stimulu.
+            First bin contains all data for speeds below 1 cm/s. Dimension 0 is mean fluorescence in the bin.
+            Dimension 1 is the standard deviation.
+            * peak_run: pd.DataFrame of speed-related properties of a cell.
+            
+        Returns
+        -------
+        tuple: binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
+        """
+
         StimulusAnalysis._log.info('Calculating speed tuning, spontaneous vs visually driven')
         
         celltraces_trimmed = np.delete(self.dfftraces, range(len(self.dxcm), np.size(self.dfftraces,1)), axis=1) 
@@ -193,11 +229,18 @@ class StimulusAnalysis(object):
         
         return binned_dx_sp, binned_cells_sp, binned_dx_vis, binned_cells_vis, peak_run
 
+
     def get_sweep_response(self):
-        ''' Calculates the response to each sweep and then for each 
-        stimulus condition
-        
-        '''
+        """ Calculates the response to each sweep in the stimulus table for each cell and the mean response.
+        The return is a 3-tuple of:
+            * sweep_response: pd.DataFrame of response dF/F traces organized by cell (column) and sweep (row)
+            * mean_sweep_response: mean values of the traces returned in sweep_response
+            * pval: p value from 1-way ANOVA comparing response during sweep to response prior to sweep
+
+        Returns
+        -------
+        3-tuple: sweep_response, mean_sweep_response, pval
+        """
         def do_mean(x):
             return np.mean(x[self.interlength:self.interlength+self.sweeplength+self.extralength])#+1])
             

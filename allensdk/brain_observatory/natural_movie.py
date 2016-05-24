@@ -19,6 +19,17 @@ import numpy as np
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 
 class NaturalMovie(StimulusAnalysis):    
+    """ Perform tuning analysis specific to natural movie stimulus. 
+    
+    Parameters
+    ----------
+    data_set: BrainObservatoryNwbDataSet object
+
+    movie_name: string
+        one of [ stimulus_info.NATURAL_MOVIE_ONE, stimulus_info.NATURAL_MOVIE_TWO, 
+                 stimulus_info.NATURAL_MOVIE_THREE ]
+    """
+
     def __init__(self, data_set, movie_name, **kwargs):
         super(NaturalMovie, self).__init__(data_set, **kwargs)
         stimulus_table = self.data_set.get_stimulus_table(movie_name)
@@ -43,14 +54,19 @@ class NaturalMovie(StimulusAnalysis):
         return sweep_response
     
     def get_peak(self, movie_name):
-        ''' Computes the peak response for each cell
-        
+        ''' Computes properties of the peak response condition for each cell.
+
+        Parameters
+        ----------
+        movie_name: string
+            one of [ stimulus_info.NATURAL_MOVIE_ONE, stimulus_info.NATURAL_MOVIE_TWO, 
+                     stimulus_info.NATURAL_MOVIE_THREE ]
         Returns
         -------
-        Panda data frame with the below fields. A suffix of "1", "2" or "3" is appended to the field name depending
+        Pandas data frame with the below fields. A suffix of "nm1", "nm2" or "nm3" is appended to the field name depending
         on which of three movie clips was presented.
-            * peak_nm
-            * response_variability_nm
+            * peak_nm1 (frame with peak response)
+            * response_variability_nm1
         '''
         peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_reliability'))
 

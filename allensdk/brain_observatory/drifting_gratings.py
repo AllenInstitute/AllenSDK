@@ -21,6 +21,13 @@ from math import sqrt
 import logging
 
 class DriftingGratings(StimulusAnalysis):
+    """ Perform tuning analysis specific to drifting gratings stimulus. 
+
+    Parameters
+    ----------
+    data_set: BrainObservatoryNwbDataSet object
+    """
+
     _log = logging.getLogger('allensdk.brain_observatory.drifting_gratings')
 
     def __init__(self, data_set, **kwargs):
@@ -39,11 +46,14 @@ class DriftingGratings(StimulusAnalysis):
         self.peak = self.get_peak()
     
     def get_response(self):
-        ''' Computes the response for each cell
+        ''' Computes the mean response for each cell to each stimulus condition.  Return is 
+        a (# orientations, # temporal frequencies, # cells, 3) np.ndarray.  The final dimension
+        contains the mean response to the condition (index 0), standard deviation of the response
+        to the condition (index 1), and p value of the response to that condition (index 3).
 
         Returns
         -------
-        Numpy array storing cell responses
+        Numpy array storing mean responses.
         '''
         DriftingGratings._log.info("Calculating mean responses")
         
@@ -63,11 +73,11 @@ class DriftingGratings(StimulusAnalysis):
         return response
     
     def get_peak(self):
-        ''' Computes the peak response for each cell
+        ''' Computes metrics related to each cell's peak response condition.
         
         Returns
         -------
-        Pnada data frame containing the following columns (_dg suffix is
+        Pandas data frame containing the following columns (_dg suffix is
         for drifting grating):
             * ori_dg (orientation)
             * tf_dg (temporal frequency)
@@ -78,7 +88,7 @@ class DriftingGratings(StimulusAnalysis):
             * ptest_dg
             * p_run_dg
             * run_modulation_dg
-            * cv_dg (coefficient of variance?)
+            * cv_dg (circular variance)
         '''
         DriftingGratings._log.info('Calculating peak response properties')
         

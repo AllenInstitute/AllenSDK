@@ -21,6 +21,13 @@ from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 import logging
 
 class NaturalScenes(StimulusAnalysis):
+    """ Perform tuning analysis specific to natural scenes stimulus. 
+
+    Parameters
+    ----------
+    data_set: BrainObservatoryNwbDataSet object
+    """
+
     _log = logging.getLogger('allensdk.brain_observatory.natural_scenes')    
     
     def __init__(self, data_set, **kwargs):
@@ -35,11 +42,14 @@ class NaturalScenes(StimulusAnalysis):
         self.peak = self.get_peak()
         
     def get_response(self):
-        ''' Computes the resonse for each cell
+        ''' Computes the mean response for each cell to each stimulus condition.  Return is 
+        a (# scenes, # cells, 3) np.ndarray.  The final dimension
+        contains the mean response to the condition (index 0), standard deviation of the response
+        to the condition (index 1), and p value of the response to that condition (index 3).
 
         Returns
         -------
-        Numpy array storing the response of each cell
+        Numpy array storing mean responses.
         '''
         NaturalScenes._log.info("Calculating mean responses")
         
@@ -58,11 +68,11 @@ class NaturalScenes(StimulusAnalysis):
         return response
     
     def get_peak(self):    
-        ''' Computes metrics about peak response for each cell
+        ''' Computes metrics about peak response condition for each cell.
         
         Returns
         -------
-        Panda data frame with the following fields ('_ns' suffix is for
+        Pandas data frame with the following fields ('_ns' suffix is for
         natural scene):
             * scene_ns (scene number)
             * response_reliability_ns

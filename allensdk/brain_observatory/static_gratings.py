@@ -25,15 +25,16 @@ from allensdk.brain_observatory.brain_observatory_exceptions \
 
 
 class StaticGratings(StimulusAnalysis):
+    """ Perform tuning analysis specific to static gratings stimulus. 
+    
+    Parameters
+    ----------
+    data_set: BrainObservatoryNwbDataSet object
+    """
+
     _log = logging.getLogger('allensdk.brain_observatory.static_gratings')        
     
     def __init__(self, data_set, **kwargs):
-        ''' Analysis object for static grating experiments.
-
-        Arguments
-        ---------
-        data_set: BrainObservatoryNwbDataSet object
-        '''
         super(StaticGratings, self).__init__(data_set, **kwargs)
         
         stimulus_table = self.data_set.get_stimulus_table('static_gratings')
@@ -52,11 +53,14 @@ class StaticGratings(StimulusAnalysis):
         self.peak = self.get_peak()
         
     def get_response(self):
-        ''' Computes the response for each cell
-        
+        ''' Computes the mean response for each cell to each stimulus condition.  Return is 
+        a (# orientations, # spatial frequencies, # phasees, # cells, 3) np.ndarray.  The final dimension
+        contains the mean response to the condition (index 0), standard deviation of the response
+        to the condition (index 1), and p value of the response to that condition (index 3).
+
         Returns
         -------
-        Numpy array storing the response of each cell
+        Numpy array storing mean responses.
         '''
         StaticGratings._log.info("Calculating mean responses")
         
@@ -84,7 +88,7 @@ class StaticGratings(StimulusAnalysis):
     
     
     def get_peak(self):    
-        ''' Computes the peak response for each cell
+        ''' Computes metrics related to each cell's peak response condition.
         
         Returns
         -------
