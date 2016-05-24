@@ -27,36 +27,45 @@ Some helpful links:
 Visual Stimuli
 --------------
 
+All displayed stimuli were warped when displayed to help compensate for angular differences in square size when displayed on a flat monitor (e.g., the left and right edges of the display were magnified to compensate for this part of the monitor being further way from the mouse). The mapping of movie pixels to screen vertices is provided at:
+
+    :py:meth:`allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords`
+
 **Locally sparse noise**
 
-Locally sparse noise stimuli consist of several black and/or white squares placed in random locations on a gray background.
-The displayed image was warped when displayed to help compensate for angular differences in square size when displayed on a flat monitor (e.g., the left and right edges of the display were magnified to compensate for this part of the monitor being further way from the mouse).
+Locally sparse noise stimuli consist of ~11 black and/or white squares placed in random locations on a gray background. The stimulus consisted of a 16x28 array of pixels, 4-degrees on a side. White and black spots were distributed such that no two spots were within 20 degress of one another.
 
 .. image:: /_static/locally_sparse_noise.png
 
 **Natural scenes**
 
-A variety of natural images were presented. These include things like flowers, animals and outdoor scenes.
+A variety of natural images were presented from the Berkeley Segmentation Dataset, the Hateren Natural Image Dataset, and the McGill Calibrated Colour Image Database. These include things like flowers, animals and outdoor scenes. Each image was contrast-normalized and presented in grayscale. Images were presented for 0.25 seconds, with no inter-image gray period, and were presented 50 times in random order. Blank sweeps were presented roughly once every 100 images.
 
 .. image:: /_static/natural_scenes.png
 
 **Natural movie**
 
-Parts of the Orson Welles movie 'Touch of Evil' were shown. Popcorn was not provided.
+Parts of the Orson Welles movie 'Touch of Evil' were shown. Popcorn was not provided. There were three movie clips, the first two being 30 seconds, and the third being 120 seconds. All were contrast-normalized and presented in grayscale at 30fps. Each clip was presented 10 times in a row with no inter-trial gray period.
 
 .. image:: /_static/natural_movie.png
 
 **Drifting grating**
 
-Moving gratings with different orientation, spatial and temporal frequency were presented.
+Moving gratings with different orientation and temporal frequency were presented. 
+Stimuli were full-screen static sinusoidal gratings at a single spatial frequency (0.04cpd) and contrast (80%). eight different orientations were presented (separated by 45 degrees) and five spatial freuqencies (0.02, 0.04, 0.08, 0.16, 0.32 cpd). Blank sweeps were presented roughly once every 20 gratings.
 
 .. image:: /_static/animated_drifting_grating.gif
 
 **Static grating**
 
 Non-moving gratings with similar variation in orientation, spatial and temporal frequency were also shown.
+Stimuli were full-screen static sinusoidal gratings at a single contrast (80%). Six different orientations were presented (separated by 30 degrees), five spatial freuqencies (0.02, 0.04, 0.08, 0.16, 0.32 cpd) and four phases (0, 0.25, 0.5, 0.75). Blank sweeps were presented roughly once every 25 gratings.
 
 .. image:: /_static/static_250px_sfreq_0.04.png
+
+**Spontaneous activity**
+
+This stimulus was used to record activity from neurons when there was no visual stimulus being presented. The stimulus was 5 minutes of mean lunimance gray.
 
 
 Code Samples

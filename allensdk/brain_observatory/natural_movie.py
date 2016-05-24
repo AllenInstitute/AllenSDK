@@ -47,9 +47,10 @@ class NaturalMovie(StimulusAnalysis):
         
         Returns
         -------
-        Panda data frame with the following fields
-            * peak
-            * response_variability
+        Panda data frame with the below fields. A suffix of "1", "2" or "3" is appended to the field name depending
+        on which of three movie clips was presented.
+            * peak_nm
+            * response_variability_nm
         '''
         peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_reliability'))
 
