@@ -42,6 +42,7 @@ class SessionAnalysis(object):
     def __init__(self, nwb_path, save_path):
         self.nwb = BrainObservatoryNwbDataSet(nwb_path)                        
         self.save_path = save_path
+        self.save_dir = os.path.dirname(save_path)
 
         self.metrics_a = {}
         self.metrics_b = {}
@@ -155,16 +156,17 @@ class SessionAnalysis(object):
 
         self.append_metadata(peak)
 
-        if plot_flag:
-            cp.plot_3sa(dg, nm1, nm3)
-            cp.plot_drifting_grating_traces(dg)
-    
         if save_flag:
             self.save_session_a(dg, nm1, nm3, peak)
+
+        if plot_flag:
+            cp.plot_3sa(dg, nm1, nm3, self.save_dir)
+            cp.plot_drifting_grating_traces(dg, self.save_dir)
+    
     
     def session_b(self, plot_flag=False, save_flag=True):
-        sg = StaticGratings(self.nwb)
         ns = NaturalScenes(self.nwb)
+        sg = StaticGratings(self.nwb)
         nm1 = NaturalMovie(self.nwb, 'natural_movie_one', speed_tuning=True)
         SessionAnalysis._log.info("Session B analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, sg.peak, ns.peak, nm1.peak])
@@ -174,14 +176,15 @@ class SessionAnalysis(object):
         self.append_metrics_natural_scene(self.metrics_b, ns)
         self.verify_roi_lists_equal(sg.roi_id, ns.roi_id)
         self.metrics_b["roi_id"] = sg.roi_id
-                
-        if plot_flag:
-            cp.plot_3sb(sg, nm1, ns)
-            cp.plot_ns_traces(ns)
-            cp.plot_sg_traces(sg)
-                    
+            
         if save_flag:
-            self.save_session_b(sg, nm1, ns, peak)
+            self.save_session_b(sg, nm1, ns, peak)    
+
+        if plot_flag:
+            cp.plot_3sb(sg, nm1, ns, self.save_dir)
+            cp.plot_ns_traces(ns, self.save_dir)
+            cp.plot_sg_traces(sg, self.save_dir)
+                    
     
     def session_c(self, plot_flag=False, save_flag=True):
         lsn = LocallySparseNoise(self.nwb)
@@ -193,13 +196,13 @@ class SessionAnalysis(object):
                 
         #self.append_metrics_natural_scene(self.metrics_c, nm1)
         self.metrics_c["roi_id"] = nm1.roi_id
-                
-        if plot_flag:
-            cp.plot_3sc(lsn, nm1, nm2)
-            cp.plot_lsn_traces(lsn)
-    
+        
         if save_flag:
-            self.save_session_c(lsn, nm1, nm2, peak)
+            self.save_session_c(lsn, nm1, nm2, peak, self.save_dir)        
+
+        if plot_flag:
+            cp.plot_3sc(lsn, nm1, nm2, self.save_dir)
+            cp.plot_lsn_traces(lsn, self.save_dir)
     
                     
 def run_session_analysis(nwb_path, save_path, plot_flag=False):
