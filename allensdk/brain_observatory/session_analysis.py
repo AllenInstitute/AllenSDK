@@ -194,11 +194,10 @@ class SessionAnalysis(object):
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_metadata(peak)
                 
-        #self.append_metrics_natural_scene(self.metrics_c, nm1)
         self.metrics_c["roi_id"] = nm1.roi_id
         
         if save_flag:
-            self.save_session_c(lsn, nm1, nm2, peak, self.save_dir)        
+            self.save_session_c(lsn, nm1, nm2, peak)
 
         if plot_flag:
             cp.plot_3sc(lsn, nm1, nm2, self.save_dir)
