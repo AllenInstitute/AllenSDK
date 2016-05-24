@@ -65,7 +65,7 @@ class BrainObservatoryAnalysis(object):
             ('sweep_response_nm3', nm3.sweep_response))
         
         nwb.save_analysis_arrays(
-            ('celltraces_dff', nm1.celltraces_dff),
+            ('celltraces_dff', nm1.dfftraces),
             ('response_dg', dg.response),
             ('binned_cells_sp', nm1.binned_cells_sp),
             ('binned_cells_vis', nm1.binned_cells_vis),
@@ -87,7 +87,7 @@ class BrainObservatoryAnalysis(object):
             ('peak', peak))
 
         nwb.save_analysis_arrays(
-            ('celltraces_dff', nm1.celltraces_dff),
+            ('celltraces_dff', nm1.dfftraces),
             ('response_sg', sg.response),
             ('response_ns', ns.response),
             ('binned_cells_sp', nm1.binned_cells_sp),
@@ -108,7 +108,7 @@ class BrainObservatoryAnalysis(object):
         
         nwb.save_analysis_arrays(
             ('receptive_field_lsn', lsn.receptive_field),
-            ('celltraces_dff', nm1.celltraces_dff),
+            ('celltraces_dff', nm1.dfftraces),
             ('binned_dx_sp', nm1.binned_dx_sp),
             ('binned_dx_vis', nm1.binned_dx_vis),    
             ('binned_cells_sp', nm1.binned_cells_sp),
@@ -142,8 +142,8 @@ class BrainObservatoryAnalysis(object):
                 raise BrainObservatoryAnalysisException("Error -- ROI lists have different entries")
     
     def session_a(self, plot_flag=False, save_flag=True):
-        nm1 = NaturalMovie(self, 'natural_movie_one')      
-        nm3 = NaturalMovie(self, 'natural_movie_three')    
+        nm1 = NaturalMovie(self, 'natural_movie_one', speed_tuning=True)
+        nm3 = NaturalMovie(self, 'natural_movie_three')
         dg = DriftingGrating(self)
 
         BrainObservatoryAnalysis._log.info("Session A analyzed")
@@ -165,7 +165,7 @@ class BrainObservatoryAnalysis(object):
     def session_b(self, plot_flag=False, save_flag=True):
         sg = StaticGrating(self)    
         ns = NaturalScenes(self)
-        nm1 = NaturalMovie(self, 'natural_movie_one')            
+        nm1 = NaturalMovie(self, 'natural_movie_one', speed_tuning=True)
         BrainObservatoryAnalysis._log.info("Session B analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, sg.peak, ns.peak, nm1.peak])
         self.append_metadata(peak)
@@ -186,7 +186,7 @@ class BrainObservatoryAnalysis(object):
     def session_c(self, plot_flag=False, save_flag=True):
         lsn = LocallySparseNoise(self)
         nm2 = NaturalMovie(self, 'natural_movie_two')
-        nm1 = NaturalMovie(self, 'natural_movie_one')
+        nm1 = NaturalMovie(self, 'natural_movie_one', speed_tuning=True)
         BrainObservatoryAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_metadata(peak)
@@ -203,7 +203,7 @@ class BrainObservatoryAnalysis(object):
     
                     
 def run_brain_observatory_analysis(nwb_path, save_path, plot_flag=False):
-    save_dir = os.path.dirname(save_path)
+    save_dir = os.path.abspath(os.path.dirname(save_path))
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)

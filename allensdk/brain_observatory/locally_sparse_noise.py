@@ -12,7 +12,7 @@ class LocallySparseNoise(StimulusAnalysis):
     def __init__(self, brain_observatory_analysis, **kwargs):
         super(LocallySparseNoise, self).__init__(brain_observatory_analysis, **kwargs)        
         self.stim_table = self.brain_observatory_analysis.nwb.get_stimulus_table('locally_sparse_noise')
-        self.LSN, self.LSN_mask = self.brain_observatory_analysis.nwb.get_locally_sparse_noise_stimulus_template()
+        self.LSN, self.LSN_mask = self.brain_observatory_analysis.nwb.get_locally_sparse_noise_stimulus_template(mask_off_screen=False)
         self.sweeplength = self.stim_table['end'][1] - self.stim_table['start'][1]
         self.interlength = 4*self.sweeplength
         self.extralength = self.sweeplength

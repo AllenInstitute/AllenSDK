@@ -26,6 +26,7 @@ class StimulusAnalysis(object):
     _log = logging.getLogger('allensdk.brain_observatory.stimulus_analysis')
     
     def __init__(self, brain_observatory_analysis,
+                 speed_tuning=False,
                  **kwargs):
         self.brain_observatory_analysis = brain_observatory_analysis
         self.save_dir = os.path.dirname(self.brain_observatory_analysis.save_path)
@@ -40,7 +41,10 @@ class StimulusAnalysis(object):
         _, self.dfftraces = self.brain_observatory_analysis.nwb.get_dff_traces()
 
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
-        self.dxcm, self.dxtime = self.brain_observatory_analysis.nwb.get_running_speed()        
+        self.dxcm, self.dxtime = self.brain_observatory_analysis.nwb.get_running_speed()
+
+        if speed_tuning:
+            self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.get_speed_tuning(binsize=800)
 
     def get_response(self):
         raise BrainObservatoryAnalysisException("get_response not implemented")
@@ -48,11 +52,6 @@ class StimulusAnalysis(object):
     def get_peak(self):
         raise BrainObservatoryAnalysisException("get_peak not implemented")
         
-    def get_global_dff(self):
-        ''' Returns dF/F traces
-        '''
-        return self.dfftraces
-    
     def get_speed_tuning(self, binsize):
         ''' Calculates speed tuning, spontaneous versus visually driven
         '''

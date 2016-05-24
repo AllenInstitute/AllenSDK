@@ -23,9 +23,6 @@ class NaturalMovie(StimulusAnalysis):
         super(NaturalMovie, self).__init__(brain_observatory_analysis, **kwargs)                   
         stimulus_table = self.brain_observatory_analysis.nwb.get_stimulus_table(movie_name)
         self.stim_table = stimulus_table[stimulus_table.frame==0]
-        self.celltraces_dff = self.get_global_dff()
-        if movie_name == 'natural_movie_one':
-            self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.get_speed_tuning(binsize=800)
         self.sweeplength = self.stim_table.start.iloc[1] - self.stim_table.start.iloc[0]
         self.sweep_response = self.get_sweep_response()
         self.peak = self.get_peak(movie_name=movie_name)     
@@ -42,7 +39,7 @@ class NaturalMovie(StimulusAnalysis):
             start = row.start
             end = start + self.sweeplength
             for nc in range(self.numbercells):
-                sweep_response[str(nc)][index] = self.celltraces_dff[nc,start:end]
+                sweep_response[str(nc)][index] = self.dfftraces[nc,start:end]
         return sweep_response
     
     def get_peak(self, movie_name):
