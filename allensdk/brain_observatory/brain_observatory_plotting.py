@@ -20,15 +20,15 @@ import pandas as pd
 import os, logging
 from numpy import arange
 
-def plot_drifting_grating_traces(self):
+def plot_drifting_grating_traces(dg, save_dir):
     '''saves figures with a Ori X TF grid of mean resposes'''
     logging.info("Plotting Ori and TF mean response for all cells")
     
-    blank =  self.sweep_response[self.stim_table.temporal_frequency==0]          
-    for nc in range(self.numbercells):
-        if np.mod(nc,100)==0:
+    blank =  dg.sweep_response[dg.stim_table.temporal_frequency==0]          
+    for nc in range(dg.numbercells):
+        if np.mod(nc,20)==0:
             logging.info("Cell #%s", str(nc))
-        xtime = np.arange(-1*self.interlength/self.acquisition_rate, (self.sweeplength+self.interlength)/self.acquisition_rate, 1/self.acquisition_rate)
+        xtime = np.arange(-1*dg.interlength/dg.acquisition_rate, (dg.sweeplength+dg.interlength)/dg.acquisition_rate, 1/dg.acquisition_rate)
         plt.figure(nc, figsize=(20,16))
         vmax=0
         vmin=0
@@ -38,12 +38,12 @@ def plot_drifting_grating_traces(self):
         except:
             blank_p = blank.iloc[:,nc].apply(np.mean) + (blank.iloc[:,nc].apply(np.std) / blank.iloc[:,nc].apply(len))
             blank_n = blank.iloc[:,nc].apply(np.mean) - (blank.iloc[:,nc].apply(np.std) / blank.iloc[:,nc].apply(len))
-        for ori in self.orivals:
-            ori_pt = np.where(self.orivals == ori)[0][0]
-            for tf in self.tfvals[1:]:
-                tf_pt = np.where(self.tfvals == tf)[0][0]
+        for ori in dg.orivals:
+            ori_pt = np.where(dg.orivals == ori)[0][0]
+            for tf in dg.tfvals[1:]:
+                tf_pt = np.where(dg.tfvals == tf)[0][0]
                 sp_pt = (5*ori_pt)+tf_pt
-                subset_response = self.sweep_response[(self.stim_table.temporal_frequency==tf)&(self.stim_table.orientation==ori)]               
+                subset_response = dg.sweep_response[(dg.stim_table.temporal_frequency==tf)&(dg.stim_table.orientation==ori)]               
                 try:
                     subset_response_p =  subset_response[str(nc)].mean() + (subset_response[str(nc)][:-1].std()/len(subset_response[str(nc)]))
                     subset_response_n =  subset_response[str(nc)].mean() - (subset_response[str(nc)][:-1].std()/len(subset_response[str(nc)]))
@@ -68,7 +68,7 @@ def plot_drifting_grating_traces(self):
                 ax.plot(xtime, subset_response[str(nc)].mean(), color='b', lw=2)
                 #TODO: remove the [:119]  and [:-1] and the try/except                 
                 ax.plot(xtime, blank[str(nc)].mean(), color='k', lw=2)
-                ax.axvspan(0, self.sweeplength/self.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
+                ax.axvspan(0, dg.sweeplength/dg.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
                 ax.set_xlim(-1,3)
                 ax.set_xticks(range(-1,4))
                 ax.yaxis.set_major_locator(MaxNLocator(4))                 
@@ -82,9 +82,9 @@ def plot_drifting_grating_traces(self):
                 if tf_pt>1:
                     ax.set_yticks([])
                 else:
-                    ax.set_ylabel(str(self.orivals[ori_pt]), fontsize=24)
+                    ax.set_ylabel(str(dg.orivals[ori_pt]), fontsize=24)
                 if ori_pt==0:
-                    ax.set_title(str(self.tfvals[tf_pt]), fontsize=24)
+                    ax.set_title(str(dg.tfvals[tf_pt]), fontsize=24)
                 
         for i in range(1,sp_pt+1):
             ax = plt.subplot(8,5,i)
@@ -94,24 +94,24 @@ def plot_drifting_grating_traces(self):
         plt.suptitle("Cell " + str(nc+1), fontsize=20)
         plt.subplots_adjust(top=0.9)
         filename = 'Traces DG Cell_'+str(nc+1)+'.png'
-        fullfilename = os.path.join(self.save_dir, filename) 
+        fullfilename = os.path.join(save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()
 
-def plot_ns_traces(self):
+def plot_ns_traces(nsa, save_dir):
     logging.info("Plotting Natural Scene traces for each cell")
-    xtime = np.arange(-1*self.interlength/self.acquisition_rate, (self.sweeplength+self.interlength)/self.acquisition_rate, 1/self.acquisition_rate)
-    blank =  self.sweep_response[self.stim_table.frame==-1]       
-    for nc in range(self.numbercells):
-        if np.mod(nc,100)==0:
+    xtime = np.arange(-1*nsa.interlength/nsa.acquisition_rate, (nsa.sweeplength+nsa.interlength)/nsa.acquisition_rate, 1/nsa.acquisition_rate)
+    blank = nsa.sweep_response[nsa.stim_table.frame==-1]       
+    for nc in range(nsa.numbercells):
+        if np.mod(nc,20)==0:
             logging.info("Cell #%s", str(nc))
         vmax=0
         vmin=0
         blank_p =  blank[str(nc)].mean() + (blank[str(nc)].std()/len(blank[str(nc)]))
         blank_n =  blank[str(nc)].mean() - (blank[str(nc)].std()/len(blank[str(nc)])) 
         plt.figure(nc, figsize=(30,25))
-        for ns in range(self.number_scenes-1):
-            subset_response = self.sweep_response[self.stim_table.frame==ns]               
+        for ns in range(nsa.number_scenes-1):
+            subset_response = nsa.sweep_response[nsa.stim_table.frame==ns]               
             subset_response_p =  subset_response[str(nc)].mean() + (subset_response[str(nc)][:].std()/len(subset_response[str(nc)]))
             subset_response_n =  subset_response[str(nc)].mean() - (subset_response[str(nc)][:].std()/len(subset_response[str(nc)]))
             ax = plt.subplot(10,12,ns+1)
@@ -123,7 +123,7 @@ def plot_ns_traces(self):
             ax.fill_between(xtime, blank_p, blank_n, color='k', alpha=0.5)                 
             ax.plot(xtime, subset_response[str(nc)].mean(), color='b', lw=2)                 
             ax.plot(xtime, blank[str(nc)].mean(), color='k', lw=2)
-            ax.axvspan(0, self.sweeplength/self.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
+            ax.axvspan(0, nsa.sweeplength/nsa.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
             ax.yaxis.set_major_locator(MaxNLocator(4))                 
             vmax = np.where(np.amax(subset_response_p)>vmax, np.amax(subset_response_p), vmax)
             vmin = np.where(np.amin(subset_response_n)<vmin, np.amin(subset_response_n), vmin)     
@@ -131,23 +131,23 @@ def plot_ns_traces(self):
                 ax.set_xticks([])
             if np.mod(ns,12):
                 ax.set_yticks([])
-        for i in range(1,self.number_scenes):
+        for i in range(1,nsa.number_scenes):
             ax = plt.subplot(10,12,i)
             ax.set_ylim(vmin, vmax)
         plt.tight_layout()
         plt.suptitle("Cell " + str(nc+1), fontsize=20)
         plt.subplots_adjust(top=0.9)
         filename = 'NS Traces Cell_'+str(nc+1)+'.png'
-        fullfilename = os.path.join(self.save_dir, filename) 
+        fullfilename = os.path.join(save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()                
 
-def plot_sg_traces(self):
+def plot_sg_traces(sg, save_dir):
     logging.info("Plotting Static Grating traces for each cell")
-    xtime = np.arange(-1*self.interlength/self.acquisition_rate, (self.sweeplength+self.interlength)/self.acquisition_rate, 1/self.acquisition_rate)     
-    blank = self.sweep_response[self.stim_table.spatial_frequency==0]
-    for nc in range(self.numbercells):
-        if np.mod(nc,100)==0:
+    xtime = np.arange(-1*sg.interlength/sg.acquisition_rate, (sg.sweeplength+sg.interlength)/sg.acquisition_rate, 1/sg.acquisition_rate)     
+    blank = sg.sweep_response[sg.stim_table.spatial_frequency==0]
+    for nc in range(sg.numbercells):
+        if np.mod(nc,20)==0:
             logging.info("Cell #%s", str(nc))
         vmax=0
         vmin=0
@@ -157,14 +157,14 @@ def plot_sg_traces(self):
             xtime = np.delete(xtime, -1)  
         plt.figure(nc, figsize=(30,30))
         ph_dict = {0:0, 0.25:6, 0.5:77, 0.75:83}
-        for ori in self.orivals:
-            ori_pt = np.where(self.orivals == ori)[0][0]
-            for sf in self.sfvals[1:]:
-                sf_pt = np.where(self.sfvals == sf)[0][0]
-                for phase in self.phasevals:
+        for ori in sg.orivals:
+            ori_pt = np.where(sg.orivals == ori)[0][0]
+            for sf in sg.sfvals[1:]:
+                sf_pt = np.where(sg.sfvals == sf)[0][0]
+                for phase in sg.phasevals:
                     ph_pt = ph_dict[phase]
                     subplotnum = sf_pt + (ori_pt*11) + ph_pt
-                    subset_response = self.sweep_response[(self.stim_table.spatial_frequency==sf)&(self.stim_table.orientation==ori)&(self.stim_table.phase==phase)]
+                    subset_response = sg.sweep_response[(sg.stim_table.spatial_frequency==sf)&(sg.stim_table.orientation==ori)&(sg.stim_table.phase==phase)]
                     subset_response_p =  subset_response[str(nc)].mean() + (subset_response[str(nc)][:].std()/len(subset_response[str(nc)]))
                     subset_response_n =  subset_response[str(nc)].mean() - (subset_response[str(nc)][:].std()/len(subset_response[str(nc)]))
                     ax = plt.subplot(13,11,subplotnum)
@@ -172,7 +172,7 @@ def plot_sg_traces(self):
                     ax.fill_between(xtime, blank_p, blank_n, color='k', alpha=0.5)                 
                     ax.plot(xtime, subset_response[str(nc)].mean(), color='b', lw=2)                 
                     ax.plot(xtime, blank[str(nc)].mean(), color='k', lw=2)
-                    ax.axvspan(0, self.sweeplength/self.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
+                    ax.axvspan(0, sg.sweeplength/sg.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
                     ax.yaxis.set_major_locator(MaxNLocator(4))                 
                     vmax = np.where(np.amax(subset_response_p)>vmax, np.amax(subset_response_p), vmax)
                     vmin = np.where(np.amin(subset_response_n)<vmin, np.amin(subset_response_n), vmin)    
@@ -199,32 +199,32 @@ def plot_sg_traces(self):
         plt.suptitle("Cell " + str(nc+1), fontsize=20)
         plt.subplots_adjust(top=0.9)
         filename = 'SG Traces Cell_'+str(nc+1)+'.png'
-        fullfilename = os.path.join(self.save_dir, filename) 
+        fullfilename = os.path.join(save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()                
 
-def plot_lsn_traces(self):
+def plot_lsn_traces(lsn, save_dir):
     logging.info("Plotting LSN traces for all cells")
-    xtime = np.arange(-self.interlength/self.acquisition_rate, 
-                       (self.interlength + self.sweeplength)/self.acquisition_rate, 
-                       1.0/self.acquisition_rate)
+    xtime = np.arange(-lsn.interlength/lsn.acquisition_rate, 
+                       (lsn.interlength + lsn.sweeplength)/lsn.acquisition_rate, 
+                       1.0/lsn.acquisition_rate)
 
-    for nc in range(self.numbercells):
-        if np.mod(nc,100)==0:
+    for nc in range(lsn.numbercells):
+        if np.mod(nc,20)==0:
             logging.info("Cell #%s", str(nc))
             
         plt.figure(nc, figsize=(24,20))
         vmax=0
         vmin=0
-        one_cell = self.sweep_response[str(nc)]
+        one_cell = lsn.sweep_response[str(nc)]
         
         for yp in range(16):
             for xp in range(28):
                 sp_pt = (yp*28)+xp+1
-                on_frame = np.where(self.LSN[:,yp,xp]==255)[0]
-                off_frame = np.where(self.LSN[:,yp,xp]==0)[0]
-                subset_on = one_cell[self.stim_table.frame.isin(on_frame)]
-                subset_off = one_cell[self.stim_table.frame.isin(off_frame)]
+                on_frame = np.where(lsn.LSN[:,yp,xp]==255)[0]
+                off_frame = np.where(lsn.LSN[:,yp,xp]==0)[0]
+                subset_on = one_cell[lsn.stim_table.frame.isin(on_frame)]
+                subset_off = one_cell[lsn.stim_table.frame.isin(off_frame)]
 
                 subset_on_mean = subset_on.mean()
                 subset_off_mean = subset_off.mean()
@@ -232,7 +232,7 @@ def plot_lsn_traces(self):
                 ax = plt.subplot(16,28,sp_pt)
                 ax.plot(xtime, subset_on_mean, color='r', lw=2)
                 ax.plot(xtime, subset_off_mean, color='b', lw=2)
-                ax.axvspan(0, self.sweeplength/self.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
+                ax.axvspan(0, lsn.sweeplength/lsn.acquisition_rate ,ymin=0, ymax=1, facecolor='gray', alpha=0.3)
                 vmax = np.where(np.amax(subset_on_mean)>vmax, np.amax(subset_on_mean), vmax)
                 vmax = np.where(np.amax(subset_off_mean)>vmax, np.amax(subset_off_mean), vmax)
                 vmin = np.where(np.amin(subset_on_mean)<vmin, np.amin(subset_on_mean), vmin)
@@ -248,15 +248,15 @@ def plot_lsn_traces(self):
         plt.suptitle("Cell " + str(nc+1), fontsize=20)
         plt.subplots_adjust(top=0.9)
         filename = 'Traces LSN Cell_'+str(nc+1)+'.png'
-        fullfilename = os.path.join(self.save_dir, filename) 
+        fullfilename = os.path.join(save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()          
 
 
-def plot_3sa(dg, nm1, nm3):
+def plot_3sa(dg, nm1, nm3, save_dir):
     logging.info("Plotting for all cell")
     for nc in range(dg.numbercells):
-        if np.mod(nc,100)==0:
+        if np.mod(nc,20)==0:
             logging.info("Cell #%s", str(nc))
         plt.figure(nc, figsize=(20,20))
         ax1 = plt.subplot2grid((6,6), (0,0), colspan=4) #full trace
@@ -400,14 +400,14 @@ def plot_3sa(dg, nm1, nm3):
         plt.tick_params(labelsize=16)    
         plt.tight_layout()
         filename = 'Cell_'+str(nc+1)+'_3SA.png'
-        fullfilename = os.path.join(dg.save_dir, filename) 
+        fullfilename = os.path.join(save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()      
 
-def plot_3sc(lsn, nm1, nm2):
+def plot_3sc(lsn, nm1, nm2, save_dir):
     logging.info("Plotting for all cells")
     for nc in range(lsn.numbercells):
-        if np.mod(nc,100)==0:
+        if np.mod(nc,20)==0:
             logging.info("Cell #%s", str(nc))
                          
         plt.figure(nc, figsize=(20,20)) 
@@ -540,14 +540,14 @@ def plot_3sc(lsn, nm1, nm2):
         plt.tick_params(labelsize=16)    
         plt.tight_layout()
         filename = 'Cell_'+str(nc+1)+'_3SC.png'
-        fullfilename = os.path.join(lsn.save_dir, filename) 
+        fullfilename = os.path.join(save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()
 
-def plot_3sb(sg, nm1, ns):
+def plot_3sb(sg, nm1, ns, save_dir):
     logging.info("Plotting for all cells")
     for nc in range(sg.numbercells):
-        if np.mod(nc,100)==0:
+        if np.mod(nc,20)==0:
             logging.info("Cell #%s", str(nc))
         plt.figure(nc, figsize=(20,24)) 
         ax1 = plt.subplot2grid((6,6), (0,0), colspan=4) #full trace
@@ -727,12 +727,13 @@ def plot_3sb(sg, nm1, ns):
         plt.tick_params(labelsize=16)    
         plt.tight_layout()
         filename = 'Cell_'+str(nc+1)+'_3SB.png'
-        fullfilename = os.path.join(sg.save_dir, filename) 
+        fullfilename = os.path.join(save_dir, filename) 
         plt.savefig(fullfilename)   
         plt.close()
 
-def experiment_summary(self, experiment_id):
+def experiment_summary(dg, experiment_id):
     '''saves figure with summary statistics for experiment'''
+
     logging.info("Plotting experiment summary")
     plt.figure(1, figsize=(20,16))
     ax1 = plt.subplot(331)
@@ -743,36 +744,36 @@ def experiment_summary(self, experiment_id):
     ax6 = plt.subplot(337)
     ax7 = plt.subplot(338)
     
-    ax1.hist(self.peak['ori_dg'][self.significant_cells].values,range=(0,self.number_ori), bins=self.number_ori, rwidth=0.8, color='gray')
+    ax1.hist(dg.peak['ori_dg'][dg.significant_cells].values,range=(0,dg.number_ori), bins=dg.number_ori, rwidth=0.8, color='gray')
     ax1.set_xticks(arange(0.5, 8, 1))
-    ax1.set_xticklabels(self.orivals)
+    ax1.set_xticklabels(dg.orivals)
     ax1.set_xlabel("Direction (deg)", fontsize=14)
     ax1.set_ylabel("# Cells", fontsize=14)
     ax1.set_title("Preferred direction", fontsize=14)
     
-    ax2.hist(self.peak['tf_dg'][self.significant_cells].values, range=(1,self.number_tf), bins=self.number_tf-1, rwidth=0.8, color='gray')
+    ax2.hist(dg.peak['tf_dg'][dg.significant_cells].values, range=(1,dg.number_tf), bins=dg.number_tf-1, rwidth=0.8, color='gray')
     ax2.set_xticks(arange(1.5,6,1))        
-    ax2.set_xticklabels(self.tfvals[1:])
+    ax2.set_xticklabels(dg.tfvals[1:])
     ax2.set_xlabel("Temporal frequency (Hz)", fontsize=14)
     ax2.set_ylabel("# Cells", fontsize=14)
     ax2.set_title("Preferred TF", fontsize=14)
     
-    ax3.hist(self.peak['response_reliability_dg'][self.significant_cells].values, range=(0,100), bins=15, color='gray')        
+    ax3.hist(dg.peak['response_reliability_dg'][dg.significant_cells].values, range=(0,100), bins=15, color='gray')        
     ax3.set_xlabel("% Significant trials", fontsize=14)
     ax3.set_ylabel("# Cells", fontsize=14)
     ax3.set_title("Significant trials", fontsize=14)
     
-    ax4.hist(self.peak['osi_dg'][self.significant_cells].values, range=(0,1.5), bins=15, color='gray')
+    ax4.hist(dg.peak['osi_dg'][dg.significant_cells].values, range=(0,1.5), bins=15, color='gray')
     ax4.set_xlabel("Orientation selectivity index", fontsize=14)
     ax4.set_ylabel("# Cells", fontsize=14)
     ax4.set_title("OSI", fontsize=14)
     
-    ax5.hist(self.peak['dsi_dg'][self.significant_cells].values, range=(0,1.5), bins=15, color='gray')
+    ax5.hist(dg.peak['dsi_dg'][dg.significant_cells].values, range=(0,1.5), bins=15, color='gray')
     ax5.set_xlabel("Direction selectivity index", fontsize=14)
     ax5.set_ylabel("# Cells", fontsize=14)
     ax5.set_title("DSI", fontsize=14)
     
-    dx = self.dxcm[np.logical_not(np.isnan(self.dxcm))]
+    dx = dg.dxcm[np.logical_not(np.isnan(dg.dxcm))]
     ax6.hist(dx, bins=50, color='gray')
     ax6.set_xlabel("Speed (cm/s)", fontsize=14)
     
@@ -791,18 +792,18 @@ def experiment_summary(self, experiment_id):
     plt.tick_params(labelsize=16)
     plt.subplots_adjust(top=0.8)
     plt.tight_layout()  
-    plt.suptitle(experiment_id + "  " + self.startdatetime, fontsize=20)
+    plt.suptitle(str(experiment_id) + "  " + self.startdatetime, fontsize=20)
     
-    plt.figtext(0.7, 0.35, "Total # cells: " + str(self.numbercells))
-    plt.figtext(0.7, 0.3, "Significant cells: " + str(len(self.significant_cells)))
+    plt.figtext(0.7, 0.35, "Total # cells: " + str(dg.numbercells))
+    plt.figtext(0.7, 0.3, "Significant cells: " + str(len(dg.significant_cells)))
     
     filename = "Experiment Summary.png"
-    fullfilename = os.path.join(self.save_dir, filename) 
+    fullfilename = os.path.join(save_dir, filename) 
     plt.savefig(fullfilename)   
     plt.close()      
         
 
-def plot_running_a(dg, nm1, nm3):
+def plot_running_a(dg, nm1, nm3, save_dir):
     logging.info("Plotting running data summary")
     nc = -1
     plt.figure(1, figsize=(10,8))
@@ -905,6 +906,6 @@ def plot_running_a(dg, nm1, nm3):
     plt.suptitle("Running Summary", fontsize=20)
     plt.subplots_adjust(top=0.9)
     filename = 'Running Summary.png'
-    fullfilename = os.path.join(dg.save_dir, filename) 
+    fullfilename = os.path.join(save_dir, filename) 
     plt.savefig(fullfilename)   
     plt.close()              
