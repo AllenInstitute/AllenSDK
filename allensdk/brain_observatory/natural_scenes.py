@@ -23,9 +23,9 @@ import logging
 class NaturalScenes(StimulusAnalysis):
     _log = logging.getLogger('allensdk.brain_observatory.natural_scenes')    
     
-    def __init__(self, brain_observatory_analysis, **kwargs):
-        super(NaturalScenes, self).__init__(brain_observatory_analysis, **kwargs)
-        self.stim_table = self.brain_observatory_analysis.nwb.get_stimulus_table('natural_scenes')
+    def __init__(self, data_set, **kwargs):
+        super(NaturalScenes, self).__init__(data_set, **kwargs)
+        self.stim_table = self.data_set.get_stimulus_table('natural_scenes')
         self.number_scenes = len(np.unique(self.stim_table.frame))
         self.sweeplength = self.stim_table.end.iloc[1] - self.stim_table.start.iloc[1]
         self.interlength = 4 * self.sweeplength

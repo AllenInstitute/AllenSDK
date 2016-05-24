@@ -27,16 +27,16 @@ from allensdk.brain_observatory.brain_observatory_exceptions \
 class StaticGrating(StimulusAnalysis):
     _log = logging.getLogger('allensdk.brain_observatory.static_grating')        
     
-    def __init__(self, brain_observatory_analysis, **kwargs):
+    def __init__(self, data_set, **kwargs):
         ''' Analysis object for static grating experiments.
 
         Arguments
         ---------
-        brain_observatory_analysis: BrainObservatoryAnalysis object
+        data_set: BrainObservatoryNwbDataSet object
         '''
-        super(StaticGrating, self).__init__(brain_observatory_analysis, **kwargs)
+        super(StaticGrating, self).__init__(data_set, **kwargs)
         
-        stimulus_table = self.brain_observatory_analysis.nwb.get_stimulus_table('static_gratings')
+        stimulus_table = self.data_set.get_stimulus_table('static_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = self.stim_table['end'].iloc[1] - self.stim_table['start'].iloc[1]
         self.interlength = 4 * self.sweeplength

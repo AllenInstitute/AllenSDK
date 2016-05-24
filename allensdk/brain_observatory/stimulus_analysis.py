@@ -25,23 +25,20 @@ from allensdk.brain_observatory.brain_observatory_exceptions import \
 class StimulusAnalysis(object):
     _log = logging.getLogger('allensdk.brain_observatory.stimulus_analysis')
     
-    def __init__(self, brain_observatory_analysis,
-                 speed_tuning=False,
-                 **kwargs):
-        self.brain_observatory_analysis = brain_observatory_analysis
-        self.save_dir = os.path.dirname(self.brain_observatory_analysis.save_path)
+    def __init__(self, data_set, speed_tuning=False):
+        self.data_set = data_set
         
         # get fluorescence 
-        self.timestamps, self.celltraces = self.brain_observatory_analysis.nwb.get_corrected_fluorescence_traces()
+        self.timestamps, self.celltraces = self.data_set.get_corrected_fluorescence_traces()
         self.numbercells = len(self.celltraces)    #number of cells in dataset
-        self.roi_id = self.brain_observatory_analysis.nwb.get_roi_ids()
-        self.cell_id = self.brain_observatory_analysis.nwb.get_cell_specimen_ids()
+        self.roi_id = self.data_set.get_roi_ids()
+        self.cell_id = self.data_set.get_cell_specimen_ids()
         
         # get dF/F 
-        _, self.dfftraces = self.brain_observatory_analysis.nwb.get_dff_traces()
+        _, self.dfftraces = self.data_set.get_dff_traces()
 
         self.acquisition_rate = 1/(self.timestamps[1]-self.timestamps[0])
-        self.dxcm, self.dxtime = self.brain_observatory_analysis.nwb.get_running_speed()
+        self.dxcm, self.dxtime = self.data_set.get_running_speed()
 
         if speed_tuning:
             self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.get_speed_tuning(binsize=800)
@@ -60,7 +57,7 @@ class StimulusAnalysis(object):
         celltraces_trimmed = np.delete(self.dfftraces, range(len(self.dxcm), np.size(self.dfftraces,1)), axis=1) 
 
         # pull out spontaneous epoch(s)        
-        spontaneous = self.brain_observatory_analysis.nwb.get_stimulus_table('spontaneous')
+        spontaneous = self.data_set.get_stimulus_table('spontaneous')
 
         peak_run = pd.DataFrame(index=range(self.numbercells), columns=('speed_max_sp','speed_min_sp','ptest_sp', 'mod_sp','speed_max_vis','speed_min_vis','ptest_vis', 'mod_vis'))
 

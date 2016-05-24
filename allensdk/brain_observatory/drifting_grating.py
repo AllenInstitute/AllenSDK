@@ -23,9 +23,9 @@ import logging
 class DriftingGrating(StimulusAnalysis):
     _log = logging.getLogger('allensdk.brain_observatory.drifting_grating')    
 
-    def __init__(self, brain_observatory_analysis, **kwargs):
-        super(DriftingGrating, self).__init__(brain_observatory_analysis, **kwargs)                   
-        stimulus_table = self.brain_observatory_analysis.nwb.get_stimulus_table('drifting_gratings')
+    def __init__(self, data_set, **kwargs):
+        super(DriftingGrating, self).__init__(data_set, **kwargs)                   
+        stimulus_table = self.data_set.get_stimulus_table('drifting_gratings')
         self.stim_table = stimulus_table.fillna(value=0.)     
         self.sweeplength = 60#self.sync_table['end'][1] - self.sync_table['start'][1]
         self.interlength = 30#self.sync_table['start'][2] - self.sync_table['end'][1]

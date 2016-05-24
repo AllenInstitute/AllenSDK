@@ -19,9 +19,9 @@ import numpy as np
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 
 class NaturalMovie(StimulusAnalysis):    
-    def __init__(self, brain_observatory_analysis, movie_name, **kwargs):
-        super(NaturalMovie, self).__init__(brain_observatory_analysis, **kwargs)                   
-        stimulus_table = self.brain_observatory_analysis.nwb.get_stimulus_table(movie_name)
+    def __init__(self, data_set, movie_name, **kwargs):
+        super(NaturalMovie, self).__init__(data_set, **kwargs)
+        stimulus_table = self.data_set.get_stimulus_table(movie_name)
         self.stim_table = stimulus_table[stimulus_table.frame==0]
         self.sweeplength = self.stim_table.start.iloc[1] - self.stim_table.start.iloc[0]
         self.sweep_response = self.get_sweep_response()

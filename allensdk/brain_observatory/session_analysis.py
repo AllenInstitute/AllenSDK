@@ -36,8 +36,8 @@ def multi_dataframe_merge(dfs):
             out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
     return out_df
 
-class BrainObservatoryAnalysis(object):
-    _log = logging.getLogger('allensdk.brain_observatory.brain_observatory_analysis')    
+class SessionAnalysis(object):
+    _log = logging.getLogger('allensdk.brain_observatory.session_analysis')    
 
     def __init__(self, nwb_path, save_path):
         self.nwb = BrainObservatoryNwbDataSet(nwb_path)                        
@@ -146,7 +146,7 @@ class BrainObservatoryAnalysis(object):
         nm3 = NaturalMovie(self, 'natural_movie_three')
         dg = DriftingGrating(self)
 
-        BrainObservatoryAnalysis._log.info("Session A analyzed")
+        SessionAnalysis._log.info("Session A analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, dg.peak, nm1.peak, nm3.peak])
         
 
@@ -166,7 +166,7 @@ class BrainObservatoryAnalysis(object):
         sg = StaticGrating(self)    
         ns = NaturalScenes(self)
         nm1 = NaturalMovie(self, 'natural_movie_one', speed_tuning=True)
-        BrainObservatoryAnalysis._log.info("Session B analyzed")
+        SessionAnalysis._log.info("Session B analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, sg.peak, ns.peak, nm1.peak])
         self.append_metadata(peak)
 
@@ -187,7 +187,7 @@ class BrainObservatoryAnalysis(object):
         lsn = LocallySparseNoise(self)
         nm2 = NaturalMovie(self, 'natural_movie_two')
         nm1 = NaturalMovie(self, 'natural_movie_one', speed_tuning=True)
-        BrainObservatoryAnalysis._log.info("Session C analyzed")
+        SessionAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_metadata(peak)
                 
@@ -202,25 +202,25 @@ class BrainObservatoryAnalysis(object):
             self.save_session_c(lsn, nm1, nm2, peak)
     
                     
-def run_brain_observatory_analysis(nwb_path, save_path, plot_flag=False):
+def run_session_analysis(nwb_path, save_path, plot_flag=False):
     save_dir = os.path.abspath(os.path.dirname(save_path))
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    brain_observatory_analysis = BrainObservatoryAnalysis(nwb_path, save_path)
+    session_analysis = SessionAnalysis(nwb_path, save_path)
 
-    session = brain_observatory_analysis.nwb.get_session_type()
+    session = session_analysis.nwb.get_session_type()
 
     if session == stimulus_info.THREE_SESSION_A:
-        brain_observatory_analysis.session_a(plot_flag)
-        metrics = brain_observatory_analysis.metrics_a
+        session_analysis.session_a(plot_flag)
+        metrics = session_analysis.metrics_a
     elif session == stimulus_info.THREE_SESSION_B:
-        brain_observatory_analysis.session_b(plot_flag)
-        metrics = brain_observatory_analysis.metrics_b
+        session_analysis.session_b(plot_flag)
+        metrics = session_analysis.metrics_b
     elif session == stimulus_info.THREE_SESSION_C:
-        brain_observatory_analysis.session_c(plot_flag)
-        metrics = brain_observatory_analysis.metrics_c
+        session_analysis.session_c(plot_flag)
+        metrics = session_analysis.metrics_c
     else:
         raise IndexError("Unknown session: %s" % session)
 
@@ -237,7 +237,7 @@ def main():
     logging.basicConfig()
     logging.getLogger().setLevel(logging.DEBUG)
 
-    run_brain_observatory_analysis(args.input_nwb, args.output_h5, args.plot)
+    run_session_analysis(args.input_nwb, args.output_h5, args.plot)
 
 
 if __name__=='__main__': main()
