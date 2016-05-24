@@ -18,14 +18,31 @@ All traces for segmented cells in a single experiment are stored in the Neurodat
 Traces include every cell's mean fluoresence trace, neuropil trace, and dF/F trace.  Code for extracting neuropil-corrected
 traces is available in the SDK. 
 
-Some helpful links:
 
-    * `Find out more about Brain Observatory NWB files <brain_observatory_nwb.html>`_ 
-    * `Read our technical whitepapers <help.alleninstitute.org/display/cam/Documentation>`_.
+Getting Started
+---------------
+
+The Brain Observatory `Jupyter notebook <_static/examples/nb/brain_observatory.html>`_ has many code samples to help get
+started with the available data:
+
+    - `Download experimental metadata by visual area, imaging depth, and Cre line <_static/examples/nb/brain_observatory.html#Experiment-Containers>`_
+    - `Find cells with specific response properties, like direction tuning <_static/examples/nb/brain_observatory.html#Find-Cells-of-Interest>`_
+    - `Download data for an experiment <_static/examples/nb/brain_observatory.html#Download-Experiment-Data-for-a-Cell>`_
+    - `Plot raw fluorescences traces, neuropil-corrected traces, and dF/F <_static/examples/nb/brain_observatory.html#Fluorescence-Traces>`_
+    - `Find the ROI mask for a given cell <_static/examples/nb/brain_observatory.html#ROI-Masks>`_    
+    - `Run neuropil correction <_static/examples/nb/brain_observatory.html#Neuropil-Correction>`_
+
+More detailed documentation is available demonstrating how to: 
+
+    - `Read and visualize the stimulus presentation tables in the NWB files: <_static/examples/nb/brain_observatory_stimuli.html>`_
+    - `Run stimulus-specific tuning analysis <_static/examples/nb/brain_observatory_analysis.html>`_
+    - `Understand the layout of Brain Observatory NWB files <brain_observatory_nwb.html>`_ 
+
+For more information, please `read our technical whitepapers <help.alleninstitute.org/display/cam/Documentation>`_.
 
 
-Visual Stimuli
---------------
+Overview of Visual Stimuli
+--------------------------
 
 All displayed stimuli were warped when displayed to help compensate for angular differences in square size when displayed on a flat monitor (e.g., the left and right edges of the display were magnified to compensate for this part of the monitor being further way from the mouse). The mapping of movie pixels to screen vertices is provided at:
 
@@ -68,23 +85,6 @@ Stimuli were full-screen static sinusoidal gratings at a single contrast (80%). 
 This stimulus was used to record activity from neurons when there was no visual stimulus being presented. The stimulus was 5 minutes of mean lunimance gray.
 
 
-Code Samples
-------------
-
-The Brain Observatory `Jupyter notebook <_static/examples/nb/brain_observatory.html>`_ has many code samples to help get
-started with analysis:
-
-    - `Download experimental metadata by visual area, imaging depth, and Cre line <_static/examples/nb/brain_observatory.html#Experiment-Containers>`_
-    - `Find cells with specific response properties, like direction tuning <_static/examples/nb/brain_observatory.html#Find-Cells-of-Interest>`_
-    - `Download data for an experiment <_static/examples/nb/brain_observatory.html#Download-Experiment-Data-for-a-Cell>`_
-    - `Plot raw fluorescences traces, neuropil-corrected traces, and dF/F <_static/examples/nb/brain_observatory.html#Fluorescence-Traces>`_
-    - `Find the ROI mask for a given cell <_static/examples/nb/brain_observatory.html#ROI-Masks>`_
-    - `Run drifting gratings tuning analysis <_static/examples/nb/brain_observatory.html#ROI-Analysis>`_
-    - `Run neuropil correction <_static/examples/nb/brain_observatory.html#Neuropil-Correction>`_
-
-A separate notebook is available demonstrating how to read and visualize the stimulus presentation tables in the NWB files:
-
-    - `Visualize the experiment by stimulus type <_static/examples/nb/brain_observatory_stimuli.html#Drifting-Gratings>`_
 
    
 

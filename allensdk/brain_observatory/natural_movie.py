@@ -59,8 +59,8 @@ class NaturalMovie(StimulusAnalysis):
         Parameters
         ----------
         movie_name: string
-            one of [ stimulus_info.NATURAL_MOVIE_ONE, stimulus_info.NATURAL_MOVIE_TWO, 
-                     stimulus_info.NATURAL_MOVIE_THREE ]
+            one of [ stimulus_info.NATURAL_MOVIE_ONE, stimulus_info.NATURAL_MOVIE_TWO, stimulus_info.NATURAL_MOVIE_THREE ]
+
         Returns
         -------
         Pandas data frame with the below fields. A suffix of "nm1", "nm2" or "nm3" is appended to the field name depending
