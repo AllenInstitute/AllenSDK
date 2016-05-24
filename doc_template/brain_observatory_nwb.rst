@@ -40,7 +40,7 @@ An NWB file has six top-level folders and five top-level datasets.
 In Figure 1, the contents of the 'session_description' dataset is displayed.
 An NWB file is designed to store data from a single experimental session in a single animal. 
 The session_description dataset provides a quick summary of the information available in the file.
-The NWB specification, describing the format and how data is stored, can be downloaded :download:`here </_static/nwb_file_format_specification_v1.0.3.pdf>`_.
+The NWB specification, describing the format and how data is stored, can be downloaded `here </_static/nwb_file_format_specification_v1.0.3.pdf>`_.
 
 
 Stimulus data
