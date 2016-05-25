@@ -33,7 +33,11 @@ def multi_dataframe_merge(dfs):
         if out_df is None:
             out_df = df
         else:
-            out_df = out_df.merge(df, how='left', left_index=True, right_index=True)
+            out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_deleteme'])
+
+    bad_columns = set([ c for c in out_df.columns if c.endswith('deleteme') ])
+    out_df.drop(list(bad_columns), axis=1, inplace=True)
+
     return out_df
 
 class SessionAnalysis(object):
