@@ -7,6 +7,18 @@ import numpy as np
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 
 def movingmode_fast(x, kernelsize, y):
+    """ Compute the windowed mode of an array.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        Array to be analyzed
+    kernelsize: int
+        Size of the moving window
+    y: np.ndarray
+        Output array to store the results
+    """
+
     histo = np.zeros(4096)
     halfsize = kernelsize/2
     for m in range (0,halfsize):
@@ -53,6 +65,17 @@ def movingmode_fast(x, kernelsize, y):
     return 0
 
 def movingaverage(x, kernelsize, y):
+    """ Compute the windowed average of an array.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        Array to be analyzed
+    kernelsize: int
+        Size of the moving window
+    y: np.ndarray
+        Output array to store the results
+    """
     halfsize = kernelsize/2
     sumkernel = np.sum(x[0:halfsize])
     for m in range (0,halfsize):
@@ -71,6 +94,7 @@ def movingaverage(x, kernelsize, y):
     return 0
 
 def plot_onetrace(x1):
+    """ Debug plotting function """
     q1 = 30000
     q2 = 60000
     q3 = 90000
@@ -107,7 +131,23 @@ def plot_onetrace(x1):
 
     return 0
 
-def compute_dff(traces, save_plot_dir=None):
+def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsize=3000):
+    """ Compute dF/F of a set of traces using a mean-shifted windowed mode operator. 
+    The operation is basically:  
+
+        T_mm = windowed_mean(windowed_mode(T))
+
+        T_dff = (T - T_mm) / T_mm
+    
+    Parameters
+    ----------
+    traces: np.ndarray
+       2D array of traces to be analyzed
+
+    Returns
+    -------
+    np.ndarray with the same shape as the input array.
+    """
 
     if save_plot_dir is not None and not os.path.exists(save_plot_dir):
         os.makedirs(save_plot_dir)
@@ -121,8 +161,8 @@ def compute_dff(traces, save_plot_dir=None):
     logging.debug("computing df/f")
 
     for n in range(0,traces.shape[0]):
-        movingmode_fast(traces[n,:], 5400, modeline[:])
-        movingaverage(modeline[:], 3000, modelineLP[:])
+        movingmode_fast(traces[n,:], mode_kernelsize, modeline[:])
+        movingaverage(modeline[:], mean_kernelsize, modelineLP[:])
 	dff[n,:] = (traces[n,:] - modelineLP[:]) / modelineLP[:]
 
         logging.debug("finished trace %d/%d" % (n+1, traces.shape[0]))
