@@ -262,7 +262,7 @@ Example experiment container record:
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Finding-Experiments-with-a-Particular-Stimulus">Finding Experiments with a Particular Stimulus<a class="anchor-link" href="#Finding-Experiments-with-a-Particular-Stimulus">&#182;</a></h2><p>The experiments described by an experiment container will have different stimulus protocols.  For example, one experiment protocol contains the static gratings stimulus and another has the natural scenes stimulus.  The <code>BrainObservatoryCache</code> helps you find out which experiment associated with a container has the stimuli you are interested in.</p>
+<h2 id="Download-Experiments-for-a-Container">Download Experiments for a Container<a class="anchor-link" href="#Download-Experiments-for-a-Container">&#182;</a></h2><p>An experiment container is a group of experiments.  Each experiment has a different stimulus protocol.  For example, one experiment protocol contains the static gratings stimulus and another has the natural scenes stimulus.  The <code>BrainObservatoryCache</code> helps you find out which experiment associated with a container has the stimuli you are interested in.  First, let's see what experiments are available for a single container.</p>
 
 </div>
 </div>
@@ -272,12 +272,75 @@ Example experiment container record:
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="c"># Find all of the experiments for an experiment container</span>
+<span class="n">cux2_ec_id</span> <span class="o">=</span> <span class="n">cux2_ecs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">]</span>
+<span class="n">exps</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">(</span><span class="n">experiment_container_ids</span><span class="o">=</span><span class="p">[</span><span class="n">cux2_ec_id</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Experiments for experiment_container_id </span><span class="si">%d</span><span class="s">: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cux2_ec_id</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">exps</span><span class="p">)))</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">exps</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Experiments for experiment_container_id 511510695: 3
+[{&apos;age_days&apos;: 143.0,
+  &apos;cre_line&apos;: u&apos;Cux2-CreERT2&apos;,
+  &apos;experiment_container_id&apos;: 511510695,
+  &apos;id&apos;: 503820068,
+  &apos;imaging_depth&apos;: 175,
+  &apos;session_type&apos;: u&apos;three_session_B&apos;,
+  &apos;targeted_structure&apos;: u&apos;VISal&apos;},
+ {&apos;age_days&apos;: 143.0,
+  &apos;cre_line&apos;: u&apos;Cux2-CreERT2&apos;,
+  &apos;experiment_container_id&apos;: 511510695,
+  &apos;id&apos;: 503412730,
+  &apos;imaging_depth&apos;: 175,
+  &apos;session_type&apos;: u&apos;three_session_A&apos;,
+  &apos;targeted_structure&apos;: u&apos;VISal&apos;},
+ {&apos;age_days&apos;: 143.0,
+  &apos;cre_line&apos;: u&apos;Cux2-CreERT2&apos;,
+  &apos;experiment_container_id&apos;: 511510695,
+  &apos;id&apos;: 504108263,
+  &apos;imaging_depth&apos;: 175,
+  &apos;session_type&apos;: u&apos;three_session_C&apos;,
+  &apos;targeted_structure&apos;: u&apos;VISal&apos;}]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <code>session_type</code> field indicates which experimental protocol was used.  If you just want to find which experiment contains the static gratings stimulus, you can do the following:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stim_info</span>
 
-<span class="c"># Find the experiment with the static static gratings stimulus for a Cux2 container</span>
+<span class="c"># Find the experiment with the static static gratings stimulus</span>
 <span class="n">cux2_ec_id</span> <span class="o">=</span> <span class="n">cux2_ecs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">]</span>
-<span class="n">exp</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">(</span><span class="n">experiment_container_ids</span><span class="o">=</span><span class="p">[</span><span class="n">cux2_ec_id</span><span class="p">],</span> <span class="n">stimuli</span><span class="o">=</span><span class="p">[</span><span class="n">stim_info</span><span class="o">.</span><span class="n">STATIC_GRATINGS</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;Cux2 experiment with static gratings:&quot;</span><span class="p">)</span>
+<span class="n">exp</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">(</span><span class="n">experiment_container_ids</span><span class="o">=</span><span class="p">[</span><span class="n">cux2_ec_id</span><span class="p">],</span> 
+                                <span class="n">stimuli</span><span class="o">=</span><span class="p">[</span><span class="n">stim_info</span><span class="o">.</span><span class="n">STATIC_GRATINGS</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Experiment with static gratings:&quot;</span><span class="p">)</span>
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
 </pre></div>
 
@@ -291,7 +354,7 @@ Example experiment container record:
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Cux2 experiment with static gratings:
+<pre>Experiment with static gratings:
 {&apos;age_days&apos;: 143.0,
  &apos;cre_line&apos;: u&apos;Cux2-CreERT2&apos;,
  &apos;experiment_container_id&apos;: 511510695,
@@ -299,6 +362,60 @@ Example experiment container record:
  &apos;imaging_depth&apos;: 175,
  &apos;session_type&apos;: u&apos;three_session_B&apos;,
  &apos;targeted_structure&apos;: u&apos;VISal&apos;}
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we can download the NWB file for this experiment.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">exp</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
+
+<span class="c"># print out the metadata available in the NWB file</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">exp</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">())</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>{&apos;age_days&apos;: 124,
+ &apos;cre_line&apos;: &apos;Cux2-CreERT2&apos;,
+ &apos;device&apos;: &apos;Nikon A1R-MP multiphoton microscope&apos;,
+ &apos;device_name&apos;: &apos;CAM2P.1&apos;,
+ &apos;excitation_lambda&apos;: &apos;910 microns&apos;,
+ &apos;experiment_container_id&apos;: 511510695,
+ &apos;fov&apos;: &apos;400x400 microns (512 x 512 pixels)&apos;,
+ &apos;genotype&apos;: &apos;Cux2-CreERT2; Camk2a-tTA; Ai93(TITL-GCaMP6f)&apos;,
+ &apos;imaging_depth_um&apos;: 175,
+ &apos;indicator&apos;: &apos;GCaMP6f&apos;,
+ &apos;ophys_experiment_id&apos;: 503820068,
+ &apos;session_start_time&apos;: datetime.datetime(2016, 2, 24, 11, 27, 49),
+ &apos;session_type&apos;: &apos;three_session_B&apos;,
+ &apos;sex&apos;: &apos;male&apos;,
+ &apos;targeted_structure&apos;: &apos;VISal&apos;}
 </pre>
 </div>
 </div>
@@ -400,7 +517,7 @@ Example experiment container record:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># Download cells for a set of experiments and convert to DataFrame</span>
@@ -455,7 +572,7 @@ direction-selective cells: 2257
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stim_info</span>
@@ -512,7 +629,7 @@ Example ophys experiment:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># pick a direction-selective cell and find its NWB file</span>
@@ -579,7 +696,7 @@ stimuli available in this file:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">dsi_cell_id</span> <span class="o">=</span> <span class="n">dsi_cell</span><span class="p">[</span><span class="s">&#39;cell_specimen_id&#39;</span><span class="p">]</span>
@@ -597,7 +714,7 @@ stimuli available in this file:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -1931,7 +2048,7 @@ REREREREVYeBEBERERERVZ3/B5ztsuILAbGYAAAAAElFTkSuQmCC
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
@@ -2711,7 +2828,7 @@ QRAEQVjkiHATBEEQBEEQBEFY5IhwEwRBEARBEARBWOSIcBMEQRAEQRAEQVjkiHATBEEQBEEQBEFY
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.drifting_gratings</span> <span class="kn">import</span> <span class="n">DriftingGratings</span>
@@ -2743,7 +2860,7 @@ QRAEQVjkiHATBEEQBEEQBEFY5IhwEwRBEARBEARBWOSIcBMEQRAEQRAEQVjkiHATBEEQBEEQBEFY
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -3039,7 +3156,7 @@ mTWGCzUzM2sMF2pmZtYYLtTMzKwx/h8MPrlDg1gttQAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.r_neuropil</span> <span class="kn">import</span> <span class="n">estimate_contamination_ratios</span>
@@ -3082,7 +3199,7 @@ max error = 0.013380
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">time</span><span class="p">,</span> <span class="n">corrected_traces</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_corrected_fluorescence_traces</span><span class="p">()</span>
@@ -3430,7 +3547,7 @@ qYMAAAAASUVORK5CYII=
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -3825,7 +3942,7 @@ iIiIiCoCgx8iIiIiIqoIDH6IiIiIiKgiMPghIiIiIqKK8P96pfFI+uzIxQAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
