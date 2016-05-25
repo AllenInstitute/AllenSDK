@@ -92,13 +92,15 @@ class DriftingGratings(StimulusAnalysis):
         '''
         DriftingGratings._log.info('Calculating peak response properties')
         
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_reliability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg','cv_dg'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_dg','tf_dg','response_reliability_dg','osi_dg','dsi_dg','peak_dff_dg','ptest_dg', 'p_run_dg','run_modulation_dg','cv_dg','cell_specimen_id'))
+        cids = self.data_set.get_cell_specimen_ids()
 
         orivals_rad = np.deg2rad(self.orivals)
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,nc,0] == np.nanmax(self.response[:,1:,nc,0]))
             prefori = cell_peak[0][0]
             preftf = cell_peak[1][0]+1
+            peak.cell_specimen_id.iloc[nc] = cids[nc]
             peak.ori_dg.iloc[nc] = prefori
             peak.tf_dg.iloc[nc] = preftf
             peak.response_reliability_dg.iloc[nc] = self.response[prefori, preftf, nc, 2]/0.15
@@ -135,5 +137,7 @@ class DriftingGratings(StimulusAnalysis):
             else:
                 peak.p_run_dg.iloc[nc] = np.NaN
                 peak.run_modulation_dg.iloc[nc] = np.NaN
+
+        
         return peak
     

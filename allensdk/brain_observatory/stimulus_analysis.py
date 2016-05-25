@@ -65,7 +65,7 @@ class StimulusAnalysis(object):
     def get_peak(self):
         """ Implemented by subclasses."""
         raise BrainObservatoryAnalysisException("get_peak not implemented")
-        
+
     def get_speed_tuning(self, binsize):
         """ Calculates speed tuning, spontaneous versus visually driven.  The return is a 5-tuple 
         of speed and dF/F histograms.  

@@ -34,7 +34,7 @@ started with the available data:
 
 More detailed documentation is available demonstrating how to: 
 
-    - `Read and visualize the stimulus presentation tables in the NWB files: <_static/examples/nb/brain_observatory_stimuli.html>`_
+    - `Read and visualize the stimulus presentation tables in the NWB files <_static/examples/nb/brain_observatory_stimuli.html>`_
     - `Run stimulus-specific tuning analysis <_static/examples/nb/brain_observatory_analysis.html>`_
     - `Understand the layout of Brain Observatory NWB files <brain_observatory_nwb.html>`_ 
 
@@ -82,7 +82,7 @@ Stimuli were full-screen static sinusoidal gratings at a single contrast (80%). 
 
 **Spontaneous activity**
 
-This stimulus was used to record activity from neurons when there was no visual stimulus being presented. The stimulus was 5 minutes of mean lunimance gray.
+This stimulus was used to record activity from neurons when there was no visual stimulus being presented. The stimulus was 5 minutes of mean luminance gray.
 
 
 

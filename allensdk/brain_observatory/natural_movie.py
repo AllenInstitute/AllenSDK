@@ -68,9 +68,11 @@ class NaturalMovie(StimulusAnalysis):
             * peak_nm1 (frame with peak response)
             * response_variability_nm1
         '''
-        peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_reliability'))
+        peak_movie = pd.DataFrame(index=range(self.numbercells), columns=('peak','response_reliability','cell_specimen_id'))
+        cids = self.data_set.get_cell_specimen_ids()
 
         for nc in range(self.numbercells):
+            peak_movie.cell_specimen_id.iloc[nc] = cids[nc]
             meanresponse = self.sweep_response[str(nc)].mean()
             movie_len= len(meanresponse)/30
             output = np.empty((movie_len,10))

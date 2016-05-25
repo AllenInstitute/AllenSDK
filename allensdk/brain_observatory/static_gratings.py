@@ -106,13 +106,15 @@ class StaticGratings(StimulusAnalysis):
         '''
         StaticGratings._log.info('Calculating peak response properties')
 
-        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_reliability_sg','osi_sg','peak_dff_sg','ptest_sg','time_to_peak_sg','duration_sg'))
+        peak = pd.DataFrame(index=range(self.numbercells), columns=('ori_sg','sf_sg', 'phase_sg', 'response_reliability_sg','osi_sg','peak_dff_sg','ptest_sg','time_to_peak_sg','duration_sg','cell_specimen_id'))
+        cids = self.data_set.get_cell_specimen_ids()
 
         for nc in range(self.numbercells):
             cell_peak = np.where(self.response[:,1:,:,nc,0] == np.nanmax(self.response[:,1:,:,nc,0]))
             pref_ori = cell_peak[0][0]
             pref_sf = cell_peak[1][0]+1
             pref_phase = cell_peak[2][0]
+            peak.cell_specimen_id.iloc[nc] = cids[nc]
             peak.ori_sg[nc] = pref_ori
             peak.sf_sg[nc] = pref_sf
             peak.phase_sg[nc] = pref_phase

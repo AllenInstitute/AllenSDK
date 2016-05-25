@@ -33,7 +33,7 @@ def multi_dataframe_merge(dfs):
         if out_df is None:
             out_df = df
         else:
-            out_df = out_df.merge(df, left_index=True, right_index=True, suffixes=['','_%d' % i])
+            out_df = out_df.merge(df, how='left', left_index=True, right_index=True)
     return out_df
 
 class SessionAnalysis(object):
