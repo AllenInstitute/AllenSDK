@@ -35,8 +35,6 @@ class LocallySparseNoise(StimulusAnalysis):
         self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
         self.receptive_field = self.get_receptive_field()
 
-
-
         
     def get_receptive_field(self):
         ''' Calculates receptive fields for each cell

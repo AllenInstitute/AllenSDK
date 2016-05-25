@@ -207,14 +207,11 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.drifting_grating</span> <span class="k">import</span> <span class="n">DriftingGrating</span>
-<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.brain_observatory_analysis</span> <span class="k">import</span> <span class="n">BrainObservatoryAnalysis</span>
+<div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.drifting_gratings</span> <span class="k">import</span> <span class="n">DriftingGratings</span>
 
 <span class="c"># example loading drifing grating data</span>
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">511440894</span><span class="p">)</span>
-<span class="n">analysis</span> <span class="o">=</span> <span class="n">BrainObservatoryAnalysis</span><span class="p">(</span><span class="n">data_set</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&quot;./&quot;</span><span class="p">)</span>
-
-<span class="n">dg</span> <span class="o">=</span> <span class="n">DriftingGrating</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
+<span class="n">dg</span> <span class="o">=</span> <span class="n">DriftingGratings</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;done analyzing drifting gratings&quot;</span><span class="p">)</span>
 </pre></div>
 
@@ -227,16 +224,8 @@ div#notebook {
 
 
 <div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 511440894 NWB. This can take some time.
-</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>
-done analyzing drifting gratings
+<pre>done analyzing drifting gratings
 </pre>
 </div>
 </div>
@@ -279,6 +268,7 @@ done analyzing drifting gratings
       <th>p_run_dg</th>
       <th>run_modulation_dg</th>
       <th>cv_dg</th>
+      <th>cell_specimen_id</th>
     </tr>
   </thead>
   <tbody>
@@ -294,6 +284,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.9241533</td>
+      <td>517399895</td>
     </tr>
     <tr>
       <th>1</th>
@@ -307,6 +298,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.4790239</td>
+      <td>517399727</td>
     </tr>
     <tr>
       <th>2</th>
@@ -320,6 +312,7 @@ done analyzing drifting gratings
       <td>0.4353102</td>
       <td>0.1834409</td>
       <td>0.2990284</td>
+      <td>517399421</td>
     </tr>
     <tr>
       <th>3</th>
@@ -333,6 +326,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>2.489806</td>
+      <td>517399683</td>
     </tr>
     <tr>
       <th>4</th>
@@ -346,6 +340,7 @@ done analyzing drifting gratings
       <td>0.1354739</td>
       <td>22.89428</td>
       <td>0.4119766</td>
+      <td>517399327</td>
     </tr>
     <tr>
       <th>5</th>
@@ -359,6 +354,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.2245991</td>
+      <td>517399317</td>
     </tr>
     <tr>
       <th>6</th>
@@ -372,6 +368,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.3178407</td>
+      <td>517399332</td>
     </tr>
     <tr>
       <th>7</th>
@@ -385,6 +382,7 @@ done analyzing drifting gratings
       <td>0.1084621</td>
       <td>2.260014</td>
       <td>0.08365179</td>
+      <td>517399349</td>
     </tr>
     <tr>
       <th>8</th>
@@ -398,6 +396,7 @@ done analyzing drifting gratings
       <td>0.02981292</td>
       <td>0.2059699</td>
       <td>0.1160312</td>
+      <td>517399337</td>
     </tr>
     <tr>
       <th>9</th>
@@ -411,6 +410,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.2153208</td>
+      <td>517399499</td>
     </tr>
     <tr>
       <th>10</th>
@@ -424,6 +424,7 @@ done analyzing drifting gratings
       <td>0.4469197</td>
       <td>0.4970043</td>
       <td>0.027628</td>
+      <td>517399513</td>
     </tr>
     <tr>
       <th>11</th>
@@ -437,6 +438,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.8307582</td>
+      <td>517399504</td>
     </tr>
     <tr>
       <th>12</th>
@@ -450,6 +452,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.4332248</td>
+      <td>517399677</td>
     </tr>
     <tr>
       <th>13</th>
@@ -463,6 +466,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.8287607</td>
+      <td>517399978</td>
     </tr>
     <tr>
       <th>14</th>
@@ -476,6 +480,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.1094999</td>
+      <td>517399307</td>
     </tr>
     <tr>
       <th>15</th>
@@ -489,6 +494,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.2978277</td>
+      <td>517399627</td>
     </tr>
     <tr>
       <th>16</th>
@@ -502,6 +508,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.2444618</td>
+      <td>517399632</td>
     </tr>
     <tr>
       <th>17</th>
@@ -515,6 +522,7 @@ done analyzing drifting gratings
       <td>0.1084621</td>
       <td>-0.01977134</td>
       <td>0.1776271</td>
+      <td>517399642</td>
     </tr>
     <tr>
       <th>18</th>
@@ -528,6 +536,7 @@ done analyzing drifting gratings
       <td>0.1354739</td>
       <td>-15.09663</td>
       <td>3.59225</td>
+      <td>517399277</td>
     </tr>
     <tr>
       <th>19</th>
@@ -541,6 +550,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>2.896881</td>
+      <td>517399652</td>
     </tr>
     <tr>
       <th>20</th>
@@ -554,6 +564,7 @@ done analyzing drifting gratings
       <td>0.01159044</td>
       <td>16.00802</td>
       <td>0.2860971</td>
+      <td>517399411</td>
     </tr>
     <tr>
       <th>21</th>
@@ -567,6 +578,7 @@ done analyzing drifting gratings
       <td>0.889526</td>
       <td>2.478378</td>
       <td>1.035872</td>
+      <td>517399384</td>
     </tr>
     <tr>
       <th>22</th>
@@ -580,6 +592,7 @@ done analyzing drifting gratings
       <td>0.1354739</td>
       <td>-0.1928012</td>
       <td>0.1182357</td>
+      <td>517399389</td>
     </tr>
     <tr>
       <th>23</th>
@@ -593,6 +606,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.4317873</td>
+      <td>517399416</td>
     </tr>
     <tr>
       <th>24</th>
@@ -606,6 +620,7 @@ done analyzing drifting gratings
       <td>0.006707649</td>
       <td>54.26513</td>
       <td>0.2745549</td>
+      <td>517399779</td>
     </tr>
     <tr>
       <th>25</th>
@@ -619,6 +634,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.7170138</td>
+      <td>517399784</td>
     </tr>
     <tr>
       <th>26</th>
@@ -632,6 +648,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.2557419</td>
+      <td>517399939</td>
     </tr>
     <tr>
       <th>27</th>
@@ -645,6 +662,7 @@ done analyzing drifting gratings
       <td>0.254148</td>
       <td>0.1336738</td>
       <td>0.2905779</td>
+      <td>517399742</td>
     </tr>
     <tr>
       <th>28</th>
@@ -658,6 +676,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.008781222</td>
+      <td>517399789</td>
     </tr>
     <tr>
       <th>29</th>
@@ -671,9 +690,11 @@ done analyzing drifting gratings
       <td>0.06629011</td>
       <td>1.391387</td>
       <td>0.4260757</td>
+      <td>517399698</td>
     </tr>
     <tr>
       <th>...</th>
+      <td>...</td>
       <td>...</td>
       <td>...</td>
       <td>...</td>
@@ -697,6 +718,7 @@ done analyzing drifting gratings
       <td>0.01617257</td>
       <td>4.060262</td>
       <td>0.02356816</td>
+      <td>517399796</td>
     </tr>
     <tr>
       <th>39</th>
@@ -710,6 +732,7 @@ done analyzing drifting gratings
       <td>0.254148</td>
       <td>3.410719</td>
       <td>0.0009827939</td>
+      <td>517399807</td>
     </tr>
     <tr>
       <th>40</th>
@@ -723,6 +746,7 @@ done analyzing drifting gratings
       <td>0.005224014</td>
       <td>3.405815</td>
       <td>0.2210455</td>
+      <td>517399188</td>
     </tr>
     <tr>
       <th>41</th>
@@ -736,6 +760,7 @@ done analyzing drifting gratings
       <td>0.1103275</td>
       <td>2.652306</td>
       <td>0.01675676</td>
+      <td>517399252</td>
     </tr>
     <tr>
       <th>42</th>
@@ -749,6 +774,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.3812902</td>
+      <td>517399364</td>
     </tr>
     <tr>
       <th>43</th>
@@ -762,6 +788,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.976792</td>
+      <td>517399953</td>
     </tr>
     <tr>
       <th>44</th>
@@ -775,6 +802,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.1083642</td>
+      <td>517399963</td>
     </tr>
     <tr>
       <th>45</th>
@@ -788,6 +816,7 @@ done analyzing drifting gratings
       <td>0.254148</td>
       <td>-0.9107268</td>
       <td>3.613198</td>
+      <td>517399958</td>
     </tr>
     <tr>
       <th>46</th>
@@ -801,6 +830,7 @@ done analyzing drifting gratings
       <td>0.5402482</td>
       <td>0.6242065</td>
       <td>0.9553986</td>
+      <td>517399968</td>
     </tr>
     <tr>
       <th>47</th>
@@ -814,6 +844,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.207253</td>
+      <td>517399973</td>
     </tr>
     <tr>
       <th>48</th>
@@ -827,6 +858,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>1.444997</td>
+      <td>517399722</td>
     </tr>
     <tr>
       <th>49</th>
@@ -840,6 +872,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>1.143703</td>
+      <td>517399207</td>
     </tr>
     <tr>
       <th>50</th>
@@ -853,6 +886,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>5.044249</td>
+      <td>517399560</td>
     </tr>
     <tr>
       <th>51</th>
@@ -866,6 +900,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>1.141335</td>
+      <td>517399168</td>
     </tr>
     <tr>
       <th>52</th>
@@ -879,6 +914,7 @@ done analyzing drifting gratings
       <td>0.6269075</td>
       <td>1.675979</td>
       <td>0.05595995</td>
+      <td>517399524</td>
     </tr>
     <tr>
       <th>53</th>
@@ -892,6 +928,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.1853143</td>
+      <td>517399287</td>
     </tr>
     <tr>
       <th>54</th>
@@ -905,6 +942,7 @@ done analyzing drifting gratings
       <td>0.1354739</td>
       <td>-59.2551</td>
       <td>3.376849</td>
+      <td>517399575</td>
     </tr>
     <tr>
       <th>55</th>
@@ -918,6 +956,7 @@ done analyzing drifting gratings
       <td>0.6559914</td>
       <td>1.615751</td>
       <td>0.1479997</td>
+      <td>517399565</td>
     </tr>
     <tr>
       <th>56</th>
@@ -931,6 +970,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.9191923</td>
+      <td>517399529</td>
     </tr>
     <tr>
       <th>57</th>
@@ -944,6 +984,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.1411602</td>
+      <td>517399875</td>
     </tr>
     <tr>
       <th>58</th>
@@ -957,6 +998,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.1596</td>
+      <td>517399905</td>
     </tr>
     <tr>
       <th>59</th>
@@ -970,6 +1012,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.9178202</td>
+      <td>517399944</td>
     </tr>
     <tr>
       <th>60</th>
@@ -983,6 +1026,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.3119261</td>
+      <td>517399900</td>
     </tr>
     <tr>
       <th>61</th>
@@ -996,6 +1040,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.143922</td>
+      <td>517399870</td>
     </tr>
     <tr>
       <th>62</th>
@@ -1009,6 +1054,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.1703779</td>
+      <td>517399890</td>
     </tr>
     <tr>
       <th>63</th>
@@ -1022,6 +1068,7 @@ done analyzing drifting gratings
       <td>0.9095903</td>
       <td>0.05468381</td>
       <td>1.111275</td>
+      <td>517399688</td>
     </tr>
     <tr>
       <th>64</th>
@@ -1035,6 +1082,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>1.061312</td>
+      <td>517399284</td>
     </tr>
     <tr>
       <th>65</th>
@@ -1048,6 +1096,7 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.8230056</td>
+      <td>517399426</td>
     </tr>
     <tr>
       <th>66</th>
@@ -1061,6 +1110,7 @@ done analyzing drifting gratings
       <td>0.01232579</td>
       <td>3.338942</td>
       <td>0.253283</td>
+      <td>517399754</td>
     </tr>
     <tr>
       <th>67</th>
@@ -1074,10 +1124,11 @@ done analyzing drifting gratings
       <td>NaN</td>
       <td>NaN</td>
       <td>0.589453</td>
+      <td>517399764</td>
     </tr>
   </tbody>
 </table>
-<p>68 rows × 10 columns</p>
+<p>68 rows × 11 columns</p>
 </div>
 </div>
 
@@ -1101,13 +1152,12 @@ done analyzing drifting gratings
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.static_grating</span> <span class="k">import</span> <span class="n">StaticGrating</span>
+<div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.static_gratings</span> <span class="k">import</span> <span class="n">StaticGratings</span>
 
 <span class="c"># example loading drifing grating data</span>
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">510938357</span><span class="p">)</span>
-<span class="n">analysis</span> <span class="o">=</span> <span class="n">BrainObservatoryAnalysis</span><span class="p">(</span><span class="n">data_set</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&quot;./&quot;</span><span class="p">)</span>
 
-<span class="n">sg</span> <span class="o">=</span> <span class="n">StaticGrating</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
+<span class="n">sg</span> <span class="o">=</span> <span class="n">StaticGratings</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;done analyzing static gratings&quot;</span><span class="p">)</span>
 </pre></div>
 
@@ -1163,6 +1213,7 @@ done analyzing drifting gratings
       <th>ptest_sg</th>
       <th>time_to_peak_sg</th>
       <th>duration_sg</th>
+      <th>cell_specimen_id</th>
     </tr>
   </thead>
   <tbody>
@@ -1177,6 +1228,7 @@ done analyzing drifting gratings
       <td>0.4700023</td>
       <td>0.89559</td>
       <td>0.03317</td>
+      <td>517399193</td>
     </tr>
     <tr>
       <th>1</th>
@@ -1189,6 +1241,7 @@ done analyzing drifting gratings
       <td>2.686254e-09</td>
       <td>0.46438</td>
       <td>0.03317</td>
+      <td>517399774</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1201,6 +1254,7 @@ done analyzing drifting gratings
       <td>0.7867488</td>
       <td>0.3317</td>
       <td>0.3317</td>
+      <td>517399702</td>
     </tr>
     <tr>
       <th>3</th>
@@ -1213,6 +1267,7 @@ done analyzing drifting gratings
       <td>0.1020908</td>
       <td>0.3317</td>
       <td>0.36487</td>
+      <td>517399683</td>
     </tr>
     <tr>
       <th>4</th>
@@ -1225,6 +1280,7 @@ done analyzing drifting gratings
       <td>0.05987895</td>
       <td>0.79608</td>
       <td>1.02827</td>
+      <td>517399421</td>
     </tr>
     <tr>
       <th>5</th>
@@ -1237,6 +1293,7 @@ done analyzing drifting gratings
       <td>4.17686e-14</td>
       <td>0.29853</td>
       <td>0.3317</td>
+      <td>517399307</td>
     </tr>
     <tr>
       <th>6</th>
@@ -1249,6 +1306,7 @@ done analyzing drifting gratings
       <td>0.000608049</td>
       <td>0.3317</td>
       <td>0.26536</td>
+      <td>517399588</td>
     </tr>
     <tr>
       <th>7</th>
@@ -1261,6 +1319,7 @@ done analyzing drifting gratings
       <td>5.208241e-17</td>
       <td>0.3317</td>
       <td>0.03317</td>
+      <td>517399332</td>
     </tr>
     <tr>
       <th>8</th>
@@ -1273,6 +1332,7 @@ done analyzing drifting gratings
       <td>8.775661e-18</td>
       <td>0.3317</td>
       <td>0.92876</td>
+      <td>517399312</td>
     </tr>
     <tr>
       <th>9</th>
@@ -1285,6 +1345,7 @@ done analyzing drifting gratings
       <td>3.132239e-13</td>
       <td>0.16585</td>
       <td>0.36487</td>
+      <td>517399317</td>
     </tr>
     <tr>
       <th>10</th>
@@ -1297,6 +1358,7 @@ done analyzing drifting gratings
       <td>3.180555e-23</td>
       <td>0.23219</td>
       <td>0.36487</td>
+      <td>517399337</td>
     </tr>
     <tr>
       <th>11</th>
@@ -1309,6 +1371,7 @@ done analyzing drifting gratings
       <td>0.0003207154</td>
       <td>0.29853</td>
       <td>0.26536</td>
+      <td>517399837</td>
     </tr>
     <tr>
       <th>12</th>
@@ -1321,6 +1384,7 @@ done analyzing drifting gratings
       <td>0.062208</td>
       <td>0.53072</td>
       <td>0.16585</td>
+      <td>517399207</td>
     </tr>
     <tr>
       <th>13</th>
@@ -1333,6 +1397,7 @@ done analyzing drifting gratings
       <td>0.08022626</td>
       <td>0.16585</td>
       <td>0.46438</td>
+      <td>517399416</td>
     </tr>
     <tr>
       <th>14</th>
@@ -1345,6 +1410,7 @@ done analyzing drifting gratings
       <td>0.01551352</td>
       <td>0.19902</td>
       <td>0.26536</td>
+      <td>517399287</td>
     </tr>
     <tr>
       <th>15</th>
@@ -1357,6 +1423,7 @@ done analyzing drifting gratings
       <td>0.03466732</td>
       <td>0.16585</td>
       <td>0.43121</td>
+      <td>517399360</td>
     </tr>
     <tr>
       <th>16</th>
@@ -1369,6 +1436,7 @@ done analyzing drifting gratings
       <td>2.416431e-08</td>
       <td>0.23219</td>
       <td>0.26536</td>
+      <td>517399513</td>
     </tr>
     <tr>
       <th>17</th>
@@ -1381,6 +1449,7 @@ done analyzing drifting gratings
       <td>0.0005802127</td>
       <td>0.46438</td>
       <td>0.53072</td>
+      <td>517399632</td>
     </tr>
     <tr>
       <th>18</th>
@@ -1393,6 +1462,7 @@ done analyzing drifting gratings
       <td>5.436721e-08</td>
       <td>0.29853</td>
       <td>0.26536</td>
+      <td>517399637</td>
     </tr>
     <tr>
       <th>19</th>
@@ -1405,6 +1475,7 @@ done analyzing drifting gratings
       <td>6.10687e-27</td>
       <td>0.19902</td>
       <td>0.3317</td>
+      <td>517399627</td>
     </tr>
     <tr>
       <th>20</th>
@@ -1417,6 +1488,7 @@ done analyzing drifting gratings
       <td>0.000635592</td>
       <td>0.43121</td>
       <td>0.72974</td>
+      <td>517399277</td>
     </tr>
     <tr>
       <th>21</th>
@@ -1429,6 +1501,7 @@ done analyzing drifting gratings
       <td>0.0140798</td>
       <td>0.63023</td>
       <td>0.03317</td>
+      <td>517399642</td>
     </tr>
     <tr>
       <th>22</th>
@@ -1441,6 +1514,7 @@ done analyzing drifting gratings
       <td>6.162032e-62</td>
       <td>0.23219</td>
       <td>0.29853</td>
+      <td>517399298</td>
     </tr>
     <tr>
       <th>23</th>
@@ -1453,6 +1527,7 @@ done analyzing drifting gratings
       <td>5.882892e-07</td>
       <td>0.19902</td>
       <td>0.19902</td>
+      <td>517399374</td>
     </tr>
     <tr>
       <th>24</th>
@@ -1465,6 +1540,7 @@ done analyzing drifting gratings
       <td>0.002381884</td>
       <td>0.3317</td>
       <td>0.46438</td>
+      <td>517399411</td>
     </tr>
     <tr>
       <th>25</th>
@@ -1477,6 +1553,7 @@ done analyzing drifting gratings
       <td>2.427085e-06</td>
       <td>0.29853</td>
       <td>0.23219</td>
+      <td>517399999</td>
     </tr>
     <tr>
       <th>26</th>
@@ -1489,6 +1566,7 @@ done analyzing drifting gratings
       <td>5.000789e-13</td>
       <td>0.29853</td>
       <td>0.3317</td>
+      <td>517399978</td>
     </tr>
     <tr>
       <th>27</th>
@@ -1501,6 +1579,7 @@ done analyzing drifting gratings
       <td>0.4121375</td>
       <td>0.43121</td>
       <td>0.03317</td>
+      <td>517399462</td>
     </tr>
     <tr>
       <th>28</th>
@@ -1513,6 +1592,7 @@ done analyzing drifting gratings
       <td>1.63434e-13</td>
       <td>0.36487</td>
       <td>0.39804</td>
+      <td>517399479</td>
     </tr>
     <tr>
       <th>29</th>
@@ -1525,9 +1605,11 @@ done analyzing drifting gratings
       <td>0.9847298</td>
       <td>0.29853</td>
       <td>0.19902</td>
+      <td>517399294</td>
     </tr>
     <tr>
       <th>...</th>
+      <td>...</td>
       <td>...</td>
       <td>...</td>
       <td>...</td>
@@ -1549,6 +1631,7 @@ done analyzing drifting gratings
       <td>7.118598e-08</td>
       <td>0.3317</td>
       <td>0.36487</td>
+      <td>517399188</td>
     </tr>
     <tr>
       <th>52</th>
@@ -1561,6 +1644,7 @@ done analyzing drifting gratings
       <td>0.006332946</td>
       <td>0.26536</td>
       <td>0.63023</td>
+      <td>517399252</td>
     </tr>
     <tr>
       <th>53</th>
@@ -1573,6 +1657,7 @@ done analyzing drifting gratings
       <td>4.936089e-05</td>
       <td>0.39804</td>
       <td>0.19902</td>
+      <td>517399327</td>
     </tr>
     <tr>
       <th>54</th>
@@ -1585,6 +1670,7 @@ done analyzing drifting gratings
       <td>3.920854e-14</td>
       <td>0.46438</td>
       <td>0.03317</td>
+      <td>517399364</td>
     </tr>
     <tr>
       <th>55</th>
@@ -1597,6 +1683,7 @@ done analyzing drifting gratings
       <td>1.052707e-37</td>
       <td>0.29853</td>
       <td>0.49755</td>
+      <td>517399953</td>
     </tr>
     <tr>
       <th>56</th>
@@ -1609,6 +1696,7 @@ done analyzing drifting gratings
       <td>5.063409e-25</td>
       <td>0.29853</td>
       <td>0.49755</td>
+      <td>517399963</td>
     </tr>
     <tr>
       <th>57</th>
@@ -1621,6 +1709,7 @@ done analyzing drifting gratings
       <td>0.006135176</td>
       <td>0.23219</td>
       <td>0.06634</td>
+      <td>517399958</td>
     </tr>
     <tr>
       <th>58</th>
@@ -1633,6 +1722,7 @@ done analyzing drifting gratings
       <td>0.07846112</td>
       <td>0.46438</td>
       <td>0.6634</td>
+      <td>517399973</td>
     </tr>
     <tr>
       <th>59</th>
@@ -1645,6 +1735,7 @@ done analyzing drifting gratings
       <td>9.246409e-88</td>
       <td>0.29853</td>
       <td>0.86242</td>
+      <td>517399369</td>
     </tr>
     <tr>
       <th>60</th>
@@ -1657,6 +1748,7 @@ done analyzing drifting gratings
       <td>6.813961e-08</td>
       <td>0.23219</td>
       <td>0.39804</td>
+      <td>517399470</td>
     </tr>
     <tr>
       <th>61</th>
@@ -1669,6 +1761,7 @@ done analyzing drifting gratings
       <td>6.752276e-08</td>
       <td>0.3317</td>
       <td>0.36487</td>
+      <td>517399555</td>
     </tr>
     <tr>
       <th>62</th>
@@ -1681,6 +1774,7 @@ done analyzing drifting gratings
       <td>0.00117197</td>
       <td>0.19902</td>
       <td>0.43121</td>
+      <td>517399722</td>
     </tr>
     <tr>
       <th>63</th>
@@ -1693,6 +1787,7 @@ done analyzing drifting gratings
       <td>7.508306e-24</td>
       <td>0.29853</td>
       <td>0.29853</td>
+      <td>517399727</td>
     </tr>
     <tr>
       <th>64</th>
@@ -1705,6 +1800,7 @@ done analyzing drifting gratings
       <td>9.588038e-05</td>
       <td>0.3317</td>
       <td>0.72974</td>
+      <td>517399560</td>
     </tr>
     <tr>
       <th>65</th>
@@ -1717,6 +1813,7 @@ done analyzing drifting gratings
       <td>1.351152e-06</td>
       <td>0.36487</td>
       <td>0.63023</td>
+      <td>517399168</td>
     </tr>
     <tr>
       <th>66</th>
@@ -1729,6 +1826,7 @@ done analyzing drifting gratings
       <td>8.285085e-50</td>
       <td>0.16585</td>
       <td>0.29853</td>
+      <td>517399262</td>
     </tr>
     <tr>
       <th>67</th>
@@ -1741,6 +1839,7 @@ done analyzing drifting gratings
       <td>0.1307774</td>
       <td>1.02827</td>
       <td>0.29853</td>
+      <td>517399575</td>
     </tr>
     <tr>
       <th>68</th>
@@ -1753,6 +1852,7 @@ done analyzing drifting gratings
       <td>2.241153e-06</td>
       <td>0.49755</td>
       <td>0.03317</td>
+      <td>517399529</td>
     </tr>
     <tr>
       <th>69</th>
@@ -1765,6 +1865,7 @@ done analyzing drifting gratings
       <td>0.000212664</td>
       <td>0.29853</td>
       <td>0.46438</td>
+      <td>517399524</td>
     </tr>
     <tr>
       <th>70</th>
@@ -1777,6 +1878,7 @@ done analyzing drifting gratings
       <td>0.01238641</td>
       <td>0.3317</td>
       <td>0.43121</td>
+      <td>517399875</td>
     </tr>
     <tr>
       <th>71</th>
@@ -1789,6 +1891,7 @@ done analyzing drifting gratings
       <td>4.091055e-10</td>
       <td>0.36487</td>
       <td>0.56389</td>
+      <td>517399870</td>
     </tr>
     <tr>
       <th>72</th>
@@ -1801,6 +1904,7 @@ done analyzing drifting gratings
       <td>0.0002189666</td>
       <td>0.26536</td>
       <td>0.3317</td>
+      <td>517399905</td>
     </tr>
     <tr>
       <th>73</th>
@@ -1813,6 +1917,7 @@ done analyzing drifting gratings
       <td>0.0008330797</td>
       <td>0.43121</td>
       <td>0.63023</td>
+      <td>517399895</td>
     </tr>
     <tr>
       <th>74</th>
@@ -1825,6 +1930,7 @@ done analyzing drifting gratings
       <td>0.002346886</td>
       <td>0.36487</td>
       <td>0.69657</td>
+      <td>517399900</td>
     </tr>
     <tr>
       <th>75</th>
@@ -1837,6 +1943,7 @@ done analyzing drifting gratings
       <td>0.4765977</td>
       <td>0.36487</td>
       <td>0.56389</td>
+      <td>517399885</td>
     </tr>
     <tr>
       <th>76</th>
@@ -1849,6 +1956,7 @@ done analyzing drifting gratings
       <td>0.001072158</td>
       <td>0.76291</td>
       <td>0.19902</td>
+      <td>517399890</td>
     </tr>
     <tr>
       <th>77</th>
@@ -1861,6 +1969,7 @@ done analyzing drifting gratings
       <td>0.07317682</td>
       <td>0.59706</td>
       <td>0.82925</td>
+      <td>517399616</td>
     </tr>
     <tr>
       <th>78</th>
@@ -1873,6 +1982,7 @@ done analyzing drifting gratings
       <td>5.166768e-34</td>
       <td>0.36487</td>
       <td>0.46438</td>
+      <td>517399817</td>
     </tr>
     <tr>
       <th>79</th>
@@ -1885,6 +1995,7 @@ done analyzing drifting gratings
       <td>0.0001941316</td>
       <td>0.43121</td>
       <td>0.43121</td>
+      <td>517399764</td>
     </tr>
     <tr>
       <th>80</th>
@@ -1897,10 +2008,11 @@ done analyzing drifting gratings
       <td>3.139787e-36</td>
       <td>0.29853</td>
       <td>0.03317</td>
+      <td>517399494</td>
     </tr>
   </tbody>
 </table>
-<p>81 rows × 9 columns</p>
+<p>81 rows × 10 columns</p>
 </div>
 </div>
 
@@ -1921,13 +2033,14 @@ done analyzing drifting gratings
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.natural_scenes</span> <span class="k">import</span> <span class="n">NaturalScenes</span>
 
-<span class="c"># this experiment also has natural scenes so let&#39;s reuse the previous objects</span>
-<span class="n">ns</span> <span class="o">=</span> <span class="n">NaturalScenes</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
+<span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">510938357</span><span class="p">)</span>
+
+<span class="n">ns</span> <span class="o">=</span> <span class="n">NaturalScenes</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;done analyzing natural scenes&quot;</span><span class="p">)</span>
 </pre></div>
 
@@ -1952,13 +2065,780 @@ done analyzing drifting gratings
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="n">ns</span><span class="o">.</span><span class="n">peak</span>
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[7]:</div>
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div style="max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>scene_ns</th>
+      <th>response_reliability_ns</th>
+      <th>peak_dff_ns</th>
+      <th>ptest_ns</th>
+      <th>p_run_ns</th>
+      <th>run_modulation_ns</th>
+      <th>time_to_peak_ns</th>
+      <th>duration_ns</th>
+      <th>cell_specimen_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>48</td>
+      <td>6</td>
+      <td>4.726091</td>
+      <td>0.166502</td>
+      <td>0.269754</td>
+      <td>-0.1073051</td>
+      <td>0.72974</td>
+      <td>0.03317</td>
+      <td>517399193</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>96</td>
+      <td>26</td>
+      <td>8.660661</td>
+      <td>1.18856e-09</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.3317</td>
+      <td>0.43121</td>
+      <td>517399774</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>103</td>
+      <td>16</td>
+      <td>2.409205</td>
+      <td>0.01520566</td>
+      <td>0.009848073</td>
+      <td>-54.77162</td>
+      <td>0.43121</td>
+      <td>0.43121</td>
+      <td>517399702</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>103</td>
+      <td>14</td>
+      <td>1.70591</td>
+      <td>0.6032894</td>
+      <td>0.1210459</td>
+      <td>-25.5943</td>
+      <td>0.89559</td>
+      <td>0.86242</td>
+      <td>517399683</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>21</td>
+      <td>4</td>
+      <td>1.537637</td>
+      <td>0.05954203</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.53072</td>
+      <td>0.36487</td>
+      <td>517399421</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>3</td>
+      <td>18</td>
+      <td>3.863556</td>
+      <td>1.569619e-08</td>
+      <td>0.0006331399</td>
+      <td>5.197345</td>
+      <td>0.26536</td>
+      <td>0.29853</td>
+      <td>517399307</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>86</td>
+      <td>22</td>
+      <td>4.361079</td>
+      <td>1.275465e-11</td>
+      <td>0.07588809</td>
+      <td>3.119035</td>
+      <td>0.23219</td>
+      <td>0.23219</td>
+      <td>517399588</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>107</td>
+      <td>42</td>
+      <td>13.75726</td>
+      <td>4.200311e-20</td>
+      <td>0.1430926</td>
+      <td>3.754596</td>
+      <td>0.26536</td>
+      <td>0.96193</td>
+      <td>517399332</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>112</td>
+      <td>24</td>
+      <td>5.418961</td>
+      <td>1.084383e-09</td>
+      <td>0.002718371</td>
+      <td>6.043627</td>
+      <td>0.3317</td>
+      <td>0.3317</td>
+      <td>517399312</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>101</td>
+      <td>12</td>
+      <td>2.10319</td>
+      <td>1.210299e-14</td>
+      <td>0.8466412</td>
+      <td>1.453579</td>
+      <td>0.29853</td>
+      <td>0.26536</td>
+      <td>517399317</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>49</td>
+      <td>28</td>
+      <td>11.39275</td>
+      <td>3.862244e-09</td>
+      <td>0.09567562</td>
+      <td>-0.1851764</td>
+      <td>0.26536</td>
+      <td>0.43121</td>
+      <td>517399337</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>43</td>
+      <td>34</td>
+      <td>8.591595</td>
+      <td>6.249872e-40</td>
+      <td>0.02307769</td>
+      <td>1.666852</td>
+      <td>0.26536</td>
+      <td>0.39804</td>
+      <td>517399837</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>37</td>
+      <td>6</td>
+      <td>1.237262</td>
+      <td>0.03216818</td>
+      <td>0.03747963</td>
+      <td>-0.6705807</td>
+      <td>0.6634</td>
+      <td>0.13268</td>
+      <td>517399207</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>58</td>
+      <td>42</td>
+      <td>9.616063</td>
+      <td>8.059547e-40</td>
+      <td>0.002310514</td>
+      <td>3.466238</td>
+      <td>0.29853</td>
+      <td>0.3317</td>
+      <td>517399416</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>86</td>
+      <td>28</td>
+      <td>7.918504</td>
+      <td>2.853768e-13</td>
+      <td>0.1788035</td>
+      <td>1.92441</td>
+      <td>0.29853</td>
+      <td>0.36487</td>
+      <td>517399287</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>85</td>
+      <td>34</td>
+      <td>7.496921</td>
+      <td>2.069269e-35</td>
+      <td>0.7828368</td>
+      <td>1.395114</td>
+      <td>0.29853</td>
+      <td>0.29853</td>
+      <td>517399360</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>10</td>
+      <td>12</td>
+      <td>2.204405</td>
+      <td>0.06169372</td>
+      <td>0.2818355</td>
+      <td>16.39791</td>
+      <td>0.46438</td>
+      <td>0.53072</td>
+      <td>517399513</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>93</td>
+      <td>26</td>
+      <td>6.888068</td>
+      <td>3.89336e-08</td>
+      <td>0.9481551</td>
+      <td>2.348487</td>
+      <td>0.29853</td>
+      <td>0.29853</td>
+      <td>517399632</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>110</td>
+      <td>16</td>
+      <td>4.494061</td>
+      <td>0.003999967</td>
+      <td>0.9343579</td>
+      <td>0.359185</td>
+      <td>0.3317</td>
+      <td>0.3317</td>
+      <td>517399637</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>59</td>
+      <td>24</td>
+      <td>7.582107</td>
+      <td>2.627275e-16</td>
+      <td>0.1138772</td>
+      <td>5.431851</td>
+      <td>0.3317</td>
+      <td>0.39804</td>
+      <td>517399627</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>108</td>
+      <td>26</td>
+      <td>5.079247</td>
+      <td>0.0002405245</td>
+      <td>0.04123212</td>
+      <td>2.365698</td>
+      <td>0.53072</td>
+      <td>0.92876</td>
+      <td>517399277</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>89</td>
+      <td>10</td>
+      <td>7.97805</td>
+      <td>0.0004684238</td>
+      <td>0.07960043</td>
+      <td>-0.003174565</td>
+      <td>1.12778</td>
+      <td>0.03317</td>
+      <td>517399642</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>41</td>
+      <td>60</td>
+      <td>21.24902</td>
+      <td>3.231541e-129</td>
+      <td>0.0003113036</td>
+      <td>2.657727</td>
+      <td>0.26536</td>
+      <td>0.3317</td>
+      <td>517399298</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>22</td>
+      <td>8</td>
+      <td>3.061689</td>
+      <td>9.95461e-08</td>
+      <td>0.6300379</td>
+      <td>0.1943519</td>
+      <td>0.29853</td>
+      <td>0.36487</td>
+      <td>517399374</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>16</td>
+      <td>24</td>
+      <td>8.387245</td>
+      <td>7.140837e-22</td>
+      <td>0.01143275</td>
+      <td>4.692861</td>
+      <td>0.26536</td>
+      <td>0.36487</td>
+      <td>517399411</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>79</td>
+      <td>30</td>
+      <td>5.797663</td>
+      <td>4.804249e-09</td>
+      <td>0.0374608</td>
+      <td>4.835201</td>
+      <td>0.53072</td>
+      <td>0.63023</td>
+      <td>517399999</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>63</td>
+      <td>36</td>
+      <td>14.85797</td>
+      <td>1.085101e-08</td>
+      <td>0.02567778</td>
+      <td>11.77215</td>
+      <td>0.29853</td>
+      <td>0.69657</td>
+      <td>517399978</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>110</td>
+      <td>34</td>
+      <td>10.43848</td>
+      <td>0.03237033</td>
+      <td>0.8199468</td>
+      <td>-0.090797</td>
+      <td>0.46438</td>
+      <td>0.03317</td>
+      <td>517399462</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>70</td>
+      <td>10</td>
+      <td>3.961959</td>
+      <td>8.027984e-09</td>
+      <td>2.272988e-05</td>
+      <td>818.3737</td>
+      <td>0.26536</td>
+      <td>0.3317</td>
+      <td>517399479</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>39</td>
+      <td>12</td>
+      <td>1.980291</td>
+      <td>0.05488602</td>
+      <td>0.06983651</td>
+      <td>12.38709</td>
+      <td>0.89559</td>
+      <td>0.86242</td>
+      <td>517399294</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>103</td>
+      <td>8</td>
+      <td>5.614323</td>
+      <td>9.856661e-06</td>
+      <td>0.385126</td>
+      <td>10.45118</td>
+      <td>0.26536</td>
+      <td>0.29853</td>
+      <td>517399188</td>
+    </tr>
+    <tr>
+      <th>52</th>
+      <td>54</td>
+      <td>20</td>
+      <td>7.082636</td>
+      <td>0.1917962</td>
+      <td>0.03565576</td>
+      <td>27.21372</td>
+      <td>0.09951</td>
+      <td>0.36487</td>
+      <td>517399252</td>
+    </tr>
+    <tr>
+      <th>53</th>
+      <td>68</td>
+      <td>16</td>
+      <td>2.873308</td>
+      <td>4.244008e-07</td>
+      <td>0.0538733</td>
+      <td>14.39089</td>
+      <td>0.29853</td>
+      <td>0.39804</td>
+      <td>517399327</td>
+    </tr>
+    <tr>
+      <th>54</th>
+      <td>18</td>
+      <td>52</td>
+      <td>9.269685</td>
+      <td>3.195636e-24</td>
+      <td>0.4105043</td>
+      <td>1.76989</td>
+      <td>0.39804</td>
+      <td>0.03317</td>
+      <td>517399364</td>
+    </tr>
+    <tr>
+      <th>55</th>
+      <td>31</td>
+      <td>52</td>
+      <td>20.79314</td>
+      <td>2.989402e-51</td>
+      <td>9.774338e-05</td>
+      <td>4.88928</td>
+      <td>0.29853</td>
+      <td>0.53072</td>
+      <td>517399953</td>
+    </tr>
+    <tr>
+      <th>56</th>
+      <td>54</td>
+      <td>14</td>
+      <td>2.90705</td>
+      <td>1.822107e-07</td>
+      <td>0.02307769</td>
+      <td>3.592056</td>
+      <td>0.3317</td>
+      <td>0.49755</td>
+      <td>517399963</td>
+    </tr>
+    <tr>
+      <th>57</th>
+      <td>101</td>
+      <td>20</td>
+      <td>4.566121</td>
+      <td>0.1142782</td>
+      <td>0.008199398</td>
+      <td>5.012547</td>
+      <td>0.69657</td>
+      <td>0.03317</td>
+      <td>517399958</td>
+    </tr>
+    <tr>
+      <th>58</th>
+      <td>32</td>
+      <td>22</td>
+      <td>6.038805</td>
+      <td>9.199826e-11</td>
+      <td>0.01471167</td>
+      <td>-0.1611356</td>
+      <td>0.3317</td>
+      <td>0.36487</td>
+      <td>517399973</td>
+    </tr>
+    <tr>
+      <th>59</th>
+      <td>98</td>
+      <td>38</td>
+      <td>30.11345</td>
+      <td>5.676966e-38</td>
+      <td>0.1663066</td>
+      <td>0.5818074</td>
+      <td>0.29853</td>
+      <td>0.39804</td>
+      <td>517399369</td>
+    </tr>
+    <tr>
+      <th>60</th>
+      <td>22</td>
+      <td>32</td>
+      <td>9.742104</td>
+      <td>3.93842e-29</td>
+      <td>0.002938107</td>
+      <td>0.1401222</td>
+      <td>0.29853</td>
+      <td>0.39804</td>
+      <td>517399470</td>
+    </tr>
+    <tr>
+      <th>61</th>
+      <td>71</td>
+      <td>20</td>
+      <td>6.698987</td>
+      <td>0.006776918</td>
+      <td>0.7569606</td>
+      <td>1.328336</td>
+      <td>0.43121</td>
+      <td>0.69657</td>
+      <td>517399555</td>
+    </tr>
+    <tr>
+      <th>62</th>
+      <td>57</td>
+      <td>22</td>
+      <td>7.743772</td>
+      <td>2.048644e-08</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.26536</td>
+      <td>0.3317</td>
+      <td>517399722</td>
+    </tr>
+    <tr>
+      <th>63</th>
+      <td>28</td>
+      <td>22</td>
+      <td>4.736869</td>
+      <td>1.388036e-15</td>
+      <td>0.4797429</td>
+      <td>2.640499</td>
+      <td>0.26536</td>
+      <td>0.23219</td>
+      <td>517399727</td>
+    </tr>
+    <tr>
+      <th>64</th>
+      <td>82</td>
+      <td>18</td>
+      <td>8.813643</td>
+      <td>0.08543431</td>
+      <td>0.6157086</td>
+      <td>0.1023942</td>
+      <td>0.09951</td>
+      <td>0.53072</td>
+      <td>517399560</td>
+    </tr>
+    <tr>
+      <th>65</th>
+      <td>31</td>
+      <td>30</td>
+      <td>6.620323</td>
+      <td>0.006193678</td>
+      <td>0.8948789</td>
+      <td>0.1321056</td>
+      <td>0.29853</td>
+      <td>0.39804</td>
+      <td>517399168</td>
+    </tr>
+    <tr>
+      <th>66</th>
+      <td>83</td>
+      <td>28</td>
+      <td>9.146555</td>
+      <td>7.341387e-35</td>
+      <td>0.0005387951</td>
+      <td>10.25046</td>
+      <td>0.26536</td>
+      <td>0.39804</td>
+      <td>517399262</td>
+    </tr>
+    <tr>
+      <th>67</th>
+      <td>19</td>
+      <td>10</td>
+      <td>6.24387</td>
+      <td>0.004549284</td>
+      <td>0.06206665</td>
+      <td>72.43707</td>
+      <td>0.72974</td>
+      <td>0.72974</td>
+      <td>517399575</td>
+    </tr>
+    <tr>
+      <th>68</th>
+      <td>106</td>
+      <td>24</td>
+      <td>10.54315</td>
+      <td>0.001388694</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.9951</td>
+      <td>0.03317</td>
+      <td>517399529</td>
+    </tr>
+    <tr>
+      <th>69</th>
+      <td>14</td>
+      <td>40</td>
+      <td>31.62177</td>
+      <td>1.008053e-12</td>
+      <td>0.02307769</td>
+      <td>3.063265</td>
+      <td>0.3317</td>
+      <td>0.6634</td>
+      <td>517399524</td>
+    </tr>
+    <tr>
+      <th>70</th>
+      <td>32</td>
+      <td>58</td>
+      <td>23.49918</td>
+      <td>2.928948e-40</td>
+      <td>0.4306772</td>
+      <td>0.6056129</td>
+      <td>0.29853</td>
+      <td>0.39804</td>
+      <td>517399875</td>
+    </tr>
+    <tr>
+      <th>71</th>
+      <td>61</td>
+      <td>12</td>
+      <td>7.384572</td>
+      <td>0.00969151</td>
+      <td>0.001061905</td>
+      <td>20.78081</td>
+      <td>0.72974</td>
+      <td>0.26536</td>
+      <td>517399870</td>
+    </tr>
+    <tr>
+      <th>72</th>
+      <td>26</td>
+      <td>8</td>
+      <td>3.831512</td>
+      <td>0.08424111</td>
+      <td>0.4537358</td>
+      <td>-310.2875</td>
+      <td>0.16585</td>
+      <td>0.39804</td>
+      <td>517399905</td>
+    </tr>
+    <tr>
+      <th>73</th>
+      <td>48</td>
+      <td>16</td>
+      <td>7.474617</td>
+      <td>7.133114e-06</td>
+      <td>0.5925132</td>
+      <td>1.543764</td>
+      <td>0.3317</td>
+      <td>0.36487</td>
+      <td>517399895</td>
+    </tr>
+    <tr>
+      <th>74</th>
+      <td>28</td>
+      <td>16</td>
+      <td>9.362315</td>
+      <td>0.02823446</td>
+      <td>0.241805</td>
+      <td>0.2666658</td>
+      <td>0.29853</td>
+      <td>0.59706</td>
+      <td>517399900</td>
+    </tr>
+    <tr>
+      <th>75</th>
+      <td>28</td>
+      <td>48</td>
+      <td>25.29058</td>
+      <td>2.426966e-21</td>
+      <td>0.09567562</td>
+      <td>1.832182</td>
+      <td>0.3317</td>
+      <td>0.39804</td>
+      <td>517399885</td>
+    </tr>
+    <tr>
+      <th>76</th>
+      <td>69</td>
+      <td>24</td>
+      <td>9.795837</td>
+      <td>2.919212e-32</td>
+      <td>4.525489e-05</td>
+      <td>17.96336</td>
+      <td>0.26536</td>
+      <td>0.39804</td>
+      <td>517399890</td>
+    </tr>
+    <tr>
+      <th>77</th>
+      <td>108</td>
+      <td>26</td>
+      <td>4.431354</td>
+      <td>0.000135613</td>
+      <td>0.9153445</td>
+      <td>1.336741</td>
+      <td>0.46438</td>
+      <td>0.69657</td>
+      <td>517399616</td>
+    </tr>
+    <tr>
+      <th>78</th>
+      <td>49</td>
+      <td>10</td>
+      <td>2.839365</td>
+      <td>1.384455e-08</td>
+      <td>0.5089587</td>
+      <td>1.117813</td>
+      <td>0.19902</td>
+      <td>0.19902</td>
+      <td>517399817</td>
+    </tr>
+    <tr>
+      <th>79</th>
+      <td>20</td>
+      <td>40</td>
+      <td>10.98776</td>
+      <td>5.66019e-15</td>
+      <td>0.8676233</td>
+      <td>1.173665</td>
+      <td>0.26536</td>
+      <td>0.29853</td>
+      <td>517399764</td>
+    </tr>
+    <tr>
+      <th>80</th>
+      <td>51</td>
+      <td>34</td>
+      <td>18.12045</td>
+      <td>1.620871e-45</td>
+      <td>0.8226206</td>
+      <td>0.5512994</td>
+      <td>0.29853</td>
+      <td>0.43121</td>
+      <td>517399494</td>
+    </tr>
+  </tbody>
+</table>
+<p>81 rows × 9 columns</p>
+</div>
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -1974,19 +2854,163 @@ done analyzing drifting gratings
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.locally_sparse_noise</span> <span class="k">import</span> <span class="n">LocallySparseNoise</span>
 
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">510656082</span><span class="p">)</span>
-<span class="n">analysis</span> <span class="o">=</span> <span class="n">BrainObservatoryAnalysis</span><span class="p">(</span><span class="n">data_set</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&quot;./&quot;</span><span class="p">)</span>
-
-<span class="n">lsn</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
+<span class="n">lsn</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;done analyzing locally sparse noise&quot;</span><span class="p">)</span>
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Calculating mean responses
+done analyzing locally sparse noise
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="n">receptive_field</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">get_receptive_field</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">receptive_field</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">interpolation</span><span class="o">=</span><span class="s">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">&#39;hot&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Calculating mean responses
+</pre>
+</div>
+</div>
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+8P1HyoCn55QuM2+TtLrf4kMlXVZ5fpm6f+HbwiDrK7Xv9l2RmfdVnj+r7os6x6tNt3GV9ZXWo23c
+yoI9XtLSXl8v09ofSLtKSTdExD0R8YmRnkwLbJOZPXfPXClpm5GcTIt8OiIWRMTF7XJ4oL+I6JC0
+q7rba7T9Nu61vndUFq0327iVBXtDPOH73Zm5q6SDJH2y8s/qDUJ2H2tr921+kaSJknaR9BtJ543s
+dBqvcnjgSkknZ+bve3+vHbdxZX1nq3t9n9V6to1bWbCXS5rQ6+sJ6t7LbluZ+ZvKf5+S9CN1HxZq
+ZysrxwIVEW+StGqE59NUmbkqKyR9V222fSPiNeou1t/PzKsri9t2G/da3x/0rO/6to1bWbDvkfS2
+iOiIiNGSjpJ0TQvfv6UiYkxEbFZ5PlbS+yQtrP6q4l0j6djK82MlXV0lW7xKwepxhNpo+0ZESLpY
+0oOZOb3Xt9pyGw+2vuvbNm7ppekRcZCk6ZJGSbo4M7/csjdvsYiYqO69aknaSNLl7bS+ETFL0v6S
+3qDuY5lfkPRjSVdIeoukJZKOzMxnRmqOjTTA+n5RUqe6/6mckp6QdGKv47tFi4h9Jd0q6X6tPexx
+hrq7jrbdNh5kfc+UNE3r0TamlwgAFIIrHQGgEBRsACgEBRsACkHBBoBCULABoBAUbAAoBAUbAArx
+/3W7opqXk4rDAAAAAElFTkSuQmCC
+"
+>
+</div>
+
+</div>
+
 </div>
 </div>
 
