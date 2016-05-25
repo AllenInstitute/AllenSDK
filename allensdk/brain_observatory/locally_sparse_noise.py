@@ -24,6 +24,9 @@ class LocallySparseNoise(StimulusAnalysis):
 
     def __init__(self, data_set, nrows=None, ncols=None, **kwargs):
         super(LocallySparseNoise, self).__init__(data_set, **kwargs)        
+        self.nrows = 16 if nrows is None else nrows
+        self.ncols = 28 if ncols is None else ncols
+
         self.stim_table = self.data_set.get_stimulus_table('locally_sparse_noise')
         self.LSN, self.LSN_mask = self.data_set.get_locally_sparse_noise_stimulus_template(mask_off_screen=False)
         self.sweeplength = self.stim_table['end'][1] - self.stim_table['start'][1]
@@ -32,8 +35,7 @@ class LocallySparseNoise(StimulusAnalysis):
         self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
         self.receptive_field = self.get_receptive_field()
 
-        self.nrows = 16 if nrows is None else nrows
-        self.ncols = 28 if ncols is None else ncols
+
 
         
     def get_receptive_field(self):
