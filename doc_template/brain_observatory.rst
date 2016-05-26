@@ -22,7 +22,7 @@ For all data in Allen Brain Observatory, we perform the following processing:
 
    1. Segment cell masks from each experiment's 2-photon fluorescence video
    2. Associate cells from experiments belonging to the same experiment container and assign unique IDs
-   3. Extract each cell's mean fluorescence traces
+   3. Extract each cell's mean fluorescence trace
    4. Extract mean fluorescence traces from each cell's surrounding neuropil
    5. Estimate neuropil-corrected fluorescence traces
    6. Compute dF/F 
