@@ -4171,8 +4171,9 @@ baCCQwghhBBCCKkN/x9eN7di7IjsUQAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<div style='background-color:#fcc;padding:5px;border-radius:3px;border:1px solid #ccc'><b>Warning:</b>
-The dF/F traces stored in the NWB file differ slightly from the traces you can compute from the corrected traces as shown above.  The <tt>r_neuropil</tt> module performs an iterative model optimization to compute an optimal correction factor <tt>r</tt>.  The dF/F traces in the NWB file are computed from the model's estimated fluorescence trace, which applies a smoothness constraint.  The <tt>BrainObservatorNwbDataSet.get_corrected_fluorescence_traces</tt> method scales the raw fluorescence trace linearly according to <tt>r</tt> without smoothing, which is the preferred behavior.</div>
+<p><div style='background-color:#fcc;padding:5px;border-radius:3px;border:1px solid #ccc'><b>Warning:</b>
+The dF/F traces stored in the NWB file differ slightly from the traces you can compute from the corrected traces as shown above.  The dF/F traces in the NWB file are computed from estimated cellular traces that obey the smoothness constraint of the neuropil subtraction algorithm.  This example shows how to take properly corrected cellular traces (accessible from the <tt>BrainObservatorNwbDataSet.get_corrected_fluorescence_traces</tt> method) and derive the correct dF/F trace.</p>
+
 </div>
 </div>
 </div>
