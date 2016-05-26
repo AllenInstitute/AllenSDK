@@ -62,35 +62,35 @@ class BrainObservatoryCache(Cache):
         self.api = BrainObservatoryApi(base_uri=base_uri)
         
 
-    def get_targeted_structures(self):
+    def get_all_targeted_structures(self):
         """ Return a list of all targeted structures in the data set. """
         containers = self.get_experiment_containers(simple=False)
         targeted_structures = set([ c['targeted_structure']['acronym'] for c in containers])
         return sorted(list(targeted_structures))
 
 
-    def get_cre_lines(self):
+    def get_all_cre_lines(self):
         """ Return a list of all cre driver lines in the data set. """
         containers = self.get_experiment_containers(simple=False)
         cre_lines = set([ _find_specimen_cre_line(c['specimen']) for c in containers ])
         return sorted(list(cre_lines))
 
 
-    def get_imaging_depths(self):
+    def get_all_imaging_depths(self):
         """ Return a list of all imaging depths in the data set. """
         containers = self.get_experiment_containers(simple=False)
         imaging_depths = set([ c['imaging_depth'] for c in containers ])
         return sorted(list(imaging_depths))
 
 
-    def get_stimulus_session_names(self):
+    def get_all_stimulus_session_names(self):
         """ Return a list of all stimulus sessions in the data set. """
         exps = self.get_ophys_experiments()
         names = set([ exp['stimulus_name'] for exp in exps ])
         return sorted(list(names))
 
 
-    def get_stimuli(self):
+    def get_all_stimuli(self):
         """ Return a list of all stimuli in the data set. """
         return sorted(list(stim_info.all_stimuli()))
     
@@ -108,15 +108,15 @@ class BrainObservatoryCache(Cache):
 
         targeted_structures: list
             List of structure acronyms.  Must be in the list returned by 
-            BrainObservatoryCache.get_targeted_structures().
+            BrainObservatoryCache.get_all_targeted_structures().
 
         imaging_depths: list
             List of imaging depths.  Must be in the list returned by 
-            BrainObservatoryCache.get_imaging_depths().
+            BrainObservatoryCache.get_all_imaging_depths().
 
         cre_lines: list
             List of cre lines.  Must be in the list returned by 
-            BrainObservatoryCache.get_cre_lines().
+            BrainObservatoryCache.get_all_cre_lines().
 
         simple: boolean
             Whether or not to simplify the dictionary properties returned by this method
@@ -167,23 +167,23 @@ class BrainObservatoryCache(Cache):
 
         targeted_structures: list
             List of structure acronyms.  Must be in the list returned by 
-            BrainObservatoryCache.get_targeted_structures().
+            BrainObservatoryCache.get_all_targeted_structures().
 
         imaging_depths: list
             List of imaging depths.  Must be in the list returned by 
-            BrainObservatoryCache.get_imaging_depths().
+            BrainObservatoryCache.get_all_imaging_depths().
 
         cre_lines: list
             List of cre lines.  Must be in the list returned by 
-            BrainObservatoryCache.get_cre_lines().
+            BrainObservatoryCache.get_all_cre_lines().
 
         stimuli: list
             List of stimulus names.  Must be in the list returned by 
-            BrainObservatoryCache.get_stimuli().
+            BrainObservatoryCache.get_all_stimuli().
 
         stimulus_sessions: list
             List of stimulus session names.  Must be in the list returned by 
-            BrainObservatoryCache.get_stimulus_session_names().
+            BrainObservatoryCache.get_all_stimulus_session_names().
 
         simple: boolean
             Whether or not to simplify the dictionary properties returned by this method

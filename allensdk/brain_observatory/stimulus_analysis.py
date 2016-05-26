@@ -59,29 +59,34 @@ class StimulusAnalysis(object):
             self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis, self.binned_cells_vis, self.peak_run = self.get_speed_tuning(binsize=800)
 
     def get_response(self):
-        """ Implemented by subclasses."""
+        """ Implemented by subclasses. """
         raise BrainObservatoryAnalysisException("get_response not implemented")
 
     def get_peak(self):
-        """ Implemented by subclasses."""
+        """ Implemented by subclasses. """
         raise BrainObservatoryAnalysisException("get_peak not implemented")
 
     def get_speed_tuning(self, binsize):
         """ Calculates speed tuning, spontaneous versus visually driven.  The return is a 5-tuple 
         of speed and dF/F histograms.  
-            * binned_dx_sp: (bins,2) np.ndarray of running speeds binned during spontaneous activity stimulus.  
+
+            binned_dx_sp: (bins,2) np.ndarray of running speeds binned during spontaneous activity stimulus.  
             The first bin contains all speeds below 1 cm/s.  Dimension 0 is mean running speed in the bin.
             Dimension 1 is the standard deviation.
-            * binned_cells_sp: (bins,2) np.ndarray of fluorescence during spontaneous activity stimulus.  
+
+            binned_cells_sp: (bins,2) np.ndarray of fluorescence during spontaneous activity stimulus.  
             First bin contains all data for speeds below 1 cm/s. Dimension 0 is mean fluorescence in the bin.
             Dimension 1 is the standard deviation.
-            * binned_dx_vis: (bins,2) np.ndarray of running speeds outside of spontaneous activity stimulus.
+
+            binned_dx_vis: (bins,2) np.ndarray of running speeds outside of spontaneous activity stimulus.
             The first bin contains all speeds below 1 cm/s.  Dimension 0 is mean running speed in the bin.
             Dimension 1 is the standard deviation.
-            * binned_cells_vis: np.ndarray of fluorescence outside of spontaneous activity stimulu.
+
+            binned_cells_vis: np.ndarray of fluorescence outside of spontaneous activity stimulu.
             First bin contains all data for speeds below 1 cm/s. Dimension 0 is mean fluorescence in the bin.
             Dimension 1 is the standard deviation.
-            * peak_run: pd.DataFrame of speed-related properties of a cell.
+
+            peak_run: pd.DataFrame of speed-related properties of a cell.
             
         Returns
         -------
@@ -233,8 +238,11 @@ class StimulusAnalysis(object):
     def get_sweep_response(self):
         """ Calculates the response to each sweep in the stimulus table for each cell and the mean response.
         The return is a 3-tuple of:
+
             * sweep_response: pd.DataFrame of response dF/F traces organized by cell (column) and sweep (row)
+
             * mean_sweep_response: mean values of the traces returned in sweep_response
+
             * pval: p value from 1-way ANOVA comparing response during sweep to response prior to sweep
 
         Returns

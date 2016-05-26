@@ -34,27 +34,27 @@ class Mask(object):
     ROI signal.
 
     This class should not be instantiated directly.
-    
+
+    Parameters
+    ----------
+    image_w: integer
+       Width of image that ROI resides in
+
+    image_h: integer
+       Height of image that ROI resides in
+
+    label: text
+       User-defined text label to identify mask
+
+    mask_group: integer
+       User-defined number to help put masks into different categories
     '''
     def __init__(self, image_w, image_h, label, mask_group):
         '''
         Mask class constructor. The Mask class is designed to be abstract
         and it should not be instantiated directly.
-
-        Arguments
-        ---------
-            image_w: integer
-            Width of image that ROI resides in
-
-            image_h: integer
-            Height of image that ROI resides in
-
-            label: text
-            User-defined text label to identify mask
-
-            mask_group: integer
-            User-defined number to help put masks into different categories
         '''
+        
         self.img_rows = image_h
         self.img_cols = image_w
         # initialize to invalid state. Mask must be manually initialized 
@@ -79,13 +79,9 @@ class Mask(object):
         '''
         Returns mask content on full-size image plane
 
-        Arguments
-        ---------
-            None
-
         Returns
         -------
-            numpy 2D array [img_rows][img_cols]
+        numpy 2D array [img_rows][img_cols]
         '''
         mask = np.zeros((self.img_rows, self.img_cols))
         mask[self.y:self.y+self.height, self.x:self.x+self.width] = self.mask
@@ -97,41 +93,44 @@ def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, labe
     '''
     Conveninece function to create and initializes an RoiMask
 
-    Arguments
-    ---------
+    Parameters
+    ----------
 
-        image_w: integer
+    image_w: integer
         Width of image that ROI resides in
 
-        image_h: integer
+    image_h: integer
         Height of image that ROI resides in
 
-        border: float[4]
+    border: float[4]
         Coordinates defining useable area of image. If the entire image
         is usable, and masks are valid anywhere in the image, this should
         be [(image_w-1), 0, (image_h-1), 0]. The following constants
         help describe the array order:
 
             RIGHT_SHIFT = 0
+
             LEFT_SHIFT = 1
+
             DOWN_SHIFT = 2
+
             UP_SHIFT = 3
 
         When parts of the image are unusable, for example due motion
         correction shifting of different image frames, the border array
         should store the usable image area
 
-        pix_list: integer[][2]
+    pix_list: integer[][2]
         List of pixel coordinates (x,y) that define the mask
 
-        roi_mask: integer[image_h][image_w]
+    roi_mask: integer[image_h][image_w]
         Image-sized array that describes the mask. Active parts of the
         mask should have values >0. Background pixels must be zero
 
-        label: text
+    label: text
         User-defined text label to identify mask
 
-        mask_group: integer
+    mask_group: integer
         User-defined number to help put masks into different categories
 
     Returns
@@ -153,18 +152,18 @@ class RoiMask(Mask):
         '''
         RoiMask class constructor
 
-        Arguments
-        ---------
-            image_w: integer
+        Parameters
+        ----------
+        image_w: integer
             Width of image that ROI resides in
 
-            image_h: integer
+        image_h: integer
             Height of image that ROI resides in
 
-            label: text
+        label: text
             User-defined text label to identify mask
 
-            mask_group: integer
+        mask_group: integer
             User-defined number to help put masks into different categories
         '''
         super(RoiMask, self).__init__(image_w, image_h, label, mask_group)
@@ -173,17 +172,13 @@ class RoiMask(Mask):
         '''
         Initialize mask using a list of mask pixels
 
-        Arguments:
+        Parameters
         ----------
-            border: float[4]
+        border: float[4]
             Coordinates defining useable area of image. See create_roi_mask()
 
-            pix_list: integer[][2]
+        pix_list: integer[][2]
             List of pixel coordinates (x,y) that define the mask
-
-        Returns
-        -------
-            nothing
         '''
         assert pix_list.shape[1] == 2, "Pixel list not properly formed"
         array = np.zeros((self.img_rows, self.img_cols))
@@ -196,18 +191,14 @@ class RoiMask(Mask):
         '''
         Initialize mask using spatial mask
 
-        Arguments:
+        Parameters
         ----------
-            border: float[4]
+        border: float[4]
             Coordinates defining useable area of image. See create_roi_mask().
 
-            roi_mask: integer[image height][image width]
+        roi_mask: integer[image height][image width]
             Image-sized array that describes the mask. Active parts of the
             mask should have values >0. Background pixels must be zero
-
-        Returns
-        -------
-            nothing
         '''
         # find lowest and highest non-zero indices on each axis
         left = None
@@ -252,25 +243,25 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
     Neuropil masks are defined as the region around an ROI, up to 13
     pixels out, that does not include other ROIs
 
-    Arguments
-    ---------
+    Parameters
+    ----------
 
-        roi: RoiMask object
+    roi: RoiMask object
         The ROI that the neuropil masks will be based on
 
-        border: float[4]
+    border: float[4]
         Coordinates defining useable area of image. See create_roi_mask().
 
-        combined_binary_mask
+    combined_binary_mask
         List of pixel coordinates (x,y) that define the mask
 
-        combined_binary_mask: integer[image_h][image_w]
+    combined_binary_mask: integer[image_h][image_w]
         Image-sized array that shows the position of all ROIs in the
         image. ROI masks should have a value of one. Background pixels 
         must be zero. In other words, ithe combined_binary_mask is a 
         bitmap union of all ROI masks
 
-        label: text
+    label: text
         User-defined text label to identify the mask
 
     Returns
@@ -298,12 +289,12 @@ class NeuropilMask(Mask):
         NeuropilMask class constructor. This class should be created by
         calling create_neuropil_mask()
 
-        Arguments
-        ---------
-            label: text
+        Parameters
+        ----------
+        label: text
             User-defined text label to identify mask
 
-            mask_group: integer
+        mask_group: integer
             User-defined number to help put masks into different categories
         '''
         super(NeuropilMask, self).__init__(w, h, label, mask_group)
@@ -313,17 +304,13 @@ class NeuropilMask(Mask):
         '''
         Initialize mask using a list of mask pixels
 
-        Arguments:
+        Parameters
         ----------
-            border: float[4]
+        border: float[4]
             Coordinates defining useable area of image. See create_roi_mask()
 
-            pix_list: integer[][2]
+        pix_list: integer[][2]
             List of pixel coordinates (x,y) that define the mask
-
-        Returns
-        -------
-            nothing
         '''
         assert pix_list.shape[1] == 2, "Pixel list not properly formed"
         array = np.zeros((self.img_rows, self.img_cols))
@@ -337,18 +324,14 @@ class NeuropilMask(Mask):
         '''
         Initialize mask using spatial mask
 
-        Arguments:
+        Parameters
         ----------
-            border: float[4]
+        border: float[4]
             Coordinates defining useable area of image. See create_roi_mask().
 
-            array: integer[image height][image width]
+        array: integer[image height][image width]
             Image-sized array that describes the mask. Active parts of the
             mask should have values >0. Background pixels must be zero
-
-        Returns
-        -------
-            nothing
         '''
         # find lowest and highest non-zero indices on each axis
         left = None
@@ -405,17 +388,17 @@ def calculate_traces(stack, mask_list):
     Calculates the average response of the specified masks in the
     image stack
 
-    Arguments
-    ---------
-        stack: float[image height][image width]
+    Parameters
+    ----------
+    stack: float[image height][image width]
         Image stack that masks are applied to
 
-        mask_list: list<Mask>
+    mask_list: list<Mask>
         List of masks
 
     Returns
     -------
-        float[number masks][number frames]
+    float[number masks][number frames]
         This is the average response for each Mask in each image frame
     '''
     traces = np.zeros((len(mask_list), stack.shape[0]))
