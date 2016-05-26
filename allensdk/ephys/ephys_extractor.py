@@ -308,8 +308,8 @@ class EphysSweepFeatureExtractor:
         if long_flat_intervals.size > 0:
             interval_index = long_flat_intervals[0] + 1
             baseline_end_time = t[non_flat_points[interval_index]]
-            return ft.average_voltage(v, t, baseline_start_time - self.baseline_interval,
-                                      baseline_start_time)
+            return ft.average_voltage(v, t, baseline_end_time - self.baseline_interval,
+                                      baseline_end_time)
         else:
             log.info("Could not find sufficiently flat interval for automatic baseline voltage", RuntimeWarning)
             return np.nan
