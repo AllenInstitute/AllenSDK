@@ -174,14 +174,14 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Brain-Observatory-Tuning-Analysis">Brain Observatory Tuning Analysis<a class="anchor-link" href="#Brain-Observatory-Tuning-Analysis">&#182;</a></h2><p>This notebook demonstrates how to run the stimulus-specific tuning analysis code in the SDK.  First let's instantiate a <code>BrainObservatoryCache</code> instance.</p>
+<h2 id="Brain-Observatory-Trace-Analysis">Brain Observatory Trace Analysis<a class="anchor-link" href="#Brain-Observatory-Trace-Analysis">&#182;</a></h2><p>This notebook demonstrates how to run the stimulus-specific tuning analysis code in the SDK.  First let's instantiate a <code>BrainObservatoryCache</code> instance.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_cache</span> <span class="k">import</span> <span class="n">BrainObservatoryCache</span>
@@ -198,19 +198,17 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Drifting-Gratings">Drifting Gratings<a class="anchor-link" href="#Drifting-Gratings">&#182;</a></h2>
+<h2 id="Drifting-Gratings">Drifting Gratings<a class="anchor-link" href="#Drifting-Gratings">&#182;</a></h2><p>In this example, we'll show how you can plot a heatmap of orientation and temporal frequency tuning for a given cell.  Here we start with a known experiment ID.  Take a look at the other notebook to see how you can find experiments of interest.  You can run the drifting grating analysis code on that experiment's NWB file as follows:</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="k">import</span> <span class="n">MaxNLocator</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
 
@@ -224,36 +222,27 @@ div#notebook {
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>WARNING:allensdk.api.queries.brain_observatory_api:Downloading ophys_experiment 502376461 NWB. This can take some time.
-</pre>
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
 </div>
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>
-</pre>
-</div>
-</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>If you know which cell you're interested in, here's how you can find out where it is in the NWB File.</p>
 
 </div>
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="n">specimens</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">specimen_id</span> <span class="o">=</span> <span class="mi">517425074</span>
-<span class="n">cell_loc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">specimens</span><span class="o">==</span><span class="n">specimen_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">specimen_ids</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">()</span>
+
+<span class="n">cell_loc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">specimen_ids</span><span class="o">==</span><span class="n">specimen_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;Specimen ID:&quot;</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;Cell loc:&quot;</span><span class="p">,</span> <span class="n">cell_loc</span><span class="p">)</span>
 </pre></div>
@@ -283,22 +272,23 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Plotting heatmap of orientation and temporal frequency tuning for a given cell.  The response is a 4-D array.</p>
+<p>The <code>response</code> property of the stimulus-specific analysis objects is 4-D array organized with the following dimensions:</p>
 
-<pre><code>0: grating direction
+<pre><code>0: grating directions
 1: grating temporal frequency (0=blank sweep)
 2: cells
-3: 0: response mean, 1: response standard error of the mean, 2: number of signficant trials</code></pre>
+3: 0=response mean, 1=response standard error of the mean, 2=number of signficant trials</code></pre>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dg</span><span class="o">.</span><span class="n">response</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:,</span><span class="n">cell_loc</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s">&#39;hot&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s">&#39;none&#39;</span><span class="p">)</span><span class="c">#skip blanksweep column</span>
+<div class=" highlight hl-ipython3"><pre><span class="c"># skip the blank sweep column of the temporal frequency dimension</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dg</span><span class="o">.</span><span class="n">response</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:,</span><span class="n">cell_loc</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="s">&#39;hot&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s">&#39;none&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">dg</span><span class="o">.</span><span class="n">tfvals</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="n">dg</span><span class="o">.</span><span class="n">orivals</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">&quot;Temporal frequency (Hz)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
@@ -560,14 +550,24 @@ QVCTEBRBENTk/wNlu/BX3WtYRAAAAABJRU5ErkJggg==
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>"peak" is a DataFrame of peak conditions (direction and temporal frequency) as well as computed response metrics</p>
+<p>The <code>peak</code> property of the analysis object is a Pandas DataFrame of peak conditions (direction and temporal frequency) as well as computed response metrics.  For drifting gratings this includes:</p>
+
+<pre><code>ori_dg: preferred direction (index into dg.orivals)
+tf_dg: preferred temporal frequency (index into tf.tfvals)
+response_reliability_dg: response reliability 
+osi_dg: orientation selectivity index
+dsi_dg: direction selectivity index
+ptest_dg: number of signficant cells
+p_run_dg: K-S statistic comparing running trials to stationary trials
+run_modulation_dg: ratio of mean fluorescence during running vs static
+cv_dg: circular variance </code></pre>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cell_loc</span><span class="p">]</span>
@@ -581,7 +581,7 @@ QVCTEBRBENTk/wNlu/BX3WtYRAAAAABJRU5ErkJggg==
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[8]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[5]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -610,14 +610,14 @@ Name: 46, dtype: object</pre>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Plot all trials for preferred condition</p>
+<p>Next let's plot all trials for a given cell's preferred condition.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="n">pref_ori</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">orivals</span><span class="p">[</span><span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="o">.</span><span class="n">ori_dg</span><span class="p">[</span><span class="n">cell_loc</span><span class="p">]]</span>
@@ -648,7 +648,7 @@ Name: 46, dtype: object</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="n">pref_trials</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">stim_table</span><span class="p">[(</span><span class="n">dg</span><span class="o">.</span><span class="n">stim_table</span><span class="o">.</span><span class="n">orientation</span><span class="o">==</span><span class="n">pref_ori</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">dg</span><span class="o">.</span><span class="n">stim_table</span><span class="o">.</span><span class="n">temporal_frequency</span><span class="o">==</span><span class="n">pref_tf</span><span class="p">)]</span>
@@ -663,7 +663,7 @@ Name: 46, dtype: object</pre>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[10]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[7]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <div style="max-width:1500px;overflow:auto;">
@@ -815,14 +815,14 @@ Name: 46, dtype: object</pre>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><code>sweep_response</code> is a DataFrame that contains the DF/F of each cell during each stimulus trial. It shares its index with <code>stim_table</code>. Each cell contains a timeseries that extends from 1 second prior to the start of the trial to 1 second after the end of the trial. The final column of <code>sweep_response</code>, named <code>dx</code> is the running speed of the mouse during each trial. The data in this DataFrame is used to create another DataFrame called <code>mean_sweep_response</code> that contains the mean DF/F during the trial for each cell (and the mean running speed in the last column).</p>
+<p><code>sweep_response</code> is a DataFrame that contains the DF/F of each cell during each stimulus trial. It shares its index with <code>stim_table</code>. Each cell contains a timeseries that extends from 1 second prior to the start of the trial to 1 second after the end of the trial. The final column of <code>sweep_response</code>, named <code>dx</code>, is the running speed of the mouse during each trial. The data in this DataFrame is used to create another DataFrame called <code>mean_sweep_response</code> that contains the mean DF/F during the trial for each cell (and the mean running speed in the last column).</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="n">subset</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">[(</span><span class="n">dg</span><span class="o">.</span><span class="n">stim_table</span><span class="o">.</span><span class="n">orientation</span><span class="o">==</span><span class="n">pref_ori</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">dg</span><span class="o">.</span><span class="n">stim_table</span><span class="o">.</span><span class="n">temporal_frequency</span><span class="o">==</span><span class="n">pref_tf</span><span class="p">)]</span>
@@ -833,9 +833,19 @@ Name: 46, dtype: object</pre>
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here we look at the mean running speed during trials that presented the preferred condition.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="n">subset_mean</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">[(</span><span class="n">dg</span><span class="o">.</span><span class="n">stim_table</span><span class="o">.</span><span class="n">orientation</span><span class="o">==</span><span class="n">pref_ori</span><span class="p">)</span><span class="o">&amp;</span><span class="p">(</span><span class="n">dg</span><span class="o">.</span><span class="n">stim_table</span><span class="o">.</span><span class="n">temporal_frequency</span><span class="o">==</span><span class="n">pref_tf</span><span class="p">)]</span>
@@ -850,7 +860,7 @@ Name: 46, dtype: object</pre>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[12]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[9]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
@@ -890,7 +900,7 @@ Name: dx, dtype: float64</pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="n">trial_timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">dg</span><span class="o">.</span><span class="n">interlength</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">interlength</span><span class="o">+</span><span class="n">dg</span><span class="o">.</span><span class="n">sweeplength</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span><span class="o">/</span><span class="n">dg</span><span class="o">.</span><span class="n">acquisition_rate</span>
@@ -2763,13 +2773,14 @@ pZRSC4AGdKWUUmoB0ICulFJKLQAa0JVSSqkFQAO6UkoptQD8f7zUmfKpiaWjAAAAAElFTkSuQmCC
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Static-Gratings">Static Gratings<a class="anchor-link" href="#Static-Gratings">&#182;</a></h2>
+<h2 id="Static-Gratings">Static Gratings<a class="anchor-link" href="#Static-Gratings">&#182;</a></h2><p>The static gratings analysis object is quite similar to the drifting gratings analysis object.  Here we'll just take a look at the <code>peak</code> table, which contains information about the preferred orientation, spatial frequency, phase, as well as a number of other metrics.</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.static_gratings</span> <span class="k">import</span> <span class="n">StaticGratings</span>
@@ -2785,10 +2796,24 @@ pZRSC4AGdKWUUmoB0ICulFJKLQAa0JVSSqkFQAO6UkoptQD8f7zUmfKpiaWjAAAAAElFTkSuQmCC
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>done analyzing static gratings
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -2798,19 +2823,120 @@ pZRSC4AGdKWUUmoB0ICulFJKLQAa0JVSSqkFQAO6UkoptQD8f7zUmfKpiaWjAAAAAElFTkSuQmCC
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[12]:</div>
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div style="max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ori_sg</th>
+      <th>sf_sg</th>
+      <th>phase_sg</th>
+      <th>response_reliability_sg</th>
+      <th>osi_sg</th>
+      <th>peak_dff_sg</th>
+      <th>ptest_sg</th>
+      <th>time_to_peak_sg</th>
+      <th>duration_sg</th>
+      <th>cell_specimen_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>16.66667</td>
+      <td>0.7277323</td>
+      <td>3.746839</td>
+      <td>0.4700023</td>
+      <td>0.89559</td>
+      <td>0.03317</td>
+      <td>517399193</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>5</td>
+      <td>3</td>
+      <td>3</td>
+      <td>35.41667</td>
+      <td>0.8987844</td>
+      <td>19.08064</td>
+      <td>2.686254e-09</td>
+      <td>0.46438</td>
+      <td>0.03317</td>
+      <td>517399774</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>4</td>
+      <td>3</td>
+      <td>3</td>
+      <td>14.58333</td>
+      <td>0.9321128</td>
+      <td>4.549655</td>
+      <td>0.7867488</td>
+      <td>0.3317</td>
+      <td>0.3317</td>
+      <td>517399702</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>5</td>
+      <td>5</td>
+      <td>1</td>
+      <td>22.91667</td>
+      <td>1.089449</td>
+      <td>2.118477</td>
+      <td>0.1020908</td>
+      <td>0.3317</td>
+      <td>0.36487</td>
+      <td>517399683</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3</td>
+      <td>5</td>
+      <td>0</td>
+      <td>16.66667</td>
+      <td>0.3153815</td>
+      <td>4.055015</td>
+      <td>0.05987895</td>
+      <td>0.79608</td>
+      <td>1.02827</td>
+      <td>517399421</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Natural-Scenes">Natural Scenes<a class="anchor-link" href="#Natural-Scenes">&#182;</a></h2>
+<h2 id="Natural-Scenes">Natural Scenes<a class="anchor-link" href="#Natural-Scenes">&#182;</a></h2><p>The natural scenes analysis object is again similar to the others.  In addition to computing the <code>sweep_response</code> and <code>mean_sweep_response</code> arrays, <code>NaturalScenes</code> reports the cell's preferred scene, running modulation, time to peak response, and other metrics.</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.natural_scenes</span> <span class="k">import</span> <span class="n">NaturalScenes</span>
@@ -2825,10 +2951,24 @@ pZRSC4AGdKWUUmoB0ICulFJKLQAa0JVSSqkFQAO6UkoptQD8f7zUmfKpiaWjAAAAAElFTkSuQmCC
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>done analyzing natural scenes
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -2838,24 +2978,126 @@ pZRSC4AGdKWUUmoB0ICulFJKLQAa0JVSSqkFQAO6UkoptQD8f7zUmfKpiaWjAAAAAElFTkSuQmCC
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[14]:</div>
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div style="max-width:1500px;overflow:auto;">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>scene_ns</th>
+      <th>response_reliability_ns</th>
+      <th>peak_dff_ns</th>
+      <th>ptest_ns</th>
+      <th>p_run_ns</th>
+      <th>run_modulation_ns</th>
+      <th>time_to_peak_ns</th>
+      <th>duration_ns</th>
+      <th>cell_specimen_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>48</td>
+      <td>6</td>
+      <td>4.726091</td>
+      <td>0.166502</td>
+      <td>0.269754</td>
+      <td>-0.1073051</td>
+      <td>0.72974</td>
+      <td>0.03317</td>
+      <td>517399193</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>96</td>
+      <td>26</td>
+      <td>8.660661</td>
+      <td>1.18856e-09</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.3317</td>
+      <td>0.43121</td>
+      <td>517399774</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>103</td>
+      <td>16</td>
+      <td>2.409205</td>
+      <td>0.01520566</td>
+      <td>0.009848073</td>
+      <td>-54.77162</td>
+      <td>0.43121</td>
+      <td>0.43121</td>
+      <td>517399702</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>103</td>
+      <td>14</td>
+      <td>1.70591</td>
+      <td>0.6032894</td>
+      <td>0.1210459</td>
+      <td>-25.5943</td>
+      <td>0.89559</td>
+      <td>0.86242</td>
+      <td>517399683</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>21</td>
+      <td>4</td>
+      <td>1.537637</td>
+      <td>0.05954203</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0.53072</td>
+      <td>0.36487</td>
+      <td>517399421</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Locally-Sparse-Noise">Locally Sparse Noise<a class="anchor-link" href="#Locally-Sparse-Noise">&#182;</a></h2>
+<h2 id="Locally-Sparse-Noise">Locally Sparse Noise<a class="anchor-link" href="#Locally-Sparse-Noise">&#182;</a></h2><p>The locally sparse noise stimulus object is a bit different from the others.  It does not have a peak condition table, instead providing a method to retrieve the "on" and "off" receptive fields of all cells.  The receptive field of a cell is computed by averaging responses to trials in which a given sparse noise grid location is on/off.</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.locally_sparse_noise</span> <span class="k">import</span> <span class="n">LocallySparseNoise</span>
+<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="k">as</span> <span class="nn">stim_info</span>
 
-<span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">510656082</span><span class="p">)</span>
+<span class="n">specimen_id</span> <span class="o">=</span> <span class="mi">517410165</span>
+<span class="n">cell</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_cell_specimens</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="n">specimen_id</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">exp</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">(</span><span class="n">experiment_container_ids</span><span class="o">=</span><span class="p">[</span><span class="n">cell</span><span class="p">[</span><span class="s">&#39;experiment_container_id&#39;</span><span class="p">]],</span>
+                                <span class="n">stimuli</span><span class="o">=</span><span class="p">[</span><span class="n">stim_info</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                                         
+<span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
 <span class="n">lsn</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="p">(</span><span class="n">data_set</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s">&quot;done analyzing locally sparse noise&quot;</span><span class="p">)</span>
 </pre></div>
@@ -2864,20 +3106,316 @@ pZRSC4AGdKWUUmoB0ICulFJKLQAa0JVSSqkFQAO6UkoptQD8f7zUmfKpiaWjAAAAAElFTkSuQmCC
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Calculating mean responses
+done analyzing locally sparse noise
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class=" highlight hl-ipython3"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
-<span class="n">receptive_field</span> <span class="o">=</span> <span class="n">lsn</span><span class="o">.</span><span class="n">get_receptive_field</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">receptive_field</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">interpolation</span><span class="o">=</span><span class="s">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">&#39;hot&#39;</span><span class="p">)</span>
+
+<span class="n">specimen_ids</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">()</span>
+<span class="n">cell_loc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">specimen_ids</span><span class="o">==</span><span class="n">specimen_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">lsn</span><span class="o">.</span><span class="n">receptive_field</span><span class="p">[:,:,</span><span class="n">cell_loc</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">interpolation</span><span class="o">=</span><span class="s">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">&#39;PuRd&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s">&#39;lower&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&quot;on receptive field&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">lsn</span><span class="o">.</span><span class="n">receptive_field</span><span class="p">[:,:,</span><span class="n">cell_loc</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">interpolation</span><span class="o">=</span><span class="s">&#39;nearest&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">&#39;Blues&#39;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s">&#39;lower&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">&quot;off receptive field&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+Pb6+3PYFV773nW+68hXfPNmV/+jPq1356l37XflOJftc+T75x7nyFc65FCp+fpUrX1Pm3N7dvpE5
+79wg+0YNcuUzR/g+zz3veNaVP1Bd4crXFfZy5Su+OcqV7zn7I1e+ZLzv+zlw3XZXPjPXV9r2jhns
+ylfPfMKVx5WNHff66dJ0EZGQUMEWEQkJFWwRkZBQwRYRCQkVbBGRkFDBFhEJCRVsEZGQUMEWEQkJ
+FWwRkZBQwRYRCQkVbBGRkEjrXCLV68oSzu6qqnW1ffTpQ1z5Hat8cxHUXnGSK8/auuZDUWr2+Oa+
+yHbOrXHUrMWufHVNpSt/zz3Xu/L/Nu6HrnxtP999nfcVLXDlKzN8H/1Ov/mqK1+2bJsrn/uC8/P5
+yK2ufM7/feLKH/Xbv7vytQW+/ZXRJduVZ42vPuT9xDc/XdcuBa58zennufLl3Tu58vHoCFtEJCRU
+sEVEQqLJgk1yJskSkiuilvUi+TrJNSTnksxPfzdFRKS5I+xHAUyKWXYbgNfNbBiAvwbPRUQkzZos
+2GY2D8CumMUXAXg8ePw4gIvT0C8REYmRzBh2PzMrCR6XAOiXwv6IiEgcLTqtz8yMpMV7ffr/fnZq
+zZihozD2ON9th0RE2rtFG5Zi0YZlCWWTKdglJPubWTHJAgBxTyC99ryrk2heRKTjOKXwZJxS+Nk9
+YR/8W/z7RSYzJDIbwNTg8VQALyfRhoiIODV3Wt/TAOYDGE5yM8mrAPwXgHNJrgFwdvBcRETSrMkh
+ETOLd2/2L6WhLyIi0oS0ziXCurh/j2wgd/FWV9ubtpS78jnD+7jyeQO6+9rvmuPK73zfN9dEr3c3
+uPI11b65QXZc/2VX/vvHXuHKH/jBY658ZuFRrnzn089w5UvmvuDKd3p1tStf26eLK587+UJXvsL5
+/yX7hbdd+Q+2r3LlPz/2fFfe9lS58jsuG+3Kd9tynCtf+vLzrnzVpLNdeeyv8eXj0KXpIiIhoYIt
+IhISKtgiIiGhgi0iEhIq2CIiIaGCLSISEirYIiIhoYItIhISKtgiIiGhgi0iEhIq2CIiIUGzxOf7
+cDVM2uazpyecrzm2r6v9vQN9c33sd87t0Gt1qa/9c4e68t1nrWg+FKXsgmGufJ+nl7ryGet8c1PY
+0b65Wep6d3XlK9/5uyuffbFvLouKAl9/ciqqfe0f47s3dca+g658/+d8+xdZma74nom+z3PX5Z+6
+8mUTCl357jPnuvIlZWtd+b75x7ry+68815XPeWJOwtlhm++FmbGx13SELSISEirYIiIhkXTBJnk7
+yQ9JriD5FMlOqeyYiIgcLqmCTbIQwHcBjDazkwBkAvBNkCwiIi7J3sBgD4BqAF1I1gLoAsD3VwcR
+EXFJ6gjbzMoA/BrAJgBbAew2szdS2TERETlcUkfYJIcC+AGAQgDlAJ4jeaWZ/TE695tPXjn0+LSe
+w3Baz+HJ91REpB1aeGAzFlZtSSib7JDIWADzzWwnAJB8EcAEAIcV7B8e+9UkmxcR6RhOzR2EU3MH
+HXp+/56FcbPJniXyEYDxJDuTJCJ3UV+ZZFsiIpKAZMewlwH4A4DFAJYHix9KVadERKShZIdEYGa/
+BPDLFPZFRESaoCsdRURCIq2TP20675GE81nF5a72LaPRuVHiemzJU678ld/4kSvPKt/kQPvemefK
+l+wtduUHfusaVz77tQWufE6nHq586eVjXPm6k3yTgfWctbz5UAsUn3GMK18w1zf5kPfznPWR77KH
+A2ed4MrvGeLbv1n7fZ///Hc+ceV3LH3Tlec/X+fK568rc+W3jy5w5bPzcxPOjv7GKE3+JCISdirY
+IiIhoYItIhISKtgiIiGhgi0iEhIq2CIiIaGCLSISEirYIiIhoYItIhISKtgiIiGhgi0iEhJJz9aX
+iIoVixLO5p12uqvtuh5dXPlv9f6eK/+zJ31zidwx+S5XvvqBm1z5gTfOcOX3PTPLle9x8WWufN3K
+ra68F7MyXfnMkj2u/O5/OceVL578Q1e+99W+zxtrfXP67Jz3qiu//GHfXBz9cxOf+wIAev7iNle+
++rzjXfk+2b5StafioCtfl+37vPVd7Pv8Z68rceXj0RG2iEhIJF2wSeaTfJ7kKpIrSY5PZcdERORw
+LRkSuQ/AHDO7jGQWgLwU9UlERBqR7F3TewD4gplNBQAzq0Hk7ukiIpImyQ6JHANgB8lHSb5P8mGS
+vr8CioiIS7JDIlkARgO4wcwWkbwXwG0A/j06dP+ez84SGddpAMZ1OjrZfoqItEvzd6/Bu+VrEsom
+W7C3ANhiZvUV+XlECvZhbuh+SpLNi4h0DBPyh2FC/rBDz+/ZPCduNqkhETMrBrCZZP1avgTgw2Ta
+EhGRxLTkLJEbAfyRZA6AjwFclZouiYhIY5Iu2Ga2DIDGPEREWomudBQRCYm0ziXCKy9OOFuel+1q
+u2pgd1e+79+WufLX9Z7gytf17urKZ8/f7MqX/8fXXfmM4gpXvrK8ypXvkUFXvtsm32n6O/J9c1ns
+W7/Kle952wFXvuC+f3Plc2avdOXrfnG+Lz+slys/Itf3X73P8u2u/P5tvs9b1w27XPkDw/u58vuO
+7ubK14wpcOV7vLbOld8zcWji4b/Hf0lH2CIiIaGCLSISEirYIiIhoYItIhISKtgiIiGhgi0iEhIq
+2CIiIaGCLSISEirYIiIhoYItIhISKtgiIiGR1rlEui1cn3DWnHNTVG/c4MrvnXK2K99r9edceavw
+zcWxd7Rv7oJuH+105TNqal35vGWfuvJ13XxzfdRe55vYccBNL7vyJTde5spnbPTNbZLTy3kHvAzf
+sVDWpTN8zZd+4MpnPniHK195yfGufHaXHFd+9w7f3CMZy0pc+fy1Za5851d9c9GULfqrK1817QZX
+Ph4dYYuIhESLCjbJTJJLSL6Sqg6JiEjjWnqEfTOAlQAsBX0REZEmJF2wSQ4EcAGAGQB8A9AiIuLW
+kiPsewD8CEBdivoiIiJNSOosEZIXAthuZktInhUv9+sNrx56fFrMrdxFRAQoWvM+3l/7fkLZZE/r
+mwDgIpIXAMgF0J3kH8zsW9GhWwsvTLJ5EZGOYcyw0RgzbPSh5zNeeyRuNqkhETO7w8wGmdkxAK4A
+8H+xxVpERFIrVedh6ywREZE0a/GVjmb2NoC3U9AXERFpgq50FBEJCZqlZzSDpK2+ZU7C+cpTj3a1
+3+uZ5a78+jde9LV/q+/a/5y9vrlE8pZsduVrBvZy5bO27va1P7i3K19x2Qmu/MEPtrvyNZ19v/xl
+5PnmssjI9F06kNmtkyuf/+JKV76qT54rn1Nx0JXP2uibi6b0Gt/cL7lF21z57Gdfd+UPXvFlV770
+gQdd+eOGTHTl954zwpXPOlCTcHbog5NhZo1+QHWELSISEirYIiIhoYItIhISKtgiIiGhgi0iEhIq
+2CIiIaGCLSISEirYIiIhoYItIhISKtgiIiGhgi0iEhJpnUtk+bS/Jpzv/Sff3CCs8/W7/Fzftf+1
+nXxzWRx84GFf+//9Y1f+qDc+duWr+nVz5ddP9829MPAHvrlW8t9a68pnlFe68g9/+LQrf8GM6a58
+wa/muvJll5/qynf/aIcrv+tS31wu/e7y9d87twz3++Y2KZ78eVc+r3ifK181usCV7/XUUlf+QNEi
+V7566kUJZz9/97maS0REJOxactf0QSTfJPkhyQ9I3pTKjomIyOFacgODagC3mNlSkl0BFJF83cxW
+pahvIiISJekjbDMrNrOlweMKAKsADEhVx0RE5HApGcMmWQhgFICFqWhPREQaavE9HYPhkOcB3Bwc
+aR/y+zcfP/T4lMKROOWYk1u6OhGRduW9jcuwaOOyhLItKtgkswG8AOBJM3s59vXrvzi1Jc2LiLR7
+44aMxLghIw89f2DeE3GzLTlLhAAeAbDSzO5Nth0REUlMS8awJwL4BoAvklwSfE1KUb9ERCRG0kMi
+ZvZ36MIbEZFWo4IrIhISLT5LpCl84MmEs1vvvt7Vdv6dvrkjDnbznaGSN/PPrvy+u25x5fv97CVX
+3k739T/3Fd8ZlsP7++Z2qK7wzR1Rudk3l0jX7ke78pf0/QdXvucs39wRxbf7Rvu6v7/NlWdVtSvf
+6xnf3Du7y3zf/+4981z5zSsSnzcIAPoe75vrozov25XP6JTpyiOj0ak74tr3q2tc+b7TfPUkHh1h
+i4iEhAq2iEhIqGCLiISECraISEioYIuIhIQKtohISKhgi4iEhAq2iEhIqGCLiISECraISEioYIuI
+hATNLD0Nk1b0xJLE3+DsR+85a1z5Xf/Q35Wv7tXZle9656OufJfTz3Tlq95915Uvv/VyVz5nb5Ur
+32PtTleeB2t9+Vpfvq5zjitf/rnernyfP3/oypde6JubpapnrivfadcBV75zaaUrX9nXN5dIjTNf
+V+3bv3mb97jymY/55urp9JXzXPmyiYNc+f4PLUg4O3D+P8HMGp3cREfYIiIh0ZI7zkwi+RHJtSR/
+kspOiYhIQ0kVbJKZAO4HMAnACQCmkByRyo6JiMjhkj3CHgdgnZltMLNqALMATE5dt0REJFayBfto
+AJujnm8JlomISJoke8eZhE7pmP7ig4cejxkxFmNHjE1ydSIi7dP88jV4tzyxOwIlW7A/BRB9Xssg
+RI6yD3Ptpdcl2byISMcwoccwTOgx7NDze7bMiZtNdkhkMYDPkSwkmQPgcgCzE3rjqsVJrjKc3qv6
+tK270KoWFPvOVw67+QkeGbUHiz9xXFfRDizYuqKtu9BAUgXbzGoA3ADgfwGsBPCMma1K5L1FHa5g
+b23rLrSqjlaw393TkQq278bFYbdg2wdt3YUGkr5rupm9BuC1FPZFRESaoCsdRURCIq1ziaSlYRGR
+di7eXCJpK9giIpJaGhIREQkJFWwRkZBQwRYRCYlWLdgdbUpWkhtILie5hOR7bd2fVCI5k2QJyRVR
+y3qRfJ3kGpJzSea3ZR9TKc72TiO5Jdi/S0hOass+phLJQSTfJPkhyQ9I3hQsb5f7uIntPaL2cav9
+0TGYknU1gC8hcmn7IgBTEr3gJoxIrgcwxszK2rovqUbyCwAqAPzBzE4Klv0SQKmZ/TL4gdzTzG5r
+y36mSpzt/SmAvWb2mzbtXBqQ7A+gv5ktJdkVQBGAiwFchXa4j5vY3q/hCNrHrXmE3VGnZG309Jyw
+M7N5AHbFLL4IwOPB48cR+cC3C3G2F2i/+7fYzJYGjysArEJkRs52uY+b2F7gCNrHrVmwO+KUrAbg
+DZKLSX63rTvTCvqZWUnwuARAv7bsTCu5keQyko+0l+GBWCQLAYwCsBAdYB9HbW/9jRiPmH3cmgW7
+I57wPdHMRgE4H8A/Bb9WdwgWGWtr7/v8AQDHADgZwDYAv27b7qReMDzwAoCbzWxv9GvtcR8H2/s8
+IttbgSNsH7dmwU5oStb2xMy2Bf/uAPASIsNC7VlJMBYIkgUAtrdxf9LKzLZbAMAMtLP9SzIbkWL9
+hJm9HCxut/s4anufrN/eI20ft2bBTnpK1jAi2YVkt+BxHoAvAzjy5mtMrdkApgaPpwJ4uYls6AUF
+q94laEf7lyQBPAJgpZndG/VSu9zH8bb3SNvHrXppOsnzAdwLIBPAI2b2n6228lZG8hhEjqqByKyI
+f2xP20vyaQBnAuiDyFjmvwP4E4BnAQwGsAHA18xsd1v1MZUa2d6fAjgLkV+VDcB6ANdGje+GGsnT
+AfwNwHJ8NuxxO4D30A73cZztvQPAFBxB+1hziYiIhISudBQRCQkVbBGRkFDBFhEJCRVsEZGQUMEW
+EQkJFWwRkZBQwRYRCYn/B9nPGELzunmjAAAAAElFTkSuQmCC
+"
+>
+</div>
+
+</div>
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+AABJRU5ErkJggg==
+"
+>
+</div>
+
+</div>
+
 </div>
 </div>
 

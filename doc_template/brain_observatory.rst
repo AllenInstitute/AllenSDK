@@ -48,10 +48,15 @@ started with the available data:
     - `Find the ROI mask for a given cell <_static/examples/nb/brain_observatory.html#ROI-Masks>`_    
     - `Run neuropil correction <_static/examples/nb/brain_observatory.html#Neuropil-Correction>`_
 
+The code used to analyze and visualize data in the `Allen Brain Observatory data portal <http://activity.brain-map.org/visualcoding>`_ 
+is available as part of the SDK.  Take a look at this `Jupyter notebook <_static/examples/nb/brain_observatory.html>`_ to find out how to:
+
+    - `Plot cell's response to its preferred stimulus condition <_static/examples/nb/brain_observatory.html#Drifting-Gratings>`_    
+    - `Compute a cell's on/off receptive field based on the locally sparse noise stimulus <_static/examples/nb/brain_observatory.html#Locally-Sparse-Noise>`_ 
+
 More detailed documentation is available demonstrating how to: 
 
     - `Read and visualize the stimulus presentation tables in the NWB files <_static/examples/nb/brain_observatory_stimuli.html>`_
-    - `Run stimulus-specific tuning analysis <_static/examples/nb/brain_observatory_analysis.html>`_
     - `Understand the layout of Brain Observatory NWB files <brain_observatory_nwb.html>`_ 
 
 

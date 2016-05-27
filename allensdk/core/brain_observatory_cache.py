@@ -260,7 +260,7 @@ class BrainObservatoryCache(Cache):
         return mappings
 
 
-    def get_cell_specimens(self, file_name=None, ophys_experiment_ids=None, simple=True):
+    def get_cell_specimens(self, file_name=None, ids=None, experiment_container_ids=None, simple=True):
         """ Return cell specimens that have certain properies.
         
         Parameters
@@ -270,8 +270,11 @@ class BrainObservatoryCache(Cache):
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
 
-        ophys_experiment_ids: list
-            List of ophys experiment ids.
+        ids: list
+            List of cell specimen ids.  
+
+        experiment_container_ids: list
+            List of experiment container ids.
             
         simple: boolean
             Whether or not to simplify the dictionary properties returned by this method
@@ -292,7 +295,9 @@ class BrainObservatoryCache(Cache):
             if self.cache:
                 ju.write(file_name, cell_specimens)
 
-        cell_specimens = self.api.filter_cell_specimens(cell_specimens)
+        cell_specimens = self.api.filter_cell_specimens(cell_specimens, 
+                                                        ids=ids, 
+                                                        experiment_container_ids=experiment_container_ids)
         
         # drop the thumbnail columns
         if simple:

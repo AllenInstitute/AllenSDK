@@ -355,5 +355,11 @@ class BrainObservatoryApi(RmaTemplate):
 
         return experiments
 
-    def filter_cell_specimens(self, cell_specimens):
+    def filter_cell_specimens(self, cell_specimens, ids=None, experiment_container_ids=None):
+        if ids is not None:
+            cell_specimens = [ c for c in cell_specimens if c['cell_specimen_id'] in ids ]
+
+        if experiment_container_ids is not None:
+            cell_specimens = [ c for c in cell_specimens if e['experiment_container_id'] in experiment_container_ids ]
+
         return cell_specimens
