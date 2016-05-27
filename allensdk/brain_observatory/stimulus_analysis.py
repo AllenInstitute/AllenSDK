@@ -72,19 +72,19 @@ class StimulusAnalysis(object):
 
             binned_dx_sp: (bins,2) np.ndarray of running speeds binned during spontaneous activity stimulus.  
             The first bin contains all speeds below 1 cm/s.  Dimension 0 is mean running speed in the bin.
-            Dimension 1 is the standard deviation.
+            Dimension 1 is the standard error of the mean.
 
             binned_cells_sp: (bins,2) np.ndarray of fluorescence during spontaneous activity stimulus.  
             First bin contains all data for speeds below 1 cm/s. Dimension 0 is mean fluorescence in the bin.
-            Dimension 1 is the standard deviation.
+            Dimension 1 is the standard error of the mean.
 
             binned_dx_vis: (bins,2) np.ndarray of running speeds outside of spontaneous activity stimulus.
             The first bin contains all speeds below 1 cm/s.  Dimension 0 is mean running speed in the bin.
-            Dimension 1 is the standard deviation.
+            Dimension 1 is the standard error of the mean.
 
             binned_cells_vis: np.ndarray of fluorescence outside of spontaneous activity stimulu.
             First bin contains all data for speeds below 1 cm/s. Dimension 0 is mean fluorescence in the bin.
-            Dimension 1 is the standard deviation.
+            Dimension 1 is the standard error of the mean.
 
             peak_run: pd.DataFrame of speed-related properties of a cell.
             
