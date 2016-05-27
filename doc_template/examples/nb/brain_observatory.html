@@ -198,7 +198,7 @@ div#notebook {
 <span class="kn">import</span> <span class="nn">pprint</span>
 
 <span class="c"># Download a list of all targeted areas</span>
-<span class="n">boc</span> <span class="o">=</span> <span class="n">BrainObservatoryCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;boc/manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="s">&#39;http://testwarehouse:9000&#39;</span><span class="p">)</span>
+<span class="n">boc</span> <span class="o">=</span> <span class="n">BrainObservatoryCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;boc/manifest.json&#39;</span><span class="p">)</span>
 <span class="n">targeted_structures</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_all_targeted_structures</span><span class="p">()</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;all targeted structures: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">targeted_structures</span><span class="p">))</span>
 </pre></div>
