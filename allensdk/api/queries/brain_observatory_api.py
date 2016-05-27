@@ -306,7 +306,15 @@ class BrainObservatoryApi(RmaTemplate):
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
         
     
-    def filter_experiment_containers(self, containers, targeted_structures=None, imaging_depths=None, transgenic_lines=None):
+    def filter_experiment_containers(self, containers, 
+                                     ids=None, 
+                                     targeted_structures=None, 
+                                     imaging_depths=None, 
+                                     transgenic_lines=None):
+
+        if ids is not None:
+            containers = [ c for c in containers if c['id'] in ids ]
+
         if targeted_structures is not None:
             containers = [ c for c in containers if c['targeted_structure']['acronym'] in targeted_structures ]
 
@@ -319,18 +327,27 @@ class BrainObservatoryApi(RmaTemplate):
         return containers
     
     
-    def filter_ophys_experiments(self, experiments, experiment_container_ids=None,
-                                 targeted_structures=None, imaging_depths=None, 
-                                 transgenic_lines=None, stimuli=None, stimulus_sessions=None):
+    def filter_ophys_experiments(self, experiments, 
+                                 ids=None,
+                                 experiment_container_ids=None,
+                                 targeted_structures=None, 
+                                 imaging_depths=None, 
+                                 transgenic_lines=None, 
+                                 stimuli=None, 
+                                 session_types=None):
 
         # re-using the code from above
-        experiments = self.filter_experiment_containers(experiments, targeted_structures, imaging_depths, transgenic_lines)
+        experiments = self.filter_experiment_containers(experiments, 
+                                                        ids=ids,
+                                                        targeted_structures=targeted_structures, 
+                                                        imaging_depths=imaging_depths, 
+                                                        transgenic_lines=transgenic_lines)
 
         if experiment_container_ids is not None:
             experiments = [ e for e in experiments if e['experiment_container_id'] in experiment_container_ids ]
             
-        if stimulus_sessions is not None:
-            experiments = [ e for e in experiments if e['stimulus_name'] in stimulus_sessions ]
+        if session_types is not None:
+            experiments = [ e for e in experiments if e['stimulus_name'] in session_types ]
 
         if stimuli is not None:
             experiments = [ e for e in experiments 

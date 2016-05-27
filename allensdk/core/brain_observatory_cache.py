@@ -83,7 +83,7 @@ class BrainObservatoryCache(Cache):
         return sorted(list(imaging_depths))
 
 
-    def get_all_stimulus_session_names(self):
+    def get_all_session_types(self):
         """ Return a list of all stimulus sessions in the data set. """
         exps = self.get_ophys_experiments()
         names = set([ exp['stimulus_name'] for exp in exps ])
@@ -95,8 +95,12 @@ class BrainObservatoryCache(Cache):
         return sorted(list(stim_info.all_stimuli()))
     
 
-    def get_experiment_containers(self, file_name=None, targeted_structures=None, 
-                                  imaging_depths=None, cre_lines=None, simple=True):
+    def get_experiment_containers(self, file_name=None, 
+                                  ids=None, 
+                                  targeted_structures=None, 
+                                  imaging_depths=None, 
+                                  cre_lines=None, 
+                                  simple=True):
         """ Get a list of experiment containers matching certain criteria.
         
         Parameters
@@ -105,6 +109,9 @@ class BrainObservatoryCache(Cache):
             File name to save/read the experiment containers.  If file_name is None, 
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
+
+        ids: list
+            List of experiment container ids.  
 
         targeted_structures: list
             List of structure acronyms.  Must be in the list returned by 
@@ -136,7 +143,10 @@ class BrainObservatoryCache(Cache):
             if self.cache:
                 ju.write(file_name, containers)
 
-        containers = self.api.filter_experiment_containers(containers, targeted_structures, imaging_depths, cre_lines)
+        containers = self.api.filter_experiment_containers(containers, ids=ids,
+                                                           targeted_structures=targeted_structures, 
+                                                           imaging_depths=imaging_depths, 
+                                                           transgenic_lines=cre_lines)
 
         if simple:
             containers = [ {
@@ -150,9 +160,15 @@ class BrainObservatoryCache(Cache):
         return containers
 
 
-    def get_ophys_experiments(self, file_name=None, experiment_container_ids=None,
-                              targeted_structures=None, imaging_depths=None, cre_lines=None,
-                              stimuli=None, stimulus_sessions=None, simple=True):
+    def get_ophys_experiments(self, file_name=None, 
+                              ids=None,
+                              experiment_container_ids=None,
+                              targeted_structures=None, 
+                              imaging_depths=None, 
+                              cre_lines=None,
+                              stimuli=None, 
+                              session_types=None, 
+                              simple=True):
         """ Get a list of ophys experiments matching certain criteria.
         
         Parameters
@@ -161,6 +177,9 @@ class BrainObservatoryCache(Cache):
             File name to save/read the ophys experiments.  If file_name is None, 
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
+
+        ids: list
+            List of ophys experiment ids.  
 
         experiment_container_ids: list
             List of experiment container ids.
@@ -181,9 +200,9 @@ class BrainObservatoryCache(Cache):
             List of stimulus names.  Must be in the list returned by 
             BrainObservatoryCache.get_all_stimuli().
 
-        stimulus_sessions: list
-            List of stimulus session names.  Must be in the list returned by 
-            BrainObservatoryCache.get_all_stimulus_session_names().
+        session_types: list
+            List of stimulus session type names.  Must be in the list returned by 
+            BrainObservatoryCache.get_all_session_types().
 
         simple: boolean
             Whether or not to simplify the dictionary properties returned by this method
@@ -203,8 +222,14 @@ class BrainObservatoryCache(Cache):
             if self.cache:
                 ju.write(file_name, exps)
 
-        exps = self.api.filter_ophys_experiments(exps, experiment_container_ids, targeted_structures, 
-                                                 imaging_depths, cre_lines, stimuli, stimulus_sessions)
+        exps = self.api.filter_ophys_experiments(exps, 
+                                                 ids=ids,
+                                                 experiment_container_ids=experiment_container_ids, 
+                                                 targeted_structures=targeted_structures, 
+                                                 imaging_depths=imaging_depths, 
+                                                 transgenic_lines=cre_lines, 
+                                                 stimuli=stimuli, 
+                                                 session_types=session_types)
 
         if simple:
             exps = [ {

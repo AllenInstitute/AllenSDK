@@ -151,14 +151,14 @@ def test_get_ophys_experiments(brain_observatory_cache):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_all_stimulus_session_names(brain_observatory_cache):
+def test_get_all_session_types(brain_observatory_cache):
     with patch('os.path.exists') as m:
         m.return_value = False
         
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):   
             # Download a list of all transgenic driver lines 
-            tls = brain_observatory_cache.get_all_stimulus_session_names()
+            tls = brain_observatory_cache.get_all_session_types()
             
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="

@@ -196,32 +196,166 @@ div#notebook {
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_cache</span> <span class="kn">import</span> <span class="n">BrainObservatoryCache</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 
 <span class="c"># Download a list of all targeted areas</span>
 <span class="n">boc</span> <span class="o">=</span> <span class="n">BrainObservatoryCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;boc/manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="s">&#39;http://testwarehouse:9000&#39;</span><span class="p">)</span>
 <span class="n">targeted_structures</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_all_targeted_structures</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;targeted structures: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">targeted_structures</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;all targeted structures: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">targeted_structures</span><span class="p">))</span>
+</pre></div>
 
-<span class="c"># Download experiment containers for VISp experiments</span>
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>all targeted structures: [u&apos;VISal&apos;, u&apos;VISl&apos;, u&apos;VISp&apos;, u&apos;VISpm&apos;]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="c"># Download experiment containers for VISp experiments</span>
 <span class="n">visp_ecs</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">targeted_structures</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;VISp&#39;</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;visp experiment containers: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">visp_ecs</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;all VISp experiment containers: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">visp_ecs</span><span class="p">))</span>
+</pre></div>
 
-<span class="c"># Download a list of all cre driver lines </span>
-<span class="n">cre_lines</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_all_cre_lines</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;cre lines: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">))</span>
+</div>
+</div>
+</div>
 
-<span class="c"># Download a list of all imaging depths</span>
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>all VISp experiment containers: 25
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="c"># Download a list of all imaging depths</span>
 <span class="n">depths</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_all_imaging_depths</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;imaging depths: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">depths</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;all imaging depths: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">depths</span><span class="p">))</span>
+</pre></div>
 
-<span class="c"># Download a list of all stimuli</span>
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>all imaging depths: [175, 275, 350, 375]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="c"># Download a list of all stimuli</span>
 <span class="n">stims</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_all_stimuli</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;stimuli: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">stims</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;all stimuli:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">stims</span><span class="p">)</span>
+</pre></div>
 
-<span class="c"># Download experiment containers for Cux2 experiments</span>
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>all stimuli:
+
+[&apos;drifting_gratings&apos;,
+ &apos;locally_sparse_noise&apos;,
+ &apos;natural_movie_one&apos;,
+ &apos;natural_movie_three&apos;,
+ &apos;natural_movie_two&apos;,
+ &apos;natural_scenes&apos;,
+ &apos;spontaneous&apos;,
+ &apos;static_gratings&apos;]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="c"># Download a list of all cre driver lines </span>
+<span class="n">cre_lines</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_all_cre_lines</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;all cre lines: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>all cre lines: [u&apos;Cux2-CreERT2&apos;, u&apos;Rbp4-Cre&apos;, u&apos;Rorb-IRES2-Cre&apos;, u&apos;Scnn1a-Tg3-Cre&apos;]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="c"># Download experiment containers for Cux2 experiments</span>
 <span class="n">cux2_ecs</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">cre_lines</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;Cux2-CreERT2&#39;</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;Cux2 experiments: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">cux2_ecs</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Cux2 experiments: </span><span class="si">%d</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">cux2_ecs</span><span class="p">))</span>
 
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;Example experiment container record:&quot;</span><span class="p">)</span>
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">cux2_ecs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -237,12 +371,8 @@ div#notebook {
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>targeted structures: [u&apos;VISal&apos;, u&apos;VISl&apos;, u&apos;VISp&apos;, u&apos;VISpm&apos;]
-visp experiment containers: 25
-cre lines: [u&apos;Cux2-CreERT2&apos;, u&apos;Rbp4-Cre&apos;, u&apos;Rorb-IRES2-Cre&apos;, u&apos;Scnn1a-Tg3-Cre&apos;]
-imaging depths: [175, 275, 350, 375]
-stimuli: [&apos;drifting_gratings&apos;, &apos;locally_sparse_noise&apos;, &apos;natural_movie_one&apos;, &apos;natural_movie_three&apos;, &apos;natural_movie_two&apos;, &apos;natural_scenes&apos;, &apos;spontaneous&apos;, &apos;static_gratings&apos;]
-Cux2 experiments: 42
+<pre>Cux2 experiments: 42
+
 Example experiment container record:
 {&apos;age_days&apos;: 143.0,
  &apos;cre_line&apos;: u&apos;Cux2-CreERT2&apos;,
@@ -269,13 +399,13 @@ Example experiment container record:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># Find all of the experiments for an experiment container</span>
 <span class="n">cux2_ec_id</span> <span class="o">=</span> <span class="n">cux2_ecs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">]</span>
 <span class="n">exps</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiments</span><span class="p">(</span><span class="n">experiment_container_ids</span><span class="o">=</span><span class="p">[</span><span class="n">cux2_ec_id</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s">&quot;Experiments for experiment_container_id </span><span class="si">%d</span><span class="s">: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cux2_ec_id</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">exps</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">&quot;Experiments for experiment_container_id </span><span class="si">%d</span><span class="s">: </span><span class="si">%d</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cux2_ec_id</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">exps</span><span class="p">)))</span>
 <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">exps</span><span class="p">)</span>
 </pre></div>
 
@@ -290,6 +420,7 @@ Example experiment container record:
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Experiments for experiment_container_id 511510695: 3
+
 [{&apos;age_days&apos;: 143.0,
   &apos;cre_line&apos;: u&apos;Cux2-CreERT2&apos;,
   &apos;experiment_container_id&apos;: 511510695,
@@ -331,7 +462,7 @@ Example experiment container record:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stim_info</span>
@@ -382,7 +513,7 @@ Example experiment container record:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">exp</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
@@ -517,10 +648,12 @@ Example experiment container record:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="c"># Download cells for a set of experiments and convert to DataFrame</span>
+<div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="c"># Download cells for a set of experiments and convert to DataFrame</span>
 <span class="n">cells</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_cell_specimens</span><span class="p">()</span>
 <span class="n">cells</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;total cells: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">cells</span><span class="p">))</span>
@@ -572,7 +705,7 @@ direction-selective cells: 2257
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stim_info</span>
@@ -629,7 +762,7 @@ Example ophys experiment:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="c"># pick a direction-selective cell and find its NWB file</span>
@@ -696,7 +829,7 @@ stimuli available in this file:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">dsi_cell_id</span> <span class="o">=</span> <span class="n">dsi_cell</span><span class="p">[</span><span class="s">&#39;cell_specimen_id&#39;</span><span class="p">]</span>
@@ -713,7 +846,7 @@ stimuli available in this file:
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -2047,7 +2180,7 @@ REREREREVYeBEBERERERVZ3/B5ztsuILAbGYAAAAAElFTkSuQmCC
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
@@ -2056,7 +2189,7 @@ REREREREVYeBEBERERERVZ3/B5ztsuILAbGYAAAAAElFTkSuQmCC
 
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_ophys_experiment_data</span><span class="p">(</span><span class="mi">510221121</span><span class="p">)</span>
 
-<span class="c"># TODO: find some cells that are interesting</span>
+<span class="c"># get the specimen IDs for a few cells</span>
 <span class="n">cids</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">()[:</span><span class="mi">15</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
 
 <span class="c"># get masks for specific cells</span>
@@ -2827,7 +2960,7 @@ QRAEQVjkiHATBEEQBEEQBEFY5IhwEwRBEARBEARBWOSIcBMEQRAEQRAEQVjkiHATBEEQBEEQBEFY
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.drifting_gratings</span> <span class="kn">import</span> <span class="n">DriftingGratings</span>
@@ -2859,7 +2992,7 @@ QRAEQVjkiHATBEEQBEEQBEFY5IhwEwRBEARBEARBWOSIcBMEQRAEQRAEQVjkiHATBEEQBEEQBEFY
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -3155,7 +3288,7 @@ mTWGCzUzM2sMF2pmZtYYLtTMzKwx/h8MPrlDg1gttQAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.r_neuropil</span> <span class="kn">import</span> <span class="n">estimate_contamination_ratios</span>
@@ -3204,7 +3337,7 @@ max error = 0.013060
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="n">_</span><span class="p">,</span> <span class="n">corrected_traces</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_corrected_fluorescence_traces</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="o">=</span><span class="p">[</span><span class="n">csid</span><span class="p">])</span>
@@ -3738,7 +3871,7 @@ KIqiKK0aNXoURVEURVEURWnVqNGjKIqiKIqiKEqr5n/yBnjXBl+9iwAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.brain_observatory.dff</span> <span class="kn">import</span> <span class="n">compute_dff</span>
@@ -4188,7 +4321,7 @@ The dF/F traces stored in the NWB file differ slightly from the traces you can c
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
@@ -4583,7 +4716,7 @@ iIiIiCoCgx8iIiIiIqoIDH6IiIiIiKgiMPghIiIiIqKK8P96pfFI+uzIxQAAAABJRU5ErkJggg==
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
