@@ -2,8 +2,7 @@ Organization of a Brain Observatory NWB file
 ============================================
 
 The Allen Institute's Brain Observatory data sets include data from 2-photon microscope recordings including image segmentation, motion correction and fluorescence traces. 
-It also includes information about the visual stimuli presented during the recording. 
-This information, which can be downloaded from **FIXME**, is packaged in the `NWB format <http://www.nwb.org>`_. 
+It also includes information about the visual stimuli presented during the recording. This information is packaged in the `NWB format <http://www.nwb.org>`_. 
 Here is a brief description how the data is stored in the NWB file.
 
 Browsing the file
@@ -104,7 +103,7 @@ This was presented as: (1) (4) (2) (1) (3) (4) (1)
 Below is a brief description and location for several types of data in the NWB file.
 
 +-----------+----------------------+---------------------------------------------------------+----------------------------------------------+
-| Category  | Data type            | Location                                                | SDK function(s)                              |
+| Category  | Data                 | Location                                                | SDK function(s)                              |
 +===========+======================+=========================================================+==============================================+
 | Metadata  | Cre line             | /general/subject/genotype                               | * get_metadata                               |
 +           +----------------------+---------------------------------------------------------+                                              |
@@ -112,10 +111,7 @@ Below is a brief description and location for several types of data in the NWB f
 +           +----------------------+---------------------------------------------------------+                                              |
 |           | Target structure     | /general/targeted_structure                             |                                              |
 +           +----------------------+---------------------------------------------------------+                                              |
-|           | Stimulus set         | /general/session_type                                   |                                              |
-+-----------+----------------------+---------------------------------------------------------+----------------------------------------------+
-| Acquired  | 2-photon image       | /acquisition/timeseries/2p_image_series                 |                                              |
-| data      | stack                |                                                         |                                              |
+|           | Stimulus session     | /general/session_type                                   |                                              |
 +-----------+----------------------+---------------------------------------------------------+----------------------------------------------+
 | Stimulus  | Locally sparse noise | /stimulus/presentation/locally_sparse_noise_stimulus    | * get_locally_sparse_noise_stimulus_table    |
 |           |                      |                                                         | * get_locally_sparse_noise_stimulus_template |
