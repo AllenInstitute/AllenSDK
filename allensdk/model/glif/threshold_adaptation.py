@@ -196,7 +196,7 @@ def err_fix_th(x, voltage, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spi
         equation. 
     * values in this function are in 'real' voltage as opposed to voltage
         relative to resting potential. 
-    * curret injection during the spike is not taken into account.  This seems reasonable as the 
+    * current injection during the spike is not taken into account.  This seems reasonable as the 
         ion channels are open during this time and injected current may not greatly influence the neuron.
     
     x: numpy array
