@@ -75,6 +75,26 @@ class Mask(object):
     def __str__(self):
         return "%s: TL=%d,%d w,h=%d,%d\n%s" % (self.label, self.x, self.y, self.width, self.height, str(self.mask))
 
+    def init_by_pixels(self, border, pix_list):
+        '''
+        Initialize mask using a list of mask pixels
+
+        Parameters
+        ----------
+        border: float[4]
+            Coordinates defining useable area of image. See create_roi_mask()
+
+        pix_list: integer[][2]
+            List of pixel coordinates (x,y) that define the mask
+        '''
+        assert pix_list.shape[1] == 2, "Pixel list not properly formed"
+        array = np.zeros((self.img_rows, self.img_cols))
+
+        # pix_list stores array of [x,y] coordinates
+        array[pix_list[:,1], pix_list[:,0]] = 1;
+        
+        self.init_by_mask(border, array)
+
     def get_mask_plane(self):
         '''
         Returns mask content on full-size image plane
@@ -168,25 +188,6 @@ class RoiMask(Mask):
         '''
         super(RoiMask, self).__init__(image_w, image_h, label, mask_group)
 
-    def init_by_pixels(self, border, pix_list):
-        '''
-        Initialize mask using a list of mask pixels
-
-        Parameters
-        ----------
-        border: float[4]
-            Coordinates defining useable area of image. See create_roi_mask()
-
-        pix_list: integer[][2]
-            List of pixel coordinates (x,y) that define the mask
-        '''
-        assert pix_list.shape[1] == 2, "Pixel list not properly formed"
-        array = np.zeros((self.img_rows, self.img_cols))
-        # pix_list stores array of [x,y] coordinates
-        for pix in pix_list:
-            array[pix[1], pix[0]] = 1;
-        self.init_by_mask(border, array)
-
     def init_by_mask(self, border, array):
         '''
         Initialize mask using spatial mask
@@ -201,28 +202,16 @@ class RoiMask(Mask):
             mask should have values >0. Background pixels must be zero
         '''
         # find lowest and highest non-zero indices on each axis
-        left = None
-        right = None
-        top = None
-        bottom = None
-        for r in range(self.img_rows):
-            for c in range(self.img_cols):
-                val = array[r][c]
-                if val > 0:
-                    if top is None or r < top:
-                        top = r
-                    if bottom is None or r > bottom:
-                        bottom = r
-                    if left is None or c < left:
-                        left = c
-                    if right is None or c > right:
-                        right = c
+        px = np.argwhere(array)
+        (top, left), (bottom, right) = px.min(0), px.max(0)
+        
         # left and right border insets
         l_inset = math.ceil(border[RIGHT_SHIFT])
-        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT])
+        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT]) - 1
         # top and bottom border insets
         t_inset = math.ceil(border[DOWN_SHIFT])
-        b_inset = math.floor(self.img_rows - border[UP_SHIFT])
+        b_inset = math.floor(self.img_rows - border[UP_SHIFT]) - 1
+
         # if ROI crosses border, it's considered invalid
         if left < l_inset or right > r_inset:
             self.valid = False
@@ -300,26 +289,6 @@ class NeuropilMask(Mask):
         super(NeuropilMask, self).__init__(w, h, label, mask_group)
 
 
-    def init_by_pixels(self, border, pix_list):
-        '''
-        Initialize mask using a list of mask pixels
-
-        Parameters
-        ----------
-        border: float[4]
-            Coordinates defining useable area of image. See create_roi_mask()
-
-        pix_list: integer[][2]
-            List of pixel coordinates (x,y) that define the mask
-        '''
-        assert pix_list.shape[1] == 2, "Pixel list not properly formed"
-        array = np.zeros((self.img_rows, self.img_cols))
-        # pix_list stores array of [x,y] coordinates
-        for pix in pix_list:
-            array[pix[1], pix[0]] = 1;
-        self.init_by_mask(border, array)
-
-
     def init_by_mask(self, border, array):
         '''
         Initialize mask using spatial mask
@@ -334,28 +303,15 @@ class NeuropilMask(Mask):
             mask should have values >0. Background pixels must be zero
         '''
         # find lowest and highest non-zero indices on each axis
-        left = None
-        right = None
-        top = None
-        bottom = None
-        for r in range(self.img_rows):
-            for c in range(self.img_cols):
-                val = array[r][c]
-                if val > 0:
-                    if left is None or c < left:
-                        left = c
-                    if right is None or c > right:
-                        right = c
-                    if top is None or r < top:
-                        top = r
-                    if bottom is None or r > bottom:
-                        bottom = r
+        px = np.argwhere(array)
+        (top, left), (bottom, right) = px.min(0), px.max(0)
+        
         # left and right border insets
         l_inset = math.ceil(border[RIGHT_SHIFT])
-        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT])
+        r_inset = math.floor(self.img_cols - border[LEFT_SHIFT]) - 1
         # top and bottom border insets
         t_inset = math.ceil(border[DOWN_SHIFT])
-        b_inset = math.floor(self.img_rows - border[UP_SHIFT])
+        b_inset = math.floor(self.img_rows - border[UP_SHIFT]) - 1
         # restrict neuropil masks to center area of frame (ie, exclude 
         #   areas that overlap with movement correction buffer)
         if left < l_inset:
