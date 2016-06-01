@@ -37,7 +37,8 @@ responses in multiple cortical areas and layers using two-photon calcium imaging
 targeted using Cre driver lines.  Response characterizations include orientation tuning, spatial and temporal
 frequency tuning, temporal dynamics, and spatial receptive field structure.
  
-The mean fluorescence traces for all segmented cells are available in the Neurodata Without Borders file format (`NWB files <cam.html#neurodata-without-borders>`_).  These files contain standardized descriptions of visual stimuli to support stimulus-specific tuning analysis.  The Allen SDK provides code to:
+The mean fluorescence traces for all segmented cells are available in the Neurodata Without Borders file format 
+(`NWB files <brain_observatory_nwb.html>`_).  These files contain standardized descriptions of visual stimuli to support stimulus-specific tuning analysis.  The Allen SDK provides code to:
 
    * download and organize experiment data according to cortical area, imaging depth, and Cre line
    * remove the contribution of neuropil signal from fluorescence traces
