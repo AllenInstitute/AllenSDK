@@ -31,7 +31,7 @@ The Allen SDK focuses on the Allen Brain Observatory, Cell Types Database, and M
 Allen Brain Observatory
 -----------------------
 
-The `Allen Brain Observatory <http://activity.brain-map.org/visualcoding>`_ is a data resource for
+The `Allen Brain Observatory <http://observatory.brain-map.org/visualcoding>`_ is a data resource for
 understanding sensory processing in the mouse visual cortex.  This study systematically measures visual
 responses in multiple cortical areas and layers using two-photon calcium imaging of GCaMP6-labeled neurons 
 targeted using Cre driver lines.  Response characterizations include orientation tuning, spatial and temporal

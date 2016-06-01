@@ -1,7 +1,7 @@
 Brain Observatory
 =================
 
-The `Allen Brain Observatory <http://activity.brain-map.org/visualcoding>`_ is a database of the visually-evoked functional
+The `Allen Brain Observatory <http://observatory.brain-map.org/visualcoding>`_ is a database of the visually-evoked functional
 responses of neurons in mouse visual cortex based on 2-photon fluorescence imaging.  Characterized responses include orientation 
 tuning, spatial and temporal frequency tuning, temporal dynamics, and spatial receptive field structure. 
 
@@ -12,7 +12,7 @@ an experiment container have different stimulus protocols, but cover the same im
 .. image:: /_static/container_session_layout.png
    :align: center
 
-For more information on experimental design and a data overview, please visit the `Allen Brain Observatory data portal <http://activity.brain-map.org/visualcoding>`_.  
+For more information on experimental design and a data overview, please visit the `Allen Brain Observatory data portal <http://observatory.brain-map.org/visualcoding>`_.  
 
 
 Data Processing
@@ -48,7 +48,7 @@ started with the available data:
     - `Find the ROI mask for a given cell <_static/examples/nb/brain_observatory.html#ROI-Masks>`_    
     - `Run neuropil correction <_static/examples/nb/brain_observatory.html#Neuropil-Correction>`_
 
-The code used to analyze and visualize data in the `Allen Brain Observatory data portal <http://activity.brain-map.org/visualcoding>`_ 
+The code used to analyze and visualize data in the `Allen Brain Observatory data portal <http://observatory.brain-map.org/visualcoding>`_ 
 is available as part of the SDK.  Take a look at this `Jupyter notebook <_static/examples/nb/brain_observatory_analysis.html>`_ to find out how to:
 
     - `Plot cell's response to its preferred stimulus condition <_static/examples/nb/brain_observatory_analysis.html#Drifting-Gratings>`_    
