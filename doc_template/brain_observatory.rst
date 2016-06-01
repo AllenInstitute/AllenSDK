@@ -32,7 +32,7 @@ All traces and masks for segmented cells in an experiment are stored in a Neurod
 Stored traces include the raw fluoresence trace, neuropil trace, and dF/F trace.  Code for extracting neuropil-corrected
 fluorescence traces, computing dF/F, and computing tuning metrics is available in the SDK.  
 
-For more information about data processing, please `read the technical whitepapers <http://help.alleninstitute.org/display/observatory/Documentation>`_.
+For more information about data processing, please `read the technical whitepapers <http://help.brain-map.org/display/observatory/Documentation>`_.
 
 
 Getting Started
