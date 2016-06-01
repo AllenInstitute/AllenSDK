@@ -253,7 +253,7 @@ def plot_lsn_traces(lsn, save_dir):
         plt.close()          
 
 
-def plot_3sa(dg, nm1, nm3, save_dir):
+def _plot_3sa(dg, nm1, nm3, save_dir):
     logging.info("Plotting for all cell")
     for nc in range(dg.numbercells):
         if np.mod(nc,20)==0:
@@ -404,7 +404,7 @@ def plot_3sa(dg, nm1, nm3, save_dir):
         plt.savefig(fullfilename)   
         plt.close()      
 
-def plot_3sc(lsn, nm1, nm2, save_dir):
+def _plot_3sc(lsn, nm1, nm2, save_dir):
     logging.info("Plotting for all cells")
     for nc in range(lsn.numbercells):
         if np.mod(nc,20)==0:
@@ -544,7 +544,7 @@ def plot_3sc(lsn, nm1, nm2, save_dir):
         plt.savefig(fullfilename)   
         plt.close()
 
-def plot_3sb(sg, nm1, ns, save_dir):
+def _plot_3sb(sg, nm1, ns, save_dir):
     logging.info("Plotting for all cells")
     for nc in range(sg.numbercells):
         if np.mod(nc,20)==0:

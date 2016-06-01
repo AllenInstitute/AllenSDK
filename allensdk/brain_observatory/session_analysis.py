@@ -164,7 +164,7 @@ class SessionAnalysis(object):
             self.save_session_a(dg, nm1, nm3, peak)
 
         if plot_flag:
-            cp.plot_3sa(dg, nm1, nm3, self.save_dir)
+            cp._plot_3sa(dg, nm1, nm3, self.save_dir)
             cp.plot_drifting_grating_traces(dg, self.save_dir)
     
     
@@ -185,7 +185,7 @@ class SessionAnalysis(object):
             self.save_session_b(sg, nm1, ns, peak)    
 
         if plot_flag:
-            cp.plot_3sb(sg, nm1, ns, self.save_dir)
+            cp._plot_3sb(sg, nm1, ns, self.save_dir)
             cp.plot_ns_traces(ns, self.save_dir)
             cp.plot_sg_traces(sg, self.save_dir)
                     
@@ -204,7 +204,7 @@ class SessionAnalysis(object):
             self.save_session_c(lsn, nm1, nm2, peak)
 
         if plot_flag:
-            cp.plot_3sc(lsn, nm1, nm2, self.save_dir)
+            cp._plot_3sc(lsn, nm1, nm2, self.save_dir)
             cp.plot_lsn_traces(lsn, self.save_dir)
     
                     
