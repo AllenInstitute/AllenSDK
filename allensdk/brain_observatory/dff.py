@@ -6,7 +6,7 @@ import numpy as np
 
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 
-def movingmode_fast(x, kernelsize, y):
+def movingmode_fast(x, kernelsize, y, modemax=1000, minlength=4096):
     """ Compute the windowed mode of an array.
 
     Parameters
@@ -19,13 +19,17 @@ def movingmode_fast(x, kernelsize, y):
         Output array to store the results
     """
 
-    histo = np.zeros(4096)
+    # compute a histogram of a half kernel
     halfsize = kernelsize/2
-    for m in range (0,halfsize):
-        histo[int(round(x[m]))] += 1
+    histo = np.bincount(np.rint(x[:halfsize]).astype(np.uint32), minlength=minlength)
 
+    # assume mode counts are below a threshold (< 1000 by default)
+    maxval = len(histo)-1
+    modemax = min(modemax, maxval)
+
+    # find the mode of the first half kernel
     mode = 1
-    for n in range (2,1000):      #the range of possible mode value is < 1000
+    for n in range (2,modemax):      
         if histo[n] > histo[mode]:
             mode = n
         
@@ -41,7 +45,7 @@ def movingmode_fast(x, kernelsize, y):
         p = int(round(x[m-halfsize]))
         histo[p] -= 1
         if p == mode:    #need to find possibly new mode value
-            for n in range (2,1000):      #the range of possible mode value is < 1000
+            for n in range (2,modemax):      
                 if histo[n] > histo[mode]:
                     mode = n
 
@@ -56,7 +60,7 @@ def movingmode_fast(x, kernelsize, y):
         p = int(round(x[m-halfsize]))
         histo[p] -= 1
         if p == mode:    #need to find possibly new mode value
-            for n in range (2,1000):      #the range of possible mode value is < 1000
+            for n in range (2,modemax):      
                 if histo[n] > histo[mode]:
                     mode = n
 
