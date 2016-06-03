@@ -71,7 +71,41 @@ def least_squares_simple_circuit_with_smoothing_fit_RCEl(voltage_list, current_l
         El_list.append(El)
     return R, C, El
 
+def least_squares_simple_circuit_with_NOT_smoothing_fit_RCEl(voltage_list, current_list, dt, no_rest=False):
+    '''Calculate resistance, capacitance and resting potential by performing 
+    least squares on a smoothed current and voltage.
+    inputs:
+        voltage_list: list of voltage responses for several sweep repeats
+        current_list: list of current injections for several sweep repeats
+        dt: time step size
+    outputs:
+        list of capacitance, resistance and resting potential values for each sweep
+    '''
+    r_list=[]
+    c_list=[]
+    El_list=[]
+    for voltage, current in zip(voltage_list, current_list):
+        i = current[0:len(voltage)-1]
+        v = voltage[0:len(voltage)-1]
+        vs = voltage[1:len(voltage)]   
+        dvdt = (vs-v)/dt
+        
+        matrix=np.ones((len(v), 3))
+        matrix[:,0]=v
+        matrix[:,1]=i
+        
+        lsq_der_sm=np.linalg.lstsq(matrix, dvdt)[0] 
+        C=1/lsq_der_sm[1]
+        R=-1/(C*lsq_der_sm[0])
+        El=C*R*lsq_der_sm[2]
+        
+        r_list.append(R)
+        c_list.append(C)
+        El_list.append(El)
+    return R, C, El
+
 def least_squares_simple_circuit_fit_RCEl(voltage_list, current_list, dt, no_rest=False):
+#NOTE THIS IS THE VERSION THAT IS CURRENTLY IN THE PIPELINE
     '''Calculate resistance, capacitance and resting potential by performing 
     least squares on current and voltage.
     inputs:
