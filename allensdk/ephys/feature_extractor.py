@@ -20,6 +20,12 @@ import numpy as np
 import scipy.signal as signal 
 import logging
 
+# Design notes:
+# to generate an average feature file, all sweeps must have all features
+# to generate a fitness score of a sweep to a feature file,, the sweep 
+#   must have all features in the file. If one is absent, a penalty 
+#   of TODO ??? will be assessed
+
 # set of features
 class EphysFeatures( object ):
     def __init__(self, name):
@@ -268,6 +274,7 @@ class EphysFeatureExtractor( object ):
                 elif recording_width and v[i] < width_volts:
                     spk["half_height_width"] = t[i] - t[idx0]
                     break
+            # </KEITH>
 
             # Check for things that are probably not spikes:
             # if there is more than 2 ms between the detection event and the peak, don't count it

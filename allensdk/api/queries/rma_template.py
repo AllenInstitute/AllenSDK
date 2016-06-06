@@ -51,12 +51,15 @@ class RmaTemplate(RmaApi):
             if 'criteria_params' in template:
                 criteria_params = { key: self.to_filter_rhs(kwargs.get(key))
                                     for key in template['criteria_params']
-                                    if key in kwargs and kwargs.get(key) != None }
+                                    if key in kwargs and kwargs.get(key) is not None }
             else:
                 criteria_params = {}
-            
-            query_args['criteria'] = \
-                str(criteria_template.render(**criteria_params))
+       
+            criteria_str = str(criteria_template.render(**criteria_params))
+            if criteria_str:
+                query_args['criteria'] = criteria_str
+                
+
         
         if 'include' in template:
             include_template = Template(template['include'])
@@ -64,12 +67,14 @@ class RmaTemplate(RmaApi):
             if 'include_params' in template:
                 include_params = { key: self.to_filter_rhs(kwargs.get(key))
                                    for key in template['include_params']
-                                   if key in kwargs and kwargs.get(key) != None}
+                                   if key in kwargs and kwargs.get(key) is not None}
             else:
                 include_params = {}
             
-            query_args['include'] = \
-                str(include_template.render(**include_params))
+            include_str = str(include_template.render(**include_params))
+            if include_str:
+                query_args['include'] = include_str
+                
         
         if 'only' in kwargs:
             if kwargs.get('only') != None:
@@ -102,8 +107,8 @@ class RmaTemplate(RmaApi):
             query_args['order'] = kwargs.get('order')
         elif 'order' in template:
             query_args['order'] = template['order']
-        
+
         data = self.model_query(**query_args)
-        
+
         return data
 

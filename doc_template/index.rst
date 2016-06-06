@@ -22,11 +22,34 @@ Welcome to the Allen SDK
    
 
 The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.  
-The Allen SDK focuses the Allen Cell Types Database and the Allen Mouse Brain Connectivity Atlas.  
-Functionality relevant to other atlases is coming in future releases.  
+The Allen SDK focuses on the Allen Brain Observatory, Cell Types Database, and Mouse Brain Connectivity Atlas.
+
+.. image:: /_static/sdk_cam.png
+   :align: right
+
+
+Allen Brain Observatory
+-----------------------
+
+The `Allen Brain Observatory <http://observatory.brain-map.org/visualcoding>`_ is a data resource for
+understanding sensory processing in the mouse visual cortex.  This study systematically measures visual
+responses in multiple cortical areas and layers using two-photon calcium imaging of GCaMP6-labeled neurons 
+targeted using Cre driver lines.  Response characterizations include orientation tuning, spatial and temporal
+frequency tuning, temporal dynamics, and spatial receptive field structure.
+ 
+The mean fluorescence traces for all segmented cells are available in the Neurodata Without Borders file format 
+(`NWB files <brain_observatory_nwb.html>`_).  These files contain standardized descriptions of visual stimuli to support stimulus-specific tuning analysis.  The Allen SDK provides code to:
+
+   * download and organize experiment data according to cortical area, imaging depth, and Cre line
+   * remove the contribution of neuropil signal from fluorescence traces
+   * access (or compute) dF/F traces based on the neuropil-corrected traces
+   * perform stimulus-specific tuning analysis (e.g. drifting grating direction tuning)
+
+....
 
 .. image:: /_static/ccf_v3_sdk.png
    :align: right
+
 
 
 Allen Cell Types Database
@@ -63,14 +86,13 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.11.0
----------------------------
+What's New - Release 0.12.0 (June 9, 2016)
+------------------------------------------
 
-The 0.11.0 release addressed several issues raised on our Github issue tracker.  Other changes and updates include:
+The 0.12.0 release debuts functionality related to the Allen Brain Observatory.  Changes include:
 
-    * Cell Types Database cells can now be filtered on their reporter status (cre+ or cre-).
-    * Cell Types Database reconstructions have markers indicating truncation and tracing termination.
-    * The Morphology class has a number of new methods for tree manipulation, and slightly different internal data structure for compartments.
-    * The GLIF simulator has more standard function names for dynamics and reset rules.
+    * BrainObservatoryCache and BrainObservatoryApi data/file manipulation classes
+    * Code for neurpil subtraction, dF/F estimation, and tuning analysis.
+    * New ephys feature extractor: ephys_features.py, ephys_extractor.py.  The old one is still there (feature_extractor.py) but should be considered deprecated.
 
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

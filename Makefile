@@ -15,7 +15,7 @@ DOC_URL=http://alleninstitute.github.io/AllenSDK
 build:
 	mkdir -p $(DISTDIR)/$(PROJECTNAME) 
 	cp -r allensdk setup.py README.md $(DISTDIR)/$(PROJECTNAME)/
-	cd $(DISTDIR); tar czvf $(PROJECTNAME).tgz $(PROJECTNAME)
+	cd $(DISTDIR); tar czvf $(PROJECTNAME).tgz --exclude .git $(PROJECTNAME)
 	
 
 distutils_build: clean
@@ -32,7 +32,10 @@ pypi_register:
 
 pypi_deploy:
 	python setup.py sdist upload --repository https://testpypi.python.org/pypi
-	
+
+
+pytest:
+	rm -rf test-reports && mkdir test-reports && find . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --pep8 --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 EXAMPLES=doc/_static/examples
 

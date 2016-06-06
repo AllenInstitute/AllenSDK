@@ -209,9 +209,11 @@ class AllActiveUtils(Utils):
         self.h("objref this")
         imprt.instantiate(self.h.this)
 
+        for sec in self.h.allsec():
+            sec.nseg = 1 + 2 * int(sec.L / 40.0)
+
         self.h("soma[0] area(0.5)")
         axon_diams = [self.h.axon[0].diam, self.h.axon[0].diam]
-
         self.h.distance(sec=self.h.soma[0])
         for sec in self.h.allsec():
             if sec.name()[:4] == "axon":
