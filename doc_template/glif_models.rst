@@ -20,7 +20,7 @@ during the simulation. The GLIF package contains a built-in set of rules,
 however developers can plug in custom rule implementations provided they
 follow a simple argument specification scheme.
 
-The Allen SDK GLIF simulator was developed and tested with Python 2.7.8, installed
+The Allen SDK GLIF simulator was developed and tested with Python 2.7.9, installed
 as part of `Anaconda Python <https://store.continuum.io/cshop/anaconda/>`_ distribution 
 version `2.1.0 <http://repo.continuum.io/archive/index.html>`_. 
 

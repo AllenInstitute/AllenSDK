@@ -191,7 +191,7 @@ div#notebook {
 <span class="c"># tells it where to store the manifest, which is a JSON file that tracks</span>
 <span class="c"># file paths.  If you supply a relative path (like this), it will go</span>
 <span class="c"># into your current working directory</span>
-<span class="n">ctc</span> <span class="o">=</span> <span class="n">CellTypesCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;cell_types/cell_types_manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="s">&#39;http://testwarehouse:9000&#39;</span><span class="p">)</span>
+<span class="n">ctc</span> <span class="o">=</span> <span class="n">CellTypesCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;cell_types/cell_types_manifest.json&#39;</span><span class="p">)</span>
 
 <span class="c"># this saves the NWB file to &#39;cell_types/specimen_464212183/ephys.nwb&#39;</span>
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_ephys_data</span><span class="p">(</span><span class="mi">464212183</span><span class="p">)</span>
