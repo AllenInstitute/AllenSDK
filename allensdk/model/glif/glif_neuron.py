@@ -22,58 +22,41 @@ class GlifNeuron( object ):
 
     Parameters
     ----------
-    El : float 
-        resting potential 
-
-    dt : float
-        duration between time steps
-
-    asc_tau_array: np.ndarray
-        TODO
-
-    R_input : float
-        input resistance
-
-    C : float
-        capacitance
-
-    asc_amp_arrap : np.ndarray
-        afterspike current vector.  one element per element of asc_tau_array.
-
-    spike_cut_length : int
-        how many time steps to replace with NaNs when a spike occurs.
-
-    th_inf : float
-        instantaneous threshold
-
-    coeffs : dict
+     El : float 
+         resting potential 
+     dt : float
+         duration between time steps
+     asc_tau_array: np.ndarray
+         TODO
+     R_input : float
+         input resistance
+     C : float
+         capacitance
+     asc_amp_arrap : np.ndarray
+         afterspike current vector.  one element per element of asc_tau_array.
+     spike_cut_length : int
+         how many time steps to replace with NaNs when a spike occurs.
+     th_inf : float
+         instantaneous threshold
+     coeffs : dict
         dictionary coefficients premultiplied to neuron properties during simulation. used for optimization.
-
-    AScurrent_dynamics_method : dict
-        dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
-
-    voltage_dynamics_method : dict
-        dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
-
-    threshold_dynamics_method : dict
-        dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
-
-    AScurrent_reset_method : dict
-        dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
-
-    voltage_reset_method : dict
-        dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
-
-    threshold_reset_method : dict
-        dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
-
-    init_voltage : float 
+     AScurrent_dynamics_method : dict
+         dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     voltage_dynamics_method : dict
+         dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     threshold_dynamics_method : dict
+         dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     AScurrent_reset_method : dict
+         dictionary containing the 'name' of the afterspike current dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     voltage_reset_method : dict
+         dictionary containing the 'name' of the voltage dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     threshold_reset_method : dict
+         dictionary containing the 'name' of the threshold dynamics method to use and a 'params' dictionary parameters to pass to that function.
+     init_voltage : float 
         initial voltage value
-
-    init_threshold : float
-        initial spike threshold value
-
-    init_AScurrents : np.ndarray
+     init_threshold : float
+         initial spike threshold value
+     init_AScurrents : np.ndarray
         initial afterspike current vector. one element per element of asc_tau_array.
     """
 
@@ -143,8 +126,7 @@ class GlifNeuron( object ):
 
     @property
     def tau_m(self):
-        """ Compute the product of the neuron's input resistance and capacitance."""
-        return self.R_input * self.C
+        return self.R_input*self.C
 
     @classmethod
     def from_dict(cls, d):

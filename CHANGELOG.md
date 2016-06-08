@@ -1,5 +1,13 @@
 # Change Log
-All notable changes to this projection will be documented in this file.
+All notable changes to this project will be documented in this file.
+
+## [0.12.0] - 2016-6-9
+
+### Added
+
+- Support for the Allen Brain Observatory data (BrainObservatoryCache and BrainObservatoryApi classes).
+- Code for neurpil subtraction, dF/F estimation, and tuning analysis.
+- New ephys feature extractor (ephys_features.py, ephys_extractor.py).  The old one is still there (feature_extractor.py) but should be considered deprecated.
 
 ## [0.11.0] - 2016-3-3
 

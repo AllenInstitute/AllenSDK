@@ -51,7 +51,7 @@ def read_url_get(url):
     Parameters
     ----------
     url : string
-        where to get the json.
+    	where to get the json.
     
     Returns
     -------

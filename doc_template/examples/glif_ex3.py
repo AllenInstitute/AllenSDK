@@ -9,5 +9,6 @@ ephys_file_name = 'stimulus.nwb'
 
 neuron = GlifNeuron.from_dict(neuron_config)
 
-sweep_numbers = [ s['sweep_number'] for s in ephys_sweeps ]
+sweep_numbers = [ s['sweep_number'] for s in ephys_sweeps 
+                  if s['stimulus_units'] == 'Amps' ]
 simulate_neuron(neuron, sweep_numbers, ephys_file_name, ephys_file_name, 0.05)

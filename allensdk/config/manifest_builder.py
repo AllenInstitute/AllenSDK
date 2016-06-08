@@ -15,15 +15,16 @@
 
 import allensdk.core.json_utilities as ju
 import logging
-
+from allensdk.config.manifest import Manifest
+import pandas as pd
 
 class ManifestBuilder(object):
+    df_columns = ['key','parent_key','spec','type','format']
+
     def __init__(self):
         self._log = logging.getLogger(__name__)
         self.path_info = []
-        self.bps_cfg = {}
-        self.stimulus_conf = {}
-        self.hoc_conf = {}
+        self.sections = {}
     
     
     def add_path(self, key, spec,
@@ -44,20 +45,45 @@ class ManifestBuilder(object):
         self.path_info.append(entry)
     
     
-    def write_json_file(self, path):
+    def add_section(self, name, contents):
+        self.sections[name] = contents
+    
+    
+    def write_json_file(self, path, overwrite=False):
+        mode = 'wb'
+        
+        if overwrite == True:
+            mode = 'wb+'
+        
         with open(path, 'wb') as f:
             f.write(self.write_json_string())
     
     
     def get_config(self):
         wrapper = { "manifest": self.path_info }
-        wrapper.update(self.bps_cfg)
-        wrapper.update(self.stimulus_conf)
-        wrapper.update(self.hoc_conf)
+        for section in self.sections.values():
+            wrapper.update(section)
         
         return wrapper
+    
+    
+    def get_manifest(self):
+        return Manifest(self.path_info)
 
     
     def write_json_string(self):
         config = self.get_config()
         return ju.write_string(config)
+
+    
+    def as_dataframe(self):
+        return pd.DataFrame(self.path_info,
+                            columns=ManifestBuilder.df_columns)
+    
+    def from_dataframe(self, df):
+        self.path_info = {}
+        
+        for _,k,p,s,t,f in df.loc[:,ManifestBuilder.df_columns].iteritems():
+            self.add_path(k, s, typename=t, parent=p, format=f)
+            
+            
