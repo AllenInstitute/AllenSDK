@@ -373,6 +373,17 @@ class GlifNeuron( object ):
                     voltage_out[time_step:time_step+n] = np.nan
                     threshold_out[time_step:time_step+n] = np.nan
                     AScurrents_out[time_step:time_step+n,:] = np.nan
+                    #Since reset is already done should paste the nans in before the last value
+                    if self.threshold_components['voltage'] is not None:
+                        lastvalue=self.threshold_components['voltage'][-1]  
+                        del self.threshold_components['voltage'][-1] # delete last value                    
+                        [self.threshold_components['voltage'].append(float('nan')) for filler in range(self.spike_cut_length-1)]
+                        self.threshold_components['voltage'].append(lastvalue)
+                    if self.threshold_components['spike'] is not None:
+                        lastvalue=self.threshold_components['spike'][-1]  
+                        del self.threshold_components['spike'][-1] # delete last value                    
+                        [self.threshold_components['spike'].append(float('nan')) for filler in range(self.spike_cut_length-1)]
+                        self.threshold_components['spike'].append(lastvalue)
 
                     time_step += self.spike_cut_length
                 else:

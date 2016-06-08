@@ -607,6 +607,9 @@ def reset_threshold_three_components(neuron, threshold_t0, voltage_v1, a_spike):
     component and a (voltage) component which are summed. 
     '''
     tcs = neuron.get_threshold_components()
+    #if this trace is to be aligned with the voltage traces the last value has to be removed (it is the indicie in the step following a spike) because it is not recorded in the voltage
+    del tcs['spike'][-1]
+    del tcs['voltage'][-1]
     neuron.add_threshold_components( tcs['spike'][-1] + a_spike,  #adding spiking component of threshold ontop of already existent spike component.
                                      tcs['voltage'][-1] ) #note these are the same value.
     
