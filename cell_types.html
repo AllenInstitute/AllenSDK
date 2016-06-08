@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Cell Types &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>Cell Types &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,10 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
     <link rel="up" title="Data Resources" href="data_resources.html" />
     <link rel="next" title="Mouse Connectivity" href="connectivity.html" />
-    <link rel="prev" title="Data Resources" href="data_resources.html" /> 
+    <link rel="prev" title="Brain Observatory" href="brain_observatory.html" /> 
   </head>
   <body>
 <script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
@@ -711,6 +711,7 @@ be used to extract the precise feature values available in the Cell Types Databa
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.cell_types_api</span> <span class="kn">import</span> <span class="n">CellTypesApi</span>
 <span class="kn">from</span> <span class="nn">allensdk.ephys.extract_cell_features</span> <span class="kn">import</span> <span class="n">extract_cell_features</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> <span class="n">NwbDataSet</span>
 
 <span class="c"># pick a cell to analyze</span>
 <span class="n">specimen_id</span> <span class="o">=</span> <span class="mi">324257146</span>
@@ -727,10 +728,10 @@ be used to extract the precise feature values available in the Cell Types Databa
     <span class="n">sweep_numbers</span><span class="p">[</span><span class="n">sweep</span><span class="p">[</span><span class="s">&#39;stimulus_name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sweep</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">])</span>
 
 <span class="c"># calculate features</span>
-<span class="n">cell_features</span> <span class="o">=</span> <span class="n">extract_cell_features</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span>
-                                      <span class="n">sweep_numbers</span><span class="p">[</span><span class="s">&#39;Long Square&#39;</span><span class="p">],</span>
+<span class="n">cell_features</span> <span class="o">=</span> <span class="n">extract_cell_features</span><span class="p">(</span><span class="n">NwbDataSet</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">),</span>
+                                      <span class="n">sweep_numbers</span><span class="p">[</span><span class="s">&#39;Ramp&#39;</span><span class="p">],</span>
                                       <span class="n">sweep_numbers</span><span class="p">[</span><span class="s">&#39;Short Square&#39;</span><span class="p">],</span>
-                                      <span class="n">sweep_numbers</span><span class="p">[</span><span class="s">&#39;Ramp&#39;</span><span class="p">])</span>
+                                      <span class="n">sweep_numbers</span><span class="p">[</span><span class="s">&#39;Long Square&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -899,6 +900,7 @@ and estimated spike times:</p>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="data_resources.html">Data Resources</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -912,11 +914,12 @@ and estimated spike times:</p>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

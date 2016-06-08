@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.test package &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>allensdk.test package &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,10 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.test.api package" href="allensdk.test.api.html" />
-    <link rel="prev" title="allensdk.model.glif package" href="allensdk.model.glif.html" /> 
+    <link rel="prev" title="allensdk.morphology package" href="allensdk.morphology.html" /> 
   </head>
   <body>
 <script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
@@ -649,6 +649,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.ontologies_api_tests">allensdk.test.api.ontologies_api_tests module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.rma_template_tests">allensdk.test.api.rma_template_tests module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.synchronization_api_tests">allensdk.test.api.synchronization_api_tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.test_annotated_section_data_set_api">allensdk.test.api.test_annotated_section_data_set_api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.test_api">allensdk.test.api.test_api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.test_brain_observatory_api">allensdk.test.api.test_brain_observatory_api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.test_cache">allensdk.test.api.test_cache module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.test_grid_data_api">allensdk.test.api.test_grid_data_api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.test_image_download_api">allensdk.test.api.test_image_download_api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.test_ontologies_api">allensdk.test.api.test_ontologies_api module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.test_rma_template">allensdk.test.api.test_rma_template module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api.test_synchronization_api">allensdk.test.api.test_synchronization_api module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.test.api.html#module-allensdk.test.api">Module contents</a></li>
 </ul>
 </li>
@@ -888,6 +897,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -901,10 +911,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="">allensdk.test package</a></li>
 </ul>
 </li>

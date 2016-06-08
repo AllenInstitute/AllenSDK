@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>Welcome to the Allen SDK &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="#" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="#" />
     <link rel="next" title="Install Guide" href="install.html" /> 
   </head>
   <body>
@@ -635,9 +635,28 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="toctree-wrapper compound">
 </div>
 <p>The Allen Software Development Kit houses source code for reading and processing Allen Brain Atlas data.
-The Allen SDK focuses the Allen Cell Types Database and the Allen Mouse Brain Connectivity Atlas.
-Functionality relevant to other atlases is coming in future releases.</p>
+The Allen SDK focuses on the Allen Brain Observatory, Cell Types Database, and Mouse Brain Connectivity Atlas.</p>
+<img alt="_images/sdk_cam.png" class="align-right" src="_images/sdk_cam.png" />
+<div class="section" id="allen-brain-observatory">
+<h2>Allen Brain Observatory<a class="headerlink" href="#allen-brain-observatory" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference external" href="http://observatory.brain-map.org/visualcoding">Allen Brain Observatory</a> is a data resource for
+understanding sensory processing in the mouse visual cortex.  This study systematically measures visual
+responses in multiple cortical areas and layers using two-photon calcium imaging of GCaMP6-labeled neurons
+targeted using Cre driver lines.  Response characterizations include orientation tuning, spatial and temporal
+frequency tuning, temporal dynamics, and spatial receptive field structure.</p>
+<p>The mean fluorescence traces for all segmented cells are available in the Neurodata Without Borders file format
+(<a class="reference external" href="brain_observatory_nwb.html">NWB files</a>).  These files contain standardized descriptions of visual stimuli to support stimulus-specific tuning analysis.  The Allen SDK provides code to:</p>
+<blockquote>
+<div><ul class="simple">
+<li>download and organize experiment data according to cortical area, imaging depth, and Cre line</li>
+<li>remove the contribution of neuropil signal from fluorescence traces</li>
+<li>access (or compute) dF/F traces based on the neuropil-corrected traces</li>
+<li>perform stimulus-specific tuning analysis (e.g. drifting grating direction tuning)</li>
+</ul>
+</div></blockquote>
+<hr class="docutils" />
 <img alt="_images/ccf_v3_sdk.png" class="align-right" src="_images/ccf_v3_sdk.png" />
+</div>
 <div class="section" id="allen-cell-types-database">
 <h2>Allen Cell Types Database<a class="headerlink" href="#allen-cell-types-database" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference external" href="http://celltypes.brain-map.org">Allen Cell Types Database</a> contains electrophysiological and morphological characterizations
@@ -665,15 +684,14 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 <p>The Allen SDK provides Python code for accessing experimental metadata along with projection signal volumes registered to a common coordinate framework.  This framework has structural annotations, which allows users to compute structure-level signal statistics.</p>
 <p>See the <a class="reference external" href="connectivity.html">mouse connectivity section</a> for more details.</p>
 </div>
-<div class="section" id="what-s-new-release-0-11-0">
-<h2>What&#8217;s New - Release 0.11.0<a class="headerlink" href="#what-s-new-release-0-11-0" title="Permalink to this headline">¶</a></h2>
-<p>The 0.11.0 release addressed several issues raised on our Github issue tracker.  Other changes and updates include:</p>
+<div class="section" id="what-s-new-release-0-12-0-june-9-2016">
+<h2>What&#8217;s New - Release 0.12.0 (June 9, 2016)<a class="headerlink" href="#what-s-new-release-0-12-0-june-9-2016" title="Permalink to this headline">¶</a></h2>
+<p>The 0.12.0 release debuts functionality related to the Allen Brain Observatory.  Changes include:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Cell Types Database cells can now be filtered on their reporter status (cre+ or cre-).</li>
-<li>Cell Types Database reconstructions have markers indicating truncation and tracing termination.</li>
-<li>The Morphology class has a number of new methods for tree manipulation, and slightly different internal data structure for compartments.</li>
-<li>The GLIF simulator has more standard function names for dynamics and reset rules.</li>
+<li>BrainObservatoryCache and BrainObservatoryApi data/file manipulation classes</li>
+<li>Code for neurpil subtraction, dF/F estimation, and tuning analysis.</li>
+<li>New ephys feature extractor: ephys_features.py, ephys_extractor.py.  The old one is still there (feature_extractor.py) but should be considered deprecated.</li>
 </ul>
 </div></blockquote>
 <p>To find out more, take a look at our <a class="reference external" href="http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md">CHANGELOG</a>.</p>
@@ -692,6 +710,7 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -705,11 +724,12 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.model.glif.glif_neuron_methods &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>allensdk.model.glif.glif_neuron_methods &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -639,6 +639,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">numpy.distutils.npy_pkg_config</span> <span class="kn">import</span> <span class="n">VariableSet</span>
 
+<span class="c">#fast_threshold=[]</span>
+<span class="c">#slow_threshold=[]</span>
+
 <div class="viewcode-block" id="GlifNeuronMethod"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod">[docs]</a><span class="k">class</span> <span class="nc">GlifNeuronMethod</span><span class="p">(</span> <span class="nb">object</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A simple class to keep track of the name and parameters associated with a neuron method.</span>
 <span class="sd">    This class is initialized with a name, function, and parameters to pass to the function.  The</span>
@@ -718,6 +721,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">two</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="n">d</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">one</span><span class="p">,</span><span class="n">two</span><span class="p">)</span>
 
+<span class="c">#commenting this out to make sure it doest get called and I forgot to switch is somewhere</span>
+<span class="c">#def min_of_line_and_const(x,b,c,d):</span>
+<span class="c">#    #TODO: move to other library</span>
+<span class="c">#    &quot;&quot;&quot; Find the minimum of a value and a position on a line </span>
+<span class="c">#</span>
+<span class="c">#    Parameters</span>
+<span class="c">#    ----------</span>
+<span class="c">#    x: float</span>
+<span class="c">#        x position on line 1</span>
+<span class="c">#    c: float</span>
+<span class="c">#        slope of line 1</span>
+<span class="c">#    d: float</span>
+<span class="c">#        y-intercept of line 1</span>
+<span class="c">#    b: float</span>
+<span class="c">#        y-intercept of line 2</span>
+<span class="c">#</span>
+<span class="c">#    Returns</span>
+<span class="c">#    -------</span>
+<span class="c">#    float</span>
+<span class="c">#        the max of a line value and a constant</span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#</span>
+<span class="c">#    one = b</span>
+<span class="c">#    two = c*x+d</span>
+<span class="c">#    return np.minimum(one,two)</span>
 </div>
 <div class="viewcode-block" id="min_of_line_and_zero"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.min_of_line_and_zero">[docs]</a><span class="k">def</span> <span class="nf">min_of_line_and_zero</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">):</span>
     <span class="c">#TODO: move to other library</span>
@@ -750,6 +778,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    a time step later.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<span class="c">#     print &#39;HERE: dynamics_threshold_inf&#39;</span>
+<span class="c">#    return AScurrents_t0*(1.0 - neuron.k*neuron.dt)</span>
     <span class="k">return</span> <span class="n">AScurrents_t0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">k</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
         
 </div>
@@ -857,9 +887,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    El_tlparam3 : float</span>
 <span class="sd">        TOOD</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    <span class="c">#confirm this is being implimented correctly.</span>
     <span class="n">G</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_of_line_and_const</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">))</span>
-
+<span class="c">#    El = min_of_line_and_const(voltage_t0, El_tlparam1, El_tlparam2, El_t1param3) #this is for when El wasnt forced to zero</span>
     <span class="n">El</span> <span class="o">=</span> <span class="n">min_of_line_and_zero</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">El_slope_param</span><span class="p">,</span> <span class="n">El_intercept_param</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;G&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span> <span class="o">-</span> <span class="n">El</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
@@ -878,8 +908,89 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    AScurrents_t0 : not used here </span>
 <span class="sd">    inj : not used here</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+<span class="c">#     print &#39;HERE: dynamics_threshold_adapt_standard&#39;</span>
     <span class="k">return</span> <span class="n">threshold_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">)</span> <span class="o">-</span> 
                            <span class="n">b</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">threshold_t0</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> 
+
+<span class="c">#TODO: depricate when sure that dynamics_threshold_three_sep_components will be the official function</span>
+<span class="c">#def dynamics_threshold_adapt_slow_plus_fast(neuron, threshold_t0, voltage_t0):        </span>
+<span class="c">#    &quot;&quot;&quot;The threshold will adapt via two mechanisms: 1. a slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard. </span>
+<span class="c">#    These are the components which are fit via optimization and inditial conditions are supplied via the GLM. 2. A fast component initiated </span>
+<span class="c">#    by a spike which quickly decays.  These values are estimated via the multi short square stimuli. </span>
+<span class="c">#    &quot;&quot;&quot;</span>
+<span class="c">#    </span>
+<span class="c">#    md = neuron.update_method_data</span>
+<span class="c">#</span>
+<span class="c">#    # initial conditions</span>
+<span class="c">#    if &#39;th_spike&#39; not in md:</span>
+<span class="c">#        md[&#39;th_spike&#39;] = [ 0 ]</span>
+<span class="c">#    if &#39;th_voltage&#39; not in md:</span>
+<span class="c">#        md[&#39;th_voltage&#39;] = [ neuron.th_inf * neuron.coeffs[&#39;th_inf&#39;] ]</span>
+<span class="c">#</span>
+<span class="c">#    th_spike = md[&#39;th_spike&#39;][-1]</span>
+<span class="c">#    th_voltage = md[&#39;th_voltage&#39;][-1] </span>
+<span class="c">#</span>
+<span class="c">##     print &#39;a_spike&#39;, md[&#39;a_spike&#39;]</span>
+<span class="c">##     print &#39;b_spike&#39;, md[&#39;b_spike&#39;]</span>
+<span class="c">##     print &#39;a_voltage&#39;, md[&#39;a_voltage&#39;]</span>
+<span class="c">##     print &#39;b_voltage&#39;, md[&#39;b_voltage&#39;]</span>
+<span class="c">#</span>
+<span class="c">#    voltage_component = th_voltage + ( md[&#39;a_voltage&#39;] * neuron.coeffs[&#39;a&#39;] * ( voltage_t0 - neuron.El ) - </span>
+<span class="c">#                                       md[&#39;b_voltage&#39;] * neuron.coeffs[&#39;b&#39;] * ( th_voltage - neuron.coeffs[&#39;th_inf&#39;] * neuron.th_inf ) ) * neuron.dt</span>
+<span class="c">#    spike_component = th_spike - md[&#39;b_spike&#39;] * th_spike * neuron.dt</span>
+<span class="c">#</span>
+<span class="c">#    </span>
+<span class="c">#    #------hack to plot slow and fast component</span>
+<span class="c">##    global fast_threshold</span>
+<span class="c">##    global slow_threshold</span>
+<span class="c">##    fast_threshold.append(spike_component)</span>
+<span class="c">##    slow_threshold.append(voltage_component)</span>
+<span class="c">#    </span>
+<span class="c">#    #------update the voltage and spiking values of the the</span>
+<span class="c">#    md[&#39;th_spike&#39;].append(spike_component)</span>
+<span class="c">#    md[&#39;th_voltage&#39;].append(voltage_component)</span>
+<span class="c">#    </span>
+<span class="c">#    return voltage_component+spike_component</span>
+
+<span class="c">#TODO: deprecate when confirm the forward and exact equations are doing the right thing.</span>
+<span class="c"># def dynamics_threshold_three_sep_components_hybrid(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj):        </span>
+<span class="c">#     &quot;&quot;&quot;This is the sequel to the dynamics_threshold_adapt_slow_plus_fast module. Here as in </span>
+<span class="c">#     dynamics_threshold_adapt_slow_plus_fast. The threshold will adapt via two mechanisms: 1. a </span>
+<span class="c">#     slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard. and 2. a </span>
+<span class="c">#     fast component initiated by a spike which quickly decays.  These two component are </span>
+<span class="c">#     in reference to zero and are recorded in the md parameters.  The third component refers to </span>
+<span class="c">#     th_inf which is added on in the end as opposed to being encompassed in the voltage component </span>
+<span class="c">#     of the threshold which caused a problem in optimizing th_inf.</span>
+<span class="c">#     AScurrents_t0 : not used here </span>
+<span class="c">#     inj : not used here</span>
+<span class="c">#     &quot;&quot;&quot;</span>
+<span class="c">#     md = neuron.update_method_data</span>
+<span class="c"># </span>
+<span class="c">#     # initial conditions</span>
+<span class="c">#     if &#39;th_spike&#39; not in md:</span>
+<span class="c">#         md[&#39;th_spike&#39;] = [ 0 ]</span>
+<span class="c">#         logging.warning(&#39;delete this function it is a hybrid&#39;)</span>
+<span class="c">#     if &#39;th_voltage&#39; not in md:</span>
+<span class="c">#         md[&#39;th_voltage&#39;] = [ 0 ]</span>
+<span class="c"># </span>
+<span class="c">#     th_spike = md[&#39;th_spike&#39;][-1]</span>
+<span class="c">#     th_voltage = md[&#39;th_voltage&#39;][-1] </span>
+<span class="c"># </span>
+<span class="c">#     #why are this variables being saved in an md variable?</span>
+<span class="c">#     #TODO: HOW CAN NEURON.COEFFS[&#39;A&#39;] BE MULTIPLIED AFTERWARD SINCE IT IS ALSO MULTIPLYING THE </span>
+<span class="c">#     #VOLTAGE COMPONENT.</span>
+<span class="c">#     voltage_component = th_voltage + ( md[&#39;a_voltage&#39;] *  ( voltage_t0 - neuron.El ) - </span>
+<span class="c">#                                        md[&#39;b_voltage&#39;] * neuron.coeffs[&#39;b&#39;] * ( th_voltage ) ) * neuron.dt</span>
+<span class="c">#     </span>
+<span class="c">#     #spike_component = th_spike - md[&#39;b_spike&#39;] * th_spike * neuron.dt</span>
+<span class="c">#     spike_component = th_spike*np.exp(-md[&#39;b_spike&#39;] * neuron.dt)</span>
+<span class="c"># </span>
+<span class="c">#     #------update the voltage and spiking values of the the</span>
+<span class="c">#     md[&#39;th_spike&#39;].append(spike_component)</span>
+<span class="c">#     md[&#39;th_voltage&#39;].append(voltage_component)</span>
+<span class="c">#     </span>
+<span class="c">#     #TODO: I dont trust the a_coeff being multiplied by the whole function</span>
+<span class="c">#     return neuron.coeffs[&#39;a&#39;]*voltage_component+spike_component+neuron.th_inf * neuron.coeffs[&#39;th_inf&#39;]    </span>
 </div>
 <div class="viewcode-block" id="spike_component_of_threshold_forward_euler"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.spike_component_of_threshold_forward_euler">[docs]</a><span class="k">def</span> <span class="nf">spike_component_of_threshold_forward_euler</span><span class="p">(</span><span class="n">th_t0</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Spike component of threshold modeled as an exponential decay. Implemented </span>
@@ -1216,8 +1327,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 
 <span class="c">#: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. &#39;voltage_dynamics_method&#39;).  </span>
-<span class="c">#: Those groups assign each method in this file a string name.  This is used by the GlifNeuron when initializing </span>
-<span class="c">#: its dynamics and reset methods.</span></div>
+<span class="c">#Those groups assign each method in this file a string name.  This is used by the GlifNeuron when initializing </span>
+<span class="c">#its dynamics and reset methods.</span></div>
 <span class="n">METHOD_LIBRARY</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s">&#39;AScurrent_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span> 
         <span class="s">&#39;exp&#39;</span><span class="p">:</span>    <span class="n">dynamics_AScurrent_exp</span><span class="p">,</span>
@@ -1268,6 +1379,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
@@ -1281,11 +1393,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

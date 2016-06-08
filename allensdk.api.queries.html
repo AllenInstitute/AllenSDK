@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries package &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>allensdk.api.queries package &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,9 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
     <link rel="up" title="allensdk.api package" href="allensdk.api.html" />
-    <link rel="next" title="allensdk.config package" href="allensdk.config.html" />
+    <link rel="next" title="allensdk.brain_observatory package" href="allensdk.brain_observatory.html" />
     <link rel="prev" title="allensdk.api package" href="allensdk.api.html" /> 
   </head>
   <body>
@@ -927,40 +927,222 @@ containing nested sample,microarray_slides,well_known_files.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-allensdk.api.queries.biophysical_perisomatic_api">
-<span id="allensdk-api-queries-biophysical-perisomatic-api-module"></span><h2>allensdk.api.queries.biophysical_perisomatic_api module<a class="headerlink" href="#module-allensdk.api.queries.biophysical_perisomatic_api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-allensdk.api.queries.brain_observatory_api">
+<span id="allensdk-api-queries-brain-observatory-api-module"></span><h2>allensdk.api.queries.brain_observatory_api module<a class="headerlink" href="#module-allensdk.api.queries.brain_observatory_api" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi">
-<em class="property">class </em><tt class="descclassname">allensdk.api.queries.biophysical_perisomatic_api.</tt><tt class="descname">BiophysicalPerisomaticApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma">
-<tt class="descname">build_rma</tt><big>(</big><em>neuronal_model_id</em>, <em>fmt='json'</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.build_rma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.build_rma" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi">
+<em class="property">class </em><tt class="descclassname">allensdk.api.queries.brain_observatory_api.</tt><tt class="descname">BrainObservatoryApi</tt><big>(</big><em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#allensdk.api.queries.rma_template.RmaTemplate" title="allensdk.api.queries.rma_template.RmaTemplate"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.rma_template.RmaTemplate</span></tt></a></p>
+<dl class="attribute">
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.NWB_FILE_TYPE">
+<tt class="descname">NWB_FILE_TYPE</tt><em class="property"> = 'NWBOphys'</em><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.NWB_FILE_TYPE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data">
-<tt class="descname">cache_data</tt><big>(</big><em>neuronal_model_id</em>, <em>working_directory=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.cache_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.cache_data" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_cell_specimens">
+<tt class="descname">filter_cell_specimens</tt><big>(</big><em>cell_specimens</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.filter_cell_specimens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_cell_specimens" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest">
-<tt class="descname">create_manifest</tt><big>(</big><em>fit_path=''</em>, <em>model_type=''</em>, <em>stimulus_filename=''</em>, <em>swc_morphology_path=''</em>, <em>marker_path=''</em>, <em>sweeps=[]</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.create_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.create_manifest" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_experiment_containers">
+<tt class="descname">filter_experiment_containers</tt><big>(</big><em>containers</em>, <em>ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>transgenic_lines=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.filter_experiment_containers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_experiment_containers" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids">
-<tt class="descname">get_well_known_file_ids</tt><big>(</big><em>neuronal_model_id</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.get_well_known_file_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.get_well_known_file_ids" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_ophys_experiments">
+<tt class="descname">filter_ophys_experiments</tt><big>(</big><em>experiments</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>transgenic_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.filter_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_ophys_experiments" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type">
-<tt class="descname">is_well_known_file_type</tt><big>(</big><em>wkf</em>, <em>name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.is_well_known_file_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.is_well_known_file_type" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_metrics">
+<tt class="descname">get_cell_metrics</tt><big>(</big><em>cell_specimen_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.get_cell_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_cell_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get cell metrics by id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cell_metrics_ids</strong> : integer or list of integers, optional</p>
+<blockquote>
+<div><p>only select specific cell metric records.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>dict</strong> : cell metric metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_column_definitions">
+<tt class="descname">get_column_definitions</tt><big>(</big><em>api_class_name=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.get_column_definitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_column_definitions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get column definitions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>api_class_names</strong> : string or list of strings, optional</p>
+<blockquote>
+<div><p>only select specific column definition records.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>dict</strong> : column definition metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_experiment_container_metrics">
+<tt class="descname">get_experiment_container_metrics</tt><big>(</big><em>experiment_container_metric_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.get_experiment_container_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_experiment_container_metrics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get experiment container metrics by id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>isi_experiment_ids</strong> : integer or list of integers, optional</p>
+<blockquote>
+<div><p>only select specific experiments.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>dict</strong> : isi experiment metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_experiment_containers">
+<tt class="descname">get_experiment_containers</tt><big>(</big><em>experiment_container_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.get_experiment_containers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_experiment_containers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get experiment container by id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>experiment_container_ids</strong> : integer or list of integers, optional</p>
+<blockquote>
+<div><p>only select specific experiment containers.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>dict</strong> : experiment container metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_isi_experiments">
+<tt class="descname">get_isi_experiments</tt><big>(</big><em>isi_experiment_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.get_isi_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_isi_experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get ISI Experiments by id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>isi_experiment_ids</strong> : integer or list of integers, optional</p>
+<blockquote>
+<div><p>only select specific experiments.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>dict</strong> : isi experiment metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_ophys_experiments">
+<tt class="descname">get_ophys_experiments</tt><big>(</big><em>ophys_experiment_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.get_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_ophys_experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get OPhys Experiments by id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>ophys_experiment_ids</strong> : integer or list of integers, optional</p>
+<blockquote>
+<div><p>only select specific experiments.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>dict</strong> : ophys experiment metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_stimulus_mappings">
+<tt class="descname">get_stimulus_mappings</tt><big>(</big><em>stimulus_mapping_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.get_stimulus_mappings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.get_stimulus_mappings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get stimulus mappings by id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>stimulus_mapping_ids</strong> : integer or list of integers, optional</p>
+<blockquote>
+<div><p>only select specific stimulus mapping records.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>dict</strong> : stimulus mapping metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.list_column_definition_class_names">
+<tt class="descname">list_column_definition_class_names</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.list_column_definition_class_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.list_column_definition_class_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get column definitions</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>list</strong> : api class name strings</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.list_isi_experiments">
+<tt class="descname">list_isi_experiments</tt><big>(</big><em>isi_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.list_isi_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.list_isi_experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>List ISI experiments available through the Allen Institute API</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>neuronal_model_ids</strong> : integer or list of integers, optional</p>
+<blockquote>
+<div><p>only select specific isi experiments.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><strong>dict</strong> : neuronal model metadata</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.rma_templates">
+<tt class="descname">rma_templates</tt><em class="property"> = {'brain_observatory_queries': [{'count': False, 'name': 'list_isi_experiments', 'criteria_params': [], 'num_rows': 'all', 'model': 'IsiExperiment', 'description': 'see name'}, {'count': False, 'criteria_params': ['isi_experiment_ids'], 'name': 'isi_experiment_by_ids', 'criteria': '[id$in{{ isi_experiment_ids }}]', 'num_rows': 'all', 'model': 'IsiExperiment', 'include': 'experiment_container(ophys_experiments,targeted_structure)', 'description': 'see name'}, {'count': False, 'criteria_params': ['ophys_experiment_ids'], 'name': 'ophys_experiment_by_ids', 'criteria': '{% if ophys_experiment_ids is defined %}[id$in{{ ophys_experiment_ids }}]{%endif%}', 'num_rows': 'all', 'model': 'OphysExperiment', 'include': 'well_known_files(well_known_file_type),targeted_structure,specimen(donor(age,transgenic_lines))', 'description': 'see name'}, {'count': False, 'name': 'ophys_experiment_data', 'criteria_params': ['ophys_experiment_id'], 'criteria': '[attachable_id$eq{{ ophys_experiment_id }}],well_known_file_type[name$eqNWBOphys]', 'num_rows': 'all', 'model': 'WellKnownFile', 'description': 'see name'}, {'count': False, 'name': 'column_definitions', 'criteria_params': ['api_class_name'], 'criteria': '[api_class_name$eq{{ api_class_name }}]', 'num_rows': 'all', 'model': 'ApiColumnDefinition', 'description': 'see name'}, {'count': False, 'name': 'column_definition_class_names', 'only': ['api_class_name'], 'num_rows': 'all', 'model': 'ApiColumnDefinition', 'description': 'see name'}, {'count': False, 'name': 'stimulus_mapping', 'criteria_params': ['stimulus_mapping_ids'], 'criteria': '{% if stimulus_mapping_ids is defined %}[id$in{{ stimulus_mapping_ids }}]{%endif%}', 'num_rows': 'all', 'model': 'ApiCamStimulusMapping', 'description': 'see name'}, {'count': False, 'criteria_params': ['experiment_container_ids'], 'name': 'experiment_container', 'criteria': '{% if experiment_container_ids is defined %}[id$in{{ experiment_container_ids }}]{%endif%}', 'num_rows': 'all', 'model': 'ExperimentContainer', 'include': 'ophys_experiments,isi_experiment,specimen(donor(age,transgenic_lines)),targeted_structure', 'description': 'see name'}, {'count': False, 'name': 'experiment_container_metric', 'criteria_params': ['experiment_container_metric_ids'], 'criteria': '{% if experiment_container_metric_ids is defined %}[id$in{{ experiment_container_metric_ids }}]{%endif%}', 'num_rows': 'all', 'model': 'ApiCamExperimentContainerMetric', 'description': 'see name'}, {'count': False, 'name': 'cell_metric', 'criteria_params': ['cell_specimen_ids'], 'criteria': '{% if cell_specimen_ids is defined %}[cell_specimen_id$in{{ cell_specimen_ids }}]{%endif%}', 'num_rows': 'all', 'model': 'ApiCamCellMetric', 'description': 'see name'}]}</em><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.rma_templates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json">
-<tt class="descname">read_json</tt><big>(</big><em>json_parsed_data</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/biophysical_perisomatic_api.html#BiophysicalPerisomaticApi.read_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi.read_json" title="Permalink to this definition">¶</a></dt>
+<dt id="allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.save_ophys_experiment_data">
+<tt class="descname">save_ophys_experiment_data</tt><big>(</big><em>ophys_experiment_id</em>, <em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/api/queries/brain_observatory_api.html#BrainObservatoryApi.save_ophys_experiment_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.save_ophys_experiment_data" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -3296,6 +3478,7 @@ for additional documentation.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -3309,11 +3492,12 @@ for additional documentation.</p>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

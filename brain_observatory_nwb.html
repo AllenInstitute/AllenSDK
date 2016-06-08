@@ -1,0 +1,892 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Organization of a Brain Observatory NWB file &mdash; Allen SDK 0.12.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.12.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" /> 
+  </head>
+  <body>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<style>
+
+	/* the icon font-family definition and helper classes */
+	@font-face {
+	  font-family: 'portal_icon_font';
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  font-weight: normal;
+	  font-style: normal;
+	}
+	 
+	 [class^="icon-"]:before, [class*=" icon-"]:before {
+	  font-family: "portal_icon_font";
+	  font-style: normal;
+	  font-weight: normal;
+	  speak: none;
+	 
+	  display: inline-block;
+	  text-decoration: inherit;
+	  width: 1em;
+	  margin-right: .2em;
+	  text-align: center;
+	  /* opacity: .8; */
+	 
+	  /* For safety - reset parent styles, that can break glyph codes*/
+	  font-variant: normal;
+	  text-transform: none;
+	     
+	  /* fix buttons height, for twitter bootstrap */
+	  line-height: 1em;
+	 
+	  /* Animation center compensation - margins should be symmetric */
+	  /* remove if not needed */
+	  margin-left: .2em;
+	
+	}
+	 
+	.icon-spin5:before { content: '\e806'; } /* '' */
+	.icon-left-open-1:before { content: '\e81e'; } /* '' */
+	.icon-plus-1:before { content: '\e801'; } /* '' */
+	.icon-facebook:before { content: '\e816'; } /* '' */
+	.icon-gplus:before { content: '\e818'; } /* '' */
+	.icon-linkedin-3:before { content: '\e815'; } /* '' */
+	.icon-twitter:before { content: '\e817'; } /* '' */
+	.icon-youtube-play:before { content: '\e805'; } /* '' */
+	.icon-plus-2:before { content: '\e809'; } /* '' */
+	.icon-record-1:before { content: '\e81c'; } /* '' */
+	.icon-cancel:before { content: '\e80b'; } /* '' */
+	.icon-search:before { content: '\e804'; } /* '' */
+	.icon-cancel-2:before { content: '\e80c'; } /* '' */
+	.icon-plus-4:before { content: '\e80d'; } /* '' */
+	.icon-cancel-3:before { content: '\e80e'; } /* '' */
+	.icon-plus:before { content: '\e808'; } /* '' */
+	.icon-down-open:before { content: '\e800'; } /* '' */
+	.icon-right-open:before { content: '\e802'; } /* '' */
+	.icon-up-open:before { content: '\e803'; } /* '' */
+	.icon-stop:before { content: '\e813'; } /* '' */
+	.icon-cancel-1:before { content: '\e820'; } /* '' */
+	.icon-plus-3:before { content: '\e80a'; } /* '' */
+	/* end icon font helpers */
+
+	/* icon font spin animation */
+	.animate-spin {
+	  -moz-animation: spin 2s infinite linear;
+	  -o-animation: spin 2s infinite linear;
+	  -webkit-animation: spin 2s infinite linear;
+	  animation: spin 2s infinite linear;
+	  display: inline-block;
+	}
+	@-moz-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-webkit-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-o-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-ms-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	/*  end spin animation */	
+
+	@font-face {
+	    font-family: 'bebas_neueregular';
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	/* top chrome styles */
+	#top_chrome {
+
+		width:100%;
+		height:28px;
+		background-color:#163E65;
+	}
+
+	.chrome_link_block {
+
+		color:#fff !important;	
+		display:inline-block;
+		height:100%;
+		max-height:28px;
+	}
+
+	.chrome_link_block:hover {
+
+		background-color:#eee;
+		color:#0779BE !important;	
+		cursor:pointer;
+	}
+
+	#top_chrome a {
+
+		color:inherit !important;	
+		text-decoration:none;
+	}
+
+	#top_chrome a:hover {
+
+		color:inherit !important;	
+	}
+
+	#top_chrome_buttons {
+
+		float:right;
+		margin-right:50px;
+	}
+
+	.chrome_button {
+
+		font-family:arial,sans-serif;
+		font-weight:bold;
+		display:inline-block;
+		font-size:9px;
+		text-align:left;
+		text-decoration:none;
+		margin:9px 20px 10px 20px;
+	}
+
+	.chrome_active {
+
+		background-color:#1b7abd;
+		color:#fff;
+	}
+
+
+	/* header element styles*/
+	#header_content {
+
+		font-family: bebas_neueregular, arial, sans-serif;
+		font-size:22px;
+		color:#0779be;		
+		letter-spacing:0.03em;
+
+		position:relative;
+		width:calc(100% - 112px);
+		min-width:800px;
+		height:76px;
+		border-bottom:2px solid #A5A8AB;
+		margin-left:50px;
+		margin-right:50px;
+        z-index:9999; /* IT-9508 */
+	}
+
+	#portal_logo {
+
+		position:absolute;
+		top:20px;
+		left:0px;
+		width:236px;
+	}
+
+	#portal_tabs {
+
+		position: absolute;
+		bottom: 12px;
+		left: 0px;
+		margin-bottom: -12px;
+		display: block;
+	}
+
+	.horizontal_list
+	{
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		display: inline; 		
+	}
+
+	.horizontal_list li { 
+
+		display: inline; 	
+	}	
+
+	#portal_tab_menu_container {
+
+		display:none;
+	}
+
+	#portal_search_input_group {
+
+		position:absolute;
+		margin: 0;
+		padding: 0;
+		bottom:12px;
+		right:0px;
+		border:1px solid #DAD9D3;
+		color:#DAD9D3;
+	}
+
+	#portal_search_input_group input {
+
+		margin: 0;
+		padding: 0;
+		border:none;
+		width:110px;
+		color:#DAD9D3;
+		font-family:Helvetica,sans-serif;
+		font-size:12px;
+		height:28px;
+		margin-left:10px;
+
+		outline:none;
+	}
+
+	input::-ms-clear {
+		display: none;
+	}
+
+	#portal_search_input_group i {
+
+		font-size:0.8em;
+		cursor:pointer;
+	}
+
+	#pSiteSearchTextInput:focus {
+
+		color:#000;
+	}
+
+	.icon_menu_down {
+
+		font-size: 12px;
+		margin-left: 4px;
+		vertical-align: text-top;
+		padding-top: 4px;
+		display: inline-block;
+	}
+
+	.portal_tab_item {
+
+		background-color: #fff;
+		padding: 12px;
+		padding-left:20px;
+		padding-right:20px;
+		display: inline-block !important;		
+	}
+
+	.portal_tab_item a:hover {
+
+		color:#fbe300;	
+	}
+
+	.portal_tab_item:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}	
+
+
+	.portal_menu_active {
+
+		background-color: #EEEEEE;
+	}	
+
+	.portal_menu_item_active {
+
+		color:#fbe300 !important;	
+	}
+
+	.portal_tab_active {
+
+		color:#a5a8ab !important;
+	}
+
+	#header_content a {		
+
+		color:inherit !important;
+	}
+
+	#header_content a:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}
+
+	#header_content ul {
+
+		list-style: none;
+		position: relative;
+		top: 58px;
+		display: inline-table;
+	}
+
+	#header_content ul ul {
+		
+		display:none;
+		opacity:0;
+	}
+
+	/* the fly out menus */
+	#header_content ul li:hover > ul,
+	#header_content ul li.hover > ul {
+
+		position: absolute;
+		top: 48px;
+		z-index:999;
+
+		display: block;
+		width: 152px;
+		padding:0px;
+		padding-top:20px;
+		padding-bottom:10px;
+		font-size: 12px;
+		font-family: Arial,Sans-Serif;
+		font-weight: bold;
+		text-transform: uppercase;
+
+		background-color: rgba(8,122,191,0.98);
+		color: #fff !important;
+		opacity: 1;
+
+		-webkit-animation: fade 0.25s;
+		animation: fade 0.25s;
+	}
+
+	@-webkit-keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}
+	@keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}	
+
+	#header_content ul li:hover > ul li {
+
+		padding: 10px;
+		padding-top: 0px;
+		padding-left: 20px;
+		display: block;
+		opacity:1;
+	}
+
+	#header_content ul li:hover > ul a {
+
+		display: block;
+		opacity:1;
+		white-space:nowrap;
+	}
+
+	#portal_menu_start_list {
+
+		left: 81px;
+
+		/* IE sauce */
+		left:85px\9;
+
+		/* Safari sauce */
+		(;left:79px;);
+	}
+
+	#portal_menu_atlases_list {
+
+		left: 290px;
+		width: 210px !important;
+        height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 303px\9;
+        height: 225px\9;
+
+		/* Safari sauce */
+		(;left:279px;);
+	}
+
+	#portal_menu_tools_list {
+
+		left: 500px;
+		width: 172px !important;
+		height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 513px\9;
+		height:225px\9;
+
+		/* Safari sauce */
+		(;left:489px;);
+		(;height:227px;);
+	}
+
+	/* mozilla sauce */
+	@-moz-document url-prefix() {
+
+		#header_content {
+
+			height:107px;
+		}
+
+		#portal_menu_start_list {
+
+			left:85px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 302px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 512px;
+			height:236px;
+		}
+	}
+
+
+	/* make it look OK on iPad also */
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}  
+	}
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}	  
+	}
+
+	.portal_menu_list_heading {
+
+		color:#9ccae5;
+		border-bottom:1px solid #9ccae5;
+		padding-bottom:5px !important;
+	}
+
+	.portal_menu_list_heading + li {
+
+		padding-top:10px !important;
+	}
+
+	.portal_menu_list_heading li {
+
+		padding-bottom:0px;
+	}	
+
+	#portal_menu_atlases_list li:last-of-type {
+
+		padding-bottom:15px !important;
+	}
+
+	.icon-spin5 {
+
+		color:#000;
+	}
+</style>
+<div id="pHeader">
+<div id="top_chrome">
+	<div id="top_chrome_buttons">
+		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
+		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
+	</div>
+</div>
+
+<div id="header_content">
+
+	<a href="http://AllenInstitute.github.io/AllenSDK">
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+	</a>
+</div>
+</div>
+
+<script>
+
+jQuery('#portal_tab_menu').bind('touchstart', function() {
+
+	if(window.console)
+		console.log("touchstart");
+});
+</script>
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="organization-of-a-brain-observatory-nwb-file">
+<h1>Organization of a Brain Observatory NWB file<a class="headerlink" href="#organization-of-a-brain-observatory-nwb-file" title="Permalink to this headline">¶</a></h1>
+<p>The Allen Institute&#8217;s Brain Observatory data sets include data from 2-photon microscope recordings including image segmentation, motion correction and fluorescence traces.
+It also includes information about the visual stimuli presented during the recording. This information is packaged in the <a class="reference external" href="http://www.nwb.org">NWB format</a>.
+Here is a brief description how the data is stored in the NWB file.</p>
+<div class="section" id="browsing-the-file">
+<h2>Browsing the file<a class="headerlink" href="#browsing-the-file" title="Permalink to this headline">¶</a></h2>
+<p>The NWB format is a self-documenting file format that is designed to store a wide range of neurophysiology data.
+Structurally, NWB is nothing more than an HDF5 file that has data organized in a particular way.
+For example, the format has a dedicated location for storing all data that is acquired during an experiment, and another place to store stimulus data that was presented.
+Data is usually stored in a time series, and each time series has information to document the type of data that it stores.
+Importantly, all HDF5 tools and libraries are able to read the NWB file.</p>
+<p>When using NWB files, the most important tool to become familiar with is HDFView.
+HDFView is an open-source tool that is published by the HDF Group.
+It allows you to browse the contents of an HDF5 (and NWB) file in an intuitive way, and also to view some of the data stored within it.
+HDFView can be downloaded at <a class="reference external" href="http://www.hdfgroup.org/products/java/hdfview/">www.hdfgroup.org</a>.
+It is <em>highly</em> recommended that anyone using an NWB file download and install this tool.</p>
+</div>
+<div class="section" id="nwb-file-organization">
+<h2>NWB file organization<a class="headerlink" href="#nwb-file-organization" title="Permalink to this headline">¶</a></h2>
+<p>Each NWB file is organized into six sections. These sections store acquired data (&#8216;acquisition&#8217;), stimulus data (&#8216;stimulus&#8217;), general metadata about the experiment (&#8216;general&#8217;), experiment organization (&#8216;epochs&#8217;), processed data (&#8216;processing&#8217;) and a free-form area for storing analysis data (&#8216;analysis&#8217;).</p>
+<div class="figure">
+<img alt="_images/fig-1.png" src="_images/fig-1.png" />
+<p class="caption"><strong>Figure 1. An NWB file, viewed in HDFView</strong></p>
+</div>
+<p>At the left of HDFView shows the organization of data in an NWB file.
+It is most useful to imagine an HDF5 file as a container that stores many files and folders within it.
+Because of this structure, you can browse an HDF5 file, and an NWB file, in the same way that you browse the files and folders on your computer.
+Folders can be opened by double-clicking on the folder icon.
+The contents of a &#8216;file&#8217; within HDF5, which called a dataset, can be seen by double-clicking it.
+An NWB file has six top-level folders and five top-level datasets.
+In Figure 1, the contents of the &#8216;session_description&#8217; dataset is displayed.
+An NWB file is designed to store data from a single experimental session in a single animal.
+The session_description dataset provides a quick summary of the information available in the file.
+The NWB specification, describing the format and how data is stored, can be downloaded <a class="reference external" href="http://github.com/NeurodataWithoutBorders/specification/blob/master/nwb_file_format_specification_v1.0.3.pdf">here</a>.</p>
+</div>
+<div class="section" id="stimulus-data">
+<h2>Stimulus data<a class="headerlink" href="#stimulus-data" title="Permalink to this headline">¶</a></h2>
+<p>Within an NWB file, stimulus data is organized into &#8216;templates&#8217;, which are stimulus descriptions that can be used one or more times, and &#8216;presentation&#8217;, which stores the time-series data about what was presented and when.</p>
+<div class="figure">
+<img alt="_images/fig-2.png" src="_images/fig-2.png" />
+<p class="caption"><strong>Figure 2. Stimuli presented during the experiment</strong></p>
+</div>
+<p>In this experiment shown in Figure 2, there were four stimuli – one locally sparse noise, two movies and one neutral stimulus for observing spontaneous activity.
+When browsing the file, note the panel at the bottom.
+Clicking on a folder or dataset will cause information about that object to be displayed there.
+This information can include the type of data stored, the unit that stored in, as well as comments and/or other metadata.</p>
+</div>
+<div class="section" id="processing">
+<h2>Processing<a class="headerlink" href="#processing" title="Permalink to this headline">¶</a></h2>
+<p>In the NWB file, the processing folder is designed to store the contents the different levels of intermediate processing of data that are necessary to convert raw data into something that can be used for scientific analysis.
+In the Allen Institute&#8217;s NWB file, these levels of processing include motion correction of the acquired 2-photon move frames, image segmentation into regions of interest, the fluorescence signal for each of these regions, and the dF/F signal that is useful for correlating cell activity with presented stimuli.</p>
+<div class="figure">
+<img alt="_images/fig-3.png" src="_images/fig-3.png" />
+<p class="caption"><strong>Figure 3. Location of dF/F data</strong></p>
+</div>
+<p>HDFView provides a very efficient way to browse the contents of an NWB file.</p>
+</div>
+<div class="section" id="organization-of-data">
+<h2>Organization of data<a class="headerlink" href="#organization-of-data" title="Permalink to this headline">¶</a></h2>
+<p>This data release was based on three different sets of stimuli, name &#8216;A&#8217;, &#8216;B&#8217; and &#8216;C&#8217;.</p>
+<p>Stimulus A included:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Drifting grating (30 minutes over 3 intervals)</li>
+<li>Natural movie (20 minutes over 2 intervals)</li>
+<li>Natural movie (5 minutes in 1 interval)</li>
+<li>Spontaneous activity (5 minutes in 1 interval)</li>
+</ol>
+</div></blockquote>
+<p>This was presented as: (1) (2) (3) (1) (2) (4) (1) (2)</p>
+<p>Stimulus B included:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Static gratings (25 minutes over 3 intervals)</li>
+<li>Natural images (25 minutes over 3 intervals)</li>
+<li>Natural movie (5 minutes in 1 interval)</li>
+<li>Spontaneous activity (5 minutes in 1 interval)</li>
+</ol>
+</div></blockquote>
+<p>This was presented as: (1) (2) (4) (2) (1) (3) (1) (2)</p>
+<p>Stimulus C included:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>Locally sparse noise (37 minutes over 3 intervals)</li>
+<li>Natural movie (5 minutes over 1 interval)</li>
+<li>Natural movie (5 minutes over 1 interval)</li>
+<li>Spontaneous activity (10 minutes over 2 intervals)</li>
+</ol>
+</div></blockquote>
+<p>This was presented as: (1) (4) (2) (1) (3) (4) (1)</p>
+<p>Below is a brief description and location for several types of data in the NWB file.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="16%" />
+<col width="42%" />
+<col width="34%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Category</th>
+<th class="head">Data</th>
+<th class="head">Location</th>
+<th class="head">SDK function(s)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td rowspan="4">Metadata</td>
+<td>Cre line</td>
+<td>/general/subject/genotype</td>
+<td rowspan="4"><ul class="first last simple">
+<li>get_metadata</li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td>Imaging depth</td>
+<td>/general/optophysiology/imaging_plane_1/imaging_depth</td>
+</tr>
+<tr class="row-even"><td>Target structure</td>
+<td>/general/targeted_structure</td>
+</tr>
+<tr class="row-odd"><td>Stimulus session</td>
+<td>/general/session_type</td>
+</tr>
+<tr class="row-even"><td rowspan="4">Stimulus</td>
+<td>Locally sparse noise</td>
+<td>/stimulus/presentation/locally_sparse_noise_stimulus</td>
+<td><ul class="first last simple">
+<li>get_stimulus_table</li>
+<li>get_locally_sparse_noise_stimulus_template</li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td>Natural movie (1)</td>
+<td>/stimulus/presentation/natural_movie_one_stimulus</td>
+<td rowspan="2"><ul class="first last simple">
+<li>get_stimulus_table</li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td>Natural movie (2)</td>
+<td>/stimulus/presentation/natural_movie_two_stimulus</td>
+</tr>
+<tr class="row-odd"><td>Gray-screen</td>
+<td>/stimulus/presentation/spontaneous_stimulus</td>
+<td><ul class="first last simple">
+<li>get_stimulus_table</li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td rowspan="4">Processed
+data</td>
+<td>Motion correction</td>
+<td>/processing/visual_coding_pipeline/MotionCorrection</td>
+<td><ul class="first last simple">
+<li>get_motion_correction</li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td>Image segmentation</td>
+<td>/processing/visual_coding_pipeline/ImageSegmentation</td>
+<td><ul class="first last simple">
+<li>get_roi_ids</li>
+<li>get_cell_specimen_ids</li>
+<li>get_roi_mask</li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td>Fluorescence</td>
+<td>/processing/visual_coding_pipeline/Fluorescence</td>
+<td><ul class="first last simple">
+<li>get_fluorescence_traces</li>
+<li>get_neuropil_traces</li>
+<li>get_corrected_fluorescence_traces</li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td>dF/F</td>
+<td>/processing/visual_coding_pipeline/DfOverF</td>
+<td><ul class="first last simple">
+<li>get_dff_traces</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer">
+    </div>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+
+  </body>
+</html>

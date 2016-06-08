@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.model.glif package &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>allensdk.model.glif package &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,10 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
     <link rel="up" title="allensdk.model package" href="allensdk.model.html" />
-    <link rel="next" title="allensdk.test package" href="allensdk.test.html" />
-    <link rel="prev" title="allensdk.model.biophysical_perisomatic package" href="allensdk.model.biophysical_perisomatic.html" /> 
+    <link rel="next" title="allensdk.morphology package" href="allensdk.morphology.html" />
+    <link rel="prev" title="allensdk.model.biophysical package" href="allensdk.model.biophysical.html" /> 
   </head>
   <body>
 <script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
@@ -660,76 +660,63 @@ afterspike current dynamics and reset rules.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>El</strong> : float</p>
-<blockquote>
+<blockquote class="last">
+<div><blockquote>
 <div><p>resting potential</p>
 </div></blockquote>
-<p><strong>dt</strong> : float</p>
-<blockquote>
-<div><p>duration between time steps</p>
-</div></blockquote>
-<p><strong>asc_tau_array: np.ndarray</strong></p>
-<blockquote>
-<div><p>TODO</p>
-</div></blockquote>
-<p><strong>R_input</strong> : float</p>
-<blockquote>
-<div><p>input resistance</p>
-</div></blockquote>
-<p><strong>C</strong> : float</p>
-<blockquote>
-<div><p>capacitance</p>
-</div></blockquote>
-<p><strong>asc_amp_arrap</strong> : np.ndarray</p>
-<blockquote>
-<div><p>afterspike current vector.  one element per element of asc_tau_array.</p>
-</div></blockquote>
-<p><strong>spike_cut_length</strong> : int</p>
-<blockquote>
-<div><p>how many time steps to replace with NaNs when a spike occurs.</p>
-</div></blockquote>
-<p><strong>th_inf</strong> : float</p>
-<blockquote>
-<div><p>instantaneous threshold</p>
-</div></blockquote>
-<p><strong>coeffs</strong> : dict</p>
-<blockquote>
-<div><p>dictionary coefficients premultiplied to neuron properties during simulation. used for optimization.</p>
-</div></blockquote>
-<p><strong>AScurrent_dynamics_method</strong> : dict</p>
-<blockquote>
-<div><p>dictionary containing the &#8216;name&#8217; of the afterspike current dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
-</div></blockquote>
-<p><strong>voltage_dynamics_method</strong> : dict</p>
-<blockquote>
-<div><p>dictionary containing the &#8216;name&#8217; of the voltage dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
-</div></blockquote>
-<p><strong>threshold_dynamics_method</strong> : dict</p>
-<blockquote>
-<div><p>dictionary containing the &#8216;name&#8217; of the threshold dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
-</div></blockquote>
-<p><strong>AScurrent_reset_method</strong> : dict</p>
-<blockquote>
-<div><p>dictionary containing the &#8216;name&#8217; of the afterspike current dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
-</div></blockquote>
-<p><strong>voltage_reset_method</strong> : dict</p>
-<blockquote>
-<div><p>dictionary containing the &#8216;name&#8217; of the voltage dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
-</div></blockquote>
-<p><strong>threshold_reset_method</strong> : dict</p>
-<blockquote>
-<div><p>dictionary containing the &#8216;name&#8217; of the threshold dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
-</div></blockquote>
-<p><strong>init_voltage</strong> : float</p>
-<blockquote>
-<div><p>initial voltage value</p>
-</div></blockquote>
-<p><strong>init_threshold</strong> : float</p>
-<blockquote>
-<div><p>initial spike threshold value</p>
-</div></blockquote>
-<p><strong>init_AScurrents</strong> : np.ndarray</p>
-<blockquote class="last">
-<div><p>initial afterspike current vector. one element per element of asc_tau_array.</p>
+<dl class="docutils">
+<dt>dt <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">duration between time steps</p>
+</dd>
+<dt>asc_tau_array: np.ndarray</dt>
+<dd><p class="first last">TODO</p>
+</dd>
+<dt>R_input <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">input resistance</p>
+</dd>
+<dt>C <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">capacitance</p>
+</dd>
+<dt>asc_amp_arrap <span class="classifier-delimiter">:</span> <span class="classifier">np.ndarray</span></dt>
+<dd><p class="first last">afterspike current vector.  one element per element of asc_tau_array.</p>
+</dd>
+<dt>spike_cut_length <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">how many time steps to replace with NaNs when a spike occurs.</p>
+</dd>
+<dt>th_inf <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">instantaneous threshold</p>
+</dd>
+<dt>coeffs <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">dictionary coefficients premultiplied to neuron properties during simulation. used for optimization.</p>
+</dd>
+<dt>AScurrent_dynamics_method <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">dictionary containing the &#8216;name&#8217; of the afterspike current dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
+</dd>
+<dt>voltage_dynamics_method <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">dictionary containing the &#8216;name&#8217; of the voltage dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
+</dd>
+<dt>threshold_dynamics_method <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">dictionary containing the &#8216;name&#8217; of the threshold dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
+</dd>
+<dt>AScurrent_reset_method <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">dictionary containing the &#8216;name&#8217; of the afterspike current dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
+</dd>
+<dt>voltage_reset_method <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">dictionary containing the &#8216;name&#8217; of the voltage dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
+</dd>
+<dt>threshold_reset_method <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd><p class="first last">dictionary containing the &#8216;name&#8217; of the threshold dynamics method to use and a &#8216;params&#8217; dictionary parameters to pass to that function.</p>
+</dd>
+<dt>init_voltage <span class="classifier-delimiter">:</span> <span class="classifier">float </span></dt>
+<dd><p class="first last">initial voltage value</p>
+</dd>
+<dt>init_threshold <span class="classifier-delimiter">:</span> <span class="classifier">float</span></dt>
+<dd><p class="first last">initial spike threshold value</p>
+</dd>
+<dt>init_AScurrents <span class="classifier-delimiter">:</span> <span class="classifier">np.ndarray</span></dt>
+<dd><p class="first last">initial afterspike current vector. one element per element of asc_tau_array.</p>
+</dd>
+</dl>
 </div></blockquote>
 </td>
 </tr>
@@ -940,8 +927,7 @@ simulation resumes.</p>
 <dl class="attribute">
 <dt id="allensdk.model.glif.glif_neuron.GlifNeuron.tau_m">
 <tt class="descname">tau_m</tt><a class="reference internal" href="_modules/allensdk/model/glif/glif_neuron.html#GlifNeuron.tau_m"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.model.glif.glif_neuron.GlifNeuron.tau_m" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the product of the neuron&#8217;s input resistance and capacitance.</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="allensdk.model.glif.glif_neuron.GlifNeuron.to_dict">
@@ -1050,10 +1036,8 @@ be raised.</p>
 
 <dl class="data">
 <dt id="allensdk.model.glif.glif_neuron_methods.METHOD_LIBRARY">
-<tt class="descclassname">allensdk.model.glif.glif_neuron_methods.</tt><tt class="descname">METHOD_LIBRARY</tt><em class="property"> = {'voltage_dynamics_method': {'piecewise_linear_exact': &lt;function dynamics_voltage_piecewise_linear_exact at 0x2aaab8227ed8&gt;, 'quadratic_forward_euler': &lt;function dynamics_voltage_quadratic_forward_euler at 0x2aaab8227f50&gt;, 'linear_exact': &lt;function dynamics_voltage_linear_exact at 0x2aaab8227e60&gt;, 'piecewise_linear_forward_euler': &lt;function dynamics_voltage_piecewise_linear_forward_euler at 0x2aaab8228050&gt;, 'linear_forward_euler': &lt;function dynamics_voltage_linear_forward_euler at 0x2aaab8227de8&gt;}, 'threshold_dynamics_method': {'three_components_exact': &lt;function dynamics_threshold_three_components_exact at 0x2aaab8228398&gt;, 'inf': &lt;function dynamics_threshold_inf at 0x2aaab8228488&gt;, 'spike_component': &lt;function dynamics_threshold_spike_component at 0x2aaab8228410&gt;, 'three_components_forward': &lt;function dynamics_threshold_three_components_forward at 0x2aaab8228320&gt;}, 'AScurrent_dynamics_method': {'none': &lt;function dynamics_AScurrent_none at 0x2aaab8227d70&gt;, 'vector': &lt;function dynamics_AScurrent_vector at 0x2aaab8227cf8&gt;, 'exp': &lt;function dynamics_AScurrent_exp at 0x2aaab8227c80&gt;}, 'AScurrent_reset_method': {'sum': &lt;function reset_AScurrent_sum at 0x2aaab8228500&gt;, 'none': &lt;function reset_AScurrent_none at 0x2aaab8228578&gt;}, 'voltage_reset_method': {'v_before': &lt;function reset_voltage_v_before at 0x2aaab82285f0&gt;, 'zero': &lt;function reset_voltage_zero at 0x2aaab82286e0&gt;, 'fixed': &lt;function reset_voltage_fixed at 0x2aaab8228758&gt;, 'i_v_before': &lt;function reset_voltage_i_v_before at 0x2aaab8228668&gt;}, 'threshold_reset_method': {'three_components': &lt;function reset_threshold_three_components at 0x2aaab82289b0&gt;, 'inf': &lt;function reset_threshold_inf at 0x2aaab82288c0&gt;, 'fixed': &lt;function reset_threshold_fixed at 0x2aaab8228938&gt;, 'max_v_th': &lt;function reset_threshold_max_v_th at 0x2aaab82287d0&gt;, 'th_before': &lt;function reset_threshold_th_before at 0x2aaab8228848&gt;}}</em><a class="headerlink" href="#allensdk.model.glif.glif_neuron_methods.METHOD_LIBRARY" title="Permalink to this definition">¶</a></dt>
-<dd><p>The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. &#8216;voltage_dynamics_method&#8217;).
-Those groups assign each method in this file a string name.  This is used by the GlifNeuron when initializing
-its dynamics and reset methods.</p>
+<tt class="descclassname">allensdk.model.glif.glif_neuron_methods.</tt><tt class="descname">METHOD_LIBRARY</tt><em class="property"> = {'voltage_dynamics_method': {'piecewise_linear_exact': &lt;function dynamics_voltage_piecewise_linear_exact at 0x7fd92651d938&gt;, 'quadratic_forward_euler': &lt;function dynamics_voltage_quadratic_forward_euler at 0x7fd92651d9b0&gt;, 'linear_exact': &lt;function dynamics_voltage_linear_exact at 0x7fd92651d8c0&gt;, 'piecewise_linear_forward_euler': &lt;function dynamics_voltage_piecewise_linear_forward_euler at 0x7fd92651da28&gt;, 'linear_forward_euler': &lt;function dynamics_voltage_linear_forward_euler at 0x7fd92651d848&gt;}, 'threshold_dynamics_method': {'three_components_exact': &lt;function dynamics_threshold_three_components_exact at 0x7fd92651dd70&gt;, 'inf': &lt;function dynamics_threshold_inf at 0x7fd92651de60&gt;, 'spike_component': &lt;function dynamics_threshold_spike_component at 0x7fd92651dde8&gt;, 'three_components_forward': &lt;function dynamics_threshold_three_components_forward at 0x7fd92651dcf8&gt;}, 'AScurrent_dynamics_method': {'none': &lt;function dynamics_AScurrent_none at 0x7fd92651d7d0&gt;, 'vector': &lt;function dynamics_AScurrent_vector at 0x7fd92651d758&gt;, 'exp': &lt;function dynamics_AScurrent_exp at 0x7fd92651d6e0&gt;}, 'AScurrent_reset_method': {'sum': &lt;function reset_AScurrent_sum at 0x7fd92651ded8&gt;, 'none': &lt;function reset_AScurrent_none at 0x7fd92651df50&gt;}, 'voltage_reset_method': {'v_before': &lt;function reset_voltage_v_before at 0x7fd92651e050&gt;, 'zero': &lt;function reset_voltage_zero at 0x7fd92651e140&gt;, 'fixed': &lt;function reset_voltage_fixed at 0x7fd92651e1b8&gt;, 'i_v_before': &lt;function reset_voltage_i_v_before at 0x7fd92651e0c8&gt;}, 'threshold_reset_method': {'three_components': &lt;function reset_threshold_three_components at 0x7fd92651e410&gt;, 'inf': &lt;function reset_threshold_inf at 0x7fd92651e320&gt;, 'fixed': &lt;function reset_threshold_fixed at 0x7fd92651e398&gt;, 'max_v_th': &lt;function reset_threshold_max_v_th at 0x7fd92651e230&gt;, 'th_before': &lt;function reset_threshold_th_before at 0x7fd92651e2a8&gt;}}</em><a class="headerlink" href="#allensdk.model.glif.glif_neuron_methods.METHOD_LIBRARY" title="Permalink to this definition">¶</a></dt>
+<dd><p>The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. &#8216;voltage_dynamics_method&#8217;).</p>
 </dd></dl>
 
 <dl class="function">
@@ -1765,6 +1749,7 @@ See <a class="reference internal" href="glif_models.html"><em>Generalized LIF Mo
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -1778,11 +1763,12 @@ See <a class="reference internal" href="glif_models.html"><em>Generalized LIF Mo
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

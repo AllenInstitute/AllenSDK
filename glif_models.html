@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Generalized LIF Models &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>Generalized LIF Models &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
     <link rel="up" title="Models" href="models.html" />
     <link rel="next" title="Biophysical Models" href="biophysical_models.html" />
     <link rel="prev" title="Models" href="models.html" /> 
@@ -650,7 +650,7 @@ update the simulation&#8217;s voltage, spike threshold, and afterspike currents
 during the simulation. The GLIF package contains a built-in set of rules,
 however developers can plug in custom rule implementations provided they
 follow a simple argument specification scheme.</p>
-<p>The Allen SDK GLIF simulator was developed and tested with Python 2.7.8, installed
+<p>The Allen SDK GLIF simulator was developed and tested with Python 2.7.9, installed
 as part of <a class="reference external" href="https://store.continuum.io/cshop/anaconda/">Anaconda Python</a> distribution
 version <a class="reference external" href="http://repo.continuum.io/archive/index.html">2.1.0</a>.</p>
 <p>The rest of this page provides examples demonstrating how to download models,
@@ -760,7 +760,8 @@ module for simulating all sweeps presented to a cell and storing them in the NWB
 
 <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
-<span class="n">sweep_numbers</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ephys_sweeps</span> <span class="p">]</span>
+<span class="n">sweep_numbers</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ephys_sweeps</span> 
+                  <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;stimulus_units&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;Amps&#39;</span> <span class="p">]</span>
 <span class="n">simulate_neuron</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">,</span> <span class="n">ephys_file_name</span><span class="p">,</span> <span class="n">ephys_file_name</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1079,6 +1080,7 @@ class.  They all return an updated afterspike current array.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -1092,11 +1094,12 @@ class.  They all return an updated afterspike current array.</p>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

@@ -27,14 +27,6 @@ allensdk.config.model.description_parser module
     :undoc-members:
     :show-inheritance:
 
-allensdk.config.model.manifest module
--------------------------------------
-
-.. automodule:: allensdk.config.model.manifest
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------

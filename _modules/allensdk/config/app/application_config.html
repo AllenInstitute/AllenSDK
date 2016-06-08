@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.config.app.application_config &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>allensdk.config.app.application_config &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -664,7 +664,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    &#39;&#39;&#39;</span>
     
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-    <span class="n">_DEFAULT_LOG_CONFIG</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;logging.conf&#39;</span><span class="p">)</span>
+    <span class="n">_DEFAULT_LOG_CONFIG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;LOG_CFG&#39;</span><span class="p">,</span> <span class="n">resource_filename</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;logging.conf&#39;</span><span class="p">))</span>
     <span class="n">lc</span><span class="o">.</span><span class="n">fileConfig</span><span class="p">(</span><span class="n">_DEFAULT_LOG_CONFIG</span><span class="p">)</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
@@ -897,6 +897,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        -----</span>
 <span class="sd">        The Python configparser library natively supports this functionality in Python 3.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;biophys&#39;</span> <span class="ow">in</span> <span class="n">description</span><span class="p">:</span>
+            <span class="n">bps_config_string</span> <span class="o">=</span> <span class="s">&#39;[biophys]</span><span class="se">\n\n</span><span class="s">&#39;</span>
+            <span class="k">return</span> <span class="n">bps_config_string</span>
+        
         <span class="n">bps_config</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s">&#39;biophys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         
         <span class="n">cfg_array</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;[biophys]&#39;</span><span class="p">]</span>
@@ -982,6 +986,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
@@ -995,11 +1000,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

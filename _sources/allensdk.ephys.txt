@@ -4,6 +4,22 @@ allensdk.ephys package
 Submodules
 ----------
 
+allensdk.ephys.ephys_extractor module
+-------------------------------------
+
+.. automodule:: allensdk.ephys.ephys_extractor
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.ephys.ephys_features module
+------------------------------------
+
+.. automodule:: allensdk.ephys.ephys_features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.ephys.extract_cell_features module
 -------------------------------------------
 

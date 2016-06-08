@@ -1,0 +1,929 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.brain_observatory.r_neuropil &mdash; Allen SDK 0.12.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.12.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<style>
+
+	/* the icon font-family definition and helper classes */
+	@font-face {
+	  font-family: 'portal_icon_font';
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  font-weight: normal;
+	  font-style: normal;
+	}
+	 
+	 [class^="icon-"]:before, [class*=" icon-"]:before {
+	  font-family: "portal_icon_font";
+	  font-style: normal;
+	  font-weight: normal;
+	  speak: none;
+	 
+	  display: inline-block;
+	  text-decoration: inherit;
+	  width: 1em;
+	  margin-right: .2em;
+	  text-align: center;
+	  /* opacity: .8; */
+	 
+	  /* For safety - reset parent styles, that can break glyph codes*/
+	  font-variant: normal;
+	  text-transform: none;
+	     
+	  /* fix buttons height, for twitter bootstrap */
+	  line-height: 1em;
+	 
+	  /* Animation center compensation - margins should be symmetric */
+	  /* remove if not needed */
+	  margin-left: .2em;
+	
+	}
+	 
+	.icon-spin5:before { content: '\e806'; } /* '' */
+	.icon-left-open-1:before { content: '\e81e'; } /* '' */
+	.icon-plus-1:before { content: '\e801'; } /* '' */
+	.icon-facebook:before { content: '\e816'; } /* '' */
+	.icon-gplus:before { content: '\e818'; } /* '' */
+	.icon-linkedin-3:before { content: '\e815'; } /* '' */
+	.icon-twitter:before { content: '\e817'; } /* '' */
+	.icon-youtube-play:before { content: '\e805'; } /* '' */
+	.icon-plus-2:before { content: '\e809'; } /* '' */
+	.icon-record-1:before { content: '\e81c'; } /* '' */
+	.icon-cancel:before { content: '\e80b'; } /* '' */
+	.icon-search:before { content: '\e804'; } /* '' */
+	.icon-cancel-2:before { content: '\e80c'; } /* '' */
+	.icon-plus-4:before { content: '\e80d'; } /* '' */
+	.icon-cancel-3:before { content: '\e80e'; } /* '' */
+	.icon-plus:before { content: '\e808'; } /* '' */
+	.icon-down-open:before { content: '\e800'; } /* '' */
+	.icon-right-open:before { content: '\e802'; } /* '' */
+	.icon-up-open:before { content: '\e803'; } /* '' */
+	.icon-stop:before { content: '\e813'; } /* '' */
+	.icon-cancel-1:before { content: '\e820'; } /* '' */
+	.icon-plus-3:before { content: '\e80a'; } /* '' */
+	/* end icon font helpers */
+
+	/* icon font spin animation */
+	.animate-spin {
+	  -moz-animation: spin 2s infinite linear;
+	  -o-animation: spin 2s infinite linear;
+	  -webkit-animation: spin 2s infinite linear;
+	  animation: spin 2s infinite linear;
+	  display: inline-block;
+	}
+	@-moz-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-webkit-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-o-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-ms-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	/*  end spin animation */	
+
+	@font-face {
+	    font-family: 'bebas_neueregular';
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	/* top chrome styles */
+	#top_chrome {
+
+		width:100%;
+		height:28px;
+		background-color:#163E65;
+	}
+
+	.chrome_link_block {
+
+		color:#fff !important;	
+		display:inline-block;
+		height:100%;
+		max-height:28px;
+	}
+
+	.chrome_link_block:hover {
+
+		background-color:#eee;
+		color:#0779BE !important;	
+		cursor:pointer;
+	}
+
+	#top_chrome a {
+
+		color:inherit !important;	
+		text-decoration:none;
+	}
+
+	#top_chrome a:hover {
+
+		color:inherit !important;	
+	}
+
+	#top_chrome_buttons {
+
+		float:right;
+		margin-right:50px;
+	}
+
+	.chrome_button {
+
+		font-family:arial,sans-serif;
+		font-weight:bold;
+		display:inline-block;
+		font-size:9px;
+		text-align:left;
+		text-decoration:none;
+		margin:9px 20px 10px 20px;
+	}
+
+	.chrome_active {
+
+		background-color:#1b7abd;
+		color:#fff;
+	}
+
+
+	/* header element styles*/
+	#header_content {
+
+		font-family: bebas_neueregular, arial, sans-serif;
+		font-size:22px;
+		color:#0779be;		
+		letter-spacing:0.03em;
+
+		position:relative;
+		width:calc(100% - 112px);
+		min-width:800px;
+		height:76px;
+		border-bottom:2px solid #A5A8AB;
+		margin-left:50px;
+		margin-right:50px;
+        z-index:9999; /* IT-9508 */
+	}
+
+	#portal_logo {
+
+		position:absolute;
+		top:20px;
+		left:0px;
+		width:236px;
+	}
+
+	#portal_tabs {
+
+		position: absolute;
+		bottom: 12px;
+		left: 0px;
+		margin-bottom: -12px;
+		display: block;
+	}
+
+	.horizontal_list
+	{
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		display: inline; 		
+	}
+
+	.horizontal_list li { 
+
+		display: inline; 	
+	}	
+
+	#portal_tab_menu_container {
+
+		display:none;
+	}
+
+	#portal_search_input_group {
+
+		position:absolute;
+		margin: 0;
+		padding: 0;
+		bottom:12px;
+		right:0px;
+		border:1px solid #DAD9D3;
+		color:#DAD9D3;
+	}
+
+	#portal_search_input_group input {
+
+		margin: 0;
+		padding: 0;
+		border:none;
+		width:110px;
+		color:#DAD9D3;
+		font-family:Helvetica,sans-serif;
+		font-size:12px;
+		height:28px;
+		margin-left:10px;
+
+		outline:none;
+	}
+
+	input::-ms-clear {
+		display: none;
+	}
+
+	#portal_search_input_group i {
+
+		font-size:0.8em;
+		cursor:pointer;
+	}
+
+	#pSiteSearchTextInput:focus {
+
+		color:#000;
+	}
+
+	.icon_menu_down {
+
+		font-size: 12px;
+		margin-left: 4px;
+		vertical-align: text-top;
+		padding-top: 4px;
+		display: inline-block;
+	}
+
+	.portal_tab_item {
+
+		background-color: #fff;
+		padding: 12px;
+		padding-left:20px;
+		padding-right:20px;
+		display: inline-block !important;		
+	}
+
+	.portal_tab_item a:hover {
+
+		color:#fbe300;	
+	}
+
+	.portal_tab_item:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}	
+
+
+	.portal_menu_active {
+
+		background-color: #EEEEEE;
+	}	
+
+	.portal_menu_item_active {
+
+		color:#fbe300 !important;	
+	}
+
+	.portal_tab_active {
+
+		color:#a5a8ab !important;
+	}
+
+	#header_content a {		
+
+		color:inherit !important;
+	}
+
+	#header_content a:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}
+
+	#header_content ul {
+
+		list-style: none;
+		position: relative;
+		top: 58px;
+		display: inline-table;
+	}
+
+	#header_content ul ul {
+		
+		display:none;
+		opacity:0;
+	}
+
+	/* the fly out menus */
+	#header_content ul li:hover > ul,
+	#header_content ul li.hover > ul {
+
+		position: absolute;
+		top: 48px;
+		z-index:999;
+
+		display: block;
+		width: 152px;
+		padding:0px;
+		padding-top:20px;
+		padding-bottom:10px;
+		font-size: 12px;
+		font-family: Arial,Sans-Serif;
+		font-weight: bold;
+		text-transform: uppercase;
+
+		background-color: rgba(8,122,191,0.98);
+		color: #fff !important;
+		opacity: 1;
+
+		-webkit-animation: fade 0.25s;
+		animation: fade 0.25s;
+	}
+
+	@-webkit-keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}
+	@keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}	
+
+	#header_content ul li:hover > ul li {
+
+		padding: 10px;
+		padding-top: 0px;
+		padding-left: 20px;
+		display: block;
+		opacity:1;
+	}
+
+	#header_content ul li:hover > ul a {
+
+		display: block;
+		opacity:1;
+		white-space:nowrap;
+	}
+
+	#portal_menu_start_list {
+
+		left: 81px;
+
+		/* IE sauce */
+		left:85px\9;
+
+		/* Safari sauce */
+		(;left:79px;);
+	}
+
+	#portal_menu_atlases_list {
+
+		left: 290px;
+		width: 210px !important;
+        height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 303px\9;
+        height: 225px\9;
+
+		/* Safari sauce */
+		(;left:279px;);
+	}
+
+	#portal_menu_tools_list {
+
+		left: 500px;
+		width: 172px !important;
+		height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 513px\9;
+		height:225px\9;
+
+		/* Safari sauce */
+		(;left:489px;);
+		(;height:227px;);
+	}
+
+	/* mozilla sauce */
+	@-moz-document url-prefix() {
+
+		#header_content {
+
+			height:107px;
+		}
+
+		#portal_menu_start_list {
+
+			left:85px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 302px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 512px;
+			height:236px;
+		}
+	}
+
+
+	/* make it look OK on iPad also */
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}  
+	}
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}	  
+	}
+
+	.portal_menu_list_heading {
+
+		color:#9ccae5;
+		border-bottom:1px solid #9ccae5;
+		padding-bottom:5px !important;
+	}
+
+	.portal_menu_list_heading + li {
+
+		padding-top:10px !important;
+	}
+
+	.portal_menu_list_heading li {
+
+		padding-bottom:0px;
+	}	
+
+	#portal_menu_atlases_list li:last-of-type {
+
+		padding-bottom:15px !important;
+	}
+
+	.icon-spin5 {
+
+		color:#000;
+	}
+</style>
+<div id="pHeader">
+<div id="top_chrome">
+	<div id="top_chrome_buttons">
+		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
+		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
+	</div>
+</div>
+
+<div id="header_content">
+
+	<a href="http://AllenInstitute.github.io/AllenSDK">
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+	</a>
+</div>
+</div>
+
+<script>
+
+jQuery('#portal_tab_menu').bind('touchstart', function() {
+
+	if(window.console)
+		console.log("touchstart");
+});
+</script>
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for allensdk.brain_observatory.r_neuropil</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="kn">as</span> <span class="nn">sparse</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">solve_banded</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">linregress</span> <span class="k">as</span> <span class="n">linregress</span>
+
+
+<div class="viewcode-block" id="get_diagonals_from_sparse"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.get_diagonals_from_sparse">[docs]</a><span class="k">def</span> <span class="nf">get_diagonals_from_sparse</span><span class="p">(</span><span class="n">mat</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Returns a dictionary of diagonals keyed by offsets</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mat: scipy.sparse matrix</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dictionary: diagonals keyed by offsets</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">mat_dia</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">todia</span><span class="p">()</span>  <span class="c">#make sure the matrix is in diagonal format</span>
+
+    <span class="n">offsets</span> <span class="o">=</span> <span class="n">mat_dia</span><span class="o">.</span><span class="n">offsets</span>
+    <span class="n">diagonals</span> <span class="o">=</span> <span class="n">mat_dia</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="n">mat_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">o</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">offsets</span><span class="p">):</span>
+        <span class="n">mat_dict</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="n">diagonals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">mat_dict</span>
+</div>
+<div class="viewcode-block" id="ab_from_diagonals"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.ab_from_diagonals">[docs]</a><span class="k">def</span> <span class="nf">ab_from_diagonals</span><span class="p">(</span><span class="n">mat_dict</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Constructs value for scipy.linalg.solve_banded</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mat_dict: dictionary of diagonals keyed by offsets</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ab: value for scipy.linalg.solve_banded</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">offsets</span> <span class="o">=</span> <span class="n">mat_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+
+    <span class="n">T</span> <span class="o">=</span> <span class="n">mat_dict</span><span class="p">[</span><span class="n">offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">ab</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">l</span><span class="o">+</span><span class="n">u</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">T</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">offsets</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">u</span><span class="o">-</span><span class="n">o</span>
+        <span class="n">ab</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">=</span><span class="n">mat_dict</span><span class="p">[</span><span class="n">o</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">ab</span>
+</div>
+<div class="viewcode-block" id="error_calc"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.error_calc">[docs]</a><span class="k">def</span> <span class="nf">error_calc</span><span class="p">(</span><span class="n">F_M</span><span class="p">,</span> <span class="n">F_N</span><span class="p">,</span> <span class="n">F_C</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+
+    <span class="n">er</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">F_C</span><span class="o">-</span><span class="p">(</span><span class="n">F_M</span><span class="o">-</span><span class="n">r</span><span class="o">*</span><span class="n">F_N</span><span class="p">))))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">F_M</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">er</span>
+</div>
+<div class="viewcode-block" id="error_calc_outlier"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.error_calc_outlier">[docs]</a><span class="k">def</span> <span class="nf">error_calc_outlier</span><span class="p">(</span><span class="n">F_M</span><span class="p">,</span> <span class="n">F_N</span><span class="p">,</span> <span class="n">F_C</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+
+    <span class="n">std_F_M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">F_M</span><span class="p">)</span>
+    <span class="n">mean_F_M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">F_M</span><span class="p">)</span>
+    <span class="n">ind_outlier</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">F_M</span> <span class="o">&gt;</span> <span class="n">mean_F_M</span> <span class="o">+</span> <span class="mf">2.</span><span class="o">*</span><span class="n">std_F_M</span><span class="p">)</span>
+
+    <span class="n">er</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">F_C</span><span class="p">[</span><span class="n">ind_outlier</span><span class="p">]</span><span class="o">-</span><span class="p">(</span><span class="n">F_M</span><span class="p">[</span><span class="n">ind_outlier</span><span class="p">]</span><span class="o">-</span><span class="n">r</span><span class="o">*</span><span class="n">F_N</span><span class="p">[</span><span class="n">ind_outlier</span><span class="p">]))))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">F_M</span><span class="p">[</span><span class="n">ind_outlier</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">er</span>
+
+</div>
+<div class="viewcode-block" id="NeuropilSubtract"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.NeuropilSubtract">[docs]</a><span class="k">class</span> <span class="nc">NeuropilSubtract</span> <span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">lam</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="mf">0.001</span>  <span class="c"># initial guess for neuropil subtraction constant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="n">T</span>
+
+        <span class="n">Ls</span> <span class="o">=</span> <span class="o">-</span><span class="n">sparse</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;csr&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">sparse</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">T</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;csr&#39;</span><span class="p">)</span>  <span class="c">#using csr because multiplication is fast</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">Ls</span> <span class="o">/=</span> <span class="n">dt</span>
+        <span class="n">Ls2</span> <span class="o">=</span> <span class="n">Ls</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Ls</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Ls2</span> <span class="o">=</span> <span class="n">Ls2</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">lam</span> <span class="o">=</span> <span class="n">lam</span>
+
+        <span class="n">M</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="n">lam</span><span class="o">*</span><span class="n">Ls2</span>
+        <span class="n">mat_dict</span> <span class="o">=</span> <span class="n">get_diagonals_from_sparse</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">ab</span> <span class="o">=</span> <span class="n">ab_from_diagonals</span><span class="p">(</span><span class="n">mat_dict</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">M</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ab</span> <span class="o">=</span> <span class="n">ab</span>
+        
+<div class="viewcode-block" id="NeuropilSubtract.set_F"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.NeuropilSubtract.set_F">[docs]</a>    <span class="k">def</span> <span class="nf">set_F</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">F_M</span><span class="p">,</span><span class="n">F_N</span><span class="p">,</span><span class="n">F_M_crossval</span><span class="p">,</span><span class="n">F_N_crossval</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Internal initializatin routine</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F_M</span> <span class="o">=</span> <span class="n">F_M</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F_N</span> <span class="o">=</span> <span class="n">F_N</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F_M_crossval</span> <span class="o">=</span> <span class="n">F_M_crossval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F_N_crossval</span> <span class="o">=</span> <span class="n">F_N_crossval</span>
+
+    
+    <span class="c">#def fit_grad_desc_early_stop(self,r_init=0.001,learning_rate=0.1):</span></div>
+<div class="viewcode-block" id="NeuropilSubtract.fit_grad_descent"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.NeuropilSubtract.fit_grad_descent">[docs]</a>    <span class="k">def</span> <span class="nf">fit_grad_descent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">r_init</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Calculate fit using gradient decent, as opposed to iteratively</span>
+<span class="sd">        computing exact solutions</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">delta_r</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r_init</span>
+
+        <span class="n">r_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">error_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">F_C</span> <span class="o">=</span> <span class="n">solve_banded</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">ab</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">F_M</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">F_N</span><span class="p">)</span>
+
+        <span class="n">itmax</span> <span class="o">=</span> <span class="mi">10000</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">exceed_bounds</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">delta_r</span> <span class="o">&gt;</span> <span class="mf">0.0001</span> <span class="ow">and</span> <span class="n">it</span> <span class="o">&lt;</span> <span class="n">itmax</span><span class="p">):</span>
+
+            <span class="n">F_C</span> <span class="o">=</span> <span class="n">solve_banded</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">ab</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">F_M</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">F_N</span><span class="p">)</span>
+            <span class="n">r_new</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">learning_rate</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">F_M</span> <span class="o">-</span> <span class="n">F_C</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">F_N</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">F_N</span><span class="p">)</span>
+
+            <span class="sd">&#39;&#39;&#39;compute error on cross-validation set&#39;&#39;&#39;</span>
+            <span class="n">F_C_crossval</span> <span class="o">=</span> <span class="n">solve_banded</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">ab</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">F_M_crossval</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">F_N_crossval</span><span class="p">)</span>
+<span class="c">#            error_it = error_calc_outlier(self.F_M_crossval, self.F_N_crossval, F_C_crossval, r)</span>
+            <span class="n">error_it</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">error_calc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">F_M_crossval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">F_N_crossval</span><span class="p">,</span> <span class="n">F_C_crossval</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+            
+            <span class="n">delta_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">r_new</span> <span class="o">-</span> <span class="n">r</span><span class="p">)</span><span class="o">/</span><span class="n">r</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">r_new</span>
+
+            <span class="n">r_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+            <span class="n">error_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_it</span><span class="p">)</span>
+            <span class="n">it</span><span class="o">+=</span><span class="mi">1</span>
+            
+            <span class="k">if</span> <span class="n">error_it</span> <span class="o">&gt;</span> <span class="n">error_list</span><span class="p">[</span><span class="n">it</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="c"># early stopping</span>
+                <span class="k">break</span>
+
+        <span class="c"># if r or error_it go out of acceptable bounds, break </span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">exceed_bounds</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="n">error_it</span> <span class="o">&gt;</span> <span class="mf">0.2</span><span class="p">:</span>
+            <span class="n">exceed_bounds</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="n">F_C</span> <span class="o">=</span> <span class="n">solve_banded</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">ab</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">F_M</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">F_N</span><span class="p">)</span>
+
+        <span class="n">r_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r_list</span><span class="p">)</span>
+        <span class="n">error_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">error_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r_vals</span> <span class="o">=</span> <span class="n">r_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_vals</span> <span class="o">=</span> <span class="n">error_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F_C</span> <span class="o">=</span> <span class="n">F_C</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F_C_crossval</span> <span class="o">=</span> <span class="n">F_C_crossval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">it</span> <span class="o">=</span> <span class="n">it</span>
+
+        <span class="k">return</span> <span class="n">exceed_bounds</span>
+
+
+<span class="c"># &#39;M&#39; denotes ROI trace</span>
+<span class="c"># &#39;N&#39; denotes neuropil trace</span></div></div>
+<div class="viewcode-block" id="estimate_contamination_ratios"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.estimate_contamination_ratios">[docs]</a><span class="k">def</span> <span class="nf">estimate_contamination_ratios</span><span class="p">(</span><span class="n">F_M_unscaled</span><span class="p">,</span> <span class="n">F_N_unscaled</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Calculates neuropil contamination of ROI</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    F_M_unscaled: ROI trace</span>
+
+<span class="sd">    F_N_unscaled: Neuropil trace</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dictionary: key-value pairs</span>
+<span class="sd">        * &#39;r&#39;: the contamination ratio -- corrected trace = M - r*N</span>
+<span class="sd">        * &#39;err&#39;: RMS error</span>
+<span class="sd">        * &#39;min_error&#39;: minimum error</span>
+<span class="sd">        * &#39;bounds_error&#39;: boolean. True if error or R are outside tolerance</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">T</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_M_unscaled</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">T</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">),</span> <span class="s">&quot;Input arrays of different dimension&quot;</span>
+    <span class="n">T_cross_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">T</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">T</span> <span class="o">-</span> <span class="n">T_cross_val</span> <span class="o">&gt;</span> <span class="n">T_cross_val</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">T</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">ns</span> <span class="o">=</span> <span class="n">NeuropilSubtract</span><span class="p">(</span><span class="n">T_cross_val</span><span class="p">,</span> <span class="n">lam</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+    <span class="n">F_M_unscaled_cross_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">F_M_unscaled</span><span class="p">)</span>
+    <span class="n">F_N_unscaled_cross_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">)</span>
+
+    <span class="sd">&#39;&#39;&#39;pick r on first half of the trace &#39;&#39;&#39;</span>
+    <span class="n">F_M_unscaled</span> <span class="o">=</span> <span class="n">F_M_unscaled</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">T_cross_val</span><span class="p">]</span>
+    <span class="n">F_N_unscaled</span> <span class="o">=</span> <span class="n">F_N_unscaled</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">T_cross_val</span><span class="p">]</span>        
+    
+    <span class="n">F_M_unscaled_cross_val</span> <span class="o">=</span> <span class="n">F_M_unscaled_cross_val</span><span class="p">[</span><span class="n">T_cross_val</span><span class="p">:</span><span class="n">T</span><span class="p">]</span>
+    <span class="n">F_N_unscaled_cross_val</span> <span class="o">=</span>  <span class="n">F_N_unscaled_cross_val</span><span class="p">[</span><span class="n">T_cross_val</span><span class="p">:</span><span class="n">T</span><span class="p">]</span>
+    
+    <span class="sd">&#39;&#39;&#39; normalize to have F_N in (0,1)&#39;&#39;&#39;</span>
+    <span class="n">F_M</span> <span class="o">=</span> <span class="p">(</span><span class="n">F_M_unscaled</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">)))</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">))</span>
+    <span class="n">F_N</span> <span class="o">=</span> <span class="p">(</span><span class="n">F_N_unscaled</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">)))</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">))</span>
+    <span class="n">F_M_cross_val</span> <span class="o">=</span> <span class="p">(</span><span class="n">F_M_unscaled_cross_val</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled_cross_val</span><span class="p">)))</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">F_N_unscaled_cross_val</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled_cross_val</span><span class="p">))</span>
+    <span class="n">F_N_cross_val</span> <span class="o">=</span> <span class="p">(</span><span class="n">F_N_unscaled_cross_val</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled_cross_val</span><span class="p">)))</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">F_N_unscaled_cross_val</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled_cross_val</span><span class="p">))</span>
+
+    <span class="c"># fitting model </span>
+    
+    <span class="n">ns</span><span class="o">.</span><span class="n">set_F</span><span class="p">(</span><span class="n">F_M</span><span class="p">,</span> <span class="n">F_N</span><span class="p">,</span> <span class="n">F_M_cross_val</span><span class="p">,</span> <span class="n">F_N_cross_val</span><span class="p">)</span>
+
+    <span class="sd">&#39;&#39;&#39;stop gradient descent at first increase of cross-validation error&#39;&#39;&#39;</span>
+    <span class="n">bounds_err</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">fit_grad_descent</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            
+    <span class="n">F_C_unscaled</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">F_C</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">ns</span><span class="o">.</span><span class="n">r</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled</span><span class="p">))</span>
+    <span class="n">F_C_unscaled_crossval</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">F_C_crossval</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">F_N_unscaled_cross_val</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled_cross_val</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">ns</span><span class="o">.</span><span class="n">r</span><span class="p">)</span><span class="o">*</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N_unscaled_cross_val</span><span class="p">))</span>
+
+    <span class="n">min_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">min_error</span><span class="p">[:</span><span class="n">T</span><span class="o">-</span><span class="n">T_cross_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">F_C_unscaled</span>
+    <span class="n">min_error</span><span class="p">[</span><span class="n">T</span><span class="o">-</span><span class="n">T_cross_val</span><span class="p">:</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="n">F_C_unscaled_crossval</span>        
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results</span><span class="p">[</span><span class="s">&quot;r&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">r</span>
+    <span class="n">results</span><span class="p">[</span><span class="s">&quot;err&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">error_vals</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">results</span><span class="p">[</span><span class="s">&quot;min_error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_error</span>
+    <span class="n">results</span><span class="p">[</span><span class="s">&quot;bounds_error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounds_err</span>
+    <span class="k">return</span> <span class="n">results</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer">
+    </div>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+
+  </body>
+</html>

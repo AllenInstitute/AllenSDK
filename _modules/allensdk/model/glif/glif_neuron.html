@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.model.glif.glif_neuron &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>allensdk.model.glif.glif_neuron &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -655,58 +655,41 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    El : float </span>
-<span class="sd">        resting potential </span>
-
-<span class="sd">    dt : float</span>
-<span class="sd">        duration between time steps</span>
-
-<span class="sd">    asc_tau_array: np.ndarray</span>
-<span class="sd">        TODO</span>
-
-<span class="sd">    R_input : float</span>
-<span class="sd">        input resistance</span>
-
-<span class="sd">    C : float</span>
-<span class="sd">        capacitance</span>
-
-<span class="sd">    asc_amp_arrap : np.ndarray</span>
-<span class="sd">        afterspike current vector.  one element per element of asc_tau_array.</span>
-
-<span class="sd">    spike_cut_length : int</span>
-<span class="sd">        how many time steps to replace with NaNs when a spike occurs.</span>
-
-<span class="sd">    th_inf : float</span>
-<span class="sd">        instantaneous threshold</span>
-
-<span class="sd">    coeffs : dict</span>
+<span class="sd">     El : float </span>
+<span class="sd">         resting potential </span>
+<span class="sd">     dt : float</span>
+<span class="sd">         duration between time steps</span>
+<span class="sd">     asc_tau_array: np.ndarray</span>
+<span class="sd">         TODO</span>
+<span class="sd">     R_input : float</span>
+<span class="sd">         input resistance</span>
+<span class="sd">     C : float</span>
+<span class="sd">         capacitance</span>
+<span class="sd">     asc_amp_arrap : np.ndarray</span>
+<span class="sd">         afterspike current vector.  one element per element of asc_tau_array.</span>
+<span class="sd">     spike_cut_length : int</span>
+<span class="sd">         how many time steps to replace with NaNs when a spike occurs.</span>
+<span class="sd">     th_inf : float</span>
+<span class="sd">         instantaneous threshold</span>
+<span class="sd">     coeffs : dict</span>
 <span class="sd">        dictionary coefficients premultiplied to neuron properties during simulation. used for optimization.</span>
-
-<span class="sd">    AScurrent_dynamics_method : dict</span>
-<span class="sd">        dictionary containing the &#39;name&#39; of the afterspike current dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
-
-<span class="sd">    voltage_dynamics_method : dict</span>
-<span class="sd">        dictionary containing the &#39;name&#39; of the voltage dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
-
-<span class="sd">    threshold_dynamics_method : dict</span>
-<span class="sd">        dictionary containing the &#39;name&#39; of the threshold dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
-
-<span class="sd">    AScurrent_reset_method : dict</span>
-<span class="sd">        dictionary containing the &#39;name&#39; of the afterspike current dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
-
-<span class="sd">    voltage_reset_method : dict</span>
-<span class="sd">        dictionary containing the &#39;name&#39; of the voltage dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
-
-<span class="sd">    threshold_reset_method : dict</span>
-<span class="sd">        dictionary containing the &#39;name&#39; of the threshold dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
-
-<span class="sd">    init_voltage : float </span>
+<span class="sd">     AScurrent_dynamics_method : dict</span>
+<span class="sd">         dictionary containing the &#39;name&#39; of the afterspike current dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
+<span class="sd">     voltage_dynamics_method : dict</span>
+<span class="sd">         dictionary containing the &#39;name&#39; of the voltage dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
+<span class="sd">     threshold_dynamics_method : dict</span>
+<span class="sd">         dictionary containing the &#39;name&#39; of the threshold dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
+<span class="sd">     AScurrent_reset_method : dict</span>
+<span class="sd">         dictionary containing the &#39;name&#39; of the afterspike current dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
+<span class="sd">     voltage_reset_method : dict</span>
+<span class="sd">         dictionary containing the &#39;name&#39; of the voltage dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
+<span class="sd">     threshold_reset_method : dict</span>
+<span class="sd">         dictionary containing the &#39;name&#39; of the threshold dynamics method to use and a &#39;params&#39; dictionary parameters to pass to that function.</span>
+<span class="sd">     init_voltage : float </span>
 <span class="sd">        initial voltage value</span>
-
-<span class="sd">    init_threshold : float</span>
-<span class="sd">        initial spike threshold value</span>
-
-<span class="sd">    init_AScurrents : np.ndarray</span>
+<span class="sd">     init_threshold : float</span>
+<span class="sd">         initial spike threshold value</span>
+<span class="sd">     init_AScurrents : np.ndarray</span>
 <span class="sd">        initial afterspike current vector. one element per element of asc_tau_array.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -776,8 +759,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="nd">@property</span>
 <div class="viewcode-block" id="GlifNeuron.tau_m"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.tau_m">[docs]</a>    <span class="k">def</span> <span class="nf">tau_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Compute the product of the neuron&#39;s input resistance and capacitance.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_input</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_input</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span>
 </div>
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="GlifNeuron.from_dict"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.from_dict">[docs]</a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
@@ -1109,6 +1091,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
@@ -1122,11 +1105,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

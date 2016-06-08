@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.config.model.formats package &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>allensdk.config.model.formats package &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
     <link rel="up" title="allensdk.config.model package" href="allensdk.config.model.html" />
     <link rel="next" title="allensdk.core package" href="allensdk.core.html" />
     <link rel="prev" title="allensdk.config.model package" href="allensdk.config.model.html" /> 
@@ -664,7 +664,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <dd><p>Bases: <a class="reference internal" href="allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser" title="allensdk.config.model.description_parser.DescriptionParser"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.config.model.description_parser.DescriptionParser</span></tt></a></p>
 <dl class="attribute">
 <dt id="allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.log">
-<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x2aaaacee32d0&gt;</em><a class="headerlink" href="#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.log" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x7fd936b90790&gt;</em><a class="headerlink" href="#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.log" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -778,117 +778,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </dd></dl>
 
 </div>
-<div class="section" id="module-allensdk.config.model.formats.json_util">
-<span id="allensdk-config-model-formats-json-util-module"></span><h2>allensdk.config.model.formats.json_util module<a class="headerlink" href="#module-allensdk.config.model.formats.json_util" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="allensdk.config.model.formats.json_util.JsonUtil">
-<em class="property">class </em><tt class="descclassname">allensdk.config.model.formats.json_util.</tt><tt class="descname">JsonUtil</tt><a class="reference internal" href="_modules/allensdk/config/model/formats/json_util.html#JsonUtil"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.json_util.JsonUtil" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<dl class="classmethod">
-<dt id="allensdk.config.model.formats.json_util.JsonUtil.read_json_file">
-<em class="property">classmethod </em><tt class="descname">read_json_file</tt><big>(</big><em>json_path</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/formats/json_util.html#JsonUtil.read_json_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.json_util.JsonUtil.read_json_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform a JSON contained in a file into an equivalent
-nested python dict.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json_path</strong> : string</p>
-<blockquote>
-<div><p>The input.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
-<blockquote>
-<div><p>Python version of the input</p>
-</div></blockquote>
-<p>Note: if the input is a bare array or literal, for example,</p>
-<p class="last">the output will be of the corresponding type.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="allensdk.config.model.formats.json_util.JsonUtil.read_json_string">
-<em class="property">classmethod </em><tt class="descname">read_json_string</tt><big>(</big><em>json_string</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/formats/json_util.html#JsonUtil.read_json_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.json_util.JsonUtil.read_json_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform a JSON string into an equivalent nested python dict.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json_string</strong> : string</p>
-<blockquote>
-<div><p>The input.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
-<blockquote>
-<div><p>Python version of the input</p>
-</div></blockquote>
-<p>Note: if the input is a bare array or literal, for example,</p>
-<p class="last">the output will be of the corresponding type.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="allensdk.config.model.formats.json_util.JsonUtil.remove_comments">
-<em class="property">classmethod </em><tt class="descname">remove_comments</tt><big>(</big><em>json_string</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/formats/json_util.html#JsonUtil.remove_comments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.json_util.JsonUtil.remove_comments" title="Permalink to this definition">¶</a></dt>
-<dd><p>Strip single and multiline javascript-style comments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json</strong> : string</p>
-<blockquote>
-<div><p>Json string with javascript-style comments.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
-<blockquote>
-<div><p>Copy of the input with comments removed.</p>
-</div></blockquote>
-<p class="last">Note: A JSON decoder MAY accept and ignore comments.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="allensdk.config.model.formats.json_util.JsonUtil.remove_multiline_comments">
-<em class="property">classmethod </em><tt class="descname">remove_multiline_comments</tt><big>(</big><em>json_string</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/model/formats/json_util.html#JsonUtil.remove_multiline_comments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.model.formats.json_util.JsonUtil.remove_multiline_comments" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rebuild input without substrings matching /<em>...</em>/.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>json_string</strong> : string</p>
-<blockquote>
-<div><p>may or may not contain multiline comments.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string</p>
-<blockquote class="last">
-<div><p>Copy of the input without the comments.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-allensdk.config.model.formats.pycfg_description_parser">
 <span id="allensdk-config-model-formats-pycfg-description-parser-module"></span><h2>allensdk.config.model.formats.pycfg_description_parser module<a class="headerlink" href="#module-allensdk.config.model.formats.pycfg_description_parser" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -897,7 +786,7 @@ nested python dict.</p>
 <dd><p>Bases: <a class="reference internal" href="allensdk.config.model.html#allensdk.config.model.description_parser.DescriptionParser" title="allensdk.config.model.description_parser.DescriptionParser"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.config.model.description_parser.DescriptionParser</span></tt></a></p>
 <dl class="attribute">
 <dt id="allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.log">
-<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x2aaaac1ca710&gt;</em><a class="headerlink" href="#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.log" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x7fd937ae8f90&gt;</em><a class="headerlink" href="#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser.log" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1004,6 +893,7 @@ nested python dict.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -1017,11 +907,12 @@ nested python dict.</p>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

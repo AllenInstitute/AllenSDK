@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core package &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>allensdk.core package &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.ephys package" href="allensdk.ephys.html" />
     <link rel="prev" title="allensdk.config.model.formats package" href="allensdk.config.model.formats.html" /> 
@@ -636,6 +636,764 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <h1>allensdk.core package<a class="headerlink" href="#allensdk-core-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-allensdk.core.brain_observatory_cache">
+<span id="allensdk-core-brain-observatory-cache-module"></span><h2>allensdk.core.brain_observatory_cache module<a class="headerlink" href="#module-allensdk.core.brain_observatory_cache" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache">
+<em class="property">class </em><tt class="descclassname">allensdk.core.brain_observatory_cache.</tt><tt class="descname">BrainObservatoryCache</tt><big>(</big><em>cache=True</em>, <em>manifest_file='brain_observatory_manifest.json'</em>, <em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.cache.Cache" title="allensdk.api.cache.Cache"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.cache.Cache</span></tt></a></p>
+<blockquote>
+<div>Cache class for storing and accessing data from the Brain Observatory.
+By default, this class will cache any downloaded metadata or files in 
+well known locations defined in a manifest file.  This behavior can be
+disabled.</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cache: boolean</strong></p>
+<blockquote class="last">
+<div><blockquote>
+<div><p>Whether the class should save results of API queries to locations specified
+in the manifest file.  Queries for files (as opposed to metadata) must have a
+file location.  If caching is disabled, those locations must be specified
+in the function call (e.g. get_ophys_experiment_data(file_name=&#8217;file.nwb&#8217;)).</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>manifest_file: string</dt>
+<dd><p class="first last">File name of the manifest to be read.  Default is &#8220;brain_observatory_manifest.json&#8221;.</p>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>api: BrainObservatoryApi instance</td>
+<td>The object used for making API queries related to the Brain</td>
+</tr>
+<tr class="row-even"><td>Observatory.</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.CELL_SPECIMENS_KEY">
+<tt class="descname">CELL_SPECIMENS_KEY</tt><em class="property"> = 'CELL_SPECIMENS'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.CELL_SPECIMENS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENTS_KEY">
+<tt class="descname">EXPERIMENTS_KEY</tt><em class="property"> = 'EXPERIMENTS'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENTS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENT_CONTAINERS_KEY">
+<tt class="descname">EXPERIMENT_CONTAINERS_KEY</tt><em class="property"> = 'EXPERIMENT_CONTAINERS'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENT_CONTAINERS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENT_DATA_KEY">
+<tt class="descname">EXPERIMENT_DATA_KEY</tt><em class="property"> = 'EXPERIMENT_DATA'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENT_DATA_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.STIMULUS_MAPPINGS_KEY">
+<tt class="descname">STIMULUS_MAPPINGS_KEY</tt><em class="property"> = 'STIMULUS_MAPPINGS'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.STIMULUS_MAPPINGS_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.build_manifest">
+<tt class="descname">build_manifest</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.build_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.build_manifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a manifest for this Cache class and save it in a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote class="last">
+<div><p>File location to save the manifest.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_cre_lines">
+<tt class="descname">get_all_cre_lines</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_cre_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_cre_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all cre driver lines in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_imaging_depths">
+<tt class="descname">get_all_imaging_depths</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_imaging_depths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_imaging_depths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all imaging depths in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_session_types">
+<tt class="descname">get_all_session_types</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_session_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_session_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all stimulus sessions in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_stimuli">
+<tt class="descname">get_all_stimuli</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_stimuli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_stimuli" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all stimuli in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_targeted_structures">
+<tt class="descname">get_all_targeted_structures</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_targeted_structures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_targeted_structures" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all targeted structures in the data set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens">
+<tt class="descname">get_cell_specimens</tt><big>(</big><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>simple=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_cell_specimens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return cell specimens that have certain properies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to save/read the cell specimens.  If file_name is None, 
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</div></blockquote>
+<p><strong>ids: list</strong></p>
+<blockquote>
+<div><p>List of cell specimen ids.</p>
+</div></blockquote>
+<p><strong>experiment_container_ids: list</strong></p>
+<blockquote>
+<div><p>List of experiment container ids.</p>
+</div></blockquote>
+<p><strong>simple: boolean</strong></p>
+<blockquote>
+<div><p>Whether or not to simplify the dictionary properties returned by this method
+to a more concise subset.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of dictionaries</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers">
+<tt class="descname">get_experiment_containers</tt><big>(</big><em>file_name=None</em>, <em>ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>simple=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_experiment_containers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of experiment containers matching certain criteria.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to save/read the experiment containers.  If file_name is None, 
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</div></blockquote>
+<p><strong>ids: list</strong></p>
+<blockquote>
+<div><p>List of experiment container ids.</p>
+</div></blockquote>
+<p><strong>targeted_structures: list</strong></p>
+<blockquote>
+<div><p>List of structure acronyms.  Must be in the list returned by 
+BrainObservatoryCache.get_all_targeted_structures().</p>
+</div></blockquote>
+<p><strong>imaging_depths: list</strong></p>
+<blockquote>
+<div><p>List of imaging depths.  Must be in the list returned by 
+BrainObservatoryCache.get_all_imaging_depths().</p>
+</div></blockquote>
+<p><strong>cre_lines: list</strong></p>
+<blockquote>
+<div><p>List of cre lines.  Must be in the list returned by 
+BrainObservatoryCache.get_all_cre_lines().</p>
+</div></blockquote>
+<p><strong>simple: boolean</strong></p>
+<blockquote>
+<div><p>Whether or not to simplify the dictionary properties returned by this method
+to a more concise subset.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of dictionaries</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_data">
+<tt class="descname">get_ophys_experiment_data</tt><big>(</big><em>ophys_experiment_id</em>, <em>file_name=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiment_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiment_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the NWB file for an ophys_experiment (if it hasn&#8217;t already been
+downloaded) and return a data accessor object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to save/read the data set.  If file_name is None, 
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</div></blockquote>
+<p><strong>ophys_experiment_id: integer</strong></p>
+<blockquote>
+<div><p>id of the ophys_experiment to retrieve</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">BrainObservatoryNwbDataSet</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments">
+<tt class="descname">get_ophys_experiments</tt><big>(</big><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em>, <em>simple=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of ophys experiments matching certain criteria.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>file_name: string</strong></p>
+<blockquote>
+<div><p>File name to save/read the ophys experiments.  If file_name is None, 
+the file_name will be pulled out of the manifest.  If caching
+is disabled, no file will be saved. Default is None.</p>
+</div></blockquote>
+<p><strong>ids: list</strong></p>
+<blockquote>
+<div><p>List of ophys experiment ids.</p>
+</div></blockquote>
+<p><strong>experiment_container_ids: list</strong></p>
+<blockquote>
+<div><p>List of experiment container ids.</p>
+</div></blockquote>
+<p><strong>targeted_structures: list</strong></p>
+<blockquote>
+<div><p>List of structure acronyms.  Must be in the list returned by 
+BrainObservatoryCache.get_all_targeted_structures().</p>
+</div></blockquote>
+<p><strong>imaging_depths: list</strong></p>
+<blockquote>
+<div><p>List of imaging depths.  Must be in the list returned by 
+BrainObservatoryCache.get_all_imaging_depths().</p>
+</div></blockquote>
+<p><strong>cre_lines: list</strong></p>
+<blockquote>
+<div><p>List of cre lines.  Must be in the list returned by 
+BrainObservatoryCache.get_all_cre_lines().</p>
+</div></blockquote>
+<p><strong>stimuli: list</strong></p>
+<blockquote>
+<div><p>List of stimulus names.  Must be in the list returned by 
+BrainObservatoryCache.get_all_stimuli().</p>
+</div></blockquote>
+<p><strong>session_types: list</strong></p>
+<blockquote>
+<div><p>List of stimulus session type names.  Must be in the list returned by 
+BrainObservatoryCache.get_all_session_types().</p>
+</div></blockquote>
+<p><strong>simple: boolean</strong></p>
+<blockquote>
+<div><p>Whether or not to simplify the dictionary properties returned by this method
+to a more concise subset.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of dictionaries</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-allensdk.core.brain_observatory_nwb_data_set">
+<span id="allensdk-core-brain-observatory-nwb-data-set-module"></span><h2>allensdk.core.brain_observatory_nwb_data_set module<a class="headerlink" href="#module-allensdk.core.brain_observatory_nwb_data_set" title="Permalink to this headline">¶</a></h2>
+<p>Created on Fri Aug 14 14:04:24 2015</p>
+<p>&#64;author: <a class="reference external" href="mailto:saskiad&#37;&#52;&#48;alleninstitute&#46;org">saskiad<span>&#64;</span>alleninstitute<span>&#46;</span>org</a>
+Functions to extract relevant data from the CAM NWB files</p>
+<dl class="class">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet">
+<em class="property">class </em><tt class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</tt><tt class="descname">BrainObservatoryNwbDataSet</tt><big>(</big><em>nwb_file</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING">
+<tt class="descname">FILE_METADATA_MAPPING</tt><em class="property"> = {'ophys_experiment_id': 'general/session_id', 'session_type': 'general/session_type', 'fov': 'general/fov', 'sex': 'general/subject/sex', 'imaging_depth': 'general/optophysiology/imaging_plane_1/imaging depth', 'device_string': 'general/devices/2-photon microscope', 'session_start_time': 'session_start_time', 'indicator': 'general/optophysiology/imaging_plane_1/indicator', 'genotype': 'general/subject/genotype', 'age': 'general/subject/age', 'excitation_lambda': 'general/optophysiology/imaging_plane_1/excitation_lambda', 'experiment_container_id': 'general/experiment_container_id', 'targeted_structure': 'general/optophysiology/imaging_plane_1/location'}</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.MOVIE_FOV_PX">
+<tt class="descname">MOVIE_FOV_PX</tt><em class="property"> = (512, 512)</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.MOVIE_FOV_PX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.PIPELINE_DATASET">
+<tt class="descname">PIPELINE_DATASET</tt><em class="property"> = 'brain_observatory_pipeline'</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.PIPELINE_DATASET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.STIMULUS_TABLE_TYPES">
+<tt class="descname">STIMULUS_TABLE_TYPES</tt><em class="property"> = {'abstract_feature_series': ['drifting_gratings', 'static_gratings'], 'indexed_time_series': ['natural_movie_one', 'natural_movie_two', 'natural_movie_three', 'natural_scenes', 'locally_sparse_noise']}</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.STIMULUS_TABLE_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_abstract_feature_series_stimulus_table">
+<tt class="descname">get_abstract_feature_series_stimulus_table</tt><big>(</big><em>stimulus_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_abstract_feature_series_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_abstract_feature_series_stimulus_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the a stimulus table for an abstract feature series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">stimulus table: pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_ids">
+<tt class="descname">get_cell_specimen_ids</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_cell_specimen_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of cell IDs for all cells in the file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">cell specimen IDs: list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces">
+<tt class="descname">get_corrected_fluorescence_traces</tt><big>(</big><em>cell_specimen_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of neuropil-corrected fluorescence traces 
+for all ROIs and the timestamps for each datapoint</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cell_specimen_ids: list or array (optional)</strong></p>
+<blockquote>
+<div><p>List of cell IDs to return traces for. If this is None (default)
+then all are returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">timestamps: 2D numpy array</p>
+<blockquote>
+<div><p>Timestamp for each fluorescence sample</p>
+</div></blockquote>
+<p>traces: 2D numpy array</p>
+<blockquote class="last">
+<div><p>Corrected fluorescence traces for each cell</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_dff_traces">
+<tt class="descname">get_dff_traces</tt><big>(</big><em>cell_specimen_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_dff_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_dff_traces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of dF/F traces for all ROIs and 
+the timestamps for each datapoint</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cell_specimen_ids: list or array (optional)</strong></p>
+<blockquote>
+<div><p>List of cell IDs to return data for. If this is None (default)
+then all are returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">timestamps: 2D numpy array</p>
+<blockquote>
+<div><p>Timestamp for each fluorescence sample</p>
+</div></blockquote>
+<p>dF/F: 2D numpy array</p>
+<blockquote class="last">
+<div><p>dF/F values for each cell</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_traces">
+<tt class="descname">get_fluorescence_traces</tt><big>(</big><em>cell_specimen_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_fluorescence_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_traces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of fluorescence traces for all ROI and 
+the timestamps for each datapoint</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cell_specimen_ids: list or array (optional)</strong></p>
+<blockquote>
+<div><p>List of cell IDs to return traces for. If this is None (default)
+then all are returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">timestamps: 2D numpy array</p>
+<blockquote>
+<div><p>Timestamp for each fluorescence sample</p>
+</div></blockquote>
+<p>traces: 2D numpy array</p>
+<blockquote class="last">
+<div><p>Fluorescence traces for each cell</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_indexed_time_series_stimulus_table">
+<tt class="descname">get_indexed_time_series_stimulus_table</tt><big>(</big><em>stimulus_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_indexed_time_series_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_indexed_time_series_stimulus_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the a stimulus table for an indexed time series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">stimulus table: pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template">
+<tt class="descname">get_locally_sparse_noise_stimulus_template</tt><big>(</big><em>mask_off_screen=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an array of the stimulus template for the specified stimulus.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>mask_off_screen: boolean</strong></p>
+<blockquote>
+<div><p>Set off-screen regions of the stimulus to LocallySparseNoise.LSN_OFF_SCREEN.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">tuple: (template, off-screen mask)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_max_projection">
+<tt class="descname">get_max_projection</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_max_projection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_max_projection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the maximum projection image for the 2P movie.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">max projection: np.ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_metadata">
+<tt class="descname">get_metadata</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of meta data associated with each 
+experiment, including Cre line, specimen number, 
+visual area imaged, imaging depth</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">metadata: dictionary</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_motion_correction">
+<tt class="descname">get_motion_correction</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_motion_correction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_motion_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_traces">
+<tt class="descname">get_neuropil_traces</tt><big>(</big><em>cell_specimen_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_neuropil_traces"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_traces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of fluorescence traces for all ROIs 
+and the timestamps for each datapoint</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cell_specimen_ids: list or array (optional)</strong></p>
+<blockquote>
+<div><p>List of cell IDs to return traces for. If this is None (default)
+then all are returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">timestamps: 2D numpy array</p>
+<blockquote>
+<div><p>Timestamp for each fluorescence sample</p>
+</div></blockquote>
+<p>traces: 2D numpy array</p>
+<blockquote class="last">
+<div><p>Neuropil fluorescence traces for each cell</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_ids">
+<tt class="descname">get_roi_ids</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_roi_ids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of IDs for all ROIs in the file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">ROI IDs: list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_mask">
+<tt class="descname">get_roi_mask</tt><big>(</big><em>cell_specimen_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_roi_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of all the ROI masks</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cell specimen IDs: list or array (optional)</strong></p>
+<blockquote>
+<div><p>List of cell IDs to return traces for. If this is None (default)
+then all are returned</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">List of ROI_Mask objects</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_running_speed">
+<tt class="descname">get_running_speed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_running_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_running_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mouse running speed in cm/s</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_session_type">
+<tt class="descname">get_session_type</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_session_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_session_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the type of experimental session, presently one of the
+following: three_session_A, three_session_B, three_session_C</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">session type: string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table">
+<tt class="descname">get_spontaneous_activity_stimulus_table</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the spontaneous activity stimulus table, if it exists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">stimulus table: pd.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table">
+<tt class="descname">get_stimulus_table</tt><big>(</big><em>stimulus_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_stimulus_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a stimulus table given a stimulus name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_template">
+<tt class="descname">get_stimulus_template</tt><big>(</big><em>stimulus_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_stimulus_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an array of the stimulus template for the specified stimulus.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>stimulus_name: string</strong></p>
+<blockquote>
+<div><p>Must be one of the strings returned by list_stimuli().</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">stimulus table: pd.DataFrame</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.list_stimuli">
+<tt class="descname">list_stimuli</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.list_stimuli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.list_stimuli" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of the stimuli presented in the experiment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">stimuli: list of strings</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_arrays">
+<tt class="descname">save_analysis_arrays</tt><big>(</big><em>*datasets</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.save_analysis_arrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_arrays" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_dataframes">
+<tt class="descname">save_analysis_dataframes</tt><big>(</big><em>*tables</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.save_analysis_dataframes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_dataframes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.MissingStimulusException">
+<em class="property">exception </em><tt class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</tt><tt class="descname">MissingStimulusException</tt><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#MissingStimulusException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.MissingStimulusException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.make_display_mask">
+<tt class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</tt><tt class="descname">make_display_mask</tt><big>(</big><em>display_shape=(1920</em>, <em>1200)</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#make_display_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.make_display_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a display-shaped mask that indicates which pixels are on screen after warping the stimulus.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.mask_stimulus_template">
+<tt class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</tt><tt class="descname">mask_stimulus_template</tt><big>(</big><em>template_display_coords</em>, <em>template_shape</em>, <em>display_mask=None</em>, <em>threshold=1.0</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#mask_stimulus_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.mask_stimulus_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a mask for a stimulus template of a given shape and display coordinates that indicates
+which part of the template is on screen after warping.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>template_display_coords: list</strong></p>
+<blockquote>
+<div><p>list of (x,y) display coordinates</p>
+</div></blockquote>
+<p><strong>template_shape: tuple</strong></p>
+<blockquote>
+<div><p>(width,height) of the display template</p>
+</div></blockquote>
+<p><strong>display_mask: np.ndarray</strong></p>
+<blockquote>
+<div><p>boolean 2D mask indicating which display coordinates are on screen after warping.</p>
+</div></blockquote>
+<p><strong>threshold: float</strong></p>
+<blockquote>
+<div><p>Fraction of pixels associated with a template display coordinate that should remain
+on screen to count as belonging to the mask.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">tuple: (template mask, pixel fraction)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords">
+<tt class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</tt><tt class="descname">warp_stimulus_coords</tt><big>(</big><em>vertices</em>, <em>distance=15.0</em>, <em>mon_height_cm=32.5</em>, <em>mon_width_cm=51.0</em>, <em>mon_res=(1920</em>, <em>1200)</em>, <em>eyepoint=(0.5</em>, <em>0.5)</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#warp_stimulus_coords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a list of screen vertices, provides a corresponding list of texture coordinates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>vertices: numpy.ndarray</strong></p>
+<blockquote>
+<div><p>[[x0,y0], [x1,y1], ...] A set of vertices to  convert to texture positions.</p>
+</div></blockquote>
+<p><strong>distance: float</strong></p>
+<blockquote>
+<div><p>distance from the monitor in cm.</p>
+</div></blockquote>
+<p><strong>mon_height_cm: float</strong></p>
+<blockquote>
+<div><p>monitor height in cm</p>
+</div></blockquote>
+<p><strong>mon_width_cm: float</strong></p>
+<blockquote>
+<div><p>monitor width in cm</p>
+</div></blockquote>
+<p><strong>mon_res: tuple</strong></p>
+<blockquote>
+<div><p>monitor resolution (x,y)</p>
+</div></blockquote>
+<p><strong>eyepoint: tuple</strong></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">np.ndarray</p>
+<blockquote class="last">
+<div><p>x,y coordinates shaped like the input that describe what pixel coordinates
+are displayed an the input coordinates after warping the stimulus.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-allensdk.core.cell_types_cache">
 <span id="allensdk-core-cell-types-cache-module"></span><h2>allensdk.core.cell_types_cache module<a class="headerlink" href="#module-allensdk.core.cell_types_cache" title="Permalink to this headline">¶</a></h2>
@@ -2583,6 +3341,7 @@ Each tree has exactly one root.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -2596,11 +3355,12 @@ Each tree has exactly one root.</p>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

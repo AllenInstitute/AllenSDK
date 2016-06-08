@@ -20,10 +20,10 @@ allensdk.api.queries.biophysical_api module
     :undoc-members:
     :show-inheritance:
 
-allensdk.api.queries.biophysical_perisomatic_api module
--------------------------------------------------------
+allensdk.api.queries.brain_observatory_api module
+-------------------------------------------------
 
-.. automodule:: allensdk.api.queries.biophysical_perisomatic_api
+.. automodule:: allensdk.api.queries.brain_observatory_api
     :members:
     :undoc-members:
     :show-inheritance:

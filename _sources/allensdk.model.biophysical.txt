@@ -4,6 +4,14 @@ allensdk.model.biophysical package
 Submodules
 ----------
 
+allensdk.model.biophysical.run_simulate module
+----------------------------------------------
+
+.. automodule:: allensdk.model.biophysical.run_simulate
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.model.biophysical.runner module
 ----------------------------------------
 

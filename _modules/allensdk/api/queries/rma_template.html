@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.rma_template &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>allensdk.api.queries.rma_template &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
@@ -684,12 +684,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">if</span> <span class="s">&#39;criteria_params&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
                 <span class="n">criteria_params</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_filter_rhs</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
                                     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;criteria_params&#39;</span><span class="p">]</span>
-                                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span> <span class="p">}</span>
+                                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">criteria_params</span> <span class="o">=</span> <span class="p">{}</span>
-            
-            <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;criteria&#39;</span><span class="p">]</span> <span class="o">=</span> \
-                <span class="nb">str</span><span class="p">(</span><span class="n">criteria_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">criteria_params</span><span class="p">))</span>
+       
+            <span class="n">criteria_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">criteria_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">criteria_params</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">criteria_str</span><span class="p">:</span>
+                <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;criteria&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">criteria_str</span>
+                
+
         
         <span class="k">if</span> <span class="s">&#39;include&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
             <span class="n">include_template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">template</span><span class="p">[</span><span class="s">&#39;include&#39;</span><span class="p">])</span>
@@ -697,12 +700,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">if</span> <span class="s">&#39;include_params&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
                 <span class="n">include_params</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_filter_rhs</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
                                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;include_params&#39;</span><span class="p">]</span>
-                                   <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">}</span>
+                                   <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">include_params</span> <span class="o">=</span> <span class="p">{}</span>
             
-            <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;include&#39;</span><span class="p">]</span> <span class="o">=</span> \
-                <span class="nb">str</span><span class="p">(</span><span class="n">include_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">include_params</span><span class="p">))</span>
+            <span class="n">include_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">include_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">include_params</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">include_str</span><span class="p">:</span>
+                <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;include&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">include_str</span>
+                
         
         <span class="k">if</span> <span class="s">&#39;only&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;only&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
@@ -735,9 +740,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;order&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="s">&#39;order&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
             <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;order&#39;</span><span class="p">]</span>
-        
+
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="o">**</span><span class="n">query_args</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">data</span>
 </pre></div></div></div>
 
@@ -752,6 +757,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
@@ -765,11 +771,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

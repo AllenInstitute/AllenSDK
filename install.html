@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Install Guide &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>Install Guide &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
     <link rel="next" title="Data Resources" href="data_resources.html" />
     <link rel="prev" title="Welcome to the Allen SDK" href="index.html" /> 
   </head>
@@ -635,7 +635,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <h1>Install Guide<a class="headerlink" href="#install-guide" title="Permalink to this headline">¶</a></h1>
 <p>This guide is a resource for using the Allen SDK package.
 It is maintained by the <a class="reference external" href="http://www.alleninstitute.org/">Allen Institute for Brain Science</a>.</p>
-<p>The Allen SDK was developed and tested with Python 2.7.8, installed
+<p>The Allen SDK was developed and tested with Python 2.7.9, installed
 as part of <a class="reference external" href="https://store.continuum.io/cshop/anaconda/">Anaconda Python</a> distribution
 version <a class="reference external" href="http://repo.continuum.io/archive/index.html">2.1.0</a>.  We do not guarantee
 consistent behavior with other Python versions.</p>
@@ -655,13 +655,6 @@ It is included with the Anaconda distribution.</p>
 <h2>Other Distribution Formats<a class="headerlink" href="#other-distribution-formats" title="Permalink to this headline">¶</a></h2>
 <p>The Allen SDK is also available from the source repository or as a downloadable .zip or .tar.gz archive.
 The package can also be <a class="reference external" href="https://packaging.python.org/en/latest/installing.html">installed from these formats</a>.</p>
-<blockquote>
-<div><ul class="simple">
-<li><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">GitHub Source Repository</a></li>
-<li><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK/archive/v0.11.0.tar.gz">AllenSDK-v0.11.0.tar.gz</a></li>
-<li><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK/archive/v0.11.0.zip">AllenSDK-v0.11.0.zip</a></li>
-</ul>
-</div></blockquote>
 </div>
 <div class="section" id="required-dependencies">
 <h2>Required Dependencies<a class="headerlink" href="#required-dependencies" title="Permalink to this headline">¶</a></h2>
@@ -676,7 +669,7 @@ The package can also be <a class="reference external" href="https://packaging.py
 <h2>Optional Dependencies<a class="headerlink" href="#optional-dependencies" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><ul class="simple">
-<li><a class="reference external" href="https://nose.readthedocs.org/en/latest">nose</a> is nicer testing for python</li>
+<li><a class="reference external" href="http://pytest.org/latest">pytest</a></li>
 <li><a class="reference external" href="http://nedbatchelder.com/code/coverage">coverage</a></li>
 <li><a class="reference external" href="http://matplotlib.org/">matplotlib</a></li>
 <li><a class="reference external" href="http://www.h5py.org">h5py</a></li>
@@ -701,7 +694,7 @@ example Dockerfiles are available.</p>
 <dd><ul class="first last simple">
 <li><a class="reference download internal" href="_downloads/Dockerfile.ubuntu"><tt class="xref download docutils literal"><span class="pre">Ubuntu</span> <span class="pre">Standalone</span></tt></a>.</li>
 <li><a class="reference download internal" href="_downloads/Dockerfile.neuralensemble"><tt class="xref download docutils literal"><span class="pre">Neural</span> <span class="pre">Ensemble</span> <span class="pre">combined</span> <span class="pre">simulators</span></tt></a>.</li>
-<li><a class="reference download internal" href="_downloads/Dockerfile.neuralensemblex"><tt class="xref download docutils literal"><span class="pre">Neural</span> <span class="pre">Ensemble</span> <span class="pre">combined</span> <span class="pre">simulators</span> <span class="pre">with</span> <span class="pre">X11</span></tt></a>.</li>
+<li><tt class="xref download docutils literal"><span class="pre">Neural</span> <span class="pre">Ensemble</span> <span class="pre">combined</span> <span class="pre">simulators</span> <span class="pre">with</span> <span class="pre">X11</span></tt>.</li>
 </ul>
 </dd>
 </dl>
@@ -736,6 +729,7 @@ docker build --tag alleninstitute/allensdk:ubuntu .
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -749,11 +743,12 @@ docker build --tag alleninstitute/allensdk:ubuntu .
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

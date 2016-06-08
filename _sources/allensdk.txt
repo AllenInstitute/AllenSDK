@@ -7,11 +7,12 @@ Subpackages
 .. toctree::
 
     allensdk.api
+    allensdk.brain_observatory
     allensdk.config
     allensdk.core
     allensdk.ephys
     allensdk.model
-    allensdk.test
+    allensdk.morphology
 
 Module contents
 ---------------

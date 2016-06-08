@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.config package &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>allensdk.config package &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,10 +23,10 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.config.app package" href="allensdk.config.app.html" />
-    <link rel="prev" title="allensdk.api.queries package" href="allensdk.api.queries.html" /> 
+    <link rel="prev" title="allensdk.brain_observatory package" href="allensdk.brain_observatory.html" /> 
   </head>
   <body>
 <script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
@@ -650,7 +650,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l4"><a class="reference internal" href="allensdk.config.model.formats.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.hdf5_util">allensdk.config.model.formats.hdf5_util module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_description_parser">allensdk.config.model.formats.json_description_parser module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_util">allensdk.config.model.formats.json_util module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.pycfg_description_parser">allensdk.config.model.formats.pycfg_description_parser module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="allensdk.config.model.formats.html#module-allensdk.config.model.formats">Module contents</a></li>
 </ul>
@@ -660,7 +659,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.html#module-allensdk.config.model.description">allensdk.config.model.description module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.html#module-allensdk.config.model.description_parser">allensdk.config.model.description_parser module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.html#module-allensdk.config.model.manifest">allensdk.config.model.manifest module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.model.html#module-allensdk.config.model">Module contents</a></li>
 </ul>
 </li>
@@ -776,6 +774,11 @@ referenced in an Allen SDK configuration</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="allensdk.config.manifest.Manifest.as_dataframe">
+<tt class="descname">as_dataframe</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.as_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.as_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="allensdk.config.manifest.Manifest.check_dir">
 <tt class="descname">check_dir</tt><big>(</big><em>path_key</em>, <em>do_exit=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.check_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.check_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verify a directories existence or optionally exit.</p>
@@ -887,7 +890,7 @@ referenced in an Allen SDK configuration</p>
 
 <dl class="attribute">
 <dt id="allensdk.config.manifest.Manifest.log">
-<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x2aaaabc01110&gt;</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.log" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x7fd937feb810&gt;</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.log" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -945,13 +948,38 @@ referenced in an Allen SDK configuration</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="allensdk.config.manifest_builder.ManifestBuilder.add_section">
+<tt class="descname">add_section</tt><big>(</big><em>name</em>, <em>contents</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/manifest_builder.html#ManifestBuilder.add_section"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest_builder.ManifestBuilder.add_section" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest_builder.ManifestBuilder.as_dataframe">
+<tt class="descname">as_dataframe</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/config/manifest_builder.html#ManifestBuilder.as_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest_builder.ManifestBuilder.as_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.config.manifest_builder.ManifestBuilder.df_columns">
+<tt class="descname">df_columns</tt><em class="property"> = ['key', 'parent_key', 'spec', 'type', 'format']</em><a class="headerlink" href="#allensdk.config.manifest_builder.ManifestBuilder.df_columns" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest_builder.ManifestBuilder.from_dataframe">
+<tt class="descname">from_dataframe</tt><big>(</big><em>df</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/manifest_builder.html#ManifestBuilder.from_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest_builder.ManifestBuilder.from_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="allensdk.config.manifest_builder.ManifestBuilder.get_config">
 <tt class="descname">get_config</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/config/manifest_builder.html#ManifestBuilder.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest_builder.ManifestBuilder.get_config" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="allensdk.config.manifest_builder.ManifestBuilder.get_manifest">
+<tt class="descname">get_manifest</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/config/manifest_builder.html#ManifestBuilder.get_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest_builder.ManifestBuilder.get_manifest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="allensdk.config.manifest_builder.ManifestBuilder.write_json_file">
-<tt class="descname">write_json_file</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/manifest_builder.html#ManifestBuilder.write_json_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest_builder.ManifestBuilder.write_json_file" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">write_json_file</tt><big>(</big><em>path</em>, <em>overwrite=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/manifest_builder.html#ManifestBuilder.write_json_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest_builder.ManifestBuilder.write_json_file" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -979,6 +1007,7 @@ referenced in an Allen SDK configuration</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -992,11 +1021,12 @@ referenced in an Allen SDK configuration</p>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

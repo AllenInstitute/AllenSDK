@@ -29,4 +29,4 @@ RUN pip install ipython[notebook] --upgrade
 RUN pip install functools32
 RUN pip install pandas
 
-RUN pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.11.0.tar.gz
+RUN pip install https://github.com/AllenInstitute/AllenSDK/archive/v0.12.0.tar.gz

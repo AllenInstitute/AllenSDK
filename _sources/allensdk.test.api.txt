@@ -76,6 +76,78 @@ allensdk.test.api.synchronization_api_tests module
     :undoc-members:
     :show-inheritance:
 
+allensdk.test.api.test_annotated_section_data_set_api module
+------------------------------------------------------------
+
+.. automodule:: allensdk.test.api.test_annotated_section_data_set_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.test_api module
+---------------------------------
+
+.. automodule:: allensdk.test.api.test_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.test_brain_observatory_api module
+---------------------------------------------------
+
+.. automodule:: allensdk.test.api.test_brain_observatory_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.test_cache module
+-----------------------------------
+
+.. automodule:: allensdk.test.api.test_cache
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.test_grid_data_api module
+-------------------------------------------
+
+.. automodule:: allensdk.test.api.test_grid_data_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.test_image_download_api module
+------------------------------------------------
+
+.. automodule:: allensdk.test.api.test_image_download_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.test_ontologies_api module
+--------------------------------------------
+
+.. automodule:: allensdk.test.api.test_ontologies_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.test_rma_template module
+------------------------------------------
+
+.. automodule:: allensdk.test.api.test_rma_template
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.test.api.test_synchronization_api module
+-------------------------------------------------
+
+.. automodule:: allensdk.test.api.test_synchronization_api
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

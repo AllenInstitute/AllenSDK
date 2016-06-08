@@ -1,0 +1,126 @@
+allensdk.brain_observatory package
+==================================
+
+Submodules
+----------
+
+allensdk.brain_observatory.brain_observatory_exceptions module
+--------------------------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.brain_observatory_exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.brain_observatory_plotting module
+------------------------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.brain_observatory_plotting
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.dff module
+-------------------------------------
+
+.. automodule:: allensdk.brain_observatory.dff
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.drifting_gratings module
+---------------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.drifting_gratings
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.findlevel module
+-------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.findlevel
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.locally_sparse_noise module
+------------------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.locally_sparse_noise
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.natural_movie module
+-----------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.natural_movie
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.natural_scenes module
+------------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.natural_scenes
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.r_neuropil module
+--------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.r_neuropil
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.roi_masks module
+-------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.roi_masks
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.session_analysis module
+--------------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.session_analysis
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.static_gratings module
+-------------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.static_gratings
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.stimulus_analysis module
+---------------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.stimulus_analysis
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.stimulus_info module
+-----------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.stimulus_info
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.brain_observatory
+    :members:
+    :undoc-members:
+    :show-inheritance:

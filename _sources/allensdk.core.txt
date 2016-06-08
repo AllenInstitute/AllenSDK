@@ -4,6 +4,22 @@ allensdk.core package
 Submodules
 ----------
 
+allensdk.core.brain_observatory_cache module
+--------------------------------------------
+
+.. automodule:: allensdk.core.brain_observatory_cache
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.core.brain_observatory_nwb_data_set module
+---------------------------------------------------
+
+.. automodule:: allensdk.core.brain_observatory_nwb_data_set
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.core.cell_types_cache module
 -------------------------------------
 

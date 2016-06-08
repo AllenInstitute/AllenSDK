@@ -8,7 +8,6 @@ Subpackages
 
     allensdk.model.biophys_sim
     allensdk.model.biophysical
-    allensdk.model.biophysical_perisomatic
     allensdk.model.glif
 
 Module contents

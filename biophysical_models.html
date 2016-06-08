@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Biophysical Models &mdash; Allen SDK 0.11.0 documentation</title>
+    <title>Biophysical Models &mdash; Allen SDK 0.12.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.11.0',
+        VERSION:     '0.12.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.11.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
     <link rel="up" title="Models" href="models.html" />
     <link rel="next" title="Examples" href="examples.html" />
     <link rel="prev" title="Generalized LIF Models" href="glif_models.html" /> 
@@ -656,7 +656,7 @@ NEURON <a class="reference external" href="http://www.neuron.yale.edu/ftp/neuron
 Instructions for compiling NEURON with the Python interpreter
 are available from the NEURON team under the heading
 <a class="reference external" href="http://www.neuron.yale.edu/neuron/download/compile_linux#otheroptions">Installation with Python as an alternative interpreter</a>.
-The Allen SDK is compatible with Python version 2.7.8, included in the Anaconda 2.1.0 distribution.</p>
+The Allen SDK is compatible with Python version 2.7.9, included in the Anaconda 2.1.0 distribution.</p>
 <p>Instructions for optional
 <a class="reference external" href="./install.html#installation-with-docker-optional">Docker installation</a>
 are also available.</p>
@@ -741,12 +741,12 @@ You can remove all of the sweep numbers that you do not want run.</p>
 <div class="section" id="simulation-main-loop">
 <h2>Simulation Main Loop<a class="headerlink" href="#simulation-main-loop" title="Permalink to this headline">¶</a></h2>
 <p>The top level script is in the
-<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.run" title="allensdk.model.biophysical_perisomatic.runner.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a>
-method of the <a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#module-allensdk.model.biophysical_perisomatic.runner" title="allensdk.model.biophysical_perisomatic.runner"><tt class="xref py py-mod docutils literal"><span class="pre">allensdk.model.biophysical_perisomatic.runner</span></tt></a>
+<tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt>
+method of the <tt class="xref py py-mod docutils literal"><span class="pre">allensdk.model.biophysical_perisomatic.runner</span></tt>
 module.  The implementation of the method is shown here step-by-step:</p>
 <p>First configure NEURON based on the configuration file, which was
 read in from the command line at the very bottom of the script.</p>
-<p><a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.runner.run" title="allensdk.model.biophysical_perisomatic.runner.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a>:</p>
+<p><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># configure NEURON</span>
 <span class="n">utils</span> <span class="o">=</span> <span class="n">Utils</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 <span class="n">h</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">h</span>
@@ -790,17 +790,17 @@ read in from the command line at the very bottom of the script.</p>
 <h2>Customization<a class="headerlink" href="#customization" title="Permalink to this headline">¶</a></h2>
 <p>Much of the code in the perisomatic simulation is not core Allen SDK code.
 The runner.py script largely reads the configuration file and calls into
-methods in the <a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils" title="allensdk.model.biophysical_perisomatic.utils.Utils"><tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt></a> class.
+methods in the <tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt> class.
 Utils is a subclass of the <a class="reference internal" href="allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils" title="allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils"><tt class="xref py py-class docutils literal"><span class="pre">HocUtils</span></tt></a>
 class, which provides access to objects in the NEURON package.
 The various methods called by the runner.script are implemented here, including:
-<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology" title="allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology"><tt class="xref py py-meth docutils literal"><span class="pre">generate_morphology()</span></tt></a>,
-<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters" title="allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters"><tt class="xref py py-meth docutils literal"><span class="pre">load_cell_parameters()</span></tt></a>,
-<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp" title="allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp"><tt class="xref py py-meth docutils literal"><span class="pre">setup_iclamp()</span></tt></a>,
-<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus" title="allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus"><tt class="xref py py-meth docutils literal"><span class="pre">read_stimulus()</span></tt></a>
+<tt class="xref py py-meth docutils literal"><span class="pre">generate_morphology()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">load_cell_parameters()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">setup_iclamp()</span></tt>,
+<tt class="xref py py-meth docutils literal"><span class="pre">read_stimulus()</span></tt>
 and
-<a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils.record_values" title="allensdk.model.biophysical_perisomatic.utils.Utils.record_values"><tt class="xref py py-meth docutils literal"><span class="pre">record_values()</span></tt></a>.</p>
-<p><a class="reference internal" href="allensdk.model.biophysical_perisomatic.html#allensdk.model.biophysical_perisomatic.utils.Utils" title="allensdk.model.biophysical_perisomatic.utils.Utils"><tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt></a>:</p>
+<tt class="xref py py-meth docutils literal"><span class="pre">record_values()</span></tt>.</p>
+<p><tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt>:</p>
 <div class="highlight-python"><div class="highlight"><pre>from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 
 .....
@@ -1162,6 +1162,7 @@ URLs that provide model data, but it is a planned future use case.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
@@ -1175,11 +1176,12 @@ URLs that provide model data, but it is a planned future use case.</p>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>

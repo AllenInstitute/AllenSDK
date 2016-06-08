@@ -1,0 +1,1093 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.brain_observatory.roi_masks &mdash; Allen SDK 0.12.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.12.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<style>
+
+	/* the icon font-family definition and helper classes */
+	@font-face {
+	  font-family: 'portal_icon_font';
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  font-weight: normal;
+	  font-style: normal;
+	}
+	 
+	 [class^="icon-"]:before, [class*=" icon-"]:before {
+	  font-family: "portal_icon_font";
+	  font-style: normal;
+	  font-weight: normal;
+	  speak: none;
+	 
+	  display: inline-block;
+	  text-decoration: inherit;
+	  width: 1em;
+	  margin-right: .2em;
+	  text-align: center;
+	  /* opacity: .8; */
+	 
+	  /* For safety - reset parent styles, that can break glyph codes*/
+	  font-variant: normal;
+	  text-transform: none;
+	     
+	  /* fix buttons height, for twitter bootstrap */
+	  line-height: 1em;
+	 
+	  /* Animation center compensation - margins should be symmetric */
+	  /* remove if not needed */
+	  margin-left: .2em;
+	
+	}
+	 
+	.icon-spin5:before { content: '\e806'; } /* '' */
+	.icon-left-open-1:before { content: '\e81e'; } /* '' */
+	.icon-plus-1:before { content: '\e801'; } /* '' */
+	.icon-facebook:before { content: '\e816'; } /* '' */
+	.icon-gplus:before { content: '\e818'; } /* '' */
+	.icon-linkedin-3:before { content: '\e815'; } /* '' */
+	.icon-twitter:before { content: '\e817'; } /* '' */
+	.icon-youtube-play:before { content: '\e805'; } /* '' */
+	.icon-plus-2:before { content: '\e809'; } /* '' */
+	.icon-record-1:before { content: '\e81c'; } /* '' */
+	.icon-cancel:before { content: '\e80b'; } /* '' */
+	.icon-search:before { content: '\e804'; } /* '' */
+	.icon-cancel-2:before { content: '\e80c'; } /* '' */
+	.icon-plus-4:before { content: '\e80d'; } /* '' */
+	.icon-cancel-3:before { content: '\e80e'; } /* '' */
+	.icon-plus:before { content: '\e808'; } /* '' */
+	.icon-down-open:before { content: '\e800'; } /* '' */
+	.icon-right-open:before { content: '\e802'; } /* '' */
+	.icon-up-open:before { content: '\e803'; } /* '' */
+	.icon-stop:before { content: '\e813'; } /* '' */
+	.icon-cancel-1:before { content: '\e820'; } /* '' */
+	.icon-plus-3:before { content: '\e80a'; } /* '' */
+	/* end icon font helpers */
+
+	/* icon font spin animation */
+	.animate-spin {
+	  -moz-animation: spin 2s infinite linear;
+	  -o-animation: spin 2s infinite linear;
+	  -webkit-animation: spin 2s infinite linear;
+	  animation: spin 2s infinite linear;
+	  display: inline-block;
+	}
+	@-moz-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-webkit-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-o-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@-ms-keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	@keyframes spin {
+	  0% {
+	    -moz-transform: rotate(0deg);
+	    -o-transform: rotate(0deg);
+	    -webkit-transform: rotate(0deg);
+	    transform: rotate(0deg);
+	  }
+
+	  100% {
+	    -moz-transform: rotate(359deg);
+	    -o-transform: rotate(359deg);
+	    -webkit-transform: rotate(359deg);
+	    transform: rotate(359deg);
+	  }
+	}
+	/*  end spin animation */	
+
+	@font-face {
+	    font-family: 'bebas_neueregular';
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    font-weight: normal;
+	    font-style: normal;
+	}
+
+	/* top chrome styles */
+	#top_chrome {
+
+		width:100%;
+		height:28px;
+		background-color:#163E65;
+	}
+
+	.chrome_link_block {
+
+		color:#fff !important;	
+		display:inline-block;
+		height:100%;
+		max-height:28px;
+	}
+
+	.chrome_link_block:hover {
+
+		background-color:#eee;
+		color:#0779BE !important;	
+		cursor:pointer;
+	}
+
+	#top_chrome a {
+
+		color:inherit !important;	
+		text-decoration:none;
+	}
+
+	#top_chrome a:hover {
+
+		color:inherit !important;	
+	}
+
+	#top_chrome_buttons {
+
+		float:right;
+		margin-right:50px;
+	}
+
+	.chrome_button {
+
+		font-family:arial,sans-serif;
+		font-weight:bold;
+		display:inline-block;
+		font-size:9px;
+		text-align:left;
+		text-decoration:none;
+		margin:9px 20px 10px 20px;
+	}
+
+	.chrome_active {
+
+		background-color:#1b7abd;
+		color:#fff;
+	}
+
+
+	/* header element styles*/
+	#header_content {
+
+		font-family: bebas_neueregular, arial, sans-serif;
+		font-size:22px;
+		color:#0779be;		
+		letter-spacing:0.03em;
+
+		position:relative;
+		width:calc(100% - 112px);
+		min-width:800px;
+		height:76px;
+		border-bottom:2px solid #A5A8AB;
+		margin-left:50px;
+		margin-right:50px;
+        z-index:9999; /* IT-9508 */
+	}
+
+	#portal_logo {
+
+		position:absolute;
+		top:20px;
+		left:0px;
+		width:236px;
+	}
+
+	#portal_tabs {
+
+		position: absolute;
+		bottom: 12px;
+		left: 0px;
+		margin-bottom: -12px;
+		display: block;
+	}
+
+	.horizontal_list
+	{
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		display: inline; 		
+	}
+
+	.horizontal_list li { 
+
+		display: inline; 	
+	}	
+
+	#portal_tab_menu_container {
+
+		display:none;
+	}
+
+	#portal_search_input_group {
+
+		position:absolute;
+		margin: 0;
+		padding: 0;
+		bottom:12px;
+		right:0px;
+		border:1px solid #DAD9D3;
+		color:#DAD9D3;
+	}
+
+	#portal_search_input_group input {
+
+		margin: 0;
+		padding: 0;
+		border:none;
+		width:110px;
+		color:#DAD9D3;
+		font-family:Helvetica,sans-serif;
+		font-size:12px;
+		height:28px;
+		margin-left:10px;
+
+		outline:none;
+	}
+
+	input::-ms-clear {
+		display: none;
+	}
+
+	#portal_search_input_group i {
+
+		font-size:0.8em;
+		cursor:pointer;
+	}
+
+	#pSiteSearchTextInput:focus {
+
+		color:#000;
+	}
+
+	.icon_menu_down {
+
+		font-size: 12px;
+		margin-left: 4px;
+		vertical-align: text-top;
+		padding-top: 4px;
+		display: inline-block;
+	}
+
+	.portal_tab_item {
+
+		background-color: #fff;
+		padding: 12px;
+		padding-left:20px;
+		padding-right:20px;
+		display: inline-block !important;		
+	}
+
+	.portal_tab_item a:hover {
+
+		color:#fbe300;	
+	}
+
+	.portal_tab_item:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}	
+
+
+	.portal_menu_active {
+
+		background-color: #EEEEEE;
+	}	
+
+	.portal_menu_item_active {
+
+		color:#fbe300 !important;	
+	}
+
+	.portal_tab_active {
+
+		color:#a5a8ab !important;
+	}
+
+	#header_content a {		
+
+		color:inherit !important;
+	}
+
+	#header_content a:hover {
+
+		background-color: #0779be;	
+		color:#fbe300 !important;	
+	}
+
+	#header_content ul {
+
+		list-style: none;
+		position: relative;
+		top: 58px;
+		display: inline-table;
+	}
+
+	#header_content ul ul {
+		
+		display:none;
+		opacity:0;
+	}
+
+	/* the fly out menus */
+	#header_content ul li:hover > ul,
+	#header_content ul li.hover > ul {
+
+		position: absolute;
+		top: 48px;
+		z-index:999;
+
+		display: block;
+		width: 152px;
+		padding:0px;
+		padding-top:20px;
+		padding-bottom:10px;
+		font-size: 12px;
+		font-family: Arial,Sans-Serif;
+		font-weight: bold;
+		text-transform: uppercase;
+
+		background-color: rgba(8,122,191,0.98);
+		color: #fff !important;
+		opacity: 1;
+
+		-webkit-animation: fade 0.25s;
+		animation: fade 0.25s;
+	}
+
+	@-webkit-keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}
+	@keyframes fade {
+	    from {opacity: 0}
+	    to {opacity: 1}
+	}	
+
+	#header_content ul li:hover > ul li {
+
+		padding: 10px;
+		padding-top: 0px;
+		padding-left: 20px;
+		display: block;
+		opacity:1;
+	}
+
+	#header_content ul li:hover > ul a {
+
+		display: block;
+		opacity:1;
+		white-space:nowrap;
+	}
+
+	#portal_menu_start_list {
+
+		left: 81px;
+
+		/* IE sauce */
+		left:85px\9;
+
+		/* Safari sauce */
+		(;left:79px;);
+	}
+
+	#portal_menu_atlases_list {
+
+		left: 290px;
+		width: 210px !important;
+        height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 303px\9;
+        height: 225px\9;
+
+		/* Safari sauce */
+		(;left:279px;);
+	}
+
+	#portal_menu_tools_list {
+
+		left: 500px;
+		width: 172px !important;
+		height: 236px;
+
+		padding-bottom:5px !important;
+
+		/* IE sauce */
+		left: 513px\9;
+		height:225px\9;
+
+		/* Safari sauce */
+		(;left:489px;);
+		(;height:227px;);
+	}
+
+	/* mozilla sauce */
+	@-moz-document url-prefix() {
+
+		#header_content {
+
+			height:107px;
+		}
+
+		#portal_menu_start_list {
+
+			left:85px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 302px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 512px;
+			height:236px;
+		}
+	}
+
+
+	/* make it look OK on iPad also */
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}  
+	}
+	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
+
+		#portal_menu_start_list {
+
+			left:81px;
+		}
+
+		#portal_menu_atlases_list {
+
+			left: 291px;		
+		}
+
+		#portal_menu_tools_list {
+
+			left: 501px;
+			height:236px;
+		}	  
+	}
+
+	.portal_menu_list_heading {
+
+		color:#9ccae5;
+		border-bottom:1px solid #9ccae5;
+		padding-bottom:5px !important;
+	}
+
+	.portal_menu_list_heading + li {
+
+		padding-top:10px !important;
+	}
+
+	.portal_menu_list_heading li {
+
+		padding-bottom:0px;
+	}	
+
+	#portal_menu_atlases_list li:last-of-type {
+
+		padding-bottom:15px !important;
+	}
+
+	.icon-spin5 {
+
+		color:#000;
+	}
+</style>
+<div id="pHeader">
+<div id="top_chrome">
+	<div id="top_chrome_buttons">
+		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
+		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
+	</div>
+</div>
+
+<div id="header_content">
+
+	<a href="http://AllenInstitute.github.io/AllenSDK">
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+	</a>
+</div>
+</div>
+
+<script>
+
+jQuery('#portal_tab_menu').bind('touchstart', function() {
+
+	if(window.console)
+		console.log("touchstart");
+});
+</script>
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for allensdk.brain_observatory.roi_masks</h1><div class="highlight"><pre>
+<span class="c"># Copyright 2016 Allen Institute for Brain Science</span>
+<span class="c"># This file is part of Allen SDK.</span>
+<span class="c">#</span>
+<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c"># it under the terms of the GNU General Public License as published by</span>
+<span class="c"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c">#</span>
+<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c"># GNU General Public License for more details.</span>
+<span class="c">#</span>
+<span class="c"># You should have received a copy of the GNU General Public License</span>
+<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage.measurements</span> <span class="kn">as</span> <span class="nn">measurements</span>
+<span class="kn">import</span> <span class="nn">scipy.ndimage.morphology</span> <span class="kn">as</span> <span class="nn">morphology</span>
+
+<span class="c"># constants used for accessing border array</span>
+<span class="n">RIGHT_SHIFT</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">LEFT_SHIFT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">DOWN_SHIFT</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">UP_SHIFT</span> <span class="o">=</span> <span class="mi">3</span>
+
+
+<div class="viewcode-block" id="Mask"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.Mask">[docs]</a><span class="k">class</span> <span class="nc">Mask</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Abstract class to represent image segmentation mask. Its two</span>
+<span class="sd">    main subclasses are RoiMask and NeuropilMask. The former represents</span>
+<span class="sd">    the mask of a region of interest (ROI), such as a cell observed in </span>
+<span class="sd">    2-photon imaging. The latter represents the neuropil around that cell,</span>
+<span class="sd">    and is useful when subtracting the neuropil signal from the measured</span>
+<span class="sd">    ROI signal.</span>
+
+<span class="sd">    This class should not be instantiated directly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image_w: integer</span>
+<span class="sd">       Width of image that ROI resides in</span>
+
+<span class="sd">    image_h: integer</span>
+<span class="sd">       Height of image that ROI resides in</span>
+
+<span class="sd">    label: text</span>
+<span class="sd">       User-defined text label to identify mask</span>
+
+<span class="sd">    mask_group: integer</span>
+<span class="sd">       User-defined number to help put masks into different categories</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_w</span><span class="p">,</span> <span class="n">image_h</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">mask_group</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Mask class constructor. The Mask class is designed to be abstract</span>
+<span class="sd">        and it should not be instantiated directly.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_rows</span> <span class="o">=</span> <span class="n">image_h</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_cols</span> <span class="o">=</span> <span class="n">image_w</span>
+        <span class="c"># initialize to invalid state. Mask must be manually initialized </span>
+        <span class="c">#   by pixel list or mask array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="c"># label is for distinguishing neuropil from ROI, in case </span>
+        <span class="c">#   these masks are mixed together</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="c"># auxiliary metadata. if a particula mask is part of an group,</span>
+        <span class="c">#   that data can be stored here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_group</span> <span class="o">=</span> <span class="n">mask_group</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: TL=</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s"> w,h=</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="se">\n</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Mask.init_by_pixels"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.Mask.init_by_pixels">[docs]</a>    <span class="k">def</span> <span class="nf">init_by_pixels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">border</span><span class="p">,</span> <span class="n">pix_list</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialize mask using a list of mask pixels</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        border: float[4]</span>
+<span class="sd">            Coordinates defining useable area of image. See create_roi_mask()</span>
+
+<span class="sd">        pix_list: integer[][2]</span>
+<span class="sd">            List of pixel coordinates (x,y) that define the mask</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="n">pix_list</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;Pixel list not properly formed&quot;</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">img_rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_cols</span><span class="p">))</span>
+
+        <span class="c"># pix_list stores array of [x,y] coordinates</span>
+        <span class="n">array</span><span class="p">[</span><span class="n">pix_list</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">pix_list</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_by_mask</span><span class="p">(</span><span class="n">border</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Mask.get_mask_plane"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.Mask.get_mask_plane">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns mask content on full-size image plane</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy 2D array [img_rows][img_cols]</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">img_rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_cols</span><span class="p">))</span>
+        <span class="n">mask</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask</span>
+        <span class="k">return</span> <span class="n">mask</span>
+        
+
+</div></div>
+<div class="viewcode-block" id="create_roi_mask"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.create_roi_mask">[docs]</a><span class="k">def</span> <span class="nf">create_roi_mask</span><span class="p">(</span><span class="n">image_w</span><span class="p">,</span> <span class="n">image_h</span><span class="p">,</span> <span class="n">border</span><span class="p">,</span> <span class="n">pix_list</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">roi_mask</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">mask_group</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Conveninece function to create and initializes an RoiMask</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    image_w: integer</span>
+<span class="sd">        Width of image that ROI resides in</span>
+
+<span class="sd">    image_h: integer</span>
+<span class="sd">        Height of image that ROI resides in</span>
+
+<span class="sd">    border: float[4]</span>
+<span class="sd">        Coordinates defining useable area of image. If the entire image</span>
+<span class="sd">        is usable, and masks are valid anywhere in the image, this should</span>
+<span class="sd">        be [(image_w-1), 0, (image_h-1), 0]. The following constants</span>
+<span class="sd">        help describe the array order:</span>
+
+<span class="sd">            RIGHT_SHIFT = 0</span>
+
+<span class="sd">            LEFT_SHIFT = 1</span>
+
+<span class="sd">            DOWN_SHIFT = 2</span>
+
+<span class="sd">            UP_SHIFT = 3</span>
+
+<span class="sd">        When parts of the image are unusable, for example due motion</span>
+<span class="sd">        correction shifting of different image frames, the border array</span>
+<span class="sd">        should store the usable image area</span>
+
+<span class="sd">    pix_list: integer[][2]</span>
+<span class="sd">        List of pixel coordinates (x,y) that define the mask</span>
+
+<span class="sd">    roi_mask: integer[image_h][image_w]</span>
+<span class="sd">        Image-sized array that describes the mask. Active parts of the</span>
+<span class="sd">        mask should have values &gt;0. Background pixels must be zero</span>
+
+<span class="sd">    label: text</span>
+<span class="sd">        User-defined text label to identify mask</span>
+
+<span class="sd">    mask_group: integer</span>
+<span class="sd">        User-defined number to help put masks into different categories</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        RoiMask object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">RoiMask</span><span class="p">(</span><span class="n">image_w</span><span class="p">,</span> <span class="n">image_h</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">mask_group</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pix_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">init_by_pixels</span><span class="p">(</span><span class="n">border</span><span class="p">,</span> <span class="n">pix_list</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">roi_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">init_by_mask</span><span class="p">(</span><span class="n">border</span><span class="p">,</span> <span class="n">roi_mask</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;Must specify either roi_mask or pix_list&quot;</span>
+    <span class="k">return</span> <span class="n">m</span>
+
+</div>
+<div class="viewcode-block" id="RoiMask"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.RoiMask">[docs]</a><span class="k">class</span> <span class="nc">RoiMask</span><span class="p">(</span><span class="n">Mask</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_w</span><span class="p">,</span> <span class="n">image_h</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">mask_group</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        RoiMask class constructor</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        image_w: integer</span>
+<span class="sd">            Width of image that ROI resides in</span>
+
+<span class="sd">        image_h: integer</span>
+<span class="sd">            Height of image that ROI resides in</span>
+
+<span class="sd">        label: text</span>
+<span class="sd">            User-defined text label to identify mask</span>
+
+<span class="sd">        mask_group: integer</span>
+<span class="sd">            User-defined number to help put masks into different categories</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RoiMask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">image_w</span><span class="p">,</span> <span class="n">image_h</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">mask_group</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RoiMask.init_by_mask"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.RoiMask.init_by_mask">[docs]</a>    <span class="k">def</span> <span class="nf">init_by_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">border</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialize mask using spatial mask</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        border: float[4]</span>
+<span class="sd">            Coordinates defining useable area of image. See create_roi_mask().</span>
+
+<span class="sd">        roi_mask: integer[image height][image width]</span>
+<span class="sd">            Image-sized array that describes the mask. Active parts of the</span>
+<span class="sd">            mask should have values &gt;0. Background pixels must be zero</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c"># find lowest and highest non-zero indices on each axis</span>
+        <span class="n">px</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">),</span> <span class="p">(</span><span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">px</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="c"># left and right border insets</span>
+        <span class="n">l_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">border</span><span class="p">[</span><span class="n">RIGHT_SHIFT</span><span class="p">])</span>
+        <span class="n">r_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_cols</span> <span class="o">-</span> <span class="n">border</span><span class="p">[</span><span class="n">LEFT_SHIFT</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="c"># top and bottom border insets</span>
+        <span class="n">t_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">border</span><span class="p">[</span><span class="n">DOWN_SHIFT</span><span class="p">])</span>
+        <span class="n">b_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_rows</span> <span class="o">-</span> <span class="n">border</span><span class="p">[</span><span class="n">UP_SHIFT</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="c"># if ROI crosses border, it&#39;s considered invalid</span>
+        <span class="k">if</span> <span class="n">left</span> <span class="o">&lt;</span> <span class="n">l_inset</span> <span class="ow">or</span> <span class="n">right</span> <span class="o">&gt;</span> <span class="n">r_inset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">top</span> <span class="o">&lt;</span> <span class="n">t_inset</span> <span class="ow">or</span> <span class="n">bottom</span> <span class="o">&gt;</span> <span class="n">b_inset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="c">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">left</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">top</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">bottom</span> <span class="o">-</span> <span class="n">top</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="c"># make copy of mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+</div></div>
+<div class="viewcode-block" id="create_neuropil_mask"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.create_neuropil_mask">[docs]</a><span class="k">def</span> <span class="nf">create_neuropil_mask</span><span class="p">(</span><span class="n">roi</span><span class="p">,</span> <span class="n">border</span><span class="p">,</span> <span class="n">combined_binary_mask</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Conveninece function to create and initializes a Neuropil mask.</span>
+<span class="sd">    Neuropil masks are defined as the region around an ROI, up to 13</span>
+<span class="sd">    pixels out, that does not include other ROIs</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    roi: RoiMask object</span>
+<span class="sd">        The ROI that the neuropil masks will be based on</span>
+
+<span class="sd">    border: float[4]</span>
+<span class="sd">        Coordinates defining useable area of image. See create_roi_mask().</span>
+
+<span class="sd">    combined_binary_mask</span>
+<span class="sd">        List of pixel coordinates (x,y) that define the mask</span>
+
+<span class="sd">    combined_binary_mask: integer[image_h][image_w]</span>
+<span class="sd">        Image-sized array that shows the position of all ROIs in the</span>
+<span class="sd">        image. ROI masks should have a value of one. Background pixels </span>
+<span class="sd">        must be zero. In other words, ithe combined_binary_mask is a </span>
+<span class="sd">        bitmap union of all ROI masks</span>
+
+<span class="sd">    label: text</span>
+<span class="sd">        User-defined text label to identify the mask</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">        NeuropilMask object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c"># combined_binary_mask is a bitmap union of ALL ROI masks</span>
+    <span class="c"># create a binary mask of the ROI</span>
+    <span class="n">binary_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">roi</span><span class="o">.</span><span class="n">img_rows</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">img_cols</span><span class="p">))</span>
+    <span class="n">binary_mask</span><span class="p">[</span><span class="n">roi</span><span class="o">.</span><span class="n">y</span><span class="p">:</span><span class="n">roi</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="n">roi</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">x</span><span class="p">:</span><span class="n">roi</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">roi</span><span class="o">.</span><span class="n">width</span><span class="p">]</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">mask</span>
+    <span class="n">binary_mask</span> <span class="o">=</span> <span class="n">binary_mask</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="c"># dilate the mask</span>
+    <span class="n">binary_mask_dilated</span> <span class="o">=</span> <span class="n">morphology</span><span class="o">.</span><span class="n">binary_dilation</span><span class="p">(</span><span class="n">binary_mask</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)),</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>  <span class="c"># T/F</span>
+    <span class="c"># eliminate ROIs from the dilation</span>
+    <span class="n">binary_mask_dilated</span> <span class="o">=</span> <span class="n">binary_mask_dilated</span> <span class="o">&gt;</span> <span class="n">combined_binary_mask</span>
+    <span class="c"># create mask from binary dilation</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">NeuropilMask</span><span class="p">(</span><span class="n">w</span><span class="o">=</span><span class="n">roi</span><span class="o">.</span><span class="n">img_cols</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="n">roi</span><span class="o">.</span><span class="n">img_rows</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">mask_group</span><span class="o">=</span><span class="n">roi</span><span class="o">.</span><span class="n">mask_group</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">init_by_mask</span><span class="p">(</span><span class="n">border</span><span class="p">,</span> <span class="n">binary_mask_dilated</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">m</span>
+
+</div>
+<div class="viewcode-block" id="NeuropilMask"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.NeuropilMask">[docs]</a><span class="k">class</span> <span class="nc">NeuropilMask</span><span class="p">(</span><span class="n">Mask</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">mask_group</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        NeuropilMask class constructor. This class should be created by</span>
+<span class="sd">        calling create_neuropil_mask()</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label: text</span>
+<span class="sd">            User-defined text label to identify mask</span>
+
+<span class="sd">        mask_group: integer</span>
+<span class="sd">            User-defined number to help put masks into different categories</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NeuropilMask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">mask_group</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="NeuropilMask.init_by_mask"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.NeuropilMask.init_by_mask">[docs]</a>    <span class="k">def</span> <span class="nf">init_by_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">border</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialize mask using spatial mask</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        border: float[4]</span>
+<span class="sd">            Coordinates defining useable area of image. See create_roi_mask().</span>
+
+<span class="sd">        array: integer[image height][image width]</span>
+<span class="sd">            Image-sized array that describes the mask. Active parts of the</span>
+<span class="sd">            mask should have values &gt;0. Background pixels must be zero</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c"># find lowest and highest non-zero indices on each axis</span>
+        <span class="n">px</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">),</span> <span class="p">(</span><span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">px</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="c"># left and right border insets</span>
+        <span class="n">l_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">border</span><span class="p">[</span><span class="n">RIGHT_SHIFT</span><span class="p">])</span>
+        <span class="n">r_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_cols</span> <span class="o">-</span> <span class="n">border</span><span class="p">[</span><span class="n">LEFT_SHIFT</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="c"># top and bottom border insets</span>
+        <span class="n">t_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">border</span><span class="p">[</span><span class="n">DOWN_SHIFT</span><span class="p">])</span>
+        <span class="n">b_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_rows</span> <span class="o">-</span> <span class="n">border</span><span class="p">[</span><span class="n">UP_SHIFT</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="c"># restrict neuropil masks to center area of frame (ie, exclude </span>
+        <span class="c">#   areas that overlap with movement correction buffer)</span>
+        <span class="k">if</span> <span class="n">left</span> <span class="o">&lt;</span> <span class="n">l_inset</span><span class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">l_inset</span>
+            <span class="k">if</span> <span class="n">right</span> <span class="o">&lt;</span> <span class="n">l_inset</span><span class="p">:</span>
+                <span class="n">right</span> <span class="o">=</span> <span class="n">l_inset</span>
+        <span class="k">if</span> <span class="n">right</span> <span class="o">&gt;</span> <span class="n">r_inset</span><span class="p">:</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">r_inset</span>
+            <span class="k">if</span> <span class="n">left</span> <span class="o">&gt;</span> <span class="n">r_inset</span><span class="p">:</span>
+                <span class="n">left</span> <span class="o">=</span> <span class="n">r_inset</span>
+        <span class="k">if</span> <span class="n">top</span> <span class="o">&lt;</span> <span class="n">t_inset</span><span class="p">:</span>
+            <span class="n">top</span> <span class="o">=</span> <span class="n">t_inset</span>
+            <span class="k">if</span> <span class="n">bottom</span> <span class="o">&lt;</span> <span class="n">t_inset</span><span class="p">:</span>
+                <span class="n">bottom</span> <span class="o">=</span> <span class="n">t_inset</span>
+        <span class="k">if</span> <span class="n">bottom</span> <span class="o">&gt;</span> <span class="n">b_inset</span><span class="p">:</span>
+            <span class="n">bottom</span> <span class="o">=</span> <span class="n">b_inset</span><span class="p">;</span>
+            <span class="k">if</span> <span class="n">top</span> <span class="o">&gt;</span> <span class="n">b_inset</span><span class="p">:</span>
+                <span class="n">top</span> <span class="o">=</span> <span class="n">b_inset</span>
+        <span class="c">#</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">left</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">top</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">bottom</span> <span class="o">-</span> <span class="n">top</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="c"># make copy of mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+</div></div>
+<div class="viewcode-block" id="calculate_traces"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.calculate_traces">[docs]</a><span class="k">def</span> <span class="nf">calculate_traces</span><span class="p">(</span><span class="n">stack</span><span class="p">,</span> <span class="n">mask_list</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Calculates the average response of the specified masks in the</span>
+<span class="sd">    image stack</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    stack: float[image height][image width]</span>
+<span class="sd">        Image stack that masks are applied to</span>
+
+<span class="sd">    mask_list: list&lt;Mask&gt;</span>
+<span class="sd">        List of masks</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float[number masks][number frames]</span>
+<span class="sd">        This is the average response for each Mask in each image frame</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">traces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">mask_list</span><span class="p">),</span> <span class="n">stack</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">num_frames</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c"># make sure masks are numpy objects</span>
+    <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">mask_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">mask</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+    <span class="c"># calcualte traces</span>
+    <span class="k">for</span> <span class="n">frame_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_frames</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">frame_num</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;frame &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame_num</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_frames</span><span class="p">)</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="n">frame_num</span><span class="p">]</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mask_list</span><span class="p">)):</span>
+                    <span class="n">mask</span> <span class="o">=</span> <span class="n">mask_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">subframe</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">mask</span><span class="o">.</span><span class="n">y</span><span class="p">:</span><span class="n">mask</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="n">mask</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">x</span><span class="p">:</span><span class="n">mask</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="n">mask</span><span class="o">.</span><span class="n">width</span><span class="p">]</span>
+                    <span class="n">total</span> <span class="o">=</span> <span class="p">(</span><span class="n">subframe</span> <span class="o">*</span> <span class="n">mask</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">area</span> <span class="o">=</span> <span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">tvals</span> <span class="o">=</span> <span class="n">total</span><span class="o">/</span><span class="n">area</span>
+                    <span class="n">traces</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">frame_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">tvals</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Error encountered processing mask during frame </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">frame_num</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">print</span> <span class="n">subframe</span><span class="o">.</span><span class="n">shape</span>
+                <span class="k">print</span> <span class="n">mask</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span>
+                <span class="k">print</span> <span class="n">mask</span>
+            <span class="k">raise</span>
+    <span class="k">return</span> <span class="n">traces</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer">
+    </div>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+
+  </body>
+</html>
