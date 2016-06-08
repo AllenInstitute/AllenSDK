@@ -197,8 +197,13 @@ div#notebook {
 <div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_cache</span> <span class="kn">import</span> <span class="n">BrainObservatoryCache</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 
-<span class="c"># Download a list of all targeted areas</span>
+<span class="c"># This class uses a &#39;manifest&#39; to keep track of downloaded data and metadata.  </span>
+<span class="c"># All downloaded files will be stored relative to the directory holding the manifest</span>
+<span class="c"># file.  If &#39;manifest_file&#39; is a relative path (as it is below), it will be </span>
+<span class="c"># saved relative to your working directory.  It can also be an absolute path.</span>
 <span class="n">boc</span> <span class="o">=</span> <span class="n">BrainObservatoryCache</span><span class="p">(</span><span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;boc/manifest.json&#39;</span><span class="p">)</span>
+
+<span class="c"># Download a list of all targeted areas</span>
 <span class="n">targeted_structures</span> <span class="o">=</span> <span class="n">boc</span><span class="o">.</span><span class="n">get_all_targeted_structures</span><span class="p">()</span>
 <span class="k">print</span><span class="p">(</span><span class="s">&quot;all targeted structures: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">targeted_structures</span><span class="p">))</span>
 </pre></div>
