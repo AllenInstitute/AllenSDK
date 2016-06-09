@@ -28,7 +28,7 @@ NEURON `version v7.4.rel-1370 <http://www.neuron.yale.edu/ftp/neuron/versions/v7
 Instructions for compiling NEURON with the Python interpreter 
 are available from the NEURON team under the heading 
 `Installation with Python as an alternative interpreter <http://www.neuron.yale.edu/neuron/download/compile_linux#otheroptions>`_.
-The Allen SDK is compatible with Python version 2.7.8, included in the Anaconda 2.1.0 distribution.
+The Allen SDK is compatible with Python version 2.7.9, included in the Anaconda 2.1.0 distribution.
 
 Instructions for optional
 `Docker installation <./install.html#installation-with-docker-optional>`_ 
