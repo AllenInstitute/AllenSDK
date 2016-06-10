@@ -6,8 +6,11 @@ import numpy as np
 
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 
-def movingmode_fast(x, kernelsize, y, modemax=1000, minlength=4096):
-    """ Compute the windowed mode of an array.
+def movingmode_fast(x, kernelsize, y):
+    """ Compute the windowed mode of an array.  A running mode is initialized
+    with a histogram of values over the initial kernelsize/2 values.  The mode
+    is then updated as the kernel moves by adding and subtracting values from
+    the histogram. 
 
     Parameters
     ----------
@@ -18,39 +21,38 @@ def movingmode_fast(x, kernelsize, y, modemax=1000, minlength=4096):
     y: np.ndarray
         Output array to store the results
     """
+    maxval = x.max()
 
     # compute a histogram of a half kernel
     halfsize = kernelsize/2
-    histo = np.bincount(np.rint(x[:halfsize]).astype(np.uint32), minlength=minlength)
-
-    # assume mode counts are below a threshold (< 1000 by default)
-    maxval = len(histo)-1
-    modemax = min(modemax, maxval)
+    histo = np.bincount(np.rint(x[:halfsize]).astype(np.uint32), minlength=maxval+2)
 
     # find the mode of the first half kernel
-    mode = 1
-    for n in range (2,modemax):      
-        if histo[n] > histo[mode]:
-            mode = n
-        
+    mode = np.argmax(histo)
+
     # here initial mode is available
     for m in range (0,halfsize):
         q = int(round(x[halfsize+m]))
+
         histo[q] += 1
+        
         if histo[q] > histo[mode]:
             mode = q
+
         y[m] = mode
-    
+
     for m in range (halfsize,x.shape[0]-halfsize):
         p = int(round(x[m-halfsize]))
         histo[p] -= 1
-        if p == mode:    #need to find possibly new mode value
-            for n in range (2,modemax):      
-                if histo[n] > histo[mode]:
-                    mode = n
+        
+        # need to find possibly new mode value
+        if p == mode:    
+            mode = np.argmax(histo)
 
         q = int(round(x[m+halfsize]))
+
         histo[q] += 1
+
         if histo[q] > histo[mode]:	
             mode = q
 
@@ -59,14 +61,15 @@ def movingmode_fast(x, kernelsize, y, modemax=1000, minlength=4096):
     for m in range (x.shape[0]-halfsize,x.shape[0]):
         p = int(round(x[m-halfsize]))
         histo[p] -= 1
-        if p == mode:    #need to find possibly new mode value
-            for n in range (2,modemax):      
-                if histo[n] > histo[mode]:
-                    mode = n
+        
+        # need to find possibly new mode value
+        if p == mode:    
+            mode = np.argmax(histo)
 
         y[m] = mode
 
     return 0
+
 
 def movingaverage(x, kernelsize, y):
     """ Compute the windowed average of an array.
@@ -80,6 +83,7 @@ def movingaverage(x, kernelsize, y):
     y: np.ndarray
         Output array to store the results
     """
+                       
     halfsize = kernelsize/2
     sumkernel = np.sum(x[0:halfsize])
     for m in range (0,halfsize):
@@ -97,46 +101,37 @@ def movingaverage(x, kernelsize, y):
 
     return 0
 
-def plot_onetrace(x1):
+
+def plot_onetrace(dff, fc):
     """ Debug plotting function """
-    q1 = 30000
-    q2 = 60000
-    q3 = 90000
-    q4 = 120000
+    qs = np.rint(np.linspace(0,len(dff),5)).astype(int)
 
-    yticks = [0.2,0.4,0.6,0.8,1.0,1.2,1.4,1.6,1.8,2.0,2.2,2.4,2.6,2.8,3.0,10.0]
-    plt.subplot(4,1,1)
-    plt.plot(np.arange(0,q1),x1[0:q1],'g')
-    plt.ylim(0, 10)
-    plt.yticks(yticks)
-    plt.xlabel('frames',fontsize=18)
-    plt.ylabel('DF/F',fontsize=18)
+    dff_max = dff.max()
+    dff_min = dff.min()
+    fc_max = fc.max()
+    fc_min = fc.min()
 
-    plt.subplot(4,1,2)
-    plt.plot(np.arange(q1,q2),x1[q1:q2],'g')
-    plt.ylim(0, 10)
-    plt.yticks(yticks)
-    plt.xlabel('frames',fontsize=18)
-    plt.ylabel('DF/F',fontsize=18)
+    for qi in range(len(qs)-1):
+        r = qs[qi], qs[qi+1]
 
-    plt.subplot(4,1,3)
-    plt.plot(np.arange(q2,q3),x1[q2:q3],'g')
-    plt.ylim(0, 10)
-    plt.yticks(yticks)
-    plt.xlabel('frames',fontsize=18)
-    plt.ylabel('DF/F',fontsize=18)
+        frames = np.arange(r[0],r[1]) 
+        ax = plt.subplot(len(qs),1,qi+1)
+        ax.plot(frames, dff[r[0]:r[1]], 'g')
+        ax.set_ylim(dff_min, dff_max)
+        ax.set_xlim(r[0],r[1])
+        ax.set_xlabel('frames',fontsize=18)
+        ax.set_ylabel('DF/F',fontsize=18, color='g')
 
-    plt.subplot(4,1,4)
-    plt.plot(np.arange(q3,x1.shape[0]),x1[q3:x1.shape[0]],'g')
-    plt.ylim(0, 10)
-    plt.yticks(yticks)
-    plt.xlabel('frames',fontsize=18)
-    plt.ylabel('DF/F',fontsize=18)
+        ax = ax.twinx()
+        ax.plot(frames, fc[r[0]:r[1]], 'b')
+        ax.set_ylim(fc_min, fc_max)
+        ax.set_xlim(r[0],r[1])
+        ax.set_ylabel('FC',fontsize=18, color='b')
 
     return 0
 
 def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsize=3000):
-    """ Compute dF/F of a set of traces using a mean-shifted windowed mode operator. 
+    """ Compute dF/F of a set of traces using a low-pass windowed-mode operator. 
     The operation is basically:  
 
         T_mm = windowed_mean(windowed_mode(T))
@@ -167,17 +162,18 @@ def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsiz
     for n in range(0,traces.shape[0]):
         movingmode_fast(traces[n,:], mode_kernelsize, modeline[:])
         movingaverage(modeline[:], mean_kernelsize, modelineLP[:])
-	dff[n,:] = (traces[n,:] - modelineLP[:]) / modelineLP[:]
+        dff[n,:] = (traces[n,:] - modelineLP[:]) / modelineLP[:]
 
         logging.debug("finished trace %d/%d" % (n+1, traces.shape[0]))
 
         if save_plot_dir:
             fig = plt.figure(figsize=(150,40))
-            plot_onetrace(dff[n,:])
+            plot_onetrace(dff[n,:], traces[n,:])
 
             plt.title('ROI '+str(n)+' ', fontsize=18)
             fig.savefig(os.path.join(save_plot_dir,'dff_%d.png' % n), orientation='landscape')
             plt.close(fig)
+
 
     return dff
 
