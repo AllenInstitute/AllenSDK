@@ -88,16 +88,16 @@ def movingaverage(x, kernelsize, y):
     sumkernel = np.sum(x[0:halfsize])
     for m in range (0,halfsize):
         sumkernel = sumkernel + x[m+halfsize]
-      	y[m] = sumkernel/(halfsize+m)
+        y[m] = sumkernel/(halfsize+m)
 
     sumkernel = np.sum(x[0:kernelsize])
     for m in range (halfsize,x.shape[0]-halfsize):
         sumkernel = sumkernel - x[m-halfsize] + x[m+halfsize]
-      	y[m] = sumkernel/kernelsize
+        y[m] = sumkernel/kernelsize
 
     for m in range (x.shape[0]-halfsize,x.shape[0]):
         sumkernel = sumkernel - x[m-halfsize]
-      	y[m] = sumkernel/(halfsize-1+(x.shape[0]-m))
+        y[m] = sumkernel/(halfsize-1+(x.shape[0]-m))
 
     return 0
 
