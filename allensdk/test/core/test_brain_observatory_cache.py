@@ -213,3 +213,28 @@ def test_build_manifest():
                     mkdir.assert_called_once_with('boc')
                     mock_write_json.assert_called_once_with(
                         'boc/manifest.json')
+
+def test_string_argument_errors(brain_observatory_cache):
+    boc = brain_observatory_cache
+
+    with pytest.raises(TypeError):
+        boc.get_experiment_containers(targeted_structures='str')
+    
+    with pytest.raises(TypeError):
+        boc.get_experiment_containers(cre_lines='str')
+
+    with pytest.raises(TypeError):
+        boc.get_ophys_experiments(targeted_structures='str')
+
+    with pytest.raises(TypeError):
+        boc.get_ophys_experiments(cre_lines='str')
+
+    with pytest.raises(TypeError):
+        boc.get_ophys_experiments(stimuli='str')
+
+    with pytest.raises(TypeError):
+        boc.get_ophys_experiments(session_types='str')
+
+
+    
+
