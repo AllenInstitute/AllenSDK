@@ -360,6 +360,6 @@ class BrainObservatoryApi(RmaTemplate):
             cell_specimens = [ c for c in cell_specimens if c['cell_specimen_id'] in ids ]
 
         if experiment_container_ids is not None:
-            cell_specimens = [ c for c in cell_specimens if e['experiment_container_id'] in experiment_container_ids ]
+            cell_specimens = [ c for c in cell_specimens if c['experiment_container_id'] in experiment_container_ids ]
 
         return cell_specimens
