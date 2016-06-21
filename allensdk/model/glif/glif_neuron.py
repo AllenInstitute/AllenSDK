@@ -365,29 +365,19 @@ class GlifNeuron( object ):
                 interpolated_spike_threshold.append(interpolate_spike_value(self.dt, interpolated_spike_time_offset, threshold_t0, threshold_t1))
             
                 # reset voltage, threshold, and afterspike currents
+                # Note that these values are not ever recorded unless the spike cut length doesnt happen (this doesnt seem quite right)
                 (voltage_t0, threshold_t0, AScurrents_t0, bad_reset_flag) = self.reset(voltage_t1, threshold_t1, AScurrents_t1) 
                 
                 # if we are not integrating during the spike (which includes right now), insert nans then jump ahead
+                # TODO MAYBE ONE LAST NAN SHOULD BE INSERTED AND THIS VALUE SHOULD BE RECORDED FOR CONSISTANCY
                 if self.spike_cut_length > 0:
                     n = self.spike_cut_length
                     voltage_out[time_step:time_step+n] = np.nan
                     threshold_out[time_step:time_step+n] = np.nan
                     AScurrents_out[time_step:time_step+n,:] = np.nan
                     #Since reset is already done should paste the nans in before the last value
-                    if self.threshold_components['voltage'] is not None:
-                        lastvalue=self.threshold_components['voltage'][-1]  
-                        del self.threshold_components['voltage'][-1] # delete last value                    
-                        [self.threshold_components['voltage'].append(float('nan')) for filler in range(self.spike_cut_length-1)]
-                        self.threshold_components['voltage'].append(lastvalue)
-                    if self.threshold_components['spike'] is not None:
-                        lastvalue=self.threshold_components['spike'][-1]  
-                        del self.threshold_components['spike'][-1] # delete last value                    
-                        [self.threshold_components['spike'].append(float('nan')) for filler in range(self.spike_cut_length-1)]
-                        self.threshold_components['spike'].append(lastvalue)
-
                     time_step += self.spike_cut_length
-                else:
-                    # we are integrating during the spike, so store the reset values
+                else:  
                     voltage_out[time_step] = voltage_t0 
                     threshold_out[time_step] = threshold_t0
                     AScurrents_out[time_step,:] = AScurrents_t0
@@ -421,11 +411,12 @@ class GlifNeuron( object ):
             'interpolated_spike_threshold': np.array(interpolated_spike_threshold)
             }
 
-    def get_threshold_components(self):
-        if self.threshold_components is None:
-            self.threshold_components = { 'spike': [0], 'voltage': [0] }
-
-        return self.threshold_components
+# TODO: DEPRICATE
+#    def get_threshold_components(self):
+#        if self.threshold_components is None:
+#            self.threshold_components = { 'spike': [0], 'voltage': [0] }
+#
+#        return self.threshold_components
 
     def add_threshold_components(self, spike, voltage):
         self.threshold_components['spike'].append(spike)

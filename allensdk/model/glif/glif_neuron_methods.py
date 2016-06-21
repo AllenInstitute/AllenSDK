@@ -390,10 +390,15 @@ def dynamics_threshold_three_components_forward(neuron, threshold_t0, voltage_t0
     AScurrents_t0 : not used here 
     inj : not used here
     """
-    tcs = neuron.get_threshold_components()
-    
-    th_spike = tcs['spike'][-1]
-    th_voltage = tcs['voltage'][-1] 
+    #TODO: just having the get_threshold_components added an erroneous zero to the beginning of the list 
+    if neuron.threshold_components is None:
+        neuron.threshold_components = { 'spike': [], 'voltage': [] }
+        th_spike = 0
+        th_voltage = 0
+    else:                
+        tcs = neuron.threshold_components
+        th_spike = tcs['spike'][-1]
+        th_voltage = tcs['voltage'][-1] 
 
     a_voltage = a_voltage * neuron.coeffs['a']
     b_voltage = b_voltage * neuron.coeffs['b']
@@ -429,10 +434,15 @@ def dynamics_threshold_three_components_exact(neuron, threshold_t0, voltage_t0, 
     inj : float
         current injected into the neuron
     """
-    tcs = neuron.get_threshold_components()
-
-    th_spike = tcs['spike'][-1]
-    th_voltage = tcs['voltage'][-1] 
+    #TODO: just having the get_threshold_components added an erroneous zero to the beginning of the list 
+    if neuron.threshold_components is None:
+        neuron.threshold_components = { 'spike': [], 'voltage': [] }
+        th_spike = 0
+        th_voltage = 0
+    else:                
+        tcs = neuron.threshold_components
+        th_spike = tcs['spike'][-1]
+        th_voltage = tcs['voltage'][-1] 
 
     a_voltage = a_voltage * neuron.coeffs['a']
     b_voltage = b_voltage * neuron.coeffs['b']
@@ -472,10 +482,15 @@ def dynamics_threshold_spike_component(neuron, threshold_t0, voltage_t0, AScurre
         current injected into the neuron
     """
 
-    tcs = neuron.get_threshold_components()
-
-    th_spike = tcs['spike'][-1]
-    th_voltage = tcs['voltage'][-1] 
+    #TODO: just having the get_threshold_components added an erroneous zero to the beginning of the list 
+    if neuron.threshold_components is None:
+        neuron.threshold_components = { 'spike': [], 'voltage': [] }
+        th_spike = 0
+        th_voltage = 0
+    else:                
+        tcs = neuron.threshold_components
+        th_spike = tcs['spike'][-1]
+        th_voltage = tcs['voltage'][-1] 
 
     spike_component = spike_component_of_threshold_exact(th_spike, b_spike, neuron.dt)
  
@@ -602,16 +617,26 @@ def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
     return  value
 
 
-def reset_threshold_three_components(neuron, threshold_t0, voltage_v1, a_spike):
+def reset_threshold_three_components(neuron, threshold_t0, voltage_v1, a_spike, b_spike):
     '''This method resets the two components of the threshold: a spike (fast)
     component and a (voltage) component which are summed. 
     '''
-    tcs = neuron.get_threshold_components()
-    #if this trace is to be aligned with the voltage traces the last value has to be removed (it is the indicie in the step following a spike) because it is not recorded in the voltage
-    del tcs['spike'][-1]
-    del tcs['voltage'][-1]
-    neuron.add_threshold_components( tcs['spike'][-1] + a_spike,  #adding spiking component of threshold ontop of already existent spike component.
-                                     tcs['voltage'][-1] ) #note these are the same value.
+    #TODO: just having the get_threshold_components added an erroneous zero to the beginning of the list 
+    if neuron.threshold_components is None:
+        raise Exception('reset should never happen at the beginning of a trace')             
+        
+    tcs = neuron.threshold_components
+    #if this trace is to be aligned with the voltage traces the last value has to be 
+    #removed (it is the indicie in the step following a spike) because it is not recorded in the voltage
+    
+    #note that these values are at the indicie of the time of the spike which is the index right after the voltage crosses threshold
+    th_spike=tcs['spike'][-1] #this needs to decay through the spike must be very particular about how many indicies to decay
+    th_voltage= tcs['voltage'][-1]
+    #this is all working via pass by reference.
+    spike_comp_decay=spike_component_of_threshold_exact(th_spike, b_spike, np.arange(1,neuron.spike_cut_length)*neuron.dt) #Note that the plus one is that one needs to know the decay and the inital condition for next starting point 
+    [tcs['voltage'].append(value) for value in np.ones(neuron.spike_cut_length-1)*th_voltage] #note that here I don't need the plus one because I am starting from zero
+    [tcs['spike'].append(value) for value in spike_comp_decay[:]]
+    tcs['spike'][-1]=tcs['spike'][-1]+a_spike
     
     return tcs['spike'][-1] + tcs['voltage'][-1] + neuron.th_inf * neuron.coeffs['th_inf']
 

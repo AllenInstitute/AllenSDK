@@ -203,7 +203,8 @@ def configure_method_parameters(neuron_config,
             neuron_config['init_threshold'] = adjusted_th_inf
                 
         elif method_config['name'] == 'three_components':
-            method_config['params'] = { 'a_spike': a_spike_component_of_threshold }
+            method_config['params'] = { 'a_spike': a_spike_component_of_threshold,
+                                       'b_spike': b_spike_component_of_threshold }
             neuron_config['init_threshold'] = adjusted_th_inf
                 
         elif method_config['name'] == 'fixed':

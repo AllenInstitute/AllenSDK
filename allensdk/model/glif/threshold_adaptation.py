@@ -178,7 +178,7 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
     return const_to_add_to_thresh_for_reset, decay_const, thresh_inf
 
 
-def err_fix_th(x, voltage, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spike, b_spike):
+def err_fix_th(x, v_trace, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spike, b_spike):
     '''This function returns the squared error for the difference between the 'known' voltage 
     component of the threshold obtained from the biological neuron and the voltage component 
     of the threshold of the model obtained with the input parameters (so that the minimum can be 
@@ -221,37 +221,48 @@ def err_fix_th(x, voltage, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spi
     a_voltage=x[0]
     b_voltage=x[1]
     # effect of the spike component of the threshold from each spike and previous spikes
-    sp_comp_of_offset_sum_vector=[0] #at first spike there is no spike component of threshold    
+    sp_comp_of_offset_sum_vector=[0] #vector of spike component of of the threshold from each spike and previous spikes; note at first spike there is no spike component of threshold so initialized at zero   
     for spike_number in range(1,len(all_spikeInd)):      #skipping first spike since no residual spike component of threshold
-        t=(all_spikeInd[spike_number]-all_spikeInd[spike_number-1])*dt
-        sp_comp_of_th_offset_local = spike_component_of_threshold_exact(a_spike, b_spike, t)# spike component of threshold at each ISI
-        sp_comp_of_offset_sum_vector.append(sp_comp_of_offset_sum_vector[-1] + sp_comp_of_th_offset_local)  #keeping track of residual spike comonent of threshold at each spike
+        t=(all_spikeInd[spike_number]-all_spikeInd[spike_number-1]-spike_cut_length)*dt #spike ISI
+        sp_comp_of_th_offset_local = spike_component_of_threshold_exact(a_spike, b_spike, t) #spike component of threshold at each ISI for each individual spike
+        #I THINK THE LINE BELOW MIGHT JUST BE WRONG BECAUSE THE OLD OFF SET WOULD DECAY AND I DONT THINK IT IS HERE:THIS IS WHAT IS BEING USED
+#        sp_comp_of_offset_sum_vector.append(sp_comp_of_offset_sum_vector[-1] + sp_comp_of_th_offset_local)  #keeping track of residual spike component of threshold at each spike
+        left_over_decay=spike_component_of_threshold_exact(sp_comp_of_offset_sum_vector[-1], b_spike, t)
+        sp_comp_of_offset_sum_vector.append(left_over_decay + sp_comp_of_th_offset_local)  #keeping track of spike component of threshold with residuals at each spike
 
-    # Compute voltage component of threshold at biological spike (subtract th_inf and spike component of threshold
-    # from biological voltage values at spike initiation)
-    bio_spike_comp_of_th_at_each_spike=voltage[all_spikeInd]-np.array(sp_comp_of_offset_sum_vector)-th_inf
+
+    # Compute v_trace component of threshold at biological spike (subtract th_inf and spike component of threshold
+    # from biological v_trace values at spike initiation)
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # NOTE THAT THERE IS AN ISSUE HERE USING FAKE DATA.  THE -1 IS HERE BECAUSE THE NEURON CROSSES THRESHOLD SOMETIME BETWEEN TWO INDICIES.
+    # FOR THE FAKE DATA THE TIME OF THE SPIKE (THE POINT FOLLOWING WHEN THE VOLTAGE CROSSES THRESHOLD) IS SET TO NAN.
+    # THE INTERPOLATED VOLTAGE CAN BE USED BUT THEN THE INTERPOLATED VOLTAGE MUST BE CALCULATED FOR THE TRUE VOLTAGE 
+    # TRACE AND POSSIBLY IN THE INTEGRATION.
+    v_comp_of_th_at_each_spike_via_data=v_trace[all_spikeInd-1]-np.array(sp_comp_of_offset_sum_vector)-th_inf  #USE THIS FOR FAKE DATA
+#    v_comp_of_th_at_each_spike_via_data=v_trace[all_spikeInd]-np.array(sp_comp_of_offset_sum_vector)-th_inf  #THIS IS PROBABLY APPROPRIATE FOR REAL DATA
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     
-    # For each ISI, calculate the difference between the voltage dependent component of the threshold
-    # and the value that would be determined via a model that uses the actual voltage of neuron.  
+    # For each ISI, calculate the difference between the v_trace dependent component of the threshold
+    # and the value that would be determined via a model that uses the actual v_trace of neuron.  
     sq_err = []    #list to store squared error between the model and biological threshold
     for spike_number in range(1, len(all_spikeInd)):      #loop over all ISI's in data
-        v_start_ind = all_spikeInd[spike_number-1]+int(spike_cut_length) #spike time plus cut
+        v_start_ind = all_spikeInd[spike_number-1]+int(spike_cut_length) #dont want to use voltage during a spike
         end_ind = all_spikeInd[spike_number]
-        v_in_ISI=voltage[v_start_ind:end_ind]
-        theta0=bio_spike_comp_of_th_at_each_spike[spike_number-1]+sp_comp_of_offset_sum_vector[spike_number-1]
-        theta1=bio_spike_comp_of_th_at_each_spike[spike_number]
+        v_in_ISI=v_trace[v_start_ind:end_ind]
+        #v_trace component of threshold at the beginning and end of the ISI
+    
+        theta0=v_comp_of_th_at_each_spike_via_data[spike_number-1] #this assumes that the voltage component of the threshold does not change over the time period of the spike
+        # not sure this makes sense any moretheta0=v_comp_of_th_at_each_spike_via_data[spike_number-1]+sp_comp_of_offset_sum_vector[spike_number-1] #use this is you want to add the biological component back on
+        theta1=v_comp_of_th_at_each_spike_via_data[spike_number]
         tvec=np.arange(len(v_in_ISI))*dt
-        
-        lhs=theta1-theta0*np.exp(-b_voltage*dt*(end_ind-v_start_ind))
-        rhs=a_voltage*np.exp(-b_voltage*tvec[-1])*np.sum(dt*(v_in_ISI-El)*np.exp(b_voltage*tvec))
-#        print "spike",all_spikeInd[spike_number], "OS",sp_comp_of_offset_sum_vector[spike_number], "theta1", theta0,"theta2", theta1,"lhs", lhs, "rhs", rhs       
-        err = (lhs-rhs)**2
+
+        #need to prove this--NOTE THAT THIS SHOULD BE EXACT DURING FAKE DATA--DIFFERENCES COULD BE DUE TO GETTING VALUES AT DIFFERENT INDICIES
+        model=+theta0*np.exp(-b_voltage*dt*(end_ind-v_start_ind))+a_voltage*np.exp(-b_voltage*tvec[-1])*np.sum(dt*(v_in_ISI-El)*np.exp(b_voltage*tvec))
+        err = (theta1-model)**2
         if ~np.isnan(err):
             sq_err.append(err)
-            
-    F = np.sum(sq_err)
-    
-    return F
+             
+    return np.sum(sq_err)
 
 def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
     '''artifacts caused by turning stimulus on and off created artifacts that 
