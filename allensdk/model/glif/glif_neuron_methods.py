@@ -403,8 +403,8 @@ def dynamics_threshold_three_components_forward(neuron, threshold_t0, voltage_t0
     a_voltage = a_voltage * neuron.coeffs['a']
     b_voltage = b_voltage * neuron.coeffs['b']
 
-    spike_component = spike_component_of_threshold_forward_euler(th_t0, b_spike, neuron.dt)    
-    voltage_component = voltage_component_of_threshold_forward_euler(th_voltage, voltage_t0, dt, a_voltage, b_voltage, neuron.El)
+    spike_component = spike_component_of_threshold_forward_euler(th_spike, b_spike, neuron.dt)    
+    voltage_component = voltage_component_of_threshold_forward_euler(th_voltage, voltage_t0, neuron.dt, a_voltage, b_voltage, neuron.El)
 
     neuron.add_threshold_components(spike_component, voltage_component)
     
@@ -633,10 +633,11 @@ def reset_threshold_three_components(neuron, threshold_t0, voltage_v1, a_spike, 
     th_spike=tcs['spike'][-1] #this needs to decay through the spike must be very particular about how many indicies to decay
     th_voltage= tcs['voltage'][-1]
     #this is all working via pass by reference.
-    spike_comp_decay=spike_component_of_threshold_exact(th_spike, b_spike, np.arange(1,neuron.spike_cut_length)*neuron.dt) #Note that the plus one is that one needs to know the decay and the inital condition for next starting point 
-    [tcs['voltage'].append(value) for value in np.ones(neuron.spike_cut_length-1)*th_voltage] #note that here I don't need the plus one because I am starting from zero
+    spike_comp_decay=spike_component_of_threshold_exact(th_spike, b_spike, np.arange(1,neuron.spike_cut_length+1)*neuron.dt) #Note that the plus one is that one needs to know the decay and the inital condition for next starting point 
+    [tcs['voltage'].append(value) for value in np.ones(neuron.spike_cut_length)*th_voltage] #note that here I don't need the plus one because I am starting from zero
     [tcs['spike'].append(value) for value in spike_comp_decay[:]]
     tcs['spike'][-1]=tcs['spike'][-1]+a_spike
+    #Note that here this is the the value for the 
     
     return tcs['spike'][-1] + tcs['voltage'][-1] + neuron.th_inf * neuron.coeffs['th_inf']
 

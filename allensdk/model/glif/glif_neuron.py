@@ -375,14 +375,18 @@ class GlifNeuron( object ):
                     voltage_out[time_step:time_step+n] = np.nan
                     threshold_out[time_step:time_step+n] = np.nan
                     AScurrents_out[time_step:time_step+n,:] = np.nan
-                    #Since reset is already done should paste the nans in before the last value
-                    time_step += self.spike_cut_length
+                    voltage_out[time_step+n] = voltage_t0 
+                    threshold_out[time_step+n] = threshold_t0
+                    AScurrents_out[time_step+n,:] = AScurrents_t0                    
+                    time_step += self.spike_cut_length+1
                 else:  
                     voltage_out[time_step] = voltage_t0 
                     threshold_out[time_step] = threshold_t0
                     AScurrents_out[time_step,:] = AScurrents_t0
 
                     time_step += 1
+                    
+
                 if bad_reset_flag:
                     voltage_out[time_step:time_step+5] = voltage_t0 
                     threshold_out[time_step:time_step+5] = threshold_t0
