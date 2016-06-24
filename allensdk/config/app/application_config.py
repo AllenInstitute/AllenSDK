@@ -18,7 +18,7 @@ from allensdk.core.json_utilities import JsonComments
 try:
     from configparser import ConfigParser #@UnresolvedImport
 except:
-    import ConfigParser
+    from ConfigParser import ConfigParser
 
 import argparse
 import os
