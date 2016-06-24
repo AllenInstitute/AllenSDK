@@ -17,7 +17,10 @@
 import pytest
 from mock import patch, mock_open
 from allensdk.core.json_utilities import JsonComments
-
+try:
+    import builtins
+except:
+    import __builtin__ as builtins
 
 @pytest.fixture
 def commented_json():
@@ -102,7 +105,7 @@ def testTwoMultiLineComments(two_multi_line_json):
 
 
 def testSingleLineCommentFile(commented_json):
-    with patch("__builtin__.open",
+    with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=commented_json)):
         parsed_json = JsonComments.read_file('mock.json')
@@ -112,31 +115,31 @@ def testSingleLineCommentFile(commented_json):
  
  
 def testBlankLinesFile(blank_line_json):
-    with patch("__builtin__.open",
+    with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=blank_line_json)):
         parsed_json = JsonComments.read_file('mock.json')
      
     assert('color' in parsed_json and
            parsed_json['color'] == 'blue')
- 
- 
+
+
 def testMultiLineFile(multi_line_json):
-    with patch("__builtin__.open",
+    with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=multi_line_json)):
         parsed_json = JsonComments.read_file('mock.json')
      
     assert('color' in parsed_json and
            parsed_json['color'] == 'blue')
- 
- 
+
+
 def testTwoMultiLineFile(two_multi_line_json):
-    with patch("__builtin__.open",
+    with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=two_multi_line_json)):
         parsed_json = JsonComments.read_file('mock.json')
-     
+
     assert('colors' in parsed_json)
     assert(len(parsed_json['colors']) == 4)
     assert('blue' in parsed_json['colors'])

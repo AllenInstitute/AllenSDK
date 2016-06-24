@@ -20,8 +20,7 @@ from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import allensdk.brain_observatory.stimulus_info as stim_info
-import pandas as pd
-import inspect
+import six
 
 class BrainObservatoryCache(Cache):
     """
@@ -371,5 +370,5 @@ def _find_specimen_cre_line(specimen):
     return next(tl['name'] for tl in specimen['donor']['transgenic_lines'] if 'Cre' in tl['name'])
 
 def _assert_not_string(arg, name):
-    if isinstance(arg, basestring):
+    if isinstance(arg, six.string_types):
         raise TypeError("Argument '%s' with value '%s' is a string type, but should be a list." % (name, arg))  

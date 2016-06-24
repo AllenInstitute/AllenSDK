@@ -23,7 +23,7 @@ setup(
     author = 'David Feng',
     author_email = 'davidf@alleninstitute.org',
     packages = prepend_find_packages('allensdk'),
-    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', 'bps', 'Makefile', 'COPYING'] },
+    package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'COPYING'] },
     description = 'core libraries for the allensdk.',
     install_requires = ['h5py>=2.2.1',
                         'matplotlib>=1.4.2',

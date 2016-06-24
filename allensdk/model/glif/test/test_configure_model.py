@@ -90,7 +90,7 @@ def test_configure_model():
         out_file = os.path.join(OUT_DIR, "%s_%s_model_config.json" % (sid, config))
 
         if os.path.exists(prep_file):
-            print "testing", prep_file
+            print("testing", prep_file)
             out_config = configure_model(ju.read(method_config_file), 
                                          ju.read(prep_file))
 

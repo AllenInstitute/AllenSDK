@@ -254,9 +254,9 @@ class Manifest(object):
         try:
             os.makedirs(directory)
         except Exception as e:
-            print e.message
-                
-    
+            print(e.message)
+
+
     def create_dir(self, path_key):
         '''Make a directory for an entry.
         

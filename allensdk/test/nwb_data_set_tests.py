@@ -26,7 +26,7 @@ class NwbDataSetTest(unittest.TestCase):
 
         manifest_file = '/local1/projects/FHL2015/cell_types/manifest.json'
         if not os.path.exists(manifest_file):
-            print "Cannot run this test: manifest does not exist (%s)" % manifest_file
+            print("Cannot run this test: manifest does not exist (%s)" % manifest_file)
             return True
         
         self.cache = CellTypesCache(manifest_file=manifest_file)

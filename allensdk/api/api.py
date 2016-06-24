@@ -13,7 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2
+try:
+    import urllib.request as urllib_request
+except:
+    import urllib2 as urllib_request
+
+try:
+    import urllib.error as urllib_error
+except:
+    import urllib2 as urllib_error
+
 import allensdk.core.json_utilities as json_utilities
 import pandas as pd
 import logging
@@ -150,7 +159,7 @@ class Api(object):
         kwargs : keyword arguments
             Keyword arguments to be passed to the rma builder function.
         
-        Returns
+        Returnsurllib_re
         -------
         any type
             The data extracted from the json response.
@@ -264,9 +273,9 @@ class Api(object):
         '''
         try:
             with open(file_path, 'wb') as f:
-                response = urllib2.urlopen(url)
+                response = urllib_request.urlopen(url)
                 f.write(response.read())
-        except urllib2.HTTPError:
+        except urllib_error.HTTPError:
             self._log.error("Couldn't retrieve file from %s" % url)
             raise
     
@@ -288,7 +297,7 @@ class Api(object):
         '''
         
         if post == False:
-            data = json_utilities.read_url(urllib2.quote(url,';/?:@&=+$,'),
+            data = json_utilities.read_url(urllib_request.quote(url,';/?:@&=+$,'),
                                            'GET')
         else:
             data = json_utilities.read_url(url, 'POST')
@@ -309,6 +318,6 @@ class Api(object):
         string
             Unparsed xml string.
         '''
-        response = urllib2.urlopen(url)
+        response = urllib_request.urlopen(url)
         
         return response.read()

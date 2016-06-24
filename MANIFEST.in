@@ -1,2 +1,2 @@
-recursive-include allensdk *.py *.conf *.json
+recursive-include allensdk *.py *.conf *.json *.txt
 include README.md COPYING Makefile

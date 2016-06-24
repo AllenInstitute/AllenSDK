@@ -16,12 +16,15 @@
 from allensdk.core.json_utilities import JsonComments
 
 try:
-    from ConfigParser import ConfigParser # Python 2
+    from configparser import ConfigParser #@UnresolvedImport
 except:
-    from configparser import ConfigParser # Python 3 #@UnresolvedImport
+    import ConfigParser
 
-import argparse, os, io
-import logging, logging.config as lc
+import argparse
+import os
+import io
+import logging
+import logging.config as lc
 from pkg_resources import resource_filename #@UnresolvedImport
 
 class ApplicationConfig(object):

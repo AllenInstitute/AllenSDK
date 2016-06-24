@@ -145,7 +145,7 @@ def dynamics_AScurrent_exp(neuron, AScurrents_t0, time_step, spike_time_steps):
     a time step later.
     """
 
-#     print 'HERE: dynamics_threshold_inf'
+#     print('HERE: dynamics_threshold_inf')
 #    return AScurrents_t0*(1.0 - neuron.k*neuron.dt)
     return AScurrents_t0*np.exp(-neuron.k*neuron.dt)
         
@@ -275,7 +275,7 @@ def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, AScurren
     AScurrents_t0 : not used here 
     inj : not used here
     """
-#     print 'HERE: dynamics_threshold_adapt_standard'
+#     print('HERE: dynamics_threshold_adapt_standard')
     return threshold_t0 + (a * neuron.coeffs['a'] * (voltage_t0-neuron.El) - 
                            b * neuron.coeffs['b'] * (threshold_t0 - neuron.coeffs['th_inf'] * neuron.th_inf)) * neuron.dt 
 
@@ -297,10 +297,10 @@ def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, AScurren
 #    th_spike = md['th_spike'][-1]
 #    th_voltage = md['th_voltage'][-1] 
 #
-##     print 'a_spike', md['a_spike']
-##     print 'b_spike', md['b_spike']
-##     print 'a_voltage', md['a_voltage']
-##     print 'b_voltage', md['b_voltage']
+##     print('a_spike', md['a_spike'])
+##     print('b_spike', md['b_spike'])
+##     print('a_voltage', md['a_voltage'])
+##     print('b_voltage', md['b_voltage'])
 #
 #    voltage_component = th_voltage + ( md['a_voltage'] * neuron.coeffs['a'] * ( voltage_t0 - neuron.El ) - 
 #                                       md['b_voltage'] * neuron.coeffs['b'] * ( th_voltage - neuron.coeffs['th_inf'] * neuron.th_inf ) ) * neuron.dt

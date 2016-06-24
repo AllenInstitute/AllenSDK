@@ -61,18 +61,17 @@ example Dockerfiles are available.
  #. Ensure you have Docker installed.
 
  #. Download one of the example Docker files:
-     * :download:`Ubuntu Standalone <./_static/examples/docker/Dockerfile.ubuntu>`.
+     * :download:`Anaconda and NEURON <./_static/examples/docker/Dockerfile.anaconda>`.
      * :download:`Neural Ensemble combined simulators <./_static/examples/docker/Dockerfile.neuralensemble>`.
-     * :download:`Neural Ensemble combined simulators with X11 <./_static/examples/docker/Dockerfile.neuralensemblex>`.
 
  #. Use Docker to build the image::
  
      mkdir docker_build
-     cp Dockerfile.ubuntu docker_build/Dockerfile
+     cp Dockerfile.anaconca docker_build/Dockerfile
      cd docker_build
-     docker build --tag alleninstitute/allensdk:ubuntu .
+     docker build --tag alleninstitute/allensdk:anaconda .
      
  #. Run the docker image::
  
-     docker run -it -v /data:/data alleninstitute/allensdk:ubuntu /bin/bash
+     docker run -it -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
 
