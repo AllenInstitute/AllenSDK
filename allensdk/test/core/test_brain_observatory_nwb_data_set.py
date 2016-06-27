@@ -1,6 +1,7 @@
 import numpy as np
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import pytest
+import os
 
 @pytest.fixture
 def data_set():
@@ -8,6 +9,8 @@ def data_set():
     data_set = BrainObservatoryNwbDataSet(nwb_file)
     return data_set
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
 def test_acceptance(data_set):
     ids = data_set.get_cell_specimen_ids()
     data_set.get_session_type()
@@ -15,10 +18,14 @@ def test_acceptance(data_set):
     data_set.get_running_speed()
     data_set.get_motion_correction()
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
 def test_get_roi_ids(data_set):
     ids = data_set.get_roi_ids()
     assert len(ids) == len(data_set.get_cell_specimen_ids())
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
 def test_get_cell_specimen_indices(data_set):
     inds = data_set.get_cell_specimen_indices([])
     assert len(inds) == 0
@@ -31,6 +38,8 @@ def test_get_cell_specimen_indices(data_set):
     inds = data_set.get_cell_specimen_indices([ids[0]])
     assert inds[0] == 0
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
 def test_get_fluorescence_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
 
@@ -44,6 +53,8 @@ def test_get_fluorescence_traces(data_set):
     timestamps, traces = data_set.get_fluorescence_traces([ids[0]])
     assert traces.shape[0] == 1
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
 def test_get_neuropil_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
 
@@ -57,6 +68,8 @@ def test_get_neuropil_traces(data_set):
     timestamps, traces = data_set.get_neuropil_traces([ids[0]])
     assert traces.shape[0] == 1
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
 def test_get_dff_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
 
@@ -70,6 +83,8 @@ def test_get_dff_traces(data_set):
     timestamps, traces = data_set.get_dff_traces([ids[0]])
     assert traces.shape[0] == 1
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
 def test_get_corrected_fluorescence_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
 
@@ -83,6 +98,8 @@ def test_get_corrected_fluorescence_traces(data_set):
     timestamps, traces = data_set.get_corrected_fluorescence_traces([ids[0]])
     assert traces.shape[0] == 1
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
 def test_get_roi_mask(data_set):
     ids = data_set.get_cell_specimen_ids()
     roi_masks = data_set.get_roi_mask()
@@ -97,6 +114,8 @@ def test_get_roi_mask(data_set):
     roi_masks = data_set.get_roi_mask([ids[0]])
     assert len(roi_masks) == 1
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
 def test_get_roi_mask_array(data_set):
     ids = data_set.get_cell_specimen_ids()
     arr = data_set.get_roi_mask_array()

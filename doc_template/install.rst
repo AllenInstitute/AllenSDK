@@ -63,6 +63,7 @@ example Dockerfiles are available.
  #. Download one of the example Docker files:
      * :download:`Anaconda and NEURON <./_static/examples/docker/Dockerfile.anaconda>`.
      * :download:`Neural Ensemble combined simulators <./_static/examples/docker/Dockerfile.neuralensemble>`.
+     * :download:`Ubuntu and NEURON <./_static/examples/docker/Dockerfile.ubuntu>`.
 
  #. Use Docker to build the image::
  

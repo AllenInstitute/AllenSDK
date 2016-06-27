@@ -69,7 +69,7 @@ def read_url_get(url):
     the output will be of the corresponding type.
     '''
     response = urllib_request.urlopen(url)
-    json_string = response.readall().decode('utf-8')
+    json_string = response.read().decode('utf-8')
     
     return json.loads(json_string)
 
