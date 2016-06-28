@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -194,6 +192,5 @@ def get_square_stim_characteristics(i, t, no_test_pulse=False):
 
     return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
 
-if __name__ == "__main__": pass
 
 

@@ -100,7 +100,7 @@ This can take some time.
 
     cd neuronal_model
     nrnivmodl ./modfiles   # compile the model (only needs to be done once)
-    python -m allensdk.model.biophysical_perisomatic.runner manifest.json
+    python -m allensdk.model.biophysical.runner manifest.json
 
 
 Selecting a Specific Sweep
@@ -114,14 +114,14 @@ Simulation Main Loop
 --------------------
 
 The top level script is in the
-:py:meth:`~allensdk.model.biophysical_perisomatic.runner.run`
-method of the :py:mod:`allensdk.model.biophysical_perisomatic.runner`
+:py:meth:`~allensdk.model.biophysical.runner.run`
+method of the :py:mod:`allensdk.model.biophysical.runner`
 module.  The implementation of the method is shown here step-by-step:
 
 First configure NEURON based on the configuration file, which was 
 read in from the command line at the very bottom of the script.
 
-:py:meth:`~allensdk.model.biophysical_perisomatic.runner.run`:
+:py:meth:`~allensdk.model.biophysical.runner.run`:
 ::
 
     # configure NEURON
@@ -170,18 +170,18 @@ Customization
 
 Much of the code in the perisomatic simulation is not core Allen SDK code.
 The runner.py script largely reads the configuration file and calls into
-methods in the :py:class:`~allensdk.model.biophysical_perisomatic.utils.Utils` class.
+methods in the :py:class:`~allensdk.model.biophysical.utils.Utils` class.
 Utils is a subclass of the :py:class:`~allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils`
 class, which provides access to objects in the NEURON package.
 The various methods called by the runner.script are implemented here, including:
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.generate_morphology`,
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.load_cell_parameters`,
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.setup_iclamp`,
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.read_stimulus`
+:py:meth:`~allensdk.model.biophysical.utils.Utils.generate_morphology`,
+:py:meth:`~allensdk.model.biophysical.utils.Utils.load_cell_parameters`,
+:py:meth:`~allensdk.model.biophysical.utils.Utils.setup_iclamp`,
+:py:meth:`~allensdk.model.biophysical.utils.Utils.read_stimulus`
 and
-:py:meth:`~allensdk.model.biophysical_perisomatic.utils.Utils.record_values`.
+:py:meth:`~allensdk.model.biophysical.utils.Utils.record_values`.
 
-:py:class:`~allensdk.model.biophysical_perisomatic.utils.Utils`:
+:py:class:`~allensdk.model.biophysical.utils.Utils`:
 ::
 
     from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils

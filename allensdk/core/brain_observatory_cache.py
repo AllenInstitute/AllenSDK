@@ -20,8 +20,7 @@ from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import allensdk.brain_observatory.stimulus_info as stim_info
-import pandas as pd
-
+import six
 
 class BrainObservatoryCache(Cache):
     """
@@ -133,6 +132,9 @@ class BrainObservatoryCache(Cache):
         -------
         list of dictionaries
         """
+        _assert_not_string(targeted_structures, "targeted_structures")
+        _assert_not_string(cre_lines, "cre_lines")
+
         file_name = self.get_cache_path(file_name, self.EXPERIMENT_CONTAINERS_KEY)
 
         if os.path.exists(file_name):
@@ -212,6 +214,11 @@ class BrainObservatoryCache(Cache):
         -------
         list of dictionaries
         """
+        _assert_not_string(targeted_structures, "targeted_structures")
+        _assert_not_string(cre_lines, "cre_lines")
+        _assert_not_string(stimuli, "stimuli")
+        _assert_not_string(session_types, "session_types")
+
         file_name = self.get_cache_path(file_name, self.EXPERIMENTS_KEY)
 
         if os.path.exists(file_name):
@@ -361,3 +368,7 @@ class BrainObservatoryCache(Cache):
 
 def _find_specimen_cre_line(specimen):
     return next(tl['name'] for tl in specimen['donor']['transgenic_lines'] if 'Cre' in tl['name'])
+
+def _assert_not_string(arg, name):
+    if isinstance(arg, six.string_types):
+        raise TypeError("Argument '%s' with value '%s' is a string type, but should be a list." % (name, arg))  

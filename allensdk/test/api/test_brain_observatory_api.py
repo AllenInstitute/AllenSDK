@@ -20,7 +20,7 @@ from allensdk.api.queries.brain_observatory_api \
 
 import pytest
 from mock import patch, MagicMock
-
+from collections import Counter
 
 @pytest.fixture
 def bo_api():
@@ -82,8 +82,17 @@ def mock_ophys_experiments():
 
 @pytest.fixture
 def mock_specimens():
-    specimens = [ 'stub']
-    
+    specimens = [ 
+        { "experiment_container_id": 511498500, 
+          "cell_specimen_id": 517394843
+          },
+        { "experiment_container_id": 511498742, 
+          "cell_specimen_id": 517398740
+          },
+        { "experiment_container_id": 511498500, 
+          "cell_specimen_id": 517394874
+          }
+        ]        
     return specimens
     
     
@@ -261,6 +270,19 @@ def test_filter_ophys_experiments_stimuli(bo_api, mock_ophys_experiments):
 def test_filter_cell_specimens(bo_api, mock_specimens):
     specimens = bo_api.filter_cell_specimens(mock_specimens)
     assert specimens == mock_specimens
+
+    specimens = bo_api.filter_cell_specimens(mock_specimens, ids=[mock_specimens[0]['cell_specimen_id']])
+    assert len(specimens) == 1
+    assert specimens[0] == mock_specimens[0]
+
+    cnt = Counter()
+    for sp in mock_specimens:
+        cnt[sp['experiment_container_id']] += 1
+
+    ecid = mock_specimens[0]['experiment_container_id']
+    specimens = bo_api.filter_cell_specimens(mock_specimens, experiment_container_ids=[ecid])
+    assert len(specimens) == cnt[ecid]
+    assert specimens[0] == mock_specimens[0]
 
 
 def test_save_ophys_experiment_data(bo_api_save_ophys):

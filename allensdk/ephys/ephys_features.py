@@ -1,3 +1,18 @@
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 import warnings
 import logging
 import numpy as np
@@ -170,8 +185,15 @@ def refine_threshold_indexes(v, t, upstroke_indexes, thresh_frac=0.05, filter=10
     target = avg_upstroke * thresh_frac
 
     upstrokes_and_start = np.append(np.array([0]), upstroke_indexes)
-    threshold_indexes = [upstk - np.flatnonzero(dvdt[upstk:upstrokes_and_start[i]:-1] <=
-                         target)[0] for i, upstk in enumerate(upstrokes_and_start[1:])]
+    threshold_indexes = []
+    for upstk, upstk_prev in zip(upstrokes_and_start[1:], upstrokes_and_start[:-1]):
+        potential_indexes = np.flatnonzero(dvdt[upstk:upstk_prev:-1] <= target)
+        if not potential_indexes.size:
+            # couldn't find a matching value for threshold,
+            # so just going to the start of the search interval
+            threshold_indexes.append(upstk_prev)
+        else:
+            threshold_indexes.append(upstk - potential_indexes[0])
 
     return np.array(threshold_indexes)
 
@@ -1065,6 +1087,3 @@ def _dbl_exp_fit(y0, x, A1, tau1, A2, tau2):
 class FeatureError(Exception):
     """Generic Python-exception-derived object raised by feature detection functions."""
     pass
-
-
-if __name__ == "__main__": pass
