@@ -76,6 +76,15 @@ def validate_swc(swc_file):
             print("File has unrecognized node type(s)")
             return False
 
+    # make sure all dendrite nodes are in tree 0
+    # this is because modeling requires a full dendrite morphology
+    for node in morphology.node_list:
+        print str(node)
+        if (node.t == 3 or node.t == 4) and node.tree_id != 0:
+            print("Dendrite node(s) exist in disconnected trees")
+            print("This breaks an SDK modeling requirement")
+            return False
+
     # if we've made it here, file is OK for using Morphology class, and 
     #   should be valid with internal processing. It may also be able
     #   to be convertable for NEURON use by resaving it
