@@ -322,7 +322,7 @@ class GlifNeuron( object ):
         threshold_t0 = self.init_threshold
         AScurrents_t0 = self.init_AScurrents
 
-        self.reset_threshold_components() #get rid of lingering method data
+        self.threshold_components = None  #get rid of lingering method data
 
         num_time_steps = len(stim) 
         num_AScurrents = len(AScurrents_t0)
@@ -426,8 +426,9 @@ class GlifNeuron( object ):
         self.threshold_components['spike'].append(spike)
         self.threshold_components['voltage'].append(voltage)
 
-    def reset_threshold_components(self):
-        self.threshold_components = None 
+# TODO: DEPRICATE
+#    def reset_threshold_components(self):
+#        self.threshold_components = None 
             
 
 

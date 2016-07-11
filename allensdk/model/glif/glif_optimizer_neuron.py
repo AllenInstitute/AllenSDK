@@ -110,7 +110,7 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
                 'grid_bio_spike_model_threshold': voltage of the model at biological/input spike times interpolated between time steps
         """
         
-        self.reset_threshold_components() #get rid of lingering threshold components
+        self.threshold_components = None  #get rid of lingering threshold components
 
         voltage_t0 = self.init_voltage
         threshold_t0 = self.init_threshold
