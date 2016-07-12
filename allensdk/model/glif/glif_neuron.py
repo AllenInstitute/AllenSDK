@@ -383,10 +383,8 @@ class GlifNeuron( object ):
                     voltage_out[time_step] = voltage_t0 
                     threshold_out[time_step] = threshold_t0
                     AScurrents_out[time_step,:] = AScurrents_t0
-
                     time_step += 1
                     
-
                 if bad_reset_flag:
                     voltage_out[time_step:time_step+5] = voltage_t0 
                     threshold_out[time_step:time_step+5] = threshold_t0
@@ -422,7 +420,7 @@ class GlifNeuron( object ):
 #
 #        return self.threshold_components
 
-    def add_threshold_components(self, spike, voltage):
+    def append_threshold_components(self, spike, voltage):
         self.threshold_components['spike'].append(spike)
         self.threshold_components['voltage'].append(voltage)
 

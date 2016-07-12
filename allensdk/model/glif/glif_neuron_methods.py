@@ -261,23 +261,23 @@ def dynamics_voltage_piecewise_linear_forward_euler(neuron, voltage_t0, AScurren
 
     return voltage_t0 + (inj + np.sum(AScurrents_t0) - G * neuron.coeffs['G'] * (voltage_t0 - El)) * neuron.dt / (neuron.C * neuron.coeffs['C'])
     
-
-def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj, a, b):
-    """ Standard adapting threshold dynamics equation.
-
-    Parameters
-    ----------
-    neuron : class
-    a : float
-        coefficient of voltage
-    b : float
-        coefficient of threshold
-    AScurrents_t0 : not used here 
-    inj : not used here
-    """
-#     print 'HERE: dynamics_threshold_adapt_standard'
-    return threshold_t0 + (a * neuron.coeffs['a'] * (voltage_t0-neuron.El) - 
-                           b * neuron.coeffs['b'] * (threshold_t0 - neuron.coeffs['th_inf'] * neuron.th_inf)) * neuron.dt 
+#TODO: after runs are done deprecate this function because it is not used
+#def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj, a, b):
+#    """ Standard adapting threshold dynamics equation.
+#
+#    Parameters
+#    ----------
+#    neuron : class
+#    a : float
+#        coefficient of voltage
+#    b : float
+#        coefficient of threshold
+#    AScurrents_t0 : not used here 
+#    inj : not used here
+#    """
+##     print 'HERE: dynamics_threshold_adapt_standard'
+#    return threshold_t0 + (a * neuron.coeffs['a'] * (voltage_t0-neuron.El) - 
+#                           b * neuron.coeffs['b'] * (threshold_t0 - neuron.coeffs['th_inf'] * neuron.th_inf)) * neuron.dt 
 
 def spike_component_of_threshold_forward_euler(th_t0, b_spike, dt):
     '''Spike component of threshold modeled as an exponential decay. Implemented 
@@ -406,7 +406,7 @@ def dynamics_threshold_three_components_forward(neuron, threshold_t0, voltage_t0
     spike_component = spike_component_of_threshold_forward_euler(th_spike, b_spike, neuron.dt)    
     voltage_component = voltage_component_of_threshold_forward_euler(th_voltage, voltage_t0, neuron.dt, a_voltage, b_voltage, neuron.El)
 
-    neuron.add_threshold_components(spike_component, voltage_component)
+    neuron.append_threshold_components(spike_component, voltage_component)
     
     return voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
 
@@ -455,7 +455,7 @@ def dynamics_threshold_three_components_exact(neuron, threshold_t0, voltage_t0, 
     spike_component = spike_component_of_threshold_exact(th_spike, b_spike, neuron.dt)
  
     #------update the voltage and spiking values of the the
-    neuron.add_threshold_components(spike_component, voltage_component)
+    neuron.append_threshold_components(spike_component, voltage_component)
      
     return voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
 
@@ -495,7 +495,7 @@ def dynamics_threshold_spike_component(neuron, threshold_t0, voltage_t0, AScurre
     spike_component = spike_component_of_threshold_exact(th_spike, b_spike, neuron.dt)
  
     #------update the voltage and spiking values of the the
-    neuron.add_threshold_components(spike_component, 0.0)
+    neuron.append_threshold_components(spike_component, 0.0)
      
     return spike_component+neuron.th_inf * neuron.coeffs['th_inf']
 
