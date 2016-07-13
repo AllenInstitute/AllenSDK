@@ -33,7 +33,7 @@ def test_preprocess_neuron():
     logging.getLogger().setLevel(logging.DEBUG)
     p = re.compile("(\d+)_data_config.json")
     dt = 5e-05
-    bessel = { 'N': 4, 'Wn': .1 }
+    bessel = { 'N': 4, 'freq': 10000 }
     cut = 0
 
     if not os.path.exists(OUT_DIR):

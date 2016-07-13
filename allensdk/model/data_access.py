@@ -32,7 +32,9 @@ def load_sweep(file_name, sweep_number, desired_dt=None, cut=0, bessel=False):
         data["stimulus"] = data["stimulus"][cut:]        
 
     if bessel:
-        b, a = signal.bessel(bessel["N"], bessel["Wn"], "low")
+        sample_freq = 1. / data["dt"]
+        filt_coeff = (bessel["freq"]) / (sample_freq / 2.) # filter fraction of Nyquist frequency
+        b, a = signal.bessel(bessel["N"], filt_coeff, "low")
         data['response'] = signal.filtfilt(b, a, data['response'], axis=0)
 
     if desired_dt is not None:

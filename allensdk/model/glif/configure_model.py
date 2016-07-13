@@ -40,7 +40,7 @@ DEFAULT_OPTIMIZER_PARAMETERS = {
     "iteration_info": [],
     "param_fit_names": [],
     "cut": 0,
-    "bessel": { 'N': 4, 'Wn': .1 }
+    "bessel": { 'N': 4, 'freq': 10000 }
     }
     
 

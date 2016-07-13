@@ -22,7 +22,7 @@ from MLIN import MLIN
 RESTING_POTENTIAL = 'slow_vm_mv'
 DEFAULT_DT = 5e-05
 DEFAULT_CUT = 0
-DEFAULT_BESSEL = { 'N': 4, 'Wn': .1 }
+DEFAULT_BESSEL = { 'N': 4, 'freq': 10000 }
 
 def preprocess_neuron(nwb_file, sweep_list, dt=None, cut=0, bessel=None):
     sweep_index = { s['sweep_number']: s for s in sweep_list }
