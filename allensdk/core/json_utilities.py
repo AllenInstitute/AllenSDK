@@ -16,6 +16,10 @@
 import numpy as np
 import json
 import re
+import logging
+
+ju_logger = logging.getLogger(__name__)
+
 try:
     import urllib.request as urllib_request
 except ImportError:
@@ -163,9 +167,16 @@ class JsonComments(object):
 
     @classmethod
     def read_file(cls, file_name):
-        with open(file_name) as f:
-            json_string = f.read()
-            return cls.read_string(json_string)
+        try:
+            with open(file_name) as f:
+                json_string = f.read()
+                json_object = cls.read_string(json_string)
+                
+                return json_object
+        except ValueError:
+            ju_logger.error(
+                "Could not load json object from file: %s" % (file_name))
+            raise
 
 
     @classmethod
