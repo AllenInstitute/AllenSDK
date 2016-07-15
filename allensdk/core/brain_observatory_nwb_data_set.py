@@ -1,10 +1,18 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Aug 14 14:04:24 2015
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-@author: saskiad@alleninstitute.org
-Functions to extract relevant data from the CAM NWB files
-"""
 import h5py
 import pandas as pd
 import numpy as np
@@ -12,6 +20,7 @@ import allensdk.brain_observatory.roi_masks as roi
 import itertools
 from collections import defaultdict
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
+import allensdk.brain_observatory.stimulus_info as si
 import dateutil
 import re
 
@@ -38,14 +47,13 @@ class BrainObservatoryNwbDataSet(object):
         }
 
     STIMULUS_TABLE_TYPES = {
-        'abstract_feature_series': [ 'drifting_gratings', 'static_gratings' ],
-        'indexed_time_series': [ 'natural_movie_one', 'natural_movie_two', 'natural_movie_three', 
-                                 'natural_scenes', 'locally_sparse_noise' ]
+        'abstract_feature_series': [ si.DRIFTING_GRATINGS, si.STATIC_GRATINGS ],
+        'indexed_time_series': [ si.NATURAL_MOVIE_ONE, si.NATURAL_MOVIE_TWO, si.NATURAL_MOVIE_THREE, 
+                                 si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE ]
         }
     
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
-        
 
     def get_fluorescence_traces(self, cell_specimen_ids=None):
         ''' Returns an array of fluorescence traces for all ROI and 
@@ -65,8 +73,6 @@ class BrainObservatoryNwbDataSet(object):
         traces: 2D numpy array
             Fluorescence traces for each cell
         '''
-        all_cell_specimen_ids = list(self.get_cell_specimen_ids())
-
         with h5py.File(self.nwb_file, 'r') as f:
             timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
             ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['data']
@@ -74,7 +80,7 @@ class BrainObservatoryNwbDataSet(object):
             if cell_specimen_ids is None:
                 cell_traces = ds.value 
             else:
-                inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
+                inds = self.get_cell_specimen_indices(cell_specimen_ids)
                 cell_traces = ds[inds,:]
 
         return timestamps, cell_traces
@@ -97,8 +103,6 @@ class BrainObservatoryNwbDataSet(object):
         traces: 2D numpy array
             Neuropil fluorescence traces for each cell
         '''
-        all_cell_specimen_ids = self.get_cell_specimen_ids()
-
         with h5py.File(self.nwb_file, 'r') as f:
             timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
 
@@ -106,7 +110,7 @@ class BrainObservatoryNwbDataSet(object):
             if cell_specimen_ids is None:
                 np_traces = ds.value 
             else:
-                inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+                inds = self.get_cell_specimen_indices(cell_specimen_ids)
                 np_traces = ds[inds,:]
 
         return timestamps, np_traces
@@ -129,8 +133,6 @@ class BrainObservatoryNwbDataSet(object):
         traces: 2D numpy array
             Corrected fluorescence traces for each cell
         '''
-        all_cell_specimen_ids = list(self.get_cell_specimen_ids())
-
         with h5py.File(self.nwb_file, 'r') as f:
             timestamps = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['timestamps'].value
             cell_traces_ds = f['processing'][self.PIPELINE_DATASET]['Fluorescence']['imaging_plane_1']['data']
@@ -142,7 +144,7 @@ class BrainObservatoryNwbDataSet(object):
                 np_traces = np_traces_ds.value 
                 r = r_ds.value 
             else:
-                inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
+                inds = self.get_cell_specimen_indices(cell_specimen_ids)
                 cell_traces = cell_traces_ds[inds,:]
                 np_traces = np_traces_ds[inds,:]
                 r = r_ds[inds]
@@ -151,6 +153,23 @@ class BrainObservatoryNwbDataSet(object):
 
         return timestamps, fc
 
+    def get_cell_specimen_indices(self, cell_specimen_ids):
+        ''' Given a list of cell specimen ids, return their index based on their order in this file.  
+        
+        Parameters
+        ----------
+        cell_specimen_ids: list of cell specimen ids
+        
+        '''
+
+        all_cell_specimen_ids = list(self.get_cell_specimen_ids())
+
+        try:
+            inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+        except ValueError as e:
+            raise ValueError("Cell specimen not found (%s)" % str(e))
+
+        return inds
         
     def get_dff_traces(self, cell_specimen_ids=None):
         ''' Returns an array of dF/F traces for all ROIs and 
@@ -170,19 +189,16 @@ class BrainObservatoryNwbDataSet(object):
         dF/F: 2D numpy array
             dF/F values for each cell
         '''
-        all_cell_specimen_ids = list(self.get_cell_specimen_ids())
-
         with h5py.File(self.nwb_file, 'r') as f:
             timestamps = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['timestamps'].value
 
             if cell_specimen_ids is None:
                 cell_traces = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['data'].value 
             else:
-                inds = [ all_cell_specimen_ids.index(i) for i in cell_specimen_ids ]
+                inds = self.get_cell_specimen_indices(cell_specimen_ids)
                 cell_traces = f['processing'][self.PIPELINE_DATASET]['DfOverF']['imaging_plane_1']['data'][inds,:]
 
         return timestamps, cell_traces
-
 
     def get_roi_ids(self):
         ''' Returns an array of IDs for all ROIs in the file
@@ -218,7 +234,6 @@ class BrainObservatoryNwbDataSet(object):
             session_type = f['general/session_type'].value
         return session_type
 
-        
     def get_max_projection(self):
         '''Returns the maximum projection image for the 2P movie.
         
@@ -383,6 +398,36 @@ class BrainObservatoryNwbDataSet(object):
 
         return template, template_mask.T
     
+    def get_roi_mask_array(self, cell_specimen_ids=None):
+        ''' Return a numpy array containing all of the ROI masks for requested cells.
+        If cell_specimen_ids is omitted, return all masks.
+        
+        Parameters
+        ----------
+        cell_specimen_ids: list
+            List of cell specimen ids.  Default None.
+
+        Returns
+        -------
+        np.ndarray: NxWxH array, where N is number of cells
+        '''
+
+        roi_masks = self.get_roi_mask(cell_specimen_ids)
+
+        if len(roi_masks) == 0:
+            raise IOError("no masks found for given cell specimen ids")
+
+        roi_list = []
+        for m in roi_masks:
+            roi_list.append(m.get_mask_plane())
+            
+        roi_arr = np.zeros((len(roi_list), roi_list[0].shape[0], roi_list[0].shape[1]), dtype=np.uint8)
+        
+        for i,roi in enumerate(roi_list):
+            roi_arr[i,:,:] = roi
+
+        return roi_arr
+
     def get_roi_mask(self, cell_specimen_ids=None):
         ''' Returns an array of all the ROI masks
 
@@ -397,22 +442,21 @@ class BrainObservatoryNwbDataSet(object):
             List of ROI_Mask objects
         '''
 
-        all_cell_specimen_ids = self.get_cell_specimen_ids()
-
         with h5py.File(self.nwb_file, 'r') as f:
             mask_loc = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']
             roi_list = f['processing'][self.PIPELINE_DATASET]['ImageSegmentation']['imaging_plane_1']['roi_list'].value
         
             inds = None
             if cell_specimen_ids is None:
-                inds = range(len(all_cell_specimen_ids))
+                inds = range(len(self.get_cell_specimen_ids()))
             else:
-                inds = [ list(all_cell_specimen_ids).index(i) for i in cell_specimen_ids ]
+                inds = self.get_cell_specimen_indices(cell_specimen_ids)
 
             roi_array = []
             for i in inds:
                 v = roi_list[i]
-                m = roi.create_roi_mask(self.MOVIE_FOV_PX[0], self.MOVIE_FOV_PX[1], [0,0,0,0], pix_list=mask_loc[v]["pix_mask"].value, label=v)
+                m = roi.create_roi_mask(self.MOVIE_FOV_PX[0], self.MOVIE_FOV_PX[1], 
+                                        [0,0,0,0], pix_list=mask_loc[v]["pix_mask"].value, label=v)
                 roi_array.append(m)
 
         return roi_array
@@ -449,7 +493,7 @@ class BrainObservatoryNwbDataSet(object):
             meta['age_days'] = int(m.groups()[0])
             del meta['age']
         else:
-            raise IOError("Could not find device.")
+            raise IOError("Could not find age.")
 
         # parse the device string (ugly, sorry)
         device_string = meta['device_string']
@@ -498,7 +542,6 @@ class BrainObservatoryNwbDataSet(object):
 
         return motion_correction
     
-    
     def save_analysis_dataframes(self, *tables):
         # NOTE: should use NWB library to write data to NWB file. It is 
         #   designed to avoid possible corruption of the file in event
@@ -510,7 +553,6 @@ class BrainObservatoryNwbDataSet(object):
 
         store.close()
         
-
     def save_analysis_arrays(self, *datasets):    
         # NOTE: should use NWB library to write data to NWB file. It is 
         #   designed to avoid possible corruption of the file in event
@@ -528,7 +570,7 @@ def warp_stimulus_coords(vertices,
                          mon_width_cm=51.0,
                          mon_res=(1920,1200),
                          eyepoint=(0.5,0.5)):
-    """  
+    '''
     For a list of screen vertices, provides a corresponding list of texture coordinates.
 
     Parameters
@@ -550,7 +592,8 @@ def warp_stimulus_coords(vertices,
     np.ndarray
         x,y coordinates shaped like the input that describe what pixel coordinates
         are displayed an the input coordinates after warping the stimulus.
-    """
+        
+    '''
 
     mon_width_cm = float(mon_width_cm)
     mon_height_cm = float(mon_height_cm)

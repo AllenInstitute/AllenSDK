@@ -9,18 +9,21 @@ MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
 RUN apt-get update
 RUN apt-get upgrade -yq
+
+RUN apt-get -yq install \
+    pkg-config \
+    libfreetype6-dev
+
 RUN apt-get -yq install \
     build-essential \
     automake \
     libtool \
     bison \
     flex
-
-RUN apt-get -yq build-dep python-matplotlib
     
 RUN apt-get -yq install \
     python \
-    python-pip \	
+    python-pip \
     python-scipy \
     python-matplotlib \
     ipython \
@@ -36,21 +39,24 @@ RUN apt-get -yq install \
     openmpi-bin \
     libopenmpi-dev
 
+
 # upgrade cython
 RUN pip install cython
 RUN pip install sphinx numpydoc
 
 #neuron installation
-RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/v7.3.ansi-1078/nrn-7.3.ansi-1078.tar.gz
-RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.3/iv-18.tar.gz
-RUN cd /opt; mkdir neuron; mv /root/nrn-7.3.ansi-1078.tar.gz /root/iv-18.tar.gz neuron/
-RUN cd /opt/neuron; tar xzf iv-18.tar.gz; rm iv-18.tar.gz; mv iv-18 iv
-RUN cd /opt/neuron/iv; ./configure --prefix=`pwd` && make && make install
-RUN cd /opt/neuron; tar xzf nrn-7.3.ansi-1078.tar.gz; rm nrn-7.3.ansi-1078.tar.gz; mv nrn-7.3 nrn
-RUN cd /opt/neuron/nrn; ./configure --prefix=`pwd` --with-iv=/opt/neuron/iv --with-paranrn --with-nrnpython --with-mpi && make && make install
-RUN echo 'export PATH=$PATH:/opt/neuron/iv/x86_64/bin:/opt/neuron/nrn/x86_64/bin' >> /etc/bash.bashrc
-RUN cd /opt/neuron/nrn/src/nrnpython; python setup.py install
+RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/nrn-7.4.x86_64.rpm
+RUN cd /root; rpm -ivh nrn-7.4.x86_64.rpm
 
 RUN pip install jupyter
 
-RUN pip install |tgz_url|
+
+RUN cd /root; wget https://github.com/AllenInstitute/AllenSDK/archive/release_0.12.zip
+RUN cd /root; \
+    unzip release_0.12.zip
+RUN cd /root; \
+    pip install ./AllenSDK-release_0.12; \
+    cd AllenSDK-release_0.12; \
+    pip install -r test_requirements.txt
+
+ENV PYTHONPATH=/usr/local/nrn/lib/python:$PYTHONPATH

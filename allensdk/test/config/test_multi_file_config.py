@@ -18,7 +18,10 @@ import pytest
 from mock import patch, mock_open
 from allensdk.config.model.description_parser import DescriptionParser
 from _pytest.monkeypatch import monkeypatch
-import __builtin__
+try:
+    import builtins
+except:
+    import __builtin__ as builtins
 
 
 def multi_config(monkeypatch):
@@ -64,12 +67,12 @@ def multi_config(monkeypatch):
               "}\n"
               )
 
-    monkeypatch.setattr(__builtin__, 'open', mock_open(read_data=file_1))
+    monkeypatch.setattr(builtins, 'open', mock_open(read_data=file_1))
     parser = DescriptionParser()
     description = parser.read("mock_1.json")
     monkeypatch.undo()
         
-    monkeypatch.setattr(__builtin__, 'open', mock_open(read_data=file_2))
+    monkeypatch.setattr(builtins, 'open', mock_open(read_data=file_2))
     parser = DescriptionParser()
     parser.read("mock_2.json", description)
     

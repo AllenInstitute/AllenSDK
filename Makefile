@@ -35,7 +35,13 @@ pypi_deploy:
 
 
 pytest:
-	rm -rf test-reports && mkdir test-reports && find . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --pep8 --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
+	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --pep8 --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
+
+pytest_lax:
+	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
+
+pytest_lite:
+	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 EXAMPLES=doc/_static/examples
 

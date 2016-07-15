@@ -17,7 +17,10 @@
 import pytest
 from mock import patch, mock_open
 from allensdk.config.model.description_parser import DescriptionParser
-
+try:
+    import builtins
+except:
+    import __builtin__ as builtins
 
 @pytest.fixture
 def pyconfig():
@@ -60,13 +63,13 @@ def pyconfig():
               "}\n"
               )
     
-    with patch("__builtin__.open",
+    with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=file_1)):
         parser = DescriptionParser()
         description = parser.read("mock_1.pycfg")
     
-    with patch("__builtin__.open",
+    with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=file_2)):
         parser = DescriptionParser()

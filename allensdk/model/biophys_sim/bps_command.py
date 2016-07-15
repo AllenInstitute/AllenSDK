@@ -29,7 +29,7 @@ def choose_bps_command(command='bps_simple', conf_file=None):
         conf_file = os.path.abspath(conf_file)
     
     if command == 'help':
-        print Config().argparser.parse_args(['--help'])
+        print(Config().argparser.parse_args(['--help']))
     elif command == 'nrnivmodl':
         sp.call(['nrnivmodl', 'modfiles']) # TODO: alternate location in manifest?
     elif command == 'run_simple':

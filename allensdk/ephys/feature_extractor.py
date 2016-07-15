@@ -121,17 +121,17 @@ class EphysFeatures( object ):
         self.scoring["rate"] = spike_score
 
     def print_out(self):
-        print "Features from " + self.name
+        print("Features from " + self.name)
         for k in self.mean.keys():
             if k in self.glossary:
-                str = "%30s = " % self.glossary[k]
+                st = "%30s = " % self.glossary[k]
                 if self.mean[k] != None:
-                    str += "%g" % self.mean[k]
+                    st += "%g" % self.mean[k]
                 else:
-                    str += "--------"
+                    st += "--------"
                 if k in self.stdev and self.stdev[k] != None:
-                    str += " +/- %g" % self.stdev[k]
-                print str
+                    st += " +/- %g" % self.stdev[k]
+                print(st)
 
     # initialize summary feature set from file
     def clone(self, param_dict):
@@ -453,18 +453,18 @@ class EphysFeatureExtractor( object ):
         lst = []
         for i in range(len(spikes) - 1):
             isi = spikes[i+1]["t"] - spikes[i]["t"]
-            #print "\t%g" % isi
+            #print("\t%g" % isi)
             isi_mean += isi
             lst.append(isi)
         isi_mean /= 1.0 * len(lst)
-        #print isi_mean
+        #print(isi_mean)
         var = 0
         for i in range(len(lst)):
             dif = isi_mean - lst[i]
             var += dif * dif
         var /= len(lst)
         #var /= len(lst) - 1
-        #print math.sqrt(var)
+        #print(math.sqrt(var))
         if isi_mean > 0:
             return math.sqrt(var) / isi_mean
         return None
@@ -564,7 +564,7 @@ class EphysFeatureExtractor( object ):
                         val = cand.mean[k]
                         inc = abs(mean - val) / stdev
                         scores.append(inc)
-#                        print "Hit %s, %g+/-%g (%g) = %g" % (k, mean, stdev, val, inc)
+#                        print("Hit %s, %g+/-%g (%g) = %g" % (k, mean, stdev, val, inc))
                     else:
                         resp = cand.scoring[k]["miss"]
                         if resp == "const":
@@ -575,7 +575,7 @@ class EphysFeatureExtractor( object ):
                             assert False
                         miss = float(miss)
                         scores.append(miss)
-#                        print "Missed %s, penalty = %g" % (k, miss)
+#                        print("Missed %s, penalty = %g" % (k, miss))
                 elif response == "perspike":
                     mean = self.summary.mean[k]
                     stdev = self.summary.stdev[k]
@@ -599,17 +599,17 @@ class EphysFeatureExtractor( object ):
                             assert False
                         miss = float(miss)
                         scores.append(miss)
-#                        print "Missed %s, penalty = %g" % (k, miss)
+#                        print("Missed %s, penalty = %g" % (k, miss))
                 else:
                     assert False
                 if abs(sum(scores)) > 1e10:
-                    print k
-                    print self.summary.scoring
-                    print self.summary.mean
-                    print self.summary.stdev
-                    print cand.summary.scoring
-                    print cand.summary.mean
-                    print cand.summary.stdev
+                    print(k)
+                    print(self.summary.scoring)
+                    print(self.summary.mean)
+                    print(self.summary.stdev)
+                    print(cand.summary.scoring)
+                    print(cand.summary.mean)
+                    print(cand.summary.stdev)
                     assert False
         return scores
 
@@ -618,7 +618,7 @@ class EphysFeatureExtractor( object ):
     #     class as the other feature objects that are being summarized
     def summarize(self, summary):
         if len(self.feature_list) == 0:
-            print "Error -- no features were extracted. Summary impossible"
+            print("Error -- no features were extracted. Summary impossible")
             sys.exit()
         # make dummy dict to verify that all feature instances have
         #   identical features
@@ -636,7 +636,7 @@ class EphysFeatureExtractor( object ):
             for i in range(len(self.feature_list)):
                 fx = self.feature_list[i].mean
                 if k not in fx:
-                    print "Error - feature '%s' not in all data sets" % k
+                    print("Error - feature '%s' not in all data sets" % k)
                     err += 1
         if err > 0:
             return None

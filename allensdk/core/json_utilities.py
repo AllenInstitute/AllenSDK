@@ -16,7 +16,18 @@
 import numpy as np
 import json
 import re
-import urllib2, urlparse
+import logging
+
+ju_logger = logging.getLogger(__name__)
+
+try:
+    import urllib.request as urllib_request
+except ImportError:
+    import urllib2 as urllib_request
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    import urlparse
 
 def read(file_name):
     """ Shortcut reading JSON from a file. """
@@ -61,8 +72,8 @@ def read_url_get(url):
     Note: if the input is a bare array or literal, for example,
     the output will be of the corresponding type.
     '''
-    response = urllib2.urlopen(url)
-    json_string = response.read()
+    response = urllib_request.urlopen(url)
+    json_string = response.read().decode('utf-8')
     
     return json.loads(json_string)
 
@@ -88,10 +99,10 @@ def read_url_post(url):
     main_url = urlparse.urlunsplit((urlp.scheme, urlp.netloc, urlp.path, '', ''))
     data = json.dumps(dict(urlparse.parse_qsl(urlp.query)))
 
-    handler = urllib2.HTTPHandler()
-    opener = urllib2.build_opener(handler)
+    handler = urllib_request.HTTPHandler()
+    opener = urllib_request.build_opener(handler)
 
-    request = urllib2.Request(main_url, data)
+    request = urllib_request.Request(main_url, data)
     request.add_header("Content-Type",'application/json')
     request.get_method = lambda: 'POST'
     
@@ -130,7 +141,9 @@ def json_handler(obj):
     elif hasattr(obj, 'isoformat'):
         return obj.isoformat()
     else:
-        raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj))
+        raise TypeError(
+            'Object of type %s with value of %s is not JSON serializable' %
+            (type(obj), repr(obj)))
 
 
 class JsonComments(object):
@@ -149,14 +162,21 @@ class JsonComments(object):
     @classmethod 
     def read_string(cls, json_string):
         json_string_no_comments = cls.remove_comments(json_string)
-        return json.loads(json_string_no_comments)        
+        return json.loads(json_string_no_comments)
 
 
     @classmethod
     def read_file(cls, file_name):
-        with open(file_name) as f:
-            json_string = f.read()
-            return cls.read_string(json_string)
+        try:
+            with open(file_name) as f:
+                json_string = f.read()
+                json_object = cls.read_string(json_string)
+                
+                return json_object
+        except ValueError:
+            ju_logger.error(
+                "Could not load json object from file: %s" % (file_name))
+            raise
 
 
     @classmethod

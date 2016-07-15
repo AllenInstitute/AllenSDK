@@ -268,15 +268,15 @@ class AllActiveUtils(Utils):
             else:
                 if hasattr(h, section_array):
                     if mechanism != "":
-                        print 'Adding mechanism %s to %s' \
-                            % (mechanism, section_array)
+                        print('Adding mechanism %s to %s' \
+                            % (mechanism, section_array))
                         for section in getattr(h, section_array):
                             if self.h.ismembrane(str(mechanism),
                                                  sec=section) != 1:
                                 section.insert(mechanism)
 
-                    print 'Setting %s to %.6g in %s' \
-                        % (param_name, param_value, section_array)
+                    print('Setting %s to %.6g in %s' \
+                        % (param_name, param_value, section_array))
                     for section in getattr(h, section_array):
                         setattr(section, param_name, param_value)
 
@@ -286,8 +286,8 @@ class AllActiveUtils(Utils):
             ek = float(erev["ek"])
             ena = float(erev["ena"])
 
-            print 'Setting ek to %.6g and ena to %.6g in %s' \
-                % (ek, ena, erev_section_array)
+            print('Setting ek to %.6g and ena to %.6g in %s' \
+                % (ek, ena, erev_section_array))
 
             if hasattr(h, erev_section_array):
                 for section in getattr(h, erev_section_array):
@@ -297,8 +297,8 @@ class AllActiveUtils(Utils):
                     if self.h.ismembrane("na_ion", sec=section) == 1:
                         setattr(section, 'ena', ena)
             else:
-                print "Warning: can't set erev for %s, " \
-                    "section array doesn't exist" % erev_section_array
+                print("Warning: can't set erev for %s, " \
+                    "section array doesn't exist" % erev_section_array)
 
         self.h.v_init = conditions['v_init']
         self.h.celsius = conditions['celsius']
