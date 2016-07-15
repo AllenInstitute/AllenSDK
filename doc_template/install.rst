@@ -26,11 +26,7 @@ To uninstall the SDK::
 Other Distribution Formats
 --------------------------
 
-The Allen SDK is also available from the source repository or as a downloadable .zip or .tar.gz archive.
-The package can also be `installed from these formats <https://packaging.python.org/en/latest/installing.html>`_.
-
-.. include:: links.rst
-
+The Allen SDK is also available from the Github source repository.
 
 Required Dependencies
 ---------------------
@@ -60,19 +56,10 @@ example Dockerfiles are available.
 
  #. Ensure you have Docker installed.
 
- #. Download one of the example Docker files:
-     * :download:`Anaconda and NEURON <./_static/examples/docker/Dockerfile.anaconda>`.
-     * :download:`Neural Ensemble combined simulators <./_static/examples/docker/Dockerfile.neuralensemble>`.
-     * :download:`Ubuntu and NEURON <./_static/examples/docker/Dockerfile.ubuntu>`.
-
  #. Use Docker to build the image::
- 
-     mkdir docker_build
-     cp Dockerfile.anaconca docker_build/Dockerfile
-     cd docker_build
-     docker build --tag alleninstitute/allensdk:anaconda .
-     
+     docker build -t alleninstitute/allensdk:ubuntu git://github.com/github.com/AllenInstitute/AllenSDK/tree/release_0.12/doc_template/examples/docker/ubuntu
+
  #. Run the docker image::
  
-     docker run -it -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
+     docker run -i -t -v /data:/data alleninstitute/allensdk:ubuntu /bin/bash
 
