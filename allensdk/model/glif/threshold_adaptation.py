@@ -12,19 +12,23 @@ from allensdk.model.glif.find_spikes import find_spikes_list
 def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=False, SHOW_PLOT=False, BLOCK=False, PUBLICATION_PLOT=False):
     '''Calculate the spike components of the threshold by fitting a decaying exponential function to data to threshold versus time 
     since last spike in the multiblip data. The exponential is forced to decay to the local th_inf (calculated as the mean all of the 
-    threshold values of the first spikes in each individual triblip stimulus). 
+    threshold values of the first spikes in each individual triblip stimulus).  For each multiblip stimulus in a stimulus set if there
+    is more than one spike the difference in voltages from the first and second spike are plotted versus the separation in time.  Note that 
+    this algorithm should only be implemented on multiblips sweeps where the neuron spike on the first and second blip.  Since there is 
+    no easy way to do this, this erroneous data should not be provided to this algorithm (i.e is should be visually checked and eliminated 
+    the preprocessor should hold back this data manually for now.)  
     
-    Notes: The standard SDK spike detection algorithm does not work with the multiblip stimulus due to artifacts 
-    when the stimulus turns on and off. Please see the find_multiblip_spikes module for more information.
+    #TODO: check to see if this is still true. Notes: The standard SDK spike detection algorithm does not work with the multiblip stimulus 
+    due to artifacts when the stimulus turns on and off. Please see the find_multiblip_spikes module for more information.
     
-    Input
+    Input:
     
     multi_SS: dictionary
         contains multiblip information such as current and stimulus
     dt: float
         time step in seconds
     
-    Returns
+    Returns:
     
     const_to_add_to_thresh_for_reset: float
         amplitude of the exponential fit otherwise known as a_spike
@@ -37,8 +41,7 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
     multi_SS_v=multi_SS['voltage']
     multi_SS_i=multi_SS['current']
 
-    # get indicies of spikes
-#    spike_ind = find_multiblip_spikes(multi_SS_i, multi_SS_v, dt) currently this is broken
+    # --get indicies of spikes
     spike_ind, _=find_spikes_list(multi_SS_v, dt)
 
     # eliminate spurious spikes that may exist
@@ -55,34 +58,38 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
     time_previous_spike=[]
     threshold=[]
     thresh_first_spike=[]  #will set constant to this
-            # voltage at all spikes in a single tri blip
 
     if MAKE_PLOT:
-        plt.figure()
+        plt.figure(figsize=(20,24))
         
-    # loop though each tri blip stimulus in muliblip stimulus
+    # Loop though each tri blip stimulus in muliblip stimulus
     for k in range(0, len(multi_SS_v)):
         thresh=[multi_SS_v[k][j] for j in spike_ind[k]] # voltage at all spikes in a single tri blip
         if thresh!=[] and len(thresh)>1:# there needs to be more than one spike so that we can find the time difference
-            thresh_first_spike.append(thresh[0])
-            threshold.append(thresh[1:])
-            time_before_temp=[]
-            for j in range(1,len(thresh)):
-                time_before_temp.append((spike_ind[k][j]-spike_ind[k][j-1])*dt)
-            #for each spike calculate the time from the previous spike   
-            time_previous_spike.append(time_before_temp)    
+            thresh_first_spike.append(thresh[0]) #Note that this finds the first spike (it might not be at the first stimulus blip)
+            threshold.append(thresh[1])
+            time_previous_spike.append((spike_ind[k][1]-spike_ind[k][0])*dt)
+#            Old way when looked at all the spikes instead of just the first two (can be depricated; just here for record keeping)
+#            threshold.append(thresh[1:])              
+#            time_before_temp=[]
+#            for j in range(1,len(thresh)):
+#                time_before_temp.append((spike_ind[k][j]-spike_ind[k][j-1])*dt)
+#            #for each spike calculate the time from the previous spike   
+#            time_previous_spike.append(time_before_temp)    
         if MAKE_PLOT:
-            plt.subplot(2,1,1)
+            plt.subplot(len(multi_SS_v)+1,1,1)
             plt.plot(np.arange(0, len(multi_SS_i[k]))*dt, multi_SS_i[k]*1e12, lw=2)
             plt.ylabel('current (pA)', fontsize=16)
             plt.xlim([2., 2.12])
             plt.title('Triple Short Square', fontsize=20)
-            plt.subplot(2,1,2)
+            plt.subplot(len(multi_SS_v)+1,1,k+2)
             plt.plot(np.arange(0, len(multi_SS_v[k]))*dt, multi_SS_v[k], lw=2)
             plt.plot(spike_ind[k]*dt, thresh, '.k', ms=16)
+            plt.xlim([2., 2.12])
+            
+    if MAKE_PLOT:
             plt.ylabel('voltage (V)', fontsize=16)
             plt.xlabel('time (s)', fontsize=16)
-            plt.xlim([2., 2.12])
     
     if SHOW_PLOT:        
         plt.show(block=False)
@@ -90,9 +97,12 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
     # put numbers into one vector for fitting of exponential function
     thresh_inf=np.mean(thresh_first_spike)  #note this threshold infinity isnt the one coming from single blip
     try: #this try here because sometimes even though have the traces there isnt more than one trace with two spikes
-        threshold=np.concatenate(threshold)
-        time_previous_spike=np.concatenate(time_previous_spike)  #note that this will have nans in it
-    
+#--these two lines no longer needed because all single values now (depricate with lines up above) instead converst them to arrays
+#        threshold=np.concatenate(threshold)
+#        time_previous_spike=np.concatenate(time_previous_spike)  #note that this will have nans in it
+        threshold=np.array(threshold)
+        time_previous_spike=np.array(time_previous_spike)  #note that this will have nans in it
+   
         if MAKE_PLOT:
             plt.figure()
             plt.plot(time_previous_spike, threshold, '.k', ms=16)
