@@ -606,7 +606,7 @@ def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
 
 
 def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
-    """ Reset the threshold to a fixed value. This method is not sued and will raise an exception if called.
+    """ Reset the threshold to a fixed value. This method is not used and will raise an exception if called.
 
     Parameters
     ----------
@@ -618,26 +618,67 @@ def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
 
 
 def reset_threshold_three_components(neuron, threshold_t0, voltage_v1, a_spike, b_spike):
-    '''This method resets the two components of the threshold: a spike (fast)
-    component and a (voltage) component which are summed. 
+    '''This method calculates the two components of the threshold: a spike (fast)
+    component and a voltage (slow) component.  The threshold_components vectors are then 
+    updated so that the traces match the voltage, current, and total threshold traces.  The
+    spike component of the threshold decays via an exponential fit specified by the amplitude
+    a_spike and the time constant b_spike fit via the multiblip data.  The voltage component 
+    does not change during the duration of the spike.  The 
+    spike component are threshold component are summed along with threshold infinity to 
+    return the total threshold.  Note that in the current implementation a_spike is added to 
+    the last value of the threshold_components which means that a_spike is the amplitude after 
+    spike cutting (if there is any).  
+
+    Inputs:  
+        neuron: class
+            contains attributes of the neuron
+        threshold_t0, voltage_t0: float
+            are not used but are here for consistency with other methods
+        a_spike: float 
+            amplitude of the exponential decay of spike component of threshold after spike
+            cutting has been implemented.
+        b_spike: float
+            amplitude of the exponential decay of spike component of threshold
+            
+    Outputs:
+        Returns: float
+            the total threshold which is the sum of the spike component of threshold, the voltage 
+            component of threshold and threshold infinity (with it's corresponding coefficient)
+        neuron.threshold_components: dictionary containing
+            a spike: list
+                vector of spiking component of threshold that corresponds to the voltage, current, 
+                and total threshold traces
+            b_spike: list
+               vector of voltage component of threshold that corresponds to the voltage, current, 
+                and total threshold traces.
+                
+    Note that this function can be changed to use a_spike at the time of the spike and then have the 
+    the spike component plus the residual decay thought the spike.  There are benefits and drawbacks to
+    this.  This potential change would be beneficial as it perhaps makes more biological sense for the 
+    threshold to go up at the time of spike if the traces are ever used.  Also this would mean that a_spike
+    would not have to be adjusted thought the spike cutting after the multiblip fit.  However the current 
+    implementation makes sense in that it is similar to how afterspike currents are implemented.
     '''
-    #TODO: just having the get_threshold_components added an erroneous zero to the beginning of the list 
     if neuron.threshold_components is None:
         raise Exception('reset should never happen at the beginning of a trace')             
         
-    tcs = neuron.threshold_components
-    #if this trace is to be aligned with the voltage traces the last value has to be 
-    #removed (it is the indicie in the step following a spike) because it is not recorded in the voltage
+    tcs = neuron.threshold_components #for ease of updating
     
-    #note that these values are at the indicie of the time of the spike which is the index right after the voltage crosses threshold
+    # note that these values are at the indicie of the time of the spike which is the index right after the voltage crosses 
+    # threshold since the neuron.threshold_components are updated by the dynamics method which is called before the reset. 
     th_spike=tcs['spike'][-1] #this needs to decay through the spike must be very particular about how many indicies to decay
     th_voltage= tcs['voltage'][-1]
-    #this is all working via pass by reference.
+    
+    # calculate spike component decay though spike from time =1 (not zero because zero is already in neuron.threshold_components
+    # via the dynamics method) though the end of the spike cutting
     spike_comp_decay=spike_component_of_threshold_exact(th_spike, b_spike, np.arange(1,neuron.spike_cut_length+1)*neuron.dt) #Note that the plus one is that one needs to know the decay and the inital condition for next starting point 
+    
+    #update neuron.threshold_components via pass by reference.
     [tcs['voltage'].append(value) for value in np.ones(neuron.spike_cut_length)*th_voltage] #note that here I don't need the plus one because I am starting from zero
-    [tcs['spike'].append(value) for value in spike_comp_decay[:]]
+    [tcs['spike'].append(value) for value in spike_comp_decay]
+    
+    # add the amplitude of the spike component decay to last value of vector (reseting)
     tcs['spike'][-1]=tcs['spike'][-1]+a_spike
-    #Note that here this is the the value for the 
     
     return tcs['spike'][-1] + tcs['voltage'][-1] + neuron.th_inf * neuron.coeffs['th_inf']
 
