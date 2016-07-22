@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import scipy.sparse as sparse
 from scipy.linalg import solve_banded
 from scipy.stats import linregress as linregress
-
+import logging
 
 def get_diagonals_from_sparse(mat):
     ''' Returns a dictionary of diagonals keyed by offsets
@@ -70,12 +70,11 @@ def error_calc_outlier(F_M, F_N, F_C, r):
 
     return er
 
-
 class NeuropilSubtract (object):
 
-    def __init__(self,T,lam=0.1):
+    def __init__(self, T, lam=0.1):
 
-        self.r = 0.001  # initial guess for neuropil subtraction constant
+        self.r = None
         self.T = T
 
         Ls = -sparse.eye(T-1,T,format='csr') + sparse.eye(T-1,T,1,format='csr')  #using csr because multiplication is fast
@@ -94,7 +93,7 @@ class NeuropilSubtract (object):
         self.M = M
         self.ab = ab
         
-    def set_F(self,F_M,F_N,F_M_crossval,F_N_crossval):
+    def set_F(self,F_M, F_N, F_M_crossval, F_N_crossval):
         ''' Internal initializatin routine
         '''
         self.F_M = F_M
@@ -104,7 +103,8 @@ class NeuropilSubtract (object):
 
     
     #def fit_grad_desc_early_stop(self,r_init=0.001,learning_rate=0.1):
-    def fit_grad_descent(self,r_init=0.001,learning_rate=0.1):
+    def fit_grad_descent(self, r_init=0.001, learning_rate=0.1, max_iterations=10000, 
+                         min_delta_r=0.001, max_error=0.2):
         ''' Calculate fit using gradient decent, as opposed to iteratively
         computing exact solutions
         '''
@@ -116,11 +116,10 @@ class NeuropilSubtract (object):
 
         F_C = solve_banded((1,1),self.ab,self.F_M - r*self.F_N)
 
-        itmax = 10000
         it = 0
 
         exceed_bounds = False
-        while (delta_r > 0.0001 and it < itmax):
+        while (delta_r > min_delta_r and it < max_iterations):
 
             F_C = solve_banded((1,1),self.ab,self.F_M - r*self.F_N)
             r_new = r + learning_rate*np.mean((self.F_M - F_C - r*self.F_N)*self.F_N)
@@ -139,12 +138,15 @@ class NeuropilSubtract (object):
             
             if error_it > error_list[it-1]: # early stopping
                 break
-
+            
         # if r or error_it go out of acceptable bounds, break 
         if r < 0.0 or r > 1.0:
             exceed_bounds = True
-        if error_it > 0.2:
+        if error_it > max_error:
             exceed_bounds = True
+
+        if it == max_iterations:
+            logging.warning("gradient descent reached maximum iterations (%d)" % max_iterations)
 
         F_C = solve_banded((1,1),self.ab,self.F_M - r*self.F_N)
 
@@ -158,11 +160,8 @@ class NeuropilSubtract (object):
         self.it = it
 
         return exceed_bounds
-
-
-# 'M' denotes ROI trace
-# 'N' denotes neuropil trace
-def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled):
+            
+def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled, r_init=0.001, learning_rate=10.0, lam=0.05):
     ''' Calculates neuropil contamination of ROI
 
     Parameters
@@ -179,13 +178,14 @@ def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled):
         * 'min_error': minimum error
         * 'bounds_error': boolean. True if error or R are outside tolerance
     '''
+    
 
     T = len(F_M_unscaled)
     assert T == len(F_N_unscaled), "Input arrays of different dimension"
     T_cross_val = int(T/2)
     if T - T_cross_val > T_cross_val:
         T = T - 1
-    ns = NeuropilSubtract(T_cross_val, lam=0.05)
+    ns = NeuropilSubtract(T_cross_val, lam=lam)
     F_M_unscaled_cross_val = np.copy(F_M_unscaled)
     F_N_unscaled_cross_val = np.copy(F_N_unscaled)
 
@@ -207,7 +207,7 @@ def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled):
     ns.set_F(F_M, F_N, F_M_cross_val, F_N_cross_val)
 
     '''stop gradient descent at first increase of cross-validation error'''
-    bounds_err = ns.fit_grad_descent(learning_rate=10)
+    bounds_err = ns.fit_grad_descent(r_init=r_init, learning_rate=learning_rate)
             
     F_C_unscaled = ns.F_C*float(np.amax(F_N_unscaled)-np.amin(F_N_unscaled)) + (1-ns.r)*float(np.amin(F_N_unscaled))
     F_C_unscaled_crossval = ns.F_C_crossval*float(np.amax(F_N_unscaled_cross_val)-np.amin(F_N_unscaled_cross_val)) + (1-ns.r)*float(np.amin(F_N_unscaled_cross_val))
@@ -220,5 +220,6 @@ def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled):
     results["err"] = abs(ns.error_vals[-1])
     results["min_error"] = min_error
     results["bounds_error"] = bounds_err
+    results["it"] = ns.it
     return results
 

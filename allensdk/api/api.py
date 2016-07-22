@@ -13,6 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+
+import shutil
+import socket
+from requests.exceptions import ConnectionError
+
+
 try:
     import urllib.request as urllib_request
 except:
@@ -272,14 +278,16 @@ class Api(object):
         .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
         '''
         try:
+            response = urllib_request.urlopen(url)
             with open(file_path, 'wb') as f:
-                response = urllib_request.urlopen(url)
-                f.write(response.read())
+                shutil.copyfileobj(response, f)
         except urllib_error.HTTPError:
             self._log.error("Couldn't retrieve file from %s" % url)
             raise
-    
-    
+        except socket.timeout:
+            self._log.error("Timed out retrieving file from %s" % url)
+            raise
+
     def retrieve_parsed_json_over_http(self, url, post=False):
         '''Get the document and put it in a Python data structure
         

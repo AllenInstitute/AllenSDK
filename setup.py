@@ -27,7 +27,7 @@ setup(
     description = 'core libraries for the allensdk.',
     install_requires = ['h5py>=2.2.1',
                         'matplotlib>=1.4.0',
-                        'scipy>=0.15.1',
+                        'scipy>=0.14.0',
                         'pandas>=0.14.1',
                         'numpy>=1.8.2',
                         'six>=1.5.2',
