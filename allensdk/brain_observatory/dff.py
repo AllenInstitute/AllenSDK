@@ -21,11 +21,17 @@ def movingmode_fast(x, kernelsize, y):
     y: np.ndarray
         Output array to store the results
     """
+
+    # offset so that the trace is non-negative
+    minval = min(x.min(), 0)
+    if minval < 0:
+        x = x - minval
+
     maxval = x.max()
 
     # compute a histogram of a half kernel
     halfsize = kernelsize/2
-    histo = np.bincount(np.rint(x[:halfsize]).astype(np.uint32), minlength=maxval+2)
+    histo = np.bincount(np.rint(x[:halfsize]).astype(np.uint32), minlength=int(maxval+2))
 
     # find the mode of the first half kernel
     mode = np.argmax(histo)
@@ -67,6 +73,10 @@ def movingmode_fast(x, kernelsize, y):
             mode = np.argmax(histo)
 
         y[m] = mode
+
+    # undo the offset
+    if minval < 0:
+        y += minval
 
     return 0
 
