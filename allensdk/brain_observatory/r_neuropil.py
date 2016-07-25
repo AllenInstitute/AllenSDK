@@ -104,7 +104,7 @@ class NeuropilSubtract (object):
     
     #def fit_grad_desc_early_stop(self,r_init=0.001,learning_rate=0.1):
     def fit_grad_descent(self, r_init=0.001, learning_rate=0.1, max_iterations=10000, 
-                         min_delta_r=0.001, max_error=0.2):
+                         min_delta_r=0.00001, max_error=0.2):
         ''' Calculate fit using gradient decent, as opposed to iteratively
         computing exact solutions
         '''
@@ -126,6 +126,7 @@ class NeuropilSubtract (object):
 
             '''compute error on cross-validation set'''
             F_C_crossval = solve_banded((1,1),self.ab,self.F_M_crossval - r*self.F_N_crossval)
+
 #            error_it = error_calc_outlier(self.F_M_crossval, self.F_N_crossval, F_C_crossval, r)
             error_it = abs(error_calc(self.F_M_crossval, self.F_N_crossval, F_C_crossval, r))
             
@@ -137,16 +138,20 @@ class NeuropilSubtract (object):
             it+=1
             
             if error_it > error_list[it-1]: # early stopping
+                logging.warning("stop: early stopping")
                 break
             
         # if r or error_it go out of acceptable bounds, break 
         if r < 0.0 or r > 1.0:
             exceed_bounds = True
+            logging.warning("stop: r exceeded [0,1] bounds")
         if error_it > max_error:
             exceed_bounds = True
-
+            logging.warning("stop: error exceeded bounds")
         if it == max_iterations:
-            logging.warning("gradient descent reached maximum iterations (%d)" % max_iterations)
+            logging.warning("stop: maximum iterations (%d)", max_iterations)
+        if delta_r <= min_delta_r:
+            logging.warning("stop: dr < min_dr (%f, %f)", delta_r, min_delta_r)
 
         F_C = solve_banded((1,1),self.ab,self.F_M - r*self.F_N)
 
@@ -217,6 +222,7 @@ def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled, r_init=0.001, lear
     min_error[T-T_cross_val:T] = F_C_unscaled_crossval        
     results = {}
     results["r"] = ns.r
+    results["r_vals"] = ns.r_vals
     results["err"] = abs(ns.error_vals[-1])
     results["min_error"] = min_error
     results["bounds_error"] = bounds_err
