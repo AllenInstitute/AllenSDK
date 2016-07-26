@@ -103,8 +103,8 @@ class NeuropilSubtract (object):
 
     
     #def fit_grad_desc_early_stop(self,r_init=0.001,learning_rate=0.1):
-    def fit_grad_descent(self, r_init=0.001, learning_rate=0.1, max_iterations=10000, 
-                         min_delta_r=0.00001, max_error=0.2):
+    def fit_grad_descent(self, r_init=0.5, learning_rate=100.0, max_iterations=10000, 
+                         min_delta_r=0.00001, max_error=0.2, annealing_factor=0.1):
         ''' Calculate fit using gradient decent, as opposed to iteratively
         computing exact solutions
         '''
@@ -118,12 +118,27 @@ class NeuropilSubtract (object):
 
         it = 0
 
+        ref_delta_e = None
+
         exceed_bounds = False
         while (delta_r > min_delta_r and it < max_iterations):
 
-            F_C = solve_banded((1,1),self.ab,self.F_M - r*self.F_N)
-            r_new = r + learning_rate*np.mean((self.F_M - F_C - r*self.F_N)*self.F_N)
+            F_C = solve_banded((1,1), self.ab, self.F_M - r*self.F_N)
 
+            delta_e = np.mean((self.F_M - F_C - r*self.F_N) * self.F_N)
+
+            # annealing
+            if annealing_factor is not None:
+                if ref_delta_e is None:
+                    ref_delta_e = delta_e
+
+                if delta_e < ref_delta_e * annealing_factor:
+                    ref_delta_e = delta_e
+                    learning_rate *= annealing_factor
+                    logging.debug("shrinking learning rate %f -> %f", learning_rate/annealing_factor, learning_rate)
+
+            r_new = r + learning_rate * delta_e
+            
             '''compute error on cross-validation set'''
             F_C_crossval = solve_banded((1,1),self.ab,self.F_M_crossval - r*self.F_N_crossval)
 
@@ -144,7 +159,7 @@ class NeuropilSubtract (object):
         # if r or error_it go out of acceptable bounds, break 
         if r < 0.0 or r > 1.0:
             exceed_bounds = True
-            logging.warning("stop: r exceeded [0,1] bounds")
+            logging.warning("stop: r outside of [0.0, 1.0] - (%f)", r)
         if error_it > max_error:
             exceed_bounds = True
             logging.warning("stop: error exceeded bounds")
@@ -159,7 +174,7 @@ class NeuropilSubtract (object):
         error_list = np.array(error_list)
         self.r_vals = r_list
         self.error_vals = error_list
-        self.r = self.r_vals[-1]
+        self.r = r
         self.F_C = F_C
         self.F_C_crossval = F_C_crossval
         self.it = it
