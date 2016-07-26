@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
