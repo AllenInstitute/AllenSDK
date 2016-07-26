@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
@@ -594,7 +593,7 @@ class Morphology( object ):
         #   compartment list
         for i in range(len(self.compartment_list)):
             if i != self.node(i)[NODE_ID]:
-                raise Assertion_Error("Internal error detected -- compartment list not properly formed")
+                raise RuntimeError("Internal error detected -- compartment list not properly formed")
 
 
     def append(self, node_list):
