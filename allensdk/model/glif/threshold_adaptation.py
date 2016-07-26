@@ -42,7 +42,9 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
     multi_SS_i=multi_SS['current']
 
     # --get indicies of spikes
-    spike_ind, _=find_spikes_list(multi_SS_v, dt)
+#    spike_ind, _=find_spikes_list(multi_SS_v, dt)
+    spike_ind=find_multiblip_spikes(multi_SS_i, multi_SS_v, dt)
+
 
     # eliminate spurious spikes that may exist
     spike_lt=[np.where(SI<int(2.02/dt))[0] for SI in spike_ind]
@@ -374,148 +376,149 @@ def fit_avoltage_bvoltage_th(x, v_trace_list, El_list, spike_cut_length, all_spi
 #             
 #    return np.sum(sq_err)
 
-def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
-    '''artifacts caused by turning stimulus on and off created artifacts that 
-    created problems for the standard spike detection algorithm.  Several alterations 
-    were made so that the algorithm would detect spikes appropriately. Please see multiblip
-    spike cutting documentation for more information on how the code differs from the SDK 
-    version and what was needed to solve specific issues.
-    input:
-    multi_SS_i: list of arrays
-        each array corresponds to the current stimulation of one triblip stimulus
-    multi_SS_v: list of arrays
-        each array corresponds to the voltage trace of triblip simulus
-    dt: float 
-    '''
-    artifact_ave_window_time_s=0.0003 #
-    window_indicies_to_ave_len=int(artifact_ave_window_time_s/dt)
-    out_spk_idxs_list=[]
-    for current, voltage in zip(multi_SS_i, multi_SS_v):
-        #--Find the beginning and end of stimuli so that we can average the voltage traces at that time
-        up_blip_index=np.where(np.diff(np.greater_equal(current, 1e-10).astype(int)) == 1)[0]#Note 1e-10 is larger than test pulse so it will not pick up test pulse
-        down_blip_index=np.where(np.diff(np.less_equal(current, 1e-10).astype(int)) == 1)[0]
-        potential_artifact_indexes=np.sort(np.append(up_blip_index, down_blip_index))
-        artifact_removed_voltage=copy.deepcopy(voltage)
-        window_boarders_index=[]
-        #--remove artifacts 
-        for index in potential_artifact_indexes:
-            smooth_window=range(index,index+window_indicies_to_ave_len+1)
-            
-            # interpolate in the smoothing window
-            blah=interp1d([smooth_window[0], smooth_window[-1]], [artifact_removed_voltage[smooth_window[0]], artifact_removed_voltage[smooth_window[-1]]])
-            artifact_removed_voltage[smooth_window]=blah(smooth_window)
-            
-            #windows boarders are just for plotting
-#            window_boarders_index.append(smooth_window[0])
-#            window_boarders_index.append(smooth_window[-1])
-#        plt.figure()
-#        plt.plot(voltage, 'b', lw=4)
-#        plt.plot(artifact_removed_voltage, 'r', lw=2)
-#        plt.plot(window_boarders_index, artifact_removed_voltage[window_boarders_index], '|g', ms=10)
-#        plt.xlim([40400, 41000])
-#        plt.show()
+# TODO: can depricate, using sdk now
+#def find_multiblip_spikes(multi_SS_i, multi_SS_v, dt):
+#    '''artifacts caused by turning stimulus on and off created artifacts that 
+#    created problems for the standard spike detection algorithm.  Several alterations 
+#    were made so that the algorithm would detect spikes appropriately. Please see multiblip
+#    spike cutting documentation for more information on how the code differs from the SDK 
+#    version and what was needed to solve specific issues.
+#    input:
+#    multi_SS_i: list of arrays
+#        each array corresponds to the current stimulation of one triblip stimulus
+#    multi_SS_v: list of arrays
+#        each array corresponds to the voltage trace of triblip simulus
+#    dt: float 
+#    '''
+#    artifact_ave_window_time_s=0.0003 #
+#    window_indicies_to_ave_len=int(artifact_ave_window_time_s/dt)
+#    out_spk_idxs_list=[]
+#    for current, voltage in zip(multi_SS_i, multi_SS_v):
+#        #--Find the beginning and end of stimuli so that we can average the voltage traces at that time
+#        up_blip_index=np.where(np.diff(np.greater_equal(current, 1e-10).astype(int)) == 1)[0]#Note 1e-10 is larger than test pulse so it will not pick up test pulse
+#        down_blip_index=np.where(np.diff(np.less_equal(current, 1e-10).astype(int)) == 1)[0]
+#        potential_artifact_indexes=np.sort(np.append(up_blip_index, down_blip_index))
+#        artifact_removed_voltage=copy.deepcopy(voltage)
+#        window_boarders_index=[]
+#        #--remove artifacts 
+#        for index in potential_artifact_indexes:
+#            smooth_window=range(index,index+window_indicies_to_ave_len+1)
+#            
+#            # interpolate in the smoothing window
+#            blah=interp1d([smooth_window[0], smooth_window[-1]], [artifact_removed_voltage[smooth_window[0]], artifact_removed_voltage[smooth_window[-1]]])
+#            artifact_removed_voltage[smooth_window]=blah(smooth_window)
+#            
+#            #windows boarders are just for plotting
+##            window_boarders_index.append(smooth_window[0])
+##            window_boarders_index.append(smooth_window[-1])
+##        plt.figure()
+##        plt.plot(voltage, 'b', lw=4)
+##        plt.plot(artifact_removed_voltage, 'r', lw=2)
+##        plt.plot(window_boarders_index, artifact_removed_voltage[window_boarders_index], '|g', ms=10)
+##        plt.xlim([40400, 41000])
+##        plt.show()
+##        
+##        t = np.arange(0, len()) * dt
+#
+#        # keeping the smooth_v convention of the SDK find spike code.  However in the SDK code 
+#        # this is used to name data potentially smoothed by a bessel filter
+#        smooth_v = artifact_removed_voltage
+#        dv = np.diff(smooth_v)    
+#        dvdt = dv / dt
+#        dvv = np.diff(dvdt)
+#                
+#        v=smooth_v[:-1]  #truncating the end of v so it has the same dimensions as dvdt for time plotting
+#
+#        spikes = []
+#        out_spk_idxs = []
 #        
-#        t = np.arange(0, len()) * dt
-
-        # keeping the smooth_v convention of the SDK find spike code.  However in the SDK code 
-        # this is used to name data potentially smoothed by a bessel filter
-        smooth_v = artifact_removed_voltage
-        dv = np.diff(smooth_v)    
-        dvdt = dv / dt
-        dvv = np.diff(dvdt)
-                
-        v=smooth_v[:-1]  #truncating the end of v so it has the same dimensions as dvdt for time plotting
-
-        spikes = []
-        out_spk_idxs = []
-        
-        peaks=get_peaks(v) # find potential spikes by finding peak over zero mv
-      
-        # Etay defines spike as time of threshold crossing.  Threshold is defined as the time at which dvdt is some percent of maximum threshold.
-        # TODO: figure out how maximum threshold is defined in original code so I can say why I don't use it
-        for spk_n, peak_idx in enumerate(peaks):
-            #---------find spike peak----------------------------
-            spk = {}
-    
-            spk["peak_idx"] = peak_idx 
-            upstroke_idx = np.argmax(dvdt[peak_idx-int(.001/dt):peak_idx]) + peak_idx-int(.001/dt)  
-            spk["upstroke"] = dvdt[upstroke_idx]
-            spk["upstroke_idx"] = upstroke_idx
-            spk["upstroke_v"] = v[upstroke_idx]
-                
-            # Define threshold where dvdt = 5% * max upstroke
-            dvdt_thr_target = THRESH_PCT_MULTIBLIP * spk["upstroke"]
-            #print 'spk[upstroke]', spk["upstroke"], 'dvdt_thr_target', dvdt_thr_target
-            prev_idx = peak_idx-int(.0035/dt)
-            #check to make sure prev_idx is not before or in a window where the stimulus blip comes on because 
-            #it will errorniously trip the threshold dvdt
-            for index in up_blip_index:
-                if prev_idx<=index+int(.0005/dt) and prev_idx>= index-int(.0035/dt):
-                    prev_idx=index+int(.0005/dt)
-                    
-            mean_dvv= [np.mean(dvv[pv-2:pv+3]) for pv in range(prev_idx,upstroke_idx)] #makes sure dv2/dt2 isnt spuriously going down by averaging 5 points
-            find_thresh_idxs = np.where(np.logical_and(dvdt[prev_idx:upstroke_idx] >= dvdt_thr_target,  np.greater(mean_dvv,0)))[0]  
-               
-            if len(find_thresh_idxs) < 1: # Can't find a good threshold value - probably a bad simulation case
-                # Fall back to the upstroke value
-                threshold_idx = upstroke_idx
-            else:
-                threshold_idx = find_thresh_idxs[0] + prev_idx
-                    
-            spk["threshold_idx"] = threshold_idx
-            spk["threshold_v"] = v[threshold_idx]
-                
-            # Check for things that are probably not spikes:
-  
-            # if the "spike" is less than 2 mV from threshold to peak, don't count it
-            if v[peak_idx] - v[threshold_idx] < 0.002:  
-                print "\tnot counting spike is closer to peak than 2 mV"
-                continue
-    
-            #NOTE: because threshold doesnt decay to zero in the multiblip this doesnt get rid of the situation that usually is only in the first spike of a stimulus
-            # if the spike is less the -30mV, don't count it
-            if v[peak_idx] < -0.04:
-                print "\tnot counting spike: peak is too small"
-                continue
-    
-            spikes.append(spk)
-    
-    #----figure out if I should still find a global threshold and then do it all again
-    #    # find global threshold which is an average of the individual thresholds
-    #    if len(spikes) > 0:
-    #        dvdt_thr_target = np.array([spk["upstroke"] for spk in spikes]).mean() * THRESH_PCT_MULTIBLIP
-    #    else: # if there weren't any spikes, move along
-    #        return np.array([])
-        
-            out_spk_idxs.append(spk["threshold_idx"])
-        
-        out_spk_idxs_list.append(np.array(out_spk_idxs))
-        
-#        time_vector=np.arange(len(v))*dt
-#        plt.figure()
-#    #    plt.subplot(3,1,1)
-#    #    plt.plot(time_vector, ddv)
-#    #    plt.plot(time_vector[out_spk_idxs], ddv[out_spk_idxs], '.r', ms=16)
-#    #    plt.xlim([40300, 42000])
-#    #    plt.ylabel('ddv')
-#        plt.subplot(2,1,1)
-#        plt.plot(time_vector, dvdt)
-#        plt.plot(time_vector[out_spk_idxs], dvdt[out_spk_idxs], '.r', ms=16)
-#        plt.plot(time_vector[potential_artifact_indexes], dvdt[potential_artifact_indexes], 'b|', ms=24, lw=4)
-#        plt.xlim([40300*dt, 42000*dt])
-#        plt.ylabel('dvdt')
-#        plt.subplot(2,1,2)
-#        plt.plot(time_vector, v)
-#        plt.plot(time_vector[out_spk_idxs], v[out_spk_idxs], 'r.', ms=16, label='threshold')
-#        plt.xlim([40300*dt, 42000*dt])
-#        plt.ylabel('voltage (V)')
-#        plt.plot(time_vector[peaks], v[peaks], '.g', ms=16, label='peaks')
-#        plt.plot(time_vector[[spikes[ii]['upstroke_idx'] for ii in range(len(spikes))]], [spikes[ii]['upstroke_v'] for ii in range(len(spikes))], '.c', ms=16, label = 'max upstroke')
-#        plt.plot(time_vector[potential_artifact_indexes], v[potential_artifact_indexes], 'b|', ms=24, lw=4)
-#        plt.legend()
-#        plt.show()
-        
-    return out_spk_idxs_list
+#        peaks=get_peaks(v) # find potential spikes by finding peak over zero mv
+#      
+#        # Etay defines spike as time of threshold crossing.  Threshold is defined as the time at which dvdt is some percent of maximum threshold.
+#        # TODO: figure out how maximum threshold is defined in original code so I can say why I don't use it
+#        for spk_n, peak_idx in enumerate(peaks):
+#            #---------find spike peak----------------------------
+#            spk = {}
+#    
+#            spk["peak_idx"] = peak_idx 
+#            upstroke_idx = np.argmax(dvdt[peak_idx-int(.001/dt):peak_idx]) + peak_idx-int(.001/dt)  
+#            spk["upstroke"] = dvdt[upstroke_idx]
+#            spk["upstroke_idx"] = upstroke_idx
+#            spk["upstroke_v"] = v[upstroke_idx]
+#                
+#            # Define threshold where dvdt = 5% * max upstroke
+#            dvdt_thr_target = THRESH_PCT_MULTIBLIP * spk["upstroke"]
+#            #print 'spk[upstroke]', spk["upstroke"], 'dvdt_thr_target', dvdt_thr_target
+#            prev_idx = peak_idx-int(.0035/dt)
+#            #check to make sure prev_idx is not before or in a window where the stimulus blip comes on because 
+#            #it will errorniously trip the threshold dvdt
+#            for index in up_blip_index:
+#                if prev_idx<=index+int(.0005/dt) and prev_idx>= index-int(.0035/dt):
+#                    prev_idx=index+int(.0005/dt)
+#                    
+#            mean_dvv= [np.mean(dvv[pv-2:pv+3]) for pv in range(prev_idx,upstroke_idx)] #makes sure dv2/dt2 isnt spuriously going down by averaging 5 points
+#            find_thresh_idxs = np.where(np.logical_and(dvdt[prev_idx:upstroke_idx] >= dvdt_thr_target,  np.greater(mean_dvv,0)))[0]  
+#               
+#            if len(find_thresh_idxs) < 1: # Can't find a good threshold value - probably a bad simulation case
+#                # Fall back to the upstroke value
+#                threshold_idx = upstroke_idx
+#            else:
+#                threshold_idx = find_thresh_idxs[0] + prev_idx
+#                    
+#            spk["threshold_idx"] = threshold_idx
+#            spk["threshold_v"] = v[threshold_idx]
+#                
+#            # Check for things that are probably not spikes:
+#  
+#            # if the "spike" is less than 2 mV from threshold to peak, don't count it
+#            if v[peak_idx] - v[threshold_idx] < 0.002:  
+#                print "\tnot counting spike is closer to peak than 2 mV"
+#                continue
+#    
+#            #NOTE: because threshold doesnt decay to zero in the multiblip this doesnt get rid of the situation that usually is only in the first spike of a stimulus
+#            # if the spike is less the -30mV, don't count it
+#            if v[peak_idx] < -0.04:
+#                print "\tnot counting spike: peak is too small"
+#                continue
+#    
+#            spikes.append(spk)
+#    
+#    #----figure out if I should still find a global threshold and then do it all again
+#    #    # find global threshold which is an average of the individual thresholds
+#    #    if len(spikes) > 0:
+#    #        dvdt_thr_target = np.array([spk["upstroke"] for spk in spikes]).mean() * THRESH_PCT_MULTIBLIP
+#    #    else: # if there weren't any spikes, move along
+#    #        return np.array([])
+#        
+#            out_spk_idxs.append(spk["threshold_idx"])
+#        
+#        out_spk_idxs_list.append(np.array(out_spk_idxs))
+#        
+##        time_vector=np.arange(len(v))*dt
+##        plt.figure()
+##    #    plt.subplot(3,1,1)
+##    #    plt.plot(time_vector, ddv)
+##    #    plt.plot(time_vector[out_spk_idxs], ddv[out_spk_idxs], '.r', ms=16)
+##    #    plt.xlim([40300, 42000])
+##    #    plt.ylabel('ddv')
+##        plt.subplot(2,1,1)
+##        plt.plot(time_vector, dvdt)
+##        plt.plot(time_vector[out_spk_idxs], dvdt[out_spk_idxs], '.r', ms=16)
+##        plt.plot(time_vector[potential_artifact_indexes], dvdt[potential_artifact_indexes], 'b|', ms=24, lw=4)
+##        plt.xlim([40300*dt, 42000*dt])
+##        plt.ylabel('dvdt')
+##        plt.subplot(2,1,2)
+##        plt.plot(time_vector, v)
+##        plt.plot(time_vector[out_spk_idxs], v[out_spk_idxs], 'r.', ms=16, label='threshold')
+##        plt.xlim([40300*dt, 42000*dt])
+##        plt.ylabel('voltage (V)')
+##        plt.plot(time_vector[peaks], v[peaks], '.g', ms=16, label='peaks')
+##        plt.plot(time_vector[[spikes[ii]['upstroke_idx'] for ii in range(len(spikes))]], [spikes[ii]['upstroke_v'] for ii in range(len(spikes))], '.c', ms=16, label = 'max upstroke')
+##        plt.plot(time_vector[potential_artifact_indexes], v[potential_artifact_indexes], 'b|', ms=24, lw=4)
+##        plt.legend()
+##        plt.show()
+#        
+#    return out_spk_idxs_list
 
 def get_peaks(voltage, aboveValue=0):
     '''This function was written by Corinne Teeter and calculates the action potential peaks of a voltage equation"
