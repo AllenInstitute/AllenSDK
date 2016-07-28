@@ -5,6 +5,7 @@ export RELEASE=dev$(BUILD_NUMBER)
 RELEASEDIR = $(PROJECTNAME)-$(VERSION).$(RELEASE)
 EGGINFODIR = $(PROJECTNAME).egg-info
 DOCDIR = doc
+COVDIR = htmlcov
 
 DOC_URL=http://alleninstitute.github.io/AllenSDK
 #ZIP_FILENAME=AllenSDK-master.zip
@@ -33,12 +34,11 @@ pypi_register:
 pypi_deploy:
 	python setup.py sdist upload --repository https://testpypi.python.org/pypi
 
-
 pytest:
-	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --pep8 --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
+	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --pep8 --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 pytest_lax:
-	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
+	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 pytest_lite:
 	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --assert=reinterp --junitxml=test-reports/test.xml {} \+
@@ -73,3 +73,4 @@ clean:
 	rm -rf $(RELEASEDIR)
 	rm -rf $(EGGINFODIR)
 	rm -rf $(DOCDIR)
+	rm -rf $(COVDIR)
