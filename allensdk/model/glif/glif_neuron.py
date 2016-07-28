@@ -172,7 +172,8 @@ class GlifNeuron( object ):
             'threshold_reset_method': copy.deepcopy(self.threshold_reset_method),
             'init_voltage': self.init_voltage,
             'init_threshold': self.init_threshold,
-            'init_AScurrents': copy.deepcopy(self.init_AScurrents)
+            'init_AScurrents': copy.deepcopy(self.init_AScurrents), 
+            'El_reference': self.El
         }
 
     @staticmethod

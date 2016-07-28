@@ -24,6 +24,7 @@ class GlifOptimizer(object):
                  param_fit_names, stim,                 
                  xtol, ftol, 
                  internal_iterations, 
+                 bessel,
                  error_function = None,
                  error_function_data = None,
                  init_params = None):
@@ -52,6 +53,8 @@ class GlifOptimizer(object):
         self.ftol = ftol
 
         self.internal_iterations = internal_iterations
+        
+        self.bessel = bessel
 
         logging.info('internal_iterations: %s' % internal_iterations)
         logging.info('outer_iterations: %s' % outer_iterations)
@@ -78,7 +81,8 @@ class GlifOptimizer(object):
             'xtol': self.xtol,
             'ftol': self.ftol,
             'internal_iterations': self.internal_iterations,
-            'iteration_info': self.iteration_info
+            'iteration_info': self.iteration_info,
+            'bessel': self.bessel
         }
             
     def randomize_parameter_values(self, values, sigma):

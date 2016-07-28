@@ -41,9 +41,39 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
         
         #TODO: what is this where is it comming from?
         self.dt_multiplier = kwargs.get('dt_multiplier', 1)
+        self.El_reference = kwargs.get('El_reference',None)
+            
             
     @classmethod
     def from_dict(cls, d):
+        
+        return cls(El = d['El'],
+                   dt = d['dt'],
+#                   tau = d['tau'],
+                   asc_tau_array=d['asc_tau_array'],
+                   R_input = d['R_input'],
+                   C = d['C'],
+                   asc_amp_array = d['asc_amp_array'],
+                   spike_cut_length = d['spike_cut_length'],
+                   th_inf = d['th_inf'],
+                   th_adapt=d['th_adapt'],
+                   coeffs = d.get('coeffs', {}),
+                   AScurrent_dynamics_method = d['AScurrent_dynamics_method'],
+                   voltage_dynamics_method = d['voltage_dynamics_method'],
+                   threshold_dynamics_method = d['threshold_dynamics_method'],
+                   voltage_reset_method = d['voltage_reset_method'],
+                   AScurrent_reset_method = d['AScurrent_reset_method'],
+                   threshold_reset_method = d['threshold_reset_method'],
+                   init_voltage = d['init_voltage'],
+                   init_threshold = d['init_threshold'],
+                   init_AScurrents = d['init_AScurrents'],
+                   extrapolation_method_name = d.get('extrapolation_method_name', 'endpoints'),
+                   dt_multiplier = d.get('dt_multiplier',1),
+                   El_reference = d['El_reference']
+                   )
+        
+    @classmethod
+    def from_dict_legacy(cls, d):
         
         return cls(El = d['El'],
                    dt = d['dt'],
@@ -73,7 +103,8 @@ class GlifOptimizerNeuron( glif_neuron.GlifNeuron ):
         
         curr_dict = super(GlifOptimizerNeuron, self).to_dict()
         curr_dict.update({'extrapolation_method_name':self.extrapolation_method_name,
-                          'dt_multiplier':self.dt_multiplier})
+                          'dt_multiplier':self.dt_multiplier,
+                          'El_reference':self.El_reference})
 
         return curr_dict
 

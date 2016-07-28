@@ -85,7 +85,8 @@ def optimize_neuron(model_config, sweep_index, save_callback=None):
                               xtol = optimizer_config['xtol'],
                               ftol = optimizer_config['ftol'],
                               internal_iterations = optimizer_config['internal_iterations'],
-                              init_params = optimizer_config.get('init_params', None))
+                              init_params = optimizer_config.get('init_params', None),
+                              bessel = optimizer_config['bessel'])
 
     def save(optimizer, outer, inner):
         logging.info('finished outer: %d inner: %d' % (outer, inner))
