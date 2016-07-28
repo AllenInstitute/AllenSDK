@@ -181,7 +181,9 @@ class NeuropilSubtract (object):
 
         return exceed_bounds
             
-def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled, r_init=0.001, learning_rate=10.0, lam=0.05):
+def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled, 
+                                  r_init=0.001, learning_rate=10.0, 
+                                  lam=0.05, annealing_factor=0.1):
     ''' Calculates neuropil contamination of ROI
 
     Parameters
@@ -227,7 +229,9 @@ def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled, r_init=0.001, lear
     ns.set_F(F_M, F_N, F_M_cross_val, F_N_cross_val)
 
     '''stop gradient descent at first increase of cross-validation error'''
-    bounds_err = ns.fit_grad_descent(r_init=r_init, learning_rate=learning_rate)
+    bounds_err = ns.fit_grad_descent(r_init=r_init, 
+                                     learning_rate=learning_rate, 
+                                     annealing_factor=annealing_factor)
             
     F_C_unscaled = ns.F_C*float(np.amax(F_N_unscaled)-np.amin(F_N_unscaled)) + (1-ns.r)*float(np.amin(F_N_unscaled))
     F_C_unscaled_crossval = ns.F_C_crossval*float(np.amax(F_N_unscaled_cross_val)-np.amin(F_N_unscaled_cross_val)) + (1-ns.r)*float(np.amin(F_N_unscaled_cross_val))
