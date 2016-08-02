@@ -189,6 +189,107 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
         
     return const_to_add_to_thresh_for_reset, decay_const, thresh_inf
 
+def fit_avoltage_bvoltage(x, v_trace_list, El_list, spike_cut_length, all_spikeInd_list, th_inf, dt, a_spike, 
+                     b_spike, fake=False):
+    '''This is a version of fit_avoltage_bvoltage_debug that does not require the th_trace, 
+    v_component_of_thresh_trace, and spike_component_of_thresh_trace needed for debugging. A
+    test should be run to make sure the same output comes out from this and the debug function
+    
+    This function returns the squared error for the difference between the 'known' voltage
+    component of the threshold obtained from the biological neuron and the voltage component 
+    of the threshold of the model obtained with the input parameters (so that the minimum can be 
+    searched for via fmin). The overall threshold is the sum of threshold infinity the spike component
+    of the threshold and the voltage component of the threshold.  Therefore threshold infinity and 
+    the spike component of the threshold must be subtracted from the threshold of the neuron in order
+    to isolate the voltage component of the threshold.  In the evaluation of the model the actual
+    voltage of the neuron is used so that any errors in the other components of the model will not 
+    influence the fits here (for example, if a afterspike current was estimated incorrectly)
+  
+    Notes:
+    * The spike component of the threshold is subtracted from the 
+        voltage which means that the voltage component of the threshold should only be added to rules.
+    * b_spike was fit using a negative value in the function therefore the negative is placed in the 
+        equation. 
+    * values in this function are in 'real' voltage as opposed to voltage
+        relative to resting potential. 
+    * current injection during the spike is not taken into account.  This seems reasonable as the 
+        ion channels are open during this time and injected current may not greatly influence the neuron.
+    
+    x: numpy array
+        x[0]=a_voltage input, x[1] is b_voltage_input, x[2] is th_inf
+    v_trace_list: list of numpy arrays
+        voltage traces (v_trace, El, and th_inf must be in the same frame of reference)
+    El_list: list of floats
+        reversal potential (v_trace, El, and th_inf must be in the same frame of reference)
+    spike_cut_length: int
+        number of indicies removed after initiation of a spike
+    all_spikeInd_list: list of numpy arrays
+        indicies of spike trains 
+    th_inf: float
+        threshold infinity (v_trace, El, and th_inf must be in the same frame of reference)
+    dt: float 
+        size of time step (SI units)
+    a_spike: float
+        amplitude of spike component of threshold.
+    b_spike: float
+        decay constant in spike component of the threshold
+    fake: Boolean
+        if True makes uses the voltage value of spike step-1 because there is not a voltage value at the spike
+        step because it is set to nan in the simulator.
+    '''
+    a_voltage=x[0]
+    b_voltage=x[1]
+
+    total_err=0
+    for v_trace, El, all_spikeInd in zip(v_trace_list, El_list, all_spikeInd_list):
+        # Calculate values along the whole trace and then take the values at the spike ind
+        internal_sp_comp_array=np.zeros(all_spikeInd[0]+spike_cut_length) 
+        left_over=0
+        #vector of spike component of of the threshold from each spike and previous spikes; note at first spike there is no spike component of threshold so initialized at zero   
+        #Note that care has to be taken here to get make sure the right amount of decay is left over
+        for spike_number in range(1,len(all_spikeInd)):      #skipping first spike since no residual spike component of threshold
+            integration_length=all_spikeInd[spike_number]-all_spikeInd[spike_number-1]+1 #this is the amount of time that needs to be integrated over note that it is one longer than the interval because of the last value is added to the aspike for the next ISI
+            local_spike_comp_of_threshold=spike_component_of_threshold_exact(a_spike+left_over, b_spike, np.arange(integration_length)*dt)
+            internal_sp_comp_array=np.append(internal_sp_comp_array, local_spike_comp_of_threshold[:-1])
+            left_over=local_spike_comp_of_threshold[-1]
+        
+        # Compute voltage component of threshold at biological spike (subtract th_inf and spike component of threshold
+        # from biological voltage values at spike initiation)
+        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        #     NOTE THAT THERE IS AN ISSUE HERE USING FAKE DATA.  THE -1 IS HERE BECAUSE THE NEURON CROSSES THRESHOLD SOMETIME BETWEEN TWO INDICIES.
+        #     FOR THE FAKE DATA THE TIME OF THE SPIKE (THE POINT FOLLOWING WHEN THE VOLTAGE CROSSES THRESHOLD) IS SET TO NAN.
+        #     THE INTERPOLATED VOLTAGE CAN BE USED BUT THEN THE INTERPOLATED VOLTAGE MUST BE CALCULATED FOR THE TRUE VOLTAGE 
+        #     TRACE AND POSSIBLY IN THE INTEGRATION.
+        if fake:
+            v_comp_of_th_at_each_spike_via_data=v_trace[all_spikeInd-1]-internal_sp_comp_array[all_spikeInd-1]-th_inf  #USE THIS FOR FAKE DATA
+        else:
+            v_comp_of_th_at_each_spike_via_data=v_trace[all_spikeInd]-internal_sp_comp_array[all_spikeInd]-th_inf  #USE THIS FOR REAL DATA (although probably not necessary)
+        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        
+        # For each ISI, calculate the difference between the voltage dependent component of the threshold
+        # and the value that would be determined via a model that uses the actual voltage of neuron.  
+        sq_err = []    #list to store squared error between the model and biological threshold
+        for spike_number in range(1, len(all_spikeInd)):      #loop over all ISI's in data
+            v_start_ind = all_spikeInd[spike_number-1]+int(spike_cut_length) #dont want to use voltage during a spike
+            end_ind = all_spikeInd[spike_number]
+            v_in_ISI=v_trace[v_start_ind:end_ind]
+            #voltage component of threshold at the beginning and end of the ISI
+            #With fake data if go from one before fake data to fake data this should be exact
+            theta0=v_comp_of_th_at_each_spike_via_data[spike_number-1] #this assumes that the voltage component of the threshold does not change over the time period of the spike
+            # not sure this makes sense any moretheta0=v_comp_of_th_at_each_spike_via_data[spike_number-1]+sp_comp_of_offset_at_spike_list[spike_number-1] #use this is you want to add the biological component back on
+            theta1=v_comp_of_th_at_each_spike_via_data[spike_number]
+            tvec=np.arange(len(v_in_ISI))*dt
+    
+            #analytical solution should be exact with fake data--small differences could be because of the differences in the voltage at 
+            #spike indicies are off by one
+            model=+theta0*np.exp(-b_voltage*dt*(end_ind-v_start_ind))+a_voltage*np.exp(-b_voltage*tvec[-1])*np.sum(dt*(v_in_ISI-El)*np.exp(b_voltage*tvec))
+            err = (theta1-model)**2
+            if ~np.isnan(err):
+                sq_err.append(err)
+        
+        total_err+=np.sum(sq_err)
+    return total_err
+
 def fit_avoltage_bvoltage_th(x, v_trace_list, El_list, spike_cut_length, all_spikeInd_list, dt, a_spike, 
                      b_spike, fake=False):
     '''This is a version of fit_avoltage_bvoltage_th_debug that does not require the th_trace, 
@@ -288,6 +389,7 @@ def fit_avoltage_bvoltage_th(x, v_trace_list, El_list, spike_cut_length, all_spi
         
         total_err+=np.sum(sq_err)
     return total_err
+
 
 #TODO: depricate confirmed use of fit_avoltage_bvoltage_th
 #def err_fix_th(x, v_trace, El, spike_cut_length, all_spikeInd, th_inf, dt, a_spike, b_spike):
