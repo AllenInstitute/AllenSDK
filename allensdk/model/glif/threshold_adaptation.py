@@ -42,8 +42,8 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
     multi_SS_i=multi_SS['current']
 
     # --get indicies of spikes
-#    spike_ind, _=find_spikes_list(multi_SS_v, dt)
-    spike_ind=find_multiblip_spikes(multi_SS_i, multi_SS_v, dt)
+    spike_ind, _=find_spikes_list(multi_SS_v, dt)
+#    spike_ind=find_multiblip_spikes(multi_SS_i, multi_SS_v, dt) can depricate find_multiblip_spikes
 
 
     # eliminate spurious spikes that may exist
