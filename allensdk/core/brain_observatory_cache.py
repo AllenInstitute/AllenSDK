@@ -86,7 +86,7 @@ class BrainObservatoryCache(Cache):
     def get_all_session_types(self):
         """ Return a list of all stimulus sessions in the data set. """
         exps = self.get_ophys_experiments()
-        names = set([ exp['stimulus_name'] for exp in exps ])
+        names = set([ exp['session_type'] for exp in exps ])
         return sorted(list(names))
 
 
