@@ -5,7 +5,7 @@
 # docker run -it alleninstitute/allensdk:neuralensemble /bin/bash
 # source ~/env/neurosci/bin/activate
 #
-FROM neuralensemble/simulation:py2
+FROM neuralensemble/simulation
 MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
 USER root
@@ -14,7 +14,8 @@ USER root
 RUN apt-get install -yq \
     pkg-config \
     libhdf5-dev \
-    hdf5-tools
+    hdf5-tools \
+    libfreetype6-dev
 
 ENV NRN=nrn-$NRN_VER NRN_RELEASE=7.4.rel-1370
 
@@ -34,7 +35,10 @@ RUN mkdir $NRN; \
 
 USER docker
 
-RUN $VENV/bin/pip install allensdk 
-RUN $VENV/bin/pip install jupyter 
+RUN $VENV/bin/pip install /home/docker/packages/${ALLENSDK}
+
+RUN $VENV/bin/pip install jupyter
+
+RUN jupyter-notebook --generate-config
 
 RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv
