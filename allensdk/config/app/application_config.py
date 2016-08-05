@@ -328,7 +328,6 @@ class ApplicationConfig(object):
             config = ConfigParser()
         
         if config_file_path.endswith('.json'):
-            cfg_string = ""
             cfg_string = self.from_json_file(config_file_path)
             config.readfp(io.BytesIO(cfg_string))
         else:

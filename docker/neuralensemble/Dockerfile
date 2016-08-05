@@ -21,8 +21,9 @@ ENV NRN=nrn-$NRN_VER NRN_RELEASE=7.4.rel-1370
 
 WORKDIR /home/docker/packages
 
-RUN wget https://www.neuron.yale.edu/ftp/neuron/versions/v$NRN_VER/v$NRN_RELEASE/nrn-$NRN_RELEASE.tar.gz
-RUN tar xzf nrn-$NRN_RELEASE.tar.gz; rm nrn-$NRN_RELEASE.tar.gz
+RUN wget https://www.neuron.yale.edu/ftp/neuron/versions/v$NRN_VER/v$NRN_RELEASE/nrn-$NRN_RELEASE.tar.gz; \
+    tar xzf nrn-$NRN_RELEASE.tar.gz; \
+    rm nrn-$NRN_RELEASE.tar.gz
 
 WORKDIR $VENV/build
 
@@ -33,12 +34,20 @@ RUN mkdir $NRN; \
     cd src/nrnpython; $VENV/bin/python setup.py install; \
     cd $VENV/bin; rm $VENV/bin/nrnivmodl; ln -s ../x86_64/bin/nrnivmodl
 
+RUN apt-get -yq install unzip
+
 USER docker
+WORKDIR /home/docker
 
-RUN $VENV/bin/pip install /home/docker/packages/${ALLENSDK}
-
-RUN $VENV/bin/pip install jupyter
-
-RUN jupyter-notebook --generate-config
+# TODO: replace w/ install from Github
+RUN mkdir allensdk; \
+    cd allensdk; \
+    wget -O allensdk.zip http://stash.corp.alleninstitute.org/plugins/servlet/archive/projects/INF/repos/allensdk?at=refs%2Fheads%2Fdev; \
+    unzip allensdk.zip; \
+    rm allensdk.zip; \
+    $VENV/bin/pip install .; \
+    $VENV/bin/pip install -r test_requirements.txt; \
+    $VENV/bin/pip install jupyter\
+    jupyter-notebook --generate-config
 
 RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv
