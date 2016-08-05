@@ -60,6 +60,7 @@ def error_calc(F_M, F_N, F_C, r):
 
     return er
 
+
 def error_calc_outlier(F_M, F_N, F_C, r):
 
     std_F_M = np.std(F_M)
@@ -70,127 +71,196 @@ def error_calc_outlier(F_M, F_N, F_C, r):
 
     return er
 
-class NeuropilSubtract (object):
 
-    def __init__(self, T, lam=0.1):
-
-        self.r = None
-        self.T = T
-
-        Ls = -sparse.eye(T-1,T,format='csr') + sparse.eye(T-1,T,1,format='csr')  #using csr because multiplication is fast
-        dt = 1.0
-        Ls /= dt
-        Ls2 = Ls.T.dot(Ls)
-
-        self.Ls2 = Ls2
-        
-        self.lam = lam
-
-        M = sparse.eye(T) + lam*Ls2
-        mat_dict = get_diagonals_from_sparse(M)
-        ab = ab_from_diagonals(mat_dict)
-
-        self.M = M
-        self.ab = ab
-        
-    def set_F(self,F_M, F_N, F_M_crossval, F_N_crossval):
-        ''' Internal initializatin routine
-        '''
-        self.F_M = F_M
-        self.F_N = F_N
-        self.F_M_crossval = F_M_crossval
-        self.F_N_crossval = F_N_crossval
-
+def ab_from_T(T, lam, dt):
+    Ls = -sparse.eye(T-1,T,format='csr') + sparse.eye(T-1,T,1,format='csr')  #using csr because multiplication is fast
+    Ls /= dt
+    Ls2 = Ls.T.dot(Ls)
     
-    #def fit_grad_desc_early_stop(self,r_init=0.001,learning_rate=0.1):
-    def fit_grad_descent(self, r_init=0.5, learning_rate=100.0, max_iterations=10000, 
-                         min_delta_r=0.00001, max_error=0.2, annealing_factor=0.1):
-        ''' Calculate fit using gradient decent, as opposed to iteratively
-        computing exact solutions
-        '''
-        delta_r = 1
-        r = r_init
+    M = sparse.eye(T) + lam*Ls2
+    mat_dict = get_diagonals_from_sparse(M)
+    ab = ab_from_diagonals(mat_dict)
+    
+    return ab
 
-        r_list = []
-        error_list = []
 
-        F_C = solve_banded((1,1),self.ab,self.F_M - r*self.F_N)
+def normalize_F(F_M, F_N):
+    F_N_min, F_N_max = float(np.amin(F_N)), float(np.amax(F_N))
+            
+    # rescale so F_N is [0,1]
+    F_M_s = (F_M - F_N_min)/(F_N_max - F_N_min)
+    F_N_s = (F_N - F_N_min)/(F_N_max - F_N_min)    
 
+    return F_M_s, F_N_s
+
+
+def alpha_filter(A=1.0, alpha=0.05, beta=0.25, T=100):
+    return A * np.exp(-alpha*np.arange(T)) - np.exp(-beta*np.arange(T))
+
+
+def validate_with_synthetic_F(T, N):
+    """ Compute N synthetic traces of length T with known values of r, then estimate r.
+    TODO: docs
+    """
+    af1 = alpha_filter()
+    af2 = alpha_filter(alpha=0.1, beta=0.5)
+
+    r_truth_vals = []
+    r_est_vals = []
+
+    for n in range(N):
+        F_M_truth, F_N_truth, F_C_truth, r_truth = synthesize_F(T, af1, af2)
+        results = estimate_contamination_ratios(F_M_truth, F_N_truth)
+        
+        r_est = results['r']
+
+        r_truth_vals.append(r_truth)
+        r_est_vals.append(r_est)
+
+    return r_truth_vals, r_est_vals
+
+
+def synthesize_F(T, af1, af2, p1=0.05, p2=0.1):
+    """ Build a synthetic F_C, F_M, F_N, and r of length T  
+    TODO: docs
+    """
+    x1 = np.random.random(T) < p1
+    F_C = np.convolve(af1, x1, mode='full')[:T]
+    
+    x2 = np.random.random(T) < p2
+    F_N = np.convolve(af2, x2, mode='full')[:T]
+
+    r = 2.0 * np.random.random()
+    
+    F_M = F_C + r * F_N
+
+    return F_M, F_N, F_C, r
+    
+
+class NeuropilSubtract(object):
+    """ TODO: docs
+    """
+
+    def __init__(self, lam=0.05, dt=1.0, folds=4):
+        self.lam = lam
+        self.dt = dt
+        self.folds = folds
+
+        self.T = None
+        self.T_f = None
+        self.ab = None
+
+        self.F_M = None
+        self.F_N = None
+
+        self.r_vals = None
+        self.error_vals = None
+        self.r = None
+        self.error = None
+
+    def set_F(self, F_M, F_N):
+        """ Break the F_M and F_N traces into the number of folds specified
+        in the class constructor and normalize each fold of F_M and R_N relative to F_N.
+        """
+
+        F_M_len = len(F_M)
+        F_N_len = len(F_N)
+
+        if F_M_len != F_N_len:
+            raise Exception("F_M and F_N must have the same length (%d vs %d)" % (F_M_len, F_N_len))
+
+        if self.T != F_M_len:
+            logging.debug("updating ab matrix for new T=%d", F_M_len)
+            self.T = F_M_len
+            self.T_f = int(self.T / self.folds)
+            self.ab = ab_from_T(self.T_f, self.lam, self.dt)
+
+        self.F_M = []
+        self.F_N = []
+
+        for fi in range(self.folds):
+            F_M_i_s, F_N_i_s = normalize_F(F_M[fi*self.T_f:(fi+1)*self.T_f], 
+                                           F_N[fi*self.T_f:(fi+1)*self.T_f])
+            
+            self.F_M.append(F_M_i_s)
+            self.F_N.append(F_N_i_s)    
+
+    def fit(self, r_range=[0.0, 2.0], iterations=3, dr=0.1, dr_factor=0.1):
+        """ Estimate error values for a range of r values.  Identify a new r range
+        around the minimum error values and repeat multiple times.
+        TODO: docs
+        """
+        global_min_error = None
+        global_min_r = None
+
+        r_vals = []
+        error_vals = []
+
+        it_range = r_range
         it = 0
+                 
+        it_dr = dr
+        while it < iterations:
+            it_errors = []
 
-        ref_delta_e = None
+            # build a set of r values evenly distributed in a current range
+            rs = np.arange(it_range[0], it_range[1], it_dr)
 
-        exceed_bounds = False
-        while (delta_r > min_delta_r and it < max_iterations):
+            # estimate error for each r 
+            for r in rs:
+                error = self.estimate_error(r)
+                it_errors.append(error)
 
-            F_C = solve_banded((1,1), self.ab, self.F_M - r*self.F_N)
+                r_vals.append(r)
+                error_vals.append(error)
 
-            delta_e = np.mean((self.F_M - F_C - r*self.F_N) * self.F_N)
-
-            # annealing
-            if annealing_factor is not None:
-                if ref_delta_e is None:
-                    ref_delta_e = delta_e
-
-                if delta_e < ref_delta_e * annealing_factor:
-                    ref_delta_e = delta_e
-                    learning_rate *= annealing_factor
-                    logging.debug("shrinking learning rate %f -> %f", learning_rate/annealing_factor, learning_rate)
-
-            r_new = r + learning_rate * delta_e
+            # find the minimum in this range and update the global minimum 
+            min_i = np.argmin(it_errors)
+            min_error = it_errors[min_i]
             
-            '''compute error on cross-validation set'''
-            F_C_crossval = solve_banded((1,1),self.ab,self.F_M_crossval - r*self.F_N_crossval)
+            if global_min_error is None or min_error < global_min_error:
+                global_min_error = min_error
+                global_min_r = rs[min_i]
 
-#            error_it = error_calc_outlier(self.F_M_crossval, self.F_N_crossval, F_C_crossval, r)
-            error_it = abs(error_calc(self.F_M_crossval, self.F_N_crossval, F_C_crossval, r))
+            logging.debug("iteration %d, r=%0.4f, e=%.6e", it, global_min_r, global_min_error)
+
+            # if the minimum error is on the upper boundary, 
+            # extend the boundary and redo this iteration
+            if min_i == len(it_errors)-1:
+                logging.debug("minimum error found on upper r bound, extending range")
+                it_range = [ rs[-1], rs[-1] + (rs[-1] - rs[0]) ] 
+            else:
+                # error is somewhere on either side of the minimum error index
+                it_range = [ rs[max(min_i - 1, 0)], rs[min(min_i + 1, len(rs)-1)] ]
+                it_dr *= dr_factor
+                it += 1
+
+        self.r_vals = r_vals
+        self.error_vals = error_vals
+        self.r = global_min_r
+        self.error = global_min_error
+
+    def estimate_error(self, r):
+        """ Estimate error values for a given r for each fold and return the mean. """
+
+        errors = np.zeros(self.folds)
+        for fi in range(self.folds):
+            F_M = self.F_M[fi]
+            F_N = self.F_N[fi]
+            F_C = solve_banded((1,1), self.ab, F_M - r*F_N)
+            errors[fi] = abs(error_calc(F_M, F_N, F_C, r))
+
+        return np.mean(errors)
             
-            delta_r = np.abs(r_new - r)/r
-            r = r_new
-
-            r_list.append(r)
-            error_list.append(error_it)
-            it+=1
-            
-            if error_it > error_list[it-1]: # early stopping
-                logging.warning("stop: early stopping")
-                break
-            
-        # if r or error_it go out of acceptable bounds, break 
-        if r < 0.0 or r > 1.0:
-            exceed_bounds = True
-            logging.warning("stop: r outside of [0.0, 1.0] - (%f)", r)
-        if error_it > max_error:
-            exceed_bounds = True
-            logging.warning("stop: error exceeded bounds")
-        if it == max_iterations:
-            logging.warning("stop: maximum iterations (%d)", max_iterations)
-        if delta_r <= min_delta_r:
-            logging.warning("stop: dr < min_dr (%f, %f)", delta_r, min_delta_r)
-
-        F_C = solve_banded((1,1),self.ab,self.F_M - r*self.F_N)
-
-        r_list = np.array(r_list)
-        error_list = np.array(error_list)
-        self.r_vals = r_list
-        self.error_vals = error_list
-        self.r = r
-        self.F_C = F_C
-        self.F_C_crossval = F_C_crossval
-        self.it = it
-
-        return exceed_bounds
-            
-def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled, 
-                                  r_init=0.001, learning_rate=10.0, 
-                                  lam=0.05, annealing_factor=0.1):
+def estimate_contamination_ratios(F_M, F_N, 
+                                  lam=0.05, folds=4, iterations=3,
+                                  r_range=[0.0, 2.0], dr=0.1, dr_factor=0.1):
     ''' Calculates neuropil contamination of ROI
-
+    
     Parameters
     ----------
-    F_M_unscaled: ROI trace
-
-    F_N_unscaled: Neuropil trace
+       F_M: ROI trace       
+       F_N: Neuropil trace
 
     Returns
     -------
@@ -200,51 +270,53 @@ def estimate_contamination_ratios(F_M_unscaled, F_N_unscaled,
         * 'min_error': minimum error
         * 'bounds_error': boolean. True if error or R are outside tolerance
     '''
-    
 
-    T = len(F_M_unscaled)
-    assert T == len(F_N_unscaled), "Input arrays of different dimension"
-    T_cross_val = int(T/2)
-    if T - T_cross_val > T_cross_val:
-        T = T - 1
-    ns = NeuropilSubtract(T_cross_val, lam=lam)
-    F_M_unscaled_cross_val = np.copy(F_M_unscaled)
-    F_N_unscaled_cross_val = np.copy(F_N_unscaled)
+    ns = NeuropilSubtract(lam=lam, folds=folds)
 
-    '''pick r on first half of the trace '''
-    F_M_unscaled = F_M_unscaled[0:T_cross_val]
-    F_N_unscaled = F_N_unscaled[0:T_cross_val]        
-    
-    F_M_unscaled_cross_val = F_M_unscaled_cross_val[T_cross_val:T]
-    F_N_unscaled_cross_val =  F_N_unscaled_cross_val[T_cross_val:T]
-    
-    ''' normalize to have F_N in (0,1)'''
-    F_M = (F_M_unscaled - float(np.amin(F_N_unscaled)))/float(np.amax(F_N_unscaled)-np.amin(F_N_unscaled))
-    F_N = (F_N_unscaled - float(np.amin(F_N_unscaled)))/float(np.amax(F_N_unscaled)-np.amin(F_N_unscaled))
-    F_M_cross_val = (F_M_unscaled_cross_val - float(np.amin(F_N_unscaled_cross_val)))/float(np.amax(F_N_unscaled_cross_val)-np.amin(F_N_unscaled_cross_val))
-    F_N_cross_val = (F_N_unscaled_cross_val - float(np.amin(F_N_unscaled_cross_val)))/float(np.amax(F_N_unscaled_cross_val)-np.amin(F_N_unscaled_cross_val))
+    ns.set_F(F_M, F_N)
 
-    # fitting model 
-    
-    ns.set_F(F_M, F_N, F_M_cross_val, F_N_cross_val)
+    ns.fit(r_range=r_range, 
+           iterations=iterations, 
+           dr=dr,
+           dr_factor=dr_factor)
 
-    '''stop gradient descent at first increase of cross-validation error'''
-    bounds_err = ns.fit_grad_descent(r_init=r_init, 
-                                     learning_rate=learning_rate, 
-                                     annealing_factor=annealing_factor)
-            
-    F_C_unscaled = ns.F_C*float(np.amax(F_N_unscaled)-np.amin(F_N_unscaled)) + (1-ns.r)*float(np.amin(F_N_unscaled))
-    F_C_unscaled_crossval = ns.F_C_crossval*float(np.amax(F_N_unscaled_cross_val)-np.amin(F_N_unscaled_cross_val)) + (1-ns.r)*float(np.amin(F_N_unscaled_cross_val))
+    if ns.r < 0:
+        logging.warning("r is negative (%f). return 0.0.", ns.r)
+        ns.r = 0
 
-    min_error = np.zeros(T)
-    min_error[:T-T_cross_val] = F_C_unscaled
-    min_error[T-T_cross_val:T] = F_C_unscaled_crossval        
-    results = {}
-    results["r"] = ns.r
-    results["r_vals"] = ns.r_vals
-    results["err"] = abs(ns.error_vals[-1])
-    results["min_error"] = min_error
-    results["bounds_error"] = bounds_err
-    results["it"] = ns.it
-    return results
+    return {
+        "r": ns.r,
+        "r_vals":  ns.r_vals,
+        "err": ns.error,
+        "err_vals": ns.error_vals,
+        "min_error": ns.error,
+        "it": len(ns.r_vals)
+        }
 
+
+def adjust_r_for_negativity(r, F_C, F_M, F_N):
+    # loop through all of the negative spots and pick r to fix them
+    neg_is = np.argwhere(F_C < 0)
+    if neg_is.size > 0:
+        logging.debug("Correcting for negative trace, starting with r = %f", r)
+
+        for i in neg_is:
+            if F_C[i] >= 0:
+                continue
+            # r_new = (F_C[i] + r_old * F_N[i]) / F_N[i]
+            r = F_M[i] / F_N[i]
+            F_C = F_M - r * F_N
+            logging.debug("  updated r to %f", r)
+
+
+        # if there is still a negative spot, it's off by some tiny epsilon.
+        # step r down by delta_r increments until we find one that works.
+        delta_r = -1e-5
+        while F_C.min() < 0 and r >= 0.0:
+            r += delta_r
+            F_C = F_M - r * F_N
+            logging.debug("  stepped r to %f", r)
+
+        logging.debug("  finished with r = %f", r)
+
+    return r
