@@ -16,13 +16,12 @@
 import pytest
 from mock import patch, mock_open, MagicMock
 from allensdk.core.brain_observatory_cache import BrainObservatoryCache
-from _pytest.monkeypatch import monkeypatch
-try:
-    import builtins
-except:
-    import __builtin__ as builtins
-    
 from allensdk.core import json_utilities
+try:
+    import __builtin__ as builtins
+except:
+    import builtins
+
 
 CACHE_MANIFEST = """
 {
@@ -71,9 +70,8 @@ CACHE_MANIFEST = """
 def brain_observatory_cache():
     boc = None
     
-    with patch('os.path.exists') as m:
-        m.return_value = True
-        
+    with patch('os.path.exists',
+               return_value=True):
         with patch(builtins.__name__ + ".open",
                    mock_open(read_data=CACHE_MANIFEST)):
             # Download a list of all targeted areas

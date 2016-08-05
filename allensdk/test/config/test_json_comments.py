@@ -20,9 +20,10 @@ from allensdk.core.json_utilities import JsonComments
 from __builtin__ import ValueError
 import logging
 try:
-    import builtins
-except:
     import __builtin__ as builtins
+except:
+    import builtins
+
 
 @pytest.fixture
 def commented_json():
