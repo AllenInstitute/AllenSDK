@@ -38,7 +38,7 @@ def testManifestParent(builder):
                      'work',
                      parent_key='BASEDIR')
     manifest = builder.get_manifest()
-    expected = '/home/username/example/work'
+    expected = b'/home/username/example/work'
     actual = manifest.get_path('WORKDIR')
     assert(expected == actual)
 
@@ -53,7 +53,7 @@ def testManifestBuilderDataFrame(builder):
     assert('type' in builder_df.keys())
     assert('spec' in builder_df.keys())
     assert('parent_key' in builder_df.keys())
-    assert('format' in builder_df.keys())        
+    assert('format' in builder_df.keys())
     assert(5 == len(builder_df.keys()))
 
 

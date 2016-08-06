@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
 
 import os
 import pandas as pd
+from six import string_types
 
 from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.cache import Cache
@@ -99,7 +100,7 @@ class CellTypesCache(Cache):
             if self.cache:
                 json_utilities.write(file_name, cells)
 
-        if isinstance(reporter_status, basestring):
+        if isinstance(reporter_status, string_types):
             reporter_status = [ reporter_status ]
 
         # filter the cells on the way out

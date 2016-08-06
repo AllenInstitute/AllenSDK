@@ -18,11 +18,10 @@ from allensdk.core.json_utilities import JsonComments
 try:
     from configparser import ConfigParser #@UnresolvedImport
 except:
-    from ConfigParser import ConfigParser
+    from ConfigParser import ConfigParser #@UnresolvedImport
 
 import argparse
 import os
-import io
 import logging
 import logging.config as lc
 from pkg_resources import resource_filename #@UnresolvedImport
@@ -329,7 +328,10 @@ class ApplicationConfig(object):
         
         if config_file_path.endswith('.json'):
             cfg_string = self.from_json_file(config_file_path)
-            config.readfp(io.BytesIO(cfg_string))
+            try:
+                cfg_string = unicode(cfg_string, "utf-8")  # Python 2.7 only
+            finally:
+                config.read_string(cfg_string)
         else:
             config.read(config_file_path)
         
