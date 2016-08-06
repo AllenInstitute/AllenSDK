@@ -32,13 +32,19 @@ except ImportError:
 def read(file_name):
     """ Shortcut reading JSON from a file. """
     with open(file_name, 'rb') as f:
-        return json.loads(f.read())
+        json_string = f.read().decode('utf-8')
+        json_obj = json.loads(json_string)
+
+    return json_obj
 
 
 def write(file_name, obj):
     """ Shortcut for writing JSON to a file.  This also takes care of serializing numpy and data types. """
     with open(file_name, 'wb') as f:
-        f.write(write_string(obj))
+        try:
+            f.write(write_string(obj))   # Python 2.7
+        except TypeError:
+            f.write(bytes(write_string(obj), 'utf-8'))  # Python 3
 
 
 def write_string(obj):

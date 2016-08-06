@@ -38,7 +38,7 @@ def testManifestParent(builder):
                      'work',
                      parent_key='BASEDIR')
     manifest = builder.get_manifest()
-    expected = b'/home/username/example/work'
+    expected = '/home/username/example/work'
     actual = manifest.get_path('WORKDIR')
     assert(expected == actual)
 
