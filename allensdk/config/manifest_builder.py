@@ -54,11 +54,16 @@ class ManifestBuilder(object):
         
         if overwrite == True:
             mode = 'wb+'
+
+        json_string = self.write_json_string()
         
-        with open(path, 'wb') as f:
-            f.write(self.write_json_string())
-    
-    
+        with open(path, mode) as f:
+            try:
+                f.write(json_string)   # Python 2.7
+            except TypeError:
+                f.write(bytes(json_string, 'utf-8'))  # Python 3
+
+
     def get_config(self):
         wrapper = { "manifest": self.path_info }
         for section in self.sections.values():
