@@ -12,51 +12,47 @@ RUN apt-get upgrade -yq
 
 RUN apt-get -yq install \
     pkg-config \
-    libfreetype6-dev
-
-RUN apt-get -yq install \
+    libfreetype6-dev \
     build-essential \
     automake \
     libtool \
     bison \
-    flex
-    
-RUN apt-get -yq install \
+    flex \
     python \
     python-pip \
     python-scipy \
     python-matplotlib \
+    python-pandas \
     ipython \
-    python-dev
-    
-RUN apt-get -yq install \
+    python-dev \
     libxext-dev \
     libncurses-dev \
     libhdf5-dev \
-    wget
-
-RUN apt-get -yq install \
+    wget \
     openmpi-bin \
-    libopenmpi-dev
-
+    libopenmpi-dev \
+    alien \
+    unzip
 
 # upgrade cython
-RUN pip install cython
-RUN pip install sphinx numpydoc
+RUN pip install \
+    cython \
+    sphinx \
+    numpydoc \
+    cycler
 
 #neuron installation
 RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/nrn-7.4.x86_64.rpm
-RUN cd /root; rpm -ivh nrn-7.4.x86_64.rpm
+RUN cd /root; alien -i nrn-7.4.x86_64.rpm
 
-RUN pip install jupyter
-
-
-RUN cd /root; wget https://github.com/AllenInstitute/AllenSDK/archive/release_0.12.zip
-RUN cd /root; \
-    unzip release_0.12.zip
-RUN cd /root; \
-    pip install ./AllenSDK-release_0.12; \
-    cd AllenSDK-release_0.12; \
-    pip install -r test_requirements.txt
+RUN mkdir allensdk; \
+    cd allensdk; \
+    wget -O allensdk.zip http://stash.corp.alleninstitute.org/plugins/servlet/archive/projects/INF/repos/allensdk?at=refs%2Fheads%2Fdev; \
+    unzip allensdk.zip; \
+    rm allensdk.zip; \
+    pip install .; \
+    pip install -r test_requirements.txt; \
+    pip install jupyter; \
+    jupyter-notebook --generate-config
 
 ENV PYTHONPATH=/usr/local/nrn/lib/python:$PYTHONPATH
