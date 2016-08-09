@@ -5,7 +5,7 @@
 # docker run -it alleninstitute/allensdk:neuralensemble /bin/bash
 # source ~/env/neurosci/bin/activate
 #
-FROM neuralensemble/simulation:py2
+FROM neuralensemble/simulation
 MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
 USER root
@@ -14,14 +14,16 @@ USER root
 RUN apt-get install -yq \
     pkg-config \
     libhdf5-dev \
-    hdf5-tools
+    hdf5-tools \
+    libfreetype6-dev
 
 ENV NRN=nrn-$NRN_VER NRN_RELEASE=7.4.rel-1370
 
 WORKDIR /home/docker/packages
 
-RUN wget https://www.neuron.yale.edu/ftp/neuron/versions/v$NRN_VER/v$NRN_RELEASE/nrn-$NRN_RELEASE.tar.gz
-RUN tar xzf nrn-$NRN_RELEASE.tar.gz; rm nrn-$NRN_RELEASE.tar.gz
+RUN wget https://www.neuron.yale.edu/ftp/neuron/versions/v$NRN_VER/v$NRN_RELEASE/nrn-$NRN_RELEASE.tar.gz; \
+    tar xzf nrn-$NRN_RELEASE.tar.gz; \
+    rm nrn-$NRN_RELEASE.tar.gz
 
 WORKDIR $VENV/build
 
@@ -32,9 +34,20 @@ RUN mkdir $NRN; \
     cd src/nrnpython; $VENV/bin/python setup.py install; \
     cd $VENV/bin; rm $VENV/bin/nrnivmodl; ln -s ../x86_64/bin/nrnivmodl
 
-USER docker
+RUN apt-get -yq install unzip
 
-RUN $VENV/bin/pip install allensdk 
-RUN $VENV/bin/pip install jupyter 
+USER docker
+WORKDIR /home/docker
+
+# TODO: replace w/ install from Github
+RUN mkdir allensdk; \
+    cd allensdk; \
+    wget -O allensdk.zip http://stash.corp.alleninstitute.org/plugins/servlet/archive/projects/INF/repos/allensdk?at=refs%2Fheads%2Fdev; \
+    unzip allensdk.zip; \
+    rm allensdk.zip; \
+    $VENV/bin/pip install .; \
+    $VENV/bin/pip install -r test_requirements.txt; \
+    $VENV/bin/pip install jupyter; \
+    $VENV/bin/jupyter-notebook --generate-config
 
 RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv

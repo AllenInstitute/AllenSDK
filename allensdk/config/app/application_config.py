@@ -14,18 +14,16 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.core.json_utilities import JsonComments
-
-try:
-    from configparser import ConfigParser #@UnresolvedImport
-except:
-    from ConfigParser import ConfigParser
-
 import argparse
 import os
-import io
 import logging
 import logging.config as lc
 from pkg_resources import resource_filename #@UnresolvedImport
+try:
+    from configparser import ConfigParser #@UnresolvedImport
+except:
+    from ConfigParser import ConfigParser #@UnresolvedImport
+
 
 class ApplicationConfig(object):
     ''' Convenience class that handles of application configuration
@@ -328,9 +326,13 @@ class ApplicationConfig(object):
             config = ConfigParser()
         
         if config_file_path.endswith('.json'):
-            cfg_string = ""
             cfg_string = self.from_json_file(config_file_path)
-            config.readfp(io.BytesIO(cfg_string))
+            try:
+                cfg_string = unicode(cfg_string, "utf-8")  # Python 2.7 only
+            except NameError:
+                pass
+            
+            config.read_string(cfg_string)  # Python 3
         else:
             config.read(config_file_path)
         

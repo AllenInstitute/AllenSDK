@@ -18,9 +18,10 @@ import pytest
 from mock import patch, mock_open
 from allensdk.config.model.description_parser import DescriptionParser
 try:
-    import builtins
-except:
     import __builtin__ as builtins
+except:
+    import builtins
+
 
 @pytest.fixture
 def pyconfig():

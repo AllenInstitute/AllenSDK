@@ -30,7 +30,7 @@ def movingmode_fast(x, kernelsize, y):
     maxval = x.max()
 
     # compute a histogram of a half kernel
-    halfsize = kernelsize/2
+    halfsize = int(kernelsize/2)
     histo = np.bincount(np.rint(x[:halfsize]).astype(np.uint32), minlength=int(maxval+2))
 
     # find the mode of the first half kernel

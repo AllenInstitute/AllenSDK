@@ -16,6 +16,7 @@
 import os
 import re
 import logging
+import errno
 import pandas as pd
 
 class Manifest(object):
@@ -210,7 +211,7 @@ class Manifest(object):
         string
             Path with parent structure and substitutions applied.
         '''
-        path_spec = str(self.path_info[path_key]['spec'].encode('ascii', 'ignore'))
+        path_spec = self.path_info[path_key]['spec']
 
         if args != None and len(args) != 0:
             path = path_spec % args
@@ -253,8 +254,11 @@ class Manifest(object):
         '''        
         try:
             os.makedirs(directory)
-        except Exception as e:
-            print(e.message)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                pass
+            else:
+                raise
 
 
     def create_dir(self, path_key):

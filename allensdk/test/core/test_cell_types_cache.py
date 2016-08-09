@@ -54,7 +54,7 @@ def test_get_cells_require_morphology(cache_fixture):
     # this downloads metadata for all cells with morphology images
     cells = ctc.get_cells(require_morphology = True)
     assert len(cells) > 0
-    print "Cells with morphology images: ", len(cells)
+    print("Cells with morphology images: ", len(cells))
 
 
 def test_get_cells_require_reconstruction(cache_fixture):
@@ -62,14 +62,14 @@ def test_get_cells_require_reconstruction(cache_fixture):
     # cells with reconstructions
     cells = ctc.get_cells(require_reconstruction = True)
     assert len(cells) > 0
-    print "Cells with reconstructions: ", len(cells)
+    print("Cells with reconstructions: ", len(cells))
 
 
 def test_get_cells_reporter_positive(cache_fixture):
     ctc, _ = cache_fixture
     # all cre positive cells
     cells = ctc.get_cells(reporter_status = RS.POSITIVE)
-    print "Cre-positive cells: ", len(cells)
+    print("Cre-positive cells: ", len(cells))
     assert len(cells) > 0
 
 
@@ -79,7 +79,7 @@ def test_get_cells_reporter_negative(cache_fixture):
     # cre negative cells with reconstructions
     cells = ctc.get_cells(require_reconstruction = True,
                           reporter_status = RS.NEGATIVE)
-    print "Cre-negative cells with reconstructions: ", len(cells)
+    print("Cre-negative cells with reconstructions: ", len(cells))
     assert len(cells) > 0
 
 
@@ -91,14 +91,14 @@ def test_get_cells_compartment_list(cache_fixture,
     morphology = ctc.get_reconstruction(cell_id)
 
     # the compartment list has all of the nodes in the file
-    print morphology.compartment_list[0]
+    print(morphology.compartment_list[0])
 
     # download and open an SWC file
     cell_id = 480114344
     morphology = ctc.get_reconstruction(cell_id)
 
     # the compartment list has all of the nodes in the file
-    print morphology.compartment_list[0]
+    print(morphology.compartment_list[0])
 
     for n in morphology.compartment_list:
         for c in morphology.children_of(n):
@@ -115,8 +115,8 @@ def test_get_reconstruction_markers(cache_fixture,
     ctc, _ = cache_fixture
     # download and open a marker file
     markers = ctc.get_reconstruction_markers(cell_id)
-    print len(markers)
-    print markers[0]
+    print(len(markers))
+    print(markers[0])
     assert len(markers) == 21
 
     # cut dendrite markers
@@ -142,11 +142,11 @@ def test_cell_types_cache_3(cache_fixture):
     fasttrough = np.array([f['fast_trough_v_long_square'] for f in ephys_features], dtype=float)
 
     A = np.vstack([fasttrough, np.ones_like(updown)]).T
-    print "First 5 rows of A:"
-    print A[:5, :]
+    print("First 5 rows of A:")
+    print(A[:5, :])
     
     m, c = np.linalg.lstsq(A, updown)[0]
-    print "m", m, "c", c
+    print("m", m, "c", c)
     
 
 
@@ -229,8 +229,8 @@ def test_cell_types_get_sweep(cache_fixture):
     
     fx.process_instance("", v, i, t, stim_start, stim_duration, "")
     feature_data = fx.feature_list[0].mean
-    print "Avg spike width: {:.2f} ms".format(feature_data['width'])
-    print "Avg spike threshold: {:.1f} mV".format(feature_data["threshold"])
+    print("Avg spike width: {:.2f} ms".format(feature_data['width']))
+    print("Avg spike threshold: {:.1f} mV".format(feature_data["threshold"]))
     
     spike_times = [s["t"] for s in feature_data["spikes"]]
     

@@ -83,7 +83,7 @@ class NwbDataSet(object):
                 exp_length = exp['stimulus']['count'].value
                 exp_idx_stop = exp_idx_start + exp_length - 1
                 experiment_index_range = ( exp_idx_start, exp_idx_stop )
-            except KeyError, _:
+            except KeyError:
                 # this sweep has no experiment.  return the index range of the entire sweep.
                 experiment_index_range = sweep_index_range
             
@@ -278,11 +278,11 @@ class NwbDataSet(object):
             try:
                 stim_details = f['stimulus']['presentation']['Sweep_%d' % sweep_number]
                 for field in metadata_fields:
-                	# check if sweep contains the specific metadata field
-                	if field in stim_details.keys():
-                		sweep_metadata[field] = stim_details[field].value
+                    # check if sweep contains the specific metadata field
+                    if field in stim_details.keys():
+                        sweep_metadata[field] = stim_details[field].value
 
-            except KeyError, _:
+            except KeyError:
                 sweep_metadata = {}
-            
+
             return sweep_metadata

@@ -53,7 +53,7 @@ def testManifestBuilderDataFrame(builder):
     assert('type' in builder_df.keys())
     assert('spec' in builder_df.keys())
     assert('parent_key' in builder_df.keys())
-    assert('format' in builder_df.keys())        
+    assert('format' in builder_df.keys())
     assert(5 == len(builder_df.keys()))
 
 
