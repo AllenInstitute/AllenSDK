@@ -294,29 +294,3 @@ def estimate_contamination_ratios(F_M, F_N,
         }
 
 
-def adjust_r_for_negativity(r, F_C, F_M, F_N):
-    # loop through all of the negative spots and pick r to fix them
-    neg_is = np.argwhere(F_C < 0)
-    if neg_is.size > 0:
-        logging.debug("Correcting for negative trace, starting with r = %f", r)
-
-        for i in neg_is:
-            if F_C[i] >= 0:
-                continue
-            # r_new = (F_C[i] + r_old * F_N[i]) / F_N[i]
-            r = F_M[i] / F_N[i]
-            F_C = F_M - r * F_N
-            logging.debug("  updated r to %f", r)
-
-
-        # if there is still a negative spot, it's off by some tiny epsilon.
-        # step r down by delta_r increments until we find one that works.
-        delta_r = -1e-5
-        while F_C.min() < 0 and r >= 0.0:
-            r += delta_r
-            F_C = F_M - r * F_N
-            logging.debug("  stepped r to %f", r)
-
-        logging.debug("  finished with r = %f", r)
-
-    return r
