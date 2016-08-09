@@ -48,6 +48,6 @@ RUN mkdir allensdk; \
     $VENV/bin/pip install .; \
     $VENV/bin/pip install -r test_requirements.txt; \
     $VENV/bin/pip install jupyter; \
-    jupyter-notebook --generate-config
+    $VENV/bin/jupyter-notebook --generate-config
 
 RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv

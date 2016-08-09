@@ -2,8 +2,15 @@ import pytest
 from mock import Mock, MagicMock
 from allensdk.api.api import Api
 import allensdk.core.json_utilities as ju
-import urllib2
 import socket
+try:
+    import urllib.request as urllib_request
+except:
+    import urllib2 as urllib_request
+try:
+    import urllib.error as urllib_error
+except:
+    import urllib2 as urllib_error
 
 
 @pytest.fixture
@@ -19,13 +26,13 @@ def api():
 
 @pytest.fixture
 def failed_download_api():
-    error404 = urllib2.HTTPError(code=404,
-                                 msg='not found',
-                                 hdrs=Mock(),
-                                 fp=Mock(),
-                                 url='')
+    error404 = urllib_error.HTTPError(code=404,
+                                      msg='not found',
+                                      hdrs=Mock(),
+                                      fp=Mock(),
+                                      url='')
     
-    urllib2.urlopen = Mock(side_effect=error404)
+    urllib_request.urlopen = Mock(side_effect=error404)
     
     api = Api()
     api._log.error = Mock()
@@ -38,7 +45,7 @@ def failed_download_api():
 def timeout_download_api():
     error_timeout = socket.timeout
      
-    urllib2.urlopen = Mock(side_effect=error_timeout)
+    urllib_request.urlopen = Mock(side_effect=error_timeout)
      
     api = Api()
     api._log.error = Mock()
@@ -59,7 +66,7 @@ def test_timeout_download(timeout_download_api):
 
 
 def test_failed_download(failed_download_api):
-    with pytest.raises(urllib2.HTTPError) as e_info:
+    with pytest.raises(urllib_error.HTTPError) as e_info:
         failed_download_api.retrieve_file_over_http('http://example.com/yo.jpg',
                                                     '/tmp/testfile')
      

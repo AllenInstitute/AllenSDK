@@ -70,10 +70,15 @@ CACHE_MANIFEST = """
 def brain_observatory_cache():
     boc = None
     
+    try:
+        manifest_data = bytes(CACHE_MANIFEST, 'UTF-8')  # Python 3
+    except:
+        manifest_data = bytes(CACHE_MANIFEST) # Python 2.7
+    
     with patch('os.path.exists',
                return_value=True):
         with patch(builtins.__name__ + ".open",
-                   mock_open(read_data=CACHE_MANIFEST)):
+                   mock_open(read_data=manifest_data)):
             # Download a list of all targeted areas
             boc = BrainObservatoryCache(manifest_file='boc/manifest.json',
                                         base_uri='http://testwarehouse:9000')
@@ -89,8 +94,7 @@ def test_get_all_targeted_structures(brain_observatory_cache):
         
         with patch('allensdk.core.json_utilities.write',
                    MagicMock(name='write_json')):
-            targeted_structures = \
-                brain_observatory_cache.get_all_targeted_structures()
+            brain_observatory_cache.get_all_targeted_structures()
         
         brain_observatory_cache.api.json_msg_query.assert_called_once_with(
             "http://testwarehouse:9000/api/v2/data/query.json?q="
@@ -200,15 +204,20 @@ def test_get_cell_specimens(brain_observatory_cache):
 
 
 def test_build_manifest():
+    try:
+        manifest_data = bytes(CACHE_MANIFEST, 'UTF-8')  # Python 3
+    except:
+        manifest_data = bytes(CACHE_MANIFEST) # Python 2.7
+
     with patch('os.path.exists') as m:
         m.return_value = False
-        
+
         with patch('allensdk.config.manifest.Manifest.safe_mkdir') as mkdir:
             with patch('allensdk.config.manifest_builder.'
                        'ManifestBuilder.write_json_file',
                        MagicMock(name='write_json_file')) as mock_write_json:
                 with patch(builtins.__name__ + ".open",
-                           mock_open(read_data=CACHE_MANIFEST)):
+                           mock_open(read_data=manifest_data)):
                     brain_observatory_cache = BrainObservatoryCache(
                         manifest_file='boc/manifest.json',
                         base_uri='http://testwarehouse:9000')
