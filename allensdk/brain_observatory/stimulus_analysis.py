@@ -126,7 +126,8 @@ class StimulusAnalysis(object):
             offset = findlevel(dx_sorted,1,'up')
 
             if offset is None:
-                raise BrainObservatoryAnalysisException("Could not find crossing in dx")
+                logging.info("dx never crosses 1, all speed data going into single bin")
+                offset = len(dx_sorted)
 
             if i==0:
                 binned_dx_sp[i,0] = np.mean(dx_sorted[:offset])
@@ -146,6 +147,11 @@ class StimulusAnalysis(object):
             celltraces_shuffled_sorted = celltraces_shuffled[:, np.argsort(dx_sp)]
             for i in range(nbins):
                 offset = findlevel(dx_sorted,1,'up')        
+
+                if offset is None:
+                    logging.info("dx never crosses 1, all speed data going into single bin")
+                    offset = celltraces_shuffled_sorted.shape[1]
+                
                 if i==0:          
                     binned_cells_shuffled_sp[:,i,0,shuf] = np.mean(celltraces_shuffled_sorted[:,:offset], axis=1)
                     binned_cells_shuffled_sp[:,i,1,shuf] = np.std(celltraces_shuffled_sorted[:,:offset], axis=1)
