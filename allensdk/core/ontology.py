@@ -185,7 +185,6 @@ class Ontology( object ):
         child_ids = self.get_child_ids(structure_ids)
         return self[child_ids]
 
-
     def structure_descends_from(self, child_id, parent_id):
         """
         Return whether one structure id is a descendant of another structure id.

@@ -35,13 +35,16 @@ pypi_deploy:
 	python setup.py sdist upload --repository https://testpypi.python.org/pypi
 
 pytest:
-	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --pep8 --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
+	find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --pep8 --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 pytest_lax:
-	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
+	find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
+
+pytest_heavy:
+	find -L . -name "test_*.py" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 pytest_lite:
-	rm -rf test-reports && mkdir test-reports && find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --assert=reinterp --junitxml=test-reports/test.xml {} \+
+	find -L . -name "test_*.py" ! -path "*glif*" -exec py.test --boxed --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 EXAMPLES=doc/_static/examples
 
