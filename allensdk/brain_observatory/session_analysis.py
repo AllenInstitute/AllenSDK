@@ -208,7 +208,7 @@ class SessionAnalysis(object):
             cp.plot_lsn_traces(lsn, self.save_dir)
     
                     
-def run_session_analysis(nwb_path, save_path, plot_flag=False):
+def run_session_analysis(nwb_path, save_path, plot_flag=False, save_flag=True):
     save_dir = os.path.abspath(os.path.dirname(save_path))
 
     if not os.path.exists(save_dir):
@@ -219,13 +219,13 @@ def run_session_analysis(nwb_path, save_path, plot_flag=False):
     session = session_analysis.nwb.get_session_type()
 
     if session == stimulus_info.THREE_SESSION_A:
-        session_analysis.session_a(plot_flag)
+        session_analysis.session_a(plot_flag=plot_flag, save_flag=save_flag)
         metrics = session_analysis.metrics_a
     elif session == stimulus_info.THREE_SESSION_B:
-        session_analysis.session_b(plot_flag)
+        session_analysis.session_b(plot_flag=plot_flag, save_flag=save_flag)
         metrics = session_analysis.metrics_b
     elif session == stimulus_info.THREE_SESSION_C:
-        session_analysis.session_c(plot_flag)
+        session_analysis.session_c(plot_flag=plot_flag, save_flag=save_flag)
         metrics = session_analysis.metrics_c
     else:
         raise IndexError("Unknown session: %s" % session)
