@@ -330,7 +330,7 @@ class ApplicationConfig(object):
             cfg_string = self.from_json_file(config_file_path)
             try:
                 config.readfp(io.BytesIO(cfg_string))
-            except NameError:
+            except (NameError, TypeError):
                 config.read_string(cfg_string)  # Python 3
         else:
             config.read(config_file_path)
