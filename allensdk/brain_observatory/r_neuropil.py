@@ -179,11 +179,44 @@ class NeuropilSubtract(object):
         self.F_N = []
 
         for fi in range(self.folds):
-            F_M_i_s, F_N_i_s = normalize_F(F_M[fi*self.T_f:(fi+1)*self.T_f], 
-                                           F_N[fi*self.T_f:(fi+1)*self.T_f])
-            
-            self.F_M.append(F_M_i_s)
-            self.F_N.append(F_N_i_s)    
+            #F_M_i_s, F_N_i_s = normalize_F(F_M[fi*self.T_f:(fi+1)*self.T_f], 
+            #                               F_N[fi*self.T_f:(fi+1)*self.T_f])
+            self.F_M.append(F_M[fi*self.T_f:(fi+1)*self.T_f])
+            self.F_N.append(F_N[fi*self.T_f:(fi+1)*self.T_f])
+
+    def fit_block_coordinate_desc(self, r_init=5.0, min_delta_r=0.00000001):
+        F_M = np.concatenate(self.F_M)
+        F_N = np.concatenate(self.F_N)
+        
+        r_vals = []
+        error_vals = []
+        r = r_init
+
+        delta_r = None
+        it = 0
+
+        ab = ab_from_T(self.T, self.lam, self.dt)
+        while delta_r is None or delta_r > min_delta_r:
+            F_C = solve_banded((1,1), ab, F_M - r*F_N)
+            new_r = - np.sum((F_C - F_M) * F_N) / np.sum(np.square(F_N))
+            error = self.estimate_error(new_r)
+
+            error_vals.append(error)
+            r_vals.append(new_r)
+
+            if r is not None:
+                delta_r = np.abs(r-new_r)/r
+
+            print it, r, delta_r, new_r - r
+                
+            r = new_r
+            it += 1
+
+        self.r_vals = r_vals
+        self.error_vals = error_vals
+        self.r = r_vals[-1]
+        self.error = error_vals.min()
+
 
     def fit(self, r_range=[0.0, 2.0], iterations=3, dr=0.1, dr_factor=0.1):
         """ Estimate error values for a range of r values.  Identify a new r range
@@ -279,6 +312,8 @@ def estimate_contamination_ratios(F_M, F_N,
            iterations=iterations, 
            dr=dr,
            dr_factor=dr_factor)
+
+    #ns.fit_block_coordinate_desc() 
 
     if ns.r < 0:
         logging.warning("r is negative (%f). return 0.0.", ns.r)

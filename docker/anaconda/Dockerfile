@@ -15,7 +15,10 @@ RUN wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/v7.4.rel-1370/nrn-7
     dpkg -i nrn-7.4.rel-1370.x86_64.deb 
 
 # TODO: replace w/ install from Github
-RUN apt-get install -yq unzip
+RUN apt-get install -yq \
+    unzip \
+    make
+
 RUN mkdir allensdk; \
     cd allensdk; \
     wget -O allensdk.zip http://stash.corp.alleninstitute.org/plugins/servlet/archive/projects/INF/repos/allensdk?at=refs%2Fheads%2Fdev; \
