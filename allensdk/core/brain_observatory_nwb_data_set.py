@@ -27,7 +27,6 @@ import re
 class MissingStimulusException(Exception): pass
 
 class BrainObservatoryNwbDataSet(object):
-    MOVIE_FOV_PX = (512, 512)
     PIPELINE_DATASET = 'brain_observatory_pipeline'
     
     FILE_METADATA_MAPPING = { 
@@ -54,6 +53,16 @@ class BrainObservatoryNwbDataSet(object):
     
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
+
+    def get_movie_dimensions(self):
+        ''' Returns the dimensions of the 2-photon movie in pixels.
+        
+        Parameters
+        ----------
+        dimensions: tuple (rows, columns)
+        '''
+        pass
+    
 
     def get_fluorescence_traces(self, cell_specimen_ids=None):
         ''' Returns an array of fluorescence traces for all ROI and 
@@ -455,8 +464,9 @@ class BrainObservatoryNwbDataSet(object):
             roi_array = []
             for i in inds:
                 v = roi_list[i]
-                m = roi.create_roi_mask(self.MOVIE_FOV_PX[0], self.MOVIE_FOV_PX[1], 
-                                        [0,0,0,0], pix_list=mask_loc[v]["pix_mask"].value, label=v)
+                roi_mask = mask_loc[v]["img_mask"].value
+                m = roi.create_roi_mask(roi_mask.shape[1], roi_mask.shape[0], 
+                                        [0,0,0,0], roi_mask=roi_mask, label=v)
                 roi_array.append(m)
 
         return roi_array
