@@ -68,7 +68,8 @@ class Cache(object):
 
                 # make the directory if it doesn't exist already
                 dirname = os.path.dirname(file_name)
-                Manifest.safe_mkdir(dirname)
+                if dirname:
+                    Manifest.safe_mkdir(dirname)
 
                 self.build_manifest(file_name)
 
