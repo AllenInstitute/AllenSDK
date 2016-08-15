@@ -206,8 +206,6 @@ class NeuropilSubtract(object):
 
             if r is not None:
                 delta_r = np.abs(r-new_r)/r
-
-            print(it, r, delta_r, new_r - r)
                 
             r = new_r
             it += 1
