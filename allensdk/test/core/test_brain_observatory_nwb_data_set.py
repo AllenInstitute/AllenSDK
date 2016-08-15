@@ -105,12 +105,12 @@ def test_get_roi_mask(data_set):
     roi_masks = data_set.get_roi_mask()
     assert len(ids) == len(roi_masks)
 
+    max_projection = data_set.get_max_projection()
     for roi_mask in roi_masks:
-        m = roi_mask.get_mask_plane()
-        assert m.shape[0] == data_set.MOVIE_FOV_PX[0]
-        assert m.shape[1] == data_set.MOVIE_FOV_PX[1]
+        mask = roi_mask.get_mask_plane()
+        assert mask.shape[0] == max_projection.shape[0]
+        assert mask.shape[1] == max_projection.shape[1]
 
-    
     roi_masks = data_set.get_roi_mask([ids[0]])
     assert len(roi_masks) == 1
 
