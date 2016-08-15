@@ -1,19 +1,19 @@
 import logging
-
 import numpy as np
 import json 
 import allensdk.core.json_utilities as ju
 import copy
+from allensdk.model.glif.glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
 
-from glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
 
 class GlifBadResetException( Exception ):
     """ Exception raised when voltage is still above threshold after a reset rule is applied. """
     def __init__(self, message, dv):
         super(Exception, self).__init__(message)
         self.dv = dv
-            
-class GlifNeuron( object ):    
+
+
+class GlifNeuron( object ):
     """ Implements the current-based Mihalas Neiber GLIF neuron.  Simulations model the voltage, 
     threshold, and afterspike currents of a neuron given an input stimulus.  A set of modular dynamics
     rules are applied until voltage crosses threshold, at which point a set of modular reset rules are 
