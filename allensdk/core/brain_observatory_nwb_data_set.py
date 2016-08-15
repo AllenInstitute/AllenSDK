@@ -54,16 +54,6 @@ class BrainObservatoryNwbDataSet(object):
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
 
-    def get_movie_dimensions(self):
-        ''' Returns the dimensions of the 2-photon movie in pixels.
-        
-        Parameters
-        ----------
-        dimensions: tuple (rows, columns)
-        '''
-        pass
-    
-
     def get_fluorescence_traces(self, cell_specimen_ids=None):
         ''' Returns an array of fluorescence traces for all ROI and 
         the timestamps for each datapoint
@@ -270,9 +260,9 @@ class BrainObservatoryNwbDataSet(object):
     def get_stimulus_table(self, stimulus_name):
         ''' Return a stimulus table given a stimulus name '''
         if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
-            return self.get_abstract_feature_series_stimulus_table(stimulus_name + "_stimulus")
+            return _get_abstract_feature_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
         elif stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
-            return self.get_indexed_time_series_stimulus_table(stimulus_name + "_stimulus")
+            return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
         elif stimulus_name == 'spontaneous':
             return self.get_spontaneous_activity_stimulus_table()
         else:
@@ -299,51 +289,6 @@ class BrainObservatoryNwbDataSet(object):
         stim_data = np.column_stack([frame_dur[start_inds,0].T, frame_dur[stop_inds,0].T]).astype(int)
 
         stimulus_table = pd.DataFrame(stim_data, columns=['start','end'])
-
-        return stimulus_table
-
-    def get_indexed_time_series_stimulus_table(self, stimulus_name):
-        ''' Return the a stimulus table for an indexed time series.
-
-        Returns
-        -------
-        stimulus table: pd.DataFrame
-        '''
-        
-        k = "stimulus/presentation/%s" % stimulus_name
-
-        with h5py.File(self.nwb_file, 'r') as f: 
-            if k not in f:
-                raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)    
-            inds = f[k + '/data'].value
-            frame_dur = f[k + '/frame_duration'].value
-
-        stimulus_table = pd.DataFrame(inds, columns=['frame'])
-        stimulus_table.loc[:,'start'] = frame_dur[:,0].astype(int)
-        stimulus_table.loc[:,'end'] = frame_dur[:,1].astype(int)
-
-        return stimulus_table
-
-    def get_abstract_feature_series_stimulus_table(self, stimulus_name):
-        ''' Return the a stimulus table for an abstract feature series.
-
-        Returns
-        -------
-        stimulus table: pd.DataFrame
-        '''
-
-        k = "stimulus/presentation/%s" % stimulus_name
-
-        with h5py.File(self.nwb_file, 'r') as f:
-            if k not in f:
-                raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
-            stim_data = f[k + '/data'].value
-            features = f[k + '/features'].value
-            frame_dur = f[k + '/frame_duration'].value
-
-        stimulus_table = pd.DataFrame(stim_data, columns=features)
-        stimulus_table.loc[:,'start'] = frame_dur[:,0].astype(int)
-        stimulus_table.loc[:,'end'] = frame_dur[:,1].astype(int)
 
         return stimulus_table
 
@@ -723,6 +668,49 @@ def mask_stimulus_template(template_display_coords, template_shape, display_mask
     
     return mask, frac
 
-                      
-
     
+def _get_abstract_feature_series_stimulus_table(nwb_file, stimulus_name):
+    ''' Return the a stimulus table for an abstract feature series.
+
+    Returns
+    -------
+    stimulus table: pd.DataFrame
+    '''
+
+    k = "stimulus/presentation/%s" % stimulus_name
+
+    with h5py.File(nwb_file, 'r') as f:
+        if k not in f:
+            raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)
+        stim_data = f[k + '/data'].value
+        features = f[k + '/features'].value
+        frame_dur = f[k + '/frame_duration'].value
+
+    stimulus_table = pd.DataFrame(stim_data, columns=features)
+    stimulus_table.loc[:,'start'] = frame_dur[:,0].astype(int)
+    stimulus_table.loc[:,'end'] = frame_dur[:,1].astype(int)
+
+    return stimulus_table
+
+
+def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
+    ''' Return the a stimulus table for an indexed time series.
+
+    Returns
+    -------
+    stimulus table: pd.DataFrame
+    '''
+
+    k = "stimulus/presentation/%s" % stimulus_name
+
+    with h5py.File(nwb_file, 'r') as f: 
+        if k not in f:
+            raise MissingStimulusException("Stimulus not found: %s" % stimulus_name)    
+        inds = f[k + '/data'].value
+        frame_dur = f[k + '/frame_duration'].value
+
+    stimulus_table = pd.DataFrame(inds, columns=['frame'])
+    stimulus_table.loc[:,'start'] = frame_dur[:,0].astype(int)
+    stimulus_table.loc[:,'end'] = frame_dur[:,1].astype(int)
+
+    return stimulus_table
