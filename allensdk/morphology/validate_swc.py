@@ -1,4 +1,4 @@
-import os, argparse
+import argparse
 import allensdk.core.swc as swc
     
 def validate_swc(swc_file):
@@ -51,6 +51,6 @@ def main():
         args = parser.parse_args()
         validate_swc(args.swc_file)
     except Exception as e:
-        print str(e)
+        print(str(e))
         exit(1)
 if __name__ == "__main__": main()
