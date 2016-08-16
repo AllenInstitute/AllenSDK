@@ -18,6 +18,7 @@ from allensdk.config.manifest import Manifest
 import pandas as pd
 import os
 
+
 class CellTypesApi(RmaApi):
     NWB_FILE_TYPE = 'NWBDownload'
     SWC_FILE_TYPE = '3DNeuronReconstruction'
@@ -25,7 +26,6 @@ class CellTypesApi(RmaApi):
 
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
-
 
     def list_cells(self, require_morphology=False, require_reconstruction=False, reporter_status=None):
         """ 
@@ -49,22 +49,23 @@ class CellTypesApi(RmaApi):
         """
 
         criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
-        
-        include = ( 'structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
-                    'ephys_features,data_sets,neuron_reconstructions,cell_reporter' )
 
-        cells = self.model_query('Specimen', criteria=criteria, include=include, num_rows='all')
-        
+        include = ('structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
+                   'ephys_features,data_sets,neuron_reconstructions,cell_reporter')
+
+        cells = self.model_query(
+            'Specimen', criteria=criteria, include=include, num_rows='all')
+
         for cell in cells:
             # specimen tags
             for tag in cell['specimen_tags']:
                 tag_name, tag_value = tag['name'].split(' - ')
-                tag_name = tag_name.replace(' ','_')
+                tag_name = tag_name.replace(' ', '_')
                 cell[tag_name] = tag_value
 
-
             # morphology and reconstuction
-            cell['has_reconstruction'] = len(cell['neuron_reconstructions']) > 0
+            cell['has_reconstruction'] = len(
+                cell['neuron_reconstructions']) > 0
             cell['has_morphology'] = len(cell['data_sets']) > 0
 
             # transgenic line
@@ -76,9 +77,7 @@ class CellTypesApi(RmaApi):
             # cell reporter status
             cell['reporter_status'] = cell['cell_reporter']['name']
 
-
         return self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
-
 
     def get_ephys_sweeps(self, specimen_id):
         """
@@ -95,9 +94,9 @@ class CellTypesApi(RmaApi):
         list: List of sweep dictionaries belonging to a cell
         """
         criteria = "[specimen_id$eq%d]" % specimen_id
-        sweeps = self.model_query('EphysSweep', criteria=criteria, num_rows='all')
+        sweeps = self.model_query(
+            'EphysSweep', criteria=criteria, num_rows='all')
         return sorted(sweeps, key=lambda x: x['sweep_number'])
-
 
     def filter_cells(self, cells, require_morphology, require_reconstruction, reporter_status):
         """ 
@@ -121,16 +120,16 @@ class CellTypesApi(RmaApi):
         """
 
         if require_morphology:
-            cells = [ c for c in cells if c['has_morphology'] ]
+            cells = [c for c in cells if c['has_morphology']]
 
         if require_reconstruction:
-            cells = [ c for c in cells if c['has_reconstruction'] ]
+            cells = [c for c in cells if c['has_reconstruction']]
 
         if reporter_status:
-            cells = [ c for c in cells if c['reporter_status'] in reporter_status]
+            cells = [c for c in cells if c[
+                'reporter_status'] in reporter_status]
 
         return cells
-        
 
     def get_ephys_features(self, dataframe=False):
         """
@@ -138,33 +137,34 @@ class CellTypesApi(RmaApi):
 
         Parameters
         ----------
-        
+
         dataframe: boolean
             If true, return the results as a Pandas DataFrame.  Otherwise
             return a list of dictionaries.
         """
 
-        features = self.model_query('EphysFeature', criteria='specimen', num_rows='all')
+        features = self.model_query(
+            'EphysFeature', criteria='specimen', num_rows='all')
 
         if dataframe:
             return pd.DataFrame(features)
         else:
             return features
 
-
     def get_morphology_features(self, dataframe=False):
         """
         Query the API for the full table of morphology features for all cells
-        
+
         Parameters
         ----------
-        
+
         dataframe: boolean
             If true, return the results as a Pandas DataFrame.  Otherwise
             return a list of dictionaries.
         """
 
-        features = self.model_query('NeuronReconstruction', criteria="specimen", num_rows='all')
+        features = self.model_query(
+            'NeuronReconstruction', criteria="specimen", num_rows='all')
 
         # the tags column isn't useful
         for f in features:
@@ -174,7 +174,6 @@ class CellTypesApi(RmaApi):
             return pd.DataFrame(features)
         else:
             return features
-
 
     def save_ephys_data(self, specimen_id, file_name):
         """
@@ -192,7 +191,8 @@ class CellTypesApi(RmaApi):
         dirname = os.path.dirname(file_name)
         Manifest.safe_mkdir(dirname)
 
-        criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eq%s]))' % (specimen_id, self.NWB_FILE_TYPE)
+        criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eq%s]))' % (
+            specimen_id, self.NWB_FILE_TYPE)
         includes = 'ephys_result(well_known_files(well_known_file_type))'
 
         results = self.model_query('Specimen',
@@ -201,12 +201,12 @@ class CellTypesApi(RmaApi):
                                    num_rows='all')
 
         try:
-            file_url = results[0]['ephys_result']['well_known_files'][0]['download_link']
+            file_url = results[0]['ephys_result'][
+                'well_known_files'][0]['download_link']
         except Exception as _:
             raise Exception("Specimen %d has no ephys data" % specimen_id)
 
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
-        
 
     def save_reconstruction(self, specimen_id, file_name):
         """
@@ -221,26 +221,26 @@ class CellTypesApi(RmaApi):
             Path to save the SWC file.  
         """
 
-        try: 
+        try:
             os.makedirs(os.path.dirname(file_name))
         except:
             pass
 
         criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
         includes = 'neuron_reconstructions(well_known_files(well_known_file_type[name$eq\'%s\']))' % self.SWC_FILE_TYPE
-        
+
         results = self.model_query('Specimen',
                                    criteria=criteria,
                                    include=includes,
                                    num_rows='all')
-        
+
         try:
-            file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
+            file_url = results[0]['neuron_reconstructions'][
+                0]['well_known_files'][0]['download_link']
         except:
             raise Exception("Specimen %d has no reconstruction" % specimen_id)
-        
-        self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
+        self.retrieve_file_over_http(self.api_url + file_url, file_name)
 
     def save_reconstruction_markers(self, specimen_id, file_name):
         """
@@ -257,27 +257,23 @@ class CellTypesApi(RmaApi):
             Path to save the marker file.
         """
 
-        try: 
+        try:
             os.makedirs(os.path.dirname(file_name))
         except:
             pass
 
         criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
         includes = 'neuron_reconstructions(well_known_files(well_known_file_type[name$eq\'%s\']))' % self.MARKER_FILE_TYPE
-        
+
         results = self.model_query('Specimen',
                                    criteria=criteria,
                                    include=includes,
                                    num_rows='all')
 
         try:
-            file_url = results[0]['neuron_reconstructions'][0]['well_known_files'][0]['download_link']
+            file_url = results[0]['neuron_reconstructions'][
+                0]['well_known_files'][0]['download_link']
         except:
             raise LookupError("Specimen %d has no marker file" % specimen_id)
-        
+
         self.retrieve_file_over_http(self.api_url + file_url, file_name)
-
-
-
-        
-

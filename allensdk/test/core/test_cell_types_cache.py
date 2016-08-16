@@ -10,7 +10,7 @@ from pandas.core.frame import DataFrame
 @pytest.fixture
 def cell_id():
     cell_id = 480114344
-    
+
     return cell_id
 
 
@@ -37,12 +37,12 @@ def test_sweep_data(cache_fixture):
     sweep_data = data_set.get_sweep(sweep_number)
 
     index_range = sweep_data["index_range"]
-    i = sweep_data["stimulus"][0:index_range[1]+1] # in A
-    v = sweep_data["response"][0:index_range[1]+1] # in V
-    i *= 1e12 # to pA
-    v *= 1e3 # to mV
+    i = sweep_data["stimulus"][0:index_range[1] + 1]  # in A
+    v = sweep_data["response"][0:index_range[1] + 1]  # in V
+    i *= 1e12  # to pA
+    v *= 1e3  # to mV
 
-    sampling_rate = sweep_data["sampling_rate"] # in Hz
+    sampling_rate = sweep_data["sampling_rate"]  # in Hz
 
     assert sampling_rate == 200000.0
     assert len(sweep_data['stimulus']) == sweep_data['index_range'][1] + 1
@@ -52,7 +52,7 @@ def test_sweep_data(cache_fixture):
 def test_get_cells_require_morphology(cache_fixture):
     ctc, _ = cache_fixture
     # this downloads metadata for all cells with morphology images
-    cells = ctc.get_cells(require_morphology = True)
+    cells = ctc.get_cells(require_morphology=True)
     assert len(cells) > 0
     print("Cells with morphology images: ", len(cells))
 
@@ -60,7 +60,7 @@ def test_get_cells_require_morphology(cache_fixture):
 def test_get_cells_require_reconstruction(cache_fixture):
     ctc, _ = cache_fixture
     # cells with reconstructions
-    cells = ctc.get_cells(require_reconstruction = True)
+    cells = ctc.get_cells(require_reconstruction=True)
     assert len(cells) > 0
     print("Cells with reconstructions: ", len(cells))
 
@@ -68,7 +68,7 @@ def test_get_cells_require_reconstruction(cache_fixture):
 def test_get_cells_reporter_positive(cache_fixture):
     ctc, _ = cache_fixture
     # all cre positive cells
-    cells = ctc.get_cells(reporter_status = RS.POSITIVE)
+    cells = ctc.get_cells(reporter_status=RS.POSITIVE)
     print("Cre-positive cells: ", len(cells))
     assert len(cells) > 0
 
@@ -77,8 +77,8 @@ def test_get_cells_reporter_negative(cache_fixture):
     ctc, _ = cache_fixture
 
     # cre negative cells with reconstructions
-    cells = ctc.get_cells(require_reconstruction = True,
-                          reporter_status = RS.NEGATIVE)
+    cells = ctc.get_cells(require_reconstruction=True,
+                          reporter_status=RS.NEGATIVE)
     print("Cre-negative cells with reconstructions: ", len(cells))
     assert len(cells) > 0
 
@@ -120,11 +120,11 @@ def test_get_reconstruction_markers(cache_fixture,
     assert len(markers) == 21
 
     # cut dendrite markers
-    dm = [ m for m in markers if m['name'] == Marker.CUT_DENDRITE ]
+    dm = [m for m in markers if m['name'] == Marker.CUT_DENDRITE]
     assert len(dm) > 0
-    
+
     # no reconstruction markers
-    nm = [ m for m in markers if m['name'] == Marker.NO_RECONSTRUCTION ]
+    nm = [m for m in markers if m['name'] == Marker.NO_RECONSTRUCTION]
     assert len(nm) > 0
 
 
@@ -136,18 +136,20 @@ def test_cell_types_cache_3(cache_fixture):
 
     # filter down to a specific cell
     specimen_id = 464212183
-    cell_ephys_features = [f for f in ephys_features if f['specimen_id'] == specimen_id]
+    cell_ephys_features = [f for f in ephys_features if f[
+        'specimen_id'] == specimen_id]
 
-    updown = np.array([f['upstroke_downstroke_ratio_long_square'] for f in ephys_features], dtype=float)
-    fasttrough = np.array([f['fast_trough_v_long_square'] for f in ephys_features], dtype=float)
+    updown = np.array([f['upstroke_downstroke_ratio_long_square']
+                       for f in ephys_features], dtype=float)
+    fasttrough = np.array([f['fast_trough_v_long_square']
+                           for f in ephys_features], dtype=float)
 
     A = np.vstack([fasttrough, np.ones_like(updown)]).T
     print("First 5 rows of A:")
     print(A[:5, :])
-    
+
     m, c = np.linalg.lstsq(A, updown)[0]
     print("m", m, "c", c)
-    
 
 
 def test_get_ephys_features(cache_fixture):
@@ -155,20 +157,22 @@ def test_get_ephys_features(cache_fixture):
 
     ephys_features = ctc.get_ephys_features()
     cells = ctc.get_cells()
-    
-    cell_index = { c['id']: c for c in cells}
-    
+
+    cell_index = {c['id']: c for c in cells}
+
     dendrite_types = ['spiny', 'aspiny']
     data = {}
-    
-    # group fast trough depth and upstroke downstroke ratio values by cell dendrite type
+
+    # group fast trough depth and upstroke downstroke ratio values by cell
+    # dendrite type
     for dendrite_type in dendrite_types:
-        type_features = [f for f in ephys_features if cell_index[f['specimen_id']]['dendrite_type'] == dendrite_type]
+        type_features = [f for f in ephys_features if cell_index[
+            f['specimen_id']]['dendrite_type'] == dendrite_type]
         data[dendrite_type] = {
             "fasttrough": [f['fast_trough_v_long_square'] for f in type_features],
             "updown": [f['upstroke_downstroke_ratio_short_square'] for f in type_features],
         }
-    
+
     assert len(data['spiny']['fasttrough']) > 0
     assert len(data['aspiny']['fasttrough']) > 0
     assert len(data['spiny']['updown']) > 0
@@ -178,7 +182,7 @@ def test_get_ephys_features(cache_fixture):
 def test_cell_types_cache_get_morphology_features(cache_fixture):
     ctc, _ = cache_fixture
     morphology_features = ctc.get_morphology_features()
-    
+
     assert morphology_features != None
 
 
@@ -186,14 +190,15 @@ def test_cell_types_cache_get_morphology_features(cache_fixture):
 def test_cell_types_cache_get_ephys_sweeps(cache_fixture):
     ctc, _ = cache_fixture
     ephys_sweeps = ctc.get_ephys_sweeps(464212183)
-    
+
     assert ephys_sweeps != None
 
 
 def test_cell_types_all_features_non_dataframe(cache_fixture):
     ctc, _ = cache_fixture
-    all_features = ctc.get_all_features(dataframe=False, require_reconstruction=True)
-    
+    all_features = ctc.get_all_features(
+        dataframe=False, require_reconstruction=True)
+
     assert all_features != None
 
 
@@ -202,7 +207,8 @@ def test_cell_types_cache_feature_extractor(cache_fixture):
 
     # or download both morphology and ephys features
     # this time we'll ask the cache to return a pandas dataframe
-    all_features = ctc.get_all_features(dataframe=True, require_reconstruction=True)
+    all_features = ctc.get_all_features(
+        dataframe=True, require_reconstruction=True)
 
     assert isinstance(all_features, DataFrame)
 
@@ -212,28 +218,28 @@ def test_cell_types_get_sweep(cache_fixture):
 
     sweep_number = 35
     sweep_data = data_set.get_sweep(sweep_number)
-    
+
     index_range = sweep_data["index_range"]
-    i = sweep_data["stimulus"][0:index_range[1]+1] # in A
-    v = sweep_data["response"][0:index_range[1]+1] # in V
-    i *= 1e12 # to pA
-    v *= 1e3 # to mV
-    
-    sampling_rate = sweep_data["sampling_rate"] # in Hz
+    i = sweep_data["stimulus"][0:index_range[1] + 1]  # in A
+    v = sweep_data["response"][0:index_range[1] + 1]  # in V
+    i *= 1e12  # to pA
+    v *= 1e3  # to mV
+
+    sampling_rate = sweep_data["sampling_rate"]  # in Hz
     t = np.arange(0, len(v)) * (1.0 / sampling_rate)
 
     fx = EphysFeatureExtractor()
-    
+
     stim_start = 1.0
     stim_duration = 1.0
-    
+
     fx.process_instance("", v, i, t, stim_start, stim_duration, "")
     feature_data = fx.feature_list[0].mean
     print("Avg spike width: {:.2f} ms".format(feature_data['width']))
     print("Avg spike threshold: {:.1f} mV".format(feature_data["threshold"]))
-    
+
     spike_times = [s["t"] for s in feature_data["spikes"]]
-    
+
     assert len(spike_times) == 54
 
 

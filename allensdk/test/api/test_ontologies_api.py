@@ -8,7 +8,7 @@ from mock import MagicMock
 def ontologies():
     oa = OntologiesApi()
     oa.json_msg_query = MagicMock(name='json_msg_query')
-    
+
     return oa
 
 
@@ -32,7 +32,7 @@ def test_list_structure_graphs(ontologies):
 
 def test_list_structure_sets(ontologies):
     ontologies.get_structure_sets()
-    
+
     ontologies.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::StructureSet,rma::options[num_rows$eq'all'][count$eqfalse]")
@@ -77,7 +77,7 @@ def test_structure_set_by_id(ontologies):
 
 
 def test_structure_sets_by_ids(ontologies):
-    ontologies.get_structures(structure_set_ids=[7,8])
+    ontologies.get_structures(structure_set_ids=[7, 8])
     ontologies.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,[structure_set_id$in7,8],"

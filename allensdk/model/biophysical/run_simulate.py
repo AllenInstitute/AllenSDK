@@ -1,14 +1,19 @@
 import allensdk.model.biophysical.runner as single_cell
-import logging, os, sys, traceback, subprocess, logging.config as lc
+import logging
+import os
+import sys
+import traceback
+import subprocess
+import logging.config as lc
 from allensdk.model.biophys_sim.config import Config
-from pkg_resources import resource_filename #@UnresolvedImport
+from pkg_resources import resource_filename  # @UnresolvedImport
 
 
 class RunSimulate(object):
     _log = logging.getLogger('allensdk.model.biophysical.run_simulate')
-    
+
     def __init__(self,
-                 input_json, 
+                 input_json,
                  output_json):
         self.input_json = input_json
         self.output_json = output_json
@@ -36,7 +41,8 @@ class RunSimulate(object):
             stimulus_path = self.manifest.get_path('stimulus_path')
             RunSimulate._log.info("stimulus path: %s" % (stimulus_path))
         except:
-            raise Exception('Could not read input stimulus path from input config.')
+            raise Exception(
+                'Could not read input stimulus path from input config.')
 
         try:
             out_path = self.manifest.get_path('output_path')
@@ -48,15 +54,18 @@ class RunSimulate(object):
             morphology_path = self.manifest.get_path('MORPHOLOGY')
             RunSimulate._log.info("morphology path: %s" % (morphology_path))
         except:
-            raise Exception('Could not read morphology path from input config.')
+            raise Exception(
+                'Could not read morphology path from input config.')
 
         single_cell.run(self.app_config)
-        
+
         lims_upload_config = BiophysicalModuleReader()
-        lims_upload_config.read_json(self.manifest.get_path('neuronal_model_run_data'))
+        lims_upload_config.read_json(
+            self.manifest.get_path('neuronal_model_run_data'))
         lims_upload_config.update_well_known_file(out_path)
         lims_upload_config.set_workflow_state('passed')
         lims_upload_config.write_file(self.output_json)
+
 
 def main(command, lims_strategy_json, lims_response_json):
     ''' Entry point for module.
@@ -75,7 +84,7 @@ def main(command, lims_strategy_json, lims_response_json):
     RunSimulate._log.debug("lims upload json: %s" % (lims_response_json))
 
     log_config = resource_filename('allensdk.model.biophysical.run_simulate',
-                                    'logging.conf')
+                                   'logging.conf')
     lc.fileConfig(log_config)
     os.environ['LOG_CFG'] = log_config
 
@@ -87,10 +96,10 @@ def main(command, lims_strategy_json, lims_response_json):
 
 if __name__ == '__main__':
     command, input_json, output_json = sys.argv[-3:]
-    
+
     try:
         main(command, input_json, output_json)
         RunSimulate._log.debug("success")
     except Exception as e:
-        RunSimulate._log.error(traceback.format_exc())   
+        RunSimulate._log.error(traceback.format_exc())
         exit(1)

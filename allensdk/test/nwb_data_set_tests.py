@@ -13,12 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, unittest
+import os
+import unittest
 
 from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.core.cell_types_cache import CellTypesCache
 
+
 class NwbDataSetTest(unittest.TestCase):
+
     def __init__(self, *args, **kwargs):
         super(NwbDataSetTest, self).__init__(*args, **kwargs)
 
@@ -26,9 +29,10 @@ class NwbDataSetTest(unittest.TestCase):
 
         manifest_file = '/local1/projects/FHL2015/cell_types/manifest.json'
         if not os.path.exists(manifest_file):
-            print("Cannot run this test: manifest does not exist (%s)" % manifest_file)
+            print("Cannot run this test: manifest does not exist (%s)" %
+                  manifest_file)
             return True
-        
+
         self.cache = CellTypesCache(manifest_file=manifest_file)
         cells = self.cache.get_cells()
 
@@ -41,6 +45,3 @@ class NwbDataSetTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-
-

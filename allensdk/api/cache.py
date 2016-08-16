@@ -21,22 +21,22 @@ import os
 
 
 class Cache(object):
+
     def __init__(self,
                  manifest=None,
                  cache=True):
         self.cache = cache
         self.load_manifest(manifest)
-    
 
     def get_cache_path(self, file_name, manifest_key, *args):
         '''Helper method for accessing path specs from manifest keys.
-        
+
         Parameters
         ----------
         file_name : string
         manifest_key : string
         args : ordered parameters
-    
+
         Returns
         -------
         string or None
@@ -49,16 +49,15 @@ class Cache(object):
                 return self.manifest.get_path(manifest_key, *args)
 
         return None
-        
 
     def load_manifest(self, file_name):
         '''Read a keyed collection of path specifications.
-        
+
         Parameters
         ----------
         file_name : string
             path to the manifest file
-        
+
         Returns
         -------
         Manifest
@@ -73,22 +72,21 @@ class Cache(object):
 
                 self.build_manifest(file_name)
 
-            
-            self.manifest = Manifest(ju.read(file_name)['manifest'], os.path.dirname(file_name))
+            self.manifest = Manifest(
+                ju.read(file_name)['manifest'], os.path.dirname(file_name))
         else:
             self.manifest = None
 
-
     def build_manifest(self, file_name):
         '''Creation of default path speifications.
-        
+
         Parameters
         ----------
         file_name : string
             where to save it
         '''
-        raise Exception("This function must be defined in the appropriate subclass")
-
+        raise Exception(
+            "This function must be defined in the appropriate subclass")
 
     def manifest_dataframe(self):
         '''Convenience method to view manifest as a pandas dataframe.
@@ -100,7 +98,7 @@ class Cache(object):
                        data,
                        new_old_name_tuples=None):
         '''Convenience method to rename columns in a pandas dataframe.
-        
+
         Parameters
         ----------
         data : dataframe
@@ -109,18 +107,17 @@ class Cache(object):
         '''
         if new_old_name_tuples == None:
             new_old_name_tuples = []
-            
+
         for new_name, old_name in new_old_name_tuples:
             data.columns = [new_name if c == old_name else c
-                            for c in data.columns]                    
-    
-    
+                            for c in data.columns]
+
     def load_csv(self,
                  path,
                  rename=None,
                  index=None):
         '''Read a csv file as a pandas dataframe.
-        
+
         Parameters
         ----------
         rename : list of string tuples (new old), optional
@@ -132,18 +129,17 @@ class Cache(object):
 
         self.rename_columns(data, rename)
 
-        if index is not None:        
+        if index is not None:
             data.set_index([index], inplace=True)
 
         return data
-
 
     def load_json(self,
                   path,
                   rename=None,
                   index=None):
         '''Read a json file as a pandas dataframe.
-        
+
         Parameters
         ----------
         rename : list of string tuples (new old), optional
@@ -154,12 +150,11 @@ class Cache(object):
         data = pj.read_json(path, orient='records')
 
         self.rename_columns(data, rename)
-        
-        if index is not None:        
+
+        if index is not None:
             data.set_index([index], inplace=True)
 
         return data
-    
 
     def wrap(self, fn, path, cache,
              save_as_json=True,
@@ -168,7 +163,7 @@ class Cache(object):
              rename=None,
              **kwargs):
         '''make an rma query, save it and return the dataframe.
-        
+
         Parameters
         ----------
         fn : function reference
@@ -187,30 +182,30 @@ class Cache(object):
             (new, old) columns to rename
         kwargs : objects
             passed through to the query function
-        
+
         Returns
         -------
         dict or DataFrame
             data type depends on return_dataframe option.
-        
+
         Notes
         -----
         Column renaming happens after the file is reloaded for json
         '''
         if cache == True:
             json_data = fn(**kwargs)
-            
+
             if save_as_json == True:
                 ju.write(path, json_data)
             else:
                 df = pd.DataFrame(json_data)
                 self.rename_columns(df, rename)
-                
+
                 if index is not None:
                     df.set_index([index], inplace=True)
-        
+
                 df.to_csv(path)
-    
+
         # read it back in
         if save_as_json == True:
             if return_dataframe == True:
@@ -223,6 +218,7 @@ class Cache(object):
         elif return_dataframe == True:
             data = pd.DataFrame.from_csv(path)
         else:
-            raise ValueError('save_as_json=False cannot be used with return_dataframe=False')
-        
+            raise ValueError(
+                'save_as_json=False cannot be used with return_dataframe=False')
+
         return data

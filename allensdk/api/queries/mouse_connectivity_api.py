@@ -16,20 +16,20 @@
 from allensdk.api.queries.rma_api import RmaApi
 from allensdk.api.queries.grid_data_api import GridDataApi
 import numpy as np
-import os, nrrd
+import os
+import nrrd
 
 
 class MouseConnectivityApi(RmaApi):
     '''
     HTTP Client for the Allen Mouse Brain Connectivity Atlas.
-    
+
     See: `Mouse Connectivity API <http://help.brain-map.org/display/mouseconnectivity/API>`_
     '''
     PRODUCT_IDS = [5, 31]
-    
+
     def __init__(self, base_uri=None):
         super(MouseConnectivityApi, self).__init__(base_uri)
-
 
     def download_annotation_volume(self, resolution, file_name):
         '''
@@ -37,7 +37,7 @@ class MouseConnectivityApi(RmaApi):
 
         Parameters
         ----------
-        
+
         resolution: int
             Desired resolution to download in microns.  Must be 10, 25, 50, or 100.
 
@@ -53,11 +53,10 @@ class MouseConnectivityApi(RmaApi):
         self.download_volumetric_data('annotation/ccf_2015',
                                       'annotation_%d.nrrd' % resolution,
                                       save_file_path=file_name)
-        
-        annotation_data, annotation_image = nrrd.read(file_name)
-        
-        return annotation_data, annotation_image
 
+        annotation_data, annotation_image = nrrd.read(file_name)
+
+        return annotation_data, annotation_image
 
     def download_template_volume(self, resolution, file_name):
         '''
@@ -65,7 +64,7 @@ class MouseConnectivityApi(RmaApi):
 
         Parameters
         ----------
-        
+
         resolution: int
             Desired resolution to download in microns.  Must be 10, 25, 50, or 100.
 
@@ -82,21 +81,20 @@ class MouseConnectivityApi(RmaApi):
                                       save_file_path=file_name)
 
         annotation_data, annotation_image = nrrd.read(file_name)
-        
+
         return annotation_data, annotation_image
-    
-    
+
     def get_experiments(self,
                         structure_ids,
                         **kwargs):
         ''' 
         Fetch experiment metadata from the Mouse Brain Connectivity Atlas.
-        
+
         Parameters
         ----------
         structure_ids : integer or list, optional
             injection structure
-        
+
         Returns
         -------
         url : string
@@ -104,29 +102,29 @@ class MouseConnectivityApi(RmaApi):
         '''
         criteria_list = ['[failed$eqfalse]',
                          'products[id$in%s]' % (','.join(str(i) for i in MouseConnectivityApi.PRODUCT_IDS))]
-            
+
         if structure_ids != None:
             if type(structure_ids) is not list:
-                structure_ids = [ structure_ids ]
-            criteria_list.append('[id$in%s]' % ','.join(str(i) for i in structure_ids))
+                structure_ids = [structure_ids]
+            criteria_list.append('[id$in%s]' % ','.join(str(i)
+                                                        for i in structure_ids))
 
         criteria_string = ','.join(criteria_list)
-                
+
         data = self.model_query('SectionDataSet',
                                 criteria=criteria_string,
                                 **kwargs)
         return data
-    
-    
+
     def get_manual_injection_summary(self, experiment_id):
         ''' Retrieve manual injection summary. '''
 
         criteria = '[id$in%d]' % (experiment_id)
-        
+
         include = ['specimen(donor(transgenic_mouse(transgenic_lines)),',
                    'injections(structure,age)),',
                    'equalization,products']
-        
+
         only = ['id',
                 'failed',
                 'storage_directory',
@@ -157,39 +155,37 @@ class MouseConnectivityApi(RmaApi):
                 'transgenic_lines.description',
                 'transgenic_lines.id',
                 'donors.id']
-        
+
         return self.model_query('SectionDataSet',
                                 criteria=criteria,
                                 include=include,
                                 only=only)
-    
-    
+
     def get_experiment_detail(self, experiment_id):
         '''Retrieve the experiments data.'''
 
         criteria = '[id$eq%d]' % (experiment_id)
-        include = [ 'specimen(stereotaxic_injections(primary_injection_structure,structures,stereotaxic_injection_coordinates)),',
-                    'equalization,',
-                    'sub_images' ]
-        order = [ "'sub_images.section_number$asc'" ]
-        
+        include = ['specimen(stereotaxic_injections(primary_injection_structure,structures,stereotaxic_injection_coordinates)),',
+                   'equalization,',
+                   'sub_images']
+        order = ["'sub_images.section_number$asc'"]
+
         return self.model_query('SectionDataSet',
                                 criteria=criteria,
                                 include=include,
                                 order=order)
-    
-    
+
     def get_projection_image_info(self,
                                   experiment_id,
                                   section_number):
         '''Fetch meta-information of one projection image.
-        
+
         Parameters
         ----------
         experiment_id : integer
-        
+
         section_number : integer
-        
+
         Notes
         -----
         See: image examples under 
@@ -199,13 +195,13 @@ class MouseConnectivityApi(RmaApi):
         '''
 
         criteria = '[id$eq%d]' % (experiment_id)
-        include = [ 'equalization,sub_images[section_number$eq%d]' % (section_number) ]
+        include = ['equalization,sub_images[section_number$eq%d]' %
+                   (section_number)]
 
         return self.model_query('SectionDataSet',
                                 criteria=criteria,
                                 include=include)
-    
-    
+
     def build_volumetric_data_download_url(self,
                                            data,
                                            file_name,
@@ -213,7 +209,7 @@ class MouseConnectivityApi(RmaApi):
                                            release=None,
                                            coordinate_framework=None):
         '''Construct url to download 3D reference model in NRRD format.
-        
+
         Parameters
         ----------
         data : string
@@ -222,31 +218,30 @@ class MouseConnectivityApi(RmaApi):
             10, 25, 50 or 100
         coordinate_framework : string
             'mouse_ccf' (default) or 'mouse_annotation'
-            
+
         Notes
         -----
         See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_ 
         for additional documentation.
         '''
-        
+
         if voxel_resolution == None:
             voxel_resolution = 10
-            
+
         if release == None:
             release = 'current-release'
-        
+
         if coordinate_framework == None:
             coordinate_framework = 'mouse_ccf'
-        
+
         url = ''.join([self.informatics_archive_endpoint,
                        '/%s/%s/' % (release, coordinate_framework),
                        data,
                        '/',
                        file_name])
-        
+
         return url
-        
-    
+
     def download_volumetric_data(self,
                                  data,
                                  file_name,
@@ -255,18 +250,18 @@ class MouseConnectivityApi(RmaApi):
                                  release=None,
                                  coordinate_framework=None):
         '''Download 3D reference model in NRRD format.
-        
+
         Parameters
         ----------
         data : string
             'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
         file_name : string
-            
+
         voxel_resolution : int
             10, 25, 50 or 100
         coordinate_framework : string
             'mouse_ccf' (default) or 'mouse_annotation'
-            
+
         Notes
         -----
         See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_ 
@@ -277,17 +272,15 @@ class MouseConnectivityApi(RmaApi):
                                                       voxel_resolution,
                                                       release,
                                                       coordinate_framework)
-        
+
         if save_file_path == None:
             save_file_path = file_name
-        
+
         if save_file_path == None:
             save_file_path = 'volumetric_data.nrrd'
-        
-        
+
         self.retrieve_file_over_http(url, save_file_path)
-    
-    
+
     def download_reference_aligned_image_channel_volumes(self,
                                                          data_set_id,
                                                          save_file_path=None):
@@ -296,65 +289,63 @@ class MouseConnectivityApi(RmaApi):
         -------
             The well known file is downloaded
         '''
-        well_known_file_url = self.get_reference_aligned_image_channel_volumes_url(data_set_id)
-        
+        well_known_file_url = self.get_reference_aligned_image_channel_volumes_url(
+            data_set_id)
+
         if save_file_path == None:
             save_file_path = str(data_set_id) + '.zip'
-            
-        self.retrieve_file_over_http(well_known_file_url, save_file_path)
 
+        self.retrieve_file_over_http(well_known_file_url, save_file_path)
 
     def build_reference_aligned_image_channel_volumes_url(self,
                                                           data_set_id):
         '''Construct url to download the red, green, and blue channels
         aligned to the 25um adult mouse brain reference space volume.
-        
+
         Parameters
         ----------
         data_set_id : integer
             aka attachable_id
-            
+
         Notes
         -----
         See: `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_ 
         for additional documentation.
         '''
-        
+
         criteria = ['well_known_file_type',
                     "[name$eq'ImagesResampledTo25MicronARA']",
                     "[attachable_id$eq%d]" % (data_set_id)]
-        
+
         model_stage = self.model_stage('WellKnownFile',
-                                      criteria=criteria)
-        
+                                       criteria=criteria)
+
         url = self.build_query_url([model_stage])
-        
+
         return url
-    
-    
+
     def get_reference_aligned_image_channel_volumes_url(self,
                                                         data_set_id):
         '''Retrieve the download link for a specific data set.\
-        
+
         Notes
         -----
         See `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_
         for additional documentation.
         '''
         download_link = self.do_query(self.build_reference_aligned_image_channel_volumes_url,
-                                      lambda parsed_json: str(parsed_json['msg'][0]['download_link']),
+                                      lambda parsed_json: str(
+                                          parsed_json['msg'][0]['download_link']),
                                       data_set_id)
-        
+
         url = self.api_url + download_link
-        
+
         return url
 
-    
-    
     def experiment_source_search(self, **kwargs):
         '''Search over the whole projection signal statistics dataset
         to find experiments with specific projection profiles.
-        
+
         Parameters
         ----------
         injection_structures : list of integers or strings
@@ -376,26 +367,25 @@ class MouseConnectivityApi(RmaApi):
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
             For paging purposes. Defaults to 2000.
-        
+
         Notes
         -----
         See `Source Search <http://help.brain-map.org/display/mouseconnectivity/API#API-SourceSearch>`_,
         `Target Search <http://help.brain-map.org/display/mouseconnectivity/API#API-TargetSearch>`_,
         and 
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
-        
+
         '''
-        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        tuples = [(k, v) for k, v in kwargs.iteritems()]
         return self.service_query('mouse_connectivity_injection_structure', parameters=tuples)
 
-    
     def experiment_spatial_search(self, **kwargs):
         '''Displays all SectionDataSets
         with projection signal density >= 0.1 at the seed point.
         This service also returns the path
         along the most dense pixels from the seed point
         to the center of each injection site..
-        
+
         Parameters
         ----------
         seed_point : list of floats
@@ -413,24 +403,23 @@ class MouseConnectivityApi(RmaApi):
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
             For paging purposes. Defaults to 2000.
-        
+
         Notes
         -----
         See `Spatial Search <http://help.brain-map.org/display/mouseconnectivity/API#API-SpatialSearch>`_
         and 
         `service::mouse_connectivity_target_spatial <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitytargetspatial>`_.
-        
+
         '''
 
-        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        tuples = [(k, v) for k, v in kwargs.iteritems()]
         return self.service_query('mouse_connectivity_target_spatial', parameters=tuples)
-    
-    
+
     def experiment_injection_coordinate_search(self, **kwargs):
         '''User specifies a seed location within the 3D reference space.
         The service returns a rank list of experiments
         by distance of its injection site to the specified seed location.
-        
+
         Parameters
         ----------
         seed_point : list of floats
@@ -446,23 +435,22 @@ class MouseConnectivityApi(RmaApi):
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
             For paging purposes. Defaults to 2000.
-        
+
         Notes
         -----
         See `Injection Coordinate Search <http://help.brain-map.org/display/mouseconnectivity/API#API-InjectionCoordinateSearch>`_
         and 
         `service::mouse_connectivity_injection_coordinate <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate>`_.
-        
+
         '''
-        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
+        tuples = [(k, v) for k, v in kwargs.iteritems()]
         return self.service_query('mouse_connectivity_injection_coordinate', parameters=tuples)
-    
-    
+
     def experiment_correlation_search(self, **kwargs):
         '''Select a seed experiment and a domain over
         which the similarity comparison is to be made.
-        
-        
+
+
         Parameters
         ----------
         row : integer
@@ -482,17 +470,16 @@ class MouseConnectivityApi(RmaApi):
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
             For paging purposes. Defaults to 2000.
-        
+
         Notes
         -----
         See `Correlation Search <http://help.brain-map.org/display/mouseconnectivity/API#API-CorrelationSearch>`_
         and 
         `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
-        
-        '''
-        tuples = [ (k,v) for k,v in kwargs.iteritems() ]
-        return self.service_query('mouse_connectivity_correlation', parameters=tuples)
 
+        '''
+        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        return self.service_query('mouse_connectivity_correlation', parameters=tuples)
 
     def get_structure_unionizes(self,
                                 experiment_ids,
@@ -507,27 +494,26 @@ class MouseConnectivityApi(RmaApi):
 
         experiment_filter = '[section_data_set_id$in%s]' %\
                             ','.join(str(i) for i in experiment_ids)
-        
+
         if is_injection == True:
             is_injection_filter = '[is_injection$eqtrue]'
         elif is_injection == False:
             is_injection_filter = '[is_injection$eqfalse]'
         else:
             is_injection_filter = ''
-        
+
         if normalized_projection_volume_limit != None:
             volume_filter = '[normalized_projection_volume$gt%f]' %\
                             (normalized_projection_volume_limit)
         else:
             volume_filter = ''
 
-        
         if hemisphere_ids is not None:
             hemisphere_filter = '[hemisphere_id$in%s]' %\
                 ','.join(str(h) for h in hemisphere_ids)
         else:
             hemisphere_filter = ''
-        
+
         if structure_name != None:
             structure_filter = ",structure[name$eq'%s']" % (structure_name)
         elif structure_ids != None:
@@ -535,39 +521,35 @@ class MouseConnectivityApi(RmaApi):
                                ','.join(str(i) for i in structure_ids)
         else:
             structure_filter = ''
-        
+
         return self.model_query(
-                'ProjectionStructureUnionize',
-                criteria=''.join([experiment_filter,
-                                  is_injection_filter,
-                                  volume_filter,
-                                  hemisphere_filter,
-                                  structure_filter]),
-                include=include,
-                order=order,
-                num_rows='all',
-                debug=debug,
-                count=False)
+            'ProjectionStructureUnionize',
+            criteria=''.join([experiment_filter,
+                              is_injection_filter,
+                              volume_filter,
+                              hemisphere_filter,
+                              structure_filter]),
+            include=include,
+            order=order,
+            num_rows='all',
+            debug=debug,
+            count=False)
 
     def download_injection_density(self, path, experiment_id, resolution):
         return GridDataApi().download_projection_grid_data(
-            experiment_id, [ GridDataApi.INJECTION_DENSITY ], resolution, path)
-
+            experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
 
     def download_projection_density(self, path, experiment_id, resolution):
         return GridDataApi().download_projection_grid_data(
-            experiment_id, [ GridDataApi.PROJECTION_DENSITY ], resolution, path)
-
+            experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
 
     def download_injection_fraction(self, path, experiment_id, resolution):
         return GridDataApi().download_projection_grid_data(
-            experiment_id, [ GridDataApi.INJECTION_FRACTION ], resolution, path)
-
+            experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
 
     def download_data_mask(self, path, experiment_id, resolution):
         return GridDataApi().download_projection_grid_data(
-           experiment_id, [ GridDataApi.DATA_MASK ], resolution, path)
-
+            experiment_id, [GridDataApi.DATA_MASK], resolution, path)
 
     def calculate_injection_centroid(self,
                                      injection_density,
@@ -575,10 +557,10 @@ class MouseConnectivityApi(RmaApi):
                                      resolution=25):
         '''
         Compute the centroid of an injection site.
-        
+
         Parameters
         ----------
-        
+
         injection_density: np.ndarray
             The injection density volume of an experiment
 
@@ -590,15 +572,14 @@ class MouseConnectivityApi(RmaApi):
         # find all voxels with injection_fraction > 0
         injection_voxels = np.nonzero(injection_fraction)
         injection_density_computed = np.multiply(injection_density[injection_voxels],
-                                                 injection_fraction[injection_voxels]) 
+                                                 injection_fraction[injection_voxels])
         sum_density = np.sum(injection_density_computed)
-    
+
         # compute centroid in CCF coordinates
-        if sum_density > 0 :
+        if sum_density > 0:
             centroid = np.dot(injection_density_computed,
                               zip(*injection_voxels)) / sum_density * resolution
         else:
             centroid = None
-        
-        return centroid
 
+        return centroid

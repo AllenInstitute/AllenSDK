@@ -13,12 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging, os
+import logging
+import os
 from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
 
 PERISOMATIC_TYPE = "Biophysical - perisomatic"
 ALL_ACTIVE_TYPE = "Biophysical - all active"
+
 
 def create_utils(description, model_type=None):
     if model_type is None:
@@ -33,7 +35,7 @@ def create_utils(description, model_type=None):
 class Utils(HocUtils):
     '''A helper class for NEURON functionality needed for
     biophysical simulations.
-    
+
     Attributes
     ----------
     h : object
@@ -43,35 +45,34 @@ class Utils(HocUtils):
     neuron : module
         The NEURON module.
     '''
-    
+
     _log = logging.getLogger(__name__)
-    
+
     def __init__(self, description):
         super(Utils, self).__init__(description)
         self.stim = None
         self.stim_curr = None
         self.sampling_rate = None
-    
+
         self.stim_vec_list = []
-    
-    
+
     def generate_morphology(self, morph_filename):
         '''Load a swc-format cell morphology file.
-        
+
         Parameters
         ----------
         morph_filename : string
             Path to swc.
         '''
         h = self.h
-        
+
         swc = self.h.Import3d_SWC_read()
         swc.input(morph_filename)
         imprt = self.h.Import3d_GUI(swc, 0)
-        
+
         h("objref this")
         imprt.instantiate(h.this)
-        
+
         h("soma[0] area(0.5)")
         for sec in h.allsec():
             sec.nseg = 1 + 2 * int(sec.L / 40.0)
@@ -84,49 +85,49 @@ class Utils(HocUtils):
             sec.nseg = 1 + 2 * int(sec.L / 40.0)
         h.axon[0].connect(h.soma[0], 0.5, 0.0)
         h.axon[1].connect(h.axon[0], 1.0, 0.0)
-        
+
         h.define_shape()
-        
-    
+
     def load_cell_parameters(self):
         '''Configure a neuron after the cell morphology has been loaded.'''
         passive = self.description.data['passive'][0]
         genome = self.description.data['genome']
         conditions = self.description.data['conditions'][0]
         h = self.h
-        
+
         h("access soma")
-        
+
         # Set fixed passive properties
         for sec in h.allsec():
             sec.Ra = passive['ra']
             sec.insert('pas')
             for seg in sec:
                 seg.pas.e = passive["e_pas"]
-        
+
         for c in passive["cm"]:
             h('forsec "' + c["section"] + '" { cm = %g }' % c["cm"])
-        
+
         # Insert channels and set parameters
         for p in genome:
-            if p["section"] == "glob": # global parameter
+            if p["section"] == "glob":  # global parameter
                 h(p["name"] + " = %g " % p["value"])
             else:
                 if p["mechanism"] != "":
-                    h('forsec "' + p["section"] + '" { insert ' + p["mechanism"] + ' }')
-                h('forsec "' + p["section"] + '" { ' + p["name"] + ' = %g }' % p["value"])
-        
+                    h('forsec "' + p["section"] +
+                      '" { insert ' + p["mechanism"] + ' }')
+                h('forsec "' + p["section"] +
+                  '" { ' + p["name"] + ' = %g }' % p["value"])
+
         # Set reversal potentials
         for erev in conditions['erev']:
             h('forsec "' + erev["section"] + '" { ek = %g }' % erev["ek"])
             h('forsec "' + erev["section"] + '" { ena = %g }' % erev["ena"])
-    
-    
+
     def setup_iclamp(self,
                      stimulus_path,
                      sweep=0):
         '''Assign a current waveform as input stimulus.
-        
+
         Parameters
         ----------
         stimulus_path : string
@@ -142,15 +143,14 @@ class Utils(HocUtils):
         self.h.dt = self.sampling_rate
         stim_vec = self.h.Vector(self.stim_curr)
         stim_vec.play(self.stim._ref_amp, self.sampling_rate)
-        
+
         stimulus_stop_index = len(self.stim_curr) - 1
         self.h.tstop = stimulus_stop_index * self.sampling_rate
         self.stim_vec_list.append(stim_vec)
-    
-    
+
     def read_stimulus(self, stimulus_path, sweep=0):
         '''load current values for a specific experiment sweep.
-        
+
         Parameters
         ----------
         stimulus path : string
@@ -162,26 +162,26 @@ class Utils(HocUtils):
             "reading stimulus path: %s, sweep %s",
             stimulus_path,
             sweep)
-        
+
         stimulus_data = NwbDataSet(stimulus_path)
         sweep_data = stimulus_data.get_sweep(sweep)
-        
+
         # convert to nA for NEURON
         self.stim_curr = sweep_data['stimulus'] * 1.0e9
-        
-        # convert from Hz        
+
+        # convert from Hz
         self.sampling_rate = 1.0e3 / sweep_data['sampling_rate']
-    
-    
+
     def record_values(self):
         '''Set up output voltage recording.'''
-        vec = { "v": self.h.Vector(),
-                "t": self.h.Vector() }
-        
+        vec = {"v": self.h.Vector(),
+               "t": self.h.Vector()}
+
         vec["v"].record(self.h.soma[0](0.5)._ref_v)
         vec["t"].record(self.h._ref_t)
-    
+
         return vec
+
 
 class AllActiveUtils(Utils):
 
@@ -237,16 +237,15 @@ class AllActiveUtils(Utils):
         # make sure diam reflects 3d points
         self.h.area(.5, sec=self.h.soma[0])
 
-
     def load_cell_parameters(self):
         '''Configure a neuron after the cell morphology has been loaded.'''
         passive = self.description.data['passive'][0]
         genome = self.description.data['genome']
         conditions = self.description.data['conditions'][0]
         h = self.h
-        
+
         h("access soma")
-        
+
         # Set fixed passive properties
         for sec in h.allsec():
             sec.Ra = passive['ra']
@@ -268,15 +267,15 @@ class AllActiveUtils(Utils):
             else:
                 if hasattr(h, section_array):
                     if mechanism != "":
-                        print('Adding mechanism %s to %s' \
-                            % (mechanism, section_array))
+                        print('Adding mechanism %s to %s'
+                              % (mechanism, section_array))
                         for section in getattr(h, section_array):
                             if self.h.ismembrane(str(mechanism),
                                                  sec=section) != 1:
                                 section.insert(mechanism)
 
-                    print('Setting %s to %.6g in %s' \
-                        % (param_name, param_value, section_array))
+                    print('Setting %s to %.6g in %s'
+                          % (param_name, param_value, section_array))
                     for section in getattr(h, section_array):
                         setattr(section, param_name, param_value)
 
@@ -286,8 +285,8 @@ class AllActiveUtils(Utils):
             ek = float(erev["ek"])
             ena = float(erev["ena"])
 
-            print('Setting ek to %.6g and ena to %.6g in %s' \
-                % (ek, ena, erev_section_array))
+            print('Setting ek to %.6g and ena to %.6g in %s'
+                  % (ek, ena, erev_section_array))
 
             if hasattr(h, erev_section_array):
                 for section in getattr(h, erev_section_array):
@@ -297,10 +296,8 @@ class AllActiveUtils(Utils):
                     if self.h.ismembrane("na_ion", sec=section) == 1:
                         setattr(section, 'ena', ena)
             else:
-                print("Warning: can't set erev for %s, " \
-                    "section array doesn't exist" % erev_section_array)
+                print("Warning: can't set erev for %s, "
+                      "section array doesn't exist" % erev_section_array)
 
         self.h.v_init = conditions['v_init']
         self.h.celsius = conditions['celsius']
-
-    

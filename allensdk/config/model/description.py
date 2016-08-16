@@ -20,16 +20,15 @@ from allensdk.config.manifest import Manifest
 
 class Description(object):
     _log = logging.getLogger(__name__)
-    
+
     def __init__(self):
         self.data = {}
         self.reserved_data = []
         self.manifest = Manifest()
-    
-    
+
     def update_data(self, data, section=None):
         '''Merge configuration data possibly from multiple files.
-        
+
         Parameters
         ----------
         data : dict
@@ -46,13 +45,12 @@ class Description(object):
         else:
             if not section in self.data:
                 self.data[section] = []
-            
+
             self.data[section].append(data)
-    
-    
+
     def is_empty(self):
         '''Check if anything is in the object.
-        
+
         Returns
         -------
         boolean
@@ -60,14 +58,13 @@ class Description(object):
         '''
         if self.data:
             return False
-        
+
         return True
-    
-    
+
     def unpack(self, data, section=None):
         '''Read the manifest and other stand-alone configuration structure,
         or insert a configuration object into a section of an existing configuration.
-        
+
         Parameters
         ----------
         data : dict
@@ -81,26 +78,24 @@ class Description(object):
             self.update_data(data)
         else:
             self.update_data(data, section)
-    
-    
+
     def unpack_manifest(self, data):
         '''Pull the manifest configuration section into a separate place.
-        
+
         Parameters
         ----------
         data : dict
             A configuration structure that still has a manifest section.
         '''
         data_manifest = data.pop("manifest", {})
-        reserved_data = { "manifest": data_manifest }
+        reserved_data = {"manifest": data_manifest}
         self.reserved_data.append(reserved_data)
         self.manifest.load_config(data_manifest)
-    
-    
+
     def fix_unary_sections(self, section_names=None):
         ''' Wrap section contents that don't have the proper
         array surrounding them in an array.
-        
+
         Parameters
         ----------
         section_names : list of strings, optional
@@ -108,10 +103,10 @@ class Description(object):
         '''
         if section_names is None:
             section_names = []
-        
+
         for section in section_names:
             if section in self.data:
                 if type(self.data[section]) is dict:
-                    self.data[section] = [ self.data[section] ];
-                    Description._log.warn("wrapped description section %s in an array." % (section))
-
+                    self.data[section] = [self.data[section]]
+                    Description._log.warn(
+                        "wrapped description section %s in an array." % (section))

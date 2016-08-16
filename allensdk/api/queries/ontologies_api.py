@@ -15,12 +15,13 @@
 
 from allensdk.api.queries.rma_template import RmaTemplate
 
+
 class OntologiesApi(RmaTemplate):
     '''
     See: `Atlas Drawings and Ontologies
     <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_
     '''
-    
+
     rma_templates = \
         {"ontology_queries": [
             {'name': 'structures_by_graph_ids',
@@ -31,7 +32,7 @@ class OntologiesApi(RmaTemplate):
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['graph_ids']
-            },
+             },
             {'name': 'structures_by_graph_names',
              'description': 'see name',
              'model': 'Structure',
@@ -40,7 +41,7 @@ class OntologiesApi(RmaTemplate):
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['graph_names']
-            },
+             },
             {'name': 'structures_by_set_ids',
              'description': 'see name',
              'model': 'Structure',
@@ -49,7 +50,7 @@ class OntologiesApi(RmaTemplate):
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['set_ids']
-            },
+             },
             {'name': 'structures_by_set_names',
              'description': 'see name',
              'model': 'Structure',
@@ -58,25 +59,25 @@ class OntologiesApi(RmaTemplate):
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['set_names']
-            },
+             },
             {'name': 'structure_graphs_list',
              'description': 'see name',
              'model': 'StructureGraph',
              'num_rows': 'all',
              'count': False
-            },
+             },
             {'name': 'structure_sets_list',
              'description': 'see name',
              'model': 'StructureSet',
              'num_rows': 'all',
              'count': False
-            },
+             },
             {'name': 'atlases_list',
              'description': 'see name',
              'model': 'Atlas',
              'num_rows': 'all',
              'count': False
-            },
+             },
             {'name': 'atlases_table',
              'description': 'see name',
              'model': 'Atlas',
@@ -94,25 +95,23 @@ class OntologiesApi(RmaTemplate):
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['atlas_ids']
-            }
+             }
         ]}
-    
-    
+
     def __init__(self, base_uri=None):
         super(OntologiesApi, self).__init__(base_uri,
                                             query_manifest=OntologiesApi.rma_templates)
-    
-    
+
     def get_structures(self,
                        structure_graph_ids=None,
                        structure_graph_names=None,
                        structure_set_ids=None,
                        structure_set_names=None,
-                       order = ['structures.graph_order'],
+                       order=['structures.graph_order'],
                        num_rows='all',
                        count=False):
         '''Retrieve data about anatomical structures.
-        
+
         Parameters
         ----------
         structure_graph_ids : int or list of ints, optional
@@ -127,12 +126,12 @@ class OntologiesApi(RmaTemplate):
             list of RMA order clauses for sorting
         num_rows : int
             how many records to retrieve
-            
+
         Returns
         -------
         dict
             the parsed json response containing data from the API
-            
+
         Notes
         -----
         Only one of the methods of limiting the query should be used at a time.
@@ -165,18 +164,17 @@ class OntologiesApi(RmaTemplate):
                                        order=order,
                                        num_rows=num_rows,
                                        count=count)
-        
+
         return data
-    
-    
+
     def unpack_structure_set_ancestors(self, structure_dataframe):
         '''Convert a slash-separated structure_id_path field to a list.
-        
+
         Parameters
         ----------
         structure_dataframe : DataFrame
             structure data from the API
-        
+
         Returns
         -------
         None
@@ -189,22 +187,21 @@ class OntologiesApi(RmaTemplate):
         ]
         structure_dataframe['structure_set_ancestor'] = structure_ancestors
 
-
     def get_atlases_table(self, atlas_ids=None, brief=True):
         '''List Atlases available through the API
         with associated ontologies and structure graphs.
-        
+
         Parameters
         ----------
         atlas_ids : integer or list of integers, optional
             only select specific atlases
         brief : boolean, optional
             True (default) requests only name and id fields.
-        
+
         Returns
         -------
         dict : atlas metadata
-        
+
         Notes
         -----
         This query is based on the
@@ -220,19 +217,17 @@ class OntologiesApi(RmaTemplate):
                                        'atlases_table',
                                        atlas_ids=atlas_ids,
                                        only=None)
-        
+
         return data
-    
-    
+
     def get_atlases(self):
         return self.template_query('ontology_queries',
                                    'atlases_list')
-    
-    
+
     def get_structure_graphs(self):
         return self.template_query('ontology_queries',
                                    'structure_graphs_list')
-        
+
     def get_structure_sets(self):
         return self.template_query('ontology_queries',
                                    'structure_sets_list')

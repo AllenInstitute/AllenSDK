@@ -1,2 +1,2 @@
-class BrainObservatoryAnalysisException(Exception): pass
-
+class BrainObservatoryAnalysisException(Exception):
+    pass
