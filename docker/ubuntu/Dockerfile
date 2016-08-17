@@ -47,7 +47,7 @@ RUN cd /root; alien -i nrn-7.4.x86_64.rpm
 
 RUN mkdir allensdk; \
     cd allensdk; \
-    wget -O allensdk.zip http://stash.corp.alleninstitute.org/plugins/servlet/archive/projects/INF/repos/allensdk?at=refs%2Fheads%2Fdev; \
+    wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.1.zip; \
     unzip allensdk.zip; \
     rm allensdk.zip; \
     pip install .; \
