@@ -17,12 +17,14 @@
 import pytest
 from mock import patch, mock_open, Mock
 from allensdk.core.json_utilities import JsonComments
-from __builtin__ import ValueError
 import logging
 try:
-    import builtins
+    import __builtin__ as builtins  # @UnresolvedImport
+    from __builtin__ import ValueError
 except:
-    import __builtin__ as builtins
+    import builtins  # @UnresolvedImport
+    from builtins import ValueError
+
 
 @pytest.fixture
 def commented_json():
@@ -83,17 +85,17 @@ def corrupted_json():
 def ju_logger():
     log = logging.getLogger('allensdk.core.json_utilities')
     log.error = Mock()
-    
+
     return log
 
 
-def testSingleLineComment(corrupted_json,
-                          ju_logger):
+def testSingleLineCommentValueError(corrupted_json,
+                                    ju_logger):
     with pytest.raises(ValueError) as e_info:
         with patch(builtins.__name__ + ".open",
                    mock_open(read_data=corrupted_json)):
-            parsed_json = JsonComments.read_file("corrupted.json")
-        
+            JsonComments.read_file("corrupted.json")
+
     ju_logger.error.assert_called_once_with(
         'Could not load json object from file: corrupted.json')
     assert e_info.typename == 'ValueError'
@@ -102,75 +104,75 @@ def testSingleLineComment(corrupted_json,
 def testSingleLineComment(commented_json):
     parsed_json = JsonComments.read_string(
         commented_json)
-     
+
     assert('color' in parsed_json and
            parsed_json['color'] == 'blue')
- 
- 
+
+
 def testBlankLines(blank_line_json):
     parsed_json = JsonComments.read_string(
         blank_line_json)
-     
+
     assert('color' in parsed_json and
            parsed_json['color'] == 'blue')
- 
- 
+
+
 def testMultiLineComment(multi_line_json):
     parsed_json = JsonComments.read_string(
         multi_line_json)
-     
+
     assert('color' in parsed_json and
            parsed_json['color'] == 'blue')
- 
- 
+
+
 def testTwoMultiLineComments(two_multi_line_json):
     parsed_json = JsonComments.read_string(
         two_multi_line_json)
-     
+
     assert('colors' in parsed_json)
     assert(len(parsed_json['colors']) == 4)
     assert('blue' in parsed_json['colors'])
     assert('orange' in parsed_json['colors'])
     assert('purple' in parsed_json['colors'])
     assert('violet' in parsed_json['colors'])
- 
- 
+
+
 def testSingleLineCommentFile(commented_json):
     with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=commented_json)):
         parsed_json = JsonComments.read_file('mock.json')
-      
+
     assert('color' in parsed_json and
            parsed_json['color'] == 'blue')
-  
-  
+
+
 def testBlankLinesFile(blank_line_json):
     with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=blank_line_json)):
         parsed_json = JsonComments.read_file('mock.json')
-      
+
     assert('color' in parsed_json and
            parsed_json['color'] == 'blue')
- 
- 
+
+
 def testMultiLineFile(multi_line_json):
     with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=multi_line_json)):
         parsed_json = JsonComments.read_file('mock.json')
-      
+
     assert('color' in parsed_json and
            parsed_json['color'] == 'blue')
- 
- 
+
+
 def testTwoMultiLineFile(two_multi_line_json):
     with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=two_multi_line_json)):
         parsed_json = JsonComments.read_file('mock.json')
- 
+
     assert('colors' in parsed_json)
     assert(len(parsed_json['colors']) == 4)
     assert('blue' in parsed_json['colors'])

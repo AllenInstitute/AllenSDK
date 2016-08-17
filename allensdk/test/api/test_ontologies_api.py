@@ -1,5 +1,19 @@
-from allensdk.api.queries.ontologies_api import OntologiesApi
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+from allensdk.api.queries.ontologies_api import OntologiesApi
 import pytest
 from mock import MagicMock
 
@@ -8,7 +22,7 @@ from mock import MagicMock
 def ontologies():
     oa = OntologiesApi()
     oa.json_msg_query = MagicMock(name='json_msg_query')
-    
+
     return oa
 
 
@@ -32,7 +46,7 @@ def test_list_structure_graphs(ontologies):
 
 def test_list_structure_sets(ontologies):
     ontologies.get_structure_sets()
-    
+
     ontologies.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::StructureSet,rma::options[num_rows$eq'all'][count$eqfalse]")
@@ -77,7 +91,7 @@ def test_structure_set_by_id(ontologies):
 
 
 def test_structure_sets_by_ids(ontologies):
-    ontologies.get_structures(structure_set_ids=[7,8])
+    ontologies.get_structures(structure_set_ids=[7, 8])
     ontologies.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,[structure_set_id$in7,8],"

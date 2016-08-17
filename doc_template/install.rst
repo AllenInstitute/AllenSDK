@@ -56,10 +56,22 @@ example Dockerfiles are available.
 
  #. Ensure you have Docker installed.
 
- #. Use Docker to build the image::
-     docker build -t alleninstitute/allensdk:ubuntu git://github.com/github.com/AllenInstitute/AllenSDK/tree/release_0.12/doc_template/examples/docker/ubuntu
-
+ #. Use Docker to build the image one of the images.
+ 
+     Anaconda::
+     
+         docker build -t alleninstitute/allensdk:anaconda git://github.com/github.com/AllenInstitute/AllenSDK/tree/v0.12.1/doc_template:docker/anaconda
+ 
+     Other docker configurations are also available under docker directory in the source repository.
+ 
  #. Run the docker image::
  
-     docker run -i -t -v /data:/data alleninstitute/allensdk:ubuntu /bin/bash
-
+     docker run -i -t -p 8888:8888 -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
+     cd allensdk
+     make pytest_lax
+ 
+ #. Start a Jupyter Notebook::
+ 
+     cd allensdk/doc_template/examples/nb
+     jupyter-notebook --ip=* --no-browser
+     
