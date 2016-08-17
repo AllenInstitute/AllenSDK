@@ -1,0 +1,8 @@
+coverage==4.1
+mock==2.0.0
+pep8==1.7.0
+pytest==2.9.2
+pytest-cov==2.2.1
+pytest-pep8==1.0.6
+pytest-xdist==1.14
+flake8>=3.0.4
