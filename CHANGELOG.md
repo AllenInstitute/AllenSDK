@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - neuropil subtraction algorithm (brain_observatory.r_neuropil) faster and more robust
+- formatting changes for better PEP8 compliance
+- preparation for Python 3 support
 
 ### Fixed
 
