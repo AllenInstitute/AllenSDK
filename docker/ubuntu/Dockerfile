@@ -45,10 +45,9 @@ RUN pip install \
 RUN cd /root; wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/nrn-7.4.x86_64.rpm
 RUN cd /root; alien -i nrn-7.4.x86_64.rpm
 
-RUN mkdir allensdk; \
-    cd allensdk; \
-    wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.1.zip; \
+RUN wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.1.zip; \
     unzip allensdk.zip; \
+    mv AllenSDK-0.12.1 allensdk; \
     rm allensdk.zip; \
     pip install .; \
     pip install -r test_requirements.txt; \

@@ -38,12 +38,11 @@ RUN apt-get -yq install unzip
 
 WORKDIR /home/docker
 
-# TODO: replace w/ install from Github
-RUN mkdir allensdk; \
-    cd allensdk; \
-    wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.1.zip; \
+RUN wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.1.zip; \
     unzip allensdk.zip; \
     rm allensdk.zip; \
+    mv AllenSDK-0.12.1 allensdk; \
+    cd allensdk; \
     $VENV/bin/pip install .; \
     $VENV/bin/pip install -r test_requirements.txt; \
     $VENV/bin/pip install jupyter; \
