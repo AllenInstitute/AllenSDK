@@ -646,7 +646,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span> <span class="c">#@UnresolvedImport</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">subprocess</span> <span class="kn">as</span> <span class="nn">sp</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -655,30 +654,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div class="viewcode-block" id="choose_bps_command"><a class="viewcode-back" href="../../../../allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.bps_command.choose_bps_command">[docs]</a><span class="k">def</span> <span class="nf">choose_bps_command</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="s">&#39;bps_simple&#39;</span><span class="p">,</span> <span class="n">conf_file</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;allensdk.model.biophys_sim.bps_command&#39;</span><span class="p">)</span>
-    
+
     <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;bps command: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">command</span><span class="p">))</span>
-    
+
     <span class="k">if</span> <span class="n">conf_file</span><span class="p">:</span>
         <span class="n">conf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">conf_file</span><span class="p">)</span>
-    
+
     <span class="k">if</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&#39;help&#39;</span><span class="p">:</span>
-        <span class="k">print</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">argparser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="s">&#39;--help&#39;</span><span class="p">])</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">argparser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="s">&#39;--help&#39;</span><span class="p">]))</span>
     <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&#39;nrnivmodl&#39;</span><span class="p">:</span>
-        <span class="n">sp</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s">&#39;nrnivmodl&#39;</span><span class="p">,</span> <span class="s">&#39;modfiles&#39;</span><span class="p">])</span> <span class="c"># TODO: alternate location in manifest?</span>
+        <span class="n">sp</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s">&#39;nrnivmodl&#39;</span><span class="p">,</span> <span class="s">&#39;modfiles&#39;</span><span class="p">])</span>
     <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&#39;run_simple&#39;</span><span class="p">:</span>
         <span class="n">app_config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
         <span class="n">description</span> <span class="o">=</span> <span class="n">app_config</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">conf_file</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;CODE_DIR&#39;</span><span class="p">))</span>
-        <span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">function_name</span><span class="p">)</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;runs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;main&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">function_name</span><span class="p">)</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span>
+            <span class="s">&#39;runs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;main&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">)</span>
         <span class="n">run_module</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">function_name</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;unknown command </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span><span class="p">(</span><span class="n">command</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;unknown command </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">command</span><span class="p">))</span>
 
 </div>
 <div class="viewcode-block" id="run_module"><a class="viewcode-back" href="../../../../allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.bps_command.run_module">[docs]</a><span class="k">def</span> <span class="nf">run_module</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">function_name</span><span class="p">):</span>
     <span class="n">m</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="n">function_name</span><span class="p">])</span>
     <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">function_name</span><span class="p">)</span>
-    
+
     <span class="n">func</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 
 
@@ -689,24 +689,24 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="kn">import</span> <span class="nn">sys</span>
     <span class="n">conf_file</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span>
-    
+
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;nrniv&#39;</span><span class="p">:</span>
             <span class="n">command</span> <span class="o">=</span> <span class="s">&#39;run_simple&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">command</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>        
+    <span class="k">else</span><span class="p">:</span>
         <span class="n">command</span> <span class="o">=</span> <span class="s">&#39;run_simple&#39;</span>
-    
+
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.conf&#39;</span><span class="p">)</span> <span class="ow">or</span>
                           <span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.json&#39;</span><span class="p">)):</span>
         <span class="n">conf_file</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>    
+    <span class="k">else</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">conf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;CONF_FILE&#39;</span><span class="p">]</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
-    
+
     <span class="n">choose_bps_command</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">conf_file</span><span class="p">)</span>
 </pre></div>
 

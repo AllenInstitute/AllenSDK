@@ -646,7 +646,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">urllib2</span>
+
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">urllib.request</span> <span class="kn">as</span> <span class="nn">urllib_request</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">urllib2</span> <span class="kn">as</span> <span class="nn">urllib_request</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">urllib.error</span> <span class="kn">as</span> <span class="nn">urllib_error</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">urllib2</span> <span class="kn">as</span> <span class="nn">urllib_error</span>
+
 <span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">json_utilities</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -656,46 +669,49 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
     <span class="n">default_api_url</span> <span class="o">=</span> <span class="s">&#39;http://api.brain-map.org&#39;</span>
     <span class="n">download_url</span> <span class="o">=</span> <span class="s">&#39;http://download.alleninstitute.org&#39;</span>
-    
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_base_url_string</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">api_base_url_string</span><span class="o">==</span><span class="bp">None</span><span class="p">:</span>
-            <span class="n">api_base_url_string</span><span class="o">=</span><span class="n">Api</span><span class="o">.</span><span class="n">default_api_url</span>
-            
+        <span class="k">if</span> <span class="n">api_base_url_string</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">api_base_url_string</span> <span class="o">=</span> <span class="n">Api</span><span class="o">.</span><span class="n">default_api_url</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">set_api_urls</span><span class="p">(</span><span class="n">api_base_url_string</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_working_directory</span> <span class="o">=</span> <span class="bp">None</span>
-    
-    
+
 <div class="viewcode-block" id="Api.set_api_urls"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.set_api_urls">[docs]</a>    <span class="k">def</span> <span class="nf">set_api_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_base_url_string</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Set the internal RMA and well known file download endpoint urls</span>
 <span class="sd">        based on a api server endpoint.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        api_base_url_string : string</span>
 <span class="sd">            url of the api to point to</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">=</span> <span class="n">api_base_url_string</span>
-        
+
         <span class="c"># http://help.brain-map.org/display/api/Downloading+a+WellKnownFile</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">well_known_file_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/well_known_file_download&#39;</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">well_known_file_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
+            <span class="s">&#39;/api/v2/well_known_file_download&#39;</span>
+
         <span class="c"># http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grid_data_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/grid_data&#39;</span>
-        
+
         <span class="c"># http://help.brain-map.org/display/api/Downloading+and+Displaying+SVG</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">svg_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/svg&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">svg_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/svg_download&#39;</span>
-        
+
         <span class="c"># http://help.brain-map.org/display/api/Downloading+an+Ontology%27s+Structure+Graph</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">structure_graph_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/structure_graph_download&#39;</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure_graph_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
+            <span class="s">&#39;/api/v2/structure_graph_download&#39;</span>
+
         <span class="c"># http://help.brain-map.org/display/api/Searching+a+Specimen+or+Structure+Tree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tree_search_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/tree_search&#39;</span>
-        
+
         <span class="c"># http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">annotated_section_data_sets_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/annotated_section_data_sets&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">compound_annotated_section_data_sets_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/compound_annotated_section_data_sets&#39;</span>
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">annotated_section_data_sets_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
+            <span class="s">&#39;/api/v2/annotated_section_data_sets&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compound_annotated_section_data_sets_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
+            <span class="s">&#39;/api/v2/compound_annotated_section_data_sets&#39;</span>
+
         <span class="c"># http://help.brain-map.org/display/api/Image-to-Image+Synchronization#Image-to-ImageSynchronization-ImagetoImage</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">image_to_atlas_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/image_to_atlas&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">image_to_image_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/image_to_image&#39;</span>
@@ -703,73 +719,72 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">reference_to_image_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/reference_to_image&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">image_to_reference_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/image_to_reference&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">structure_to_image_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/structure_to_image&#39;</span>
-        
+
         <span class="c"># http://help.brain-map.org/display/mouseconnectivity/API</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">section_image_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/section_image_download&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">atlas_image_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/atlas_image_download&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">projection_image_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/projection_image_download&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">section_image_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
+            <span class="s">&#39;/api/v2/section_image_download&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atlas_image_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
+            <span class="s">&#39;/api/v2/atlas_image_download&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projection_image_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
+            <span class="s">&#39;/api/v2/projection_image_download&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">informatics_archive_endpoint</span> <span class="o">=</span> <span class="n">Api</span><span class="o">.</span><span class="n">download_url</span> <span class="o">+</span> <span class="s">&#39;/informatics-archive&#39;</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/data&#39;</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Api.set_default_working_directory"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.set_default_working_directory">[docs]</a>    <span class="k">def</span> <span class="nf">set_default_working_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_directory</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Set the working directory where files will be saved.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        working_directory : string</span>
 <span class="sd">             the absolute path string of the working directory.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_working_directory</span> <span class="o">=</span> <span class="n">working_directory</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Api.read_data"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.read_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_json</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Return the message data from the parsed query.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        parsed_json : dict</span>
 <span class="sd">            A python structure corresponding to the JSON data returned from the API.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        See `API Response Formats - Response Envelope &lt;http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope&gt;`_</span>
 <span class="sd">        for additional documentation.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">parsed_json</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">]</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Api.json_msg_query"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.json_msg_query">[docs]</a>    <span class="k">def</span> <span class="nf">json_msg_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Common case where the url is fully constructed</span>
 <span class="sd">            and the response data is stored in the &#39;msg&#39; field.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        url : string</span>
 <span class="sd">            Where to get the data in json form</span>
 <span class="sd">        dataframe : boolean</span>
 <span class="sd">            True converts to a pandas dataframe, False (default) doesn&#39;t</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict or DataFrame</span>
 <span class="sd">            returned data; type depends on dataframe option</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_query</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">:</span>  <span class="n">url</span><span class="p">,</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_query</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
                              <span class="bp">self</span><span class="o">.</span><span class="n">read_data</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">dataframe</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">dataframe</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">data</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Api.do_query"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.do_query">[docs]</a>    <span class="k">def</span> <span class="nf">do_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_builder_fn</span><span class="p">,</span> <span class="n">json_traversal_fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Bundle an query url construction function</span>
 <span class="sd">        with a corresponding response json traversal function.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        url_builder_fn : function</span>
@@ -782,34 +797,33 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Arguments to be passed to the url builder function.</span>
 <span class="sd">        kwargs : keyword arguments</span>
 <span class="sd">            Keyword arguments to be passed to the rma builder function.</span>
-<span class="sd">        </span>
-<span class="sd">        Returns</span>
+
+<span class="sd">        Returnsurllib_re</span>
 <span class="sd">        -------</span>
 <span class="sd">        any type</span>
 <span class="sd">            The data extracted from the json response.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        `A simple Api subclass example</span>
 <span class="sd">        &lt;data_api_client.html#creating-new-api-query-classes&gt;`_.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">api_url</span> <span class="o">=</span> <span class="n">url_builder_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        
+
         <span class="n">post</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;post&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
-        
+
         <span class="n">json_parsed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_parsed_json_over_http</span><span class="p">(</span><span class="n">api_url</span><span class="p">,</span> <span class="n">post</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">json_traversal_fn</span><span class="p">(</span><span class="n">json_parsed_data</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Api.do_rma_query"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.do_rma_query">[docs]</a>    <span class="k">def</span> <span class="nf">do_rma_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rma_builder_fn</span><span class="p">,</span> <span class="n">json_traversal_fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Bundle an RMA query url construction function</span>
 <span class="sd">        with a corresponding response json traversal function.</span>
-<span class="sd">        </span>
+
 <span class="sd">        ..note:: Deprecated in AllenSDK 0.9.2</span>
 <span class="sd">            `do_rma_query` will be removed in AllenSDK 1.0, it is replaced by</span>
 <span class="sd">            `do_query` because the latter is more general.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        rma_builder_fn : function</span>
@@ -820,130 +834,129 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Arguments to be passed to the rma builder function.</span>
 <span class="sd">        kwargs : keyword arguments</span>
 <span class="sd">            Keyword arguments to be passed to the rma builder function.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        any type</span>
 <span class="sd">            The data extracted from the json response.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        `A simple Api subclass example</span>
 <span class="sd">        &lt;data_api_client.html#creating-new-api-query-classes&gt;`_.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_query</span><span class="p">(</span><span class="n">rma_builder_fn</span><span class="p">,</span> <span class="n">json_traversal_fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Api.load_api_schema"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.load_api_schema">[docs]</a>    <span class="k">def</span> <span class="nf">load_api_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Download the RMA schema from the current RMA endpoint</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
 <span class="sd">            the parsed json schema message</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        This information and other </span>
+<span class="sd">        This information and other</span>
 <span class="sd">        `Allen Brain Atlas Data Portal Data Model &lt;http://help.brain-map.org/display/api/Data+Model&gt;`_</span>
 <span class="sd">        documentation is also available as a</span>
 <span class="sd">        `Class Hierarchy &lt;http://api.brain-map.org/class_hierarchy&gt;`_</span>
 <span class="sd">        and `Class List &lt;http://api.brain-map.org/class_hierarchy&gt;`_.</span>
-<span class="sd">        </span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">schema_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span> <span class="o">+</span> <span class="s">&#39;/enumerate.json&#39;</span>
-        <span class="n">json_parsed_schema_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_parsed_json_over_http</span><span class="p">(</span><span class="n">schema_url</span><span class="p">)</span>
-        
+        <span class="n">json_parsed_schema_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_parsed_json_over_http</span><span class="p">(</span>
+            <span class="n">schema_url</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">json_parsed_schema_data</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Api.construct_well_known_file_download_url"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.construct_well_known_file_download_url">[docs]</a>    <span class="k">def</span> <span class="nf">construct_well_known_file_download_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">well_known_file_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Join data api endpoint and id.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        well_known_file_id : integer or string representing an integer</span>
 <span class="sd">            well known file id</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
 <span class="sd">            the well-known-file download url for the current api api server</span>
-<span class="sd">        </span>
+
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        retrieve_file_over_http: Can be used to retrieve the file from the url.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">well_known_file_endpoint</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">well_known_file_id</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Api.retrieve_file_over_http"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.retrieve_file_over_http">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get a file from the data api and save it.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        url : string</span>
 <span class="sd">            Url[1]_ from which to get the file.</span>
 <span class="sd">        file_path : string</span>
 <span class="sd">            Absolute path including the file name to save.</span>
-<span class="sd">        </span>
+
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        construct_well_known_file_download_url: Can be used to construct the url.</span>
-<span class="sd">        </span>
+
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
 <span class="sd">        .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile &lt;http://help.brain-map.org/display/api/Downloading+a+WellKnownFile&gt;`_.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">urllib_request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
-        <span class="k">except</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfileobj</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">urllib_error</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t retrieve file from </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">url</span><span class="p">)</span>
             <span class="k">raise</span>
-    
-    </div>
+        <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">timeout</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Timed out retrieving file from </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">url</span><span class="p">)</span>
+            <span class="k">raise</span>
+</div>
 <div class="viewcode-block" id="Api.retrieve_parsed_json_over_http"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.retrieve_parsed_json_over_http">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_parsed_json_over_http</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get the document and put it in a Python data structure</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        url : string</span>
 <span class="sd">            Full API query url.</span>
 <span class="sd">        post : boolean</span>
 <span class="sd">            True does an HTTP POST, False (default) encodes the URL and does a GET</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
 <span class="sd">            Result document as parsed by the JSON library.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="k">if</span> <span class="n">post</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read_url</span><span class="p">(</span><span class="n">urllib2</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">url</span><span class="p">,</span><span class="s">&#39;;/?:@&amp;=+$,&#39;</span><span class="p">),</span>
+
+        <span class="k">if</span> <span class="n">post</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read_url</span><span class="p">(</span><span class="n">urllib_request</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s">&#39;;/?:@&amp;=+$,&#39;</span><span class="p">),</span>
                                            <span class="s">&#39;GET&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s">&#39;POST&#39;</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">data</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Api.retrieve_xml_over_http"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.retrieve_xml_over_http">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_xml_over_http</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get the document and put it in a Python data structure</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        url : string</span>
 <span class="sd">            Full API query url.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
 <span class="sd">            Unparsed xml string.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-        
+        <span class="n">response</span> <span class="o">=</span> <span class="n">urllib_request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div></div>
 </pre></div>
 

@@ -631,7 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.config.manifest</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2014-2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2014-2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -649,10 +649,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">errno</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 
+
 <div class="viewcode-block" id="Manifest"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest">[docs]</a><span class="k">class</span> <span class="nc">Manifest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Manages the location of external files </span>
+    <span class="sd">&quot;&quot;&quot;Manages the location of external files</span>
 <span class="sd">     referenced in an Allen SDK configuration &quot;&quot;&quot;</span>
 
     <span class="n">DIR</span> <span class="o">=</span> <span class="s">&#39;dir&#39;</span>
@@ -664,13 +666,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">relative_base_dir</span> <span class="o">=</span> <span class="n">relative_base_dir</span>
 
-        <span class="k">if</span> <span class="n">config</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-       
-        
+
 <div class="viewcode-block" id="Manifest.load_config"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Load paths into the manifest from an Allen SDK config section.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        config : Config</span>
@@ -681,13 +682,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">path_format</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="k">if</span> <span class="s">&#39;format&#39;</span> <span class="ow">in</span> <span class="n">path_info</span><span class="p">:</span>
                 <span class="n">path_format</span> <span class="o">=</span> <span class="n">path_info</span><span class="p">[</span><span class="s">&#39;format&#39;</span><span class="p">]</span>
-            
+
             <span class="k">if</span> <span class="n">path_type</span> <span class="o">==</span> <span class="s">&#39;file&#39;</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">parent_key</span> <span class="o">=</span> <span class="n">path_info</span><span class="p">[</span><span class="s">&#39;parent_key&#39;</span><span class="p">]</span>
                 <span class="k">except</span><span class="p">:</span>
                     <span class="n">parent_key</span> <span class="o">=</span> <span class="bp">None</span>
-                
+
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_file</span><span class="p">(</span><span class="n">path_info</span><span class="p">[</span><span class="s">&#39;key&#39;</span><span class="p">],</span>
                               <span class="n">path_info</span><span class="p">[</span><span class="s">&#39;spec&#39;</span><span class="p">],</span>
                               <span class="n">parent_key</span><span class="p">,</span>
@@ -697,7 +698,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                     <span class="n">parent_key</span> <span class="o">=</span> <span class="n">path_info</span><span class="p">[</span><span class="s">&#39;parent_key&#39;</span><span class="p">]</span>
                 <span class="k">except</span><span class="p">:</span>
                     <span class="n">parent_key</span> <span class="o">=</span> <span class="bp">None</span>
-                
+
                 <span class="n">spec</span> <span class="o">=</span> <span class="n">path_info</span><span class="p">[</span><span class="s">&#39;spec&#39;</span><span class="p">]</span>
                 <span class="n">absolute</span> <span class="o">=</span> <span class="bp">False</span>
                 <span class="k">if</span> <span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;/&#39;</span><span class="p">:</span>
@@ -711,12 +712,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">Manifest</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Unknown path type in manifest: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
                                      <span class="p">(</span><span class="n">path_type</span><span class="p">))</span>
-                        
-        </div>
+</div>
 <div class="viewcode-block" id="Manifest.add_path"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.add_path">[docs]</a>    <span class="k">def</span> <span class="nf">add_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">path_type</span><span class="o">=</span><span class="n">DIR</span><span class="p">,</span>
                  <span class="n">absolute</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">path_format</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Insert a new entry.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        key : string</span>
@@ -734,65 +734,64 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">parent_key</span><span class="p">:</span>
             <span class="n">path_args</span> <span class="o">=</span> <span class="p">[]</span>
-            
+
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">parent_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">parent_key</span><span class="p">][</span><span class="s">&#39;spec&#39;</span><span class="p">]</span>
                 <span class="n">path_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parent_path</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
-                <span class="n">Manifest</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;cannot resolve directory key </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">parent_key</span><span class="p">))</span>
+                <span class="n">Manifest</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s">&quot;cannot resolve directory key </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">parent_key</span><span class="p">))</span>
                 <span class="k">raise</span>
             <span class="n">path_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">))</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">path_args</span><span class="p">)</span>
-        
+
         <span class="c"># TODO: relative paths need to be considered better</span>
-        <span class="k">if</span> <span class="n">absolute</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">absolute</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relative_base_dir</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
-            
+
         <span class="k">if</span> <span class="n">path_type</span> <span class="o">==</span> <span class="n">Manifest</span><span class="o">.</span><span class="n">DIRNAME</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-            
-        <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="n">path_type</span><span class="p">,</span>
-                                <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">path</span><span class="p">}</span>
-        
-        <span class="k">if</span> <span class="n">path_type</span> <span class="o">==</span> <span class="n">Manifest</span><span class="o">.</span><span class="n">FILE</span> <span class="ow">and</span> <span class="n">path_format</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_format</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="n">path_type</span><span class="p">,</span>
+                               <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">path</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">path_type</span> <span class="o">==</span> <span class="n">Manifest</span><span class="o">.</span><span class="n">FILE</span> <span class="ow">and</span> <span class="n">path_format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_format</span>
 </div>
 <div class="viewcode-block" id="Manifest.add_paths"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.add_paths">[docs]</a>    <span class="k">def</span> <span class="nf">add_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_info</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; add information about paths stored in the manifest.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">            path_info : dict</span>
 <span class="sd">                Information about the new paths</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">for</span> <span class="n">path_key</span><span class="p">,</span> <span class="n">path_data</span> <span class="ow">in</span> <span class="n">path_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">path_format</span> <span class="o">=</span> <span class="bp">None</span>
-            
+
             <span class="k">if</span> <span class="s">&#39;format&#39;</span> <span class="ow">in</span> <span class="n">path_data</span><span class="p">:</span>
                 <span class="n">path_format</span> <span class="o">=</span> <span class="n">path_data</span><span class="p">[</span><span class="s">&#39;format&#39;</span><span class="p">]</span>
-            
+
             <span class="n">Manifest</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Adding path.  type: </span><span class="si">%s</span><span class="s">, format: </span><span class="si">%s</span><span class="s">, spec: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
                               <span class="p">(</span><span class="n">path_data</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">],</span>
                                <span class="n">path_data</span><span class="p">[</span><span class="s">&#39;spec&#39;</span><span class="p">],</span>
                                <span class="n">path_format</span><span class="p">))</span>
-            <span class="n">entry</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="n">path_data</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">],</span>
-                      <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">path_data</span><span class="p">[</span><span class="s">&#39;spec&#39;</span><span class="p">]</span> 
-                    <span class="p">}</span>
-            <span class="k">if</span> <span class="n">path_format</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="n">path_data</span><span class="p">[</span><span class="s">&#39;type&#39;</span><span class="p">],</span>
+                     <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">path_data</span><span class="p">[</span><span class="s">&#39;spec&#39;</span><span class="p">]</span>
+                     <span class="p">}</span>
+            <span class="k">if</span> <span class="n">path_format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">entry</span><span class="p">[</span><span class="s">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_format</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">path_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Manifest.add_file"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.add_file">[docs]</a>    <span class="k">def</span> <span class="nf">add_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">file_key</span><span class="p">,</span>
                  <span class="n">file_name</span><span class="p">,</span>
                  <span class="n">dir_key</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">path_format</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Insert a new file entry.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        file_key : string</span>
@@ -805,62 +804,61 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            File type for further parsing.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">path_args</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="k">if</span> <span class="n">dir_key</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">dir_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">dir_key</span><span class="p">][</span><span class="s">&#39;spec&#39;</span><span class="p">]</span>
                 <span class="n">path_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
-                <span class="n">Manifest</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;cannot resolve directory key </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dir_key</span><span class="p">))</span>
+                <span class="n">Manifest</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s">&quot;cannot resolve directory key </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dir_key</span><span class="p">))</span>
                 <span class="k">raise</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">file_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">):</span>
             <span class="n">path_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">path_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
-        
+
         <span class="n">path_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">))</span>
         <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="o">*</span><span class="n">path_args</span><span class="p">)</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">file_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="n">Manifest</span><span class="o">.</span><span class="n">FILE</span><span class="p">,</span>
-                                     <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">file_path</span> <span class="p">}</span>
-        
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">file_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="n">Manifest</span><span class="o">.</span><span class="n">FILE</span><span class="p">,</span>
+                                    <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">file_path</span><span class="p">}</span>
+
         <span class="k">if</span> <span class="n">path_format</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">file_key</span><span class="p">][</span><span class="s">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_format</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Manifest.get_path"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.get_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Retrieve an entry with substitutions.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        path_key : string</span>
 <span class="sd">            Refer to the entry to retrieve.</span>
 <span class="sd">        args : any types, optional</span>
 <span class="sd">           arguments to be substituted into the path spec for %s, %d, etc.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
 <span class="sd">            Path with parent structure and substitutions applied.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">path_spec</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">path_key</span><span class="p">][</span><span class="s">&#39;spec&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;ascii&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">))</span>
+        <span class="n">path_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">path_key</span><span class="p">][</span><span class="s">&#39;spec&#39;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">args</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">path_spec</span> <span class="o">%</span> <span class="n">args</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">path_spec</span>
-            
+
         <span class="k">return</span> <span class="n">path</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Manifest.get_format"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.get_format">[docs]</a>    <span class="k">def</span> <span class="nf">get_format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_key</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Retrieve the type of a path entry.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        path_key : string</span>
 <span class="sd">            reference to the entry</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
@@ -868,31 +866,32 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">path_entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="n">path_key</span><span class="p">]</span>
         <span class="n">path_format</span> <span class="o">=</span> <span class="bp">None</span>
-        
+
         <span class="k">if</span> <span class="s">&#39;format&#39;</span> <span class="ow">in</span> <span class="n">path_entry</span><span class="p">:</span>
             <span class="n">path_format</span> <span class="o">=</span> <span class="n">path_entry</span><span class="p">[</span><span class="s">&#39;format&#39;</span><span class="p">]</span>
-            
+
         <span class="k">return</span> <span class="n">path_format</span>
-    
-    </div>
+</div>
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="Manifest.safe_mkdir"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.safe_mkdir">[docs]</a>    <span class="k">def</span> <span class="nf">safe_mkdir</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Create path if not already there.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        directory : string</span>
 <span class="sd">            create it if it doesn&#39;t exist</span>
-<span class="sd">        &#39;&#39;&#39;</span>        
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">print</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span>
-                
-    </div>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EEXIST</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span>
+</div>
 <div class="viewcode-block" id="Manifest.create_dir"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.create_dir">[docs]</a>    <span class="k">def</span> <span class="nf">create_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_key</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Make a directory for an entry.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        path_key : string</span>
@@ -900,11 +899,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">dir_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="n">path_key</span><span class="p">)</span>
         <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Manifest.check_dir"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.check_dir">[docs]</a>    <span class="k">def</span> <span class="nf">check_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_key</span><span class="p">,</span> <span class="n">do_exit</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Verify a directories existence or optionally exit.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        path_key : string</span>
@@ -913,17 +911,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            What to do if the directory is not present.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">dir_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="n">path_key</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
-            <span class="n">Manifest</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s">&#39;Directory </span><span class="si">%s</span><span class="s"> does not exist; exiting.&#39;</span> <span class="o">%</span> 
+            <span class="n">Manifest</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s">&#39;Directory </span><span class="si">%s</span><span class="s"> does not exist; exiting.&#39;</span> <span class="o">%</span>
                                <span class="p">(</span><span class="n">dir_path</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">do_exit</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">do_exit</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
                 <span class="n">quit</span><span class="p">()</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Manifest.resolve_paths"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.resolve_paths">[docs]</a>    <span class="k">def</span> <span class="nf">resolve_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description_dict</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s">&#39;_key&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Walk input items and expand those that refer to a manifest entry.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        description_dict : dict</span>
@@ -931,8 +928,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        suffix : string</span>
 <span class="sd">            Indicates the entries to be expanded.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">key_pattern</span> <span class="o">=</span>  <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;(.*)</span><span class="si">%s</span><span class="s">$&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">suffix</span><span class="p">))</span>
-        
+        <span class="n">key_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;(.*)</span><span class="si">%s</span><span class="s">$&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">suffix</span><span class="p">))</span>
+
         <span class="k">for</span> <span class="n">description_key</span><span class="p">,</span> <span class="n">manifest_key</span> <span class="ow">in</span> <span class="n">description_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">key_pattern</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">description_key</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">m</span><span class="p">:</span>

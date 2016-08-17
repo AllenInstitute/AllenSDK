@@ -651,7 +651,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div class="viewcode-block" id="GridDataApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.grid_data_api.GridDataApi">[docs]</a><span class="k">class</span> <span class="nc">GridDataApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;HTTP Client for the Allen 3-D Expression Grid Data Service.</span>
-<span class="sd">    </span>
+
 <span class="sd">    See: `Downloading 3-D Expression Grid Data &lt;http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data&gt;`_</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -661,26 +661,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">INJECTION_ENERGY</span> <span class="o">=</span> <span class="s">&#39;injection_energy&#39;</span>
     <span class="n">PROJECTION_ENERGY</span> <span class="o">=</span> <span class="s">&#39;projection_energy&#39;</span>
     <span class="n">DATA_MASK</span> <span class="o">=</span> <span class="s">&#39;data_mask&#39;</span>
-    
-    <span class="n">ENERGY</span><span class="o">=</span><span class="s">&#39;energy&#39;</span>
-    <span class="n">DENSITY</span><span class="o">=</span><span class="s">&#39;density&#39;</span>
-    <span class="n">INTENSITY</span><span class="o">=</span><span class="s">&#39;intensity&#39;</span>
-    
+
+    <span class="n">ENERGY</span> <span class="o">=</span> <span class="s">&#39;energy&#39;</span>
+    <span class="n">DENSITY</span> <span class="o">=</span> <span class="s">&#39;density&#39;</span>
+    <span class="n">INTENSITY</span> <span class="o">=</span> <span class="s">&#39;intensity&#39;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">GridDataApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">resolution</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">resolution</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">resolution</span> <span class="o">=</span> <span class="mi">25</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span>
-        
+
 <div class="viewcode-block" id="GridDataApi.download_expression_grid_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.grid_data_api.GridDataApi.download_expression_grid_data">[docs]</a>    <span class="k">def</span> <span class="nf">download_expression_grid_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                       <span class="n">section_data_set_id</span><span class="p">,</span>
                                       <span class="n">include</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                       <span class="n">path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Download in NRRD format.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        section_data_set_id : integer</span>
@@ -693,34 +693,33 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">            file : 3-D expression grid data packaged into a compressed archive file (.zip).</span>
-<span class="sd">            </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">include</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">include_clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;?include=&#39;</span><span class="p">,</span>
                                       <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">include</span><span class="p">)])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">include_clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
+
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_data_endpoint</span><span class="p">,</span>
                        <span class="s">&#39;/download/&#39;</span><span class="p">,</span>
                        <span class="nb">str</span><span class="p">(</span><span class="n">section_data_set_id</span><span class="p">),</span>
                        <span class="n">include_clause</span><span class="p">])</span>
-        
-        <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">section_data_set_id</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.zip&#39;</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-  
-    </div>
+</div>
 <div class="viewcode-block" id="GridDataApi.download_projection_grid_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.grid_data_api.GridDataApi.download_projection_grid_data">[docs]</a>    <span class="k">def</span> <span class="nf">download_projection_grid_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                       <span class="n">section_data_set_id</span><span class="p">,</span>
                                       <span class="n">image</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                       <span class="n">resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                       <span class="n">save_file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Download in NRRD format.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        section_data_set_id : integer</span>
@@ -731,33 +730,33 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            in microns. 10, 25, 50, or 100 (default).</span>
 <span class="sd">        save_file_path : string, optional</span>
 <span class="sd">            File name to save as.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        See `Downloading 3-D Projection Grid Data &lt;http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data#name=&quot;Downloading3-DExpressionGridData-DOWNLOADING3DPROJECTIONGRIDDATA&quot;&gt;`_</span>
 <span class="sd">        for additional documentation.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">params_list</span> <span class="o">=</span> <span class="p">[]</span>
-        
-        <span class="k">if</span> <span class="n">image</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">params_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;image=&#39;</span> <span class="o">+</span>  <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
-        
-        <span class="k">if</span> <span class="n">resolution</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">params_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;image=&#39;</span> <span class="o">+</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">resolution</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">params_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;resolution=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">resolution</span><span class="p">))</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">params_clause</span> <span class="o">=</span> <span class="s">&#39;?&#39;</span> <span class="o">+</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params_list</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">params_clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
+
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_data_endpoint</span><span class="p">,</span>
                        <span class="s">&#39;/download_file/&#39;</span><span class="p">,</span>
                        <span class="nb">str</span><span class="p">(</span><span class="n">section_data_set_id</span><span class="p">),</span>
                        <span class="n">params_clause</span><span class="p">])</span>
 
-        <span class="k">if</span> <span class="n">save_file_path</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">save_file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">save_file_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">section_data_set_id</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.nrrd&#39;</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">save_file_path</span><span class="p">)</span></div></div>
 </pre></div>
 

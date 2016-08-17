@@ -729,7 +729,7 @@ and application configuration.</p>
 This can take some time.</p>
 <div class="highlight-python"><div class="highlight"><pre>cd neuronal_model
 nrnivmodl ./modfiles   # compile the model (only needs to be done once)
-python -m allensdk.model.biophysical_perisomatic.runner manifest.json
+python -m allensdk.model.biophysical.runner manifest.json
 </pre></div>
 </div>
 </div>
@@ -741,12 +741,12 @@ You can remove all of the sweep numbers that you do not want run.</p>
 <div class="section" id="simulation-main-loop">
 <h2>Simulation Main Loop<a class="headerlink" href="#simulation-main-loop" title="Permalink to this headline">¶</a></h2>
 <p>The top level script is in the
-<tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt>
-method of the <tt class="xref py py-mod docutils literal"><span class="pre">allensdk.model.biophysical_perisomatic.runner</span></tt>
+<a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.runner.run" title="allensdk.model.biophysical.runner.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a>
+method of the <a class="reference internal" href="allensdk.model.biophysical.html#module-allensdk.model.biophysical.runner" title="allensdk.model.biophysical.runner"><tt class="xref py py-mod docutils literal"><span class="pre">allensdk.model.biophysical.runner</span></tt></a>
 module.  The implementation of the method is shown here step-by-step:</p>
 <p>First configure NEURON based on the configuration file, which was
 read in from the command line at the very bottom of the script.</p>
-<p><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt>:</p>
+<p><a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.runner.run" title="allensdk.model.biophysical.runner.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="c"># configure NEURON</span>
 <span class="n">utils</span> <span class="o">=</span> <span class="n">Utils</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 <span class="n">h</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">h</span>
@@ -790,17 +790,17 @@ read in from the command line at the very bottom of the script.</p>
 <h2>Customization<a class="headerlink" href="#customization" title="Permalink to this headline">¶</a></h2>
 <p>Much of the code in the perisomatic simulation is not core Allen SDK code.
 The runner.py script largely reads the configuration file and calls into
-methods in the <tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt> class.
+methods in the <a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils" title="allensdk.model.biophysical.utils.Utils"><tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt></a> class.
 Utils is a subclass of the <a class="reference internal" href="allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils" title="allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils"><tt class="xref py py-class docutils literal"><span class="pre">HocUtils</span></tt></a>
 class, which provides access to objects in the NEURON package.
 The various methods called by the runner.script are implemented here, including:
-<tt class="xref py py-meth docutils literal"><span class="pre">generate_morphology()</span></tt>,
-<tt class="xref py py-meth docutils literal"><span class="pre">load_cell_parameters()</span></tt>,
-<tt class="xref py py-meth docutils literal"><span class="pre">setup_iclamp()</span></tt>,
-<tt class="xref py py-meth docutils literal"><span class="pre">read_stimulus()</span></tt>
+<a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.generate_morphology" title="allensdk.model.biophysical.utils.Utils.generate_morphology"><tt class="xref py py-meth docutils literal"><span class="pre">generate_morphology()</span></tt></a>,
+<a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.load_cell_parameters" title="allensdk.model.biophysical.utils.Utils.load_cell_parameters"><tt class="xref py py-meth docutils literal"><span class="pre">load_cell_parameters()</span></tt></a>,
+<a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.setup_iclamp" title="allensdk.model.biophysical.utils.Utils.setup_iclamp"><tt class="xref py py-meth docutils literal"><span class="pre">setup_iclamp()</span></tt></a>,
+<a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.read_stimulus" title="allensdk.model.biophysical.utils.Utils.read_stimulus"><tt class="xref py py-meth docutils literal"><span class="pre">read_stimulus()</span></tt></a>
 and
-<tt class="xref py py-meth docutils literal"><span class="pre">record_values()</span></tt>.</p>
-<p><tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt>:</p>
+<a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.record_values" title="allensdk.model.biophysical.utils.Utils.record_values"><tt class="xref py py-meth docutils literal"><span class="pre">record_values()</span></tt></a>.</p>
+<p><a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils" title="allensdk.model.biophysical.utils.Utils"><tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt></a>:</p>
 <div class="highlight-python"><div class="highlight"><pre>from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 
 .....

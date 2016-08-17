@@ -653,8 +653,7 @@ It is included with the Anaconda distribution.</p>
 </div>
 <div class="section" id="other-distribution-formats">
 <h2>Other Distribution Formats<a class="headerlink" href="#other-distribution-formats" title="Permalink to this headline">¶</a></h2>
-<p>The Allen SDK is also available from the source repository or as a downloadable .zip or .tar.gz archive.
-The package can also be <a class="reference external" href="https://packaging.python.org/en/latest/installing.html">installed from these formats</a>.</p>
+<p>The Allen SDK is also available from the Github source repository.</p>
 </div>
 <div class="section" id="required-dependencies">
 <h2>Required Dependencies<a class="headerlink" href="#required-dependencies" title="Permalink to this headline">¶</a></h2>
@@ -689,26 +688,25 @@ example Dockerfiles are available.</p>
 <div><ol class="arabic">
 <li><p class="first">Ensure you have Docker installed.</p>
 </li>
-<li><dl class="first docutils">
-<dt>Download one of the example Docker files:</dt>
-<dd><ul class="first last simple">
-<li><a class="reference download internal" href="_downloads/Dockerfile.ubuntu"><tt class="xref download docutils literal"><span class="pre">Ubuntu</span> <span class="pre">Standalone</span></tt></a>.</li>
-<li><a class="reference download internal" href="_downloads/Dockerfile.neuralensemble"><tt class="xref download docutils literal"><span class="pre">Neural</span> <span class="pre">Ensemble</span> <span class="pre">combined</span> <span class="pre">simulators</span></tt></a>.</li>
-<li><tt class="xref download docutils literal"><span class="pre">Neural</span> <span class="pre">Ensemble</span> <span class="pre">combined</span> <span class="pre">simulators</span> <span class="pre">with</span> <span class="pre">X11</span></tt>.</li>
-</ul>
-</dd>
-</dl>
+<li><p class="first">Use Docker to build the image one of the images.</p>
+<blockquote>
+<div><p>Anaconda:</p>
+<div class="highlight-python"><div class="highlight"><pre>docker build -t alleninstitute/allensdk:anaconda https://github.com/AllenInstitute/AllenSDK.git#v0.12.1:docker/anaconda
+</pre></div>
+</div>
+<p>Other docker configurations are also available under docker directory in the source repository.</p>
+</div></blockquote>
 </li>
-<li><p class="first">Use Docker to build the image:</p>
-<div class="highlight-python"><div class="highlight"><pre>mkdir docker_build
-cp Dockerfile.ubuntu docker_build/Dockerfile
-cd docker_build
-docker build --tag alleninstitute/allensdk:ubuntu .
+<li><p class="first">Run the docker image:</p>
+<div class="highlight-python"><div class="highlight"><pre>docker run -i -t -p 8888:8888 -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
+cd allensdk
+make pytest_lax
 </pre></div>
 </div>
 </li>
-<li><p class="first">Run the docker image:</p>
-<div class="highlight-python"><div class="highlight"><pre>docker run -it -v /data:/data alleninstitute/allensdk:ubuntu /bin/bash
+<li><p class="first">Start a Jupyter Notebook:</p>
+<div class="highlight-python"><div class="highlight"><pre>cd allensdk/doc_template/examples/nb
+jupyter-notebook --ip=* --no-browser
 </pre></div>
 </div>
 </li>

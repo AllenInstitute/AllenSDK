@@ -631,7 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.core.cell_types_cache</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -648,6 +648,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">string_types</span>
 
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="kn">import</span> <span class="n">ManifestBuilder</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">Cache</span>
@@ -659,22 +660,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">import</span> <span class="nn">logging</span>
 
+
 <div class="viewcode-block" id="CellTypesCache"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache">[docs]</a><span class="k">class</span> <span class="nc">CellTypesCache</span><span class="p">(</span><span class="n">Cache</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cache class for storing and accessing data from the Cell Types Database.</span>
-<span class="sd">    By default, this class will cache any downloaded metadata or files in </span>
+<span class="sd">    By default, this class will cache any downloaded metadata or files in</span>
 <span class="sd">    well known locations defined in a manifest file.  This behavior can be</span>
 <span class="sd">    disabled.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    </span>
+
 <span class="sd">    api: CellTypesApi instance</span>
 <span class="sd">        The object used for making API queries related to the Cell Types Database</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    </span>
+
 <span class="sd">    cache: boolean</span>
 <span class="sd">        Whether the class should save results of API queries to locations specified</span>
 <span class="sd">        in the manifest file.  Queries for files (as opposed to metadata) must have a</span>
@@ -695,9 +697,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">MARKER_KEY</span> <span class="o">=</span> <span class="s">&#39;MARKER&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;cell_types_manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CellTypesCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CellTypesCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
+            <span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">CellTypesApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="n">base_uri</span><span class="p">)</span>
-
 
 <div class="viewcode-block" id="CellTypesCache.get_cells"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_cells">[docs]</a>    <span class="k">def</span> <span class="nf">get_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">require_morphology</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">reporter_status</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -706,9 +708,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        </span>
+
 <span class="sd">        file_name: string</span>
-<span class="sd">            File name to save/read the cell metadata as JSON.  If file_name is None, </span>
+<span class="sd">            File name to save/read the cell metadata as JSON.  If file_name is None,</span>
 <span class="sd">            the file_name will be pulled out of the manifest.  If caching</span>
 <span class="sd">            is disabled, no file will be saved. Default is None.</span>
 
@@ -717,7 +719,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        require_reconstruction: boolean</span>
 <span class="sd">            Filter out cells that have no morphological reconstructions.</span>
-<span class="sd">           </span>
+
 <span class="sd">        reporter_status: list</span>
 <span class="sd">            Filter for cells that have one or more cell reporter statuses.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -732,26 +734,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
                 <span class="n">json_utilities</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">cells</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reporter_status</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
-            <span class="n">reporter_status</span> <span class="o">=</span> <span class="p">[</span> <span class="n">reporter_status</span> <span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reporter_status</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+            <span class="n">reporter_status</span> <span class="o">=</span> <span class="p">[</span><span class="n">reporter_status</span><span class="p">]</span>
 
         <span class="c"># filter the cells on the way out</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">filter_cells</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">,</span> <span class="n">reporter_status</span><span class="p">)</span>
-    
 </div>
 <div class="viewcode-block" id="CellTypesCache.get_ephys_sweeps"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_sweeps">[docs]</a>    <span class="k">def</span> <span class="nf">get_ephys_sweeps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Download sweep metadata for a single cell specimen.  </span>
+<span class="sd">        Download sweep metadata for a single cell specimen.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        </span>
+
 <span class="sd">        specimen_id: int</span>
 <span class="sd">             ID of a cell.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_SWEEPS_KEY</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
-        
+        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_SWEEPS_KEY</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="n">sweeps</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -761,23 +763,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">json_utilities</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sweeps</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">sweeps</span>
-
-    </div>
+</div>
 <div class="viewcode-block" id="CellTypesCache.get_ephys_features"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_ephys_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Download electrophysiology features for all cells in the database.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        </span>
+
 <span class="sd">        file_name: string</span>
-<span class="sd">            File name to save/read the ephys features metadata as CSV.  </span>
-<span class="sd">            If file_name is None, the file_name will be pulled out of the </span>
-<span class="sd">            manifest.  If caching is disabled, no file will be saved. </span>
+<span class="sd">            File name to save/read the ephys features metadata as CSV.</span>
+<span class="sd">            If file_name is None, the file_name will be pulled out of the</span>
+<span class="sd">            manifest.  If caching is disabled, no file will be saved.</span>
 <span class="sd">            Default is None.</span>
 
 <span class="sd">        dataframe: boolean</span>
-<span class="sd">            Return the output as a Pandas DataFrame.  If False, return </span>
+<span class="sd">            Return the output as a Pandas DataFrame.  If False, return</span>
 <span class="sd">            a list of dictionaries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -795,7 +796,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">return</span> <span class="n">features_df</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">features_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
-
 </div>
 <div class="viewcode-block" id="CellTypesCache.get_morphology_features"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_morphology_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_morphology_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -803,25 +803,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        </span>
+
 <span class="sd">        file_name: string</span>
-<span class="sd">            File name to save/read the ephys features metadata as CSV.  </span>
-<span class="sd">            If file_name is None, the file_name will be pulled out of the </span>
-<span class="sd">            manifest.  If caching is disabled, no file will be saved. </span>
+<span class="sd">            File name to save/read the ephys features metadata as CSV.</span>
+<span class="sd">            If file_name is None, the file_name will be pulled out of the</span>
+<span class="sd">            manifest.  If caching is disabled, no file will be saved.</span>
 <span class="sd">            Default is None.</span>
 
 <span class="sd">        dataframe: boolean</span>
-<span class="sd">            Return the output as a Pandas DataFrame.  If False, return </span>
+<span class="sd">            Return the output as a Pandas DataFrame.  If False, return</span>
 <span class="sd">            a list of dictionaries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MORPHOLOGY_FEATURES_KEY</span><span class="p">)</span>
-        
+
+        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MORPHOLOGY_FEATURES_KEY</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="n">features_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">features_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_morphology_features</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-            
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
                 <span class="n">features_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
@@ -829,8 +830,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">return</span> <span class="n">features_df</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">features_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
-
-    </div>
+</div>
 <div class="viewcode-block" id="CellTypesCache.get_all_features"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_all_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Download morphology and electrophysiology features for all cells and merge them</span>
@@ -840,11 +840,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        ----------</span>
 
 <span class="sd">        dataframe: boolean</span>
-<span class="sd">            Return the output as a Pandas DataFrame.  If False, return </span>
+<span class="sd">            Return the output as a Pandas DataFrame.  If False, return</span>
 <span class="sd">            a list of dictionaries.</span>
 
 <span class="sd">        require_reconstruction: boolean</span>
-<span class="sd">            Only return ephys and morphology features for cells that have </span>
+<span class="sd">            Only return ephys and morphology features for cells that have</span>
 <span class="sd">            reconstructions. Default True.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -853,15 +853,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">how</span> <span class="o">=</span> <span class="s">&#39;inner&#39;</span> <span class="k">if</span> <span class="n">require_reconstruction</span> <span class="k">else</span> <span class="s">&#39;outer&#39;</span>
 
-        <span class="n">all_features</span> <span class="o">=</span> <span class="n">ephys_features</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">morphology_features</span><span class="p">,</span> 
+        <span class="n">all_features</span> <span class="o">=</span> <span class="n">ephys_features</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">morphology_features</span><span class="p">,</span>
                                             <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">,</span>
                                             <span class="n">on</span><span class="o">=</span><span class="s">&#39;specimen_id&#39;</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">dataframe</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">all_features</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">all_features</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
-        
 </div>
 <div class="viewcode-block" id="CellTypesCache.get_ephys_data"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_ephys_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -869,14 +868,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        </span>
+
 <span class="sd">        specimen_id: int</span>
 <span class="sd">            The ID of a cell specimen to download.</span>
 
 <span class="sd">        file_name: string</span>
-<span class="sd">            File name to save/read the ephys features metadata as CSV.  </span>
-<span class="sd">            If file_name is None, the file_name will be pulled out of the </span>
-<span class="sd">            manifest.  If caching is disabled, no file will be saved. </span>
+<span class="sd">            File name to save/read the ephys features metadata as CSV.</span>
+<span class="sd">            If file_name is None, the file_name will be pulled out of the</span>
+<span class="sd">            manifest.  If caching is disabled, no file will be saved.</span>
 <span class="sd">            Default is None.</span>
 
 <span class="sd">        Returns</span>
@@ -886,13 +885,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            and response traces out of an NWB file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_DATA_KEY</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_DATA_KEY</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">save_ephys_data</span><span class="p">(</span><span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-
 </div>
 <div class="viewcode-block" id="CellTypesCache.get_reconstruction"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_reconstruction">[docs]</a>    <span class="k">def</span> <span class="nf">get_reconstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -900,14 +899,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        </span>
+
 <span class="sd">        specimen_id: int</span>
 <span class="sd">            The ID of a cell specimen to download.</span>
 
 <span class="sd">        file_name: string</span>
-<span class="sd">            File name to save/read the reconstruction SWC.  </span>
-<span class="sd">            If file_name is None, the file_name will be pulled out of the </span>
-<span class="sd">            manifest.  If caching is disabled, no file will be saved. </span>
+<span class="sd">            File name to save/read the reconstruction SWC.</span>
+<span class="sd">            If file_name is None, the file_name will be pulled out of the</span>
+<span class="sd">            manifest.  If caching is disabled, no file will be saved.</span>
 <span class="sd">            Default is None.</span>
 
 <span class="sd">        Returns</span>
@@ -916,16 +915,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">             A class instance with methods for accessing morphology compartments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">RECONSTRUCTION_KEY</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">RECONSTRUCTION_KEY</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Please enable caching (CellTypes.cache = True) or specify a save_file_name.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s">&quot;Please enable caching (CellTypes.cache = True) or specify a save_file_name.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">save_reconstruction</span><span class="p">(</span><span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">swc</span><span class="o">.</span><span class="n">read_swc</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-
 </div>
 <div class="viewcode-block" id="CellTypesCache.get_reconstruction_markers"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_reconstruction_markers">[docs]</a>    <span class="k">def</span> <span class="nf">get_reconstruction_markers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -933,14 +933,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        </span>
+
 <span class="sd">        specimen_id: int</span>
 <span class="sd">            The ID of a cell specimen to download.</span>
 
 <span class="sd">        file_name: string</span>
-<span class="sd">            File name to save/read the reconstruction marker.  </span>
-<span class="sd">            If file_name is None, the file_name will be pulled out of the </span>
-<span class="sd">            manifest.  If caching is disabled, no file will be saved. </span>
+<span class="sd">            File name to save/read the reconstruction marker.</span>
+<span class="sd">            If file_name is None, the file_name will be pulled out of the</span>
+<span class="sd">            manifest.  If caching is disabled, no file will be saved.</span>
 <span class="sd">            Default is None.</span>
 
 <span class="sd">        Returns</span>
@@ -949,10 +949,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">             A class instance with methods for accessing morphology compartments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MARKER_KEY</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MARKER_KEY</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Please enable caching (CellTypes.cache = True) or specify a save_file_name.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s">&quot;Please enable caching (CellTypes.cache = True) or specify a save_file_name.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
@@ -962,15 +964,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="k">return</span> <span class="p">[]</span>
 
         <span class="k">return</span> <span class="n">swc</span><span class="o">.</span><span class="n">read_marker_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-
 </div>
 <div class="viewcode-block" id="CellTypesCache.build_manifest"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.build_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">build_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a manifest for this Cache class and save it in a file.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        </span>
+
 <span class="sd">        file_name: string</span>
 <span class="sd">            File location to save the manifest.</span>
 
@@ -979,14 +980,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">mb</span> <span class="o">=</span> <span class="n">ManifestBuilder</span><span class="p">()</span>
 
         <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span> <span class="s">&#39;.&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CELLS_KEY</span><span class="p">,</span> <span class="s">&#39;cells.json&#39;</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_DATA_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/ephys.nwb&#39;</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_FEATURES_KEY</span><span class="p">,</span> <span class="s">&#39;ephys_features.csv&#39;</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MORPHOLOGY_FEATURES_KEY</span><span class="p">,</span> <span class="s">&#39;morphology_features.csv&#39;</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RECONSTRUCTION_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/reconstruction.swc&#39;</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MARKER_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/reconstruction.marker&#39;</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_SWEEPS_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/ephys_sweeps.json&#39;</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CELLS_KEY</span><span class="p">,</span> <span class="s">&#39;cells.json&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_DATA_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/ephys.nwb&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_FEATURES_KEY</span><span class="p">,</span> <span class="s">&#39;ephys_features.csv&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MORPHOLOGY_FEATURES_KEY</span><span class="p">,</span> <span class="s">&#39;morphology_features.csv&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RECONSTRUCTION_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/reconstruction.swc&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MARKER_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/reconstruction.marker&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_SWEEPS_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/ephys_sweeps.json&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
 
         <span class="n">mb</span><span class="o">.</span><span class="n">write_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
@@ -999,12 +1006,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">POSITIVE</span> <span class="o">=</span> <span class="s">&#39;cre reporter positive&#39;</span>
     <span class="n">NEGATIVE</span> <span class="o">=</span> <span class="s">&#39;cre reporter negative&#39;</span>
     <span class="n">NA</span> <span class="o">=</span> <span class="s">&#39;not applicable&#39;</span>
-    <span class="n">INDETERMINATE</span> <span class="o">=</span> <span class="s">&#39;cre reporter indeterminate&#39;</span>
-
-
-
-
-    </div>
+    <span class="n">INDETERMINATE</span> <span class="o">=</span> <span class="s">&#39;cre reporter indeterminate&#39;</span></div>
 </pre></div>
 
           </div>

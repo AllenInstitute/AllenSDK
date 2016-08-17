@@ -649,93 +649,92 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
 <span class="kn">from</span> <span class="nn">jinja2</span> <span class="kn">import</span> <span class="n">Template</span>
 
+
 <div class="viewcode-block" id="RmaTemplate"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_template.RmaTemplate">[docs]</a><span class="k">class</span> <span class="nc">RmaTemplate</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    See: `Atlas Drawings and Ontologies</span>
 <span class="sd">    &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies&gt;`_</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">query_manifest</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RmaTemplate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">templates</span> <span class="o">=</span> <span class="n">query_manifest</span>
-    
-    
+
 <div class="viewcode-block" id="RmaTemplate.to_filter_rhs"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_template.RmaTemplate.to_filter_rhs">[docs]</a>    <span class="k">def</span> <span class="nf">to_filter_rhs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
             <span class="k">return</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rhs</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">rhs</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaTemplate.template_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_template.RmaTemplate.template_query">[docs]</a>    <span class="k">def</span> <span class="nf">template_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template_name</span><span class="p">,</span> <span class="n">entry_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">cb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">templates</span><span class="p">[</span><span class="n">template_name</span><span class="p">]</span>
         <span class="n">templates</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cb</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">entry_name</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">templates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">template</span> <span class="o">=</span> <span class="n">templates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Entry </span><span class="si">%s</span><span class="s"> not found.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">entry_name</span><span class="p">))</span>
-        
+
         <span class="n">query_args</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;model&#39;</span><span class="p">:</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;model&#39;</span><span class="p">]}</span>
-        
+
         <span class="k">if</span> <span class="s">&#39;criteria&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
             <span class="n">criteria_template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">template</span><span class="p">[</span><span class="s">&#39;criteria&#39;</span><span class="p">])</span>
-            
+
             <span class="k">if</span> <span class="s">&#39;criteria_params&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
-                <span class="n">criteria_params</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_filter_rhs</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-                                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;criteria_params&#39;</span><span class="p">]</span>
-                                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="p">}</span>
+                <span class="n">criteria_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_filter_rhs</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+                                   <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;criteria_params&#39;</span><span class="p">]</span>
+                                   <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">criteria_params</span> <span class="o">=</span> <span class="p">{}</span>
-       
+
             <span class="n">criteria_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">criteria_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">criteria_params</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">criteria_str</span><span class="p">:</span>
                 <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;criteria&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">criteria_str</span>
-                
 
-        
         <span class="k">if</span> <span class="s">&#39;include&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
             <span class="n">include_template</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="n">template</span><span class="p">[</span><span class="s">&#39;include&#39;</span><span class="p">])</span>
-            
+
             <span class="k">if</span> <span class="s">&#39;include_params&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
-                <span class="n">include_params</span> <span class="o">=</span> <span class="p">{</span> <span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_filter_rhs</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-                                   <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;include_params&#39;</span><span class="p">]</span>
-                                   <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">}</span>
+                <span class="n">include_params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_filter_rhs</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+                                  <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;include_params&#39;</span><span class="p">]</span>
+                                  <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">include_params</span> <span class="o">=</span> <span class="p">{}</span>
-            
+
             <span class="n">include_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">include_template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">include_params</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">include_str</span><span class="p">:</span>
                 <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;include&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">include_str</span>
-                
-        
+
         <span class="k">if</span> <span class="s">&#39;only&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;only&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;only&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;only&#39;</span><span class="p">)))]</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;only&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;only&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span>
+                    <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;only&#39;</span><span class="p">)))]</span>
         <span class="k">elif</span> <span class="s">&#39;only&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
-            <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;only&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">template</span><span class="p">[</span><span class="s">&#39;only&#39;</span><span class="p">]))]</span>
-        
+            <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;only&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">template</span><span class="p">[</span><span class="s">&#39;only&#39;</span><span class="p">]))]</span>
+
         <span class="k">if</span> <span class="s">&#39;except&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;except&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;except&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;except&#39;</span><span class="p">)))]</span>
+            <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;except&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;except&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span>
+                    <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;except&#39;</span><span class="p">)))]</span>
         <span class="k">elif</span> <span class="s">&#39;except&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
             <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;except&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;except&#39;</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="s">&#39;start_row&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;start_row&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;start_row&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="s">&#39;start_row&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
             <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;start_row&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;start_row&#39;</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="s">&#39;num_rows&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;num_rows&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;num_rows&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="s">&#39;num_rows&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
             <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;num_rows&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;num_rows&#39;</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="s">&#39;count&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;count&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="s">&#39;count&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
             <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;count&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">template</span><span class="p">[</span><span class="s">&#39;count&#39;</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="s">&#39;order&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">query_args</span><span class="p">[</span><span class="s">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;order&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="s">&#39;order&#39;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
@@ -743,8 +742,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="o">**</span><span class="n">query_args</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">data</span>
-</pre></div></div></div>
+        <span class="k">return</span> <span class="n">data</span></div></div>
+</pre></div>
 
           </div>
         </div>

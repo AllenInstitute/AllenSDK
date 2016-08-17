@@ -647,27 +647,30 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">import</span> <span class="n">JsonComments</span>
-
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.config</span> <span class="kn">as</span> <span class="nn">lc</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span>  <span class="c"># @UnresolvedImport</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="kn">import</span> <span class="n">ConfigParser</span> <span class="c"># Python 2</span>
+    <span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>  <span class="c"># @UnresolvedImport</span>
 <span class="k">except</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span> <span class="c"># Python 3 #@UnresolvedImport</span>
+    <span class="kn">from</span> <span class="nn">ConfigParser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>  <span class="c"># @UnresolvedImport</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">logging.config</span> <span class="kn">as</span> <span class="nn">lc</span>
-<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span> <span class="c">#@UnresolvedImport</span>
 
 <div class="viewcode-block" id="ApplicationConfig"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig">[docs]</a><span class="k">class</span> <span class="nc">ApplicationConfig</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Convenience class that handles of application configuration</span>
 <span class="sd">    from environment variables, .conf files and the command line</span>
 <span class="sd">    using Python standard libraries and formats.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-    <span class="n">_DEFAULT_LOG_CONFIG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&#39;LOG_CFG&#39;</span><span class="p">,</span> <span class="n">resource_filename</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;logging.conf&#39;</span><span class="p">))</span>
+    <span class="n">_DEFAULT_LOG_CONFIG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span>
+        <span class="s">&#39;LOG_CFG&#39;</span><span class="p">,</span> <span class="n">resource_filename</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;logging.conf&#39;</span><span class="p">))</span>
     <span class="n">lc</span><span class="o">.</span><span class="n">fileConfig</span><span class="p">(</span><span class="n">_DEFAULT_LOG_CONFIG</span><span class="p">)</span>
-    
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">defaults</span><span class="p">,</span>
                  <span class="n">name</span><span class="o">=</span><span class="s">&quot;app&quot;</span><span class="p">,</span>
                  <span class="n">halp</span><span class="o">=</span><span class="s">&quot;Run application.&quot;</span><span class="p">,</span>
@@ -675,12 +678,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">help</span> <span class="o">=</span> <span class="n">halp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug_enabled</span> <span class="o">=</span> <span class="bp">False</span>
-    
-        <span class="k">if</span> <span class="n">default_log_config</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">default_log_config</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">default_log_config</span> <span class="o">=</span> <span class="n">ApplicationConfig</span><span class="o">.</span><span class="n">_DEFAULT_LOG_CONFIG</span>
-        
-        <span class="n">ApplicationConfig</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;default log config: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">default_log_config</span><span class="p">))</span>
-        
+
+        <span class="n">ApplicationConfig</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s">&quot;default log config: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">default_log_config</span><span class="p">))</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s">&#39;config_file_path&#39;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.conf&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">application_name</span><span class="p">),</span>
@@ -691,30 +695,29 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="s">&#39;help&#39;</span><span class="p">:</span> <span class="s">&#39;logging configuration path&#39;</span>
             <span class="p">}</span>
         <span class="p">}</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">defaults</span><span class="p">)</span>
-        
+
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;defaults: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">))</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">argparser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_argparser</span><span class="p">()</span>
-                
+
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">[</span><span class="s">&#39;default&#39;</span><span class="p">])</span>
-    
-    
+
 <div class="viewcode-block" id="ApplicationConfig.load"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_line_args</span><span class="p">,</span> <span class="n">disable_existing_loggers</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Load application configuration options, first from the environment,</span>
 <span class="sd">        then from the configuration file, then from the command line.</span>
-<span class="sd">            </span>
+
 <span class="sd">        Each stage of loading can override the previous stage.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        command_line_args : dict</span>
 <span class="sd">            Parameters passed to the application.</span>
 <span class="sd">        disable_existing_loggers : boolean</span>
 <span class="sd">            Reset the logging system or not.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        fileConfig</span>
@@ -722,56 +725,55 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="c"># read and apply options from the environment</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">apply_configuration_from_environment</span><span class="p">()</span>
-        
+
         <span class="c"># command line so we can find the config file.</span>
         <span class="n">parsed_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_command_line_args</span><span class="p">(</span><span class="n">command_line_args</span><span class="p">)</span>
-        
+
         <span class="k">try</span><span class="p">:</span>
             <span class="c"># read and apply the configuration file options</span>
             <span class="n">config_file_path</span> <span class="o">=</span> <span class="n">parsed_args</span><span class="o">.</span><span class="n">config_file_path</span>
-            
+
             <span class="k">if</span> <span class="n">config_file_path</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">config_file_path</span> <span class="o">=</span> <span class="n">config_file_path</span>
-            
+
             <span class="bp">self</span><span class="o">.</span><span class="n">apply_configuration_from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file_path</span><span class="p">)</span>
-            
+
             <span class="c"># apply the remaining command line options</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">apply_configuration_from_command_line</span><span class="p">(</span><span class="n">parsed_args</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">ApplicationConfig</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Could not load configuration file: </span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> 
+            <span class="n">ApplicationConfig</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Could not load configuration file: </span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
                                          <span class="p">(</span><span class="n">parsed_args</span><span class="o">.</span><span class="n">config_file_path</span><span class="p">,</span>
-                                         <span class="n">e</span><span class="p">))</span>
+                                          <span class="n">e</span><span class="p">))</span>
             <span class="k">raise</span>
-        
+
         <span class="k">if</span> <span class="n">parsed_args</span><span class="o">.</span><span class="n">log_config_path</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">lc</span><span class="o">.</span><span class="n">fileConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_config_path</span><span class="p">,</span>
                               <span class="n">disable_existing_loggers</span><span class="o">=</span><span class="n">disable_existing_loggers</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Could not load log configuration file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
-                             <span class="p">(</span><span class="n">parsed_args</span><span class="o">.</span><span class="n">log_config_path</span><span class="p">))</span>
+                              <span class="p">(</span><span class="n">parsed_args</span><span class="o">.</span><span class="n">log_config_path</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c"># TODO: configure default logging</span>
             <span class="k">pass</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ApplicationConfig.create_argparser"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.create_argparser">[docs]</a>    <span class="k">def</span> <span class="nf">create_argparser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Initialization for the command-line parsing stage.</span>
-<span class="sd">        </span>
-<span class="sd">        An application specific prefix is applied to argument names. </span>
-<span class="sd">        </span>
+
+<span class="sd">        An application specific prefix is applied to argument names.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        prog : string</span>
 <span class="sd">            Application specific prefix for argument names.</span>
 <span class="sd">        description : string</span>
 <span class="sd">            A brief &#39;help&#39; description of the application.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        argParse.ArgumentParser</span>
 <span class="sd">            The initialized argument parser object.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Defaults are set at the first environment reading.</span>
@@ -781,118 +783,115 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                          <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">help</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;config_file_path&#39;</span><span class="p">:</span>
-                <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="s">&#39;help&#39;</span><span class="p">])</span>
+                <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+                    <span class="s">&quot;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="s">&#39;help&#39;</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;--</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="s">&#39;help&#39;</span><span class="p">])</span>
-       
+                <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;--</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
+                                    <span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="s">&#39;help&#39;</span><span class="p">])</span>
+
         <span class="k">return</span> <span class="n">parser</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ApplicationConfig.parse_command_line_args"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.parse_command_line_args">[docs]</a>    <span class="k">def</span> <span class="nf">parse_command_line_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Simply call the internal argparser object.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        args : array</span>
 <span class="sd">            Parameters passed to the application.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Namespace</span>
 <span class="sd">            Parsed paramenters.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">argparser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ApplicationConfig.apply_configuration_from_command_line"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_command_line">[docs]</a>    <span class="k">def</span> <span class="nf">apply_configuration_from_command_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_args</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read application configuration variables from the command line.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Unassigned variables are left unchanged if previously assigned,</span>
 <span class="sd">        set to their default values,</span>
 <span class="sd">        or None if no default is specified at init time.</span>
 <span class="sd">        Assigned variables will overwrite the previous value.</span>
-<span class="sd">        </span>
+
 <span class="sd">        see: https://docs.python.org/2/howto/argparse.html</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        parsed_args : dict</span>
 <span class="sd">            the arguments as parsed from the command line.</span>
-<span class="sd">        </span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;command_line args: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">parsed_args</span><span class="p">))</span>
-        
+
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">:</span>
             <span class="n">parsed_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">parsed_args</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">parsed_value</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">parsed_value</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ApplicationConfig.apply_configuration_from_environment"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_environment">[docs]</a>    <span class="k">def</span> <span class="nf">apply_configuration_from_environment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read application configuration variables from the environment.</span>
-<span class="sd">        </span>
-<span class="sd">        The variable names are upper case and have a </span>
+
+<span class="sd">        The variable names are upper case and have a</span>
 <span class="sd">        prefix defined by the application.</span>
-<span class="sd">            </span>
+
 <span class="sd">        See: https://docs.python.org/2/library/os.html</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">:</span>
-            <span class="n">environment_variable</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">application_name</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+            <span class="n">environment_variable</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
             <span class="n">environment_value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">environment_variable</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">environment_value</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">environment_value</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ApplicationConfig.from_json_file"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.from_json_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_json_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_path</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read an application configuration from a JSON format file.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        json_path : string</span>
 <span class="sd">            Path to the JSON file.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
 <span class="sd">            An application configuration in INI format</span>
-<span class="sd">        </span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">description</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">json_path</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_config_string</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ApplicationConfig.from_json_string"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.from_json_string">[docs]</a>    <span class="k">def</span> <span class="nf">from_json_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_string</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read a configuration from a JSON format string.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        json_string : string</span>
 <span class="sd">            A JSON-formatted string containing an application configuration.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
 <span class="sd">            An application configuration in INI format</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">description</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">read_string</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_config_string</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ApplicationConfig.to_config_string"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.to_config_string">[docs]</a>    <span class="k">def</span> <span class="nf">to_config_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Create a configuration string from a dict.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        description : dict</span>
 <span class="sd">            Configuration options for an application.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
 <span class="sd">            Equivalent configuration as an INI format string</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The Python configparser library natively supports this functionality in Python 3.</span>
@@ -900,70 +899,74 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="ow">not</span> <span class="s">&#39;biophys&#39;</span> <span class="ow">in</span> <span class="n">description</span><span class="p">:</span>
             <span class="n">bps_config_string</span> <span class="o">=</span> <span class="s">&#39;[biophys]</span><span class="se">\n\n</span><span class="s">&#39;</span>
             <span class="k">return</span> <span class="n">bps_config_string</span>
-        
+
         <span class="n">bps_config</span> <span class="o">=</span> <span class="n">description</span><span class="p">[</span><span class="s">&#39;biophys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        
+
         <span class="n">cfg_array</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;[biophys]&#39;</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="s">&#39;log_config_path&#39;</span> <span class="ow">in</span> <span class="n">bps_config</span><span class="p">:</span>
-            <span class="n">cfg_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s">&#39;log_config_path: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">bps_config</span><span class="p">[</span><span class="s">&#39;log_config_path&#39;</span><span class="p">]))</span>
-         
+            <span class="n">cfg_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s">&#39;log_config_path: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                                 <span class="n">bps_config</span><span class="p">[</span><span class="s">&#39;log_config_path&#39;</span><span class="p">]))</span>
+
         <span class="k">if</span> <span class="s">&#39;debug&#39;</span> <span class="ow">in</span> <span class="n">bps_config</span><span class="p">:</span>
             <span class="n">cfg_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s">&#39;debug: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">bps_config</span><span class="p">[</span><span class="s">&#39;debug&#39;</span><span class="p">]))</span>
-         
+
         <span class="k">if</span> <span class="s">&#39;model_file&#39;</span> <span class="ow">in</span> <span class="n">bps_config</span><span class="p">:</span>
-            <span class="n">cfg_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s">&#39;model_file: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bps_config</span><span class="p">[</span><span class="s">&#39;model_file&#39;</span><span class="p">])))</span>
-            
+            <span class="n">cfg_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s">&#39;model_file: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
+                                 <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bps_config</span><span class="p">[</span><span class="s">&#39;model_file&#39;</span><span class="p">])))</span>
+
         <span class="n">cfg_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
-        
+
         <span class="n">bps_cfg_string</span> <span class="o">=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cfg_array</span><span class="p">)</span>
         <span class="n">ApplicationConfig</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">bps_cfg_string</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">bps_cfg_string</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ApplicationConfig.apply_configuration_from_file"><a class="viewcode-back" href="../../../../allensdk.config.app.html#allensdk.config.app.application_config.ApplicationConfig.apply_configuration_from_file">[docs]</a>    <span class="k">def</span> <span class="nf">apply_configuration_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file_path</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Read application configuration variables from a .conf file.</span>
-<span class="sd">        </span>
-<span class="sd">        Unassigned variables are set to their default values </span>
+
+<span class="sd">        Unassigned variables are set to their default values</span>
 <span class="sd">        or None if no default is specified at init time.</span>
 <span class="sd">        The variables are found in a section named by the application.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        config_file_path : string</span>
 <span class="sd">            path to to an INI (.conf) or JSON format application config file.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        </span>
+
 <span class="sd">        see: https://docs.python.org/2/library/configparser.html</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">none_defaults</span> <span class="o">=</span> <span class="p">{}</span>
-        
+
         <span class="c"># defaults are set in environment</span>
         <span class="c"># they are only overriden by the config file if present</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">:</span>
             <span class="n">none_defaults</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
 
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;none_defaults: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">none_defaults</span><span class="p">))</span>
-            
+
         <span class="n">config</span> <span class="o">=</span> <span class="bp">None</span>
-        
+
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="n">defaults</span><span class="o">=</span><span class="n">none_defaults</span><span class="p">,</span> 
+            <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="n">defaults</span><span class="o">=</span><span class="n">none_defaults</span><span class="p">,</span>
                                   <span class="n">allow_no_value</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;This python installation does not support configuration defaults.&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s">&quot;This python installation does not support configuration defaults.&quot;</span><span class="p">)</span>
             <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
-        
+
         <span class="k">if</span> <span class="n">config_file_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.json&#39;</span><span class="p">):</span>
-            <span class="n">cfg_string</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
             <span class="n">cfg_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">from_json_file</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span>
-            <span class="n">config</span><span class="o">.</span><span class="n">readfp</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">cfg_string</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">readfp</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">cfg_string</span><span class="p">))</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">NameError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">read_string</span><span class="p">(</span><span class="n">cfg_string</span><span class="p">)</span>  <span class="c"># Python 3</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span>
-        
+
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">defaults</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">file_value</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">application_name</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>

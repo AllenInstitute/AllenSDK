@@ -631,7 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.api.queries.synchronization_api</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -648,26 +648,27 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">from</span> <span class="nn">allensdk.api.api</span> <span class="kn">import</span> <span class="n">Api</span>
 
+
 <div class="viewcode-block" id="SynchronizationApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.synchronization_api.SynchronizationApi">[docs]</a><span class="k">class</span> <span class="nc">SynchronizationApi</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;HTTP client for image synchronization services uses the image alignment results from </span>
+    <span class="sd">&#39;&#39;&#39;HTTP client for image synchronization services uses the image alignment results from</span>
 <span class="sd">    the Informatics Data Processing Pipeline.</span>
-<span class="sd">    Note: all locations on SectionImages are reported in pixel coordinates </span>
+<span class="sd">    Note: all locations on SectionImages are reported in pixel coordinates</span>
 <span class="sd">    and all locations in 3-D ReferenceSpaces are reported in microns.</span>
-<span class="sd">    </span>
+
 <span class="sd">    See `Image to Image Synchronization &lt;http://help.brain-map.org/display/api/Image-to-Image+Synchronization&gt;`_</span>
 <span class="sd">    for additional documentation.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SynchronizationApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
-        
-    
+
 <div class="viewcode-block" id="SynchronizationApi.get_image_to_atlas"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_atlas">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_to_atlas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                            <span class="n">section_image_id</span><span class="p">,</span>
                            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
                            <span class="n">atlas_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;For a specified Atlas, find the closest annotated SectionImage</span>
 <span class="sd">        and (x,y) location as defined by a seed SectionImage and seed (x,y) location.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        section_image_id : integer</span>
@@ -678,7 +679,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Pixel coordinate of the seed location in the seed SectionImage.</span>
 <span class="sd">        atlas_id : int</span>
 <span class="sd">            Target Atlas for image sync.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
@@ -691,17 +692,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                        <span class="s">&#39;?x=</span><span class="si">%f</span><span class="s">&amp;y=</span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
                        <span class="s">&#39;&amp;atlas_id=&#39;</span><span class="p">,</span>
                        <span class="nb">str</span><span class="p">(</span><span class="n">atlas_id</span><span class="p">)])</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="SynchronizationApi.get_image_to_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_to_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                            <span class="n">section_image_id</span><span class="p">,</span>
                            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
                            <span class="n">section_data_set_ids</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;For a list of target SectionDataSets, find the closest SectionImage</span>
 <span class="sd">        and (x,y) location as defined by a seed SectionImage and seed (x,y) pixel location.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        section_image_id : integer</span>
@@ -712,7 +712,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Pixel coordinate of the seed location in the seed SectionImage.</span>
 <span class="sd">        section_data_set_ids : list of integers</span>
 <span class="sd">            Target SectionDataSet IDs for image sync.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
@@ -725,17 +725,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                        <span class="s">&#39;?x=</span><span class="si">%f</span><span class="s">&amp;y=</span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
                        <span class="s">&#39;&amp;section_data_set_ids=&#39;</span><span class="p">,</span>
                        <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">section_data_set_ids</span><span class="p">)])</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="SynchronizationApi.get_image_to_image_2d"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_image_2d">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_to_image_2d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                               <span class="n">section_image_id</span><span class="p">,</span>
                               <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span>
                               <span class="n">section_image_ids</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;For a list of target SectionImages, find the closest (x,y) location</span>
 <span class="sd">        as defined by a seed SectionImage and seed (x,y) location.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        section_image_id : integer</span>
@@ -746,7 +745,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Pixel coordinate of the seed location in the seed SectionImage.</span>
 <span class="sd">        section_image_ids : list of ints</span>
 <span class="sd">            Target SectionImage IDs for image sync.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
@@ -759,17 +758,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                        <span class="s">&#39;?x=</span><span class="si">%f</span><span class="s">&amp;y=</span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
                        <span class="s">&#39;&amp;section_image_ids=&#39;</span><span class="p">,</span>
                        <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">section_image_ids</span><span class="p">)])</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    
-        </div>
+</div>
 <div class="viewcode-block" id="SynchronizationApi.get_reference_to_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.synchronization_api.SynchronizationApi.get_reference_to_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_reference_to_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                <span class="n">reference_space_id</span><span class="p">,</span>
                                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span>
                                <span class="n">section_data_set_ids</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;For a list of target SectionDataSets, find the closest SectionImage</span>
 <span class="sd">        and (x,y) location as defined by a (x,y,z) location in a specified ReferenceSpace.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        reference_space_id : integer</span>
@@ -782,7 +780,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Coordinate (in microns) of the seed location in the seed ReferenceSpace.</span>
 <span class="sd">        section_data_set_ids : list of ints</span>
 <span class="sd">            Target SectionDataSets IDs for image sync.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
@@ -795,16 +793,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                        <span class="s">&#39;?x=</span><span class="si">%f</span><span class="s">&amp;y=</span><span class="si">%f</span><span class="s">&amp;z=</span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span>
                        <span class="s">&#39;&amp;section_data_set_ids=&#39;</span><span class="p">,</span>
                        <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">section_data_set_ids</span><span class="p">)])</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="SynchronizationApi.get_image_to_reference"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.synchronization_api.SynchronizationApi.get_image_to_reference">[docs]</a>    <span class="k">def</span> <span class="nf">get_image_to_reference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                <span class="n">section_image_id</span><span class="p">,</span>
                                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;For a specified SectionImage and (x,y) location,</span>
 <span class="sd">        return the (x,y,z) location in the ReferenceSpace of the associated SectionDataSet.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        section_image_id : integer</span>
@@ -813,7 +810,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Pixel coordinate on the specified SectionImage.</span>
 <span class="sd">        y : float</span>
 <span class="sd">            Pixel coordinate on the specified SectionImage.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
@@ -824,23 +821,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                        <span class="nb">str</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">),</span>
                        <span class="s">&#39;.json&#39;</span><span class="p">,</span>
                        <span class="s">&#39;?x=</span><span class="si">%f</span><span class="s">&amp;y=</span><span class="si">%f</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)])</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    
-    </div>
-<div class="viewcode-block" id="SynchronizationApi.get_structure_to_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.synchronization_api.SynchronizationApi.get_structure_to_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_to_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+</div>
+<div class="viewcode-block" id="SynchronizationApi.get_structure_to_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.synchronization_api.SynchronizationApi.get_structure_to_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_to_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                <span class="n">section_data_set_id</span><span class="p">,</span>
                                <span class="n">structure_ids</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;For a list of target structures, find the closest SectionImage </span>
+        <span class="sd">&#39;&#39;&#39;For a list of target structures, find the closest SectionImage</span>
 <span class="sd">        and (x,y) location as defined by the centroid of each Structure.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        section_data_set_id : integer</span>
 <span class="sd">            primary key</span>
 <span class="sd">        structure_ids : list of integers</span>
 <span class="sd">            primary key</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
@@ -852,7 +848,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                        <span class="s">&#39;.json&#39;</span><span class="p">,</span>
                        <span class="s">&#39;?structure_ids=&#39;</span><span class="p">,</span>
                        <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">structure_ids</span><span class="p">])])</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span></div></div>
 </pre></div>
 

@@ -680,7 +680,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <dl class="function">
 <dt id="allensdk.brain_observatory.dff.compute_dff">
 <tt class="descclassname">allensdk.brain_observatory.dff.</tt><tt class="descname">compute_dff</tt><big>(</big><em>traces</em>, <em>save_plot_dir=None</em>, <em>mode_kernelsize=5400</em>, <em>mean_kernelsize=3000</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/dff.html#compute_dff"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.dff.compute_dff" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute dF/F of a set of traces using a mean-shifted windowed mode operator. 
+<dd><p>Compute dF/F of a set of traces using a low-pass windowed-mode operator.
 The operation is basically:</p>
 <blockquote>
 <div><p>T_mm = windowed_mean(windowed_mode(T))</p>
@@ -737,7 +737,10 @@ The operation is basically:</p>
 <dl class="function">
 <dt id="allensdk.brain_observatory.dff.movingmode_fast">
 <tt class="descclassname">allensdk.brain_observatory.dff.</tt><tt class="descname">movingmode_fast</tt><big>(</big><em>x</em>, <em>kernelsize</em>, <em>y</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/dff.html#movingmode_fast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.dff.movingmode_fast" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the windowed mode of an array.</p>
+<dd><p>Compute the windowed mode of an array.  A running mode is initialized
+with a histogram of values over the initial kernelsize/2 values.  The mode
+is then updated as the kernel moves by adding and subtracting values from
+the histogram.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -762,7 +765,7 @@ The operation is basically:</p>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.dff.plot_onetrace">
-<tt class="descclassname">allensdk.brain_observatory.dff.</tt><tt class="descname">plot_onetrace</tt><big>(</big><em>x1</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/dff.html#plot_onetrace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.dff.plot_onetrace" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">allensdk.brain_observatory.dff.</tt><tt class="descname">plot_onetrace</tt><big>(</big><em>dff</em>, <em>fc</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/dff.html#plot_onetrace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.dff.plot_onetrace" title="Permalink to this definition">¶</a></dt>
 <dd><p>Debug plotting function</p>
 </dd></dl>
 
@@ -815,7 +818,7 @@ The operation is basically:</p>
 <dl class="method">
 <dt id="allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_response">
 <tt class="descname">get_response</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/drifting_gratings.html#DriftingGratings.get_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.drifting_gratings.DriftingGratings.get_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes the mean response for each cell to each stimulus condition.  Return is 
+<dd><p>Computes the mean response for each cell to each stimulus condition.  Return is
 a (# orientations, # temporal frequencies, # cells, 3) np.ndarray.  The final dimension
 contains the mean response to the condition (index 0), standard error of the mean of the response
 to the condition (index 1), and p value of the response to that condition (index 3).</p>
@@ -908,7 +911,7 @@ to the condition (index 1), and p value of the response to that condition (index
 <p><strong>movie_name: string</strong></p>
 <blockquote class="last">
 <div><dl class="docutils">
-<dt>one of [ stimulus_info.NATURAL_MOVIE_ONE, stimulus_info.NATURAL_MOVIE_TWO, </dt>
+<dt>one of [ stimulus_info.NATURAL_MOVIE_ONE, stimulus_info.NATURAL_MOVIE_TWO,</dt>
 <dd><p class="first last">stimulus_info.NATURAL_MOVIE_THREE ]</p>
 </dd>
 </dl>
@@ -1008,7 +1011,7 @@ to the condition (index 1), and p value of the response to that condition (index
 <dl class="method">
 <dt id="allensdk.brain_observatory.natural_scenes.NaturalScenes.get_response">
 <tt class="descname">get_response</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/natural_scenes.html#NaturalScenes.get_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.natural_scenes.NaturalScenes.get_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes the mean response for each cell to each stimulus condition.  Return is 
+<dd><p>Computes the mean response for each cell to each stimulus condition.  Return is
 a (# scenes, # cells, 3) np.ndarray.  The final dimension
 contains the mean response to the condition (index 0), standard error of the mean of the response
 to the condition (index 1), and p value of the response to that condition (index 3).</p>
@@ -1025,96 +1028,8 @@ to the condition (index 1), and p value of the response to that condition (index
 </dd></dl>
 
 </div>
-<div class="section" id="module-allensdk.brain_observatory.r_neuropil">
-<span id="allensdk-brain-observatory-r-neuropil-module"></span><h2>allensdk.brain_observatory.r_neuropil module<a class="headerlink" href="#module-allensdk.brain_observatory.r_neuropil" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="allensdk.brain_observatory.r_neuropil.NeuropilSubtract">
-<em class="property">class </em><tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">NeuropilSubtract</tt><big>(</big><em>T</em>, <em>lam=0.1</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#NeuropilSubtract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.NeuropilSubtract" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<dl class="method">
-<dt id="allensdk.brain_observatory.r_neuropil.NeuropilSubtract.fit_grad_descent">
-<tt class="descname">fit_grad_descent</tt><big>(</big><em>r_init=0.001</em>, <em>learning_rate=0.1</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#NeuropilSubtract.fit_grad_descent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.NeuropilSubtract.fit_grad_descent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate fit using gradient decent, as opposed to iteratively
-computing exact solutions</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="allensdk.brain_observatory.r_neuropil.NeuropilSubtract.set_F">
-<tt class="descname">set_F</tt><big>(</big><em>F_M</em>, <em>F_N</em>, <em>F_M_crossval</em>, <em>F_N_crossval</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#NeuropilSubtract.set_F"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.NeuropilSubtract.set_F" title="Permalink to this definition">¶</a></dt>
-<dd><p>Internal initializatin routine</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="allensdk.brain_observatory.r_neuropil.ab_from_diagonals">
-<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">ab_from_diagonals</tt><big>(</big><em>mat_dict</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#ab_from_diagonals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.ab_from_diagonals" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructs value for scipy.linalg.solve_banded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mat_dict: dictionary of diagonals keyed by offsets</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ab: value for scipy.linalg.solve_banded</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="allensdk.brain_observatory.r_neuropil.error_calc">
-<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">error_calc</tt><big>(</big><em>F_M</em>, <em>F_N</em>, <em>F_C</em>, <em>r</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#error_calc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.error_calc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="allensdk.brain_observatory.r_neuropil.error_calc_outlier">
-<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">error_calc_outlier</tt><big>(</big><em>F_M</em>, <em>F_N</em>, <em>F_C</em>, <em>r</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#error_calc_outlier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.error_calc_outlier" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="allensdk.brain_observatory.r_neuropil.estimate_contamination_ratios">
-<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">estimate_contamination_ratios</tt><big>(</big><em>F_M_unscaled</em>, <em>F_N_unscaled</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#estimate_contamination_ratios"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.estimate_contamination_ratios" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates neuropil contamination of ROI</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>F_M_unscaled: ROI trace</strong></p>
-<p><strong>F_N_unscaled: Neuropil trace</strong></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dictionary: key-value pairs</p>
-<blockquote class="last">
-<div><ul class="simple">
-<li>&#8216;r&#8217;: the contamination ratio &#8211; corrected trace = M - r*N</li>
-<li>&#8216;err&#8217;: RMS error</li>
-<li>&#8216;min_error&#8217;: minimum error</li>
-<li>&#8216;bounds_error&#8217;: boolean. True if error or R are outside tolerance</li>
-</ul>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="allensdk.brain_observatory.r_neuropil.get_diagonals_from_sparse">
-<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">get_diagonals_from_sparse</tt><big>(</big><em>mat</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#get_diagonals_from_sparse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.get_diagonals_from_sparse" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dictionary of diagonals keyed by offsets</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mat: scipy.sparse matrix</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary: diagonals keyed by offsets</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+<div class="section" id="allensdk-brain-observatory-r-neuropil-module">
+<h2>allensdk.brain_observatory.r_neuropil module<a class="headerlink" href="#allensdk-brain-observatory-r-neuropil-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-allensdk.brain_observatory.roi_masks">
 <span id="allensdk-brain-observatory-roi-masks-module"></span><h2>allensdk.brain_observatory.roi_masks module<a class="headerlink" href="#module-allensdk.brain_observatory.roi_masks" title="Permalink to this headline">¶</a></h2>
@@ -1124,7 +1039,7 @@ computing exact solutions</p>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Abstract class to represent image segmentation mask. Its two
 main subclasses are RoiMask and NeuropilMask. The former represents
-the mask of a region of interest (ROI), such as a cell observed in 
+the mask of a region of interest (ROI), such as a cell observed in
 2-photon imaging. The latter represents the neuropil around that cell,
 and is useful when subtracting the neuropil signal from the measured
 ROI signal.</p>
@@ -1303,8 +1218,8 @@ pixels out, that does not include other ROIs</p>
 <p><strong>combined_binary_mask: integer[image_h][image_w]</strong></p>
 <blockquote>
 <div><p>Image-sized array that shows the position of all ROIs in the
-image. ROI masks should have a value of one. Background pixels 
-must be zero. In other words, ithe combined_binary_mask is a 
+image. ROI masks should have a value of one. Background pixels
+must be zero. In other words, ithe combined_binary_mask is a
 bitmap union of all ROI masks</p>
 </div></blockquote>
 <p><strong>label: text</strong></p>
@@ -1454,7 +1369,7 @@ mask should have values &gt;0. Background pixels must be zero</p>
 
 <dl class="function">
 <dt id="allensdk.brain_observatory.session_analysis.run_session_analysis">
-<tt class="descclassname">allensdk.brain_observatory.session_analysis.</tt><tt class="descname">run_session_analysis</tt><big>(</big><em>nwb_path</em>, <em>save_path</em>, <em>plot_flag=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#run_session_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.run_session_analysis" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">allensdk.brain_observatory.session_analysis.</tt><tt class="descname">run_session_analysis</tt><big>(</big><em>nwb_path</em>, <em>save_path</em>, <em>plot_flag=False</em>, <em>save_flag=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/session_analysis.html#run_session_analysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.session_analysis.run_session_analysis" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -1505,7 +1420,7 @@ mask should have values &gt;0. Background pixels must be zero</p>
 <dl class="method">
 <dt id="allensdk.brain_observatory.static_gratings.StaticGratings.get_response">
 <tt class="descname">get_response</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/static_gratings.html#StaticGratings.get_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.static_gratings.StaticGratings.get_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>Computes the mean response for each cell to each stimulus condition.  Return is 
+<dd><p>Computes the mean response for each cell to each stimulus condition.  Return is
 a (# orientations, # spatial frequencies, # phasees, # cells, 3) np.ndarray.  The final dimension
 contains the mean response to the condition (index 0), standard error of the mean of the response
 to the condition (index 1), and p value of the response to that condition (index 3).</p>
@@ -1529,8 +1444,8 @@ to the condition (index 1), and p value of the response to that condition (index
 <em class="property">class </em><tt class="descclassname">allensdk.brain_observatory.stimulus_analysis.</tt><tt class="descname">StimulusAnalysis</tt><big>(</big><em>data_set</em>, <em>speed_tuning=False</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Base class for all response analysis code. Subclasses are responsible
-for computing metrics and traces relevant to a particular stimulus.  
-The base class contains methods for organizing sweep responses row of 
+for computing metrics and traces relevant to a particular stimulus.
+The base class contains methods for organizing sweep responses row of
 a stimulus stable (get_sweep_response).  Subclasses implement the
 get_response method, computes the mean sweep response to all sweeps for
 a each stimulus condition.</p>
@@ -1562,13 +1477,13 @@ a each stimulus condition.</p>
 <dl class="method">
 <dt id="allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning">
 <tt class="descname">get_speed_tuning</tt><big>(</big><em>binsize</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/stimulus_analysis.html#StimulusAnalysis.get_speed_tuning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates speed tuning, spontaneous versus visually driven.  The return is a 5-tuple 
+<dd><p>Calculates speed tuning, spontaneous versus visually driven.  The return is a 5-tuple
 of speed and dF/F histograms.</p>
 <blockquote>
-<div><p>binned_dx_sp: (bins,2) np.ndarray of running speeds binned during spontaneous activity stimulus.  
+<div><p>binned_dx_sp: (bins,2) np.ndarray of running speeds binned during spontaneous activity stimulus.
 The first bin contains all speeds below 1 cm/s.  Dimension 0 is mean running speed in the bin.
 Dimension 1 is the standard error of the mean.</p>
-<p>binned_cells_sp: (bins,2) np.ndarray of fluorescence during spontaneous activity stimulus.  
+<p>binned_cells_sp: (bins,2) np.ndarray of fluorescence during spontaneous activity stimulus.
 First bin contains all data for speeds below 1 cm/s. Dimension 0 is mean fluorescence in the bin.
 Dimension 1 is the standard error of the mean.</p>
 <p>binned_dx_vis: (bins,2) np.ndarray of running speeds outside of spontaneous activity stimulus.

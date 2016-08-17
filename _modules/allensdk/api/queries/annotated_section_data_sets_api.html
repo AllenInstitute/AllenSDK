@@ -648,14 +648,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
 
+
 <div class="viewcode-block" id="AnnotatedSectionDataSetsApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi">[docs]</a><span class="k">class</span> <span class="nc">AnnotatedSectionDataSetsApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;See:</span>
 <span class="sd">    `Searching Annotated SectionDataSets &lt;http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets&gt;`_</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AnnotatedSectionDataSetsApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
-        
-    
+
 <div class="viewcode-block" id="AnnotatedSectionDataSetsApi.get_annotated_section_data_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_annotated_section_data_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                         <span class="n">structures</span><span class="p">,</span>
                                         <span class="n">intensity_values</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -664,7 +665,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                         <span class="n">age_names</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;For a list of target structures, find the SectionDataSet</span>
 <span class="sd">        that matches the parameters for intensity_values, density_values, pattern_values, and Age.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        structure_graph_id : dict of integers</span>
@@ -677,43 +678,42 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            &#39;Full&#39;</span>
 <span class="sd">        age_names : array of strings, options</span>
 <span class="sd">            for example &#39;E11.5&#39;, &#39;13.5&#39;</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        data : dict</span>
 <span class="sd">            The parsed JSON repsonse message.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        This method uses the non-RMA Annotated SectionDataSet endpoint.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;structures=&#39;</span> <span class="o">+</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">structures</span><span class="p">))]</span>
-        
+
         <span class="k">if</span> <span class="n">intensity_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">intensity_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;intensity_values=&#39;</span> <span class="o">+</span>
                           <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">intensity_values</span><span class="p">)))</span>
-        
+
         <span class="k">if</span> <span class="n">density_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">density_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;density_values=&#39;</span> <span class="o">+</span>
                           <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">density_values</span><span class="p">)))</span>
-        
+
         <span class="k">if</span> <span class="n">pattern_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;pattern_values=&#39;</span> <span class="o">+</span>
                           <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pattern_values</span><span class="p">)))</span>
-        
+
         <span class="k">if</span> <span class="n">age_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">age_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;age_names=&#39;</span> <span class="o">+</span>
                           <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">age_names</span><span class="p">)))</span>
-        
+
         <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;?&#39;</span> <span class="o">+</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-        
+
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">annotated_section_data_sets_endpoint</span><span class="p">,</span>
                        <span class="s">&#39;.json&#39;</span><span class="p">,</span>
                        <span class="n">url_params</span><span class="p">])</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="AnnotatedSectionDataSetsApi.get_annotated_section_data_sets_via_rma"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets_via_rma">[docs]</a>    <span class="k">def</span> <span class="nf">get_annotated_section_data_sets_via_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                 <span class="n">structures</span><span class="p">,</span>
                                                 <span class="n">intensity_values</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -722,7 +722,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                                 <span class="n">age_names</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;For a list of target structures, find the SectionDataSet</span>
 <span class="sd">        that matches the parameters for intensity_values, density_values, pattern_values, and Age.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        structure_graph_id : dict of integers</span>
@@ -735,114 +735,113 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            pattern values, &#39;Full&#39;</span>
 <span class="sd">        age_names : array of strings, options</span>
 <span class="sd">            for example &#39;E11.5&#39;, &#39;13.5&#39;</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        data : dict</span>
 <span class="sd">            The parsed JSON response message.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        This method uses the RMA endpoint to search annotated SectionDataSet data.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">age_include_strings</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;age&#39;</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="n">age_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">age_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">age_include_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[name$in&#39;</span><span class="p">)</span>
             <span class="n">age_include_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">age_names</span><span class="p">)))</span>
             <span class="n">age_include_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;]&#39;</span><span class="p">)</span>
         <span class="n">age_include</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">age_include_strings</span><span class="p">)</span>
-        
+
         <span class="n">criteria_strings</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;manual_annotations&#39;</span><span class="p">]</span>
-        
+
         <span class="k">if</span> <span class="n">intensity_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">intensity_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">criteria_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[intensity_call$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span>
-                <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">intensity_values</span><span class="p">))))</span>
-        
+                                    <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">intensity_values</span><span class="p">))))</span>
+
         <span class="k">if</span> <span class="n">density_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">density_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">criteria_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[density_call$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span>
-                <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">density_values</span><span class="p">))))</span>
-        
+                                    <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">density_values</span><span class="p">))))</span>
+
         <span class="k">if</span> <span class="n">pattern_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">pattern_values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">criteria_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[pattern_call$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span>
-                <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pattern_values</span><span class="p">))))</span>
-        
-        <span class="n">criteria_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;(structure[id$in</span><span class="si">%s</span><span class="s">])&#39;</span> <span class="o">%</span> 
-            <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">structures</span><span class="p">))))</span>
-        
+                                    <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pattern_values</span><span class="p">))))</span>
+
+        <span class="n">criteria_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;(structure[id$in</span><span class="si">%s</span><span class="s">])&#39;</span> <span class="o">%</span>
+                                <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">structures</span><span class="p">))))</span>
+
         <span class="n">criteria_clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">criteria_strings</span><span class="p">)</span>
-        
+
         <span class="n">include_clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;specimen&#39;</span><span class="p">,</span>
                                   <span class="s">&#39;(donor(&#39;</span><span class="p">,</span>
                                   <span class="n">age_include</span><span class="p">,</span>
                                   <span class="s">&#39;)),&#39;</span><span class="p">,</span>
                                   <span class="s">&#39;probes(gene),&#39;</span>
                                   <span class="s">&#39;plane_of_section&#39;</span><span class="p">])</span>
-        
+
         <span class="n">order_by_array</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;genes.acronym&#39;</span><span class="p">,</span>
                           <span class="s">&#39;ages.embryonic+desc&#39;</span><span class="p">,</span>
                           <span class="s">&#39;ages.days&#39;</span><span class="p">,</span>
                           <span class="s">&#39;data_sets.id&#39;</span><span class="p">]</span>
-        
+
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;SectionDataSet&#39;</span><span class="p">,</span>
                                 <span class="n">criteria</span><span class="o">=</span><span class="n">criteria_clause</span><span class="p">,</span>
                                 <span class="n">include</span><span class="o">=</span><span class="n">include_clause</span><span class="p">,</span>
                                 <span class="n">start_row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                                 <span class="n">num_rows</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
                                 <span class="n">order</span><span class="o">=</span><span class="n">order_by_array</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">data</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="AnnotatedSectionDataSetsApi.get_compound_annotated_section_data_sets"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_compound_annotated_section_data_sets">[docs]</a>    <span class="k">def</span> <span class="nf">get_compound_annotated_section_data_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                  <span class="n">queries</span><span class="p">,</span>
                                                  <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Find the SectionDataSet that matches several annotated_section_data_sets queries</span>
 <span class="sd">        linked together with a Boolean &#39;and&#39; or &#39;or&#39;.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        queries : array of dicts</span>
 <span class="sd">            dicts with args like build_query</span>
 <span class="sd">        fmt : string, optional</span>
 <span class="sd">            &#39;json&#39; or &#39;xml&#39;</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        data : dict</span>
 <span class="sd">            The parsed JSON repsonse message.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">url_strings</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;?query=&#39;</span><span class="p">]</span>
-        
+
         <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
             <span class="n">url_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[&#39;</span><span class="p">)</span>
-            
+
             <span class="n">params</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;structures $in &#39;</span> <span class="o">+</span>
                       <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">query</span><span class="p">[</span><span class="s">&#39;structures&#39;</span><span class="p">]))]</span>
-            
+
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;intensity_values&#39;</span><span class="p">,</span> <span class="s">&#39;density_values&#39;</span><span class="p">,</span> <span class="s">&#39;pattern_values&#39;</span><span class="p">,</span> <span class="s">&#39;age_names&#39;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">query</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> $in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span>
                                   <span class="p">(</span><span class="n">key</span><span class="p">,</span>
                                    <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">query</span><span class="p">[</span><span class="s">&#39;intensity_values&#39;</span><span class="p">]))))</span>
-            
+
             <span class="n">url_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39; : &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">))</span>
-            
+
             <span class="n">url_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;]&#39;</span><span class="p">)</span>
-            
+
             <span class="k">if</span> <span class="s">&#39;link&#39;</span> <span class="ow">in</span> <span class="n">query</span> <span class="ow">and</span> <span class="n">query</span><span class="p">[</span><span class="s">&#39;link&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;or&#39;</span><span class="p">:</span>
                 <span class="n">url_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39; or &#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="s">&#39;link&#39;</span> <span class="ow">in</span> <span class="n">query</span> <span class="ow">and</span> <span class="n">query</span><span class="p">[</span><span class="s">&#39;link&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;and&#39;</span><span class="p">:</span>
                 <span class="n">url_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39; and &#39;</span><span class="p">)</span>
-        
+
         <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">url_strings</span><span class="p">)</span>
-        
+
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">compound_annotated_section_data_sets_endpoint</span><span class="p">,</span>
                        <span class="s">&#39;.&#39;</span><span class="p">,</span>
                        <span class="n">fmt</span><span class="p">,</span>
                        <span class="n">url_params</span><span class="p">])</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span></div></div>
 </pre></div>
 

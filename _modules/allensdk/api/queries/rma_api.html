@@ -631,7 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.api.queries.rma_api</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -648,47 +648,47 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">from</span> <span class="nn">allensdk.api.api</span> <span class="kn">import</span> <span class="n">Api</span>
 
+
 <div class="viewcode-block" id="RmaApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi">[docs]</a><span class="k">class</span> <span class="nc">RmaApi</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    See: `RESTful Model Access (RMA) &lt;http://help.brain-map.org/display/api/RESTful+Model+Access+%28RMA%29&gt;`_</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">MODEL</span><span class="o">=</span><span class="s">&#39;model::&#39;</span>
-    <span class="n">PIPE</span><span class="o">=</span><span class="s">&#39;pipe::&#39;</span>
-    <span class="n">SERVICE</span><span class="o">=</span><span class="s">&#39;service::&#39;</span>
-    <span class="n">CRITERIA</span><span class="o">=</span><span class="s">&#39;rma::criteria&#39;</span>
-    <span class="n">INCLUDE</span><span class="o">=</span><span class="s">&#39;rma::include&#39;</span>
-    <span class="n">OPTIONS</span><span class="o">=</span><span class="s">&#39;rma::options&#39;</span>
-    <span class="n">ORDER</span><span class="o">=</span><span class="s">&#39;order&#39;</span>
-    <span class="n">NUM_ROWS</span><span class="o">=</span><span class="s">&#39;num_rows&#39;</span>
-    <span class="n">ALL</span><span class="o">=</span><span class="s">&#39;all&#39;</span>
-    <span class="n">START_ROW</span><span class="o">=</span><span class="s">&#39;start_row&#39;</span>
-    <span class="n">COUNT</span><span class="o">=</span><span class="s">&#39;count&#39;</span>
-    <span class="n">ONLY</span><span class="o">=</span><span class="s">&#39;only&#39;</span>
-    <span class="n">EXCEPT</span><span class="o">=</span><span class="s">&#39;except&#39;</span>
-    <span class="n">TABULAR</span><span class="o">=</span><span class="s">&#39;tabular&#39;</span>
-    <span class="n">DEBUG</span><span class="o">=</span><span class="s">&#39;debug&#39;</span>
-    <span class="n">PREVIEW</span><span class="o">=</span><span class="s">&#39;preview&#39;</span>
-    <span class="n">TRUE</span><span class="o">=</span><span class="s">&#39;true&#39;</span>
-    <span class="n">FALSE</span><span class="o">=</span><span class="s">&#39;false&#39;</span>
-    <span class="n">IS</span><span class="o">=</span><span class="s">&#39;$is&#39;</span>
-    <span class="n">EQ</span><span class="o">=</span><span class="s">&#39;$eq&#39;</span>
-    
+    <span class="n">MODEL</span> <span class="o">=</span> <span class="s">&#39;model::&#39;</span>
+    <span class="n">PIPE</span> <span class="o">=</span> <span class="s">&#39;pipe::&#39;</span>
+    <span class="n">SERVICE</span> <span class="o">=</span> <span class="s">&#39;service::&#39;</span>
+    <span class="n">CRITERIA</span> <span class="o">=</span> <span class="s">&#39;rma::criteria&#39;</span>
+    <span class="n">INCLUDE</span> <span class="o">=</span> <span class="s">&#39;rma::include&#39;</span>
+    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="s">&#39;rma::options&#39;</span>
+    <span class="n">ORDER</span> <span class="o">=</span> <span class="s">&#39;order&#39;</span>
+    <span class="n">NUM_ROWS</span> <span class="o">=</span> <span class="s">&#39;num_rows&#39;</span>
+    <span class="n">ALL</span> <span class="o">=</span> <span class="s">&#39;all&#39;</span>
+    <span class="n">START_ROW</span> <span class="o">=</span> <span class="s">&#39;start_row&#39;</span>
+    <span class="n">COUNT</span> <span class="o">=</span> <span class="s">&#39;count&#39;</span>
+    <span class="n">ONLY</span> <span class="o">=</span> <span class="s">&#39;only&#39;</span>
+    <span class="n">EXCEPT</span> <span class="o">=</span> <span class="s">&#39;except&#39;</span>
+    <span class="n">TABULAR</span> <span class="o">=</span> <span class="s">&#39;tabular&#39;</span>
+    <span class="n">DEBUG</span> <span class="o">=</span> <span class="s">&#39;debug&#39;</span>
+    <span class="n">PREVIEW</span> <span class="o">=</span> <span class="s">&#39;preview&#39;</span>
+    <span class="n">TRUE</span> <span class="o">=</span> <span class="s">&#39;true&#39;</span>
+    <span class="n">FALSE</span> <span class="o">=</span> <span class="s">&#39;false&#39;</span>
+    <span class="n">IS</span> <span class="o">=</span> <span class="s">&#39;$is&#39;</span>
+    <span class="n">EQ</span> <span class="o">=</span> <span class="s">&#39;$eq&#39;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
-    
-    
+
 <div class="viewcode-block" id="RmaApi.build_query_url"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.build_query_url">[docs]</a>    <span class="k">def</span> <span class="nf">build_query_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                         <span class="n">stage_clauses</span><span class="p">,</span>
                         <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Combine one or more RMA query stages into a single RMA query.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        stage_clauses : list of strings</span>
 <span class="sd">            subqueries</span>
 <span class="sd">        fmt : string, optional</span>
 <span class="sd">            json (default), xml, or csv</span>
-<span class="sd">            </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
@@ -696,27 +696,27 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">stage_clauses</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
             <span class="n">stage_clauses</span> <span class="o">=</span> <span class="p">[</span><span class="n">stage_clauses</span><span class="p">]</span>
-        
+
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span>
             <span class="s">&#39;/query.&#39;</span><span class="p">,</span>
             <span class="n">fmt</span><span class="p">,</span>
             <span class="s">&#39;?q=&#39;</span><span class="p">,</span>
             <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stage_clauses</span><span class="p">)])</span>
-        
+
         <span class="k">return</span> <span class="n">url</span>
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.model_stage"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.model_stage">[docs]</a>    <span class="k">def</span> <span class="nf">model_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                     <span class="n">model</span><span class="p">,</span>
                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct a model stage of an RMA query string.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        model : string</span>
 <span class="sd">            The top level data type</span>
 <span class="sd">        filters : dict</span>
-<span class="sd">            key, value comparisons applied to the top-level model to narrow the results.            </span>
+<span class="sd">            key, value comparisons applied to the top-level model to narrow the results.</span>
 <span class="sd">        criteria : string</span>
 <span class="sd">            raw RMA criteria clause to choose what object are returned</span>
 <span class="sd">        include : string</span>
@@ -724,19 +724,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        only : list of strings, optional</span>
 <span class="sd">            to be joined into an rma::options only filter to limit what data is returned</span>
 <span class="sd">        except : list of strings, optional</span>
-<span class="sd">            to be joined into an rma::options except filter to limit what data is returned            </span>
+<span class="sd">            to be joined into an rma::options except filter to limit what data is returned</span>
 <span class="sd">        tabular : list of string, optional</span>
-<span class="sd">            return columns as a tabular data structure rather than a nested tree.                    </span>
+<span class="sd">            return columns as a tabular data structure rather than a nested tree.</span>
 <span class="sd">        count : boolean, optional</span>
-<span class="sd">            False to skip the extra database count query.                    </span>
+<span class="sd">            False to skip the extra database count query.</span>
 <span class="sd">        debug : string, optional</span>
 <span class="sd">            &#39;true&#39;, &#39;false&#39; or &#39;preview&#39;</span>
 <span class="sd">        num_rows : int or string, optional</span>
-<span class="sd">            how many database rows are returned (may not correspond directly to JSON tree structure) </span>
+<span class="sd">            how many database rows are returned (may not correspond directly to JSON tree structure)</span>
 <span class="sd">        start_row : int or string, optional</span>
 <span class="sd">            which database row is start of returned data  (may not correspond directly to JSON tree structure)</span>
-<span class="sd">        </span>
-<span class="sd">        </span>
+
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        See `RMA Path Syntax &lt;http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-DoubleColonforAxis&gt;`_</span>
@@ -747,96 +747,93 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        response, including the normalized query.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">clauses</span> <span class="o">=</span> <span class="p">[</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">MODEL</span> <span class="o">+</span> <span class="n">model</span><span class="p">]</span>
-        
+
         <span class="n">filters</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;filters&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">filters</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">(</span><span class="n">filters</span><span class="p">))</span>
-            
+
         <span class="n">criteria</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;criteria&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">criteria</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">criteria</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">CRITERIA</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span>
-        
+
         <span class="n">include</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;include&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">include</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">INCLUDE</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">include</span><span class="p">)</span>
-        
+
         <span class="n">options_clause</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options_clause</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">options_clause</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">options_clause</span><span class="p">)</span>
-        
+
         <span class="n">stage</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clauses</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">stage</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.pipe_stage"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.pipe_stage">[docs]</a>    <span class="k">def</span> <span class="nf">pipe_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                    <span class="n">pipe_name</span><span class="p">,</span>
                    <span class="n">parameters</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Connect model and service stages via their JSON responses.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        See: `Service Pipelines &lt;http://help.brain-map.org/display/api/Service+Pipelines&gt;`_ </span>
+<span class="sd">        See: `Service Pipelines &lt;http://help.brain-map.org/display/api/Service+Pipelines&gt;`_</span>
 <span class="sd">        and</span>
 <span class="sd">        `Connected Services and Pipes &lt;http://help.brain-map.org/display/api/Connected+Services+and+Pipes&gt;`_</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">clauses</span> <span class="o">=</span> <span class="p">[</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">PIPE</span> <span class="o">+</span> <span class="n">pipe_name</span><span class="p">]</span>
-        
+
         <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tuple_filters</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
-        
+
         <span class="n">stage</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clauses</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">stage</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.service_stage"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.service_stage">[docs]</a>    <span class="k">def</span> <span class="nf">service_stage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                       <span class="n">service_name</span><span class="p">,</span>
                       <span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct an RMA query fragment to send a request to a connected service.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        service_name : string</span>
 <span class="sd">            Name of a documented connected service.</span>
 <span class="sd">        parameters : dict</span>
 <span class="sd">            key-value pairs as in the online documentation.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        See: `Service Pipelines &lt;http://help.brain-map.org/display/api/Service+Pipelines&gt;`_ </span>
+<span class="sd">        See: `Service Pipelines &lt;http://help.brain-map.org/display/api/Service+Pipelines&gt;`_</span>
 <span class="sd">        and</span>
 <span class="sd">        `Connected Services and Pipes &lt;http://help.brain-map.org/display/api/Connected+Services+and+Pipes&gt;`_</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">clauses</span> <span class="o">=</span> <span class="p">[</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">SERVICE</span> <span class="o">+</span> <span class="n">service_name</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="n">parameters</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tuple_filters</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
-        
+
         <span class="n">stage</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clauses</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">stage</span>
-
 </div>
 <div class="viewcode-block" id="RmaApi.model_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.model_query">[docs]</a>    <span class="k">def</span> <span class="nf">model_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct and execute a model stage of an RMA query string.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        model : string</span>
 <span class="sd">            The top level data type</span>
 <span class="sd">        filters : dict</span>
-<span class="sd">            key, value comparisons applied to the top-level model to narrow the results.            </span>
+<span class="sd">            key, value comparisons applied to the top-level model to narrow the results.</span>
 <span class="sd">        criteria : string</span>
 <span class="sd">            raw RMA criteria clause to choose what object are returned</span>
 <span class="sd">        include : string</span>
@@ -844,19 +841,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        only : list of strings, optional</span>
 <span class="sd">            to be joined into an rma::options only filter to limit what data is returned</span>
 <span class="sd">        except : list of strings, optional</span>
-<span class="sd">            to be joined into an rma::options except filter to limit what data is returned            </span>
+<span class="sd">            to be joined into an rma::options except filter to limit what data is returned</span>
 <span class="sd">        tabular : list of string, optional</span>
-<span class="sd">            return columns as a tabular data structure rather than a nested tree.                    </span>
+<span class="sd">            return columns as a tabular data structure rather than a nested tree.</span>
 <span class="sd">        count : boolean, optional</span>
-<span class="sd">            False to skip the extra database count query.                    </span>
+<span class="sd">            False to skip the extra database count query.</span>
 <span class="sd">        debug : string, optional</span>
 <span class="sd">            &#39;true&#39;, &#39;false&#39; or &#39;preview&#39;</span>
 <span class="sd">        num_rows : int or string, optional</span>
-<span class="sd">            how many database rows are returned (may not correspond directly to JSON tree structure) </span>
+<span class="sd">            how many database rows are returned (may not correspond directly to JSON tree structure)</span>
 <span class="sd">        start_row : int or string, optional</span>
 <span class="sd">            which database row is start of returned data  (may not correspond directly to JSON tree structure)</span>
-<span class="sd">        </span>
-<span class="sd">        </span>
+
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        See `RMA Path Syntax &lt;http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-DoubleColonforAxis&gt;`_</span>
@@ -869,33 +866,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">build_query_url</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">model_stage</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)))</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.service_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.service_query">[docs]</a>    <span class="k">def</span> <span class="nf">service_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct and Execute a single-stage RMA query</span>
 <span class="sd">        to send a request to a connected service.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        service_name : string</span>
 <span class="sd">            Name of a documented connected service.</span>
 <span class="sd">        parameters : dict</span>
 <span class="sd">            key-value pairs as in the online documentation.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        See: `Service Pipelines &lt;http://help.brain-map.org/display/api/Service+Pipelines&gt;`_ </span>
+<span class="sd">        See: `Service Pipelines &lt;http://help.brain-map.org/display/api/Service+Pipelines&gt;`_</span>
 <span class="sd">        and</span>
 <span class="sd">        `Connected Services and Pipes &lt;http://help.brain-map.org/display/api/Connected+Services+and+Pipes&gt;`_</span>
-<span class="sd">        &#39;&#39;&#39;</span>        
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">build_query_url</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">service_stage</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)))</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.options_clause"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.options_clause">[docs]</a>    <span class="k">def</span> <span class="nf">options_clause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;build rma:: options clause.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        only : list of strings, optional</span>
@@ -909,87 +904,86 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
         <span class="n">options_params</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="n">only</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">ONLY</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">only</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">only</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">only_except_tabular_clause</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">ONLY</span><span class="p">,</span>
                                                 <span class="n">only</span><span class="p">))</span>
-        
+
         <span class="n">excpt</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">EXCEPT</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">excpt</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">excpt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">only_except_tabular_clause</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">EXCEPT</span><span class="p">,</span>
                                                 <span class="n">excpt</span><span class="p">))</span>
-        
+
         <span class="n">tabular</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">TABULAR</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">tabular</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">tabular</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">only_except_tabular_clause</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">TABULAR</span><span class="p">,</span>
                                                 <span class="n">tabular</span><span class="p">))</span>
-        
+
         <span class="n">num_rows</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">NUM_ROWS</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">num_rows</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">num_rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">num_rows</span> <span class="o">==</span> <span class="n">RmaApi</span><span class="o">.</span><span class="n">ALL</span><span class="p">:</span>
                 <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;[</span><span class="si">%s</span><span class="s">$eq&#39;all&#39;]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">NUM_ROWS</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">NUM_ROWS</span><span class="p">,</span>
                                                      <span class="n">num_rows</span><span class="p">))</span>
-        
+
         <span class="n">start_row</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">START_ROW</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">start_row</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">start_row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">START_ROW</span><span class="p">,</span>
                                                  <span class="n">start_row</span><span class="p">))</span>
-        
+
         <span class="n">order</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">ORDER</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">order</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">order_clause</span><span class="p">(</span><span class="n">order</span><span class="p">))</span>
-        
+
         <span class="n">debug</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">debug</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">debug</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">debug_clause</span><span class="p">(</span><span class="n">debug</span><span class="p">))</span>
-        
+
         <span class="n">cnt</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">COUNT</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">cnt</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="bp">True</span> <span class="ow">or</span> <span class="n">cnt</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">cnt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cnt</span> <span class="ow">is</span> <span class="bp">True</span> <span class="ow">or</span> <span class="n">cnt</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
                 <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">COUNT</span><span class="p">,</span>
                                                      <span class="n">RmaApi</span><span class="o">.</span><span class="n">TRUE</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">cnt</span> <span class="o">==</span> <span class="bp">False</span> <span class="ow">or</span> <span class="n">cnt</span> <span class="o">==</span> <span class="s">&#39;false&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">cnt</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">or</span> <span class="n">cnt</span> <span class="o">==</span> <span class="s">&#39;false&#39;</span><span class="p">:</span>
                 <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">COUNT</span><span class="p">,</span>
                                                      <span class="n">RmaApi</span><span class="o">.</span><span class="n">FALSE</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">pass</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">options_params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">clause</span> <span class="o">=</span> <span class="n">RmaApi</span><span class="o">.</span><span class="n">OPTIONS</span> <span class="o">+</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">options_params</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">clause</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.only_except_tabular_clause"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.only_except_tabular_clause">[docs]</a>    <span class="k">def</span> <span class="nf">only_except_tabular_clause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_type</span><span class="p">,</span> <span class="n">attribute_list</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct a clause to filter which attributes are returned</span>
 <span class="sd">        for use in an rma::options clause.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filter_type : string</span>
 <span class="sd">            &#39;only&#39;, &#39;except&#39;, or &#39;tabular&#39;</span>
 <span class="sd">        attribute_list : list of strings</span>
 <span class="sd">            for example [&#39;acronym&#39;, &#39;products.name&#39;, &#39;structure.id&#39;]</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        clause : string</span>
 <span class="sd">            The query clause for inclusion in an RMA query URL.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The title of tabular columns can be set by adding &#39;+as+&lt;title&gt;&#39;</span>
@@ -1003,14 +997,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        The tabular filter is required for .csv format RMA requests.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
-        <span class="k">if</span> <span class="n">attribute_list</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">attribute_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filter_type</span><span class="p">,</span>
                                     <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attribute_list</span><span class="p">))</span>
-        
+
         <span class="k">return</span> <span class="n">clause</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.order_clause"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.order_clause">[docs]</a>    <span class="k">def</span> <span class="nf">order_clause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order_list</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct a debug clause for use in an rma::options clause.</span>
 
@@ -1018,93 +1011,91 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        ----------</span>
 <span class="sd">        order_list : list of strings</span>
 <span class="sd">            for example [&#39;acronym&#39;, &#39;products.name+asc&#39;, &#39;structure.id+desc&#39;]</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        clause : string</span>
 <span class="sd">            The query clause for inclusion in an RMA query URL.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Optionally adding &#39;+asc&#39; (default) or &#39;+desc&#39; after an attribute</span>
 <span class="sd">        will change the sort order.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
-        <span class="k">if</span> <span class="n">order_list</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">order_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;[order$eq</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">order_list</span><span class="p">))</span>
-        
+
         <span class="k">return</span> <span class="n">clause</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.debug_clause"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.debug_clause">[docs]</a>    <span class="k">def</span> <span class="nf">debug_clause</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug_value</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct a debug clause for use in an rma::options clause.</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        debug_value : string or boolean</span>
 <span class="sd">            True, False, None (default) or &#39;preview&#39;</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        clause : string</span>
 <span class="sd">            The query clause for inclusion in an RMA query URL.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        True will request debugging information in the response.</span>
 <span class="sd">        False will request no debugging information.</span>
 <span class="sd">        None will return an empty clause.</span>
 <span class="sd">        &#39;preview&#39; will request debugging information without the query being run.</span>
-<span class="sd">         </span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
-        <span class="k">if</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">debug_value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="bp">True</span> <span class="ow">or</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">debug_value</span> <span class="ow">is</span> <span class="bp">True</span> <span class="ow">or</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
             <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;[debug$eqtrue]&#39;</span>
-        <span class="k">elif</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="bp">False</span> <span class="ow">or</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s">&#39;false&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">debug_value</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">or</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s">&#39;false&#39;</span><span class="p">:</span>
             <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;[debug$eqfalse]&#39;</span>
         <span class="k">elif</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s">&#39;preview&#39;</span><span class="p">:</span>
             <span class="n">clause</span> <span class="o">=</span> <span class="s">&quot;[debug$eq&#39;preview&#39;]&quot;</span>
-        
+
         <span class="k">return</span> <span class="n">clause</span>
-    
-    
+
     <span class="c"># TODO: deprecate for something that can preserve order</span></div>
 <div class="viewcode-block" id="RmaApi.filters"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.filters">[docs]</a>    <span class="k">def</span> <span class="nf">filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;serialize RMA query filter clauses.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filters : dict</span>
 <span class="sd">            keys and values for narrowing a query.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
 <span class="sd">            filter clause for an RMA query string.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">filters_builder</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
-        
+
         <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filters_builder</span><span class="p">)</span>
-    
+
     <span class="c"># TODO: this needs to be more rigorous.</span></div>
 <div class="viewcode-block" id="RmaApi.tuple_filters"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.tuple_filters">[docs]</a>    <span class="k">def</span> <span class="nf">tuple_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct an RMA filter clause.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        </span>
+
 <span class="sd">        See `RMA Path Syntax - Square Brackets for Filters &lt;http://help.brain-map.org/display/api/RMA+Path+Syntax#RMAPathSyntax-SquareBracketsforFilters&gt;`_ for additional documentation.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">filters_builder</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="k">for</span> <span class="n">filt</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">filt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">filt</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filt</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">val</span> <span class="o">=</span> <span class="n">filt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1131,87 +1122,82 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                                      <span class="n">filt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                                                      <span class="nb">str</span><span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
 
-        
         <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filters_builder</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.quote_string"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.quote_string">[docs]</a>    <span class="k">def</span> <span class="nf">quote_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_string</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Wrap a clause in single quotes.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        the_string : string</span>
 <span class="sd">            a clause to be included in an rma query that needs to be quoted</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
 <span class="sd">            input wrapped in single quotes</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">the_string</span><span class="p">,</span> <span class="s">&quot;&#39;&quot;</span><span class="p">])</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.filter"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;serialize a single RMA query filter clause.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        key : string</span>
 <span class="sd">            keys for narrowing a query.</span>
 <span class="sd">        value : string</span>
 <span class="sd">            value for narrowing a query.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>
 <span class="sd">            a single filter clause for an RMA query string.</span>
-<span class="sd">        &#39;&#39;&#39;</span>        
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;[&#39;</span><span class="p">,</span>
                         <span class="n">key</span><span class="p">,</span>
                         <span class="n">RmaApi</span><span class="o">.</span><span class="n">EQ</span><span class="p">,</span>
                         <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
                         <span class="s">&#39;]&#39;</span><span class="p">])</span>
-    
-    </div>
-<div class="viewcode-block" id="RmaApi.build_schema_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.build_schema_query">[docs]</a>    <span class="k">def</span> <span class="nf">build_schema_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">clazz</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
+</div>
+<div class="viewcode-block" id="RmaApi.build_schema_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.build_schema_query">[docs]</a>    <span class="k">def</span> <span class="nf">build_schema_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clazz</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Build the URL that will fetch the data schema.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        clazz : string, optional</span>
 <span class="sd">            Name of a specific class or None (default).</span>
 <span class="sd">        fmt : string, optional</span>
 <span class="sd">            json (default) or xml</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        url : string</span>
 <span class="sd">            The constructed URL</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        If a class is specified, only the schema information for that class</span>
 <span class="sd">        will be requested, otherwise the url requests the entire schema.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">clazz</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">clazz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">class_clause</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="n">clazz</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">class_clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
+
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span>
                        <span class="n">class_clause</span><span class="p">,</span>
                        <span class="s">&#39;.&#39;</span><span class="p">,</span>
                        <span class="n">fmt</span><span class="p">])</span>
-        
+
         <span class="k">return</span> <span class="n">url</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="RmaApi.get_schema"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.get_schema">[docs]</a>    <span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clazz</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Retrieve schema information.&#39;&#39;&#39;</span>
         <span class="n">schema_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_schema_query</span><span class="p">,</span>
-                                   <span class="bp">self</span><span class="o">.</span><span class="n">read_data</span><span class="p">,</span>
-                                   <span class="n">clazz</span><span class="p">)</span>
-        
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">read_data</span><span class="p">,</span>
+                                    <span class="n">clazz</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">schema_data</span></div></div>
 </pre></div>
 

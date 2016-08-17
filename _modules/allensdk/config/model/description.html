@@ -653,16 +653,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div class="viewcode-block" id="Description"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description.Description">[docs]</a><span class="k">class</span> <span class="nc">Description</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reserved_data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">()</span>
-    
-    
+
 <div class="viewcode-block" id="Description.update_data"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description.Description.update_data">[docs]</a>    <span class="k">def</span> <span class="nf">update_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Merge configuration data possibly from multiple files.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        data : dict</span>
@@ -670,7 +669,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        section : string, optional</span>
 <span class="sd">            What configuration section to read it into if the file does not specify.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">entries</span>
@@ -679,13 +678,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-            
+
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Description.is_empty"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description.Description.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Check if anything is in the object.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        boolean</span>
@@ -693,14 +691,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">False</span>
-        
+
         <span class="k">return</span> <span class="bp">True</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Description.unpack"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description.Description.unpack">[docs]</a>    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read the manifest and other stand-alone configuration structure,</span>
 <span class="sd">        or insert a configuration object into a section of an existing configuration.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        data : dict</span>
@@ -709,31 +706,29 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        section : string, optional.</span>
 <span class="sd">            If this is present, place data within an existing section array.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">unpack_manifest</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Description.unpack_manifest"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description.Description.unpack_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">unpack_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Pull the manifest configuration section into a separate place.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        data : dict</span>
 <span class="sd">            A configuration structure that still has a manifest section.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">data_manifest</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;manifest&quot;</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">reserved_data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;manifest&quot;</span><span class="p">:</span> <span class="n">data_manifest</span> <span class="p">}</span>
+        <span class="n">reserved_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;manifest&quot;</span><span class="p">:</span> <span class="n">data_manifest</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reserved_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reserved_data</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">data_manifest</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Description.fix_unary_sections"><a class="viewcode-back" href="../../../../allensdk.config.model.html#allensdk.config.model.description.Description.fix_unary_sections">[docs]</a>    <span class="k">def</span> <span class="nf">fix_unary_sections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_names</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Wrap section contents that don&#39;t have the proper</span>
 <span class="sd">        array surrounding them in an array.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        section_names : list of strings, optional</span>
@@ -741,13 +736,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">section_names</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">section_names</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">section_names</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">section</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="p">];</span>
-                    <span class="n">Description</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;wrapped description section </span><span class="si">%s</span><span class="s"> in an array.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">section</span><span class="p">))</span>
-</pre></div></div></div>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">section</span><span class="p">]]</span>
+                    <span class="n">Description</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="s">&quot;wrapped description section </span><span class="si">%s</span><span class="s"> in an array.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">section</span><span class="p">))</span></div></div>
+</pre></div>
 
           </div>
         </div>

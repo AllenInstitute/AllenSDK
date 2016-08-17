@@ -631,7 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.core.ontology</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -650,16 +650,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">json_utilities</span>
 
-<div class="viewcode-block" id="Ontology"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.ontology.Ontology">[docs]</a><span class="k">class</span> <span class="nc">Ontology</span><span class="p">(</span> <span class="nb">object</span> <span class="p">):</span>      
+
+<div class="viewcode-block" id="Ontology"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.ontology.Ontology">[docs]</a><span class="k">class</span> <span class="nc">Ontology</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span>
 
         <span class="n">child_ids</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
         <span class="n">descendant_ids</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">s</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
             <span class="n">parent_id</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;parent_structure_id&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">parent_id</span><span class="p">):</span>
                 <span class="n">parent_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parent_id</span><span class="p">)</span>
@@ -673,9 +674,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">child_ids</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">child_ids</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">descendant_ids</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">descendant_ids</span><span class="p">)</span>
 
-
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structures</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; </span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a subset of structures by id or acronym. Duplicate values are ignored.</span>
 
 <span class="sd">        Parameters</span>
@@ -688,13 +688,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        </span>
+
 <span class="sd">        pandas.DataFrame</span>
 <span class="sd">            A subset of rows from the complete ontology that match filtering criteria.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c"># __getitem__ always has a single argument.  If called with a single argument </span>
-        <span class="c"># (e.g. ontology[315]), that item is passed straight through.  If called with </span>
+        <span class="c"># __getitem__ always has a single argument.  If called with a single argument</span>
+        <span class="c"># (e.g. ontology[315]), that item is passed straight through.  If called with</span>
         <span class="c"># multiple arguments (e.g. ontology[315,997]), that gets passed through as a</span>
         <span class="c"># tuple.  This normalizes the arguments so that everything is iterable.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structures</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structures</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">structures</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
@@ -706,13 +706,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">string_strs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">structures</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
-                <span class="c"># if it&#39;s a pandas series, assume it&#39;s a series of structure ids</span>
+                <span class="c"># if it&#39;s a pandas series, assume it&#39;s a series of structure</span>
+                <span class="c"># ids</span>
                 <span class="n">structure_ids</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">):</span>
                 <span class="c"># if it&#39;s a string, assume it&#39;s an acronym</span>
-                <span class="n">string_strs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>            
+                <span class="n">string_strs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c"># if it&#39;s anything else, cast it to an integer and treat it like a structure id</span>
+                <span class="c"># if it&#39;s anything else, cast it to an integer and treat it</span>
+                <span class="c"># like a structure id</span>
                 <span class="n">structure_ids</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
 
         <span class="c"># convert the string arguments to rows</span>
@@ -724,16 +726,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="c"># if there are no other structure ids, just return this dataframe</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">string_strs</span>
-                
+
             <span class="c"># otherwise pull out the ids and add them to the set</span>
             <span class="n">structure_ids</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">string_strs</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-        
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">structure_ids</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">how</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
 
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">structure_ids</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Ontology.get_descendant_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.ontology.Ontology.get_descendant_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_descendant_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Find the set of the ids of structures that are descendants of one or more structures.  </span>
+<span class="sd">        Find the set of the ids of structures that are descendants of one or more structures.</span>
 <span class="sd">        The returned set will include the input structure ids.</span>
 
 <span class="sd">        Parameters</span>
@@ -752,14 +753,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">else</span><span class="p">:</span>
             <span class="n">descendants</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">structure_id</span> <span class="ow">in</span> <span class="n">structure_ids</span><span class="p">:</span>
-                <span class="n">descendants</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descendant_ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">structure_id</span><span class="p">),</span> <span class="nb">set</span><span class="p">()))</span>
+                <span class="n">descendants</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descendant_ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">structure_id</span><span class="p">),</span> <span class="nb">set</span><span class="p">()))</span>
             <span class="k">return</span> <span class="n">descendants</span>
-
 </div>
 <div class="viewcode-block" id="Ontology.get_child_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.ontology.Ontology.get_child_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_child_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the set of ids that are immediate children of one or more structures.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        structure_ids: iterable</span>
@@ -778,11 +779,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">for</span> <span class="n">structure_id</span> <span class="ow">in</span> <span class="n">structure_ids</span><span class="p">:</span>
                 <span class="n">children</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">child_ids</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">structure_id</span><span class="p">),</span> <span class="nb">set</span><span class="p">()))</span>
             <span class="k">return</span> <span class="n">children</span>
-                                
 </div>
 <div class="viewcode-block" id="Ontology.get_descendants"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.ontology.Ontology.get_descendants">[docs]</a>    <span class="k">def</span> <span class="nf">get_descendants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Find the set of structures that are descendants of one or more structures.  </span>
+<span class="sd">        Find the set of structures that are descendants of one or more structures.</span>
 <span class="sd">        The returned set will include the input structures.</span>
 
 <span class="sd">        Parameters</span>
@@ -798,12 +798,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">descendant_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_descendant_ids</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">descendant_ids</span><span class="p">]</span>
-
 </div>
 <div class="viewcode-block" id="Ontology.get_children"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.ontology.Ontology.get_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the set of structures that are immediate children of one or more structures.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        structure_ids: iterable</span>
@@ -817,7 +816,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">child_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_child_ids</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">child_ids</span><span class="p">]</span>
-
 </div>
 <div class="viewcode-block" id="Ontology.structure_descends_from"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.ontology.Ontology.structure_descends_from">[docs]</a>    <span class="k">def</span> <span class="nf">structure_descends_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child_id</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -828,7 +826,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">child</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">parent_str</span> <span class="o">=</span> <span class="s">&#39;/</span><span class="si">%d</span><span class="s">/&#39;</span> <span class="o">%</span> <span class="n">parent_id</span>
             <span class="k">return</span> <span class="n">child</span><span class="p">[</span><span class="s">&#39;structure_id_path&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">parent_str</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span>
-        
+
         <span class="k">return</span> <span class="bp">False</span></div></div>
 </pre></div>
 

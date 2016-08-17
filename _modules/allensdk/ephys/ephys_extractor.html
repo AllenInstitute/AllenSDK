@@ -631,12 +631,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.ephys.ephys_extractor</h1><div class="highlight"><pre>
+<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c"># This file is part of Allen SDK.</span>
+<span class="c">#</span>
+<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c"># it under the terms of the GNU General Public License as published by</span>
+<span class="c"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c">#</span>
+<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c"># GNU General Public License for more details.</span>
+<span class="c">#</span>
+<span class="c"># You should have received a copy of the GNU General Public License</span>
+<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">Series</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 
 <span class="kn">import</span> <span class="nn">ephys_features</span> <span class="kn">as</span> <span class="nn">ft</span>
 
@@ -648,7 +662,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="n">SHORT_SQUARES_WINDOW_END</span> <span class="o">=</span> <span class="mf">1.021</span>
 
 
-<div class="viewcode-block" id="EphysSweepFeatureExtractor"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">EphysSweepFeatureExtractor</span><span class="p">:</span>    
+<div class="viewcode-block" id="EphysSweepFeatureExtractor"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">EphysSweepFeatureExtractor</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Feature calculation for a sweep (voltage and/or current time series).&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span>
@@ -944,7 +958,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">return</span> <span class="n">ft</span><span class="o">.</span><span class="n">average_voltage</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">baseline_end_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_interval</span><span class="p">,</span>
                                       <span class="n">baseline_end_time</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Could not find sufficiently flat interval for automatic baseline voltage&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Could not find sufficiently flat interval for automatic baseline voltage&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
 <div class="viewcode-block" id="EphysSweepFeatureExtractor.voltage_deflection"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.voltage_deflection">[docs]</a>    <span class="k">def</span> <span class="nf">voltage_deflection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deflect_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -995,7 +1009,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">deflect_index</span> <span class="o">=</span> <span class="n">deflect_func</span><span class="p">(</span><span class="n">v_window</span><span class="p">)</span> <span class="o">+</span> <span class="n">start_index</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">deflect_index</span><span class="p">],</span> <span class="n">deflect_index</span>
-    </div>
+</div>
 <div class="viewcode-block" id="EphysSweepFeatureExtractor.stimulus_amplitude"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.stimulus_amplitude">[docs]</a>    <span class="k">def</span> <span class="nf">stimulus_amplitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_amplitude_calculator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -1316,7 +1330,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">ext</span> <span class="o">=</span> <span class="n">EphysSweepSetFeatureExtractor</span><span class="o">.</span><span class="n">from_sweeps</span><span class="p">(</span><span class="n">spiking_sweeps</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ramps_ext</span> <span class="o">=</span> <span class="n">ext</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;ramps&quot;</span><span class="p">][</span><span class="s">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;ramps&quot;</span><span class="p">][</span><span class="s">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="EphysCellFeatureExtractor.ramps_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features">[docs]</a>    <span class="k">def</span> <span class="nf">ramps_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1389,7 +1403,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">subthresh_sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;avg_rate&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">subthresh_ext</span> <span class="o">=</span> <span class="n">EphysSweepSetFeatureExtractor</span><span class="o">.</span><span class="n">from_sweeps</span><span class="p">(</span><span class="n">subthresh_sweeps</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_long_squares_ext</span> <span class="o">=</span> <span class="n">subthresh_ext</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subthresh_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;No subthreshold long square sweeps, cannot evaluate cell features.&quot;</span><span class="p">)</span>
 
@@ -1451,7 +1465,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="s">&quot;short_squares&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;short_squares&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="s">&quot;ramps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;ramps&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="p">}</span>
-        
+
         <span class="c"># convert feature extractor lists to sweep dictionarsweep extract lists</span>
         <span class="n">ls_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
         <span class="n">ls_spike_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
@@ -1468,7 +1482,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;rheobase_sweep&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rheo_sweep</span>
         <span class="n">out</span><span class="p">[</span><span class="s">&quot;short_squares&quot;</span><span class="p">][</span><span class="s">&quot;common_amp_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ss_sweeps</span>
         <span class="n">out</span><span class="p">[</span><span class="s">&quot;ramps&quot;</span><span class="p">][</span><span class="s">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramp_sweeps</span>
-        
+
         <span class="k">return</span> <span class="n">out</span>
 
 </div></div>
@@ -1610,9 +1624,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="k">def</span> <span class="nf">_short_step_stim_amp</span><span class="p">(</span><span class="n">sweep</span><span class="p">):</span>
     <span class="n">t_index</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_time_index</span><span class="p">(</span><span class="n">sweep</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">sweep</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">sweep</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">t_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-
-
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span> <span class="k">pass</span>
 </pre></div>
 
           </div>

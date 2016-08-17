@@ -631,6 +631,21 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.ephys.ephys_features</h1><div class="highlight"><pre>
+<span class="c"># Copyright 2016 Allen Institute for Brain Science</span>
+<span class="c"># This file is part of Allen SDK.</span>
+<span class="c">#</span>
+<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c"># it under the terms of the GNU General Public License as published by</span>
+<span class="c"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c">#</span>
+<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c"># GNU General Public License for more details.</span>
+<span class="c">#</span>
+<span class="c"># You should have received a copy of the GNU General Public License</span>
+<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -803,8 +818,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">target</span> <span class="o">=</span> <span class="n">avg_upstroke</span> <span class="o">*</span> <span class="n">thresh_frac</span>
 
     <span class="n">upstrokes_and_start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]),</span> <span class="n">upstroke_indexes</span><span class="p">)</span>
-    <span class="n">threshold_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">upstk</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">upstk</span><span class="p">:</span><span class="n">upstrokes_and_start</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span>
-                         <span class="n">target</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">upstk</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">upstrokes_and_start</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span>
+    <span class="n">threshold_indexes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">upstk</span><span class="p">,</span> <span class="n">upstk_prev</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">upstrokes_and_start</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">upstrokes_and_start</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">potential_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">upstk</span><span class="p">:</span><span class="n">upstk_prev</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">target</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">potential_indexes</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="c"># couldn&#39;t find a matching value for threshold,</span>
+            <span class="c"># so just going to the start of the search interval</span>
+            <span class="n">threshold_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">upstk_prev</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">threshold_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">upstk</span> <span class="o">-</span> <span class="n">potential_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">threshold_indexes</span><span class="p">)</span>
 
@@ -1697,10 +1719,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div class="viewcode-block" id="FeatureError"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_features.FeatureError">[docs]</a><span class="k">class</span> <span class="nc">FeatureError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Generic Python-exception-derived object raised by feature detection functions.&quot;&quot;&quot;</span>
-    <span class="k">pass</span>
-
-</div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span> <span class="k">pass</span>
+    <span class="k">pass</span></div>
 </pre></div>
 
           </div>

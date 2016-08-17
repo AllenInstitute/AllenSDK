@@ -662,24 +662,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="n">THREE_SESSION_C</span> <span class="o">=</span> <span class="s">&#39;three_session_C&#39;</span>
 
 <span class="n">SESSION_STIMULUS_MAP</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">THREE_SESSION_A</span><span class="p">:</span> <span class="p">[</span> <span class="n">DRIFTING_GRATINGS</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_THREE</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span> <span class="p">],</span>
-    <span class="n">THREE_SESSION_B</span><span class="p">:</span> <span class="p">[</span> <span class="n">STATIC_GRATINGS</span><span class="p">,</span> <span class="n">NATURAL_SCENES</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span> <span class="p">],</span>
-    <span class="n">THREE_SESSION_C</span><span class="p">:</span> <span class="p">[</span> <span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_TWO</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span> <span class="p">]</span>
-    <span class="p">}</span>
+    <span class="n">THREE_SESSION_A</span><span class="p">:</span> <span class="p">[</span><span class="n">DRIFTING_GRATINGS</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_THREE</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span><span class="p">],</span>
+    <span class="n">THREE_SESSION_B</span><span class="p">:</span> <span class="p">[</span><span class="n">STATIC_GRATINGS</span><span class="p">,</span> <span class="n">NATURAL_SCENES</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span><span class="p">],</span>
+    <span class="n">THREE_SESSION_C</span><span class="p">:</span> <span class="p">[</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">NATURAL_MOVIE_TWO</span><span class="p">,</span> <span class="n">SPONTANEOUS_ACTIVITY</span><span class="p">]</span>
+<span class="p">}</span>
+
 
 <div class="viewcode-block" id="stimuli_in_session"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.stimuli_in_session">[docs]</a><span class="k">def</span> <span class="nf">stimuli_in_session</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Return a list what stimuli are available in a given session. </span>
-<span class="sd">    </span>
+    <span class="sd">&quot;&quot;&quot; Return a list what stimuli are available in a given session.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    session: string</span>
 <span class="sd">        Must be one of: [stimulus_info.THREE_SESSION_A, stimulus_info.THREE_SESSION_B, stimulus_info.THREE_SESSION_C]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SESSION_STIMULUS_MAP</span><span class="p">[</span><span class="n">session</span><span class="p">]</span>
+
 </div>
 <div class="viewcode-block" id="all_stimuli"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_info.all_stimuli">[docs]</a><span class="k">def</span> <span class="nf">all_stimuli</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot; Return a list of all stimuli in the data set &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">set</span><span class="p">([</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">vl</span> <span class="ow">in</span> <span class="n">SESSION_STIMULUS_MAP</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vl</span> <span class="p">])</span></div>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vl</span> <span class="ow">in</span> <span class="n">SESSION_STIMULUS_MAP</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vl</span><span class="p">])</span></div>
 </pre></div>
 
           </div>

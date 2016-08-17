@@ -631,30 +631,40 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.core.brain_observatory_nwb_data_set</h1><div class="highlight"><pre>
-<span class="c"># -*- coding: utf-8 -*-</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Created on Fri Aug 14 14:04:24 2015</span>
+<span class="c"># Copyright 2016 Allen Institute for Brain Science</span>
+<span class="c"># This file is part of Allen SDK.</span>
+<span class="c">#</span>
+<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c"># it under the terms of the GNU General Public License as published by</span>
+<span class="c"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c">#</span>
+<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c"># GNU General Public License for more details.</span>
+<span class="c">#</span>
+<span class="c"># You should have received a copy of the GNU General Public License</span>
+<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="sd">@author: saskiad@alleninstitute.org</span>
-<span class="sd">Functions to extract relevant data from the CAM NWB files</span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">h5py</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">allensdk.brain_observatory.roi_masks</span> <span class="kn">as</span> <span class="nn">roi</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">allensdk.brain_observatory.locally_sparse_noise</span> <span class="kn">import</span> <span class="n">LocallySparseNoise</span>
+<span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">si</span>
 <span class="kn">import</span> <span class="nn">dateutil</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
-<div class="viewcode-block" id="MissingStimulusException"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.MissingStimulusException">[docs]</a><span class="k">class</span> <span class="nc">MissingStimulusException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span>
+
+<div class="viewcode-block" id="MissingStimulusException"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.MissingStimulusException">[docs]</a><span class="k">class</span> <span class="nc">MissingStimulusException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet">[docs]</a><span class="k">class</span> <span class="nc">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="n">MOVIE_FOV_PX</span> <span class="o">=</span> <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
     <span class="n">PIPELINE_DATASET</span> <span class="o">=</span> <span class="s">&#39;brain_observatory_pipeline&#39;</span>
-    
-    <span class="n">FILE_METADATA_MAPPING</span> <span class="o">=</span> <span class="p">{</span> 
+
+    <span class="n">FILE_METADATA_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s">&#39;age&#39;</span><span class="p">:</span> <span class="s">&#39;general/subject/age&#39;</span><span class="p">,</span>
         <span class="s">&#39;sex&#39;</span><span class="p">:</span> <span class="s">&#39;general/subject/sex&#39;</span><span class="p">,</span>
         <span class="s">&#39;imaging_depth&#39;</span><span class="p">:</span> <span class="s">&#39;general/optophysiology/imaging_plane_1/imaging depth&#39;</span><span class="p">,</span>
@@ -668,20 +678,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="s">&#39;genotype&#39;</span><span class="p">:</span> <span class="s">&#39;general/subject/genotype&#39;</span><span class="p">,</span>
         <span class="s">&#39;session_start_time&#39;</span><span class="p">:</span> <span class="s">&#39;session_start_time&#39;</span><span class="p">,</span>
         <span class="s">&#39;session_type&#39;</span><span class="p">:</span> <span class="s">&#39;general/session_type&#39;</span>
-        <span class="p">}</span>
+    <span class="p">}</span>
 
     <span class="n">STIMULUS_TABLE_TYPES</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s">&#39;abstract_feature_series&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s">&#39;drifting_gratings&#39;</span><span class="p">,</span> <span class="s">&#39;static_gratings&#39;</span> <span class="p">],</span>
-        <span class="s">&#39;indexed_time_series&#39;</span><span class="p">:</span> <span class="p">[</span> <span class="s">&#39;natural_movie_one&#39;</span><span class="p">,</span> <span class="s">&#39;natural_movie_two&#39;</span><span class="p">,</span> <span class="s">&#39;natural_movie_three&#39;</span><span class="p">,</span> 
-                                 <span class="s">&#39;natural_scenes&#39;</span><span class="p">,</span> <span class="s">&#39;locally_sparse_noise&#39;</span> <span class="p">]</span>
-        <span class="p">}</span>
-    
+        <span class="s">&#39;abstract_feature_series&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">si</span><span class="o">.</span><span class="n">DRIFTING_GRATINGS</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">STATIC_GRATINGS</span><span class="p">],</span>
+        <span class="s">&#39;indexed_time_series&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">si</span><span class="o">.</span><span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">NATURAL_MOVIE_TWO</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">NATURAL_MOVIE_THREE</span><span class="p">,</span>
+                                <span class="n">si</span><span class="o">.</span><span class="n">NATURAL_SCENES</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">]</span>
+    <span class="p">}</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span> <span class="o">=</span> <span class="n">nwb_file</span>
-        
 
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_fluorescence_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_fluorescence_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Returns an array of fluorescence traces for all ROI and </span>
+        <span class="sd">&#39;&#39;&#39; Returns an array of fluorescence traces for all ROI and</span>
 <span class="sd">        the timestamps for each datapoint</span>
 
 <span class="sd">        Parameters</span>
@@ -698,22 +707,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        traces: 2D numpy array</span>
 <span class="sd">            Fluorescence traces for each cell</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">all_cell_specimen_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">())</span>
-
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
+            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">value</span> 
+                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">inds</span> <span class="o">=</span> <span class="p">[</span> <span class="n">all_cell_specimen_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cell_specimen_ids</span> <span class="p">]</span>
-                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,:]</span>
+                <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
+                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span>
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_neuropil_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuropil_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Returns an array of fluorescence traces for all ROIs </span>
+        <span class="sd">&#39;&#39;&#39; Returns an array of fluorescence traces for all ROIs</span>
 <span class="sd">        and the timestamps for each datapoint</span>
 
 <span class="sd">        Parameters</span>
@@ -730,22 +739,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        traces: 2D numpy array</span>
 <span class="sd">            Neuropil fluorescence traces for each cell</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">all_cell_specimen_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">()</span>
-
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
-            <span class="n">ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;neuropil_traces&#39;</span><span class="p">]</span>
+            <span class="n">ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;neuropil_traces&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">np_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">value</span> 
+                <span class="n">np_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">inds</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">list</span><span class="p">(</span><span class="n">all_cell_specimen_ids</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cell_specimen_ids</span> <span class="p">]</span>
-                <span class="n">np_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,:]</span>
+                <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
+                <span class="n">np_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">np_traces</span>
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_corrected_fluorescence_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Returns an array of neuropil-corrected fluorescence traces </span>
+        <span class="sd">&#39;&#39;&#39; Returns an array of neuropil-corrected fluorescence traces</span>
 <span class="sd">        for all ROIs and the timestamps for each datapoint</span>
 
 <span class="sd">        Parameters</span>
@@ -762,31 +771,51 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        traces: 2D numpy array</span>
 <span class="sd">            Corrected fluorescence traces for each cell</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">all_cell_specimen_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">())</span>
-
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">cell_traces_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
-            <span class="n">np_traces_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;neuropil_traces&#39;</span><span class="p">]</span>
-            <span class="n">r_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;r&#39;</span><span class="p">]</span>
+            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">cell_traces_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
+            <span class="n">np_traces_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;neuropil_traces&#39;</span><span class="p">]</span>
+            <span class="n">r_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;r&#39;</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">cell_traces_ds</span><span class="o">.</span><span class="n">value</span> 
-                <span class="n">np_traces</span> <span class="o">=</span> <span class="n">np_traces_ds</span><span class="o">.</span><span class="n">value</span> 
-                <span class="n">r</span> <span class="o">=</span> <span class="n">r_ds</span><span class="o">.</span><span class="n">value</span> 
+                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">cell_traces_ds</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">np_traces</span> <span class="o">=</span> <span class="n">np_traces_ds</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">r_ds</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">inds</span> <span class="o">=</span> <span class="p">[</span> <span class="n">all_cell_specimen_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cell_specimen_ids</span> <span class="p">]</span>
-                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">cell_traces_ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,:]</span>
-                <span class="n">np_traces</span> <span class="o">=</span> <span class="n">np_traces_ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,:]</span>
+                <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
+                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">cell_traces_ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
+                <span class="n">np_traces</span> <span class="o">=</span> <span class="n">np_traces_ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
                 <span class="n">r</span> <span class="o">=</span> <span class="n">r_ds</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
 
         <span class="n">fc</span> <span class="o">=</span> <span class="n">cell_traces</span> <span class="o">-</span> <span class="n">np_traces</span> <span class="o">*</span> <span class="n">r</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">fc</span>
+</div>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_cell_specimen_indices"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Given a list of cell specimen ids, return their index based on their order in this file.</span>
 
-        </div>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cell_specimen_ids: list of cell specimen ids</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">all_cell_specimen_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">())</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">inds</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">all_cell_specimen_ids</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cell_specimen_ids</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Cell specimen not found (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">inds</span>
+</div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_dff_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_dff_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_dff_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Returns an array of dF/F traces for all ROIs and </span>
+        <span class="sd">&#39;&#39;&#39; Returns an array of dF/F traces for all ROIs and</span>
 <span class="sd">        the timestamps for each datapoint</span>
 
 <span class="sd">        Parameters</span>
@@ -803,19 +832,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        dF/F: 2D numpy array</span>
 <span class="sd">            dF/F values for each cell</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">all_cell_specimen_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">())</span>
-
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;DfOverF&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;DfOverF&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
             <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;DfOverF&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> 
+                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                    <span class="s">&#39;DfOverF&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">inds</span> <span class="o">=</span> <span class="p">[</span> <span class="n">all_cell_specimen_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cell_specimen_ids</span> <span class="p">]</span>
-                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;DfOverF&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">,:]</span>
+                <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
+                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                    <span class="s">&#39;DfOverF&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span>
-
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of IDs for all ROIs in the file</span>
@@ -825,7 +854,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        ROI IDs: list</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">roi_id</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s">&#39;roi_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> 
+            <span class="n">roi_id</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s">&#39;roi_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">roi_id</span>
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_cell_specimen_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -836,7 +866,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        cell specimen IDs: list</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">cell_id</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s">&#39;cell_specimen_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> 
+            <span class="n">cell_id</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s">&#39;cell_specimen_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">cell_id</span>
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_session_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_session_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_session_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -850,23 +881,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">session_type</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;general/session_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">session_type</span>
-
-        </div>
+</div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_max_projection"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_max_projection">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Returns the maximum projection image for the 2P movie.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        max projection: np.ndarray</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">max_projection</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;reference_images&#39;</span><span class="p">][</span><span class="s">&#39;maximum_intensity_projection_image&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">max_projection</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;ImageSegmentation&#39;</span><span class="p">][</span>
+                <span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;reference_images&#39;</span><span class="p">][</span><span class="s">&#39;maximum_intensity_projection_image&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
         <span class="k">return</span> <span class="n">max_projection</span>
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.list_stimuli"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.list_stimuli">[docs]</a>    <span class="k">def</span> <span class="nf">list_stimuli</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Return a list of the stimuli presented in the experiment. </span>
-<span class="sd">        </span>
+        <span class="sd">&#39;&#39;&#39; Return a list of the stimuli presented in the experiment.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        stimuli: list of strings</span>
@@ -874,18 +905,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">keys</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;stimulus/presentation/&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">[</span> <span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_stimulus&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span> <span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_stimulus&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus_table"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return a stimulus table given a stimulus name &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">stimulus_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_TABLE_TYPES</span><span class="p">[</span><span class="s">&#39;abstract_feature_series&#39;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="n">stimulus_name</span> <span class="o">+</span> <span class="s">&quot;_stimulus&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_get_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span> <span class="o">+</span> <span class="s">&quot;_stimulus&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">stimulus_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_TABLE_TYPES</span><span class="p">[</span><span class="s">&#39;indexed_time_series&#39;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">stimulus_name</span> <span class="o">+</span> <span class="s">&quot;_stimulus&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span> <span class="o">+</span> <span class="s">&quot;_stimulus&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">stimulus_name</span> <span class="o">==</span> <span class="s">&#39;spontaneous&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_spontaneous_activity_stimulus_table</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;Could not find a stimulus table named &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
+                <span class="s">&quot;Could not find a stimulus table named &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_spontaneous_activity_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return the spontaneous activity stimulus table, if it exists.</span>
@@ -903,56 +935,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">stop_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">events</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_inds</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stop_inds</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;inconsistent start and time times in spontaneous activity stimulus table&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s">&quot;inconsistent start and time times in spontaneous activity stimulus table&quot;</span><span class="p">)</span>
 
-        <span class="n">stim_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">frame_dur</span><span class="p">[</span><span class="n">start_inds</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">frame_dur</span><span class="p">[</span><span class="n">stop_inds</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">stim_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">frame_dur</span><span class="p">[</span><span class="n">start_inds</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">frame_dur</span><span class="p">[</span><span class="n">stop_inds</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
-        <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stim_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;start&#39;</span><span class="p">,</span><span class="s">&#39;end&#39;</span><span class="p">])</span>
-
-        <span class="k">return</span> <span class="n">stimulus_table</span>
-</div>
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_indexed_time_series_stimulus_table"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_indexed_time_series_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Return the a stimulus table for an indexed time series.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        stimulus table: pd.DataFrame</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        
-        <span class="n">k</span> <span class="o">=</span> <span class="s">&quot;stimulus/presentation/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span>
-
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span> 
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MissingStimulusException</span><span class="p">(</span><span class="s">&quot;Stimulus not found: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span>    
-            <span class="n">inds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;/data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">frame_dur</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;/frame_duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-
-        <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">inds</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;frame&#39;</span><span class="p">])</span>
-        <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">stimulus_table</span>
-</div>
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_abstract_feature_series_stimulus_table"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_abstract_feature_series_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Return the a stimulus table for an abstract feature series.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        stimulus table: pd.DataFrame</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="n">k</span> <span class="o">=</span> <span class="s">&quot;stimulus/presentation/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span>
-
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">MissingStimulusException</span><span class="p">(</span><span class="s">&quot;Stimulus not found: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span>
-            <span class="n">stim_data</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;/data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">features</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;/features&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">frame_dur</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;/frame_duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-
-        <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stim_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">features</span><span class="p">)</span>
-        <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stim_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;start&#39;</span><span class="p">,</span> <span class="s">&#39;end&#39;</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">stimulus_table</span>
 </div>
@@ -985,9 +974,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        -------</span>
 <span class="sd">        tuple: (template, off-screen mask)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        
+
         <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stimulus_template</span><span class="p">(</span><span class="s">&quot;locally_sparse_noise&quot;</span><span class="p">)</span>
-        
+
         <span class="c"># build mapping from template coordinates to display coordinates</span>
         <span class="n">template_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
         <span class="n">template_display_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1260</span><span class="p">,</span> <span class="mi">720</span><span class="p">)</span>
@@ -996,26 +985,59 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">scale</span> <span class="o">=</span> <span class="p">[</span>
             <span class="nb">float</span><span class="p">(</span><span class="n">template_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">template_display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
             <span class="nb">float</span><span class="p">(</span><span class="n">template_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">template_display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="p">]</span>
+        <span class="p">]</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="p">[</span>
             <span class="o">-</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">template_display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
-             <span class="o">-</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">template_display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">0.5</span>
-             <span class="p">]</span>
+            <span class="o">-</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">template_display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">0.5</span>
+        <span class="p">]</span>
 
-        <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">indexing</span><span class="o">=</span><span class="s">&#39;ij&#39;</span><span class="p">)</span>
-        <span class="n">template_display_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x</span> <span class="o">+</span> <span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> 
-                                            <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">],</span> 
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">indexing</span><span class="o">=</span><span class="s">&#39;ij&#39;</span><span class="p">)</span>
+        <span class="n">template_display_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x</span> <span class="o">+</span> <span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span>
+                                            <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">scale</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">],</span>
                                            <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">template_display_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span><span class="n">template_display_coords</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
         <span class="c"># build mask</span>
-        <span class="n">template_mask</span><span class="p">,</span> <span class="n">template_frac</span> <span class="o">=</span> <span class="n">mask_stimulus_template</span><span class="p">(</span><span class="n">template_display_coords</span><span class="p">,</span> <span class="n">template_shape</span><span class="p">)</span>
+        <span class="n">template_mask</span><span class="p">,</span> <span class="n">template_frac</span> <span class="o">=</span> <span class="n">mask_stimulus_template</span><span class="p">(</span>
+            <span class="n">template_display_coords</span><span class="p">,</span> <span class="n">template_shape</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">mask_off_screen</span><span class="p">:</span>
-            <span class="n">template</span><span class="p">[:,</span><span class="o">~</span><span class="n">template_mask</span><span class="o">.</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">LSN_OFF_SCREEN</span>
+            <span class="n">template</span><span class="p">[:,</span> <span class="o">~</span><span class="n">template_mask</span><span class="o">.</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">LSN_OFF_SCREEN</span>
 
         <span class="k">return</span> <span class="n">template</span><span class="p">,</span> <span class="n">template_mask</span><span class="o">.</span><span class="n">T</span>
-    </div>
+</div>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_mask_array"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_mask_array">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_mask_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Return a numpy array containing all of the ROI masks for requested cells.</span>
+<span class="sd">        If cell_specimen_ids is omitted, return all masks.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cell_specimen_ids: list</span>
+<span class="sd">            List of cell specimen ids.  Default None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray: NxWxH array, where N is number of cells</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">roi_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_roi_mask</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi_masks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;no masks found for given cell specimen ids&quot;</span><span class="p">)</span>
+
+        <span class="n">roi_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">roi_masks</span><span class="p">:</span>
+            <span class="n">roi_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">get_mask_plane</span><span class="p">())</span>
+
+        <span class="n">roi_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">roi_list</span><span class="p">),</span> <span class="n">roi_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span>
+                           <span class="mi">0</span><span class="p">],</span> <span class="n">roi_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">roi_list</span><span class="p">):</span>
+            <span class="n">roi_arr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">roi</span>
+
+        <span class="k">return</span> <span class="n">roi_arr</span>
+</div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of all the ROI masks</span>
 
@@ -1030,38 +1052,40 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            List of ROI_Mask objects</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">all_cell_specimen_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">()</span>
-
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">mask_loc</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">]</span>
-            <span class="n">roi_list</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;roi_list&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        
+            <span class="n">mask_loc</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">]</span>
+            <span class="n">roi_list</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;roi_list&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
             <span class="n">inds</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">inds</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_cell_specimen_ids</span><span class="p">))</span>
+                <span class="n">inds</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_ids</span><span class="p">()))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">inds</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">list</span><span class="p">(</span><span class="n">all_cell_specimen_ids</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cell_specimen_ids</span> <span class="p">]</span>
+                <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
 
             <span class="n">roi_array</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inds</span><span class="p">:</span>
                 <span class="n">v</span> <span class="o">=</span> <span class="n">roi_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                <span class="n">m</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">create_roi_mask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MOVIE_FOV_PX</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOVIE_FOV_PX</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">pix_list</span><span class="o">=</span><span class="n">mask_loc</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="s">&quot;pix_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+                <span class="n">roi_mask</span> <span class="o">=</span> <span class="n">mask_loc</span><span class="p">[</span><span class="n">v</span><span class="p">][</span><span class="s">&quot;img_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">create_roi_mask</span><span class="p">(</span><span class="n">roi_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">roi_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">roi_mask</span><span class="o">=</span><span class="n">roi_mask</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
                 <span class="n">roi_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">roi_array</span>
-    </div>
+</div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_metadata"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Returns a dictionary of meta data associated with each </span>
-<span class="sd">        experiment, including Cre line, specimen number, </span>
+        <span class="sd">&#39;&#39;&#39; Returns a dictionary of meta data associated with each</span>
+<span class="sd">        experiment, including Cre line, specimen number,</span>
 <span class="sd">        visual area imaged, imaging depth</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        metadata: dictionary</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        
+
         <span class="n">meta</span> <span class="o">=</span> <span class="p">{}</span>
-            
+
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">memory_key</span><span class="p">,</span> <span class="n">disk_key</span> <span class="ow">in</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="o">.</span><span class="n">FILE_METADATA_MAPPING</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">v</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">disk_key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
@@ -1074,7 +1098,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;imaging_depth&#39;</span><span class="p">]</span>
         <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ophys_experiment_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s">&#39;ophys_experiment_id&#39;</span><span class="p">])</span>
         <span class="n">meta</span><span class="p">[</span><span class="s">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s">&#39;experiment_container_id&#39;</span><span class="p">])</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s">&#39;session_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s">&#39;session_start_time&#39;</span><span class="p">])</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s">&#39;session_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;session_start_time&#39;</span><span class="p">])</span>
 
         <span class="c"># parse the age in days</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&quot;(.*?) days&quot;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;age&#39;</span><span class="p">])</span>
@@ -1082,7 +1107,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">meta</span><span class="p">[</span><span class="s">&#39;age_days&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;age&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;Could not find device.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;Could not find age.&quot;</span><span class="p">)</span>
 
         <span class="c"># parse the device string (ugly, sorry)</span>
         <span class="n">device_string</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;device_string&#39;</span><span class="p">]</span>
@@ -1097,59 +1122,61 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;Could not find device.&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">meta</span>
-        
-
-    </div>
+</div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_running_speed"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_running_speed">[docs]</a>    <span class="k">def</span> <span class="nf">get_running_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns the mouse running speed in cm/s</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">dxcm</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;BehavioralTimeSeries&#39;</span><span class="p">][</span><span class="s">&#39;running_speed&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">dxtime</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;BehavioralTimeSeries&#39;</span><span class="p">][</span><span class="s">&#39;running_speed&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>    
+            <span class="n">dxcm</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;BehavioralTimeSeries&#39;</span><span class="p">][</span><span class="s">&#39;running_speed&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">dxtime</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;BehavioralTimeSeries&#39;</span><span class="p">][</span><span class="s">&#39;running_speed&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
-        <span class="n">dxcm</span> <span class="o">=</span> <span class="n">dxcm</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dxcm</span> <span class="o">=</span> <span class="n">dxcm</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">dxtime</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">timestamps</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="n">adjust</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">timestamps</span><span class="o">==</span><span class="n">dxtime</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">adjust</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">timestamps</span> <span class="o">==</span> <span class="n">dxtime</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">dxtime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">dxtime</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">[:</span><span class="n">adjust</span><span class="p">])</span>
             <span class="n">dxcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">adjust</span><span class="p">))</span>
         <span class="n">adjust</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">dxtime</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">adjust</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
-            <span class="n">dxtime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">[(</span><span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">adjust</span><span class="p">):])</span>
+        <span class="k">if</span> <span class="n">adjust</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dxtime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">[(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">adjust</span><span class="p">):])</span>
             <span class="n">dxcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">adjust</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span>
-    </div>
+</div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_motion_correction"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_motion_correction">[docs]</a>    <span class="k">def</span> <span class="nf">get_motion_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">motion_log</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;MotionCorrection&#39;</span><span class="p">][</span><span class="s">&#39;2p_image_series&#39;</span><span class="p">][</span><span class="s">&#39;xy_translations&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">motion_time</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;MotionCorrection&#39;</span><span class="p">][</span><span class="s">&#39;2p_image_series&#39;</span><span class="p">][</span><span class="s">&#39;xy_translations&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">motion_names</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;MotionCorrection&#39;</span><span class="p">][</span><span class="s">&#39;2p_image_series&#39;</span><span class="p">][</span><span class="s">&#39;xy_translations&#39;</span><span class="p">][</span><span class="s">&#39;feature_description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">motion_log</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;MotionCorrection&#39;</span><span class="p">][</span>
+                <span class="s">&#39;2p_image_series&#39;</span><span class="p">][</span><span class="s">&#39;xy_translations&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">motion_time</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;MotionCorrection&#39;</span><span class="p">][</span>
+                <span class="s">&#39;2p_image_series&#39;</span><span class="p">][</span><span class="s">&#39;xy_translations&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">motion_names</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;MotionCorrection&#39;</span><span class="p">][</span>
+                <span class="s">&#39;2p_image_series&#39;</span><span class="p">][</span><span class="s">&#39;xy_translations&#39;</span><span class="p">][</span><span class="s">&#39;feature_description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
             <span class="n">motion_correction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">motion_log</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">motion_names</span><span class="p">)</span>
-            <span class="n">motion_correction</span><span class="p">[</span><span class="s">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">motion_time</span>    
+            <span class="n">motion_correction</span><span class="p">[</span><span class="s">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">motion_time</span>
 
         <span class="k">return</span> <span class="n">motion_correction</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.save_analysis_dataframes"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_dataframes">[docs]</a>    <span class="k">def</span> <span class="nf">save_analysis_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tables</span><span class="p">):</span>
-        <span class="c"># NOTE: should use NWB library to write data to NWB file. It is </span>
+        <span class="c"># NOTE: should use NWB library to write data to NWB file. It is</span>
         <span class="c">#   designed to avoid possible corruption of the file in event</span>
         <span class="c">#   of a failed write</span>
         <span class="n">store</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">HDFStore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;a&#39;</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
             <span class="n">store</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&#39;analysis/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>
 
         <span class="n">store</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        
 </div>
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.save_analysis_arrays"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_arrays">[docs]</a>    <span class="k">def</span> <span class="nf">save_analysis_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">datasets</span><span class="p">):</span>    
-        <span class="c"># NOTE: should use NWB library to write data to NWB file. It is </span>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.save_analysis_arrays"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_arrays">[docs]</a>    <span class="k">def</span> <span class="nf">save_analysis_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">datasets</span><span class="p">):</span>
+        <span class="c"># NOTE: should use NWB library to write data to NWB file. It is</span>
         <span class="c">#   designed to avoid possible corruption of the file in event</span>
         <span class="c">#   of a failed write</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;analysis&#39;</span><span class="p">]:</span>
                     <span class="k">del</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;analysis&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s">&#39;analysis/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
@@ -1159,9 +1186,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                          <span class="n">distance</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>
                          <span class="n">mon_height_cm</span><span class="o">=</span><span class="mf">32.5</span><span class="p">,</span>
                          <span class="n">mon_width_cm</span><span class="o">=</span><span class="mf">51.0</span><span class="p">,</span>
-                         <span class="n">mon_res</span><span class="o">=</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span><span class="mi">1200</span><span class="p">),</span>
-                         <span class="n">eyepoint</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)):</span>
-    <span class="sd">&quot;&quot;&quot;  </span>
+                         <span class="n">mon_res</span><span class="o">=</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1200</span><span class="p">),</span>
+                         <span class="n">eyepoint</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    For a list of screen vertices, provides a corresponding list of texture coordinates.</span>
 
 <span class="sd">    Parameters</span>
@@ -1183,7 +1210,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    np.ndarray</span>
 <span class="sd">        x,y coordinates shaped like the input that describe what pixel coordinates</span>
 <span class="sd">        are displayed an the input coordinates after warping the stimulus.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">mon_width_cm</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mon_width_cm</span><span class="p">)</span>
     <span class="n">mon_height_cm</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mon_height_cm</span><span class="p">)</span>
@@ -1196,8 +1224,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">mon_res_x</span>
     <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">mon_res_y</span>
 
-    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">mon_width_cm</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">mon_height_cm</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">mon_width_cm</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">mon_height_cm</span>
 
     <span class="n">xEye</span> <span class="o">=</span> <span class="n">eyepoint</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">mon_width_cm</span>
     <span class="n">yEye</span> <span class="o">=</span> <span class="n">eyepoint</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">mon_height_cm</span>
@@ -1230,7 +1258,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">tx</span> <span class="o">=</span> <span class="n">arcLength</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
     <span class="n">ty</span> <span class="o">=</span> <span class="n">arcLength</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
 
-    <span class="n">u_coords</span> <span class="o">=</span> <span class="n">tx</span> <span class="o">/</span> <span class="n">mon_width_cm</span> 
+    <span class="n">u_coords</span> <span class="o">=</span> <span class="n">tx</span> <span class="o">/</span> <span class="n">mon_width_cm</span>
     <span class="n">v_coords</span> <span class="o">=</span> <span class="n">ty</span> <span class="o">/</span> <span class="n">mon_height_cm</span>
 
     <span class="n">retCoords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">u_coords</span><span class="p">,</span> <span class="n">v_coords</span><span class="p">))</span>
@@ -1240,30 +1268,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">retCoords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">retCoords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">mon_res_y</span>
 
     <span class="k">return</span> <span class="n">retCoords</span>
+
 </div>
-<div class="viewcode-block" id="make_display_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.make_display_mask">[docs]</a><span class="k">def</span> <span class="nf">make_display_mask</span><span class="p">(</span><span class="n">display_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span><span class="mi">1200</span><span class="p">)):</span>
+<div class="viewcode-block" id="make_display_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.make_display_mask">[docs]</a><span class="k">def</span> <span class="nf">make_display_mask</span><span class="p">(</span><span class="n">display_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1200</span><span class="p">)):</span>
     <span class="sd">&#39;&#39;&#39; Build a display-shaped mask that indicates which pixels are on screen after warping the stimulus. &#39;&#39;&#39;</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">-</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">-</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
-    <span class="n">display_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)))</span>
-                                                     
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">-</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">-</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">display_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)))</span>
+
     <span class="n">warped_coords</span> <span class="o">=</span> <span class="n">warp_stimulus_coords</span><span class="p">(</span><span class="n">display_coords</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
-    <span class="n">off_warped_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="n">warped_coords</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
-                                   <span class="n">warped_coords</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span> <span class="p">])</span>
+    <span class="n">off_warped_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">warped_coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+                                  <span class="n">warped_coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">])</span>
 
-    
     <span class="n">used_coords</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">off_warped_coords</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-        <span class="n">used_coords</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">off_warped_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">],</span> <span class="n">off_warped_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">used_coords</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">off_warped_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">off_warped_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]))</span>
 
-    <span class="n">used_coords</span> <span class="o">=</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">used_coords</span> <span class="p">]),</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">y</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">used_coords</span> <span class="p">])</span> <span class="p">)</span>
+    <span class="n">used_coords</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">used_coords</span><span class="p">]),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">y</span> <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">used_coords</span><span class="p">]))</span>
 
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">display_shape</span><span class="p">)</span>
     <span class="n">mask</span><span class="p">[</span><span class="n">used_coords</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="k">return</span> <span class="n">mask</span>
+
 </div>
 <div class="viewcode-block" id="mask_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.mask_stimulus_template">[docs]</a><span class="k">def</span> <span class="nf">mask_stimulus_template</span><span class="p">(</span><span class="n">template_display_coords</span><span class="p">,</span> <span class="n">template_shape</span><span class="p">,</span> <span class="n">display_mask</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Build a mask for a stimulus template of a given shape and display coordinates that indicates</span>
@@ -1275,14 +1304,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        list of (x,y) display coordinates</span>
 
 <span class="sd">    template_shape: tuple</span>
-<span class="sd">        (width,height) of the display template  </span>
+<span class="sd">        (width,height) of the display template</span>
 
 <span class="sd">    display_mask: np.ndarray</span>
 <span class="sd">        boolean 2D mask indicating which display coordinates are on screen after warping.</span>
 
 <span class="sd">    threshold: float</span>
 <span class="sd">        Fraction of pixels associated with a template display coordinate that should remain</span>
-<span class="sd">        on screen to count as belonging to the mask. </span>
+<span class="sd">        on screen to count as belonging to the mask.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1295,17 +1324,63 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">template_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">template_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">template_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="n">tdcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">template_display_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:]</span> <span class="o">==</span> <span class="n">x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">template_display_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">,:,:]</span> <span class="o">==</span> <span class="n">y</span><span class="p">))</span>
+            <span class="n">tdcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">template_display_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">==</span> <span class="n">x</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span>
+                <span class="n">template_display_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">==</span> <span class="n">y</span><span class="p">))</span>
             <span class="n">v</span> <span class="o">=</span> <span class="n">display_mask</span><span class="p">[</span><span class="n">tdcm</span><span class="p">]</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-            <span class="n">frac</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
-            <span class="n">mask</span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span> <span class="o">&gt;=</span> <span class="n">threshold</span>
-    
+            <span class="n">frac</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span> <span class="o">&gt;=</span> <span class="n">threshold</span>
+
     <span class="k">return</span> <span class="n">mask</span><span class="p">,</span> <span class="n">frac</span>
 
-                      
+</div>
+<span class="k">def</span> <span class="nf">_get_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Return the a stimulus table for an abstract feature series.</span>
 
-    </div>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stimulus table: pd.DataFrame</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="s">&quot;stimulus/presentation/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span>
+
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingStimulusException</span><span class="p">(</span>
+                <span class="s">&quot;Stimulus not found: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span>
+        <span class="n">stim_data</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;/data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;/features&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">frame_dur</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;/frame_duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stim_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">features</span><span class="p">)</span>
+    <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stimulus_table</span>
+
+
+<span class="k">def</span> <span class="nf">_get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Return the a stimulus table for an indexed time series.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    stimulus table: pd.DataFrame</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="s">&quot;stimulus/presentation/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span>
+
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingStimulusException</span><span class="p">(</span>
+                <span class="s">&quot;Stimulus not found: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span>
+        <span class="n">inds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;/data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">frame_dur</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&#39;/frame_duration&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">inds</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;frame&#39;</span><span class="p">])</span>
+    <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s">&#39;start&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stimulus_table</span>
 </pre></div>
 
           </div>

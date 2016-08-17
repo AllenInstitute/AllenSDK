@@ -631,7 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.model.biophys_sim.neuron.hoc_utils</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -646,13 +646,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span> <span class="c">#@UnresolvedImport</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 
 <div class="viewcode-block" id="HocUtils"><a class="viewcode-back" href="../../../../../allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils">[docs]</a><span class="k">class</span> <span class="nc">HocUtils</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;A helper class for containing references to NEUORN.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    h : object</span>
@@ -666,45 +665,44 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">h</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="n">nrn</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="n">neuron</span> <span class="o">=</span> <span class="bp">None</span>
-    
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">neuron</span>
         <span class="kn">import</span> <span class="nn">nrn</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">h</span>
         <span class="n">HocUtils</span><span class="o">.</span><span class="n">neuron</span> <span class="o">=</span> <span class="n">neuron</span>
         <span class="n">HocUtils</span><span class="o">.</span><span class="n">nrn</span> <span class="o">=</span> <span class="n">nrn</span>
         <span class="n">HocUtils</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">hoc_files</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;neuron&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;hoc&#39;</span><span class="p">]</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_hoc</span><span class="p">()</span>
-    
-    
+
 <div class="viewcode-block" id="HocUtils.initialize_hoc"><a class="viewcode-back" href="../../../../../allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils.initialize_hoc">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_hoc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Basic setup for NEURON.&#39;&#39;&#39;</span>
         <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span>
         <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;conditions&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        
+
         <span class="k">for</span> <span class="n">hoc_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hoc_files</span><span class="p">:</span>
             <span class="n">HocUtils</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;loading hoc file </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">hoc_file</span><span class="p">))</span>
             <span class="n">HocUtils</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">hoc_file</span><span class="p">))</span>
-        
+
         <span class="n">h</span><span class="p">(</span><span class="s">&#39;starttime = startsw()&#39;</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="s">&#39;celsius&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">h</span><span class="o">.</span><span class="n">celsius</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;celsius&#39;</span><span class="p">]</span>
-            
+
         <span class="k">if</span> <span class="s">&#39;v_init&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">h</span><span class="o">.</span><span class="n">v_init</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;v_init&#39;</span><span class="p">]</span>
-            
+
         <span class="k">if</span> <span class="s">&#39;dt&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">h</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;dt&#39;</span><span class="p">]</span>
-            <span class="n">h</span><span class="o">.</span><span class="n">steps_per_ms</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">h</span><span class="o">.</span><span class="n">dt</span>
-            
+            <span class="n">h</span><span class="o">.</span><span class="n">steps_per_ms</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">h</span><span class="o">.</span><span class="n">dt</span>
+
         <span class="k">if</span> <span class="s">&#39;tstop&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">h</span><span class="o">.</span><span class="n">tstop</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;tstop&#39;</span><span class="p">]</span>
             <span class="n">h</span><span class="o">.</span><span class="n">runStopAt</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">tstop</span></div></div>

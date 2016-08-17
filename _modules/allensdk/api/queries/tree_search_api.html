@@ -648,24 +648,24 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">from</span> <span class="nn">allensdk.api.api</span> <span class="kn">import</span> <span class="n">Api</span>
 
+
 <div class="viewcode-block" id="TreeSearchApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.tree_search_api.TreeSearchApi">[docs]</a><span class="k">class</span> <span class="nc">TreeSearchApi</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    </span>
+
 <span class="sd">    See `Searching a Specimen or Structure Tree &lt;http://help.brain-map.org/display/api/Image-to-Image+Synchronization&gt;`_</span>
 <span class="sd">    for additional documentation.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TreeSearchApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>    
-        
-    
+        <span class="nb">super</span><span class="p">(</span><span class="n">TreeSearchApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
+
 <div class="viewcode-block" id="TreeSearchApi.get_tree"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.tree_search_api.TreeSearchApi.get_tree">[docs]</a>    <span class="k">def</span> <span class="nf">get_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">kind</span><span class="p">,</span>
                  <span class="n">db_id</span><span class="p">,</span>
                  <span class="n">ancestors</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">descendants</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Fetch meta data for the specified structure or specimen.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        kind : string</span>
@@ -676,7 +676,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            whether to include ancestors in the response (defaults to False)</span>
 <span class="sd">        descendants : boolean, optional</span>
 <span class="sd">            whether to include descendants in the response (defaults to False)</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
@@ -684,22 +684,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
-        <span class="k">if</span> <span class="n">ancestors</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">ancestors</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;ancestors=true&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ancestors</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">ancestors</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;ancestors=false&#39;</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">descendants</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">descendants</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;descendants=true&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">descendants</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">descendants</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;descendants=false&#39;</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;?&#39;</span> <span class="o">+</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
+
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">tree_search_endpoint</span><span class="p">,</span>
                        <span class="s">&#39;/&#39;</span><span class="p">,</span>
                        <span class="n">kind</span><span class="p">,</span>
@@ -707,7 +707,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                        <span class="nb">str</span><span class="p">(</span><span class="n">db_id</span><span class="p">),</span>
                        <span class="s">&#39;.json&#39;</span><span class="p">,</span>
                        <span class="n">url_params</span><span class="p">])</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span><span class="n">url</span><span class="p">)</span></div></div>
 </pre></div>
 

@@ -651,15 +651,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 
+
 <div class="viewcode-block" id="ManifestBuilder"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder">[docs]</a><span class="k">class</span> <span class="nc">ManifestBuilder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="n">df_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;key&#39;</span><span class="p">,</span><span class="s">&#39;parent_key&#39;</span><span class="p">,</span><span class="s">&#39;spec&#39;</span><span class="p">,</span><span class="s">&#39;type&#39;</span><span class="p">,</span><span class="s">&#39;format&#39;</span><span class="p">]</span>
+    <span class="n">df_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;key&#39;</span><span class="p">,</span> <span class="s">&#39;parent_key&#39;</span><span class="p">,</span> <span class="s">&#39;spec&#39;</span><span class="p">,</span> <span class="s">&#39;type&#39;</span><span class="p">,</span> <span class="s">&#39;format&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sections</span> <span class="o">=</span> <span class="p">{}</span>
-    
-    
+
 <div class="viewcode-block" id="ManifestBuilder.add_path"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.add_path">[docs]</a>    <span class="k">def</span> <span class="nf">add_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span>
                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;dir&#39;</span><span class="p">,</span>
                  <span class="n">parent_key</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -667,59 +667,56 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">entry</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
             <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="n">typename</span><span class="p">,</span>
-            <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">spec</span> <span class="p">}</span>
-        
-        <span class="k">if</span> <span class="n">format</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">spec</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">entry</span><span class="p">[</span><span class="s">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">format</span>
-        
-        <span class="k">if</span> <span class="n">parent_key</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">parent_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">entry</span><span class="p">[</span><span class="s">&#39;parent_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_key</span>
-            
+
         <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ManifestBuilder.add_section"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.add_section">[docs]</a>    <span class="k">def</span> <span class="nf">add_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">contents</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">contents</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ManifestBuilder.write_json_file"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.write_json_file">[docs]</a>    <span class="k">def</span> <span class="nf">write_json_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="s">&#39;wb&#39;</span>
-        
-        <span class="k">if</span> <span class="n">overwrite</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">overwrite</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="n">mode</span> <span class="o">=</span> <span class="s">&#39;wb+&#39;</span>
-        
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">write_json_string</span><span class="p">())</span>
-    
-    </div>
+
+        <span class="n">json_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_json_string</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>   <span class="c"># Python 2.7</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">json_string</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">))</span>  <span class="c"># Python 3</span>
+</div>
 <div class="viewcode-block" id="ManifestBuilder.get_config"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">wrapper</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;manifest&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span> <span class="p">}</span>
+        <span class="n">wrapper</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;manifest&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">wrapper</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">wrapper</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ManifestBuilder.get_manifest"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.get_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">get_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Manifest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">)</span>
-
-    </div>
+</div>
 <div class="viewcode-block" id="ManifestBuilder.write_json_string"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.write_json_string">[docs]</a>    <span class="k">def</span> <span class="nf">write_json_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">ju</span><span class="o">.</span><span class="n">write_string</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-
-    </div>
+</div>
 <div class="viewcode-block" id="ManifestBuilder.as_dataframe"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.as_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">as_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">,</span>
                             <span class="n">columns</span><span class="o">=</span><span class="n">ManifestBuilder</span><span class="o">.</span><span class="n">df_columns</span><span class="p">)</span>
-    </div>
+</div>
 <div class="viewcode-block" id="ManifestBuilder.from_dataframe"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.from_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">from_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span> <span class="o">=</span> <span class="p">{}</span>
-        
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">f</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">ManifestBuilder</span><span class="o">.</span><span class="n">df_columns</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-            
-            </div></div>
+
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">ManifestBuilder</span><span class="o">.</span><span class="n">df_columns</span><span class="p">]</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="n">f</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

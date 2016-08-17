@@ -655,15 +655,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div class="viewcode-block" id="JsonDescriptionParser"><a class="viewcode-back" href="../../../../../allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser">[docs]</a><span class="k">class</span> <span class="nc">JsonDescriptionParser</span><span class="p">(</span><span class="n">DescriptionParser</span><span class="p">):</span>
     <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-    
-    
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">JsonDescriptionParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
-    
-    
+
 <div class="viewcode-block" id="JsonDescriptionParser.read"><a class="viewcode-back" href="../../../../../allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Parse a complete or partial configuration.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        json_string : string</span>
@@ -672,26 +670,25 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Where to put the parsed configuration.  If None a new one is created.</span>
 <span class="sd">        section : string, optional</span>
 <span class="sd">            Where to put the parsed configuration within the description.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Description</span>
 <span class="sd">            The input description with parsed configuration added.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Section is only specified for &quot;bare&quot; objects that are to be added to a section array.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">description</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">description</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">description</span> <span class="o">=</span> <span class="n">Description</span><span class="p">()</span>
-            
+
         <span class="n">data</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
         <span class="n">description</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">description</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="JsonDescriptionParser.read_string"><a class="viewcode-back" href="../../../../../allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.read_string">[docs]</a>    <span class="k">def</span> <span class="nf">read_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_string</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Parse a complete or partial configuration.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        json_string : string</span>
@@ -700,27 +697,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Where to put the parsed configuration.  If None a new one is created.</span>
 <span class="sd">        section : string, optional</span>
 <span class="sd">            Where to put the parsed configuration within the description.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Description</span>
 <span class="sd">            The input description with parsed configuration added.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Section is only specified for &quot;bare&quot; objects that are to be added to a section array.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">description</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">description</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">description</span> <span class="o">=</span> <span class="n">Description</span><span class="p">()</span>
-        
+
         <span class="n">data</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">read_string</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
-        
+
         <span class="n">description</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">description</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="JsonDescriptionParser.write"><a class="viewcode-back" href="../../../../../allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Write the description to a JSON file.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        description : Description</span>
@@ -728,23 +724,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">dump</span><span class="p">(</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">dump</span><span class="p">(</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t write allensdk json description: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s">&quot;Couldn&#39;t write allensdk json description: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
             <span class="k">raise</span>
-        
+
         <span class="k">return</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="JsonDescriptionParser.write_string"><a class="viewcode-back" href="../../../../../allensdk.config.model.formats.html#allensdk.config.model.formats.json_description_parser.JsonDescriptionParser.write_string">[docs]</a>    <span class="k">def</span> <span class="nf">write_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Write the description to a JSON string.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        description : Description</span>
 <span class="sd">            Object to write.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string</span>

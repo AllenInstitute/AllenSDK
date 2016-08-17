@@ -631,7 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.ephys.feature_extractor</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -648,15 +648,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="kn">as</span> <span class="nn">signal</span> 
+<span class="kn">import</span> <span class="nn">scipy.signal</span> <span class="kn">as</span> <span class="nn">signal</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="c"># Design notes:</span>
 <span class="c"># to generate an average feature file, all sweeps must have all features</span>
-<span class="c"># to generate a fitness score of a sweep to a feature file,, the sweep </span>
-<span class="c">#   must have all features in the file. If one is absent, a penalty </span>
+<span class="c"># to generate a fitness score of a sweep to a feature file,, the sweep</span>
+<span class="c">#   must have all features in the file. If one is absent, a penalty</span>
 <span class="c">#   of TODO ??? will be assessed</span>
 
 <span class="c"># set of features</span>
@@ -676,7 +675,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="c">#    &#39;miss&#39;    feature absent:</span>
         <span class="c">#        &#39;constant&#39;        score = scoring[&#39;constant&#39;]</span>
         <span class="c">#        &#39;mean_mult&#39;        score = mean * scoring[&#39;mean_mult&#39;]</span>
-        <span class="c"># </span>
+        <span class="c">#</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
@@ -735,7 +734,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;upstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Vm of peak upstroke (mV)&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;upstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;downstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Peak downstroke (mV/ms)&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;downstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;downstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;downstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Vm of peak downstroke (mV)&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;downstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">perspike_score</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="s">&quot;threshold&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Threshold voltage (mV)&quot;</span>
@@ -754,17 +753,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="s">&quot;rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spike_score</span>
 
 <div class="viewcode-block" id="EphysFeatures.print_out"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatures.print_out">[docs]</a>    <span class="k">def</span> <span class="nf">print_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">print</span> <span class="s">&quot;Features from &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Features from &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">:</span>
-                <span class="nb">str</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%30s</span><span class="s"> = &quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="nb">str</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">st</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%30s</span><span class="s"> = &quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">glossary</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">st</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="nb">str</span> <span class="o">+=</span> <span class="s">&quot;--------&quot;</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="nb">str</span> <span class="o">+=</span> <span class="s">&quot; +/- </span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-                <span class="k">print</span> <span class="nb">str</span>
+                    <span class="n">st</span> <span class="o">+=</span> <span class="s">&quot;--------&quot;</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">st</span> <span class="o">+=</span> <span class="s">&quot; +/- </span><span class="si">%g</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">st</span><span class="p">)</span>
 
     <span class="c"># initialize summary feature set from file</span></div>
 <div class="viewcode-block" id="EphysFeatures.clone"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatures.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
@@ -819,7 +818,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">temp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">temp_spk_idxs</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">spk_idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">temp_spk_idxs</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="n">temp</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span> 
+            <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">temp_spk_idxs</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span><span class="n">temp</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="c"># check if the dvdt has gone back down below zero between presumed spike times</span>
                 <span class="c"># sometimes the dvdt bobbles around detection threshold and produces spurious guesses at spike times</span>
                 <span class="n">spk_idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
@@ -848,7 +847,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">prev_idx</span> <span class="o">=</span> <span class="n">spk_idxs</span><span class="p">[</span><span class="n">spk_n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">prev_idx</span> <span class="o">=</span> <span class="n">start_idx</span>
-            
+
             <span class="c"># Find the peak</span>
             <span class="n">peak_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">spk_idx</span><span class="p">:</span><span class="n">next_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">spk_idx</span>
 
@@ -915,7 +914,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="k">continue</span>
             <span class="c"># if the &quot;spike&quot; is less than 2 mV, don&#39;t count it</span>
             <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="n">threshold_idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">:</span>
-                <span class="k">continue</span> 
+                <span class="k">continue</span>
             <span class="c"># if the absolute value of the peak is less than -30 mV, don&#39;t count it</span>
             <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">30.0</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -935,11 +934,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">prev_idx</span> <span class="o">=</span> <span class="n">spikes</span><span class="p">[</span><span class="n">spk_n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="s">&quot;peak_idx&quot;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">prev_idx</span> <span class="o">=</span> <span class="n">start_idx</span>
-            
+
             <span class="c"># Restore variables from before</span>
             <span class="c"># peak_idx = spk[&#39;peak_idx&#39;]</span>
             <span class="n">peak_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">spk</span><span class="p">[</span><span class="s">&#39;threshold_idx&#39;</span><span class="p">]:</span><span class="n">next_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">spk</span><span class="p">[</span><span class="s">&#39;threshold_idx&#39;</span><span class="p">]</span>
-                
+
             <span class="n">spk</span><span class="p">[</span><span class="s">&quot;peak_idx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">peak_idx</span>
             <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span>
             <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span>
@@ -948,7 +947,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="c"># Determine maximum upstroke of spike</span>
             <span class="c"># upstroke_idx = spk[&#39;upstroke_idx&#39;]</span>
             <span class="n">upstroke_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">spk</span><span class="p">[</span><span class="s">&#39;threshold_idx&#39;</span><span class="p">]:</span><span class="n">peak_idx</span><span class="p">])</span> <span class="o">+</span> <span class="n">spk</span><span class="p">[</span><span class="s">&#39;threshold_idx&#39;</span><span class="p">]</span>
-            
+
             <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]):</span> <span class="c"># sometimes dvdt will be NaN because of multiple cvode points at same time step</span>
                 <span class="n">close_idx</span> <span class="o">=</span> <span class="n">upstroke_idx</span> <span class="o">+</span> <span class="mi">1</span>
@@ -964,7 +963,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
                 <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
                 <span class="n">spk</span><span class="p">[</span><span class="s">&quot;upstroke_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">upstroke_idx</span><span class="p">]</span>
-            
+
             <span class="c"># Find threshold based on average target</span>
             <span class="n">find_thresh_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">prev_idx</span><span class="p">:</span><span class="n">upstroke_idx</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">threshold_target</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">find_thresh_idxs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># Can&#39;t find a good threshold value - probably a bad simulation case</span>
@@ -1015,7 +1014,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;base_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">t</span> <span class="o">&gt;</span> <span class="n">onset</span> <span class="o">-</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="n">onset</span> <span class="o">-</span> <span class="mf">0.001</span><span class="p">))]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="c"># baseline voltage, 100ms before stim</span>
         <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;spikes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spikes</span>
         <span class="n">isi_cv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">isicv</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">isi_cv</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">isi_cv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;ISICV&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">isi_cv</span>
         <span class="n">n_spikes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span>
         <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;n_spikes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_spikes</span>
@@ -1029,7 +1028,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="bp">self</span><span class="o">.</span><span class="n">calculate_trough</span><span class="p">(</span><span class="n">spk</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">curr</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">idx_next</span><span class="p">)</span>
                 <span class="n">half_max_v</span> <span class="o">=</span> <span class="p">(</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_peak&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_trough&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;f_trough&quot;</span><span class="p">]</span>
                 <span class="n">over_half_max_v_idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_idx&quot;</span><span class="p">]:</span><span class="n">spk</span><span class="p">[</span><span class="s">&quot;trough_idx&quot;</span><span class="p">]]</span> <span class="o">&gt;</span> <span class="n">half_max_v</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">over_half_max_v_idxs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">over_half_max_v_idxs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">spk</span><span class="p">[</span><span class="s">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">over_half_max_v_idxs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_idx&quot;</span><span class="p">]]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">over_half_max_v_idxs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">spk</span><span class="p">[</span><span class="s">&quot;t_idx&quot;</span><span class="p">]])</span>
             <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;latency&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">*</span> <span class="p">(</span><span class="n">spikes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">onset</span><span class="p">)</span>
             <span class="n">feature</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;latency_n30&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">*</span> <span class="p">(</span><span class="n">spikes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;t_n30&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">onset</span><span class="p">)</span>
@@ -1063,7 +1062,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">cnt</span> <span class="o">+=</span> <span class="mf">1.0</span>
             <span class="c"># this shouldn&#39;t be possible, but it may be in future version</span>
             <span class="c">#   so might as well trap for it</span>
-            <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>    
+            <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">mean</span> <span class="o">/=</span> <span class="n">cnt</span>
             <span class="n">stdev</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1086,25 +1085,25 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">lst</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
             <span class="n">isi</span> <span class="o">=</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">spikes</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s">&quot;t&quot;</span><span class="p">]</span>
-            <span class="c">#print &quot;\t%g&quot; % isi</span>
+            <span class="c">#print(&quot;\t%g&quot; % isi)</span>
             <span class="n">isi_mean</span> <span class="o">+=</span> <span class="n">isi</span>
             <span class="n">lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">isi</span><span class="p">)</span>
         <span class="n">isi_mean</span> <span class="o">/=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
-        <span class="c">#print isi_mean</span>
+        <span class="c">#print(isi_mean)</span>
         <span class="n">var</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)):</span>
             <span class="n">dif</span> <span class="o">=</span> <span class="n">isi_mean</span> <span class="o">-</span> <span class="n">lst</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">var</span> <span class="o">+=</span> <span class="n">dif</span> <span class="o">*</span> <span class="n">dif</span>
         <span class="n">var</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
         <span class="c">#var /= len(lst) - 1</span>
-        <span class="c">#print math.sqrt(var)</span>
+        <span class="c">#print(math.sqrt(var))</span>
         <span class="k">if</span> <span class="n">isi_mean</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">)</span> <span class="o">/</span> <span class="n">isi_mean</span>
         <span class="k">return</span> <span class="bp">None</span>
 </div>
 <div class="viewcode-block" id="EphysFeatureExtractor.adaptation_index"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.adaptation_index">[docs]</a>    <span class="k">def</span> <span class="nf">adaptation_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spikes</span><span class="p">,</span> <span class="n">stim_end</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span> 
+            <span class="k">return</span> <span class="bp">None</span>
         <span class="n">adi</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">isi</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1145,9 +1144,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="c"># calculate etay&#39;s &#39;fast&#39; and &#39;slow&#39; ahp here</span>
         <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.005</span> <span class="o">&gt;=</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
             <span class="n">five_ms_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>        
+        <span class="k">else</span><span class="p">:</span>
             <span class="n">five_ms_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="mf">0.005</span> <span class="o">+</span> <span class="n">t</span><span class="p">[</span><span class="n">peak_idx</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c"># 5ms after peak</span>
-            
+
         <span class="c"># fast AHP is minimum value occurring w/in 5ms</span>
         <span class="k">if</span> <span class="n">five_ms_idx</span> <span class="o">&gt;=</span> <span class="n">next_idx</span><span class="p">:</span>
             <span class="n">five_ms_idx</span> <span class="o">=</span> <span class="n">next_idx</span>
@@ -1178,7 +1177,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="c"># calculate nearness score for feature set X relative to summary</span>
     <span class="c"># the nearness score is the sum of squares the features are from</span>
     <span class="c">#   their target values, in units of standard deviations</span>
-    <span class="c"># when a feature is absent, the algorithm to determine the </span>
+    <span class="c"># when a feature is absent, the algorithm to determine the</span>
     <span class="c">#   penalty is stored in the feature itself, and this value</span>
     <span class="c">#   is calculated then added to the sum</span></div>
 <div class="viewcode-block" id="EphysFeatureExtractor.score_feature_set"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.score_feature_set">[docs]</a>    <span class="k">def</span> <span class="nf">score_feature_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">set_num</span><span class="p">):</span>
@@ -1193,11 +1192,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                     <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
                     <span class="n">stdev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
                     <span class="k">assert</span> <span class="n">stdev</span> <span class="o">&gt;</span> <span class="mi">0</span>
-                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span> <span class="ow">and</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span> <span class="ow">and</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                         <span class="n">val</span> <span class="o">=</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
                         <span class="n">inc</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">mean</span> <span class="o">-</span> <span class="n">val</span><span class="p">)</span> <span class="o">/</span> <span class="n">stdev</span>
                         <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inc</span><span class="p">)</span>
-<span class="c">#                        print &quot;Hit %s, %g+/-%g (%g) = %g&quot; % (k, mean, stdev, val, inc)</span>
+<span class="c">#                        print(&quot;Hit %s, %g+/-%g (%g) = %g&quot; % (k, mean, stdev, val, inc))</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">resp</span> <span class="o">=</span> <span class="n">cand</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s">&quot;miss&quot;</span><span class="p">]</span>
                         <span class="k">if</span> <span class="n">resp</span> <span class="o">==</span> <span class="s">&quot;const&quot;</span><span class="p">:</span>
@@ -1208,12 +1207,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                             <span class="k">assert</span> <span class="bp">False</span>
                         <span class="n">miss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">miss</span><span class="p">)</span>
                         <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">miss</span><span class="p">)</span>
-<span class="c">#                        print &quot;Missed %s, penalty = %g&quot; % (k, miss)</span>
+<span class="c">#                        print(&quot;Missed %s, penalty = %g&quot; % (k, miss))</span>
                 <span class="k">elif</span> <span class="n">response</span> <span class="o">==</span> <span class="s">&quot;perspike&quot;</span><span class="p">:</span>
                     <span class="n">mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
                     <span class="n">stdev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
                     <span class="k">assert</span> <span class="n">stdev</span> <span class="o">&gt;</span> <span class="mi">0</span>
-                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span> <span class="ow">and</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span> <span class="ow">and</span> <span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                         <span class="n">val</span> <span class="o">=</span> <span class="mi">0</span>
                         <span class="n">n_spikes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cand</span><span class="o">.</span><span class="n">mean</span><span class="p">[</span><span class="s">&quot;spikes&quot;</span><span class="p">])</span>
                         <span class="n">skip_last_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">scoring</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s">&quot;skip_last_n&quot;</span><span class="p">]</span>
@@ -1232,30 +1231,30 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                             <span class="k">assert</span> <span class="bp">False</span>
                         <span class="n">miss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">miss</span><span class="p">)</span>
                         <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">miss</span><span class="p">)</span>
-<span class="c">#                        print &quot;Missed %s, penalty = %g&quot; % (k, miss)</span>
+<span class="c">#                        print(&quot;Missed %s, penalty = %g&quot; % (k, miss))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">assert</span> <span class="bp">False</span>
                 <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">scores</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mf">1e10</span><span class="p">:</span>
-                    <span class="k">print</span> <span class="n">k</span>
-                    <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">scoring</span>
-                    <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span>
-                    <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span>
-                    <span class="k">print</span> <span class="n">cand</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">scoring</span>
-                    <span class="k">print</span> <span class="n">cand</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span>
-                    <span class="k">print</span> <span class="n">cand</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span>
+                    <span class="k">print</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">scoring</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="n">cand</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">scoring</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="n">cand</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="n">cand</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">stdev</span><span class="p">)</span>
                     <span class="k">assert</span> <span class="bp">False</span>
         <span class="k">return</span> <span class="n">scores</span>
 
     <span class="c"># create summary of feature instances</span>
-    <span class="c">#   &#39;summary&#39; is an empty feature object. this must be the same </span>
+    <span class="c">#   &#39;summary&#39; is an empty feature object. this must be the same</span>
     <span class="c">#     class as the other feature objects that are being summarized</span></div>
 <div class="viewcode-block" id="EphysFeatureExtractor.summarize"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.summarize">[docs]</a>    <span class="k">def</span> <span class="nf">summarize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">summary</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s">&quot;Error -- no features were extracted. Summary impossible&quot;</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Error -- no features were extracted. Summary impossible&quot;</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
         <span class="c"># make dummy dict to verify that all feature instances have</span>
         <span class="c">#   identical features</span>
-        <span class="c"># only copy features that are in the glossary. some are for </span>
+        <span class="c"># only copy features that are in the glossary. some are for</span>
         <span class="c">#   internal use (eg, t_idx -- time index) and aren&#39;t important</span>
         <span class="c">#   here</span>
         <span class="n">superset</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1269,7 +1268,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">)):</span>
                 <span class="n">fx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fx</span><span class="p">:</span>
-                    <span class="k">print</span> <span class="s">&quot;Error - feature &#39;</span><span class="si">%s</span><span class="s">&#39; not in all data sets&quot;</span> <span class="o">%</span> <span class="n">k</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Error - feature &#39;</span><span class="si">%s</span><span class="s">&#39; not in all data sets&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
                     <span class="n">err</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">err</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">None</span>

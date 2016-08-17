@@ -631,7 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.api.queries.image_download_api</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -648,30 +648,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
 
+
 <div class="viewcode-block" id="ImageDownloadApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi">[docs]</a><span class="k">class</span> <span class="nc">ImageDownloadApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;HTTP Client to download whole or partial two-dimensional images from the Allen Institute</span>
 <span class="sd">    with the SectionImage, AtlasImage and ProjectionImage Download Services.</span>
-<span class="sd">    </span>
+
 <span class="sd">    See `Downloading an Image &lt;http://help.brain-map.org/display/api/Downloading+an+Image&gt;`_</span>
 <span class="sd">    for more documentation.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ImageDownloadApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
-    
-    
+
 <div class="viewcode-block" id="ImageDownloadApi.download_section_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image">[docs]</a>    <span class="k">def</span> <span class="nf">download_section_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                <span class="n">section_image_id</span><span class="p">,</span>
                                <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Download whole or partial two-dimensional images</span>
 <span class="sd">        from the Allen Institute with the SectionImage service.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        section_image_id : integer</span>
 <span class="sd">            Image to download.</span>
 <span class="sd">        file_path : string, optional</span>
-<span class="sd">            where to put it            </span>
+<span class="sd">            where to put it</span>
 <span class="sd">        downsample : int, optional</span>
 <span class="sd">            Number of times to downsample the original image.</span>
 <span class="sd">        quality : int, optional</span>
@@ -697,118 +698,118 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        -------</span>
 <span class="sd">        None</span>
 <span class="sd">            the file is downloaded and saved to the path.</span>
-<span class="sd">            </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        &#39;downsample=1&#39; halves the number of pixels of the original image</span>
 <span class="sd">        both horizontally and vertically.</span>
 <span class="sd">        Specifying &#39;downsample=2&#39; quarters the height and width values.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Quality must be an integer from 0, for the lowest quality,</span>
 <span class="sd">        up to as high as 100. If it is not specified,</span>
 <span class="sd">        it defaults to the highest quality.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Top is specified in full-resolution (largest tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.y is the default value.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Left is specified in full-resolution (largest tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.x is the default value.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Width is specified in tier-resolution (desired tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.width is the default value. It is automatically adjusted when downsampled.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Height is specified in tier-resolution (desired tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.height is the default value. It is automatically adjusted when downsampled.</span>
-<span class="sd">        </span>
+
 <span class="sd">        The range parameter consists of 6 comma delimited integers</span>
 <span class="sd">        that define the lower (0) and upper (4095) bound for each channel in red-green-blue order</span>
 <span class="sd">        (i.e. &quot;range=0,1500,0,1000,0,4095&quot;).</span>
 <span class="sd">        The default range values can be determined by referring to the following fields</span>
 <span class="sd">        on the Equalization model associated with the SectionDataSet:</span>
 <span class="sd">        red_lower, red_uppper, green_lower, green_upper, blue_lower, blue_upper.</span>
-<span class="sd">        For more information, see the </span>
+<span class="sd">        For more information, see the</span>
 <span class="sd">        `Image Controls &lt;http://help.brain-map.org/display/mouseconnectivity/Projection#Projection-ImageControls&gt;`_</span>
-<span class="sd">        section of the Allen Mouse Brain Connectivity Atlas: </span>
+<span class="sd">        section of the Allen Mouse Brain Connectivity Atlas:</span>
 <span class="sd">        `Projection Dataset &lt;http://help.brain-map.org/display/mouseconnectivity/Projection&gt;`_</span>
 <span class="sd">        help topic.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="n">downsample</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;downsample&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">downsample</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">downsample</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;downsample=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">downsample</span><span class="p">))</span>
-        
+
         <span class="n">quality</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;quality&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">quality</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;quality=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">quality</span><span class="p">))</span>
-        
+
         <span class="n">expression</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;expression&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">expression</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">expression</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">expression</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;expression=true&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;expression=false&#39;</span><span class="p">)</span>
-        
+
         <span class="c"># region of interest</span>
-        <span class="k">for</span> <span class="n">roi_key</span> <span class="ow">in</span> <span class="p">[</span> <span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">,</span> <span class="s">&#39;height&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">roi_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">,</span> <span class="s">&#39;height&#39;</span><span class="p">]:</span>
             <span class="n">roi_value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">roi_value</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">roi_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="n">roi_value</span><span class="p">))</span>
-        
+
         <span class="n">range_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;range&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="c"># see http://api.brain-map.org/api/v2/data/SectionDataSet/100141599.xml?include=equalization,section_images</span>
+
+        <span class="c"># see</span>
+        <span class="c"># http://api.brain-map.org/api/v2/data/SectionDataSet/100141599.xml?include=equalization,section_images</span>
         <span class="k">if</span> <span class="n">range_list</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;range=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">range_list</span><span class="p">)))</span>
-        
+
         <span class="n">tumor_feature_annotation</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;tumor_feature_annotation&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">tumor_feature_annotation</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">tumor_feature_annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">tumor_feature_annotation</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;tumor_feature_annotation=true&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;tumor_feature_annotation=false&#39;</span><span class="p">)</span>
-        
+
         <span class="n">tumor_feature_boundary</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;tumor_feature_boundary&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">tumor_feature_boundary</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">tumor_feature_boundary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">tumor_feature_boundary</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;tumor_feature_boundary=true&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;tumor_feature_boundary=false&#39;</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&quot;?&quot;</span> <span class="o">+</span> <span class="s">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
+
         <span class="n">image_url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">section_image_download_endpoint</span><span class="p">,</span>
                              <span class="s">&#39;/&#39;</span><span class="p">,</span>
                              <span class="nb">str</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">),</span>
                              <span class="n">url_params</span><span class="p">])</span>
-        
-        <span class="k">if</span> <span class="n">file_path</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">file_path</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s">.jpg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">section_image_id</span><span class="p">)</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">image_url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ImageDownloadApi.download_atlas_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.download_atlas_image">[docs]</a>    <span class="k">def</span> <span class="nf">download_atlas_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                              <span class="n">atlas_image_id</span><span class="p">,</span>
                              <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Download whole or partial two-dimensional images</span>
 <span class="sd">        from the Allen Institute with the AtlasImage service.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        atlas_image_id : integer</span>
 <span class="sd">            Image to download.</span>
 <span class="sd">        file_path : string, optional</span>
-<span class="sd">            where to put it            </span>
+<span class="sd">            where to put it</span>
 <span class="sd">        annotation : boolean, optional</span>
 <span class="sd">            True to retrieve the specified AtlasImage with annotations.</span>
 <span class="sd">        atlas : integer, optional</span>
@@ -825,99 +826,98 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Number of columns in the output image.</span>
 <span class="sd">        height : int, optional</span>
 <span class="sd">            Number of rows in the output image.</span>
-<span class="sd">                </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None</span>
 <span class="sd">            the file is downloaded and saved to the path.</span>
-<span class="sd">            </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The P56 Adult Mouse Brain Atlas and Developing Mouse Brain Atlas</span>
 <span class="sd">        share a common AtlasDataSet, so the Atlas.ID should be specified.</span>
-<span class="sd">        </span>
+
 <span class="sd">        &#39;downsample=1&#39; halves the number of pixels of the original image</span>
 <span class="sd">        both horizontally and vertically.</span>
 <span class="sd">        Specifying &#39;downsample=2&#39; quarters the height and width values.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Quality must be an integer from 0, for the lowest quality,</span>
 <span class="sd">        up to as high as 100. If it is not specified,</span>
 <span class="sd">        it defaults to the highest quality.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Top is specified in full-resolution (largest tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.y is the default value.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Left is specified in full-resolution (largest tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.x is the default value.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Width is specified in tier-resolution (desired tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.width is the default value. It is automatically adjusted when downsampled.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Height is specified in tier-resolution (desired tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.height is the default value. It is automatically adjusted when downsampled.</span>
-<span class="sd">        </span>
+
 <span class="sd">        See: `Downloading an Image - ProjectionImage Download Service &lt;http://help.brain-map.org/display/api/Downloading+an+Image#DownloadinganImage-ProjectionImage%26nbsp%3BDownloadService&gt;`_</span>
 <span class="sd">        and</span>
 <span class="sd">        `Downloading Atlas Images and Graphics &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics&gt;`_.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Use :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table`</span>
 <span class="sd">        to get atlas ids programmatically.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="n">projection</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;projection&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">projection</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">projection</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">projection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">projection</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;projection=true&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;projection=false&#39;</span><span class="p">)</span>
-        
+
         <span class="n">downsample</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;downsample&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">downsample</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">downsample</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;downsample=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">downsample</span><span class="p">))</span>
-        
+
         <span class="n">quality</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;quality&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">quality</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;quality=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">quality</span><span class="p">))</span>
-        
+
         <span class="c"># region of interest</span>
-        <span class="k">for</span> <span class="n">roi_key</span> <span class="ow">in</span> <span class="p">[</span> <span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">,</span> <span class="s">&#39;height&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">roi_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">,</span> <span class="s">&#39;height&#39;</span><span class="p">]:</span>
             <span class="n">roi_value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">roi_value</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">roi_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="n">roi_value</span><span class="p">))</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&quot;?&quot;</span> <span class="o">+</span> <span class="s">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
+
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">projection_image_download_endpoint</span><span class="p">,</span>
                        <span class="s">&#39;/&#39;</span><span class="p">,</span>
                        <span class="nb">str</span><span class="p">(</span><span class="n">atlas_image_id</span><span class="p">),</span>
                        <span class="n">url_params</span><span class="p">])</span>
-        
-        <span class="k">if</span> <span class="n">file_path</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">file_path</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s">.jpg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atlas_image_id</span><span class="p">)</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ImageDownloadApi.download_projection_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.download_projection_image">[docs]</a>    <span class="k">def</span> <span class="nf">download_projection_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                   <span class="n">projection_image_id</span><span class="p">,</span>
                                   <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Download whole or partial two-dimensional images</span>
 <span class="sd">        from the Allen Institute with the AtlasImage service.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        atlas_image_id : integer</span>
 <span class="sd">            Image to download.</span>
 <span class="sd">        file_path : string, optional</span>
-<span class="sd">            where to put it.  default is id.jpg            </span>
+<span class="sd">            where to put it.  default is id.jpg</span>
 <span class="sd">        projection : boolean, optional</span>
 <span class="sd">            True to retrieve the specified SectionImage with projection.</span>
 <span class="sd">        downsample : int, optional</span>
@@ -932,106 +932,105 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Number of columns in the output image.</span>
 <span class="sd">        height : int, optional</span>
 <span class="sd">            Number of rows in the output image.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None</span>
 <span class="sd">            the file is downloaded and saved to the path.</span>
-<span class="sd">            </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The P56 Adult Mouse Brain Atlas and Developing Mouse Brain Atlas</span>
 <span class="sd">        share a common AtlasDataSet, so the Atlas.ID should be specified.</span>
-<span class="sd">        </span>
+
 <span class="sd">        &#39;downsample=1&#39; halves the number of pixels of the original image</span>
 <span class="sd">        both horizontally and vertically.</span>
 <span class="sd">        Specifying &#39;downsample=2&#39; quarters the height and width values.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Quality must be an integer from 0, for the lowest quality,</span>
 <span class="sd">        up to as high as 100. If it is not specified,</span>
 <span class="sd">        it defaults to the highest quality.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Top is specified in full-resolution (largest tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.y is the default value.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Left is specified in full-resolution (largest tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.x is the default value.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Width is specified in tier-resolution (desired tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.width is the default value. It is automatically adjusted when downsampled.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Height is specified in tier-resolution (desired tier) pixel coordinates.</span>
 <span class="sd">        SectionImage.height is the default value. It is automatically adjusted when downsampled.</span>
-<span class="sd">        </span>
+
 <span class="sd">        See: `Downloading an Image - AtlasImage Download Service &lt;http://help.brain-map.org/display/api/Downloading+an+Image#DownloadinganImage-AtlasImage%26nbsp%3BDownloadService&gt;`_</span>
 <span class="sd">        and</span>
 <span class="sd">        `Downloading Atlas Images and Graphics &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics&gt;`_.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Use :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table`</span>
 <span class="sd">        to get atlas ids programmatically.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
-        
+
         <span class="n">annotation</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;annotation&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">annotation</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">annotation</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;annotation=true&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;annotation=false&#39;</span><span class="p">)</span>
-        
+
         <span class="n">atlas</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;atlas&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">atlas</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">atlas</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;atlas=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atlas</span><span class="p">))</span>
-        
+
         <span class="n">downsample</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;downsample&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">downsample</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">downsample</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;downsample=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">downsample</span><span class="p">))</span>
-        
+
         <span class="n">quality</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;quality&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">quality</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;quality=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">quality</span><span class="p">))</span>
-        
+
         <span class="c"># region of interest</span>
-        <span class="k">for</span> <span class="n">roi_key</span> <span class="ow">in</span> <span class="p">[</span> <span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">,</span> <span class="s">&#39;height&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">roi_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">,</span> <span class="s">&#39;height&#39;</span><span class="p">]:</span>
             <span class="n">roi_value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">roi_value</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">roi_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="n">roi_value</span><span class="p">))</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&quot;?&quot;</span> <span class="o">+</span> <span class="s">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
+
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">atlas_image_download_endpoint</span><span class="p">,</span>
                        <span class="s">&#39;/&#39;</span><span class="p">,</span>
                        <span class="nb">str</span><span class="p">(</span><span class="n">projection_image_id</span><span class="p">),</span>
                        <span class="n">url_params</span><span class="p">])</span>
-                    
-        <span class="k">if</span> <span class="n">file_path</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">file_path</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s">.jpg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">projection_image_id</span><span class="p">)</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="ImageDownloadApi.atlas_image_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.atlas_image_query">[docs]</a>    <span class="k">def</span> <span class="nf">atlas_image_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atlas_id</span><span class="p">,</span> <span class="n">image_type_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Build the URL.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        atlas_id : integer, optional</span>
 <span class="sd">            request a certain record.</span>
 <span class="sd">        image_type_name : string, optional</span>
 <span class="sd">            if not present, the query will get it from the atlas id.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        url : string</span>
 <span class="sd">            The constructed URL</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        See `Downloading Atlas Images and Graphics &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics&gt;`_</span>
@@ -1039,36 +1038,37 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        The atlas id can be found with :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.build_atlases_query`</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">rma</span> <span class="o">=</span> <span class="bp">self</span>
-        
+
         <span class="n">stages</span> <span class="o">=</span> <span class="p">[]</span>
-        
-        <span class="k">if</span> <span class="n">image_type_name</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">image_type_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">atlas_stage</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">model_stage</span><span class="p">(</span><span class="s">&#39;Atlas&#39;</span><span class="p">,</span>
                                           <span class="n">criteria</span><span class="o">=</span><span class="s">&#39;[id$eq</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atlas_id</span><span class="p">),</span>
                                           <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;image_type&#39;</span><span class="p">])</span>
             <span class="n">stages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atlas_stage</span><span class="p">)</span>
-            
+
             <span class="n">atlas_name_pipe_stage</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">pipe_stage</span><span class="p">(</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
                                                    <span class="n">parameters</span><span class="o">=</span><span class="p">[(</span><span class="s">&#39;type_name&#39;</span><span class="p">,</span>
-                                                               <span class="n">rma</span><span class="o">.</span><span class="n">IS</span><span class="p">,</span>
-                                                               <span class="n">rma</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="s">&#39;image_type&#39;</span><span class="p">))])</span>
+                                                                <span class="n">rma</span><span class="o">.</span><span class="n">IS</span><span class="p">,</span>
+                                                                <span class="n">rma</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="s">&#39;image_type&#39;</span><span class="p">))])</span>
             <span class="n">stages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atlas_name_pipe_stage</span><span class="p">)</span>
-            
+
             <span class="n">image_type_name</span> <span class="o">=</span> <span class="s">&#39;$type_name&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">image_type_name</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">quote_string</span><span class="p">(</span><span class="n">image_type_name</span><span class="p">)</span>
-        
+
         <span class="n">criteria_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;[annotated$eqtrue],&#39;</span><span class="p">,</span>
                          <span class="s">&#39;atlas_data_set(atlases[id$eq</span><span class="si">%d</span><span class="s">]),&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atlas_id</span><span class="p">),</span>
                          <span class="s">&quot;alternate_images[image_type$eq</span><span class="si">%s</span><span class="s">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">image_type_name</span><span class="p">)]</span>
-        
+
         <span class="n">atlas_image_model_stage</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">model_stage</span><span class="p">(</span><span class="s">&#39;AtlasImage&#39;</span><span class="p">,</span>
                                                   <span class="n">criteria</span><span class="o">=</span><span class="n">criteria_list</span><span class="p">,</span>
-                                                  <span class="n">order</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;sub_images.section_number&#39;</span><span class="p">],</span>
+                                                  <span class="n">order</span><span class="o">=</span><span class="p">[</span>
+                                                      <span class="s">&#39;sub_images.section_number&#39;</span><span class="p">],</span>
                                                   <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
-        
+
         <span class="n">stages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atlas_image_model_stage</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_msg_query</span><span class="p">(</span>
             <span class="n">rma</span><span class="o">.</span><span class="n">build_query_url</span><span class="p">(</span><span class="n">stages</span><span class="p">))</span></div></div>
 </pre></div>

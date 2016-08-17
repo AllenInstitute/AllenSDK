@@ -648,14 +648,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 
+
 <div class="viewcode-block" id="DatUtilities"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.dat_utilities.DatUtilities">[docs]</a><span class="k">class</span> <span class="nc">DatUtilities</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    
+
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="DatUtilities.save_voltage"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.dat_utilities.DatUtilities.save_voltage">[docs]</a>    <span class="k">def</span> <span class="nf">save_voltage</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Save a single voltage output result into a simple text format.</span>
-<span class="sd">        </span>
+
 <span class="sd">        The output file is one t v pair per line.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        output_path : string</span>
@@ -666,7 +667,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            time</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="n">v</span><span class="p">)))</span>
-        <span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">numpy</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div></div>
 </pre></div>
 

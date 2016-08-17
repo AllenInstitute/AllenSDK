@@ -648,66 +648,64 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">from</span> <span class="nn">allensdk.api.api</span> <span class="kn">import</span> <span class="n">Api</span>
 
+
 <div class="viewcode-block" id="SvgApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi">[docs]</a><span class="k">class</span> <span class="nc">SvgApi</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SvgApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
-    
-    
+
 <div class="viewcode-block" id="SvgApi.build_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi.build_query">[docs]</a>    <span class="k">def</span> <span class="nf">build_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section_image_id</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Build the URL that will fetch meta data for the specified structure.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        section_image_id : integer</span>
 <span class="sd">            Key of the object to be retrieved.</span>
 <span class="sd">        groups : array of integers</span>
 <span class="sd">            Keys of the group labels to filter the svg types that are returned.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        url : string</span>
 <span class="sd">            The constructed URL</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">download</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">download</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="n">endpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">svg_download_endpoint</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">endpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">svg_endpoint</span>
-            
-        
+
         <span class="k">if</span> <span class="n">groups</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
-            
+
         <span class="k">if</span> <span class="n">groups</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;?groups=&#39;</span> <span class="o">+</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        
+
         <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">endpoint</span><span class="p">,</span>
                        <span class="s">&#39;/&#39;</span><span class="p">,</span>
                        <span class="nb">str</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">),</span>
                        <span class="n">url_params</span><span class="p">])</span>
-        
+
         <span class="k">return</span> <span class="n">url</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="SvgApi.download_svg"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi.download_svg">[docs]</a>    <span class="k">def</span> <span class="nf">download_svg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                      <span class="n">section_image_id</span><span class="p">,</span>
                      <span class="n">groups</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                      <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Download the svg file&#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">file_path</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">file_path</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s">.svg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">section_image_id</span><span class="p">)</span>
-        
+
         <span class="n">svg_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_query</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">,</span> <span class="n">groups</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">svg_url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="SvgApi.get_svg"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi.get_svg">[docs]</a>    <span class="k">def</span> <span class="nf">get_svg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                 <span class="n">section_image_id</span><span class="p">,</span>
                 <span class="n">groups</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get the svg document.&#39;&#39;&#39;</span>
         <span class="n">svg_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_query</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_xml_over_http</span><span class="p">(</span><span class="n">svg_url</span><span class="p">)</span></div></div>
 </pre></div>
 

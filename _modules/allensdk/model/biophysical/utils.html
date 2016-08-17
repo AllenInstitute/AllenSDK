@@ -646,12 +646,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">allensdk.model.biophys_sim.neuron.hoc_utils</span> <span class="kn">import</span> <span class="n">HocUtils</span>
 <span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> <span class="n">NwbDataSet</span>
 
 <span class="n">PERISOMATIC_TYPE</span> <span class="o">=</span> <span class="s">&quot;Biophysical - perisomatic&quot;</span>
 <span class="n">ALL_ACTIVE_TYPE</span> <span class="o">=</span> <span class="s">&quot;Biophysical - all active&quot;</span>
+
 
 <div class="viewcode-block" id="create_utils"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.create_utils">[docs]</a><span class="k">def</span> <span class="nf">create_utils</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">model_type</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -666,7 +668,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="Utils"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils">[docs]</a><span class="k">class</span> <span class="nc">Utils</span><span class="p">(</span><span class="n">HocUtils</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;A helper class for NEURON functionality needed for</span>
 <span class="sd">    biophysical simulations.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    h : object</span>
@@ -676,35 +678,34 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    neuron : module</span>
 <span class="sd">        The NEURON module.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    
+
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-    
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Utils</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stim</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stim_curr</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">=</span> <span class="bp">None</span>
-    
+
         <span class="bp">self</span><span class="o">.</span><span class="n">stim_vec_list</span> <span class="o">=</span> <span class="p">[]</span>
-    
-    
+
 <div class="viewcode-block" id="Utils.generate_morphology"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.generate_morphology">[docs]</a>    <span class="k">def</span> <span class="nf">generate_morphology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">morph_filename</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Load a swc-format cell morphology file.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        morph_filename : string</span>
 <span class="sd">            Path to swc.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span>
-        
+
         <span class="n">swc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">Import3d_SWC_read</span><span class="p">()</span>
         <span class="n">swc</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="n">morph_filename</span><span class="p">)</span>
         <span class="n">imprt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">Import3d_GUI</span><span class="p">(</span><span class="n">swc</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        
+
         <span class="n">h</span><span class="p">(</span><span class="s">&quot;objref this&quot;</span><span class="p">)</span>
         <span class="n">imprt</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">this</span><span class="p">)</span>
-        
+
         <span class="n">h</span><span class="p">(</span><span class="s">&quot;soma[0] area(0.5)&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">allsec</span><span class="p">():</span>
             <span class="n">sec</span><span class="o">.</span><span class="n">nseg</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">sec</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="mf">40.0</span><span class="p">)</span>
@@ -717,49 +718,49 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">sec</span><span class="o">.</span><span class="n">nseg</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">sec</span><span class="o">.</span><span class="n">L</span> <span class="o">/</span> <span class="mf">40.0</span><span class="p">)</span>
         <span class="n">h</span><span class="o">.</span><span class="n">axon</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">soma</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
         <span class="n">h</span><span class="o">.</span><span class="n">axon</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">axon</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-        
+
         <span class="n">h</span><span class="o">.</span><span class="n">define_shape</span><span class="p">()</span>
-        
-    </div>
+</div>
 <div class="viewcode-block" id="Utils.load_cell_parameters"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.load_cell_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">load_cell_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Configure a neuron after the cell morphology has been loaded.&#39;&#39;&#39;</span>
         <span class="n">passive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;passive&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">genome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;genome&#39;</span><span class="p">]</span>
         <span class="n">conditions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;conditions&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span>
-        
+
         <span class="n">h</span><span class="p">(</span><span class="s">&quot;access soma&quot;</span><span class="p">)</span>
-        
+
         <span class="c"># Set fixed passive properties</span>
         <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">allsec</span><span class="p">():</span>
             <span class="n">sec</span><span class="o">.</span><span class="n">Ra</span> <span class="o">=</span> <span class="n">passive</span><span class="p">[</span><span class="s">&#39;ra&#39;</span><span class="p">]</span>
             <span class="n">sec</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="s">&#39;pas&#39;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">sec</span><span class="p">:</span>
                 <span class="n">seg</span><span class="o">.</span><span class="n">pas</span><span class="o">.</span><span class="n">e</span> <span class="o">=</span> <span class="n">passive</span><span class="p">[</span><span class="s">&quot;e_pas&quot;</span><span class="p">]</span>
-        
+
         <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">passive</span><span class="p">[</span><span class="s">&quot;cm&quot;</span><span class="p">]:</span>
             <span class="n">h</span><span class="p">(</span><span class="s">&#39;forsec &quot;&#39;</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="s">&quot;section&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;&quot; { cm = </span><span class="si">%g</span><span class="s"> }&#39;</span> <span class="o">%</span> <span class="n">c</span><span class="p">[</span><span class="s">&quot;cm&quot;</span><span class="p">])</span>
-        
+
         <span class="c"># Insert channels and set parameters</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">genome</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;section&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;glob&quot;</span><span class="p">:</span> <span class="c"># global parameter</span>
+            <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;section&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;glob&quot;</span><span class="p">:</span>  <span class="c"># global parameter</span>
                 <span class="n">h</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot; = </span><span class="si">%g</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;value&quot;</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;mechanism&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
-                    <span class="n">h</span><span class="p">(</span><span class="s">&#39;forsec &quot;&#39;</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;section&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;&quot; { insert &#39;</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;mechanism&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39; }&#39;</span><span class="p">)</span>
-                <span class="n">h</span><span class="p">(</span><span class="s">&#39;forsec &quot;&#39;</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;section&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;&quot; { &#39;</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39; = </span><span class="si">%g</span><span class="s"> }&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;value&quot;</span><span class="p">])</span>
-        
+                    <span class="n">h</span><span class="p">(</span><span class="s">&#39;forsec &quot;&#39;</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;section&quot;</span><span class="p">]</span> <span class="o">+</span>
+                      <span class="s">&#39;&quot; { insert &#39;</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;mechanism&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39; }&#39;</span><span class="p">)</span>
+                <span class="n">h</span><span class="p">(</span><span class="s">&#39;forsec &quot;&#39;</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;section&quot;</span><span class="p">]</span> <span class="o">+</span>
+                  <span class="s">&#39;&quot; { &#39;</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39; = </span><span class="si">%g</span><span class="s"> }&#39;</span> <span class="o">%</span> <span class="n">p</span><span class="p">[</span><span class="s">&quot;value&quot;</span><span class="p">])</span>
+
         <span class="c"># Set reversal potentials</span>
         <span class="k">for</span> <span class="n">erev</span> <span class="ow">in</span> <span class="n">conditions</span><span class="p">[</span><span class="s">&#39;erev&#39;</span><span class="p">]:</span>
             <span class="n">h</span><span class="p">(</span><span class="s">&#39;forsec &quot;&#39;</span> <span class="o">+</span> <span class="n">erev</span><span class="p">[</span><span class="s">&quot;section&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;&quot; { ek = </span><span class="si">%g</span><span class="s"> }&#39;</span> <span class="o">%</span> <span class="n">erev</span><span class="p">[</span><span class="s">&quot;ek&quot;</span><span class="p">])</span>
             <span class="n">h</span><span class="p">(</span><span class="s">&#39;forsec &quot;&#39;</span> <span class="o">+</span> <span class="n">erev</span><span class="p">[</span><span class="s">&quot;section&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;&quot; { ena = </span><span class="si">%g</span><span class="s"> }&#39;</span> <span class="o">%</span> <span class="n">erev</span><span class="p">[</span><span class="s">&quot;ena&quot;</span><span class="p">])</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Utils.setup_iclamp"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.setup_iclamp">[docs]</a>    <span class="k">def</span> <span class="nf">setup_iclamp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                      <span class="n">stimulus_path</span><span class="p">,</span>
                      <span class="n">sweep</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Assign a current waveform as input stimulus.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        stimulus_path : string</span>
@@ -775,15 +776,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span>
         <span class="n">stim_vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_curr</span><span class="p">)</span>
         <span class="n">stim_vec</span><span class="o">.</span><span class="n">play</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim</span><span class="o">.</span><span class="n">_ref_amp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span><span class="p">)</span>
-        
+
         <span class="n">stimulus_stop_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stim_curr</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">tstop</span> <span class="o">=</span> <span class="n">stimulus_stop_index</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stim_vec_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stim_vec</span><span class="p">)</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Utils.read_stimulus"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.read_stimulus">[docs]</a>    <span class="k">def</span> <span class="nf">read_stimulus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_path</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;load current values for a specific experiment sweep.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        stimulus path : string</span>
@@ -795,26 +795,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="s">&quot;reading stimulus path: </span><span class="si">%s</span><span class="s">, sweep </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span>
             <span class="n">stimulus_path</span><span class="p">,</span>
             <span class="n">sweep</span><span class="p">)</span>
-        
+
         <span class="n">stimulus_data</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">stimulus_path</span><span class="p">)</span>
         <span class="n">sweep_data</span> <span class="o">=</span> <span class="n">stimulus_data</span><span class="o">.</span><span class="n">get_sweep</span><span class="p">(</span><span class="n">sweep</span><span class="p">)</span>
-        
+
         <span class="c"># convert to nA for NEURON</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stim_curr</span> <span class="o">=</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1.0e9</span>
-        
-        <span class="c"># convert from Hz        </span>
+
+        <span class="c"># convert from Hz</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_rate</span> <span class="o">=</span> <span class="mf">1.0e3</span> <span class="o">/</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s">&#39;sampling_rate&#39;</span><span class="p">]</span>
-    
-    </div>
+</div>
 <div class="viewcode-block" id="Utils.record_values"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.record_values">[docs]</a>    <span class="k">def</span> <span class="nf">record_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Set up output voltage recording.&#39;&#39;&#39;</span>
-        <span class="n">vec</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;v&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(),</span>
-                <span class="s">&quot;t&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span> <span class="p">}</span>
-        
+        <span class="n">vec</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;v&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(),</span>
+               <span class="s">&quot;t&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()}</span>
+
         <span class="n">vec</span><span class="p">[</span><span class="s">&quot;v&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">soma</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_v</span><span class="p">)</span>
         <span class="n">vec</span><span class="p">[</span><span class="s">&quot;t&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">_ref_t</span><span class="p">)</span>
-    
+
         <span class="k">return</span> <span class="n">vec</span>
+
 </div></div>
 <div class="viewcode-block" id="AllActiveUtils"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.AllActiveUtils">[docs]</a><span class="k">class</span> <span class="nc">AllActiveUtils</span><span class="p">(</span><span class="n">Utils</span><span class="p">):</span>
 
@@ -869,7 +869,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="c"># make sure diam reflects 3d points</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">area</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="n">sec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">soma</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-
 </div>
 <div class="viewcode-block" id="AllActiveUtils.load_cell_parameters"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.utils.AllActiveUtils.load_cell_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">load_cell_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Configure a neuron after the cell morphology has been loaded.&#39;&#39;&#39;</span>
@@ -877,9 +876,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">genome</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;genome&#39;</span><span class="p">]</span>
         <span class="n">conditions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;conditions&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span>
-        
+
         <span class="n">h</span><span class="p">(</span><span class="s">&quot;access soma&quot;</span><span class="p">)</span>
-        
+
         <span class="c"># Set fixed passive properties</span>
         <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">h</span><span class="o">.</span><span class="n">allsec</span><span class="p">():</span>
             <span class="n">sec</span><span class="o">.</span><span class="n">Ra</span> <span class="o">=</span> <span class="n">passive</span><span class="p">[</span><span class="s">&#39;ra&#39;</span><span class="p">]</span>
@@ -901,15 +900,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">section_array</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">mechanism</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
-                        <span class="k">print</span> <span class="s">&#39;Adding mechanism </span><span class="si">%s</span><span class="s"> to </span><span class="si">%s</span><span class="s">&#39;</span> \
-                            <span class="o">%</span> <span class="p">(</span><span class="n">mechanism</span><span class="p">,</span> <span class="n">section_array</span><span class="p">)</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Adding mechanism </span><span class="si">%s</span><span class="s"> to </span><span class="si">%s</span><span class="s">&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="n">mechanism</span><span class="p">,</span> <span class="n">section_array</span><span class="p">))</span>
                         <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">section_array</span><span class="p">):</span>
                             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">ismembrane</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mechanism</span><span class="p">),</span>
                                                  <span class="n">sec</span><span class="o">=</span><span class="n">section</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
                                 <span class="n">section</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">mechanism</span><span class="p">)</span>
 
-                    <span class="k">print</span> <span class="s">&#39;Setting </span><span class="si">%s</span><span class="s"> to </span><span class="si">%.6g</span><span class="s"> in </span><span class="si">%s</span><span class="s">&#39;</span> \
-                        <span class="o">%</span> <span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">param_value</span><span class="p">,</span> <span class="n">section_array</span><span class="p">)</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s">&#39;Setting </span><span class="si">%s</span><span class="s"> to </span><span class="si">%.6g</span><span class="s"> in </span><span class="si">%s</span><span class="s">&#39;</span>
+                          <span class="o">%</span> <span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">param_value</span><span class="p">,</span> <span class="n">section_array</span><span class="p">))</span>
                     <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">section_array</span><span class="p">):</span>
                         <span class="nb">setattr</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">param_value</span><span class="p">)</span>
 
@@ -919,8 +918,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">ek</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">erev</span><span class="p">[</span><span class="s">&quot;ek&quot;</span><span class="p">])</span>
             <span class="n">ena</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">erev</span><span class="p">[</span><span class="s">&quot;ena&quot;</span><span class="p">])</span>
 
-            <span class="k">print</span> <span class="s">&#39;Setting ek to </span><span class="si">%.6g</span><span class="s"> and ena to </span><span class="si">%.6g</span><span class="s"> in </span><span class="si">%s</span><span class="s">&#39;</span> \
-                <span class="o">%</span> <span class="p">(</span><span class="n">ek</span><span class="p">,</span> <span class="n">ena</span><span class="p">,</span> <span class="n">erev_section_array</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&#39;Setting ek to </span><span class="si">%.6g</span><span class="s"> and ena to </span><span class="si">%.6g</span><span class="s"> in </span><span class="si">%s</span><span class="s">&#39;</span>
+                  <span class="o">%</span> <span class="p">(</span><span class="n">ek</span><span class="p">,</span> <span class="n">ena</span><span class="p">,</span> <span class="n">erev_section_array</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">erev_section_array</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">erev_section_array</span><span class="p">):</span>
@@ -930,13 +929,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">ismembrane</span><span class="p">(</span><span class="s">&quot;na_ion&quot;</span><span class="p">,</span> <span class="n">sec</span><span class="o">=</span><span class="n">section</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                         <span class="nb">setattr</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s">&#39;ena&#39;</span><span class="p">,</span> <span class="n">ena</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">print</span> <span class="s">&quot;Warning: can&#39;t set erev for </span><span class="si">%s</span><span class="s">, &quot;</span> \
-                    <span class="s">&quot;section array doesn&#39;t exist&quot;</span> <span class="o">%</span> <span class="n">erev_section_array</span>
+                <span class="k">print</span><span class="p">(</span><span class="s">&quot;Warning: can&#39;t set erev for </span><span class="si">%s</span><span class="s">, &quot;</span>
+                      <span class="s">&quot;section array doesn&#39;t exist&quot;</span> <span class="o">%</span> <span class="n">erev_section_array</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">v_init</span> <span class="o">=</span> <span class="n">conditions</span><span class="p">[</span><span class="s">&#39;v_init&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">celsius</span> <span class="o">=</span> <span class="n">conditions</span><span class="p">[</span><span class="s">&#39;celsius&#39;</span><span class="p">]</span>
-
-    </div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">celsius</span> <span class="o">=</span> <span class="n">conditions</span><span class="p">[</span><span class="s">&#39;celsius&#39;</span><span class="p">]</span></div></div>
 </pre></div>
 
           </div>

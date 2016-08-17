@@ -631,9 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.ephys.extract_cell_features</h1><div class="highlight"><pre>
-<span class="c">#!/usr/bin/env python</span>
-
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -648,28 +646,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">h5py</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
-
 <span class="kn">import</span> <span class="nn">logging</span>
-
-<span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> <span class="n">NwbDataSet</span>
-
 <span class="kn">import</span> <span class="nn">allensdk.ephys.ephys_extractor</span> <span class="kn">as</span> <span class="nn">efex</span>
 <span class="kn">import</span> <span class="nn">allensdk.ephys.ephys_features</span> <span class="kn">as</span> <span class="nn">ft</span>
 
 <span class="n">HERO_MIN_AMP_OFFSET</span> <span class="o">=</span> <span class="mf">39.0</span>
 <span class="n">HERO_MAX_AMP_OFFSET</span> <span class="o">=</span> <span class="mf">61.0</span>
 
-<span class="n">SHORT_SQUARE_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Short Square&quot;</span><span class="p">,</span> 
-                      <span class="s">&quot;Short Square - Triple&quot;</span><span class="p">,</span> 
-                      <span class="s">&quot;Short Square - Hold -60mv&quot;</span><span class="p">,</span> 
-                      <span class="s">&quot;Short Square - Hold -70mv&quot;</span><span class="p">,</span> 
+<span class="n">SHORT_SQUARE_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;Short Square&quot;</span><span class="p">,</span>
+                      <span class="s">&quot;Short Square - Triple&quot;</span><span class="p">,</span>
+                      <span class="s">&quot;Short Square - Hold -60mv&quot;</span><span class="p">,</span>
+                      <span class="s">&quot;Short Square - Hold -70mv&quot;</span><span class="p">,</span>
                       <span class="s">&quot;Short Square - Hold -80mv&quot;</span><span class="p">]</span>
 
 <span class="n">SHORT_SQUARE_MAX_THRESH_FRAC</span> <span class="o">=</span> <span class="mf">0.1</span>
@@ -702,17 +690,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">fex</span> <span class="o">=</span> <span class="n">efex</span><span class="o">.</span><span class="n">extractor_for_nwb_sweeps</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">)</span>
 
         <span class="n">fex</span><span class="o">.</span><span class="n">process_spikes</span><span class="p">()</span>
-        
-        <span class="n">sweep_features</span><span class="o">.</span><span class="n">update</span><span class="p">({</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span><span class="p">:</span><span class="n">f</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fex</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="p">})</span>            
+
+        <span class="n">sweep_features</span><span class="o">.</span><span class="n">update</span><span class="p">({</span> <span class="n">f</span><span class="o">.</span><span class="n">id</span><span class="p">:</span><span class="n">f</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fex</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="p">})</span>
 
     <span class="k">return</span> <span class="n">sweep_features</span>
 </div>
 <div class="viewcode-block" id="extract_cell_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.extract_cell_features.extract_cell_features">[docs]</a><span class="k">def</span> <span class="nf">extract_cell_features</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span>
-                          <span class="n">ramp_sweep_numbers</span><span class="p">,</span> 
-                          <span class="n">short_square_sweep_numbers</span><span class="p">,</span> 
+                          <span class="n">ramp_sweep_numbers</span><span class="p">,</span>
+                          <span class="n">short_square_sweep_numbers</span><span class="p">,</span>
                           <span class="n">long_square_sweep_numbers</span><span class="p">):</span>
 
-    <span class="n">fex</span> <span class="o">=</span> <span class="n">efex</span><span class="o">.</span><span class="n">cell_extractor_for_nwb</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span> 
+    <span class="n">fex</span> <span class="o">=</span> <span class="n">efex</span><span class="o">.</span><span class="n">cell_extractor_for_nwb</span><span class="p">(</span><span class="n">data_set</span><span class="p">,</span>
                                       <span class="n">ramp_sweep_numbers</span><span class="p">,</span>
                                       <span class="n">short_square_sweep_numbers</span><span class="p">,</span>
                                       <span class="n">long_square_sweep_numbers</span><span class="p">)</span>
@@ -729,7 +717,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">fex</span><span class="o">.</span><span class="n">long_squares_features</span><span class="p">(</span><span class="s">&quot;spiking&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sweeps</span><span class="p">():</span>
         <span class="n">nspikes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sweep</span><span class="o">.</span><span class="n">spikes</span><span class="p">())</span>
         <span class="n">amp</span> <span class="o">=</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;stim_amp&quot;</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="n">nspikes</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">amp</span> <span class="o">&gt;</span> <span class="n">hero_min</span> <span class="ow">and</span> <span class="n">amp</span> <span class="o">&lt;</span> <span class="n">hero_max</span> <span class="ow">and</span> <span class="n">amp</span> <span class="o">&lt;</span> <span class="n">hero_amp</span><span class="p">:</span>
             <span class="n">hero_amp</span> <span class="o">=</span> <span class="n">amp</span>
             <span class="n">hero_sweep</span> <span class="o">=</span> <span class="n">sweep</span>
@@ -739,7 +727,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">latency</span> <span class="o">=</span> <span class="n">hero_sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;latency&quot;</span><span class="p">)</span>
         <span class="n">mean_isi</span> <span class="o">=</span> <span class="n">hero_sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;mean_isi&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Could not find hero sweep.&quot;</span><span class="p">)</span>  
+        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Could not find hero sweep.&quot;</span><span class="p">)</span>
 
     <span class="c"># find the mean features of the first spike for the ramps and short squares</span>
     <span class="n">ramps_ms0</span> <span class="o">=</span> <span class="n">mean_features_spike_zero</span><span class="p">(</span><span class="n">fex</span><span class="o">.</span><span class="n">ramps_features</span><span class="p">()</span><span class="o">.</span><span class="n">sweeps</span><span class="p">())</span>
@@ -754,7 +742,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">cell_features</span><span class="p">[</span><span class="s">&quot;short_squares&quot;</span><span class="p">][</span><span class="s">&quot;mean_spike_0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ss_ms0</span>
 
     <span class="k">return</span> <span class="n">cell_features</span>
-    </div>
+</div>
 <div class="viewcode-block" id="mean_features_spike_zero"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.extract_cell_features.mean_features_spike_zero">[docs]</a><span class="k">def</span> <span class="nf">mean_features_spike_zero</span><span class="p">(</span><span class="n">sweeps</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Compute mean feature values for the first spike in list of extractors &quot;&quot;&quot;</span>
 
@@ -767,7 +755,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="get_stim_characteristics"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.extract_cell_features.get_stim_characteristics">[docs]</a><span class="k">def</span> <span class="nf">get_stim_characteristics</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">no_test_pulse</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Identify the start time, duration, amplitude, start index, and</span>
-<span class="sd">    end index of a general stimulus.  </span>
+<span class="sd">    end index of a general stimulus.</span>
 <span class="sd">    This assumes that there is a test pulse followed by the stimulus square.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -777,9 +765,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">diff_idx</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
-    <span class="c"># skip the first up/down </span>
+    <span class="c"># skip the first up/down</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">no_test_pulse</span> <span class="k">else</span> <span class="mi">1</span>
-    
+
     <span class="c"># shift by one to compensate for diff()</span>
     <span class="n">start_idx</span> <span class="o">=</span> <span class="n">diff_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">end_idx</span> <span class="o">=</span> <span class="n">diff_idx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
@@ -796,14 +784,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="c"># Assumes that there is a test pulse followed by the stimulus ramp</span>
     <span class="n">di</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
     <span class="n">up_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">di</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-    
+
     <span class="n">start_idx</span> <span class="o">=</span> <span class="n">up_idx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="c"># shift by one to compensate for diff()</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">start_idx</span><span class="p">],</span> <span class="n">start_idx</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="get_square_stim_characteristics"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.extract_cell_features.get_square_stim_characteristics">[docs]</a><span class="k">def</span> <span class="nf">get_square_stim_characteristics</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">no_test_pulse</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Identify the start time, duration, amplitude, start index, and</span>
-<span class="sd">    end index of a square stimulus.  </span>
+<span class="sd">    end index of a square stimulus.</span>
 <span class="sd">    This assumes that there is a test pulse followed by the stimulus square.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -812,7 +800,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">down_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">di</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">no_test_pulse</span> <span class="k">else</span> <span class="mi">1</span>
-    
+
     <span class="c"># second square is the stimulus</span>
     <span class="k">if</span> <span class="n">up_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">down_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span> <span class="c"># positive square</span>
         <span class="n">start_idx</span> <span class="o">=</span> <span class="n">up_idx</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span> <span class="c"># shift by one to compensate for diff()</span>
@@ -826,9 +814,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">stim_amp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">start_idx</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="p">(</span><span class="n">stim_start</span><span class="p">,</span> <span class="n">stim_dur</span><span class="p">,</span> <span class="n">stim_amp</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">)</span>
-</div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span> <span class="k">pass</span>
-</pre></div>
+</pre></div></div>
 
           </div>
         </div>

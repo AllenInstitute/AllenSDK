@@ -631,7 +631,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.api.cache</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
 <span class="c"># This file is part of Allen SDK.</span>
 <span class="c">#</span>
 <span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
@@ -654,22 +654,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 
 <div class="viewcode-block" id="Cache"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache">[docs]</a><span class="k">class</span> <span class="nc">Cache</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">manifest</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="n">cache</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_manifest</span><span class="p">(</span><span class="n">manifest</span><span class="p">)</span>
-    
 
 <div class="viewcode-block" id="Cache.get_cache_path"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.get_cache_path">[docs]</a>    <span class="k">def</span> <span class="nf">get_cache_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">manifest_key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Helper method for accessing path specs from manifest keys.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        file_name : string</span>
 <span class="sd">        manifest_key : string</span>
 <span class="sd">        args : ordered parameters</span>
-<span class="sd">    </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        string or None</span>
@@ -682,45 +682,44 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="n">manifest_key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">None</span>
-        
 </div>
 <div class="viewcode-block" id="Cache.load_manifest"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.load_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">load_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read a keyed collection of path specifications.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        file_name : string</span>
 <span class="sd">            path to the manifest file</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Manifest</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">file_name</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
 
                 <span class="c"># make the directory if it doesn&#39;t exist already</span>
                 <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-                <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dirname</span><span class="p">:</span>
+                    <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">build_manifest</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
-            
-            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span><span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)[</span><span class="s">&#39;manifest&#39;</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
+                <span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)[</span><span class="s">&#39;manifest&#39;</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="bp">None</span>
-
 </div>
 <div class="viewcode-block" id="Cache.build_manifest"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.build_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">build_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Creation of default path speifications.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        file_name : string</span>
 <span class="sd">            where to save it</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;This function must be defined in the appropriate subclass&quot;</span><span class="p">)</span>
-
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="s">&quot;This function must be defined in the appropriate subclass&quot;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Cache.manifest_dataframe"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.manifest_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">manifest_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convenience method to view manifest as a pandas dataframe.</span>
@@ -732,27 +731,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                        <span class="n">data</span><span class="p">,</span>
                        <span class="n">new_old_name_tuples</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convenience method to rename columns in a pandas dataframe.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        data : dataframe</span>
 <span class="sd">            edited in place.</span>
 <span class="sd">        new_old_name_tuples : list of string tuples (new, old)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">new_old_name_tuples</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">new_old_name_tuples</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">new_old_name_tuples</span> <span class="o">=</span> <span class="p">[]</span>
-            
+
         <span class="k">for</span> <span class="n">new_name</span><span class="p">,</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="n">new_old_name_tuples</span><span class="p">:</span>
             <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_name</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="n">old_name</span> <span class="k">else</span> <span class="n">c</span>
-                            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>                    
-    
-    </div>
+                            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+</div>
 <div class="viewcode-block" id="Cache.load_csv"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.load_csv">[docs]</a>    <span class="k">def</span> <span class="nf">load_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">path</span><span class="p">,</span>
                  <span class="n">rename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read a csv file as a pandas dataframe.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        rename : list of string tuples (new old), optional</span>
@@ -764,18 +762,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>        
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">data</span>
-
 </div>
 <div class="viewcode-block" id="Cache.load_json"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.load_json">[docs]</a>    <span class="k">def</span> <span class="nf">load_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                   <span class="n">path</span><span class="p">,</span>
                   <span class="n">rename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                   <span class="n">index</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Read a json file as a pandas dataframe.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        rename : list of string tuples (new old), optional</span>
@@ -786,12 +783,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">data</span> <span class="o">=</span> <span class="n">pj</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>        
+
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">data</span>
-    
 </div>
 <div class="viewcode-block" id="Cache.wrap"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.wrap">[docs]</a>    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span>
              <span class="n">save_as_json</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
@@ -800,7 +796,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
              <span class="n">rename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
              <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;make an rma query, save it and return the dataframe.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        fn : function reference</span>
@@ -812,51 +808,52 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        save_as_json : boolean, optional</span>
 <span class="sd">            True (default) will save data as json, False as csv</span>
 <span class="sd">        return_dataframe : boolean, optional</span>
-<span class="sd">            True will cast the return value to a pandas dataframe, False (default) will not </span>
+<span class="sd">            True will cast the return value to a pandas dataframe, False (default) will not</span>
 <span class="sd">        index : string, optional</span>
 <span class="sd">            column to use as the pandas index</span>
 <span class="sd">        rename : list of string tuples, optional</span>
 <span class="sd">            (new, old) columns to rename</span>
 <span class="sd">        kwargs : objects</span>
 <span class="sd">            passed through to the query function</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict or DataFrame</span>
 <span class="sd">            data type depends on return_dataframe option.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Column renaming happens after the file is reloaded for json</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">cache</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cache</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="n">json_data</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            
-            <span class="k">if</span> <span class="n">save_as_json</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">save_as_json</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
                 <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">json_data</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">json_data</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
-                
+
                 <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                     <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        
+
                 <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    
+
         <span class="c"># read it back in</span>
-        <span class="k">if</span> <span class="n">save_as_json</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">return_dataframe</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">save_as_json</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">return_dataframe</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">pj</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                     <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">return_dataframe</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">return_dataframe</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;save_as_json=False cannot be used with return_dataframe=False&#39;</span><span class="p">)</span>
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s">&#39;save_as_json=False cannot be used with return_dataframe=False&#39;</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">data</span></div></div>
 </pre></div>
 

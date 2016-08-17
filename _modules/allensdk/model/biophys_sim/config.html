@@ -646,8 +646,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span> <span class="c">#@UnresolvedImport</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">resource_filename</span>  <span class="c"># @UnresolvedImport</span>
 <span class="kn">from</span> <span class="nn">allensdk.config.app.application_config</span> <span class="kn">import</span> <span class="n">ApplicationConfig</span>
 <span class="kn">from</span> <span class="nn">allensdk.config.model.description_parser</span> <span class="kn">import</span> <span class="n">DescriptionParser</span>
 <span class="kn">from</span> <span class="nn">allensdk.config.model.description</span> <span class="kn">import</span> <span class="n">Description</span>
@@ -655,35 +656,33 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div class="viewcode-block" id="Config"><a class="viewcode-back" href="../../../../allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.config.Config">[docs]</a><span class="k">class</span> <span class="nc">Config</span><span class="p">(</span><span class="n">ApplicationConfig</span><span class="p">):</span>
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-    
+
     <span class="n">_DEFAULT_LOG_CONFIG</span> <span class="o">=</span> <span class="n">resource_filename</span><span class="p">(</span><span class="n">__name__</span><span class="p">,</span> <span class="s">&#39;logging.conf&#39;</span><span class="p">)</span>
-    
+
     <span class="c">#: A structure that defines the available configuration parameters.</span>
     <span class="c">#: The default value and help strings may be seen by viewing the source.</span>
-    <span class="n">_DEFAULTS</span> <span class="o">=</span> <span class="p">{</span> 
-        <span class="s">&#39;workdir&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="s">&#39;workdir&#39;</span><span class="p">,</span>
-                     <span class="s">&#39;help&#39;</span><span class="p">:</span> <span class="s">&#39;writable directory where intermediate and output files are written.&#39;</span> <span class="p">},</span>
-        <span class="s">&#39;data_dir&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
-                      <span class="s">&#39;help&#39;</span><span class="p">:</span> <span class="s">&#39;writable directory where intermediate and output files are written.&#39;</span> <span class="p">},</span>
-        <span class="s">&#39;model_file&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="s">&#39;config.json&#39;</span><span class="p">,</span>
-                        <span class="s">&#39;help&#39;</span><span class="p">:</span> <span class="s">&#39;file where the model parameters are set.&#39;</span> <span class="p">},</span>
-        <span class="s">&#39;main&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="s">&#39;simulation#run&#39;</span><span class="p">,</span>
-                  <span class="s">&#39;help&#39;</span> <span class="p">:</span> <span class="s">&#39;module#function that runs the actual simulation&#39;</span> <span class="p">}</span>
+    <span class="n">_DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;workdir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="s">&#39;workdir&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;help&#39;</span><span class="p">:</span> <span class="s">&#39;writable directory where intermediate and output files are written.&#39;</span><span class="p">},</span>
+        <span class="s">&#39;data_dir&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">,</span>
+                     <span class="s">&#39;help&#39;</span><span class="p">:</span> <span class="s">&#39;writable directory where intermediate and output files are written.&#39;</span><span class="p">},</span>
+        <span class="s">&#39;model_file&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="s">&#39;config.json&#39;</span><span class="p">,</span>
+                       <span class="s">&#39;help&#39;</span><span class="p">:</span> <span class="s">&#39;file where the model parameters are set.&#39;</span><span class="p">},</span>
+        <span class="s">&#39;main&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="s">&#39;simulation#run&#39;</span><span class="p">,</span>
+                 <span class="s">&#39;help&#39;</span><span class="p">:</span> <span class="s">&#39;module#function that runs the actual simulation&#39;</span><span class="p">}</span>
     <span class="p">}</span>
-    
-    
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">_DEFAULTS</span><span class="p">,</span> 
-                                     <span class="n">name</span><span class="o">=</span><span class="s">&#39;biophys&#39;</span><span class="p">,</span> 
+        <span class="nb">super</span><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">Config</span><span class="o">.</span><span class="n">_DEFAULTS</span><span class="p">,</span>
+                                     <span class="n">name</span><span class="o">=</span><span class="s">&#39;biophys&#39;</span><span class="p">,</span>
                                      <span class="n">halp</span><span class="o">=</span><span class="s">&#39;tools for biophysically detailed modeling at the Allen Institute.&#39;</span><span class="p">,</span>
                                      <span class="n">default_log_config</span><span class="o">=</span><span class="n">Config</span><span class="o">.</span><span class="n">_DEFAULT_LOG_CONFIG</span><span class="p">)</span>
-    
-    
+
 <div class="viewcode-block" id="Config.load"><a class="viewcode-back" href="../../../../allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.config.Config.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="p">,</span>
              <span class="n">disable_existing_logs</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Parse the application configuration then immediately load</span>
 <span class="sd">        the model configuration files.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        disable_existing_logs : boolean, optional</span>
@@ -691,24 +690,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Config</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">([</span><span class="n">config_path</span><span class="p">],</span> <span class="n">disable_existing_logs</span><span class="p">)</span>
         <span class="n">description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_model_description</span><span class="p">()</span>
-        
+
         <span class="k">return</span> <span class="n">description</span>
-        
-        </div>
+</div>
 <div class="viewcode-block" id="Config.read_model_description"><a class="viewcode-back" href="../../../../allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.config.Config.read_model_description">[docs]</a>    <span class="k">def</span> <span class="nf">read_model_description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;parse the model_file field of the application configuration</span>
 <span class="sd">        and read the files.</span>
-<span class="sd">        </span>
+
 <span class="sd">        The model_file field of the application configuration is</span>
 <span class="sd">        first split at commas, since it may list more than one file.</span>
-<span class="sd">        </span>
+
 <span class="sd">        The files may be uris of the form :samp:`file:filename?section=name`,</span>
 <span class="sd">        in which case a bare configuration object is read from filename</span>
 <span class="sd">        into the configuration section with key &#39;name&#39;.</span>
-<span class="sd">        </span>
+
 <span class="sd">        A simple filename without a section option</span>
 <span class="sd">        is treated as a standard multi-section configuration file.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        description : Description</span>
@@ -716,29 +714,29 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">reader</span> <span class="o">=</span> <span class="n">DescriptionParser</span><span class="p">()</span>
         <span class="n">description</span> <span class="o">=</span> <span class="n">Description</span><span class="p">()</span>
-        
+
         <span class="n">Config</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;model file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="p">)</span>
-        
+
         <span class="c"># TODO: make space aware w/ regex</span>
         <span class="k">for</span> <span class="n">model_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_file</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">model_file</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;file:&quot;</span><span class="p">):</span>
                 <span class="n">model_file</span> <span class="o">=</span> <span class="s">&#39;file:&#39;</span> <span class="o">+</span> <span class="n">model_file</span>
-            
-            <span class="n">file_regex</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;^file:([^?]*)(\?(.*)?)?&quot;</span><span class="p">)</span>
+
+            <span class="n">file_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;^file:([^?]*)(\?(.*)?)?&quot;</span><span class="p">)</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">file_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">model_file</span><span class="p">)</span>
             <span class="n">model_file</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">file_url_params</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-                <span class="n">file_url_params</span><span class="o">.</span><span class="n">update</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> \
-                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">)</span> \
-                        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;&amp;&#39;</span><span class="p">))))</span>
+                <span class="n">file_url_params</span><span class="o">.</span><span class="n">update</span><span class="p">(((</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                                        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">)</span>
+                                                  <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;&amp;&#39;</span><span class="p">))))</span>
             <span class="k">if</span> <span class="s">&#39;section&#39;</span> <span class="ow">in</span> <span class="n">file_url_params</span><span class="p">:</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="n">file_url_params</span><span class="p">[</span><span class="s">&#39;section&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">section</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="n">Config</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;reading model file </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">model_file</span><span class="p">))</span>
             <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">model_file</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
-        
+
         <span class="k">return</span> <span class="n">description</span></div></div>
 </pre></div>
 
