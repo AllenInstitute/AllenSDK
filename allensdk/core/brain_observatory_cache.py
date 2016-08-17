@@ -26,7 +26,7 @@ import six
 class BrainObservatoryCache(Cache):
     """
     Cache class for storing and accessing data from the Brain Observatory.
-    By default, this class will cache any downloaded metadata or files in 
+    By default, this class will cache any downloaded metadata or files in
     well known locations defined in a manifest file.  This behavior can be
     disabled.
 
@@ -103,23 +103,23 @@ class BrainObservatoryCache(Cache):
         Parameters
         ----------
         file_name: string
-            File name to save/read the experiment containers.  If file_name is None, 
+            File name to save/read the experiment containers.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
 
         ids: list
-            List of experiment container ids.  
+            List of experiment container ids.
 
         targeted_structures: list
-            List of structure acronyms.  Must be in the list returned by 
+            List of structure acronyms.  Must be in the list returned by
             BrainObservatoryCache.get_all_targeted_structures().
 
         imaging_depths: list
-            List of imaging depths.  Must be in the list returned by 
+            List of imaging depths.  Must be in the list returned by
             BrainObservatoryCache.get_all_imaging_depths().
 
         cre_lines: list
-            List of cre lines.  Must be in the list returned by 
+            List of cre lines.  Must be in the list returned by
             BrainObservatoryCache.get_all_cre_lines().
 
         simple: boolean
@@ -174,34 +174,34 @@ class BrainObservatoryCache(Cache):
         Parameters
         ----------
         file_name: string
-            File name to save/read the ophys experiments.  If file_name is None, 
+            File name to save/read the ophys experiments.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
 
         ids: list
-            List of ophys experiment ids.  
+            List of ophys experiment ids.
 
         experiment_container_ids: list
             List of experiment container ids.
 
         targeted_structures: list
-            List of structure acronyms.  Must be in the list returned by 
+            List of structure acronyms.  Must be in the list returned by
             BrainObservatoryCache.get_all_targeted_structures().
 
         imaging_depths: list
-            List of imaging depths.  Must be in the list returned by 
+            List of imaging depths.  Must be in the list returned by
             BrainObservatoryCache.get_all_imaging_depths().
 
         cre_lines: list
-            List of cre lines.  Must be in the list returned by 
+            List of cre lines.  Must be in the list returned by
             BrainObservatoryCache.get_all_cre_lines().
 
         stimuli: list
-            List of stimulus names.  Must be in the list returned by 
+            List of stimulus names.  Must be in the list returned by
             BrainObservatoryCache.get_all_stimuli().
 
         session_types: list
-            List of stimulus session type names.  Must be in the list returned by 
+            List of stimulus session type names.  Must be in the list returned by
             BrainObservatoryCache.get_all_session_types().
 
         simple: boolean
@@ -269,12 +269,12 @@ class BrainObservatoryCache(Cache):
         Parameters
         ----------
         file_name: string
-            File name to save/read the cell specimens.  If file_name is None, 
+            File name to save/read the cell specimens.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
 
         ids: list
-            List of cell specimen ids.  
+            List of cell specimen ids.
 
         experiment_container_ids: list
             List of experiment container ids.
@@ -320,9 +320,9 @@ class BrainObservatoryCache(Cache):
         Parameters
         ----------
         file_name: string
-            File name to save/read the data set.  If file_name is None, 
+            File name to save/read the data set.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.        
+            is disabled, no file will be saved. Default is None.
 
         ophys_experiment_id: integer
             id of the ophys_experiment to retrieve

@@ -36,7 +36,7 @@ class SvgApi(Api):
         url : string
             The constructed URL
         '''
-        if download == True:
+        if download is True:
             endpoint = self.svg_download_endpoint
         else:
             endpoint = self.svg_endpoint
@@ -61,7 +61,7 @@ class SvgApi(Api):
                      groups=None,
                      file_path=None):
         '''Download the svg file'''
-        if file_path == None:
+        if file_path is None:
             file_path = '%d.svg' % (section_image_id)
 
         svg_url = self.build_query(section_image_id, groups, download=True)

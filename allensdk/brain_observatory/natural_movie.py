@@ -20,14 +20,14 @@ from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 
 
 class NaturalMovie(StimulusAnalysis):
-    """ Perform tuning analysis specific to natural movie stimulus. 
+    """ Perform tuning analysis specific to natural movie stimulus.
 
     Parameters
     ----------
     data_set: BrainObservatoryNwbDataSet object
 
     movie_name: string
-        one of [ stimulus_info.NATURAL_MOVIE_ONE, stimulus_info.NATURAL_MOVIE_TWO, 
+        one of [ stimulus_info.NATURAL_MOVIE_ONE, stimulus_info.NATURAL_MOVIE_TWO,
                  stimulus_info.NATURAL_MOVIE_THREE ]
     """
 

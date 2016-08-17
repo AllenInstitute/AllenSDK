@@ -1,3 +1,18 @@
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 import allensdk.model.biophysical.runner as single_cell
 import logging
 import os
@@ -70,7 +85,7 @@ class RunSimulate(object):
 def main(command, lims_strategy_json, lims_response_json):
     ''' Entry point for module.
         :param command: select behavior, nrnivmodl or simulate
-        :type command: string    
+        :type command: string
         :param lims_strategy_json: path to json file output from lims.
         :type lims_strategy_json: string
         :param lims_response_json: path to json file returned to lims.

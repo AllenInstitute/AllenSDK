@@ -1,3 +1,18 @@
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 from allensdk.core.cell_types_cache import CellTypesCache
 from allensdk.core.cell_types_cache import ReporterStatus as RS
 from allensdk.ephys.feature_extractor import EphysFeatureExtractor
@@ -183,7 +198,7 @@ def test_cell_types_cache_get_morphology_features(cache_fixture):
     ctc, _ = cache_fixture
     morphology_features = ctc.get_morphology_features()
 
-    assert morphology_features != None
+    assert morphology_features is not None
 
 
 # download all morphology features for cells with reconstructions
@@ -191,7 +206,7 @@ def test_cell_types_cache_get_ephys_sweeps(cache_fixture):
     ctc, _ = cache_fixture
     ephys_sweeps = ctc.get_ephys_sweeps(464212183)
 
-    assert ephys_sweeps != None
+    assert ephys_sweeps is not None
 
 
 def test_cell_types_all_features_non_dataframe(cache_fixture):
@@ -199,7 +214,7 @@ def test_cell_types_all_features_non_dataframe(cache_fixture):
     all_features = ctc.get_all_features(
         dataframe=False, require_reconstruction=True)
 
-    assert all_features != None
+    assert all_features is not None
 
 
 def test_cell_types_cache_feature_extractor(cache_fixture):

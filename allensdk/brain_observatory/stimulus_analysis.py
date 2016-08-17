@@ -16,10 +16,7 @@
 import scipy.stats as st
 import numpy as np
 import pandas as pd
-import time
-import os
 import logging
-
 from allensdk.brain_observatory.findlevel import findlevel
 from allensdk.brain_observatory.brain_observatory_exceptions import \
     BrainObservatoryAnalysisException
@@ -27,11 +24,11 @@ from allensdk.brain_observatory.brain_observatory_exceptions import \
 
 class StimulusAnalysis(object):
     """ Base class for all response analysis code. Subclasses are responsible
-    for computing metrics and traces relevant to a particular stimulus.  
-    The base class contains methods for organizing sweep responses row of 
+    for computing metrics and traces relevant to a particular stimulus.
+    The base class contains methods for organizing sweep responses row of
     a stimulus stable (get_sweep_response).  Subclasses implement the
     get_response method, computes the mean sweep response to all sweeps for
-    a each stimulus condition.    
+    a each stimulus condition.
 
     Parameters
     ----------
@@ -71,14 +68,14 @@ class StimulusAnalysis(object):
         raise BrainObservatoryAnalysisException("get_peak not implemented")
 
     def get_speed_tuning(self, binsize):
-        """ Calculates speed tuning, spontaneous versus visually driven.  The return is a 5-tuple 
-        of speed and dF/F histograms.  
+        """ Calculates speed tuning, spontaneous versus visually driven.  The return is a 5-tuple
+        of speed and dF/F histograms.
 
-            binned_dx_sp: (bins,2) np.ndarray of running speeds binned during spontaneous activity stimulus.  
+            binned_dx_sp: (bins,2) np.ndarray of running speeds binned during spontaneous activity stimulus.
             The first bin contains all speeds below 1 cm/s.  Dimension 0 is mean running speed in the bin.
             Dimension 1 is the standard error of the mean.
 
-            binned_cells_sp: (bins,2) np.ndarray of fluorescence during spontaneous activity stimulus.  
+            binned_cells_sp: (bins,2) np.ndarray of fluorescence during spontaneous activity stimulus.
             First bin contains all data for speeds below 1 cm/s. Dimension 0 is mean fluorescence in the bin.
             Dimension 1 is the standard error of the mean.
 

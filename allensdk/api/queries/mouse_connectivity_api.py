@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -87,7 +87,7 @@ class MouseConnectivityApi(RmaApi):
     def get_experiments(self,
                         structure_ids,
                         **kwargs):
-        ''' 
+        '''
         Fetch experiment metadata from the Mouse Brain Connectivity Atlas.
 
         Parameters
@@ -103,7 +103,7 @@ class MouseConnectivityApi(RmaApi):
         criteria_list = ['[failed$eqfalse]',
                          'products[id$in%s]' % (','.join(str(i) for i in MouseConnectivityApi.PRODUCT_IDS))]
 
-        if structure_ids != None:
+        if structure_ids is not None:
             if type(structure_ids) is not list:
                 structure_ids = [structure_ids]
             criteria_list.append('[id$in%s]' % ','.join(str(i)
@@ -188,7 +188,7 @@ class MouseConnectivityApi(RmaApi):
 
         Notes
         -----
-        See: image examples under 
+        See: image examples under
         `Experimental Overview and Metadata <http://help.brain-map.org/display/mouseconnectivity/API##API-ExperimentalOverviewandMetadata>`_
         for additional documentation.
         Download the image using :py:meth:`allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image`
@@ -221,17 +221,17 @@ class MouseConnectivityApi(RmaApi):
 
         Notes
         -----
-        See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_ 
+        See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_
         for additional documentation.
         '''
 
-        if voxel_resolution == None:
+        if voxel_resolution is None:
             voxel_resolution = 10
 
-        if release == None:
+        if release is None:
             release = 'current-release'
 
-        if coordinate_framework == None:
+        if coordinate_framework is None:
             coordinate_framework = 'mouse_ccf'
 
         url = ''.join([self.informatics_archive_endpoint,
@@ -264,7 +264,7 @@ class MouseConnectivityApi(RmaApi):
 
         Notes
         -----
-        See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_ 
+        See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_
         for additional documentation.
         '''
         url = self.build_volumetric_data_download_url(data,
@@ -273,10 +273,10 @@ class MouseConnectivityApi(RmaApi):
                                                       release,
                                                       coordinate_framework)
 
-        if save_file_path == None:
+        if save_file_path is None:
             save_file_path = file_name
 
-        if save_file_path == None:
+        if save_file_path is None:
             save_file_path = 'volumetric_data.nrrd'
 
         self.retrieve_file_over_http(url, save_file_path)
@@ -292,7 +292,7 @@ class MouseConnectivityApi(RmaApi):
         well_known_file_url = self.get_reference_aligned_image_channel_volumes_url(
             data_set_id)
 
-        if save_file_path == None:
+        if save_file_path is None:
             save_file_path = str(data_set_id) + '.zip'
 
         self.retrieve_file_over_http(well_known_file_url, save_file_path)
@@ -309,7 +309,7 @@ class MouseConnectivityApi(RmaApi):
 
         Notes
         -----
-        See: `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_ 
+        See: `Reference-aligned Image Channel Volumes <http://help.brain-map.org/display/mouseconnectivity/API#API-ReferencealignedImageChannelVolumes>`_
         for additional documentation.
         '''
 
@@ -372,7 +372,7 @@ class MouseConnectivityApi(RmaApi):
         -----
         See `Source Search <http://help.brain-map.org/display/mouseconnectivity/API#API-SourceSearch>`_,
         `Target Search <http://help.brain-map.org/display/mouseconnectivity/API#API-TargetSearch>`_,
-        and 
+        and
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
 
         '''
@@ -407,7 +407,7 @@ class MouseConnectivityApi(RmaApi):
         Notes
         -----
         See `Spatial Search <http://help.brain-map.org/display/mouseconnectivity/API#API-SpatialSearch>`_
-        and 
+        and
         `service::mouse_connectivity_target_spatial <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitytargetspatial>`_.
 
         '''
@@ -430,7 +430,7 @@ class MouseConnectivityApi(RmaApi):
             Integer Structure.id or String Structure.acronym.
         primary_structure_only : boolean, optional
         product_ids : list of integers, optional
-            Integer Product.id        
+            Integer Product.id
         start_row : integer, optional
             For paging purposes. Defaults to 0.
         num_rows : integer, optional
@@ -439,7 +439,7 @@ class MouseConnectivityApi(RmaApi):
         Notes
         -----
         See `Injection Coordinate Search <http://help.brain-map.org/display/mouseconnectivity/API#API-InjectionCoordinateSearch>`_
-        and 
+        and
         `service::mouse_connectivity_injection_coordinate <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate>`_.
 
         '''
@@ -474,7 +474,7 @@ class MouseConnectivityApi(RmaApi):
         Notes
         -----
         See `Correlation Search <http://help.brain-map.org/display/mouseconnectivity/API#API-CorrelationSearch>`_
-        and 
+        and
         `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
 
         '''
@@ -495,14 +495,14 @@ class MouseConnectivityApi(RmaApi):
         experiment_filter = '[section_data_set_id$in%s]' %\
                             ','.join(str(i) for i in experiment_ids)
 
-        if is_injection == True:
+        if is_injection is True:
             is_injection_filter = '[is_injection$eqtrue]'
-        elif is_injection == False:
+        elif is_injection is False:
             is_injection_filter = '[is_injection$eqfalse]'
         else:
             is_injection_filter = ''
 
-        if normalized_projection_volume_limit != None:
+        if normalized_projection_volume_limit is not None:
             volume_filter = '[normalized_projection_volume$gt%f]' %\
                             (normalized_projection_volume_limit)
         else:
@@ -514,9 +514,9 @@ class MouseConnectivityApi(RmaApi):
         else:
             hemisphere_filter = ''
 
-        if structure_name != None:
+        if structure_name is not None:
             structure_filter = ",structure[name$eq'%s']" % (structure_name)
-        elif structure_ids != None:
+        elif structure_ids is not None:
             structure_filter = '[structure_id$in%s]' %\
                                ','.join(str(i) for i in structure_ids)
         else:

@@ -1,4 +1,4 @@
-# Copyright 2014 Allen Institute for Brain Science
+# Copyright 2014-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ class DescriptionParser(object):
         section : string, optional
             What configuration section to read it into if the file does not specify.
         '''
-        if description == None:
+        if description is None:
             description = Description()
 
         self.reader = self.parser_for_extension(file_path)
@@ -46,7 +46,7 @@ class DescriptionParser(object):
         raise Exception("Not implemented, use a sub class")
 
     def write(self, filename, description):
-        """Save the configuration.  
+        """Save the configuration.
 
         Parameters
         ----------

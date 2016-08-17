@@ -52,14 +52,14 @@ class TreeSearchApi(Api):
         params = []
         url_params = ''
 
-        if ancestors == True:
+        if ancestors is True:
             params.append('ancestors=true')
-        elif ancestors == False:
+        elif ancestors is False:
             params.append('ancestors=false')
 
-        if descendants == True:
+        if descendants is True:
             params.append('descendants=true')
-        elif descendants == False:
+        elif descendants is False:
             params.append('descendants=false')
 
         if len(params) > 0:

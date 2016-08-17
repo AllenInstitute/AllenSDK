@@ -38,7 +38,7 @@ class GridDataApi(RmaApi):
                  base_uri=None):
         super(GridDataApi, self).__init__(base_uri)
 
-        if resolution == None:
+        if resolution is None:
             resolution = 25
         self.resolution = resolution
 
@@ -64,7 +64,7 @@ class GridDataApi(RmaApi):
         Notes
         -----
         '''
-        if include != None:
+        if include is not None:
             include_clause = ''.join(['?include=',
                                       ','.join(include)])
         else:
@@ -75,7 +75,7 @@ class GridDataApi(RmaApi):
                        str(section_data_set_id),
                        include_clause])
 
-        if path == None:
+        if path is None:
             path = str(section_data_set_id) + '.zip'
 
         self.retrieve_file_over_http(url, path)
@@ -105,10 +105,10 @@ class GridDataApi(RmaApi):
         '''
         params_list = []
 
-        if image != None:
+        if image is not None:
             params_list.append('image=' + ','.join(image))
 
-        if resolution != None:
+        if resolution is not None:
             params_list.append('resolution=%d' % (resolution))
 
         if len(params_list) > 0:
@@ -121,7 +121,7 @@ class GridDataApi(RmaApi):
                        str(section_data_set_id),
                        params_clause])
 
-        if save_file_path == None:
+        if save_file_path is None:
             save_file_path = str(section_data_set_id) + '.nrrd'
 
         self.retrieve_file_over_http(url, save_file_path)

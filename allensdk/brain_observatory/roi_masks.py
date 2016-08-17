@@ -14,7 +14,6 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 import math
-import scipy.ndimage.measurements as measurements
 import scipy.ndimage.morphology as morphology
 
 # constants used for accessing border array
@@ -28,7 +27,7 @@ class Mask(object):
     '''
     Abstract class to represent image segmentation mask. Its two
     main subclasses are RoiMask and NeuropilMask. The former represents
-    the mask of a region of interest (ROI), such as a cell observed in 
+    the mask of a region of interest (ROI), such as a cell observed in
     2-photon imaging. The latter represents the neuropil around that cell,
     and is useful when subtracting the neuropil signal from the measured
     ROI signal.
@@ -247,8 +246,8 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
 
     combined_binary_mask: integer[image_h][image_w]
         Image-sized array that shows the position of all ROIs in the
-        image. ROI masks should have a value of one. Background pixels 
-        must be zero. In other words, ithe combined_binary_mask is a 
+        image. ROI masks should have a value of one. Background pixels
+        must be zero. In other words, ithe combined_binary_mask is a
         bitmap union of all ROI masks
 
     label: text

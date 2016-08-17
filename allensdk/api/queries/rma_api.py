@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -83,7 +83,7 @@ class RmaApi(Api):
         model : string
             The top level data type
         filters : dict
-            key, value comparisons applied to the top-level model to narrow the results.            
+            key, value comparisons applied to the top-level model to narrow the results.
         criteria : string
             raw RMA criteria clause to choose what object are returned
         include : string
@@ -91,15 +91,15 @@ class RmaApi(Api):
         only : list of strings, optional
             to be joined into an rma::options only filter to limit what data is returned
         except : list of strings, optional
-            to be joined into an rma::options except filter to limit what data is returned            
+            to be joined into an rma::options except filter to limit what data is returned
         tabular : list of string, optional
-            return columns as a tabular data structure rather than a nested tree.                    
+            return columns as a tabular data structure rather than a nested tree.
         count : boolean, optional
-            False to skip the extra database count query.                    
+            False to skip the extra database count query.
         debug : string, optional
             'true', 'false' or 'preview'
         num_rows : int or string, optional
-            how many database rows are returned (may not correspond directly to JSON tree structure) 
+            how many database rows are returned (may not correspond directly to JSON tree structure)
         start_row : int or string, optional
             which database row is start of returned data  (may not correspond directly to JSON tree structure)
 
@@ -117,12 +117,12 @@ class RmaApi(Api):
 
         filters = kwargs.get('filters', None)
 
-        if filters != None:
+        if filters is not None:
             clauses.append(self.filters(filters))
 
         criteria = kwargs.get('criteria', None)
 
-        if criteria != None:
+        if criteria is not None:
             clauses.append(',')
             clauses.append(RmaApi.CRITERIA)
             clauses.append(',')
@@ -130,7 +130,7 @@ class RmaApi(Api):
 
         include = kwargs.get('include', None)
 
-        if include != None:
+        if include is not None:
             clauses.append(',')
             clauses.append(RmaApi.INCLUDE)
             clauses.append(',')
@@ -153,7 +153,7 @@ class RmaApi(Api):
 
         Notes
         -----
-        See: `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_ 
+        See: `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_
         and
         `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
         '''
@@ -179,13 +179,13 @@ class RmaApi(Api):
 
         Notes
         -----
-        See: `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_ 
+        See: `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_
         and
         `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
         '''
         clauses = [RmaApi.SERVICE + service_name]
 
-        if parameters != None:
+        if parameters is not None:
             clauses.append(self.tuple_filters(parameters))
 
         stage = ''.join(clauses)
@@ -200,7 +200,7 @@ class RmaApi(Api):
         model : string
             The top level data type
         filters : dict
-            key, value comparisons applied to the top-level model to narrow the results.            
+            key, value comparisons applied to the top-level model to narrow the results.
         criteria : string
             raw RMA criteria clause to choose what object are returned
         include : string
@@ -208,15 +208,15 @@ class RmaApi(Api):
         only : list of strings, optional
             to be joined into an rma::options only filter to limit what data is returned
         except : list of strings, optional
-            to be joined into an rma::options except filter to limit what data is returned            
+            to be joined into an rma::options except filter to limit what data is returned
         tabular : list of string, optional
-            return columns as a tabular data structure rather than a nested tree.                    
+            return columns as a tabular data structure rather than a nested tree.
         count : boolean, optional
-            False to skip the extra database count query.                    
+            False to skip the extra database count query.
         debug : string, optional
             'true', 'false' or 'preview'
         num_rows : int or string, optional
-            how many database rows are returned (may not correspond directly to JSON tree structure) 
+            how many database rows are returned (may not correspond directly to JSON tree structure)
         start_row : int or string, optional
             which database row is start of returned data  (may not correspond directly to JSON tree structure)
 
@@ -247,7 +247,7 @@ class RmaApi(Api):
 
         Notes
         -----
-        See: `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_ 
+        See: `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_
         and
         `Connected Services and Pipes <http://help.brain-map.org/display/api/Connected+Services+and+Pipes>`_
         '''
@@ -274,28 +274,28 @@ class RmaApi(Api):
 
         only = kwargs.get(RmaApi.ONLY, None)
 
-        if only != None:
+        if only is not None:
             options_params.append(
                 self.only_except_tabular_clause(RmaApi.ONLY,
                                                 only))
 
         excpt = kwargs.get(RmaApi.EXCEPT, None)
 
-        if excpt != None:
+        if excpt is not None:
             options_params.append(
                 self.only_except_tabular_clause(RmaApi.EXCEPT,
                                                 excpt))
 
         tabular = kwargs.get(RmaApi.TABULAR, None)
 
-        if tabular != None:
+        if tabular is not None:
             options_params.append(
                 self.only_except_tabular_clause(RmaApi.TABULAR,
                                                 tabular))
 
         num_rows = kwargs.get(RmaApi.NUM_ROWS, None)
 
-        if num_rows != None:
+        if num_rows is not None:
             if num_rows == RmaApi.ALL:
                 options_params.append("[%s$eq'all']" % (RmaApi.NUM_ROWS))
             else:
@@ -304,27 +304,27 @@ class RmaApi(Api):
 
         start_row = kwargs.get(RmaApi.START_ROW, None)
 
-        if start_row != None:
+        if start_row is not None:
             options_params.append('[%s$eq%d]' % (RmaApi.START_ROW,
                                                  start_row))
 
         order = kwargs.get(RmaApi.ORDER, None)
 
-        if order != None:
+        if order is not None:
             options_params.append(self.order_clause(order))
 
         debug = kwargs.get(RmaApi.DEBUG, None)
 
-        if debug != None:
+        if debug is not None:
             options_params.append(self.debug_clause(debug))
 
         cnt = kwargs.get(RmaApi.COUNT, None)
 
-        if cnt != None:
-            if cnt == True or cnt == 'true':
+        if cnt is not None:
+            if cnt is True or cnt == 'true':
                 options_params.append('[%s$eq%s]' % (RmaApi.COUNT,
                                                      RmaApi.TRUE))
-            elif cnt == False or cnt == 'false':
+            elif cnt is False or cnt == 'false':
                 options_params.append('[%s$eq%s]' % (RmaApi.COUNT,
                                                      RmaApi.FALSE))
             else:
@@ -365,7 +365,7 @@ class RmaApi(Api):
         '''
         clause = ''
 
-        if attribute_list != None:
+        if attribute_list is not None:
             clause = '[%s$eq%s]' % (filter_type,
                                     ','.join(attribute_list))
 
@@ -391,7 +391,7 @@ class RmaApi(Api):
         '''
         clause = ''
 
-        if order_list != None:
+        if order_list is not None:
             clause = '[order$eq%s]' % (','.join(order_list))
 
         return clause
@@ -418,11 +418,11 @@ class RmaApi(Api):
         '''
         clause = ''
 
-        if debug_value == None:
+        if debug_value is None:
             clause = ''
-        if debug_value == True or debug_value == 'true':
+        if debug_value is True or debug_value == 'true':
             clause = '[debug$eqtrue]'
-        elif debug_value == False or debug_value == 'false':
+        elif debug_value is False or debug_value == 'false':
             clause = '[debug$eqfalse]'
         elif debug_value == 'preview':
             clause = "[debug$eq'preview']"
@@ -462,7 +462,7 @@ class RmaApi(Api):
         filters_builder = []
 
         for filt in filters:
-            if filt[-1] == None:
+            if filt[-1] is None:
                 continue
             if len(filt) == 2:
                 val = filt[1]
@@ -547,7 +547,7 @@ class RmaApi(Api):
         If a class is specified, only the schema information for that class
         will be requested, otherwise the url requests the entire schema.
         '''
-        if clazz != None:
+        if clazz is not None:
             class_clause = '/' + clazz
         else:
             class_clause = ''

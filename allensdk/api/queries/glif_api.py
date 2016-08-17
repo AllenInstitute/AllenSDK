@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@ class GlifApi(RmaApi):
         self.neuron_config_url = None
 
     def list_neuronal_models(self):
-        ''' Query the API for a list of all GLIF neuronal models. 
+        ''' Query the API for a list of all GLIF neuronal models.
 
         Returns
         -------
@@ -49,7 +49,7 @@ class GlifApi(RmaApi):
         Returns
         -------
         dict
-            A dictionary containing 
+            A dictionary containing
         '''
         include = ('neuronal_model_template(well_known_files(well_known_file_type)),' +
                    'specimen(ephys_sweeps,ephys_result(well_known_files(well_known_file_type))),' +
@@ -115,7 +115,7 @@ class GlifApi(RmaApi):
         return self.metadata
 
     def get_ephys_sweeps(self):
-        ''' Retrieve ephys sweep information out of downloaded metadata for a neuronal model 
+        ''' Retrieve ephys sweep information out of downloaded metadata for a neuronal model
 
         Returns
         -------
@@ -125,7 +125,7 @@ class GlifApi(RmaApi):
         return self.ephys_sweeps
 
     def get_neuron_config(self, output_file_name=None):
-        ''' Retrieve a model configuration file from the API, optionally save it to disk, and 
+        ''' Retrieve a model configuration file from the API, optionally save it to disk, and
         return the contents of that file as a dictionary.
 
         Parameters

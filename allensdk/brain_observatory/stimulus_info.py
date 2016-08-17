@@ -36,7 +36,7 @@ SESSION_STIMULUS_MAP = {
 
 
 def stimuli_in_session(session):
-    """ Return a list what stimuli are available in a given session. 
+    """ Return a list what stimuli are available in a given session.
 
     Parameters
     ----------

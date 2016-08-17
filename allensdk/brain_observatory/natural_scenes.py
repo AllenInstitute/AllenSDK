@@ -22,7 +22,7 @@ import logging
 
 
 class NaturalScenes(StimulusAnalysis):
-    """ Perform tuning analysis specific to natural scenes stimulus. 
+    """ Perform tuning analysis specific to natural scenes stimulus.
 
     Parameters
     ----------
@@ -44,7 +44,7 @@ class NaturalScenes(StimulusAnalysis):
         self.peak = self.get_peak()
 
     def get_response(self):
-        ''' Computes the mean response for each cell to each stimulus condition.  Return is 
+        ''' Computes the mean response for each cell to each stimulus condition.  Return is
         a (# scenes, # cells, 3) np.ndarray.  The final dimension
         contains the mean response to the condition (index 0), standard error of the mean of the response
         to the condition (index 1), and p value of the response to that condition (index 3).

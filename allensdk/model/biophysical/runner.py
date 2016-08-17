@@ -49,7 +49,7 @@ def run(description, sweeps=None):
     # configure stimulus and recording
     stimulus_path = description.manifest.get_path('stimulus_path')
     run_params = description.data['runs'][0]
-    if sweeps == None:
+    if sweeps is None:
         sweeps = run_params['sweeps']
     sweeps_by_type = run_params['sweeps_by_type']
     junction_potential = description.data['fitting'][0]['junction_potential']

@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -17,9 +17,9 @@ from allensdk.api.api import Api
 
 
 class SynchronizationApi(Api):
-    '''HTTP client for image synchronization services uses the image alignment results from 
+    '''HTTP client for image synchronization services uses the image alignment results from
     the Informatics Data Processing Pipeline.
-    Note: all locations on SectionImages are reported in pixel coordinates 
+    Note: all locations on SectionImages are reported in pixel coordinates
     and all locations in 3-D ReferenceSpaces are reported in microns.
 
     See `Image to Image Synchronization <http://help.brain-map.org/display/api/Image-to-Image+Synchronization>`_
@@ -194,7 +194,7 @@ class SynchronizationApi(Api):
     def get_structure_to_image(self,
                                section_data_set_id,
                                structure_ids):
-        '''For a list of target structures, find the closest SectionImage 
+        '''For a list of target structures, find the closest SectionImage
         and (x,y) location as defined by the centroid of each Structure.
 
         Parameters

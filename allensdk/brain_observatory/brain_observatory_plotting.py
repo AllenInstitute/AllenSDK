@@ -19,7 +19,6 @@ import numpy as np
 import pandas as pd
 import os
 import logging
-from numpy import arange
 
 
 def plot_drifting_grating_traces(dg, save_dir):

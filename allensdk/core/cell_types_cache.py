@@ -31,7 +31,7 @@ import logging
 class CellTypesCache(Cache):
     """
     Cache class for storing and accessing data from the Cell Types Database.
-    By default, this class will cache any downloaded metadata or files in 
+    By default, this class will cache any downloaded metadata or files in
     well known locations defined in a manifest file.  This behavior can be
     disabled.
 
@@ -77,7 +77,7 @@ class CellTypesCache(Cache):
         ----------
 
         file_name: string
-            File name to save/read the cell metadata as JSON.  If file_name is None, 
+            File name to save/read the cell metadata as JSON.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
 
@@ -109,7 +109,7 @@ class CellTypesCache(Cache):
 
     def get_ephys_sweeps(self, specimen_id, file_name=None):
         """
-        Download sweep metadata for a single cell specimen.  
+        Download sweep metadata for a single cell specimen.
 
         Parameters
         ----------
@@ -139,13 +139,13 @@ class CellTypesCache(Cache):
         ----------
 
         file_name: string
-            File name to save/read the ephys features metadata as CSV.  
-            If file_name is None, the file_name will be pulled out of the 
-            manifest.  If caching is disabled, no file will be saved. 
+            File name to save/read the ephys features metadata as CSV.
+            If file_name is None, the file_name will be pulled out of the
+            manifest.  If caching is disabled, no file will be saved.
             Default is None.
 
         dataframe: boolean
-            Return the output as a Pandas DataFrame.  If False, return 
+            Return the output as a Pandas DataFrame.  If False, return
             a list of dictionaries.
         """
 
@@ -172,13 +172,13 @@ class CellTypesCache(Cache):
         ----------
 
         file_name: string
-            File name to save/read the ephys features metadata as CSV.  
-            If file_name is None, the file_name will be pulled out of the 
-            manifest.  If caching is disabled, no file will be saved. 
+            File name to save/read the ephys features metadata as CSV.
+            If file_name is None, the file_name will be pulled out of the
+            manifest.  If caching is disabled, no file will be saved.
             Default is None.
 
         dataframe: boolean
-            Return the output as a Pandas DataFrame.  If False, return 
+            Return the output as a Pandas DataFrame.  If False, return
             a list of dictionaries.
         """
 
@@ -207,11 +207,11 @@ class CellTypesCache(Cache):
         ----------
 
         dataframe: boolean
-            Return the output as a Pandas DataFrame.  If False, return 
+            Return the output as a Pandas DataFrame.  If False, return
             a list of dictionaries.
 
         require_reconstruction: boolean
-            Only return ephys and morphology features for cells that have 
+            Only return ephys and morphology features for cells that have
             reconstructions. Default True.
         """
 
@@ -240,9 +240,9 @@ class CellTypesCache(Cache):
             The ID of a cell specimen to download.
 
         file_name: string
-            File name to save/read the ephys features metadata as CSV.  
-            If file_name is None, the file_name will be pulled out of the 
-            manifest.  If caching is disabled, no file will be saved. 
+            File name to save/read the ephys features metadata as CSV.
+            If file_name is None, the file_name will be pulled out of the
+            manifest.  If caching is disabled, no file will be saved.
             Default is None.
 
         Returns
@@ -271,9 +271,9 @@ class CellTypesCache(Cache):
             The ID of a cell specimen to download.
 
         file_name: string
-            File name to save/read the reconstruction SWC.  
-            If file_name is None, the file_name will be pulled out of the 
-            manifest.  If caching is disabled, no file will be saved. 
+            File name to save/read the reconstruction SWC.
+            If file_name is None, the file_name will be pulled out of the
+            manifest.  If caching is disabled, no file will be saved.
             Default is None.
 
         Returns
@@ -305,9 +305,9 @@ class CellTypesCache(Cache):
             The ID of a cell specimen to download.
 
         file_name: string
-            File name to save/read the reconstruction marker.  
-            If file_name is None, the file_name will be pulled out of the 
-            manifest.  If caching is disabled, no file will be saved. 
+            File name to save/read the reconstruction marker.
+            If file_name is None, the file_name will be pulled out of the
+            manifest.  If caching is disabled, no file will be saved.
             Default is None.
 
         Returns

@@ -192,7 +192,7 @@ class BiophysicalApi(Api):
                         swc_morphology_path='',
                         marker_path='',
                         sweeps=[]):
-        '''Generate a json configuration file with parameters for a 
+        '''Generate a json configuration file with parameters for a
         a biophysical experiment.
 
         Parameters

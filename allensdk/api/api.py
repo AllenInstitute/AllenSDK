@@ -16,8 +16,6 @@
 
 import shutil
 import socket
-from requests.exceptions import ConnectionError
-
 
 try:
     import urllib.request as urllib_request
@@ -40,7 +38,7 @@ class Api(object):
     download_url = 'http://download.alleninstitute.org'
 
     def __init__(self, api_base_url_string=None):
-        if api_base_url_string == None:
+        if api_base_url_string is None:
             api_base_url_string = Api.default_api_url
 
         self.set_api_urls(api_base_url_string)
@@ -145,7 +143,7 @@ class Api(object):
         data = self.do_query(lambda *a, **k: url,
                              self.read_data)
 
-        if dataframe == True:
+        if dataframe is True:
             data = pd.DataFrame(data)
 
         return data
@@ -226,7 +224,7 @@ class Api(object):
 
         Notes
         -----
-        This information and other 
+        This information and other
         `Allen Brain Atlas Data Portal Data Model <http://help.brain-map.org/display/api/Data+Model>`_
         documentation is also available as a
         `Class Hierarchy <http://api.brain-map.org/class_hierarchy>`_
@@ -303,7 +301,7 @@ class Api(object):
             Result document as parsed by the JSON library.
         '''
 
-        if post == False:
+        if post is False:
             data = json_utilities.read_url(urllib_request.quote(url, ';/?:@&=+$,'),
                                            'GET')
         else:

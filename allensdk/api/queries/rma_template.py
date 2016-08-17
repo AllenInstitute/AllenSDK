@@ -73,7 +73,7 @@ class RmaTemplate(RmaApi):
                 query_args['include'] = include_str
 
         if 'only' in kwargs:
-            if kwargs.get('only') != None:
+            if kwargs.get('only') is not None:
                 query_args['only'] = [self.quote_string(
                     ','.join(kwargs.get('only')))]
         elif 'only' in template:
@@ -81,7 +81,7 @@ class RmaTemplate(RmaApi):
                 self.quote_string(','.join(template['only']))]
 
         if 'except' in kwargs:
-            if kwargs.get('except') != None:
+            if kwargs.get('except') is not None:
                 query_args['except'] = [self.quote_string(
                     ','.join(kwargs.get('except')))]
         elif 'except' in template:

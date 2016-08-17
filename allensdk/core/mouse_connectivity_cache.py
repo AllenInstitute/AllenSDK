@@ -31,8 +31,8 @@ from allensdk.config.manifest import Manifest
 class MouseConnectivityCache(Cache):
     """
     Cache class for storing and accessing data related to the adult mouse
-    Connectivity Atlas.  By default, this class will cache any downloaded 
-    metadata or files in well known locations defined in a manifest file.  
+    Connectivity Atlas.  By default, this class will cache any downloaded
+    metadata or files in well known locations defined in a manifest file.
     This behavior can be disabled.
 
     Attributes
@@ -84,15 +84,15 @@ class MouseConnectivityCache(Cache):
         self.api = MouseConnectivityApi(base_uri=base_uri)
 
     def get_annotation_volume(self, file_name=None):
-        """ 
+        """
         Read the annotation volume.  Download it first if it doesn't exist.
 
         Parameters
         ----------
 
         file_name: string
-            File name to store the annotation volume.  If it already exists, 
-            it will be read from this file.  If file_name is None, the 
+            File name to store the annotation volume.  If it already exists,
+            it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
 
         """
@@ -115,15 +115,15 @@ class MouseConnectivityCache(Cache):
         return annotation, info
 
     def get_template_volume(self, file_name=None):
-        """ 
+        """
         Read the template volume.  Download it first if it doesn't exist.
 
         Parameters
         ----------
 
         file_name: string
-            File name to store the template volume.  If it already exists, 
-            it will be read from this file.  If file_name is None, the 
+            File name to store the template volume.  If it already exists,
+            it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
 
         """
@@ -145,9 +145,9 @@ class MouseConnectivityCache(Cache):
         return annotation, info
 
     def get_projection_density(self, experiment_id, file_name=None):
-        """ 
-        Read a projection density volume for a single experiment.  Download it 
-        first if it doesn't exist.  Projection density is the proportion of 
+        """
+        Read a projection density volume for a single experiment.  Download it
+        first if it doesn't exist.  Projection density is the proportion of
         of projecting pixels in a grid voxel in [0,1].
 
         Parameters
@@ -158,8 +158,8 @@ class MouseConnectivityCache(Cache):
             section_data_set_id in the API.
 
         file_name: string
-            File name to store the template volume.  If it already exists, 
-            it will be read from this file.  If file_name is None, the 
+            File name to store the template volume.  If it already exists,
+            it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
 
         """
@@ -178,10 +178,10 @@ class MouseConnectivityCache(Cache):
         return nrrd.read(file_name)
 
     def get_injection_density(self, experiment_id, file_name=None):
-        """ 
-        Read an injection density volume for a single experiment. Download it 
+        """
+        Read an injection density volume for a single experiment. Download it
         first if it doesn't exist.  Injection density is the proportion of
-        projecting pixels in a grid voxel only including pixels that are 
+        projecting pixels in a grid voxel only including pixels that are
         part of the injection site in [0,1].
 
         Parameters
@@ -192,8 +192,8 @@ class MouseConnectivityCache(Cache):
             section_data_set_id in the API.
 
         file_name: string
-            File name to store the template volume.  If it already exists, 
-            it will be read from this file.  If file_name is None, the 
+            File name to store the template volume.  If it already exists,
+            it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
 
         """
@@ -213,8 +213,8 @@ class MouseConnectivityCache(Cache):
         return nrrd.read(file_name)
 
     def get_injection_fraction(self, experiment_id, file_name=None):
-        """ 
-        Read an injection fraction volume for a single experiment. Download it 
+        """
+        Read an injection fraction volume for a single experiment. Download it
         first if it doesn't exist.  Injection fraction is the proportion of
         pixels in the injection site in a grid voxel in [0,1].
 
@@ -226,8 +226,8 @@ class MouseConnectivityCache(Cache):
             section_data_set_id in the API.
 
         file_name: string
-            File name to store the template volume.  If it already exists, 
-            it will be read from this file.  If file_name is None, the 
+            File name to store the template volume.  If it already exists,
+            it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
 
         """
@@ -247,8 +247,8 @@ class MouseConnectivityCache(Cache):
         return nrrd.read(file_name)
 
     def get_data_mask(self, experiment_id, file_name=None):
-        """ 
-        Read a data mask volume for a single experiment. Download it 
+        """
+        Read a data mask volume for a single experiment. Download it
         first if it doesn't exist.  Data mask is a binary mask of
         voxels that have valid data.  Only use valid data in analysis!
 
@@ -260,8 +260,8 @@ class MouseConnectivityCache(Cache):
             section_data_set_id in the API.
 
         file_name: string
-            File name to store the template volume.  If it already exists, 
-            it will be read from this file.  If file_name is None, the 
+            File name to store the template volume.  If it already exists,
+            it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
 
         """
@@ -281,14 +281,14 @@ class MouseConnectivityCache(Cache):
         return nrrd.read(file_name)
 
     def get_ontology(self, file_name=None):
-        """ 
+        """
         Read the list of adult mouse structures and return an Ontology instance.
 
         Parameters
         ----------
 
         file_name: string
-            File name to save/read the structures table.  If file_name is None, 
+            File name to save/read the structures table.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
         """
@@ -296,14 +296,14 @@ class MouseConnectivityCache(Cache):
         return Ontology(self.get_structures(file_name))
 
     def get_structures(self, file_name=None):
-        """ 
+        """
         Read the list of adult mouse structures and return a Pandas DataFrame.
 
         Parameters
         ----------
 
         file_name: string
-            File name to save/read the structures table.  If file_name is None, 
+            File name to save/read the structures table.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
         """
@@ -334,10 +334,10 @@ class MouseConnectivityCache(Cache):
 
         dataframe: boolean
             Return the list of experiments as a Pandas DataFrame.  If False,
-            return a list of dictionaries.  Default False. 
+            return a list of dictionaries.  Default False.
 
         file_name: string
-            File name to save/read the structures table.  If file_name is None, 
+            File name to save/read the structures table.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
 
@@ -384,7 +384,7 @@ class MouseConnectivityCache(Cache):
         return experiments
 
     def filter_experiments(self, experiments, cre=None, injection_structure_ids=None):
-        """ 
+        """
         Take a list of experiments and filter them by cre status and injection structure.
 
         Parameters
@@ -400,9 +400,9 @@ class MouseConnectivityCache(Cache):
             If None, return all experiments.  Default None.
         """
 
-        if cre == True:
+        if cre is True:
             experiments = [e for e in experiments if e['transgenic-line']]
-        elif cre == False:
+        elif cre is False:
             experiments = [e for e in experiments if not e['transgenic-line']]
         elif cre is not None:
             experiments = [e for e in experiments if e[
@@ -418,7 +418,7 @@ class MouseConnectivityCache(Cache):
     def get_experiment_structure_unionizes(self, experiment_id, file_name=None, is_injection=None,
                                            structure_ids=None, hemisphere_ids=None):
         """
-        Retrieve the structure unionize data for a specific experiment.  Filter by 
+        Retrieve the structure unionize data for a specific experiment.  Filter by
         structure, injection status, and hemisphere.
 
         Parameters
@@ -428,9 +428,9 @@ class MouseConnectivityCache(Cache):
             ID of the experiment of interest.  Corresponds to section_data_set_id in the API.
 
         file_name: string
-            File name to save/read the experiments list.  If file_name is None, 
+            File name to save/read the experiments list.  If file_name is None,
             the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.            
+            is disabled, no file will be saved. Default is None.
 
         is_injection: boolean
             If True, only return unionize records that disregard non-injection pixels.
@@ -443,7 +443,7 @@ class MouseConnectivityCache(Cache):
 
         hemisphere_ids: list
             Only return unionize records that disregard pixels outside of a hemisphere.
-            or set of hemispheres. Left = 1, Right = 2, Both = 3.  If None, include all 
+            or set of hemispheres. Left = 1, Right = 2, Both = 3.  If None, include all
             records [1, 2, 3].  Default None.
 
         """
@@ -487,7 +487,7 @@ class MouseConnectivityCache(Cache):
 
         hemisphere_ids: list
             Only return unionize records that disregard pixels outside of a hemisphere.
-            or set of hemispheres. Left = 1, Right = 2, Both = 3.  If None, include all 
+            or set of hemispheres. Left = 1, Right = 2, Both = 3.  If None, include all
             records [1, 2, 3].  Default None.
         """
         if is_injection is not None:
@@ -506,7 +506,7 @@ class MouseConnectivityCache(Cache):
 
     def get_structure_unionizes(self, experiment_ids, is_injection=None, structure_ids=None, hemisphere_ids=None):
         """
-        Get structure unionizes for a set of experiment IDs.  Filter the results by injection status, 
+        Get structure unionizes for a set of experiment IDs.  Filter the results by injection status,
         structure, and hemisphere.
 
         Parameters
@@ -525,7 +525,7 @@ class MouseConnectivityCache(Cache):
 
         hemisphere_ids: list
             Only return unionize records that disregard pixels outside of a hemisphere.
-            or set of hemispheres. Left = 1, Right = 2, Both = 3.  If None, include all 
+            or set of hemispheres. Left = 1, Right = 2, Both = 3.  If None, include all
             records [1, 2, 3].  Default None.
         """
 
@@ -596,24 +596,24 @@ class MouseConnectivityCache(Cache):
 
     def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
         """
-        Read a 3D numpy array shaped like the annotation volume that has non-zero values where 
+        Read a 3D numpy array shaped like the annotation volume that has non-zero values where
         voxels belong to a particular structure.  This will take care of identifying substructures.
 
         Parameters
         ----------
 
         structure_id: int
-            ID of a structure.  
+            ID of a structure.
 
         file_name: string
-            File name to store the structure mask.  If it already exists, 
-            it will be read from this file.  If file_name is None, the 
+            File name to store the structure mask.  If it already exists,
+            it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
 
         annotation_file_name: string
-            File name to store the annotation volume.  If it already exists, 
-            it will be read from this file.  If file_name is None, the 
-            file_name will be pulled out of the manifest.  Default is None.            
+            File name to store the annotation volume.  If it already exists,
+            it will be read from this file.  If file_name is None, the
+            file_name will be pulled out of the manifest.  Default is None.
         """
 
         file_name = self.get_cache_path(

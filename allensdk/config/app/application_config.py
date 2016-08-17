@@ -46,7 +46,7 @@ class ApplicationConfig(object):
         self.help = halp
         self.debug_enabled = False
 
-        if default_log_config == None:
+        if default_log_config is None:
             default_log_config = ApplicationConfig._DEFAULT_LOG_CONFIG
 
         ApplicationConfig._log.info(
@@ -127,7 +127,7 @@ class ApplicationConfig(object):
     def create_argparser(self):
         '''Initialization for the command-line parsing stage.
 
-        An application specific prefix is applied to argument names. 
+        An application specific prefix is applied to argument names.
 
         Parameters
         ----------
@@ -199,7 +199,7 @@ class ApplicationConfig(object):
     def apply_configuration_from_environment(self):
         '''Read application configuration variables from the environment.
 
-        The variable names are upper case and have a 
+        The variable names are upper case and have a
         prefix defined by the application.
 
         See: https://docs.python.org/2/library/os.html
@@ -292,7 +292,7 @@ class ApplicationConfig(object):
     def apply_configuration_from_file(self, config_file_path):
         ''' Read application configuration variables from a .conf file.
 
-        Unassigned variables are set to their default values 
+        Unassigned variables are set to their default values
         or None if no default is specified at init time.
         The variables are found in a section named by the application.
 

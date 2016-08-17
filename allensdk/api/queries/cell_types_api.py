@@ -28,7 +28,7 @@ class CellTypesApi(RmaApi):
         super(CellTypesApi, self).__init__(base_uri)
 
     def list_cells(self, require_morphology=False, require_reconstruction=False, reporter_status=None):
-        """ 
+        """
         Query the API for a list of all cells in the Cell Types Database.
 
         Parameters
@@ -99,7 +99,7 @@ class CellTypesApi(RmaApi):
         return sorted(sweeps, key=lambda x: x['sweep_number'])
 
     def filter_cells(self, cells, require_morphology, require_reconstruction, reporter_status):
-        """ 
+        """
         Filter a list of cell specimens to those that optionally have morphologies
         or have morphological reconstructions.
 
@@ -133,7 +133,7 @@ class CellTypesApi(RmaApi):
 
     def get_ephys_features(self, dataframe=False):
         """
-        Query the API for the full table of EphysFeatures for all cells.  
+        Query the API for the full table of EphysFeatures for all cells.
 
         Parameters
         ----------
@@ -185,7 +185,7 @@ class CellTypesApi(RmaApi):
             ID of the specimen, from the Specimens database model in the Allen Institute API.
 
         file_name: str
-            Path to save the NWB file.  
+            Path to save the NWB file.
         """
 
         dirname = os.path.dirname(file_name)
@@ -210,7 +210,7 @@ class CellTypesApi(RmaApi):
 
     def save_reconstruction(self, specimen_id, file_name):
         """
-        Save the morphological reconstruction of a cell as an SWC file.  
+        Save the morphological reconstruction of a cell as an SWC file.
 
         Parameters
         ----------
@@ -218,7 +218,7 @@ class CellTypesApi(RmaApi):
             ID of the specimen, from the Specimens database model in the Allen Institute API.
 
         file_name: str
-            Path to save the SWC file.  
+            Path to save the SWC file.
         """
 
         try:

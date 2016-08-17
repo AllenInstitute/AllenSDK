@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -33,23 +33,23 @@ class NwbDataSet(object):
            NWB file name
         """
         self.file_name = file_name
-        if spike_time_key == None:
+        if spike_time_key is None:
             self.spike_time_key = NwbDataSet.SPIKE_TIMES
         else:
             self.spike_time_key = spike_time_key
 
     def get_sweep(self, sweep_number):
         """ Retrieve the stimulus, response, index_range, and sampling rate
-        for a particular sweep.  This method hides the NWB file's distinction 
+        for a particular sweep.  This method hides the NWB file's distinction
         between a "Sweep" and an "Experiment".  An experiment is a subset of
-        of a sweep that excludes the initial test pulse.  It also excludes 
+        of a sweep that excludes the initial test pulse.  It also excludes
         any erroneous response data at the end of the sweep (usually for
-        ramp sweeps, where recording was terminated mid-stimulus).  
+        ramp sweeps, where recording was terminated mid-stimulus).
 
-        Some sweeps do not have an experiment, so full data arrays are 
+        Some sweeps do not have an experiment, so full data arrays are
         returned.  Sweeps that have an experiment return full data arrays
-        (include the test pulse) with any erroneous data trimmed from the 
-        back of the sweep.  
+        (include the test pulse) with any erroneous data trimmed from the
+        back of the sweep.
 
         Parameters
         ----------
@@ -100,9 +100,9 @@ class NwbDataSet(object):
             }
 
     def set_sweep(self, sweep_number, stimulus, response):
-        """ Overwrite the stimulus or response of an NWB file.  
+        """ Overwrite the stimulus or response of an NWB file.
         If the supplied arrays are shorter than stored arrays,
-        they are padded with zeros to match the original data 
+        they are padded with zeros to match the original data
         size.
 
         Parameters
@@ -144,7 +144,7 @@ class NwbDataSet(object):
                 swp['response']['timeseries']['data'][...] = response
 
     def get_spike_times(self, sweep_number, key=None):
-        """ Return any spike times stored in the NWB file for a sweep.  
+        """ Return any spike times stored in the NWB file for a sweep.
 
         Parameters
         ----------
@@ -159,7 +159,7 @@ class NwbDataSet(object):
            list of spike times in seconds relative to the start of the sweep
         """
 
-        if key == None:
+        if key is None:
             key = self.spike_time_key
 
         with h5py.File(self.file_name, 'r') as f:
@@ -186,7 +186,7 @@ class NwbDataSet(object):
            array of spike times in seconds
         """
 
-        if key == None:
+        if key is None:
             key = self.spike_time_key
 
         with h5py.File(self.file_name, 'r+') as f:
@@ -254,8 +254,8 @@ class NwbDataSet(object):
 
     def get_sweep_metadata(self, sweep_number):
         """ Retrieve the sweep level metadata associated with each sweep.
-        Includes information on stimulus parameters like its name and amplitude 
-        as well as recording quality metadata, like access resistance and 
+        Includes information on stimulus parameters like its name and amplitude
+        as well as recording quality metadata, like access resistance and
         seal quality.
 
         Parameters
@@ -265,7 +265,7 @@ class NwbDataSet(object):
         Returns
         -------
         dict
-            A dictionary with 'aibs_stimulus_amplitude_pa', 'aibs_stimulus_name', 
+            A dictionary with 'aibs_stimulus_amplitude_pa', 'aibs_stimulus_name',
             'gain', 'initial_access_resistance', 'seal' elements.  These specific
             fields are ones encoded in the original AIBS in vitro .nwb files.
         """

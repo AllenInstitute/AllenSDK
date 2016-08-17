@@ -36,10 +36,10 @@ class ManifestBuilder(object):
             'type': typename,
             'spec': spec}
 
-        if format != None:
+        if format is not None:
             entry['format'] = format
 
-        if parent_key != None:
+        if parent_key is not None:
             entry['parent_key'] = parent_key
 
         self.path_info.append(entry)
@@ -50,7 +50,7 @@ class ManifestBuilder(object):
     def write_json_file(self, path, overwrite=False):
         mode = 'wb'
 
-        if overwrite == True:
+        if overwrite is True:
             mode = 'wb+'
 
         json_string = self.write_json_string()

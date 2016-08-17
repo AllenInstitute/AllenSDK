@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -17,7 +17,6 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
-import allensdk.core.json_utilities as json_utilities
 
 
 class Ontology(object):
@@ -43,7 +42,7 @@ class Ontology(object):
         self.descendant_ids = dict(descendant_ids)
 
     def __getitem__(self, structures):
-        """ 
+        """
         Return a subset of structures by id or acronym. Duplicate values are ignored.
 
         Parameters
@@ -102,7 +101,7 @@ class Ontology(object):
 
     def get_descendant_ids(self, structure_ids):
         """
-        Find the set of the ids of structures that are descendants of one or more structures.  
+        Find the set of the ids of structures that are descendants of one or more structures.
         The returned set will include the input structure ids.
 
         Parameters
@@ -150,7 +149,7 @@ class Ontology(object):
 
     def get_descendants(self, structure_ids):
         """
-        Find the set of structures that are descendants of one or more structures.  
+        Find the set of structures that are descendants of one or more structures.
         The returned set will include the input structures.
 
         Parameters

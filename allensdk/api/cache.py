@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -62,7 +62,7 @@ class Cache(object):
         -------
         Manifest
         '''
-        if file_name != None:
+        if file_name is not None:
             if not os.path.exists(file_name):
 
                 # make the directory if it doesn't exist already
@@ -105,7 +105,7 @@ class Cache(object):
             edited in place.
         new_old_name_tuples : list of string tuples (new, old)
         '''
-        if new_old_name_tuples == None:
+        if new_old_name_tuples is None:
             new_old_name_tuples = []
 
         for new_name, old_name in new_old_name_tuples:
@@ -175,7 +175,7 @@ class Cache(object):
         save_as_json : boolean, optional
             True (default) will save data as json, False as csv
         return_dataframe : boolean, optional
-            True will cast the return value to a pandas dataframe, False (default) will not 
+            True will cast the return value to a pandas dataframe, False (default) will not
         index : string, optional
             column to use as the pandas index
         rename : list of string tuples, optional
@@ -192,10 +192,10 @@ class Cache(object):
         -----
         Column renaming happens after the file is reloaded for json
         '''
-        if cache == True:
+        if cache is True:
             json_data = fn(**kwargs)
 
-            if save_as_json == True:
+            if save_as_json is True:
                 ju.write(path, json_data)
             else:
                 df = pd.DataFrame(json_data)
@@ -207,15 +207,15 @@ class Cache(object):
                 df.to_csv(path)
 
         # read it back in
-        if save_as_json == True:
-            if return_dataframe == True:
+        if save_as_json is True:
+            if return_dataframe is True:
                 data = pj.read_json(path, orient='records')
                 self.rename_columns(data, rename)
-                if index != None:
+                if index is not None:
                     data.set_index([index], inplace=True)
             else:
                 data = ju.read(path)
-        elif return_dataframe == True:
+        elif return_dataframe is True:
             data = pd.DataFrame.from_csv(path)
         else:
             raise ValueError(

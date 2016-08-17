@@ -1,8 +1,21 @@
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 import numpy as np
-import matplotlib.pyplot as plt
 import scipy.sparse as sparse
 from scipy.linalg import solve_banded
-from scipy.stats import linregress as linregress
 import logging
 
 
@@ -127,7 +140,7 @@ def validate_with_synthetic_F(T, N):
 
 
 def synthesize_F(T, af1, af2, p1=0.05, p2=0.1):
-    """ Build a synthetic F_C, F_M, F_N, and r of length T  
+    """ Build a synthetic F_C, F_M, F_N, and r of length T
     TODO: docs
     """
     x1 = np.random.random(T) < p1
@@ -213,7 +226,7 @@ class NeuropilSubtract(object):
 
             if r is not None:
                 delta_r = np.abs(r - new_r) / r
-
+i
             r = new_r
             it += 1
 
@@ -300,7 +313,7 @@ def estimate_contamination_ratios(F_M, F_N,
 
     Parameters
     ----------
-       F_M: ROI trace       
+       F_M: ROI trace
        F_N: Neuropil trace
 
     Returns

@@ -25,7 +25,7 @@ from allensdk.brain_observatory.brain_observatory_exceptions \
 
 
 class StaticGratings(StimulusAnalysis):
-    """ Perform tuning analysis specific to static gratings stimulus. 
+    """ Perform tuning analysis specific to static gratings stimulus.
 
     Parameters
     ----------
@@ -54,7 +54,7 @@ class StaticGratings(StimulusAnalysis):
         self.peak = self.get_peak()
 
     def get_response(self):
-        ''' Computes the mean response for each cell to each stimulus condition.  Return is 
+        ''' Computes the mean response for each cell to each stimulus condition.  Return is
         a (# orientations, # spatial frequencies, # phasees, # cells, 3) np.ndarray.  The final dimension
         contains the mean response to the condition (index 0), standard error of the mean of the response
         to the condition (index 1), and p value of the response to that condition (index 3).
@@ -97,11 +97,11 @@ class StaticGratings(StimulusAnalysis):
 
         Returns
         -------
-        Panda data frame with the following fields (_sg suffix is 
+        Panda data frame with the following fields (_sg suffix is
         for static grating):
             * ori_sg (orientation)
             * sf_sg (spatial frequency)
-            * phase_sg 
+            * phase_sg
             * response_variability_sg
             * osi_sg (orientation selectivity index)
             * peak_dff_sg (peak dF/F)

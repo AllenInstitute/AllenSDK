@@ -1,4 +1,4 @@
-# Copyright 2014-2015 Allen Institute for Brain Science
+# Copyright 2014-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ import pandas as pd
 
 
 class Manifest(object):
-    """Manages the location of external files 
+    """Manages the location of external files
      referenced in an Allen SDK configuration """
 
     DIR = 'dir'
@@ -33,7 +33,7 @@ class Manifest(object):
         self.path_info = {}
         self.relative_base_dir = relative_base_dir
 
-        if config != None:
+        if config is not None:
             self.load_config(config)
 
     def load_config(self, config):
@@ -113,7 +113,7 @@ class Manifest(object):
             path = os.path.join(*path_args)
 
         # TODO: relative paths need to be considered better
-        if absolute == True:
+        if absolute is True:
             path = os.path.abspath(path)
         else:
             path = os.path.abspath(os.path.join(self.relative_base_dir, path))
@@ -124,7 +124,7 @@ class Manifest(object):
         self.path_info[key] = {'type': path_type,
                                'spec': path}
 
-        if path_type == Manifest.FILE and path_format != None:
+        if path_type == Manifest.FILE and path_format is not None:
             self.path_info[key]['format'] = path_format
 
     def add_paths(self, path_info):
@@ -147,7 +147,7 @@ class Manifest(object):
             entry = {'type': path_data['type'],
                      'spec': path_data['spec']
                      }
-            if path_format != None:
+            if path_format is not None:
                 entry['format'] = path_format
 
             self.path_info[path_key] = entry
@@ -211,7 +211,7 @@ class Manifest(object):
         '''
         path_spec = self.path_info[path_key]['spec']
 
-        if args != None and len(args) != 0:
+        if args is not None and len(args) != 0:
             path = path_spec % args
         else:
             path = path_spec
@@ -282,7 +282,7 @@ class Manifest(object):
         if not os.path.exists(dir_path):
             Manifest.log.fatal('Directory %s does not exist; exiting.' %
                                (dir_path))
-            if do_exit == True:
+            if do_exit is True:
                 quit()
 
     def resolve_paths(self, description_dict, suffix='_key'):

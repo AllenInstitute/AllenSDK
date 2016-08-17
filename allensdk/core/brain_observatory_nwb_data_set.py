@@ -18,7 +18,6 @@ import pandas as pd
 import numpy as np
 import allensdk.brain_observatory.roi_masks as roi
 import itertools
-from collections import defaultdict
 from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 import allensdk.brain_observatory.stimulus_info as si
 import dateutil
@@ -58,7 +57,7 @@ class BrainObservatoryNwbDataSet(object):
         self.nwb_file = nwb_file
 
     def get_fluorescence_traces(self, cell_specimen_ids=None):
-        ''' Returns an array of fluorescence traces for all ROI and 
+        ''' Returns an array of fluorescence traces for all ROI and
         the timestamps for each datapoint
 
         Parameters
@@ -90,7 +89,7 @@ class BrainObservatoryNwbDataSet(object):
         return timestamps, cell_traces
 
     def get_neuropil_traces(self, cell_specimen_ids=None):
-        ''' Returns an array of fluorescence traces for all ROIs 
+        ''' Returns an array of fluorescence traces for all ROIs
         and the timestamps for each datapoint
 
         Parameters
@@ -122,7 +121,7 @@ class BrainObservatoryNwbDataSet(object):
         return timestamps, np_traces
 
     def get_corrected_fluorescence_traces(self, cell_specimen_ids=None):
-        ''' Returns an array of neuropil-corrected fluorescence traces 
+        ''' Returns an array of neuropil-corrected fluorescence traces
         for all ROIs and the timestamps for each datapoint
 
         Parameters
@@ -164,7 +163,7 @@ class BrainObservatoryNwbDataSet(object):
         return timestamps, fc
 
     def get_cell_specimen_indices(self, cell_specimen_ids):
-        ''' Given a list of cell specimen ids, return their index based on their order in this file.  
+        ''' Given a list of cell specimen ids, return their index based on their order in this file.
 
         Parameters
         ----------
@@ -183,7 +182,7 @@ class BrainObservatoryNwbDataSet(object):
         return inds
 
     def get_dff_traces(self, cell_specimen_ids=None):
-        ''' Returns an array of dF/F traces for all ROIs and 
+        ''' Returns an array of dF/F traces for all ROIs and
         the timestamps for each datapoint
 
         Parameters
@@ -264,7 +263,7 @@ class BrainObservatoryNwbDataSet(object):
         return max_projection
 
     def list_stimuli(self):
-        ''' Return a list of the stimuli presented in the experiment. 
+        ''' Return a list of the stimuli presented in the experiment.
 
         Returns
         -------
@@ -443,8 +442,8 @@ class BrainObservatoryNwbDataSet(object):
         return roi_array
 
     def get_metadata(self):
-        ''' Returns a dictionary of meta data associated with each 
-        experiment, including Cre line, specimen number, 
+        ''' Returns a dictionary of meta data associated with each
+        experiment, including Cre line, specimen number,
         visual area imaged, imaging depth
 
         Returns
@@ -672,14 +671,14 @@ def mask_stimulus_template(template_display_coords, template_shape, display_mask
         list of (x,y) display coordinates
 
     template_shape: tuple
-        (width,height) of the display template  
+        (width,height) of the display template
 
     display_mask: np.ndarray
         boolean 2D mask indicating which display coordinates are on screen after warping.
 
     threshold: float
         Fraction of pixels associated with a template display coordinate that should remain
-        on screen to count as belonging to the mask. 
+        on screen to count as belonging to the mask.
 
     Returns
     -------

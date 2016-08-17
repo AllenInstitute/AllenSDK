@@ -1,3 +1,18 @@
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import os
 import argparse
@@ -12,7 +27,7 @@ def movingmode_fast(x, kernelsize, y):
     """ Compute the windowed mode of an array.  A running mode is initialized
     with a histogram of values over the initial kernelsize/2 values.  The mode
     is then updated as the kernel moves by adding and subtracting values from
-    the histogram. 
+    the histogram.
 
     Parameters
     ----------
@@ -145,8 +160,8 @@ def plot_onetrace(dff, fc):
 
 
 def compute_dff(traces, save_plot_dir=None, mode_kernelsize=5400, mean_kernelsize=3000):
-    """ Compute dF/F of a set of traces using a low-pass windowed-mode operator. 
-    The operation is basically:  
+    """ Compute dF/F of a set of traces using a low-pass windowed-mode operator.
+    The operation is basically:
 
         T_mm = windowed_mean(windowed_mode(T))
 

@@ -136,28 +136,28 @@ class OntologiesApi(RmaTemplate):
         -----
         Only one of the methods of limiting the query should be used at a time.
         '''
-        if structure_graph_ids != None:
+        if structure_graph_ids is not None:
             data = self.template_query('ontology_queries',
                                        'structures_by_graph_ids',
                                        graph_ids=structure_graph_ids,
                                        order=order,
                                        num_rows=num_rows,
                                        count=count)
-        elif structure_graph_names != None:
+        elif structure_graph_names is not None:
             data = self.template_query('ontology_queries',
                                        'structures_by_graph_names',
                                        graph_names=structure_graph_names,
                                        order=order,
                                        num_rows=num_rows,
                                        count=count)
-        elif structure_set_ids != None:
+        elif structure_set_ids is not None:
             data = self.template_query('ontology_queries',
                                        'structures_by_set_ids',
                                        set_ids=structure_set_ids,
                                        order=order,
                                        num_rows=num_rows,
                                        count=count)
-        elif structure_set_names != None:
+        elif structure_set_names is not None:
             data = self.template_query('ontology_queries',
                                        'structures_by_set_names',
                                        set_names=structure_set_names,
@@ -208,7 +208,7 @@ class OntologiesApi(RmaTemplate):
         `table of available Atlases <http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies>`_.
         See also: `Class: Atlas <http://api.brain-map.org/doc/Atlas.html>`_
         '''
-        if brief == True:
+        if brief is True:
             data = self.template_query('ontology_queries',
                                        'atlases_table',
                                        atlas_ids=atlas_ids)

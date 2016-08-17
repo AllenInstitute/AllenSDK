@@ -36,7 +36,7 @@ class Description(object):
         section : string, optional
             What configuration section to read it into if the file does not specify.
         '''
-        if section == None:
+        if section is None:
             for (section, entries) in data.items():
                 if not section in self.data:
                     self.data[section] = entries
@@ -73,7 +73,7 @@ class Description(object):
         section : string, optional.
             If this is present, place data within an existing section array.
         '''
-        if section == None:
+        if section is None:
             self.unpack_manifest(data)
             self.update_data(data)
         else:

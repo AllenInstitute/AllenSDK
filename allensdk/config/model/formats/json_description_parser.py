@@ -45,7 +45,7 @@ class JsonDescriptionParser(DescriptionParser):
 
         Section is only specified for "bare" objects that are to be added to a section array.
         '''
-        if description == None:
+        if description is None:
             description = Description()
 
         data = JsonComments.read_file(file_path)
@@ -72,7 +72,7 @@ class JsonDescriptionParser(DescriptionParser):
 
         Section is only specified for "bare" objects that are to be added to a section array.
         '''
-        if description == None:
+        if description is None:
             description = Description()
 
         data = JsonComments.read_string(json_string)

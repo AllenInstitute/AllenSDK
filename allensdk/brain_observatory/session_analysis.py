@@ -18,21 +18,20 @@ from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 from allensdk.brain_observatory.natural_scenes import NaturalScenes
 from allensdk.brain_observatory.drifting_gratings import DriftingGratings
 from allensdk.brain_observatory.natural_movie import NaturalMovie
-
-from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+from allensdk.core.brain_observatory_nwb_data_set \
+    import BrainObservatoryNwbDataSet
 import allensdk.brain_observatory.stimulus_info as stimulus_info
-from allensdk.brain_observatory.brain_observatory_exceptions import BrainObservatoryAnalysisException
+from allensdk.brain_observatory.brain_observatory_exceptions \
+    import BrainObservatoryAnalysisException
 import allensdk.brain_observatory.brain_observatory_plotting as cp
 import argparse
 import logging
 import os
-import sys
-import numpy as np
 
 
 def multi_dataframe_merge(dfs):
     out_df = None
-    for i, df in enumerate(dfs):
+    for _, df in enumerate(dfs):
         if out_df is None:
             out_df = df
         else:

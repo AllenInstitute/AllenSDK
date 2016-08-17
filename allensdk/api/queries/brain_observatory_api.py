@@ -124,7 +124,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         Returns
         -------
-        dict : ophys experiment metadata        
+        dict : ophys experiment metadata
         '''
         data = self.template_query('brain_observatory_queries',
                                    'ophys_experiment_by_ids',
@@ -142,7 +142,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         Returns
         -------
-        dict : isi experiment metadata        
+        dict : isi experiment metadata
         '''
         data = self.template_query('brain_observatory_queries',
                                    'isi_experiment_by_ids',
@@ -160,7 +160,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         Returns
         -------
-        dict : neuronal model metadata        
+        dict : neuronal model metadata
         '''
         data = self.template_query('brain_observatory_queries',
                                    'list_isi_experiments')
@@ -175,7 +175,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         Returns
         -------
-        list : api class name strings        
+        list : api class name strings
         '''
         data = self.template_query('brain_observatory_queries',
                                    'column_definition_class_names')
@@ -194,7 +194,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         Returns
         -------
-        dict : column definition metadata        
+        dict : column definition metadata
         '''
         data = self.template_query('brain_observatory_queries',
                                    'column_definitions',
@@ -213,7 +213,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         Returns
         -------
-        dict : stimulus mapping metadata        
+        dict : stimulus mapping metadata
         '''
         data = self.template_query('brain_observatory_queries',
                                    'stimulus_mapping',
@@ -231,7 +231,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         Returns
         -------
-        dict : cell metric metadata        
+        dict : cell metric metadata
         '''
         self._log.warning(
             "Downloading metrics and metadata for all cells. This can take some time.")
@@ -252,7 +252,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         Returns
         -------
-        dict : experiment container metadata        
+        dict : experiment container metadata
         '''
         data = self.template_query('brain_observatory_queries',
                                    'experiment_container',
@@ -270,7 +270,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         Returns
         -------
-        dict : isi experiment metadata        
+        dict : isi experiment metadata
         '''
         data = self.template_query('brain_observatory_queries',
                                    'experiment_container_metric',

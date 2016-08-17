@@ -29,7 +29,7 @@ def grid_data():
 
 
 def test_api_doc_url_download_expression_grid(grid_data):
-    '''Url to download the 200um density volume 
+    '''Url to download the 200um density volume
        for the Mouse Brain Atlas SectionDataSet 69816930.
 
     Notes

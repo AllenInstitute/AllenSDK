@@ -57,7 +57,7 @@ class PycfgDescriptionParser(DescriptionParser):
             Configuration object.
         '''
 
-        if description == None:
+        if description is None:
             description = Description()
 
         header = kwargs.get('header', '')

@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -39,7 +39,7 @@ class ImageDownloadApi(RmaApi):
         section_image_id : integer
             Image to download.
         file_path : string, optional
-            where to put it            
+            where to put it
         downsample : int, optional
             Number of times to downsample the original image.
         quality : int, optional
@@ -94,9 +94,9 @@ class ImageDownloadApi(RmaApi):
         The default range values can be determined by referring to the following fields
         on the Equalization model associated with the SectionDataSet:
         red_lower, red_uppper, green_lower, green_upper, blue_lower, blue_upper.
-        For more information, see the 
+        For more information, see the
         `Image Controls <http://help.brain-map.org/display/mouseconnectivity/Projection#Projection-ImageControls>`_
-        section of the Allen Mouse Brain Connectivity Atlas: 
+        section of the Allen Mouse Brain Connectivity Atlas:
         `Projection Dataset <http://help.brain-map.org/display/mouseconnectivity/Projection>`_
         help topic.
         '''
@@ -104,17 +104,17 @@ class ImageDownloadApi(RmaApi):
 
         downsample = kwargs.get('downsample', None)
 
-        if downsample != None:
+        if downsample is not None:
             params.append('downsample=%d' % (downsample))
 
         quality = kwargs.get('quality', None)
 
-        if quality != None:
+        if quality is not None:
             params.append('quality=%d' % (quality))
 
         expression = kwargs.get('expression', None)
 
-        if expression != None:
+        if expression is not None:
             if expression:
                 params.append('expression=true')
             else:
@@ -123,7 +123,7 @@ class ImageDownloadApi(RmaApi):
         # region of interest
         for roi_key in ['left', 'top', 'width', 'height']:
             roi_value = kwargs.get(roi_key, None)
-            if roi_value != None:
+            if roi_value is not None:
                 params.append('%s=%d' % (roi_key, roi_value))
 
         range_list = kwargs.get('range', None)
@@ -135,7 +135,7 @@ class ImageDownloadApi(RmaApi):
 
         tumor_feature_annotation = kwargs.get('tumor_feature_annotation', None)
 
-        if tumor_feature_annotation != None:
+        if tumor_feature_annotation is not None:
             if tumor_feature_annotation:
                 params.append('tumor_feature_annotation=true')
             else:
@@ -143,7 +143,7 @@ class ImageDownloadApi(RmaApi):
 
         tumor_feature_boundary = kwargs.get('tumor_feature_boundary', None)
 
-        if tumor_feature_boundary != None:
+        if tumor_feature_boundary is not None:
             if tumor_feature_boundary:
                 params.append('tumor_feature_boundary=true')
             else:
@@ -159,7 +159,7 @@ class ImageDownloadApi(RmaApi):
                              str(section_image_id),
                              url_params])
 
-        if file_path == None:
+        if file_path is None:
             file_path = '%d.jpg' % (section_image_id)
 
         self.retrieve_file_over_http(image_url, file_path)
@@ -176,7 +176,7 @@ class ImageDownloadApi(RmaApi):
         atlas_image_id : integer
             Image to download.
         file_path : string, optional
-            where to put it            
+            where to put it
         annotation : boolean, optional
             True to retrieve the specified AtlasImage with annotations.
         atlas : integer, optional
@@ -235,26 +235,26 @@ class ImageDownloadApi(RmaApi):
 
         projection = kwargs.get('projection', None)
 
-        if projection != None:
-            if projection == True:
+        if projection is not None:
+            if projection is True:
                 params.append('projection=true')
             else:
                 params.append('projection=false')
 
         downsample = kwargs.get('downsample', None)
 
-        if downsample != None:
+        if downsample is not None:
             params.append('downsample=%d' % (downsample))
 
         quality = kwargs.get('quality', None)
 
-        if quality != None:
+        if quality is not None:
             params.append('quality=%d' % (quality))
 
         # region of interest
         for roi_key in ['left', 'top', 'width', 'height']:
             roi_value = kwargs.get(roi_key, None)
-            if roi_value != None:
+            if roi_value is not None:
                 params.append('%s=%d' % (roi_key, roi_value))
 
         if len(params) > 0:
@@ -267,7 +267,7 @@ class ImageDownloadApi(RmaApi):
                        str(atlas_image_id),
                        url_params])
 
-        if file_path == None:
+        if file_path is None:
             file_path = '%d.jpg' % (atlas_image_id)
 
         self.retrieve_file_over_http(url, file_path)
@@ -284,7 +284,7 @@ class ImageDownloadApi(RmaApi):
         atlas_image_id : integer
             Image to download.
         file_path : string, optional
-            where to put it.  default is id.jpg            
+            where to put it.  default is id.jpg
         projection : boolean, optional
             True to retrieve the specified SectionImage with projection.
         downsample : int, optional
@@ -341,31 +341,31 @@ class ImageDownloadApi(RmaApi):
 
         annotation = kwargs.get('annotation', None)
 
-        if annotation != None:
-            if annotation == True:
+        if annotation is not None:
+            if annotation is True:
                 params.append('annotation=true')
             else:
                 params.append('annotation=false')
 
         atlas = kwargs.get('atlas', None)
 
-        if atlas != None:
+        if atlas is not None:
             params.append('atlas=%d' % (atlas))
 
         downsample = kwargs.get('downsample', None)
 
-        if downsample != None:
+        if downsample is not None:
             params.append('downsample=%d' % (downsample))
 
         quality = kwargs.get('quality', None)
 
-        if quality != None:
+        if quality is not None:
             params.append('quality=%d' % (quality))
 
         # region of interest
         for roi_key in ['left', 'top', 'width', 'height']:
             roi_value = kwargs.get(roi_key, None)
-            if roi_value != None:
+            if roi_value is not None:
                 params.append('%s=%d' % (roi_key, roi_value))
 
         if len(params) > 0:
@@ -378,7 +378,7 @@ class ImageDownloadApi(RmaApi):
                        str(projection_image_id),
                        url_params])
 
-        if file_path == None:
+        if file_path is None:
             file_path = '%d.jpg' % (projection_image_id)
 
         self.retrieve_file_over_http(url, file_path)
@@ -408,7 +408,7 @@ class ImageDownloadApi(RmaApi):
 
         stages = []
 
-        if image_type_name == None:
+        if image_type_name is None:
             atlas_stage = rma.model_stage('Atlas',
                                           criteria='[id$eq%d]' % (atlas_id),
                                           only=['image_type'])

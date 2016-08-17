@@ -44,7 +44,7 @@ _TID = NODE_TREE_ID
 
 ########################################################################
 def read_swc(file_name, columns="NOT_USED", numeric_columns="NOT_USED"):
-    """  
+    """
     Read in an SWC file and return a Morphology object.
 
     Parameters
@@ -125,8 +125,8 @@ class Compartment(dict):
 
 
 class Morphology(object):
-    """ 
-    Keep track of the list of compartments in a morphology and provide 
+    """
+    Keep track of the list of compartments in a morphology and provide
     a few helper methods (soma, tree information, pruning, etc).
     """
 
@@ -139,14 +139,14 @@ class Morphology(object):
     NODE_TYPES = [SOMA, AXON, DENDRITE, BASAL_DENDRITE, APICAL_DENDRITE]
 
     def __init__(self, compartment_list=None, compartment_index=None):
-        """ 
+        """
         Try to initialize from a list of compartments first, then from
         a dictionary indexed by compartment id if that fails, and finally just
         leave everything empty.
 
         Parameters
         ----------
-        compartment_list: list 
+        compartment_list: list
             list of compartment dictionaries
 
         compartment_index: dict
@@ -190,7 +190,7 @@ class Morphology(object):
 
     @property
     def compartment_list(self):
-        """ Return the compartment list.  This is a property to ensure that the 
+        """ Return the compartment list.  This is a property to ensure that the
         compartment list and compartment index are in sync. """
         return self._compartment_list
 
@@ -230,7 +230,7 @@ class Morphology(object):
         file while also being able to initialize from the compartment list
         of an existing Morphology object. As nodes in a morphology object
         contain reference to nodes in that object, make a shallow copy
-        of input nodes and overwrite known references (ie, the 
+        of input nodes and overwrite known references (ie, the
         'children' array)
         """
         self._compartment_list = []
@@ -257,7 +257,7 @@ class Morphology(object):
     # tree and node access
 
     def tree(self, n):
-        """ 
+        """
         Returns a list of all Morphology Nodes within the specified
         tree. A tree is defined as a fully connected graph of nodes.
         Each tree has exactly one root.
@@ -277,7 +277,7 @@ class Morphology(object):
         return self._tree_list[n]
 
     def node(self, n):
-        """ 
+        """
         Returns the morphology node having the specified ID.
 
         Parameters
@@ -354,8 +354,8 @@ class Morphology(object):
         return seg
 
     def change_parent(self, child, parent):
-        """ Change the parent of a node. The child node is adjusted to 
-        point to the new parent, the child is taken off of the previous 
+        """ Change the parent of a node. The child node is adjusted to
+        point to the new parent, the child is taken off of the previous
         parent's child list, and it is added to the new parent's child list.
 
         Parameters
@@ -381,8 +381,8 @@ class Morphology(object):
 
     # returns a list of nodes located within dist of x,y,z
     def find(self, x, y, z, dist, node_type=None):
-        """ Returns a list of Morphology Objects located within 'dist' 
-        of coordinate (x,y,z). If node_type is specified, the search 
+        """ Returns a list of Morphology Objects located within 'dist'
+        of coordinate (x,y,z). If node_type is specified, the search
         will be constrained to return only nodes of that type.
 
         Parameters
@@ -394,7 +394,7 @@ class Morphology(object):
             The search radius
 
         node_type: enum (optional)
-            One of the following constants: SOMA, AXON, DENDRITE, 
+            One of the following constants: SOMA, AXON, DENDRITE,
             BASAL_DENDRITE or APICAL_DENDRITE
 
         Returns
@@ -442,7 +442,7 @@ class Morphology(object):
         return {c[NODE_ID]: c for c in self._compartment_list if c[NODE_TYPE] == compartment_type}
 
     def save(self, file_name):
-        """ Write this morphology out to an SWC file 
+        """ Write this morphology out to an SWC file
 
         Parameters
         ----------
@@ -477,7 +477,7 @@ class Morphology(object):
            Reassign ids so that ids are continuous (no missing id numbers).
 
         Returns
-        -------   
+        -------
         Morphology
             A new morphology instance
         """
@@ -530,9 +530,9 @@ class Morphology(object):
 
     def _reconstruct(self):
         """
-        internal function that restructures data and establishes 
-        appropriate internal linking. data is re-order, removing 'holes' 
-        in sequence so that each object ID corresponds to its position 
+        internal function that restructures data and establishes
+        appropriate internal linking. data is re-order, removing 'holes'
+        in sequence so that each object ID corresponds to its position
         in compartment list. trees are (re)calculated
         parent-child indices are recalculated as is compartment table
         construct a map between new and old IDs
@@ -667,12 +667,12 @@ class Morphology(object):
         Parameters
         ----------
         node_type: enum
-            The compartment type to keep in the morphology. 
-            Use one of the following constants: SOMA, AXON, DENDRITE, 
+            The compartment type to keep in the morphology.
+            Use one of the following constants: SOMA, AXON, DENDRITE,
             BASAL_DENDRITE, or APICAL_DENDRITE
 
         keep_soma: Boolean (optional)
-            True (default) if soma nodes should remain in the 
+            True (default) if soma nodes should remain in the
             morpyhology, and False if the soma should also be stripped
         """
         flagged_for_removal = {}
@@ -701,7 +701,7 @@ class Morphology(object):
     # strip out the specified SWC type
     def strip_type(self, node_type):
         """ Strips all compartments of the specified type from the
-        morphology. 
+        morphology.
         Parent and child relationships are updated accordingly, creating
         new roots when necessary.
 
@@ -732,20 +732,20 @@ class Morphology(object):
 
     # strip out the specified SWC type
     def convert_type(self, old_type, new_type):
-        """ Converts all compartments from one type to another. 
-        Nodes of the original type are not affected so this 
+        """ Converts all compartments from one type to another.
+        Nodes of the original type are not affected so this
         procedure can also be used as a merge procedure.
 
         Parameters
         ----------
         old_type: enum
             The compartment type to be changed.
-            Use one of the following constants: SOMA, AXON, DENDRITE, 
+            Use one of the following constants: SOMA, AXON, DENDRITE,
             BASAL_DENDRITE, or APICAL_DENDRITE
 
         new_type: enum
             The target compartment type.
-            Use one of the following constants: SOMA, AXON, DENDRITE, 
+            Use one of the following constants: SOMA, AXON, DENDRITE,
             BASAL_DENDRITE, or APICAL_DENDRITE
         """
         for seg in self.compartment_list:
@@ -753,7 +753,7 @@ class Morphology(object):
                 seg[NODE_TYPE] = new_type
 
     def apply_affine(self, aff, scale=None):
-        """ Apply an affine transform to all compartments in this 
+        """ Apply an affine transform to all compartments in this
         morphology. Node radius is adjusted as well.
 
         Format of the affine matrix is:
@@ -762,7 +762,7 @@ class Morphology(object):
         [x1 y1 z1]  [ty]
         [x2 y2 z2]  [tz]
 
-        where the left 3x3 the matrix defines the affine rotation 
+        where the left 3x3 the matrix defines the affine rotation
         and scaling, and the right column is the translation
         vector.
 

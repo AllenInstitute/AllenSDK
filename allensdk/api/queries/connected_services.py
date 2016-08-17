@@ -28,7 +28,7 @@ class ConnectedServices(object):
     `Service Pipelines <http://help.brain-map.org/display/api/Service+Pipelines>`_.
 
     Connected Services only include API services that are accessed
-    via the RMA endpoint using an rma::services stage. 
+    via the RMA endpoint using an rma::services stage.
     '''
     ARRAY = 'array'
     STRING = 'string'
@@ -51,7 +51,7 @@ class ConnectedServices(object):
 
         for parameter in schema_entry['parameters']:
             value = kwargs.get(parameter['name'], None)
-            if value != None:
+            if value is not None:
                 params.append((parameter['name'], value))
 
         service_stage = rma.service_stage(service_name,
