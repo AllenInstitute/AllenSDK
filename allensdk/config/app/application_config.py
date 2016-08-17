@@ -14,27 +14,30 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from allensdk.core.json_utilities import JsonComments
-
+import argparse
+import os
+import io
+import logging
+import logging.config as lc
+from pkg_resources import resource_filename  # @UnresolvedImport
 try:
-    from ConfigParser import ConfigParser # Python 2
+    from configparser import ConfigParser  # @UnresolvedImport
 except:
-    from configparser import ConfigParser # Python 3 #@UnresolvedImport
+    from ConfigParser import ConfigParser  # @UnresolvedImport
 
-import argparse, os, io
-import logging, logging.config as lc
-from pkg_resources import resource_filename #@UnresolvedImport
 
 class ApplicationConfig(object):
     ''' Convenience class that handles of application configuration
     from environment variables, .conf files and the command line
     using Python standard libraries and formats.
     '''
-    
+
     _log = logging.getLogger(__name__)
-    _DEFAULT_LOG_CONFIG = os.getenv('LOG_CFG', resource_filename(__name__, 'logging.conf'))
+    _DEFAULT_LOG_CONFIG = os.getenv(
+        'LOG_CFG', resource_filename(__name__, 'logging.conf'))
     lc.fileConfig(_DEFAULT_LOG_CONFIG)
-    
-    def __init__(self, 
+
+    def __init__(self,
                  defaults,
                  name="app",
                  halp="Run application.",
@@ -42,12 +45,13 @@ class ApplicationConfig(object):
         self.application_name = name
         self.help = halp
         self.debug_enabled = False
-    
-        if default_log_config == None:
+
+        if default_log_config is None:
             default_log_config = ApplicationConfig._DEFAULT_LOG_CONFIG
-        
-        ApplicationConfig._log.info("default log config: %s" % (default_log_config))
-        
+
+        ApplicationConfig._log.info(
+            "default log config: %s" % (default_log_config))
+
         self.defaults = {
             'config_file_path': {
                 'default': "%s.conf" % (self.application_name),
@@ -58,30 +62,29 @@ class ApplicationConfig(object):
                 'help': 'logging configuration path'
             }
         }
-        
+
         self.defaults.update(defaults)
-        
+
         logging.info("defaults: %s" % (self.defaults))
-        
+
         self.argparser = self.create_argparser()
-                
+
         for key, value in self.defaults.items():
             setattr(self, key, value['default'])
-    
-    
+
     def load(self, command_line_args, disable_existing_loggers=True):
         ''' Load application configuration options, first from the environment,
         then from the configuration file, then from the command line.
-            
+
         Each stage of loading can override the previous stage.
-        
+
         Parameters
         ----------
         command_line_args : dict
             Parameters passed to the application.
         disable_existing_loggers : boolean
             Reset the logging system or not.
-        
+
         Returns
         -------
         fileConfig
@@ -89,56 +92,55 @@ class ApplicationConfig(object):
         '''
         # read and apply options from the environment
         self.apply_configuration_from_environment()
-        
+
         # command line so we can find the config file.
         parsed_args = self.parse_command_line_args(command_line_args)
-        
+
         try:
             # read and apply the configuration file options
             config_file_path = parsed_args.config_file_path
-            
+
             if config_file_path:
                 self.config_file_path = config_file_path
-            
+
             self.apply_configuration_from_file(self.config_file_path)
-            
+
             # apply the remaining command line options
             self.apply_configuration_from_command_line(parsed_args)
         except Exception as e:
-            ApplicationConfig._log.error("Could not load configuration file: %s\n%s" % 
+            ApplicationConfig._log.error("Could not load configuration file: %s\n%s" %
                                          (parsed_args.config_file_path,
-                                         e))
+                                          e))
             raise
-        
+
         if parsed_args.log_config_path:
             try:
                 lc.fileConfig(self.log_config_path,
                               disable_existing_loggers=disable_existing_loggers)
             except:
                 logging.error("Could not load log configuration file: %s" %
-                             (parsed_args.log_config_path))
+                              (parsed_args.log_config_path))
         else:
             # TODO: configure default logging
             pass
-    
-    
+
     def create_argparser(self):
         '''Initialization for the command-line parsing stage.
-        
-        An application specific prefix is applied to argument names. 
-        
+
+        An application specific prefix is applied to argument names.
+
         Parameters
         ----------
         prog : string
             Application specific prefix for argument names.
         description : string
             A brief 'help' description of the application.
-        
+
         Returns
         -------
         argParse.ArgumentParser
             The initialized argument parser object.
-        
+
         Notes
         -----
         Defaults are set at the first environment reading.
@@ -148,118 +150,115 @@ class ApplicationConfig(object):
                                          description=self.help)
         for key, value in self.defaults.items():
             if key == 'config_file_path':
-                parser.add_argument("%s" % (key), default=None, help=value['help'])
+                parser.add_argument(
+                    "%s" % (key), default=None, help=value['help'])
             else:
-                parser.add_argument("--%s" % (key), default=None, help=value['help'])
-       
+                parser.add_argument("--%s" %
+                                    (key), default=None, help=value['help'])
+
         return parser
-    
-    
+
     def parse_command_line_args(self, args):
         '''Simply call the internal argparser object.
-        
+
         Parameters
         ----------
         args : array
             Parameters passed to the application.
-        
+
         Returns
         -------
         Namespace
             Parsed paramenters.
         '''
         return self.argparser.parse_args(args)
-    
-    
+
     def apply_configuration_from_command_line(self, parsed_args):
         '''Read application configuration variables from the command line.
-        
+
         Unassigned variables are left unchanged if previously assigned,
         set to their default values,
         or None if no default is specified at init time.
         Assigned variables will overwrite the previous value.
-        
+
         see: https://docs.python.org/2/howto/argparse.html
-        
+
         Parameters
         ----------
         parsed_args : dict
             the arguments as parsed from the command line.
-        
+
         '''
         logging.info('command_line args: %s' % (parsed_args))
-        
+
         for key in self.defaults:
             parsed_value = getattr(parsed_args, key)
             if parsed_value and getattr(self, key) is None:
                 setattr(self, key, parsed_value)
-    
-    
+
     def apply_configuration_from_environment(self):
         '''Read application configuration variables from the environment.
-        
-        The variable names are upper case and have a 
+
+        The variable names are upper case and have a
         prefix defined by the application.
-            
+
         See: https://docs.python.org/2/library/os.html
         '''
         for key in self.defaults:
-            environment_variable = "%s_%s" % (self.application_name.upper(), key.upper())
+            environment_variable = "%s_%s" % (
+                self.application_name.upper(), key.upper())
             environment_value = os.environ.get(environment_variable)
             if environment_value:
                 setattr(self, key, environment_value)
-    
-    
+
     def from_json_file(self, json_path):
         '''Read an application configuration from a JSON format file.
-        
+
         Parameters
         ----------
         json_path : string
             Path to the JSON file.
-        
+
         Returns
         -------
         string
             An application configuration in INI format
-        
+
         '''
         description = JsonComments.read_file(json_path)
-        
+
         return self.to_config_string(description)
-    
-    
+
     def from_json_string(self, json_string):
         '''Read a configuration from a JSON format string.
-        
+
         Parameters
         ----------
         json_string : string
             A JSON-formatted string containing an application configuration.
-        
+
         Returns
         -------
         string
             An application configuration in INI format
         '''
         description = JsonComments.read_string(json_string)
-        
+
         return self.to_config_string(description)
-    
-    
+
     def to_config_string(self, description):
         '''Create a configuration string from a dict.
-        
+
         Parameters
         ----------
         description : dict
             Configuration options for an application.
-        
+
         Returns
         -------
         string
             Equivalent configuration as an INI format string
-        
+
         Notes
         -----
         The Python configparser library natively supports this functionality in Python 3.
@@ -267,70 +266,74 @@ class ApplicationConfig(object):
         if not 'biophys' in description:
             bps_config_string = '[biophys]\n\n'
             return bps_config_string
-        
+
         bps_config = description['biophys'][0]
-        
+
         cfg_array = ['[biophys]']
-        
+
         if 'log_config_path' in bps_config:
-            cfg_array.append(str('log_config_path: %s' % bps_config['log_config_path']))
-         
+            cfg_array.append(str('log_config_path: %s' %
+                                 bps_config['log_config_path']))
+
         if 'debug' in bps_config:
             cfg_array.append(str('debug: %s' % bps_config['debug']))
-         
+
         if 'model_file' in bps_config:
-            cfg_array.append(str('model_file: %s' % ','.join(bps_config['model_file'])))
-            
+            cfg_array.append(str('model_file: %s' %
+                                 ','.join(bps_config['model_file'])))
+
         cfg_array.append("\n")
-        
+
         bps_cfg_string = "\n".join(cfg_array)
         ApplicationConfig._log.info(bps_cfg_string)
-        
+
         return bps_cfg_string
-    
-    
+
     def apply_configuration_from_file(self, config_file_path):
         ''' Read application configuration variables from a .conf file.
-        
-        Unassigned variables are set to their default values 
+
+        Unassigned variables are set to their default values
         or None if no default is specified at init time.
         The variables are found in a section named by the application.
-        
+
         Parameters
         ----------
         config_file_path : string
             path to to an INI (.conf) or JSON format application config file.
-        
+
         Returns
         -------
-        
+
         see: https://docs.python.org/2/library/configparser.html
         '''
         none_defaults = {}
-        
+
         # defaults are set in environment
         # they are only overriden by the config file if present
         for key in self.defaults:
             none_defaults[key] = None
 
         logging.info("none_defaults: %s" % (none_defaults))
-            
+
         config = None
-        
+
         try:
-            config = ConfigParser(defaults=none_defaults, 
+            config = ConfigParser(defaults=none_defaults,
                                   allow_no_value=True)
         except:
-            logging.warn("This python installation does not support configuration defaults.")
+            logging.warn(
+                "This python installation does not support configuration defaults.")
             config = ConfigParser()
-        
+
         if config_file_path.endswith('.json'):
-            cfg_string = ""
             cfg_string = self.from_json_file(config_file_path)
-            config.readfp(io.BytesIO(cfg_string))
+            try:
+                config.readfp(io.BytesIO(cfg_string))
+            except (NameError, TypeError):
+                config.read_string(cfg_string)  # Python 3
         else:
             config.read(config_file_path)
-        
+
         for key in self.defaults:
             try:
                 file_value = config.get(self.application_name, key)

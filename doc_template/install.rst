@@ -26,11 +26,7 @@ To uninstall the SDK::
 Other Distribution Formats
 --------------------------
 
-The Allen SDK is also available from the source repository or as a downloadable .zip or .tar.gz archive.
-The package can also be `installed from these formats <https://packaging.python.org/en/latest/installing.html>`_.
-
-.. include:: links.rst
-
+The Allen SDK is also available from the Github source repository.
 
 Required Dependencies
 ---------------------
@@ -60,19 +56,22 @@ example Dockerfiles are available.
 
  #. Ensure you have Docker installed.
 
- #. Download one of the example Docker files:
-     * :download:`Ubuntu Standalone <./_static/examples/docker/Dockerfile.ubuntu>`.
-     * :download:`Neural Ensemble combined simulators <./_static/examples/docker/Dockerfile.neuralensemble>`.
-     * :download:`Neural Ensemble combined simulators with X11 <./_static/examples/docker/Dockerfile.neuralensemblex>`.
-
- #. Use Docker to build the image::
+ #. Use Docker to build the image one of the images.
  
-     mkdir docker_build
-     cp Dockerfile.ubuntu docker_build/Dockerfile
-     cd docker_build
-     docker build --tag alleninstitute/allensdk:ubuntu .
+     Anaconda::
      
+         docker build -t alleninstitute/allensdk:anaconda https://github.com/AllenInstitute/AllenSDK.git#v0.12.1:docker/anaconda
+ 
+     Other docker configurations are also available under docker directory in the source repository.
+ 
  #. Run the docker image::
  
-     docker run -it -v /data:/data alleninstitute/allensdk:ubuntu /bin/bash
-
+     docker run -i -t -p 8888:8888 -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
+     cd allensdk
+     make pytest_lax
+ 
+ #. Start a Jupyter Notebook::
+ 
+     cd allensdk/doc_template/examples/nb
+     jupyter-notebook --ip=* --no-browser
+     

@@ -1,9 +1,23 @@
+# Copyright 2015-2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 import numpy as np
-import pandas as pd
-from pandas import DataFrame, Series
+from pandas import DataFrame
 import warnings
 import logging
-from collections import defaultdict, Counter
+from collections import Counter
 
 import ephys_features as ft
 
@@ -15,7 +29,7 @@ SHORT_SQUARES_WINDOW_START = 1.02
 SHORT_SQUARES_WINDOW_END = 1.021
 
 
-class EphysSweepFeatureExtractor:    
+class EphysSweepFeatureExtractor:
     """Feature calculation for a sweep (voltage and/or current time series)."""
 
     def __init__(self, t=None, v=None, i=None, start=None, end=None, filter=10.,
@@ -311,7 +325,7 @@ class EphysSweepFeatureExtractor:
             return ft.average_voltage(v, t, baseline_end_time - self.baseline_interval,
                                       baseline_end_time)
         else:
-            log.info("Could not find sufficiently flat interval for automatic baseline voltage", RuntimeWarning)
+            logging.info("Could not find sufficiently flat interval for automatic baseline voltage", RuntimeWarning)
             return np.nan
 
     def voltage_deflection(self, deflect_type=None):
@@ -362,7 +376,7 @@ class EphysSweepFeatureExtractor:
         deflect_index = deflect_func(v_window) + start_index
 
         return self.v[deflect_index], deflect_index
-    
+
     def stimulus_amplitude(self):
         """ """
         if self.stimulus_amplitude_calculator is not None:
@@ -683,7 +697,7 @@ class EphysCellFeatureExtractor:
         ext = EphysSweepSetFeatureExtractor.from_sweeps(spiking_sweeps)
         self._ramps_ext = ext
 
-        self._features["ramps"]["spiking_sweeps"] = ext.sweeps() 
+        self._features["ramps"]["spiking_sweeps"] = ext.sweeps()
 
 
     def ramps_features(self):
@@ -756,7 +770,7 @@ class EphysCellFeatureExtractor:
         subthresh_sweeps = [sweep for sweep in ext.sweeps() if sweep.sweep_feature("avg_rate") == 0]
         subthresh_ext = EphysSweepSetFeatureExtractor.from_sweeps(subthresh_sweeps)
         self._subthreshold_long_squares_ext = subthresh_ext
-        
+
         if len(subthresh_ext.sweeps()) == 0:
             raise ft.FeatureError("No subthreshold long square sweeps, cannot evaluate cell features.")
 
@@ -818,7 +832,7 @@ class EphysCellFeatureExtractor:
             "short_squares": self._features["short_squares"].copy(),
             "ramps": self._features["ramps"].copy(),
             }
-        
+
         # convert feature extractor lists to sweep dictionarsweep extract lists
         ls_sweeps = [ s.as_dict() for s in out["long_squares"]["sweeps"] ]
         ls_spike_sweeps = [ s.as_dict() for s in out["long_squares"]["spiking_sweeps"] ]
@@ -835,7 +849,7 @@ class EphysCellFeatureExtractor:
         out["long_squares"]["rheobase_sweep"] = rheo_sweep
         out["short_squares"]["common_amp_sweeps"] = ss_sweeps
         out["ramps"]["spiking_sweeps"] = ramp_sweeps
-        
+
         return out
 
 
@@ -977,6 +991,3 @@ def _step_stim_amp(sweep):
 def _short_step_stim_amp(sweep):
     t_index = ft.find_time_index(sweep.t, sweep.start)
     return sweep.i[t_index + 1:].max()
-
-
-if __name__ == "__main__": pass

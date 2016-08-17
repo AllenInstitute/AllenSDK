@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -15,15 +15,14 @@
 
 import sys
 import math
-import copy
 import numpy as np
-import scipy.signal as signal 
+import scipy.signal as signal
 import logging
 
 # Design notes:
 # to generate an average feature file, all sweeps must have all features
-# to generate a fitness score of a sweep to a feature file,, the sweep 
-#   must have all features in the file. If one is absent, a penalty 
+# to generate a fitness score of a sweep to a feature file,, the sweep
+#   must have all features in the file. If one is absent, a penalty
 #   of TODO ??? will be assessed
 
 # set of features
@@ -43,7 +42,7 @@ class EphysFeatures( object ):
         #    'miss'    feature absent:
         #        'constant'        score = scoring['constant']
         #        'mean_mult'        score = mean * scoring['mean_mult']
-        # 
+        #
         self.scoring = {}
 
         self.name = name
@@ -102,7 +101,7 @@ class EphysFeatures( object ):
         self.glossary["upstroke_v"] = "Vm of peak upstroke (mV)"
         self.scoring["upstroke_v"] = perspike_score.copy()
         self.glossary["downstroke"] = "Peak downstroke (mV/ms)"
-        self.scoring["downstroke"] = perspike_score.copy()        
+        self.scoring["downstroke"] = perspike_score.copy()
         self.glossary["downstroke_v"] = "Vm of peak downstroke (mV)"
         self.scoring["downstroke_v"] = perspike_score.copy()
         self.glossary["threshold"] = "Threshold voltage (mV)"
@@ -121,17 +120,17 @@ class EphysFeatures( object ):
         self.scoring["rate"] = spike_score
 
     def print_out(self):
-        print "Features from " + self.name
+        print("Features from " + self.name)
         for k in self.mean.keys():
             if k in self.glossary:
-                str = "%30s = " % self.glossary[k]
-                if self.mean[k] != None:
-                    str += "%g" % self.mean[k]
+                st = "%30s = " % self.glossary[k]
+                if self.mean[k] is not None:
+                    st += "%g" % self.mean[k]
                 else:
-                    str += "--------"
-                if k in self.stdev and self.stdev[k] != None:
-                    str += " +/- %g" % self.stdev[k]
-                print str
+                    st += "--------"
+                if k in self.stdev and self.stdev[k] is not None:
+                    st += " +/- %g" % self.stdev[k]
+                print(st)
 
     # initialize summary feature set from file
     def clone(self, param_dict):
@@ -186,7 +185,7 @@ class EphysFeatureExtractor( object ):
         for i, temp in enumerate(temp_spk_idxs):
             if i == 0:
                 spk_idxs.append(temp)
-            elif np.any(dvdt[temp_spk_idxs[i - 1]:temp] < 0): 
+            elif np.any(dvdt[temp_spk_idxs[i - 1]:temp] < 0):
                 # check if the dvdt has gone back down below zero between presumed spike times
                 # sometimes the dvdt bobbles around detection threshold and produces spurious guesses at spike times
                 spk_idxs.append(temp)
@@ -215,7 +214,7 @@ class EphysFeatureExtractor( object ):
                 prev_idx = spk_idxs[spk_n - 1]
             else:
                 prev_idx = start_idx
-            
+
             # Find the peak
             peak_idx = np.argmax(v[spk_idx:next_idx]) + spk_idx
 
@@ -282,7 +281,7 @@ class EphysFeatureExtractor( object ):
                 continue
             # if the "spike" is less than 2 mV, don't count it
             if v[peak_idx] - v[threshold_idx] < 2.0:
-                continue 
+                continue
             # if the absolute value of the peak is less than -30 mV, don't count it
             if v[peak_idx] < -30.0:
                 continue
@@ -302,11 +301,11 @@ class EphysFeatureExtractor( object ):
                 prev_idx = spikes[spk_n - 1]["peak_idx"]
             else:
                 prev_idx = start_idx
-            
+
             # Restore variables from before
             # peak_idx = spk['peak_idx']
             peak_idx = np.argmax(v[spk['threshold_idx']:next_idx]) + spk['threshold_idx']
-                
+
             spk["peak_idx"] = peak_idx
             spk["f_peak"] = v[peak_idx]
             spk["f_peak_i"] = curr[peak_idx]
@@ -315,7 +314,7 @@ class EphysFeatureExtractor( object ):
             # Determine maximum upstroke of spike
             # upstroke_idx = spk['upstroke_idx']
             upstroke_idx = np.argmax(dvdt[spk['threshold_idx']:peak_idx]) + spk['threshold_idx']
-            
+
             spk["upstroke"] = dvdt[upstroke_idx]
             if np.isnan(spk["upstroke"]): # sometimes dvdt will be NaN because of multiple cvode points at same time step
                 close_idx = upstroke_idx + 1
@@ -331,7 +330,7 @@ class EphysFeatureExtractor( object ):
                 spk["upstroke_v"] = v[upstroke_idx]
                 spk["upstroke_i"] = curr[upstroke_idx]
                 spk["upstroke_t"] = t[upstroke_idx]
-            
+
             # Find threshold based on average target
             find_thresh_idxs = np.where(dvdt[prev_idx:upstroke_idx] <= threshold_target)[0]
             if len(find_thresh_idxs) < 1: # Can't find a good threshold value - probably a bad simulation case
@@ -382,7 +381,7 @@ class EphysFeatureExtractor( object ):
         feature.mean["base_v"] = v[np.where((t > onset - 0.1) & (t < onset - 0.001))].mean() # baseline voltage, 100ms before stim
         feature.mean["spikes"] = spikes
         isi_cv = self.isicv(spikes)
-        if isi_cv != None:
+        if isi_cv is not None:
             feature.mean["ISICV"] = isi_cv
         n_spikes = len(spikes)
         feature.mean["n_spikes"] = n_spikes
@@ -396,7 +395,7 @@ class EphysFeatureExtractor( object ):
                 self.calculate_trough(spk, v, curr, t, idx_next)
                 half_max_v = (spk["f_peak"] - spk["f_trough"]) / 2.0 + spk["f_trough"]
                 over_half_max_v_idxs = np.where(v[spk["t_idx"]:spk["trough_idx"]] > half_max_v)[0]
-                if len(over_half_max_v_idxs) > 0: 
+                if len(over_half_max_v_idxs) > 0:
                     spk["width"] = 1000. * (t[over_half_max_v_idxs[-1] + spk["t_idx"]] - t[over_half_max_v_idxs[0] + spk["t_idx"]])
             feature.mean["latency"] = 1000. * (spikes[0]["t"] - onset)
             feature.mean["latency_n30"] = 1000. * (spikes[0]["t_n30"] - onset)
@@ -430,7 +429,7 @@ class EphysFeatureExtractor( object ):
                 cnt += 1.0
             # this shouldn't be possible, but it may be in future version
             #   so might as well trap for it
-            if cnt == 0:    
+            if cnt == 0:
                 continue
             mean /= cnt
             stdev = 0
@@ -453,25 +452,25 @@ class EphysFeatureExtractor( object ):
         lst = []
         for i in range(len(spikes) - 1):
             isi = spikes[i+1]["t"] - spikes[i]["t"]
-            #print "\t%g" % isi
+            #print("\t%g" % isi)
             isi_mean += isi
             lst.append(isi)
         isi_mean /= 1.0 * len(lst)
-        #print isi_mean
+        #print(isi_mean)
         var = 0
         for i in range(len(lst)):
             dif = isi_mean - lst[i]
             var += dif * dif
         var /= len(lst)
         #var /= len(lst) - 1
-        #print math.sqrt(var)
+        #print(math.sqrt(var))
         if isi_mean > 0:
             return math.sqrt(var) / isi_mean
         return None
 
     def adaptation_index(self, spikes, stim_end):
         if len(spikes) < 4:
-            return None 
+            return None
         adi = 0
         cnt = 0
         isi = []
@@ -512,9 +511,9 @@ class EphysFeatureExtractor( object ):
         # calculate etay's 'fast' and 'slow' ahp here
         if t[peak_idx] + 0.005 >= t[-1]:
             five_ms_idx = len(t) - 1
-        else:        
+        else:
             five_ms_idx = np.where(t >= 0.005 + t[peak_idx])[0][0]  # 5ms after peak
-            
+
         # fast AHP is minimum value occurring w/in 5ms
         if five_ms_idx >= next_idx:
             five_ms_idx = next_idx
@@ -545,7 +544,7 @@ class EphysFeatureExtractor( object ):
     # calculate nearness score for feature set X relative to summary
     # the nearness score is the sum of squares the features are from
     #   their target values, in units of standard deviations
-    # when a feature is absent, the algorithm to determine the 
+    # when a feature is absent, the algorithm to determine the
     #   penalty is stored in the feature itself, and this value
     #   is calculated then added to the sum
     def score_feature_set(self, set_num):
@@ -560,11 +559,11 @@ class EphysFeatureExtractor( object ):
                     mean = self.summary.mean[k]
                     stdev = self.summary.stdev[k]
                     assert stdev > 0
-                    if k in cand.mean and cand.mean[k] != None:
+                    if k in cand.mean and cand.mean[k] is not None:
                         val = cand.mean[k]
                         inc = abs(mean - val) / stdev
                         scores.append(inc)
-#                        print "Hit %s, %g+/-%g (%g) = %g" % (k, mean, stdev, val, inc)
+#                        print("Hit %s, %g+/-%g (%g) = %g" % (k, mean, stdev, val, inc))
                     else:
                         resp = cand.scoring[k]["miss"]
                         if resp == "const":
@@ -575,12 +574,12 @@ class EphysFeatureExtractor( object ):
                             assert False
                         miss = float(miss)
                         scores.append(miss)
-#                        print "Missed %s, penalty = %g" % (k, miss)
+#                        print("Missed %s, penalty = %g" % (k, miss))
                 elif response == "perspike":
                     mean = self.summary.mean[k]
                     stdev = self.summary.stdev[k]
                     assert stdev > 0
-                    if k in cand.mean and cand.mean[k] != None:
+                    if k in cand.mean and cand.mean[k] is not None:
                         val = 0
                         n_spikes = len(cand.mean["spikes"])
                         skip_last_n = self.summary.scoring[k]["skip_last_n"]
@@ -599,30 +598,30 @@ class EphysFeatureExtractor( object ):
                             assert False
                         miss = float(miss)
                         scores.append(miss)
-#                        print "Missed %s, penalty = %g" % (k, miss)
+#                        print("Missed %s, penalty = %g" % (k, miss))
                 else:
                     assert False
                 if abs(sum(scores)) > 1e10:
-                    print k
-                    print self.summary.scoring
-                    print self.summary.mean
-                    print self.summary.stdev
-                    print cand.summary.scoring
-                    print cand.summary.mean
-                    print cand.summary.stdev
+                    print(k)
+                    print(self.summary.scoring)
+                    print(self.summary.mean)
+                    print(self.summary.stdev)
+                    print(cand.summary.scoring)
+                    print(cand.summary.mean)
+                    print(cand.summary.stdev)
                     assert False
         return scores
 
     # create summary of feature instances
-    #   'summary' is an empty feature object. this must be the same 
+    #   'summary' is an empty feature object. this must be the same
     #     class as the other feature objects that are being summarized
     def summarize(self, summary):
         if len(self.feature_list) == 0:
-            print "Error -- no features were extracted. Summary impossible"
+            print("Error -- no features were extracted. Summary impossible")
             sys.exit()
         # make dummy dict to verify that all feature instances have
         #   identical features
-        # only copy features that are in the glossary. some are for 
+        # only copy features that are in the glossary. some are for
         #   internal use (eg, t_idx -- time index) and aren't important
         #   here
         superset = {}
@@ -636,7 +635,7 @@ class EphysFeatureExtractor( object ):
             for i in range(len(self.feature_list)):
                 fx = self.feature_list[i].mean
                 if k not in fx:
-                    print "Error - feature '%s' not in all data sets" % k
+                    print("Error - feature '%s' not in all data sets" % k)
                     err += 1
         if err > 0:
             return None

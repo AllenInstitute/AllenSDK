@@ -14,7 +14,6 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 import math
-import scipy.ndimage.measurements as measurements
 import scipy.ndimage.morphology as morphology
 
 # constants used for accessing border array
@@ -28,7 +27,7 @@ class Mask(object):
     '''
     Abstract class to represent image segmentation mask. Its two
     main subclasses are RoiMask and NeuropilMask. The former represents
-    the mask of a region of interest (ROI), such as a cell observed in 
+    the mask of a region of interest (ROI), such as a cell observed in
     2-photon imaging. The latter represents the neuropil around that cell,
     and is useful when subtracting the neuropil signal from the measured
     ROI signal.
@@ -49,15 +48,16 @@ class Mask(object):
     mask_group: integer
        User-defined number to help put masks into different categories
     '''
+
     def __init__(self, image_w, image_h, label, mask_group):
         '''
         Mask class constructor. The Mask class is designed to be abstract
         and it should not be instantiated directly.
         '''
-        
+
         self.img_rows = image_h
         self.img_cols = image_w
-        # initialize to invalid state. Mask must be manually initialized 
+        # initialize to invalid state. Mask must be manually initialized
         #   by pixel list or mask array
         self.x = 0
         self.width = 0
@@ -65,7 +65,7 @@ class Mask(object):
         self.height = 0
         self.mask = None
         self.valid = True
-        # label is for distinguishing neuropil from ROI, in case 
+        # label is for distinguishing neuropil from ROI, in case
         #   these masks are mixed together
         self.label = label
         # auxiliary metadata. if a particula mask is part of an group,
@@ -91,8 +91,8 @@ class Mask(object):
         array = np.zeros((self.img_rows, self.img_cols))
 
         # pix_list stores array of [x,y] coordinates
-        array[pix_list[:,1], pix_list[:,0]] = 1;
-        
+        array[pix_list[:, 1], pix_list[:, 0]] = 1
+
         self.init_by_mask(border, array)
 
     def get_mask_plane(self):
@@ -104,9 +104,8 @@ class Mask(object):
         numpy 2D array [img_rows][img_cols]
         '''
         mask = np.zeros((self.img_rows, self.img_cols))
-        mask[self.y:self.y+self.height, self.x:self.x+self.width] = self.mask
+        mask[self.y:self.y + self.height, self.x:self.x + self.width] = self.mask
         return mask
-        
 
 
 def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, label=None, mask_group=-1):
@@ -168,6 +167,7 @@ def create_roi_mask(image_w, image_h, border, pix_list=None, roi_mask=None, labe
 
 
 class RoiMask(Mask):
+
     def __init__(self, image_w, image_h, label, mask_group):
         '''
         RoiMask class constructor
@@ -204,7 +204,7 @@ class RoiMask(Mask):
         # find lowest and highest non-zero indices on each axis
         px = np.argwhere(array)
         (top, left), (bottom, right) = px.min(0), px.max(0)
-        
+
         # left and right border insets
         l_inset = math.ceil(border[RIGHT_SHIFT])
         r_inset = math.floor(self.img_cols - border[LEFT_SHIFT]) - 1
@@ -223,7 +223,7 @@ class RoiMask(Mask):
         self.y = top
         self.height = bottom - top + 1
         # make copy of mask
-        self.mask = array[top:bottom+1, left:right+1]
+        self.mask = array[top:bottom + 1, left:right + 1]
 
 
 def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
@@ -246,8 +246,8 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
 
     combined_binary_mask: integer[image_h][image_w]
         Image-sized array that shows the position of all ROIs in the
-        image. ROI masks should have a value of one. Background pixels 
-        must be zero. In other words, ithe combined_binary_mask is a 
+        image. ROI masks should have a value of one. Background pixels
+        must be zero. In other words, ithe combined_binary_mask is a
         bitmap union of all ROI masks
 
     label: text
@@ -260,19 +260,22 @@ def create_neuropil_mask(roi, border, combined_binary_mask, label=None):
     # combined_binary_mask is a bitmap union of ALL ROI masks
     # create a binary mask of the ROI
     binary_mask = np.zeros((roi.img_rows, roi.img_cols))
-    binary_mask[roi.y:roi.y+roi.height, roi.x:roi.x+roi.width] = roi.mask
+    binary_mask[roi.y:roi.y + roi.height, roi.x:roi.x + roi.width] = roi.mask
     binary_mask = binary_mask > 0
     # dilate the mask
-    binary_mask_dilated = morphology.binary_dilation(binary_mask, structure=np.ones((3,3)), iterations=13)  # T/F
+    binary_mask_dilated = morphology.binary_dilation(
+        binary_mask, structure=np.ones((3, 3)), iterations=13)  # T/F
     # eliminate ROIs from the dilation
     binary_mask_dilated = binary_mask_dilated > combined_binary_mask
     # create mask from binary dilation
-    m = NeuropilMask(w=roi.img_cols, h=roi.img_rows, label=label, mask_group=roi.mask_group)
+    m = NeuropilMask(w=roi.img_cols, h=roi.img_rows,
+                     label=label, mask_group=roi.mask_group)
     m.init_by_mask(border, binary_mask_dilated)
     return m
 
 
 class NeuropilMask(Mask):
+
     def __init__(self, w, h, label, mask_group):
         '''
         NeuropilMask class constructor. This class should be created by
@@ -287,7 +290,6 @@ class NeuropilMask(Mask):
             User-defined number to help put masks into different categories
         '''
         super(NeuropilMask, self).__init__(w, h, label, mask_group)
-
 
     def init_by_mask(self, border, array):
         '''
@@ -305,14 +307,14 @@ class NeuropilMask(Mask):
         # find lowest and highest non-zero indices on each axis
         px = np.argwhere(array)
         (top, left), (bottom, right) = px.min(0), px.max(0)
-        
+
         # left and right border insets
         l_inset = math.ceil(border[RIGHT_SHIFT])
         r_inset = math.floor(self.img_cols - border[LEFT_SHIFT]) - 1
         # top and bottom border insets
         t_inset = math.ceil(border[DOWN_SHIFT])
         b_inset = math.floor(self.img_rows - border[UP_SHIFT]) - 1
-        # restrict neuropil masks to center area of frame (ie, exclude 
+        # restrict neuropil masks to center area of frame (ie, exclude
         #   areas that overlap with movement correction buffer)
         if left < l_inset:
             left = l_inset
@@ -327,7 +329,7 @@ class NeuropilMask(Mask):
             if bottom < t_inset:
                 bottom = t_inset
         if bottom > b_inset:
-            bottom = b_inset;
+            bottom = b_inset
             if top > b_inset:
                 top = b_inset
         #
@@ -336,7 +338,7 @@ class NeuropilMask(Mask):
         self.y = top
         self.height = bottom - top + 1
         # make copy of mask
-        self.mask = array[top:bottom+1, left:right+1]
+        self.mask = array[top:bottom + 1, left:right + 1]
 
 
 def calculate_traces(stack, mask_list):
@@ -365,24 +367,24 @@ def calculate_traces(stack, mask_list):
             mask.mask = np.array(mask.mask)
     # calcualte traces
     for frame_num in range(num_frames):
-        if frame_num % 1000 == 0 :
-            print "frame " + str(frame_num) + " of " + str(num_frames)
+        if frame_num % 1000 == 0:
+            print("frame " + str(frame_num) + " of " + str(num_frames))
         frame = stack[frame_num]
         mask = None
         try:
             for i in range(len(mask_list)):
-                    mask = mask_list[i]
-                    subframe = frame[mask.y:mask.y+mask.height, mask.x:mask.x+mask.width]
-                    total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
-                    area = (mask.mask).sum(axis=-1).sum(axis=-1)
-                    tvals = total/area
-                    traces[i][frame_num] = tvals
+                mask = mask_list[i]
+                subframe = frame[mask.y:mask.y +
+                                 mask.height, mask.x:mask.x + mask.width]
+                total = (subframe * mask.mask).sum(axis=-1).sum(axis=-1)
+                area = (mask.mask).sum(axis=-1).sum(axis=-1)
+                tvals = total / area
+                traces[i][frame_num] = tvals
         except:
             print("Error encountered processing mask during frame %d" % frame_num)
             if mask is not None:
-                print subframe.shape
-                print mask.mask.shape
-                print mask
+                print(subframe.shape)
+                print(mask.mask.shape)
+                print(mask)
             raise
     return traces
-

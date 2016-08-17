@@ -15,28 +15,30 @@
 
 
 import pytest
-from mock import MagicMock
+from mock import patch, mock_open
 from allensdk.model.biophys_sim.config import Config
-from allensdk.core.json_utilities import JsonComments
+try:
+    import __builtin__ as builtins  # @UnresolvedImport
+except:
+    import builtins  # @UnresolvedImport
 
 
 @pytest.fixture
 def simple_config():
-    manifest = {
-        'manifest': [
-            { 'type': 'dir',
-              'spec': 'MOCK_DOT',
-              'key': 'BASEDIR'
+    manifest = '''{
+        "manifest": [
+            { "type": "dir",
+              "spec": "MOCK_DOT",
+              "key": "BASEDIR"
             }],
-        'biophys':
-            [{ 'hoc': [ 'stdgui.hoc'] }],
-    }
-    
-    ju = JsonComments
-    ju.read_file = MagicMock(return_value=manifest)
-    
-    config = Config().load('config.json', False)
-    
+        "biophys":
+            [{ "hoc": [ "stdgui.hoc"] }]
+    }'''
+
+    with patch(builtins.__name__ + ".open",
+               mock_open(read_data=manifest)):
+        config = Config().load('config.json', False)
+
     return config
 
 

@@ -1,3 +1,18 @@
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+
 import pytest
 from mock import MagicMock
 import allensdk.core.json_utilities as ju
@@ -16,7 +31,7 @@ def rma():
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['graph_ids']
-            },
+             },
             {'name': 'structures_by_graph_names',
              'description': 'see name',
              'model': 'Structure',
@@ -25,7 +40,7 @@ def rma():
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['graph_names']
-            },
+             },
             {'name': 'structures_by_set_ids',
              'description': 'see name',
              'model': 'Structure',
@@ -34,7 +49,7 @@ def rma():
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['set_ids']
-            },
+             },
             {'name': 'structures_by_set_names',
              'description': 'see name',
              'model': 'Structure',
@@ -43,25 +58,25 @@ def rma():
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['set_names']
-            },
+             },
             {'name': 'structure_graphs_list',
              'description': 'see name',
              'model': 'StructureGraph',
              'num_rows': 'all',
              'count': False
-            },
+             },
             {'name': 'structure_sets_list',
              'description': 'see name',
              'model': 'StructureSet',
              'num_rows': 'all',
              'count': False
-            },
+             },
             {'name': 'atlases_list',
              'description': 'see name',
              'model': 'Atlas',
              'num_rows': 'all',
              'count': False
-            },
+             },
             {'name': 'atlases_table',
              'description': 'see name',
              'model': 'Atlas',
@@ -70,7 +85,7 @@ def rma():
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['graph_ids']
-            },
+             },
             {'name': 'atlases_table_brief',
              'description': 'see name',
              'model': 'Atlas',
@@ -87,21 +102,21 @@ def rma():
                       'graphic_group_labels.name'],
              'num_rows': 'all',
              'count': False
-            }
+             }
         ]}
     rma = RmaTemplate(query_manifest=templates)
-    
+
     return rma
 
 
 def test_atlases_list(rma):
     ju.read_url_get = \
         MagicMock(name='read_url_get',
-                  return_value={ 'msg': [{ 'whatever': True }] })
-    
+                  return_value={'msg': [{'whatever': True}]})
+
     rma.template_query('ontology_queries',
                        'atlases_list')
-    
+
     ju.read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Atlas,rma::options"
@@ -111,11 +126,11 @@ def test_atlases_list(rma):
 def test_structure_graphs_list(rma):
     ju.read_url_get = \
         MagicMock(name='read_url_get',
-                  return_value={ 'msg': [{ 'whatever': True }] })
-    
+                  return_value={'msg': [{'whatever': True}]})
+
     rma.template_query('ontology_queries',
                        'structure_graphs_list')
-    
+
     ju.read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::StructureGraph,rma::options"
@@ -125,11 +140,11 @@ def test_structure_graphs_list(rma):
 def test_structure_sets_list(rma):
     ju.read_url_get = \
         MagicMock(name='read_url_get',
-                  return_value={ 'msg': [{ 'whatever': True }] })
-    
+                  return_value={'msg': [{'whatever': True}]})
+
     rma.template_query('ontology_queries',
                        'structure_sets_list')
-    
+
     ju.read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::StructureSet,rma::options"
@@ -139,12 +154,12 @@ def test_structure_sets_list(rma):
 def test_structures_by_graph_ids(rma):
     ju.read_url_get = \
         MagicMock(name='read_url_get',
-                  return_value={ 'msg': [{ 'whatever': True }] })
-    
+                  return_value={'msg': [{'whatever': True}]})
+
     rma.template_query('ontology_queries',
                        'structures_by_graph_ids',
                        graph_ids='1')
-    
+
     ju.read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
@@ -156,12 +171,12 @@ def test_structures_by_graph_ids(rma):
 def test_structures_by_two_graph_ids(rma):
     ju.read_url_get = \
         MagicMock(name='read_url_get',
-                  return_value={ 'msg': [{ 'whatever': True }] })
-    
+                  return_value={'msg': [{'whatever': True}]})
+
     rma.template_query('ontology_queries',
                        'structures_by_graph_ids',
                        graph_ids=[1, 2])
-    
+
     ju.read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
@@ -174,12 +189,12 @@ def test_structures_by_two_graph_ids(rma):
 def test_structures_by_graph_names(rma):
     ju.read_url_get = \
         MagicMock(name='read_url_get',
-                  return_value={ 'msg': [{ 'whatever': True }] })
-    
+                  return_value={'msg': [{'whatever': True}]})
+
     rma.template_query('ontology_queries',
                        'structures_by_graph_names',
                        graph_names=rma.quote_string('Human+Brain+Atlas'))
-    
+
     ju.read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
@@ -192,12 +207,12 @@ def test_structures_by_graph_names(rma):
 def test_structures_by_set_ids(rma):
     ju.read_url_get = \
         MagicMock(name='read_url_get',
-                  return_value={ 'msg': [{ 'whatever': True }] })
-    
+                  return_value={'msg': [{'whatever': True}]})
+
     rma.template_query('ontology_queries',
                        'structures_by_graph_ids',
                        graph_ids='1')
-    
+
     ju.read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Structure,rma::criteria,"
@@ -208,11 +223,11 @@ def test_structures_by_set_ids(rma):
 def test_atlases_table(rma):
     ju.read_url_get = \
         MagicMock(name='read_url_get',
-                  return_value={ 'msg': [{ 'whatever': True }] })
-    
+                  return_value={'msg': [{'whatever': True}]})
+
     rma.template_query('ontology_queries',
                        'atlases_table')
-    
+
     ju.read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Atlas,rma::criteria,"
@@ -224,12 +239,12 @@ def test_atlases_table(rma):
 def test_atlases_table_one_graph(rma):
     ju.read_url_get = \
         MagicMock(name='read_url_get',
-                  return_value={ 'msg': [{ 'whatever': True }] })
-    
+                  return_value={'msg': [{'whatever': True}]})
+
     rma.template_query('ontology_queries',
                        'atlases_table',
                        graph_ids=1)
-    
+
     ju.read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Atlas,rma::criteria,"
@@ -241,11 +256,11 @@ def test_atlases_table_one_graph(rma):
 def test_atlases_table_brief(rma):
     ju.read_url_get = \
         MagicMock(name='read_url_get',
-                  return_value={ 'msg': [{ 'whatever': True }] })
-    
+                  return_value={'msg': [{'whatever': True}]})
+
     rma.template_query('ontology_queries',
                        'atlases_table_brief')
-    
+
     ju.read_url_get.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::Atlas,"

@@ -13,7 +13,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib2
+
+import shutil
+import socket
+
+try:
+    import urllib.request as urllib_request
+except:
+    import urllib2 as urllib_request
+
+try:
+    import urllib.error as urllib_error
+except:
+    import urllib2 as urllib_error
+
 import allensdk.core.json_utilities as json_utilities
 import pandas as pd
 import logging
@@ -23,46 +36,49 @@ class Api(object):
     _log = logging.getLogger(__name__)
     default_api_url = 'http://api.brain-map.org'
     download_url = 'http://download.alleninstitute.org'
-    
+
     def __init__(self, api_base_url_string=None):
-        if api_base_url_string==None:
-            api_base_url_string=Api.default_api_url
-            
+        if api_base_url_string is None:
+            api_base_url_string = Api.default_api_url
+
         self.set_api_urls(api_base_url_string)
         self.default_working_directory = None
-    
-    
+
     def set_api_urls(self, api_base_url_string):
         '''Set the internal RMA and well known file download endpoint urls
         based on a api server endpoint.
-        
+
         Parameters
         ----------
         api_base_url_string : string
             url of the api to point to
         '''
         self.api_url = api_base_url_string
-        
+
         # http://help.brain-map.org/display/api/Downloading+a+WellKnownFile
-        self.well_known_file_endpoint = api_base_url_string + '/api/v2/well_known_file_download'
-        
+        self.well_known_file_endpoint = api_base_url_string + \
+            '/api/v2/well_known_file_download'
+
         # http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data
         self.grid_data_endpoint = api_base_url_string + '/grid_data'
-        
+
         # http://help.brain-map.org/display/api/Downloading+and+Displaying+SVG
         self.svg_endpoint = api_base_url_string + '/api/v2/svg'
         self.svg_download_endpoint = api_base_url_string + '/api/v2/svg_download'
-        
+
         # http://help.brain-map.org/display/api/Downloading+an+Ontology%27s+Structure+Graph
-        self.structure_graph_endpoint = api_base_url_string + '/api/v2/structure_graph_download'
-        
+        self.structure_graph_endpoint = api_base_url_string + \
+            '/api/v2/structure_graph_download'
+
         # http://help.brain-map.org/display/api/Searching+a+Specimen+or+Structure+Tree
         self.tree_search_endpoint = api_base_url_string + '/api/v2/tree_search'
-        
+
         # http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets
-        self.annotated_section_data_sets_endpoint = api_base_url_string + '/api/v2/annotated_section_data_sets'
-        self.compound_annotated_section_data_sets_endpoint = api_base_url_string + '/api/v2/compound_annotated_section_data_sets'
-        
+        self.annotated_section_data_sets_endpoint = api_base_url_string + \
+            '/api/v2/annotated_section_data_sets'
+        self.compound_annotated_section_data_sets_endpoint = api_base_url_string + \
+            '/api/v2/compound_annotated_section_data_sets'
+
         # http://help.brain-map.org/display/api/Image-to-Image+Synchronization#Image-to-ImageSynchronization-ImagetoImage
         self.image_to_atlas_endpoint = api_base_url_string + '/api/v2/image_to_atlas'
         self.image_to_image_endpoint = api_base_url_string + '/api/v2/image_to_image'
@@ -70,73 +86,72 @@ class Api(object):
         self.reference_to_image_endpoint = api_base_url_string + '/api/v2/reference_to_image'
         self.image_to_reference_endpoint = api_base_url_string + '/api/v2/image_to_reference'
         self.structure_to_image_endpoint = api_base_url_string + '/api/v2/structure_to_image'
-        
+
         # http://help.brain-map.org/display/mouseconnectivity/API
-        self.section_image_download_endpoint = api_base_url_string + '/api/v2/section_image_download'
-        self.atlas_image_download_endpoint = api_base_url_string + '/api/v2/atlas_image_download'
-        self.projection_image_download_endpoint = api_base_url_string + '/api/v2/projection_image_download'
+        self.section_image_download_endpoint = api_base_url_string + \
+            '/api/v2/section_image_download'
+        self.atlas_image_download_endpoint = api_base_url_string + \
+            '/api/v2/atlas_image_download'
+        self.projection_image_download_endpoint = api_base_url_string + \
+            '/api/v2/projection_image_download'
         self.informatics_archive_endpoint = Api.download_url + '/informatics-archive'
-        
+
         self.rma_endpoint = api_base_url_string + '/api/v2/data'
-    
-    
+
     def set_default_working_directory(self, working_directory):
         '''Set the working directory where files will be saved.
-        
+
         Parameters
         ----------
         working_directory : string
              the absolute path string of the working directory.
         '''
         self.default_working_directory = working_directory
-    
-    
+
     def read_data(self, parsed_json):
         '''Return the message data from the parsed query.
-        
+
         Parameters
         ----------
         parsed_json : dict
             A python structure corresponding to the JSON data returned from the API.
-        
+
         Notes
         -----
         See `API Response Formats - Response Envelope <http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope>`_
         for additional documentation.
         '''
         return parsed_json['msg']
-    
-    
+
     def json_msg_query(self, url, dataframe=False):
         ''' Common case where the url is fully constructed
             and the response data is stored in the 'msg' field.
-        
+
         Parameters
         ----------
         url : string
             Where to get the data in json form
         dataframe : boolean
             True converts to a pandas dataframe, False (default) doesn't
-        
+
         Returns
         -------
         dict or DataFrame
             returned data; type depends on dataframe option
         '''
 
-        data = self.do_query(lambda *a, **k:  url,
+        data = self.do_query(lambda *a, **k: url,
                              self.read_data)
-        
-        if dataframe == True:
+
+        if dataframe is True:
             data = pd.DataFrame(data)
-        
+
         return data
-    
-    
+
     def do_query(self, url_builder_fn, json_traversal_fn, *args, **kwargs):
         '''Bundle an query url construction function
         with a corresponding response json traversal function.
-        
+
         Parameters
         ----------
         url_builder_fn : function
@@ -149,34 +164,33 @@ class Api(object):
             Arguments to be passed to the url builder function.
         kwargs : keyword arguments
             Keyword arguments to be passed to the rma builder function.
-        
-        Returns
+
+        Returnsurllib_re
         -------
         any type
             The data extracted from the json response.
-        
+
         Examples
         --------
         `A simple Api subclass example
         <data_api_client.html#creating-new-api-query-classes>`_.
         '''
         api_url = url_builder_fn(*args, **kwargs)
-        
+
         post = kwargs.get('post', False)
-        
+
         json_parsed_data = self.retrieve_parsed_json_over_http(api_url, post)
-        
+
         return json_traversal_fn(json_parsed_data)
-    
-    
+
     def do_rma_query(self, rma_builder_fn, json_traversal_fn, *args, **kwargs):
         '''Bundle an RMA query url construction function
         with a corresponding response json traversal function.
-        
+
         ..note:: Deprecated in AllenSDK 0.9.2
             `do_rma_query` will be removed in AllenSDK 1.0, it is replaced by
             `do_query` because the latter is more general.
-        
+
         Parameters
         ----------
         rma_builder_fn : function
@@ -187,128 +201,127 @@ class Api(object):
             Arguments to be passed to the rma builder function.
         kwargs : keyword arguments
             Keyword arguments to be passed to the rma builder function.
-        
+
         Returns
         -------
         any type
             The data extracted from the json response.
-        
+
         Examples
         --------
         `A simple Api subclass example
         <data_api_client.html#creating-new-api-query-classes>`_.
         '''
         return self.do_query(rma_builder_fn, json_traversal_fn, *args, **kwargs)
-    
-    
+
     def load_api_schema(self):
         '''Download the RMA schema from the current RMA endpoint
-        
+
         Returns
         -------
         dict
             the parsed json schema message
-        
+
         Notes
         -----
-        This information and other 
+        This information and other
         `Allen Brain Atlas Data Portal Data Model <http://help.brain-map.org/display/api/Data+Model>`_
         documentation is also available as a
         `Class Hierarchy <http://api.brain-map.org/class_hierarchy>`_
         and `Class List <http://api.brain-map.org/class_hierarchy>`_.
-        
+
         '''
         schema_url = self.rma_endpoint + '/enumerate.json'
-        json_parsed_schema_data = self.retrieve_parsed_json_over_http(schema_url)
-        
+        json_parsed_schema_data = self.retrieve_parsed_json_over_http(
+            schema_url)
+
         return json_parsed_schema_data
-    
-    
+
     def construct_well_known_file_download_url(self, well_known_file_id):
         '''Join data api endpoint and id.
-        
+
         Parameters
         ----------
         well_known_file_id : integer or string representing an integer
             well known file id
-        
+
         Returns
         -------
         string
             the well-known-file download url for the current api api server
-        
+
         See Also
         --------
         retrieve_file_over_http: Can be used to retrieve the file from the url.
         '''
         return self.well_known_file_endpoint + '/' + str(well_known_file_id)
-    
-    
+
     def retrieve_file_over_http(self, url, file_path):
         '''Get a file from the data api and save it.
-        
+
         Parameters
         ----------
         url : string
             Url[1]_ from which to get the file.
         file_path : string
             Absolute path including the file name to save.
-        
+
         See Also
         --------
         construct_well_known_file_download_url: Can be used to construct the url.
-        
+
         References
         ----------
         .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
         '''
         try:
+            response = urllib_request.urlopen(url)
             with open(file_path, 'wb') as f:
-                response = urllib2.urlopen(url)
-                f.write(response.read())
-        except urllib2.HTTPError:
+                shutil.copyfileobj(response, f)
+        except urllib_error.HTTPError:
             self._log.error("Couldn't retrieve file from %s" % url)
             raise
-    
-    
+        except socket.timeout:
+            self._log.error("Timed out retrieving file from %s" % url)
+            raise
+
     def retrieve_parsed_json_over_http(self, url, post=False):
         '''Get the document and put it in a Python data structure
-        
+
         Parameters
         ----------
         url : string
             Full API query url.
         post : boolean
             True does an HTTP POST, False (default) encodes the URL and does a GET
-        
+
         Returns
         -------
         dict
             Result document as parsed by the JSON library.
         '''
-        
-        if post == False:
-            data = json_utilities.read_url(urllib2.quote(url,';/?:@&=+$,'),
+
+        if post is False:
+            data = json_utilities.read_url(urllib_request.quote(url, ';/?:@&=+$,'),
                                            'GET')
         else:
             data = json_utilities.read_url(url, 'POST')
-        
+
         return data
-    
-    
+
     def retrieve_xml_over_http(self, url):
         '''Get the document and put it in a Python data structure
-        
+
         Parameters
         ----------
         url : string
             Full API query url.
-        
+
         Returns
         -------
         string
             Unparsed xml string.
         '''
-        response = urllib2.urlopen(url)
-        
+        response = urllib_request.urlopen(url)
+
         return response.read()
