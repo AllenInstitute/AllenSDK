@@ -25,7 +25,7 @@ def annotated():
     asdsa = AnnotatedSectionDataSetsApi()
 
     asdsa.json_msg_query = MagicMock(name='json_msg_query')
-    
+
     return asdsa
 
 
@@ -33,10 +33,10 @@ def test_get_annotated_section_data_set(annotated):
     annotated.get_annotated_section_data_sets(
         structures=[112763676],
         intensity_values=["High", "Low", "Medium"],
-        density_values=["High","Low"],
+        density_values=["High", "Low"],
         pattern_values=["Full"],
         age_names=["E11.5", "13.5"])
-    
+
     annotated.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/annotated_section_data_sets.json"
         "?structures=112763676&intensity_values='High','Low','Medium'"
@@ -48,10 +48,10 @@ def test_get_compound_annotated_section_data_set(annotated):
     annotated.get_annotated_section_data_sets(
         structures=[112763676],
         intensity_values=["High", "Low", "Medium"],
-        density_values=["High","Low"],
+        density_values=["High", "Low"],
         pattern_values=["Full"],
         age_names=["E11.5", "13.5"])
-    
+
     annotated.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/annotated_section_data_sets.json?"
         "structures=112763676"
@@ -63,14 +63,14 @@ def test_get_compound_annotated_section_data_set(annotated):
 def test_get_annotated_section_data_set_via_rma(annotated):
     annotated.json_msg_query = \
         MagicMock(name='json_msg_query')
-           
+
     annotated.get_compound_annotated_section_data_sets(
         [{'structures': [112763676],
           'intensity_values': ['High', 'Low'],
-          'link': 'or' },
+          'link': 'or'},
          {'structures': [112763686],
           'intensity_values': ['Low']}])
-    
+
     annotated.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org"
         "/api/v2/compound_annotated_section_data_sets.json"

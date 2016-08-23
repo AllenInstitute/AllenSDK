@@ -15,13 +15,12 @@
 
 
 import pytest
-from mock import patch, mock_open, MagicMock
+from mock import patch, mock_open
 from allensdk.model.biophys_sim.config import Config
-from allensdk.core.json_utilities import JsonComments
 try:
-    import __builtin__ as builtins  #@UnresolvedImport
+    import __builtin__ as builtins  # @UnresolvedImport
 except:
-    import builtins #@UnresolvedImport
+    import builtins  # @UnresolvedImport
 
 
 @pytest.fixture

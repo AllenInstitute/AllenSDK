@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -13,12 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging, time
-import argparse, os
+import logging
+import time
+import argparse
+import os
 import numpy as np
-
 import allensdk.core.json_utilities as json_utilities
-from allensdk.core.nwb_data_set import NwbDataSet 
+from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.api.queries.glif_api import GlifApi
 from allensdk.model.glif.glif_neuron import GlifNeuron
 
@@ -46,20 +47,20 @@ def simulate_sweep(neuron, stimulus, spike_cut_value):
 
     logging.debug("simulating")
 
-    data = neuron.run(stimulus)    
+    data = neuron.run(stimulus)
 
     voltage = data['voltage']
     voltage[np.isnan(voltage)] = spike_cut_value
-    
+
     logging.debug("simulation time %f" % (time.time() - start_time))
-    
+
     return data
 
 
 def load_sweep(file_name, sweep_number):
     ''' Load the stimulus for a sweep from file. '''
     logging.debug("loading sweep %d" % sweep_number)
-    
+
     load_start_time = time.time()
     data = NwbDataSet(file_name).get_sweep(sweep_number)
 
@@ -75,27 +76,27 @@ def write_sweep_response(file_name, sweep_number, response, spike_times):
 
     write_start_time = time.time()
     ephds = NwbDataSet(file_name)
-    
+
     ephds.set_sweep(sweep_number, stimulus=None, response=response)
     ephds.set_spike_times(sweep_number, spike_times)
-    
+
     logging.debug("write time %f" % (time.time() - write_start_time))
 
-    
+
 def simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_name, spike_cut_value):
     ''' Load a sweep stimulus, simulate the response, and write it out. '''
-    
+
     sweep_start_time = time.time()
-    
+
     try:
         data = load_sweep(input_file_name, sweep_number)
     except Exception as e:
         logging.warning("Failed to load sweep, skipping. (%s)" % str(e))
         raise
-        
+
         # tell the neuron what dt should be for this sweep
     neuron.dt = 1.0 / data['sampling_rate']
-    
+
     sim_data = simulate_sweep(neuron, data['stimulus'], spike_cut_value)
 
     write_sweep_response(output_file_name, sweep_number, sim_data['voltage'], sim_data['interpolated_spike_times'])
@@ -108,8 +109,8 @@ def simulate_neuron(neuron, sweep_numbers, input_file_name, output_file_name, sp
 
     for sweep_number in sweep_numbers:
         simulate_sweep_from_file(neuron, sweep_number, input_file_name, output_file_name, spike_cut_value)
-                 
-    logging.debug("total elapsed time %f" % (time.time() - start_time))    
+
+    logging.debug("total elapsed time %f" % (time.time() - start_time))
 
 def main():
     args = parse_arguments()
@@ -117,7 +118,7 @@ def main():
     logging.getLogger().setLevel(args.log_level)
 
     glif_api = None
-    if (args.neuron_config_file is None or 
+    if (args.neuron_config_file is None or
         args.sweeps_file is None or
         args.ephys_file is None):
 
@@ -152,14 +153,14 @@ def main():
     else:
         logging.warning("Overwriting input file data with simulated data in place.")
         output_ephys_file = ephys_file
-        
+
 
     neuron = GlifNeuron.from_dict(neuron_config)
 
     # filter out test sweeps
     sweep_numbers = [ s['sweep_number'] for s in sweeps if s['stimulus_name'] != 'Test' ]
 
-    simulate_neuron(neuron, sweep_numbers, ephys_file, output_ephys_file, args.spike_cut_value) 
+    simulate_neuron(neuron, sweep_numbers, ephys_file, output_ephys_file, args.spike_cut_value)
 
 
 

@@ -63,20 +63,20 @@ def pyconfig():
               "    ]\n"
               "}\n"
               )
-    
+
     with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=file_1)):
         parser = DescriptionParser()
         description = parser.read("mock_1.pycfg")
-    
+
     with patch(builtins.__name__ + ".open",
                mock_open(
                    read_data=file_2)):
         parser = DescriptionParser()
         parser.read("mock_2.pycfg",
                     description)
-    
+
     return description
 
 
@@ -91,27 +91,27 @@ def testSectionA(pyconfig):
     assert len(pyconfig.data['section_A']) == 2
     assert pyconfig.data['section_A'][0] == {
         'prop_a': 'val_a',
-        'prop_b': 'val_b' }
+        'prop_b': 'val_b'}
     assert pyconfig.data['section_A'][1] == {
         'prop_c': 'val_c',
-        'prop_d': 'val_d' }
+        'prop_d': 'val_d'}
 
 
 def testSectionB(pyconfig):
     assert len(pyconfig.data['section_B']) == 3
     assert pyconfig.data['section_B'][0] == {
         'prop_e': 'val_e',
-        'prop_f': 'val_f' }
+        'prop_f': 'val_f'}
     assert pyconfig.data['section_B'][1] == {
         'prop_g': 'val_g',
-        'prop_h': 'val_h' }
+        'prop_h': 'val_h'}
     assert pyconfig.data['section_B'][2] == {
         'prop_i': 'val_i',
-        'prop_j': 'val_j' }
+        'prop_j': 'val_j'}
 
 
 def testSectionC(pyconfig):
     assert len(pyconfig.data['section_C']) == 1
     assert pyconfig.data['section_C'][0] == {
         'prop_k': 'val_k',
-        'prop_l': 'val_l' }
+        'prop_l': 'val_l'}
