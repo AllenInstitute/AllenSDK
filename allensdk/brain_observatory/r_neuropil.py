@@ -226,7 +226,7 @@ class NeuropilSubtract(object):
 
             if r is not None:
                 delta_r = np.abs(r - new_r) / r
-i
+
             r = new_r
             it += 1
 
