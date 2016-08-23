@@ -29,6 +29,7 @@ setup(
                         'matplotlib>=1.4.0',
                         'scipy>=0.14.0',
                         'pandas>=0.14.1',
+                        'jinja2>=2.7.3',
                         'numpy>=1.8.2',
                         'six>=1.5.2',
                         'pynrrd >= 0.2.1'],
