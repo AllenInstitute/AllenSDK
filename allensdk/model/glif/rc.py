@@ -189,3 +189,72 @@ def least_squares_simple_circuit_fit_REl(voltage_list, current_list, Cap, dt):
 #    print "tau", np.mean(resistance_list)*np.mean(capacitance_list)*1e3, "ms"
     
     return resistance_list, El_list
+
+def fit_RmReCEL_lssq(subthresh_noise_voltage_list, subthresh_noise_current_list, dt, Rs):
+    '''Uses least squares on subthreshold noise to fit the membrane resistance (Rm), the electrode (Re), 
+    the membrane capacitance C, and the resting potential El of a neuron model with an electrode.  The neuron is in 
+    parallel with a seal resistance coming from the electrode. This whole circuit is in series with an 
+    electrode resistance.  Note that this assumes the electrode capacitance is compensated for.
+    
+    Inputs
+        subthresh_noise_voltage_list: list of numpy arrays
+            recorded (observed) voltage, each sweep in an array
+        current: list of numpy array
+            stimulus injected though electrode, each sweep in an array
+        dt: float
+            time step
+        Rs: float
+            electrode seal resistance
+    Outputs
+        Rm_list: list of floats 
+            Membrane resistance
+        Re_list: list of floats
+            Electrode resisitance
+        C_list: list of floats
+            Membrane capacitance
+        El_list: list of floats
+            Resting potential
+            '''
+    
+    Rm_list=[] 
+    Re_list=[] 
+    C_list=[]
+    El_list=[]
+    for voltage, current in zip(subthresh_noise_voltage_list, subthresh_noise_current_list):
+        i=current[0:-1]
+        iplus1=current[1:]
+        Vo=voltage  # observed voltage
+        #--set up matrix for linear regression.  Note that matrix for derivative versus non derivative regression is the same.
+        matrix=np.ones((len(Vo)-1, 4))
+        matrix[:,0]=Vo[0:len(Vo)-1]
+        matrix[:,2]=i
+        matrix[:,3]=iplus1-i
+        #--do least squares
+        out_of_lssq=np.linalg.lstsq(matrix, Vo[1:]-Vo[:-1])[0] 
+        
+        #--solve for matrix coefficients
+        Re=out_of_lssq[3]
+        A=np.zeros((3,3))
+        A[0,0]=Re
+        A[1,0]=1.
+        A[0,1]=1. 
+        A[2,2]=1.
+        
+        b=np.zeros((3,1))
+        b[0,0]=out_of_lssq[2]
+        b[1,0]=-out_of_lssq[0]
+        b[2,0]=out_of_lssq[1]
+            
+        x=np.linalg.solve(A, b) 
+        C=dt/x[1]
+        Rm=1./(x[0]*C/dt -1/Rs)
+        El=x[2]*C*Rm/dt
+
+        Rm_list.append(Rm.tolist()[0]) 
+        Re_list.append(Re)
+        C_list.append(C.tolist()[0])
+        El_list.append(El.tolist()[0])
+        
+    return Rm_list, Re_list, C_list, El_list
+    
+    
