@@ -496,7 +496,7 @@ class BrainObservatoryNwbDataSet(object):
         if generated_by is not None:
             del meta["generated_by"]
 
-            file_version = = str(generated_by[-1])
+            file_version = str(generated_by[-1])
         else:
             file_version = "0.9"
         meta["file_version"] = file_version
