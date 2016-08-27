@@ -14,6 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import h5py
+import logging
 import pandas as pd
 import numpy as np
 import allensdk.brain_observatory.roi_masks as roi
@@ -44,7 +45,9 @@ class BrainObservatoryNwbDataSet(object):
         'fov': 'general/fov',
         'genotype': 'general/subject/genotype',
         'session_start_time': 'session_start_time',
-        'session_type': 'general/session_type'
+        'session_type': 'general/session_type',
+        'specimen_name': 'general/specimen_name',
+        'generated_by': 'general/generated_by'
     }
 
     STIMULUS_TABLE_TYPES = {
@@ -455,10 +458,13 @@ class BrainObservatoryNwbDataSet(object):
 
         with h5py.File(self.nwb_file, 'r') as f:
             for memory_key, disk_key in BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING.items():
-                v = f[disk_key].value
-                if v.dtype.type is np.string_:
-                    v = str(v)
-                meta[memory_key] = v
+                try:
+                    v = f[disk_key].value
+                    if v.dtype.type is np.string_:
+                        v = str(v)
+                    meta[memory_key] = v
+                except KeyError as e:
+                    logging.warning("could not find key %s", disk_key)
 
         meta['cre_line'] = meta['genotype'].split(';')[0]
         meta['imaging_depth_um'] = int(meta['imaging_depth'].split()[0])
@@ -488,6 +494,16 @@ class BrainObservatoryNwbDataSet(object):
         else:
             raise IOError("Could not find device.")
 
+        # file version
+        generated_by = meta.get("generated_by", None)
+        if generated_by is not None:
+            del meta["generated_by"]
+
+            file_version = str(generated_by[-1])
+        else:
+            file_version = "0.9"
+        meta["file_version"] = file_version
+
         return meta
 
     def get_running_speed(self):
@@ -501,15 +517,12 @@ class BrainObservatoryNwbDataSet(object):
             timestamps = f['processing'][self.PIPELINE_DATASET][
                 'Fluorescence']['imaging_plane_1']['timestamps'].value
 
-        dxcm = dxcm[:, 0]
-        if dxtime[0] != timestamps[0]:
-            adjust = np.where(timestamps == dxtime[0])[0][0]
-            dxtime = np.insert(dxtime, 0, timestamps[:adjust])
-            dxcm = np.insert(dxcm, 0, np.repeat(np.NaN, adjust))
-        adjust = len(timestamps) - len(dxtime)
-        if adjust > 0:
-            dxtime = np.append(dxtime, timestamps[(-1 * adjust):])
-            dxcm = np.append(dxcm, np.repeat(np.NaN, adjust))
+        # v0.9 stored this as an Nx1 array instead of a flat 1-d array
+        if len(dxcm.shape) == 2:
+            dxcm = dxcm[:, 0]
+
+        dxcm, dxtime = align_running_speed(dxcm, dxtime, timestamps)
+
         return dxcm, dxtime
 
     def get_motion_correction(self):
@@ -548,6 +561,25 @@ class BrainObservatoryNwbDataSet(object):
                     del f['analysis'][k]
                 f.create_dataset('analysis/%s' % k, data=v)
 
+
+def align_running_speed(dxcm, dxtime, timestamps):
+    ''' If running speed timestamps differ from fluorescence
+    timestamps, adjust by inserting NaNs to running speed.
+
+    Returns
+    -------
+    tuple: dxcm, dxtime
+    '''
+    if dxtime[0] != timestamps[0]:
+        adjust = np.where(timestamps == dxtime[0])[0][0]
+        dxtime = np.insert(dxtime, 0, timestamps[:adjust])
+        dxcm = np.insert(dxcm, 0, np.repeat(np.NaN, adjust))
+    adjust = len(timestamps) - len(dxtime)
+    if adjust > 0:
+        dxtime = np.append(dxtime, timestamps[(-1 * adjust):])
+        dxcm = np.append(dxcm, np.repeat(np.NaN, adjust))
+        
+    return dxcm, dxtime
 
 def warp_stimulus_coords(vertices,
                          distance=15.0,
