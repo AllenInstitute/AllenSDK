@@ -14,6 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import h5py
+import logging
 import pandas as pd
 import numpy as np
 import allensdk.brain_observatory.roi_masks as roi
@@ -457,11 +458,13 @@ class BrainObservatoryNwbDataSet(object):
 
         with h5py.File(self.nwb_file, 'r') as f:
             for memory_key, disk_key in BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING.items():
-                if disk_key in f.keys():
+                try:
                     v = f[disk_key].value
                     if v.dtype.type is np.string_:
                         v = str(v)
                     meta[memory_key] = v
+                except KeyError as e:
+                    logging.warning("could not find key %s", disk_key)
 
         meta['cre_line'] = meta['genotype'].split(';')[0]
         meta['imaging_depth_um'] = int(meta['imaging_depth'].split()[0])
