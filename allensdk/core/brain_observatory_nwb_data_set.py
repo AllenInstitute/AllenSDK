@@ -28,7 +28,6 @@ import re
 class MissingStimulusException(Exception):
     pass
 
-
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
 
@@ -460,8 +459,17 @@ class BrainObservatoryNwbDataSet(object):
             for memory_key, disk_key in BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING.items():
                 try:
                     v = f[disk_key].value
+
+                    # convert numpy strings to python strings
                     if v.dtype.type is np.string_:
-                        v = str(v)
+                        if len(v.shape) == 0:
+                            v = str(v)
+                        elif len(v.shape) == 1:
+                            v = [ str(s) for s in v ]
+                        else:
+                            raise Exception("Unrecognized metadata formatting for field %s" % disk_key)
+
+
                     meta[memory_key] = v
                 except KeyError as e:
                     logging.warning("could not find key %s", disk_key)
@@ -498,11 +506,10 @@ class BrainObservatoryNwbDataSet(object):
         generated_by = meta.get("generated_by", None)
         if generated_by is not None:
             del meta["generated_by"]
-
-            file_version = str(generated_by[-1])
+            version = generated_by[-1]
         else:
-            file_version = "0.9"
-        meta["file_version"] = file_version
+            version = "0.9"
+        meta["pipeline_version"] = version
 
         return meta
 
