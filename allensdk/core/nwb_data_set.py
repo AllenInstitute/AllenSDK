@@ -196,7 +196,13 @@ class NwbDataSet(object):
 
             analysis_dir = f["analysis"]
             if NwbDataSet.SPIKE_TIMES not in analysis_dir.keys():
-                analysis_dir.create_group(NwbDataSet.SPIKE_TIMES)
+                #   analysis_dir.create_group(NwbDataSet.SPIKE_TIMES)
+                g = analysis_dir.create_group(NwbDataSet.SPIKE_TIMES)
+                # mixup in specification for validator resulted everything
+                #   in 'analysis' requiring a custom label, even though
+                #   it's already known to be custom. don't argue, just
+                #   support the metadata redundancy
+                g.attrs["neurodata_type"] = "Custom"
 
             spike_dir = analysis_dir[NwbDataSet.SPIKE_TIMES]
 
