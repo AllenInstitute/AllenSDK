@@ -91,9 +91,8 @@ class BrainObservatoryNwbDataSet(object):
         traces: 2D numpy array
             Fluorescence traces for each cell
         '''
+        timestamps = self.get_fluorescence_timestamps()
         with h5py.File(self.nwb_file, 'r') as f:
-            timestamps = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['timestamps'].value
             ds = f['processing'][self.PIPELINE_DATASET][
                 'Fluorescence']['imaging_plane_1']['data']
 
@@ -104,6 +103,14 @@ class BrainObservatoryNwbDataSet(object):
                 cell_traces = ds[inds, :]
 
         return timestamps, cell_traces
+
+    def get_fluorescence_timestamps(self):
+        ''' Returns an array of timestamps in seconds for the fluorescence traces '''
+
+        with h5py.File(self.nwb_file, 'r') as f:
+            timestamps = f['processing'][self.PIPELINE_DATASET][
+                'Fluorescence']['imaging_plane_1']['timestamps'].value
+        return timestamps
 
     def get_neuropil_traces(self, cell_specimen_ids=None):
         ''' Returns an array of fluorescence traces for all ROIs
@@ -123,10 +130,10 @@ class BrainObservatoryNwbDataSet(object):
         traces: 2D numpy array
             Neuropil fluorescence traces for each cell
         '''
-        with h5py.File(self.nwb_file, 'r') as f:
-            timestamps = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['timestamps'].value
 
+        timestamps = self.get_fluorescence_timestamps()
+
+        with h5py.File(self.nwb_file, 'r') as f:
             ds = f['processing'][self.PIPELINE_DATASET][
                 'Fluorescence']['imaging_plane_1']['neuropil_traces']
             if cell_specimen_ids is None:
@@ -155,27 +162,25 @@ class BrainObservatoryNwbDataSet(object):
         traces: 2D numpy array
             Corrected fluorescence traces for each cell
         '''
+        
+        try:
+            timestamps, cell_traces = self.get_demixed_traces(cell_specimen_ids)
+        except KeyError as e:
+            timestamps, cell_traces = self.get_fluorescence_traces(cell_specimen_ids)
+
+        _, neuropil_traces = self.get_neuropil_traces(cell_specimen_ids)
+
         with h5py.File(self.nwb_file, 'r') as f:
-            timestamps = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['timestamps'].value
-            cell_traces_ds = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['data']
-            np_traces_ds = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['neuropil_traces']
             r_ds = f['processing'][self.PIPELINE_DATASET][
                 'Fluorescence']['imaging_plane_1']['r']
 
             if cell_specimen_ids is None:
-                cell_traces = cell_traces_ds.value
-                np_traces = np_traces_ds.value
                 r = r_ds.value
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
-                cell_traces = cell_traces_ds[inds, :]
-                np_traces = np_traces_ds[inds, :]
                 r = r_ds[inds]
 
-        fc = cell_traces - np_traces * r[:, np.newaxis]
+        fc = cell_traces - neuropil_traces * r[:, np.newaxis]
 
         return timestamps, fc
 
@@ -198,6 +203,38 @@ class BrainObservatoryNwbDataSet(object):
 
         return inds
 
+    def get_demixed_traces(self, cell_specimen_ids=None):
+        ''' Returns an array of demixed traces for all ROIs and 
+        the timesstamps for each datapoint
+        
+        Parameters
+        ----------
+        cell_specimen_ids: list or array (optional)
+            List of cell IDs to return data for. If this is None (default)
+            then all are returned
+
+        Returns
+        -------
+        timestamps: 2D numpy array
+            Timestamp for each fluorescence sample
+
+        demix_traces: 2D numpy array
+            demixed trace values for each cell
+        '''
+
+        with h5py.File(self.nwb_file, 'r') as f:
+            demix_ds = f['processing'][self.PIPELINE_DATASET][
+                'Fluorescence']['imaging_plane_1_demixed_signal']
+            
+            timestamps = demix_ds['timestamps'].value
+            if cell_specimen_ids is None:
+                demix_traces = demix_ds['data'].value
+            else:
+                inds = self.get_cell_specimen_indices(cell_specimen_ids)
+                demix_traces = demix_ds['data'][inds, :]
+
+        return timestamps, demix_traces
+
     def get_dff_traces(self, cell_specimen_ids=None):
         ''' Returns an array of dF/F traces for all ROIs and
         the timestamps for each datapoint
@@ -217,16 +254,16 @@ class BrainObservatoryNwbDataSet(object):
             dF/F values for each cell
         '''
         with h5py.File(self.nwb_file, 'r') as f:
-            timestamps = f['processing'][self.PIPELINE_DATASET][
-                'DfOverF']['imaging_plane_1']['timestamps'].value
+            dff_ds = f['processing'][self.PIPELINE_DATASET][
+                'DfOverF']['imaging_plane_1']
+
+            timestamps = dff_ds['timestamps'].value
 
             if cell_specimen_ids is None:
-                cell_traces = f['processing'][self.PIPELINE_DATASET][
-                    'DfOverF']['imaging_plane_1']['data'].value
+                cell_traces = dff_ds['data'].value
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
-                cell_traces = f['processing'][self.PIPELINE_DATASET][
-                    'DfOverF']['imaging_plane_1']['data'][inds, :]
+                cell_traces = dff_ds['data'][inds, :]
 
         return timestamps, cell_traces
 
@@ -532,12 +569,12 @@ class BrainObservatoryNwbDataSet(object):
         ''' Returns the mouse running speed in cm/s
         '''
         with h5py.File(self.nwb_file, 'r') as f:
-            dxcm = f['processing'][self.PIPELINE_DATASET][
-                'BehavioralTimeSeries']['running_speed']['data'].value
-            dxtime = f['processing'][self.PIPELINE_DATASET][
-                'BehavioralTimeSeries']['running_speed']['timestamps'].value
-            timestamps = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['timestamps'].value
+            dx_ds = f['processing'][self.PIPELINE_DATASET][
+                'BehavioralTimeSeries']['running_speed']
+            dxcm = dx_ds['data'].value
+            dxtime = dx_ds['timestamps'].value
+
+        timestamps = self.get_fluorescence_timestamps()
 
         # v0.9 stored this as an Nx1 array instead of a flat 1-d array
         if len(dxcm.shape) == 2:
