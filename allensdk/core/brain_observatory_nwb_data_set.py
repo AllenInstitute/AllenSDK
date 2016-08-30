@@ -55,6 +55,9 @@ class BrainObservatoryNwbDataSet(object):
                                 si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE]
     }
 
+    MOTION_CORRECTION_DATASETS = [ "MotionCorrection/2p_image_series/xy_translations", 
+                                   "MotionCorrection/2p_image_series/xy_translation" ]
+
     def __init__(self, nwb_file):
         self.nwb_file = nwb_file
 
@@ -535,15 +538,31 @@ class BrainObservatoryNwbDataSet(object):
     def get_motion_correction(self):
         ''' Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment
         '''
+        
+        motion_correction = None
         with h5py.File(self.nwb_file, 'r') as f:
-            motion_log = f['processing'][self.PIPELINE_DATASET]['MotionCorrection'][
-                '2p_image_series']['xy_translations']['data'].value
-            motion_time = f['processing'][self.PIPELINE_DATASET]['MotionCorrection'][
-                '2p_image_series']['xy_translations']['timestamps'].value
-            motion_names = f['processing'][self.PIPELINE_DATASET]['MotionCorrection'][
-                '2p_image_series']['xy_translations']['feature_description'].value
-            motion_correction = pd.DataFrame(motion_log, columns=motion_names)
-            motion_correction['timestamp'] = motion_time
+            pipeline_ds = f['processing'][self.PIPELINE_DATASET]
+
+            # pipeline 0.9 stores this in xy_translations
+            # pipeline 1.0 stores this in xy_translation
+            for mc_ds_name in self.MOTION_CORRECTION_DATASETS:
+                try:
+                    mc_ds = pipeline_ds[mc_ds_name]
+
+                    motion_log = mc_ds['data'].value
+                    motion_time = mc_ds['timestamps'].value
+                    motion_names = mc_ds['feature_description'].value
+
+                    motion_correction = pd.DataFrame(motion_log, columns=motion_names)
+                    motion_correction['timestamp'] = motion_time
+
+                    # break out if we found it
+                    break
+                except KeyError as e:
+                    pass
+        
+        if motion_correction is None:
+            raise KeyError("Could not find motion correction data.")
 
         return motion_correction
 
