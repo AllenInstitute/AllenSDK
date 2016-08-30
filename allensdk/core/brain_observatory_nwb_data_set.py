@@ -23,13 +23,15 @@ from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 import allensdk.brain_observatory.stimulus_info as si
 import dateutil
 import re
-
+import os
+from pkg_resources import parse_version
 
 class MissingStimulusException(Exception):
     pass
 
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
+    SUPPORTED_PIPELINE_VERSION = "1.0"
 
     FILE_METADATA_MAPPING = {
         'age': 'general/subject/age',
@@ -59,7 +61,17 @@ class BrainObservatoryNwbDataSet(object):
                                    "MotionCorrection/2p_image_series/xy_translation" ]
 
     def __init__(self, nwb_file):
+
+        if not os.path.exists(nwb_file):
+            raise IOError("File does not exist: %s" % nwb_file)
+
         self.nwb_file = nwb_file
+        
+        pipeline_version = self.get_metadata()['pipeline_version']
+        
+        if parse_version(pipeline_version) > parse_version(self.SUPPORTED_PIPELINE_VERSION):
+            logging.warning("File %s has a pipeline version newer than the version supported by this class (%s vs %s)."
+                            " Please update your AllenSDK." % (nwb_file, pipeline_version, self.SUPPORTED_PIPELINE_VERSION))
 
     def get_fluorescence_traces(self, cell_specimen_ids=None):
         ''' Returns an array of fluorescence traces for all ROI and
