@@ -33,17 +33,17 @@ Required Dependencies
 
  * `NumPy <http://wiki.scipy.org/Tentative_NumPy_Tutorial>`_
  * `SciPy <http://www.scipy.org/>`_
-
+ * `matplotlib <http://matplotlib.org/>`_
+ * `h5py <http://www.h5py.org>`_
+ * `pandas <http://pandas.pydata.org>`_
+ * `pynrrd <http://pypi.python.org/pypi/pynrrd>`_
+ * `Jinja2 <http://jinja.pocoo.org>`_
 
 Optional Dependencies
 ---------------------
 
  * `pytest <http://pytest.org/latest>`_
  * `coverage <http://nedbatchelder.com/code/coverage>`_
- * `matplotlib <http://matplotlib.org/>`_
- * `h5py <http://www.h5py.org>`_
- * `pandas <http://pandas.pydata.org>`_
- * `pynrrd <http://pypi.python.org/pypi/pynrrd>`_
 
 Installation with Docker (Optional)
 -----------------------------------
@@ -60,7 +60,7 @@ example Dockerfiles are available.
  
      Anaconda::
      
-         docker build -t alleninstitute/allensdk:anaconda https://github.com/AllenInstitute/AllenSDK.git#v0.12.1:docker/anaconda
+         docker build -t alleninstitute/allensdk:anaconda https://github.com/AllenInstitute/AllenSDK.git#v0.12.2:docker/anaconda
  
      Other docker configurations are also available under docker directory in the source repository.
  

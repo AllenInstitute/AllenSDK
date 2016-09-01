@@ -1028,8 +1028,141 @@ to the condition (index 1), and p value of the response to that condition (index
 </dd></dl>
 
 </div>
-<div class="section" id="allensdk-brain-observatory-r-neuropil-module">
-<h2>allensdk.brain_observatory.r_neuropil module<a class="headerlink" href="#allensdk-brain-observatory-r-neuropil-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-allensdk.brain_observatory.r_neuropil">
+<span id="allensdk-brain-observatory-r-neuropil-module"></span><h2>allensdk.brain_observatory.r_neuropil module<a class="headerlink" href="#module-allensdk.brain_observatory.r_neuropil" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="allensdk.brain_observatory.r_neuropil.NeuropilSubtract">
+<em class="property">class </em><tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">NeuropilSubtract</tt><big>(</big><em>lam=0.05</em>, <em>dt=1.0</em>, <em>folds=4</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#NeuropilSubtract"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.NeuropilSubtract" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>TODO: docs</p>
+<dl class="method">
+<dt id="allensdk.brain_observatory.r_neuropil.NeuropilSubtract.estimate_error">
+<tt class="descname">estimate_error</tt><big>(</big><em>r</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#NeuropilSubtract.estimate_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.NeuropilSubtract.estimate_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate error values for a given r for each fold and return the mean.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.r_neuropil.NeuropilSubtract.fit">
+<tt class="descname">fit</tt><big>(</big><em>r_range=[0.0, 2.0], iterations=3, dr=0.1, dr_factor=0.1</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#NeuropilSubtract.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.NeuropilSubtract.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate error values for a range of r values.  Identify a new r range
+around the minimum error values and repeat multiple times.
+TODO: docs</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.r_neuropil.NeuropilSubtract.fit_block_coordinate_desc">
+<tt class="descname">fit_block_coordinate_desc</tt><big>(</big><em>r_init=5.0</em>, <em>min_delta_r=1e-08</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#NeuropilSubtract.fit_block_coordinate_desc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.NeuropilSubtract.fit_block_coordinate_desc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.brain_observatory.r_neuropil.NeuropilSubtract.set_F">
+<tt class="descname">set_F</tt><big>(</big><em>F_M</em>, <em>F_N</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#NeuropilSubtract.set_F"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.NeuropilSubtract.set_F" title="Permalink to this definition">¶</a></dt>
+<dd><p>Break the F_M and F_N traces into the number of folds specified
+in the class constructor and normalize each fold of F_M and R_N relative to F_N.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.r_neuropil.ab_from_T">
+<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">ab_from_T</tt><big>(</big><em>T</em>, <em>lam</em>, <em>dt</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#ab_from_T"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.ab_from_T" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.r_neuropil.ab_from_diagonals">
+<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">ab_from_diagonals</tt><big>(</big><em>mat_dict</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#ab_from_diagonals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.ab_from_diagonals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs value for scipy.linalg.solve_banded</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mat_dict: dictionary of diagonals keyed by offsets</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">ab: value for scipy.linalg.solve_banded</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.r_neuropil.alpha_filter">
+<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">alpha_filter</tt><big>(</big><em>A=1.0</em>, <em>alpha=0.05</em>, <em>beta=0.25</em>, <em>T=100</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#alpha_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.alpha_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.r_neuropil.error_calc">
+<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">error_calc</tt><big>(</big><em>F_M</em>, <em>F_N</em>, <em>F_C</em>, <em>r</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#error_calc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.error_calc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.r_neuropil.error_calc_outlier">
+<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">error_calc_outlier</tt><big>(</big><em>F_M</em>, <em>F_N</em>, <em>F_C</em>, <em>r</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#error_calc_outlier"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.error_calc_outlier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.r_neuropil.estimate_contamination_ratios">
+<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">estimate_contamination_ratios</tt><big>(</big><em>F_M, F_N, lam=0.05, folds=4, iterations=3, r_range=[0.0, 2.0], dr=0.1, dr_factor=0.1</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#estimate_contamination_ratios"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.estimate_contamination_ratios" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates neuropil contamination of ROI</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>F_M: ROI trace</strong></p>
+<blockquote>
+<div><p>F_N: Neuropil trace</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dictionary: key-value pairs</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li>&#8216;r&#8217;: the contamination ratio &#8211; corrected trace = M - r*N</li>
+<li>&#8216;err&#8217;: RMS error</li>
+<li>&#8216;min_error&#8217;: minimum error</li>
+<li>&#8216;bounds_error&#8217;: boolean. True if error or R are outside tolerance</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.r_neuropil.get_diagonals_from_sparse">
+<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">get_diagonals_from_sparse</tt><big>(</big><em>mat</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#get_diagonals_from_sparse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.get_diagonals_from_sparse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of diagonals keyed by offsets</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mat: scipy.sparse matrix</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">dictionary: diagonals keyed by offsets</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.r_neuropil.normalize_F">
+<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">normalize_F</tt><big>(</big><em>F_M</em>, <em>F_N</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#normalize_F"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.normalize_F" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.r_neuropil.synthesize_F">
+<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">synthesize_F</tt><big>(</big><em>T</em>, <em>af1</em>, <em>af2</em>, <em>p1=0.05</em>, <em>p2=0.1</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#synthesize_F"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.synthesize_F" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a synthetic F_C, F_M, F_N, and r of length T
+TODO: docs</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.brain_observatory.r_neuropil.validate_with_synthetic_F">
+<tt class="descclassname">allensdk.brain_observatory.r_neuropil.</tt><tt class="descname">validate_with_synthetic_F</tt><big>(</big><em>T</em>, <em>N</em><big>)</big><a class="reference internal" href="_modules/allensdk/brain_observatory/r_neuropil.html#validate_with_synthetic_F"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.brain_observatory.r_neuropil.validate_with_synthetic_F" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute N synthetic traces of length T with known values of r, then estimate r.
+TODO: docs</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-allensdk.brain_observatory.roi_masks">
 <span id="allensdk-brain-observatory-roi-masks-module"></span><h2>allensdk.brain_observatory.roi_masks module<a class="headerlink" href="#module-allensdk.brain_observatory.roi_masks" title="Permalink to this headline">¶</a></h2>
