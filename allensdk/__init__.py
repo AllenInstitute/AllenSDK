@@ -1,6 +1,6 @@
 import logging
 
-__version__ = '0.12.1'
+__version__ = '0.12.2'
 
 try:
     from logging import NullHandler
@@ -10,4 +10,3 @@ except ImportError:
             pass
 
 logging.getLogger(__name__).addHandler(NullHandler())
-
