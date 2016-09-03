@@ -62,16 +62,16 @@ class BrainObservatoryNwbDataSet(object):
 
     def __init__(self, nwb_file):
 
-        if not os.path.exists(nwb_file):
-            raise IOError("File does not exist: %s" % nwb_file)
-
         self.nwb_file = nwb_file
         
-        pipeline_version = self.get_metadata()['pipeline_version']
+        if os.path.exists(self.nwb_file):
+            meta = self.get_metadata()
+            if meta and 'pipeline_version' in meta:
+                pipeline_version = meta['pipeline_version']
         
-        if parse_version(pipeline_version) > parse_version(self.SUPPORTED_PIPELINE_VERSION):
-            logging.warning("File %s has a pipeline version newer than the version supported by this class (%s vs %s)."
-                            " Please update your AllenSDK." % (nwb_file, pipeline_version, self.SUPPORTED_PIPELINE_VERSION))
+                if parse_version(pipeline_version) > parse_version(self.SUPPORTED_PIPELINE_VERSION):
+                    logging.warning("File %s has a pipeline version newer than the version supported by this class (%s vs %s)."
+                                    " Please update your AllenSDK." % (nwb_file, pipeline_version, self.SUPPORTED_PIPELINE_VERSION))
 
     def get_fluorescence_traces(self, cell_specimen_ids=None):
         ''' Returns an array of fluorescence traces for all ROI and
@@ -526,42 +526,54 @@ class BrainObservatoryNwbDataSet(object):
                 except KeyError as e:
                     logging.warning("could not find key %s", disk_key)
 
-        meta['cre_line'] = meta['genotype'].split(';')[0]
-        meta['imaging_depth_um'] = int(meta['imaging_depth'].split()[0])
-        del meta['imaging_depth']
-        meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
-        meta['experiment_container_id'] = int(meta['experiment_container_id'])
-        meta['session_start_time'] = dateutil.parser.parse(
-            meta['session_start_time'])
+        if 'genotye' in meta:
+            meta['cre_line'] = meta['genotype'].split(';')[0]
 
-        # parse the age in days
-        m = re.match("(.*?) days", meta['age'])
-        if m:
-            meta['age_days'] = int(m.groups()[0])
-            del meta['age']
-        else:
-            raise IOError("Could not find age.")
+        if 'imaging_depth' in meta:
+            meta['imaging_depth_um'] = int(meta['imaging_depth'].split()[0])
+            del meta['imaging_depth']
+            
+        if 'ophys_experiment_id' in meta:
+            meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
+
+        if 'experiment_container_id' in meta:
+            meta['experiment_container_id'] = int(meta['experiment_container_id'])
+
+        if 'session_start_time' in meta:
+            meta['session_start_time'] = dateutil.parser.parse(
+                meta['session_start_time'])
+
+        if 'age' in meta:
+            # parse the age in days
+            m = re.match("(.*?) days", meta['age'])
+            if m:
+                meta['age_days'] = int(m.groups()[0])
+                del meta['age']
+            else:
+                raise IOError("Could not parse age.")
 
         # parse the device string (ugly, sorry)
-        device_string = meta['device_string']
-        del meta['device_string']
+        if 'device_string' in meta:
+            device_string = meta['device_string']
+            del meta['device_string']
 
-        m = re.match("(.*?)\.\s(.*?)\sPlease*", device_string)
-        if m:
-            device, device_name = m.groups()
-            meta['device'] = device
-            meta['device_name'] = device_name
-        else:
-            raise IOError("Could not find device.")
+            m = re.match("(.*?)\.\s(.*?)\sPlease*", device_string)
+            if m:
+                device, device_name = m.groups()
+                meta['device'] = device
+                meta['device_name'] = device_name
+            else:
+                raise IOError("Could not parse device string.")
 
         # file version
-        generated_by = meta.get("generated_by", None)
-        if generated_by is not None:
-            del meta["generated_by"]
-            version = generated_by[-1]
-        else:
-            version = "0.9"
-        meta["pipeline_version"] = version
+        if 'generated_by' in meta:
+            generated_by = meta.get("generated_by", None)
+            if generated_by is not None:
+                del meta["generated_by"]
+                version = generated_by[-1]
+            else:
+                version = "0.9"
+            meta["pipeline_version"] = version
 
         return meta
 
