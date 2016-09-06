@@ -53,7 +53,7 @@ def find_ranked_sweep(sweep_list, key, reverse=False):
 
 def organize_sweeps_by_name(sweeps, name):
     sweep_list = get_sweeps_by_name(sweeps, name)
-    subthreshold_list = [ s for s in sweep_list if s.get('num_spikes',None) == 0 ]    
+    subthreshold_list = [ s for s in sweep_list if s.get('num_spikes',None) in [0, None] ]    
     suprathreshold_list = [ s for s in sweep_list if s.get('num_spikes',None) > 0 ]    
 
     return {
