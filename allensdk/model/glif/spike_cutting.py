@@ -5,6 +5,8 @@ from allensdk.model.glif.find_spikes import align_and_cut_spikes, ALIGN_CUT_WIND
 import logging
 
 import matplotlib.pyplot as plt 
+plt.rcParams.update({'font.size': 16})
+
 
 def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list, 
                                                     all_voltage_list, dt, El_reference, deltaV, 
@@ -129,15 +131,16 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
             truncatedTime = np.arange(0, len(all_v_spike_shape_list[0])) * dt
             plt.figure(figsize=(20, 10))
             for ii in range(0, len(all_v_spike_shape_list)):
-                plt.plot(truncatedTime, temp_v_spike_shape_list[ii]*1e3)
+                plt.plot(truncatedTime*1000, temp_v_spike_shape_list[ii]*1e3, lw=2)
                 # plt.plot(truncatedTime[aligned_peakInd[ii]],spikewave[aligned_peakInd[ii]], '.k'
-                plt.plot(truncatedTime[all_thresholdInd[ii]], temp_v_spike_shape_list[ii][all_thresholdInd[ii]]*1e3, '*k')
-                plt.title('Spike Cutting', fontsize=20)
+                plt.plot(truncatedTime[all_thresholdInd[ii]]*1000, temp_v_spike_shape_list[ii][all_thresholdInd[ii]]*1e3, '.k', ms=10)
+#                plt.title('Spike Cutting', fontsize=20)
 #                plt.subplot(2,1,2)
 #                plt.plot(truncatedTime, all_v_spike_shape_list[ii])
-                plt.plot(time_at_minExpVar, (all_v_at_min_expVar_list+El_reference+deltaV)*1e3, '*k')
-                plt.xlabel('time (s)', fontsize=16)
-                plt.ylabel('voltage (mV)', fontsize=16)
+                plt.plot(time_at_minExpVar*1000, (np.array(all_v_at_min_expVar_list)+El_reference+deltaV)*1.e3, '.k', ms=10)
+                plt.xlabel('Time (ms)', fontsize=16)
+                plt.ylabel('Voltage (mV)', fontsize=16)
+                plt.xlim([0,12])
 #                plt.title("Adjusted spikes (RP=%.3g, deltaV=%.3g)" % (El_reference,deltaV))  
             
         if SHOW_PLOT:
@@ -174,7 +177,7 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
         plotLineRegressRed(slope_at_each_time_end[vectorIndex_of_max_explained_var], intercept_at_each_time_end[vectorIndex_of_max_explained_var], np.NAN, xlim)
         plt.legend(loc=2, fontsize=20)
         if SHOW_PLOT:
-            plt.show(block=False)                   
+            plt.show(block=BLOCK)                   
 
     if PUBLICATION_PLOT:
         
@@ -187,11 +190,11 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
         
         def plot_hack(slope, intercept, r,xlim):
             y=slope*xlim+intercept
-            plt.plot(xlim, y, '-r', lw=4, label='slope='+"%.2f"%slope+', intercept='+"%.3f"%intercept)
+            plt.plot(xlim, y, '-k', lw=4, label='slope='+"%.2f"%slope+', intercept='+"%.3f"%intercept)
             
         plot_hack(slope_at_min_expVar_list, intercept_at_min_expVar_list*1e3, r_value_at_min_expVar_list, xlim*1e3)
         plt.legend(loc=2, fontsize=16)
-        
+        plt.show(block=BLOCK)
 
     #TODO:  Corinne look to see if these were calculated with zeroed out El if not does is matter?
     if isinstance(slope_at_min_expVar_list, np.ndarray):
