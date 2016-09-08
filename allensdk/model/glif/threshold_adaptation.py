@@ -47,11 +47,11 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
 
 
     # eliminate spurious spikes that may exist
-    spike_lt=[np.where(SI<int(2.02/dt))[0] for SI in spike_ind]
+    spike_lt=[np.where(SI<int(2.0/dt))[0] for SI in spike_ind]
     if len(np.concatenate(spike_lt))>0:
         logging.warning('there is a spike before the stimulus in the multiblip')
     spike_ind=[np.delete(SI,ind)for SI, ind in zip(spike_ind, spike_lt)]
-    spike_gt=[np.where(SI>int(2.1/dt))[0] for SI in spike_ind]
+    spike_gt=[np.where(SI>int(3.0/dt))[0] for SI in spike_ind]
     if len(np.concatenate(spike_gt))>0:
         logging.warning('there is a spike after the stimulus in the multiblip')    
     spike_ind=[np.delete(SI,ind)for SI, ind in zip(spike_ind, spike_gt)]
@@ -142,20 +142,20 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
                     thresh=[multi_SS_v[k][j] for j in spike_ind[k]]
     
                     ax1.plot(np.arange(0, len(multi_SS_i[k]))*dt, multi_SS_i[k]*1.e12, lw=2)
-                    ax1.set_ylabel('current (pA)', fontsize=16)
+                    ax1.set_ylabel('Current (pA)', fontsize=16)
                     ax1.set_xlim([2., 2.12])
                     ax1.set_title('Triple Short Square', fontsize=20)
     
                     ax2.plot(np.arange(0, len(multi_SS_v[k]))*dt, multi_SS_v[k]*1.e3, lw=2)
                     ax2.plot(spike_ind[k]*dt, np.array(thresh)*1.e3, '.k', ms=16)
-                    ax2.set_ylabel('voltage (mV)', fontsize=16)
-                    ax2.set_xlabel('time (s)', fontsize=16)
+                    ax2.set_ylabel('Voltage (mV)', fontsize=16)
+                    ax2.set_xlabel('Time (ms)', fontsize=16)
                     ax2.set_xlim([2., 2.12])
                     
     
                 ax3.plot(time_previous_spike, np.array(threshold)*1.e3, '.k', ms=16)
-                ax3.set_ylabel('threshold (mV)', fontsize=16)
-                ax3.set_xlabel('time since last spike (s)', fontsize=16)
+                ax3.set_ylabel('Threshold (mV)', fontsize=16)
+                ax3.set_xlabel('Time since last spike (s)', fontsize=16)
                 ax3.set_title('Spiking component of threshold', fontsize=20)
                 ax3.plot(time_previous_spike, fit_force*1.e3, 'r', lw=4, label="exp fit: k=%.3g, amp=%.3g" % (popt_force[1], popt_force[0]))
                 ax3.legend() 
@@ -181,7 +181,8 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
         # a different way above.  However the decay constant still needs to be negated here for use in the 
         # rest of the code. 
         decay_const=-decay_const
-        
+    
+
     except Exception, e:
         logging.error(e.message)
         const_to_add_to_thresh_for_reset=None 
