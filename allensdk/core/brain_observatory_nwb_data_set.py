@@ -515,12 +515,11 @@ class BrainObservatoryNwbDataSet(object):
                     # convert numpy strings to python strings
                     if v.dtype.type is np.string_:
                         if len(v.shape) == 0:
-                            v = str(v)
+                            v = v.decode('UTF-8')
                         elif len(v.shape) == 1:
-                            v = [ str(s) for s in v ]
+                            v = [ s.decode('UTF-8') for s in v ]
                         else:
                             raise Exception("Unrecognized metadata formatting for field %s" % disk_key)
-
 
                     meta[memory_key] = v
                 except KeyError as e:
