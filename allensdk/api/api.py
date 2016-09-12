@@ -94,6 +94,8 @@ class Api(object):
             '/api/v2/atlas_image_download'
         self.projection_image_download_endpoint = api_base_url_string + \
             '/api/v2/projection_image_download'
+        self.image_download_endpoint = api_base_url_string + \
+            '/api/v2/image_download'
         self.informatics_archive_endpoint = Api.download_url + '/informatics-archive'
 
         self.rma_endpoint = api_base_url_string + '/api/v2/data'
