@@ -336,7 +336,7 @@ def test_api_doc_url_download_projection_image_view_exception(image_api):
                                             downsample=4,
                                             view='typo')
 
-    assert excinfo.value.message == "view argument should be 'expression', 'projection', 'tumor_feature_annotation' or 'tumor_feature_boundary'"
+    assert excinfo.value.args[0] == "view argument should be 'expression', 'projection', 'tumor_feature_annotation' or 'tumor_feature_boundary'"
 
 
 def test_api_doc_url_download_image_downsampled(image_api):
