@@ -35,6 +35,17 @@ SESSION_STIMULUS_MAP = {
 }
 
 
+def sessions_with_stimulus(stimulus):
+    """ Return the names of the sessions that contain a given stimulus. """
+    
+    sessions = set()
+    for session, session_stimuli in SESSION_STIMULUS_MAP.iteritems():
+        if stimulus in session_stimuli:
+            sessions.add(session)
+
+    return sorted(list(sessions))
+
+
 def stimuli_in_session(session):
     """ Return a list what stimuli are available in a given session.
 
