@@ -863,7 +863,7 @@ def detect_bursts(isis, isi_types, fast_tr_v, fast_tr_t, slow_tr_v, slow_tr_t,
         return np.array([])
 
     if len(into_burst) != len(out_of_burst):
-        raise ft.FeatureError("Inconsistent burst boundary identification")
+        raise FeatureError("Inconsistent burst boundary identification")
 
     inout_pairs = zip(into_burst, out_of_burst)
     delta_t = slow_tr_t - fast_tr_t
