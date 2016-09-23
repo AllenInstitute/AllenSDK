@@ -275,7 +275,7 @@ class BrainObservatoryCache(Cache):
                 'experiment_container_id': e['experiment_container_id'],
                 'session_type': e['stimulus_name'],
                 'donor_name': e['specimen']['donor']['external_donor_name'],
-                'specimen_name': c['specimen']['name']
+                'specimen_name': e['specimen']['name']
                     } for e in exps]
         return exps
 
@@ -294,7 +294,12 @@ class BrainObservatoryCache(Cache):
 
         return mappings
 
-    def get_cell_specimens(self, file_name=None, ids=None, experiment_container_ids=None, simple=True):
+    def get_cell_specimens(self, 
+                           file_name=None, 
+                           ids=None, 
+                           experiment_container_ids=None, 
+                           simple=True,
+                           filters=None):
         """ Return cell specimens that have certain properies.
 
         Parameters
@@ -331,7 +336,8 @@ class BrainObservatoryCache(Cache):
 
         cell_specimens = self.api.filter_cell_specimens(cell_specimens,
                                                         ids=ids,
-                                                        experiment_container_ids=experiment_container_ids)
+                                                        experiment_container_ids=experiment_container_ids,
+                                                        filters=filters)
 
         # drop the thumbnail columns
         if simple:
