@@ -163,10 +163,7 @@ class BrainObservatoryNwbDataSet(object):
             Corrected fluorescence traces for each cell
         '''
         
-        try:
-            timestamps, cell_traces = self.get_demixed_traces(cell_specimen_ids)
-        except KeyError as e:
-            timestamps, cell_traces = self.get_fluorescence_traces(cell_specimen_ids)
+        timestamps, cell_traces = self.get_fluorescence_traces(cell_specimen_ids)
 
         _, neuropil_traces = self.get_neuropil_traces(cell_specimen_ids)
 
@@ -202,38 +199,6 @@ class BrainObservatoryNwbDataSet(object):
             raise ValueError("Cell specimen not found (%s)" % str(e))
 
         return inds
-
-    def get_demixed_traces(self, cell_specimen_ids=None):
-        ''' Returns an array of demixed traces for all ROIs and 
-        the timesstamps for each datapoint
-        
-        Parameters
-        ----------
-        cell_specimen_ids: list or array (optional)
-            List of cell IDs to return data for. If this is None (default)
-            then all are returned
-
-        Returns
-        -------
-        timestamps: 2D numpy array
-            Timestamp for each fluorescence sample
-
-        demix_traces: 2D numpy array
-            demixed trace values for each cell
-        '''
-
-        with h5py.File(self.nwb_file, 'r') as f:
-            demix_ds = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1_demixed_signal']
-            
-            timestamps = demix_ds['timestamps'].value
-            if cell_specimen_ids is None:
-                demix_traces = demix_ds['data'].value
-            else:
-                inds = self.get_cell_specimen_indices(cell_specimen_ids)
-                demix_traces = demix_ds['data'][inds, :]
-
-        return timestamps, demix_traces
 
     def get_dff_traces(self, cell_specimen_ids=None):
         ''' Returns an array of dF/F traces for all ROIs and
