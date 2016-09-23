@@ -19,7 +19,6 @@ from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import logging
 
-
 class BrainObservatoryApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')
 
@@ -350,7 +349,10 @@ class BrainObservatoryApi(RmaTemplate):
 
         return experiments
 
-    def filter_cell_specimens(self, cell_specimens, ids=None, experiment_container_ids=None):
+    def filter_cell_specimens(self, cell_specimens, 
+                              ids=None, 
+                              experiment_container_ids=None,
+                              filters=None):
         if ids is not None:
             cell_specimens = [c for c in cell_specimens if c[
                 'cell_specimen_id'] in ids]
@@ -359,4 +361,28 @@ class BrainObservatoryApi(RmaTemplate):
             cell_specimens = [c for c in cell_specimens if c[
                 'experiment_container_id'] in experiment_container_ids]
 
+        if filters is not None:
+            cell_specimens = [c for c in cell_specimens 
+                              if self.cell_matches_filters(c, filters)]
+
         return cell_specimens
+
+    def cell_matches_filters(self, cell, filters):
+        for flt in filters:
+            field = flt['field']
+            if field not in cell:
+                raise Exception("Could not find field '%s' in cell" % flt['field'])
+
+            op = flt['op']
+            value = flt['value']
+            field = cell[field]
+
+            if op == "=":
+                if not (field == value):
+                    return False
+            elif op == "in":
+                if not (field in value):
+                    return False
+
+        return True
+
