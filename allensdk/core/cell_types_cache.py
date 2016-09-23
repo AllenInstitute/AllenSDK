@@ -327,7 +327,7 @@ class CellTypesCache(Cache):
             try:
                 self.api.save_reconstruction_markers(specimen_id, file_name)
             except LookupError as e:
-                logging.warning(e.message)
+                logging.warning(e.args)
                 return []
 
         return swc.read_marker_file(file_name)

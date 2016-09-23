@@ -22,7 +22,7 @@ def deprecated_method():
 
     @deprecated
     def i_am_deprecated():
-        print('hi')
+        pass
 
     return i_am_deprecated
 

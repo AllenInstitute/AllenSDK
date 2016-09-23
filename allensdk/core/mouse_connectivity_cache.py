@@ -65,6 +65,7 @@ class MouseConnectivityCache(Cache):
 
     """
 
+    CCF_VERSION_KEY = 'CCF_VERSION'
     ANNOTATION_KEY = 'ANNOTATION'
     TEMPLATE_KEY = 'TEMPLATE'
     PROJECTION_DENSITY_KEY = 'PROJECTION_DENSITY'
@@ -76,10 +77,16 @@ class MouseConnectivityCache(Cache):
     STRUCTURES_KEY = 'STRUCTURES'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
 
-    def __init__(self, resolution=25, cache=True, manifest_file='mouse_connectivity_manifest.json', base_uri=None):
+    def __init__(self,
+                 resolution=25,
+                 cache=True,
+                 manifest_file='mouse_connectivity_manifest.json',
+                 ccf_version=None,
+                 base_uri=None):
         super(MouseConnectivityCache, self).__init__(
             manifest=manifest_file, cache=cache)
 
+        self.ccf_version = ccf_version
         self.resolution = resolution
         self.api = MouseConnectivityApi(base_uri=base_uri)
 
@@ -110,7 +117,9 @@ class MouseConnectivityCache(Cache):
             Manifest.safe_mkdir(os.path.dirname(file_name))
 
             annotation, info = self.api.download_annotation_volume(
-                self.resolution, file_name)
+                self.ccf_version,
+                self.resolution,
+                file_name)
 
         return annotation, info
 
@@ -686,9 +695,14 @@ class MouseConnectivityCache(Cache):
                                   parent_key='BASEDIR',
                                   typename='file')
 
+        manifest_builder.add_path(self.CCF_VERSION_KEY,
+                                  'annotation/ccf_%d',
+                                  parent_key='BASEDIR',
+                                  typename='dir')
+
         manifest_builder.add_path(self.ANNOTATION_KEY,
                                   'annotation_%d.nrrd',
-                                  parent_key='BASEDIR',
+                                  parent_key=self.CCF_VERSION_KEY,
                                   typename='file')
 
         manifest_builder.add_path(self.TEMPLATE_KEY,

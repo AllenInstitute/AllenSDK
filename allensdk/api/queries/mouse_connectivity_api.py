@@ -31,7 +31,23 @@ class MouseConnectivityApi(RmaApi):
     def __init__(self, base_uri=None):
         super(MouseConnectivityApi, self).__init__(base_uri)
 
-    def download_annotation_volume(self, resolution, file_name):
+    AVERAGE_TEMPLATE = 'average_template'
+    ARA_NISSL = 'ara_nissl'
+    MOUSE_2011 = 'annotation/mouse_2011'
+    DEVMOUSE_2012 = 'annotation/devmouse_2012'
+    CCF_2015 = 'annotation/ccf_2015'
+    CCF_2016 = 'annotation/ccf_2016'
+    CCF_VERSION_DEFAULT = CCF_2016
+
+    VOXEL_RESOLUTION_10_MICRONS = 10
+    VOXEL_RESOLUTION_25_MICRONS = 25
+    VOXEL_RESOLUTION_50_MICRONS = 50
+    VOXEL_RESOLUTION_100_MICRONS = 100
+
+    def download_annotation_volume(self,
+                                   ccf_version,
+                                   resolution,
+                                   file_name):
         '''
         Download the annotation volume at a particular resolution.
 
@@ -39,18 +55,23 @@ class MouseConnectivityApi(RmaApi):
         ----------
 
         resolution: int
-            Desired resolution to download in microns.  Must be 10, 25, 50, or 100.
+            Desired resolution to download in microns.
+            Must be 10, 25, 50, or 100.
 
         file_name: string
             Where to save the annotation volume.
         '''
 
+        if ccf_version == None:
+            ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
+        
+        
         try:
             os.makedirs(os.path.dirname(file_name))
         except:
             pass
 
-        self.download_volumetric_data('annotation/ccf_2015',
+        self.download_volumetric_data(ccf_version,
                                       'annotation_%d.nrrd' % resolution,
                                       save_file_path=file_name)
 
@@ -76,7 +97,7 @@ class MouseConnectivityApi(RmaApi):
         except:
             pass
 
-        self.download_volumetric_data('average_template',
+        self.download_volumetric_data(MouseConnectivityApi.AVERAGE_TEMPLATE,
                                       'average_template_%d.nrrd' % resolution,
                                       save_file_path=file_name)
 
@@ -203,7 +224,7 @@ class MouseConnectivityApi(RmaApi):
                                 include=include)
 
     def build_volumetric_data_download_url(self,
-                                           data,
+                                           data_path,
                                            file_name,
                                            voxel_resolution=None,
                                            release=None,
@@ -212,7 +233,7 @@ class MouseConnectivityApi(RmaApi):
 
         Parameters
         ----------
-        data : string
+        data_path : string
             'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
         voxel_resolution : int
             10, 25, 50 or 100
@@ -226,7 +247,7 @@ class MouseConnectivityApi(RmaApi):
         '''
 
         if voxel_resolution is None:
-            voxel_resolution = 10
+            voxel_resolution = MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS
 
         if release is None:
             release = 'current-release'
@@ -236,14 +257,14 @@ class MouseConnectivityApi(RmaApi):
 
         url = ''.join([self.informatics_archive_endpoint,
                        '/%s/%s/' % (release, coordinate_framework),
-                       data,
+                       data_path,
                        '/',
                        file_name])
 
         return url
 
     def download_volumetric_data(self,
-                                 data,
+                                 data_path,
                                  file_name,
                                  voxel_resolution=None,
                                  save_file_path=None,
@@ -253,7 +274,7 @@ class MouseConnectivityApi(RmaApi):
 
         Parameters
         ----------
-        data : string
+        data_path : string
             'average_template', 'ara_nissl', 'annotation/ccf_2015', 'annotation/mouse_2011', or 'annotation/devmouse_2012'
         file_name : string
 
@@ -267,7 +288,7 @@ class MouseConnectivityApi(RmaApi):
         See: `3-D Reference Models <http://help.brain-map.org/display/mouseconnectivity/API#API-3DReferenceModels>`_
         for additional documentation.
         '''
-        url = self.build_volumetric_data_download_url(data,
+        url = self.build_volumetric_data_download_url(data_path,
                                                       file_name,
                                                       voxel_resolution,
                                                       release,

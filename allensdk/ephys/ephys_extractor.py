@@ -720,6 +720,7 @@ class EphysCellFeatureExtractor:
                 break
             if c[0] < common_amp:
                 common_amp = c[0]
+
         self._features["short_squares"]["stimulus_amplitude"] = common_amp
         ext = EphysSweepSetFeatureExtractor.from_sweeps([sweep for sweep in spiking_sweeps if _short_step_stim_amp(sweep) == common_amp])
         self._short_squares_ext = ext
