@@ -275,7 +275,7 @@ class BrainObservatoryCache(Cache):
                 'experiment_container_id': e['experiment_container_id'],
                 'session_type': e['stimulus_name'],
                 'donor_name': e['specimen']['donor']['external_donor_name'],
-                'specimen_name': c['specimen']['name']
+                'specimen_name': e['specimen']['name']
                     } for e in exps]
         return exps
 
