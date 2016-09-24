@@ -14,6 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import pandas as pd
 from allensdk.api.queries.rma_template import RmaTemplate
 from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
@@ -108,6 +109,17 @@ class BrainObservatoryApi(RmaTemplate):
              'criteria_params': ['cell_specimen_ids']
              }
         ]}
+
+    _QUERY_TEMPLATES = {
+        "=": '({0} == {1})',
+        "<": '({0} < {1})',
+        ">": '({0} > {1})',
+        "<=": '({0} <= {1})',
+        ">=": '({0} >= {1})',
+        "between": '({0} >= {1}) and ({0} <= {1})',
+        "in": '({0} == {1})',
+        "is": '({0} == {1})'
+    }
 
     def __init__(self, base_uri=None):
         super(BrainObservatoryApi, self).__init__(base_uri,
@@ -362,27 +374,25 @@ class BrainObservatoryApi(RmaTemplate):
                 'experiment_container_id'] in experiment_container_ids]
 
         if filters is not None:
-            cell_specimens = [c for c in cell_specimens 
-                              if self.cell_matches_filters(c, filters)]
+            cell_specimens = self.dataframe_query(cell_specimens,
+                                                  filters,
+                                                  'cell_specimen_id')
 
         return cell_specimens
 
-    def cell_matches_filters(self, cell, filters):
-        for flt in filters:
-            field = flt['field']
-            if field not in cell:
-                raise Exception("Could not find field '%s' in cell" % flt['field'])
-
-            op = flt['op']
-            value = flt['value']
-            field = cell[field]
-
-            if op == "=":
-                if not (field == value):
-                    return False
-            elif op == "in":
-                if not (field in value):
-                    return False
-
-        return True
-
+    def dataframe_query(self,
+                        datas,
+                        filters,
+                        primary_key):
+        queries = ' & '.join(self._QUERY_TEMPLATES[f['op']].\
+                             format(f['field'],
+                                    str(f['value'])) for f in filters)
+        
+        result_dataframe = pd.DataFrame(datas)
+        result_dataframe = result_dataframe.query(queries)
+        
+        result = [d for d in datas
+                  if d[primary_key]
+                  in set(result_dataframe[primary_key])]
+        
+        return result
