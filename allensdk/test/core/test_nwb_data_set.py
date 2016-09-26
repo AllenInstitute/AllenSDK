@@ -13,13 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from mock import patch, Mock, MagicMock
+from mock import patch, MagicMock
 from pkg_resources import resource_filename  # @UnresolvedImport
 import numpy as np
 from allensdk.core.nwb_data_set import NwbDataSet
 import pytest
 import os
-import h5py
 
 NWB_FLAVORS = []
 
@@ -30,7 +29,6 @@ else:
 with open(nwb_list_file, 'r') as f:
     NWB_FLAVORS = [l.strip() for l in f]
 
-pass
 
 @pytest.fixture(params=NWB_FLAVORS)
 def data_set(request):
@@ -116,7 +114,7 @@ def test_fill_sweep_responses(mock_data_set):
                 }
             }
         }
-     }
+    }
 
     with patch('h5py.File', mock_h5py_file(data=h5)):
         data_set.fill_sweep_responses(0.0, [1])
@@ -161,7 +159,7 @@ def test_set_spike_times(mock_data_set):
                 }
             }
         }
-     }
+    }
 
     with patch('h5py.File', mock_h5py_file(data=h5)) as f:
         data_set.set_spike_times(1, [0.1, 0.2, 0.3, 0.4, 0.5])

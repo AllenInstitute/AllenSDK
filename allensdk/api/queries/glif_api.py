@@ -16,7 +16,7 @@
 import json
 import logging
 
-from allensdk.api.queries.rma_api import RmaApi
+from .rma_api import RmaApi
 
 
 class GlifApi(RmaApi):

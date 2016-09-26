@@ -19,9 +19,8 @@ import numpy as np
 import pandas as pd
 from math import sqrt
 import logging
-from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
-from allensdk.brain_observatory.brain_observatory_exceptions \
-    import BrainObservatoryAnalysisException
+from .stimulus_analysis import StimulusAnalysis
+from .brain_observatory_exceptions import BrainObservatoryAnalysisException
 
 
 class StaticGratings(StimulusAnalysis):

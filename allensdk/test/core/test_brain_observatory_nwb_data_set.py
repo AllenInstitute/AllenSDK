@@ -28,7 +28,6 @@ else:
 with open(nwb_list_file, 'r') as f:
     NWB_FLAVORS = [l.strip() for l in f]
 
-pass
 
 @pytest.fixture(params=NWB_FLAVORS)
 def data_set(request):
@@ -105,7 +104,7 @@ def test_get_dff_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
  
     timestamps, traces = data_set.get_dff_traces()
-    #assert len(timestamps) == traces.shape[1]
+    # assert len(timestamps) == traces.shape[1]
     assert len(ids) == traces.shape[0]
  
     timestamps, traces = data_set.get_dff_traces(ids)

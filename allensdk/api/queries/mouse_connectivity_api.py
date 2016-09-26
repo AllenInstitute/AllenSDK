@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.queries.rma_api import RmaApi
-from allensdk.api.queries.grid_data_api import GridDataApi
+from .rma_api import RmaApi
+from .grid_data_api import GridDataApi
 import numpy as np
 import os
 import nrrd
@@ -325,7 +325,7 @@ class MouseConnectivityApi(RmaApi):
 
         Parameters
         ----------
-        data_set_id : integer
+        data_set_id : integerallensdk.api.queries
             aka attachable_id
 
         Notes

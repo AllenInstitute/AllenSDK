@@ -17,7 +17,7 @@
 import scipy.stats as st
 import numpy as np
 import pandas as pd
-from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
+from .stimulus_analysis import StimulusAnalysis
 import logging
 
 

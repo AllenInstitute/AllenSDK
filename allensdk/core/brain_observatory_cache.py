@@ -14,11 +14,11 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import allensdk.core.json_utilities as ju
+from . import json_utilities as ju
 from allensdk.api.cache import Cache
 from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
+from .brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import allensdk.brain_observatory.stimulus_info as stim_info
 import six
 

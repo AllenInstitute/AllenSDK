@@ -1,4 +1,4 @@
-# Copyright 2014 Allen Institute for Brain Science
+# Copyright 2014-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 import os
 import subprocess as sp
 import logging
-from allensdk.model.biophys_sim.config import Config
+from .config import Config
 
 
 def choose_bps_command(command='bps_simple', conf_file=None):

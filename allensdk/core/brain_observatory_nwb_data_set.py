@@ -501,11 +501,12 @@ class BrainObservatoryNwbDataSet(object):
             meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
 
         if 'experiment_container_id' in meta:
-            meta['experiment_container_id'] = int(meta['experiment_container_id'])
+            meta['experiment_container_id'] = \
+                int(meta['experiment_container_id'])
 
         if 'session_start_time' in meta:
-            meta['session_start_time'] = dateutil.parser.parse(
-                meta['session_start_time'])
+            meta['session_start_time'] = \
+                dateutil.parser.parse(meta['session_start_time'])
 
         if 'age' in meta:
             # parse the age in days

@@ -15,7 +15,7 @@
 
 import os
 import pandas as pd
-from allensdk.api.queries.rma_template import RmaTemplate
+from .rma_template import RmaTemplate
 from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import logging
