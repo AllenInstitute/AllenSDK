@@ -15,6 +15,7 @@
 
 import os
 import pandas as pd
+from six import string_types
 from .rma_template import RmaTemplate
 from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
@@ -116,7 +117,7 @@ class BrainObservatoryApi(RmaTemplate):
         ">": '({0} > {1})',
         "<=": '({0} <= {1})',
         ">=": '({0} >= {1})',
-        "between": '({0} >= {1}) and ({0} <= {1})',
+        "between": '({0} >= {1}) and ({0} <= {2})',
         "in": '({0} == {1})',
         "is": '({0} == {1})'
     }
@@ -380,19 +381,45 @@ class BrainObservatoryApi(RmaTemplate):
 
         return cell_specimens
 
+    def dataframe_query_string(self,
+                               filters):
+        def _quote_string(v):
+            if isinstance(v, string_types):
+                return "'%s'" % (v)
+            else:
+                return str(v)
+
+        def _filter_clause(op, field, value):
+            if op == 'in':
+                query_args = [field, str(value)]
+            elif type(value) is list:
+                query_args = [field] + map(_quote_string, value)
+            else:
+                query_args = [field, str(value)]
+            
+            cluster_string = self._QUERY_TEMPLATES[op].\
+                format(*query_args)
+            
+            return cluster_string
+
+        query_string = ' & '.join(_filter_clause(f['op'],
+                                                 f['field'],
+                                                 f['value']) for f in filters)
+        
+        return query_string
+
+
     def dataframe_query(self,
                         datas,
                         filters,
                         primary_key):
-        queries = ' & '.join(self._QUERY_TEMPLATES[f['op']].\
-                             format(f['field'],
-                                    str(f['value'])) for f in filters)
-        
+        queries = self.dataframe_query_string(filters)
         result_dataframe = pd.DataFrame(datas)
         result_dataframe = result_dataframe.query(queries)
         
+        result_keys = set(result_dataframe[primary_key]) 
         result = [d for d in datas
                   if d[primary_key]
-                  in set(result_dataframe[primary_key])]
+                  in result_keys]
         
         return result

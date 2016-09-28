@@ -15,7 +15,10 @@
 import pytest
 from mock import patch, mock_open, MagicMock
 from test_brain_observatory_cache import CACHE_MANIFEST
-from allensdk.core.brain_observatory_cache import BrainObservatoryCache
+from allensdk.core.brain_observatory_cache \
+    import BrainObservatoryCache
+from allensdk.api.queries.brain_observatory_api \
+    import BrainObservatoryApi
 
 
 try:
@@ -112,6 +115,13 @@ def cells():
 
 
 @pytest.fixture
+def api():
+    boi = BrainObservatoryApi()
+    
+    return boi
+
+
+@pytest.fixture
 def unmocked_boc():
     boc = BrainObservatoryCache()
     
@@ -156,6 +166,17 @@ def example_filters():
     
     return f
 
+
+@pytest.fixture
+def between_filter():
+    f = [{"field": "p_ns",
+          "op": "between",
+          "value": [ 0.00034, 0.00035 ] }
+    ]
+    
+    return f
+
+
 FILTER_OPERATORS = ["=", "<", ">", "<=", ">=", "between", "in", "is"]
 QUERY_TEMPLATES = {
     "=": '({0} == {1})',
@@ -171,15 +192,15 @@ QUERY_TEMPLATES = {
 
 @pytest.mark.skipif(True, reason="not done")
 def test_dataframe_query(brain_observatory_cache,
-                         example_filters,
+                         between_filter,
                          cells):
     brain_observatory_cache = unmocked_boc
     with patch('os.path.exists',
-               MagicMock(return_value=True)) as ope:
+               MagicMock(return_value=True)):
         with patch('allensdk.core.json_utilities.read',
                    MagicMock(return_value=cells)) as mju:
             cells = brain_observatory_cache.get_cell_specimens(
-                filters=example_filters)
+                filters=between_filter)
     
             assert len(cells) > 0
 
@@ -195,3 +216,93 @@ def test_dataframe_query_unmocked(unmocked_boc,
     # total lines = 18260, can make fail by passing no filters
     expected = 105
     assert len(cells) == expected
+
+
+def test_dataframe_query_between_unmocked(unmocked_boc,
+                                          between_filter,
+                                          cells):
+    brain_observatory_cache = unmocked_boc
+
+    cells = brain_observatory_cache.get_cell_specimens(
+        filters=between_filter)
+    
+    # total lines = 18260, can make fail by passing no filters
+    expected = 9
+    assert len(cells) == expected
+
+
+@pytest.mark.xfail
+def test_dataframe_query_is_unmocked(unmocked_boc,
+                                     cells):
+    brain_observatory_cache = unmocked_boc
+
+    is_filter = [
+        {"field": "all_stim",
+         "op": "is",
+         "value": True }
+    ]
+
+    cells = brain_observatory_cache.get_cell_specimens(
+        filters=is_filter)
+    
+    # total lines = 18260, can make fail by passing no filters
+    expected = 9800
+    assert len(cells) == expected
+
+
+def test_dataframe_query_string_between(api):
+    filters = [
+        {"field": "p_ns",
+         "op": "between",
+         "value": [ 0.00034, 0.00035 ] }
+    ]
+
+    query_string = api.dataframe_query_string(filters)
+    
+    assert query_string == '(p_ns >= 0.00034) and (p_ns <= 0.00035)'
+
+
+def test_dataframe_query_string_in(api):
+    filters = [
+        {"field": "name",
+         "op": "in",
+         "value": [ 'Abc', 'Def', 'Ghi' ] }
+    ]
+
+    query_string = api.dataframe_query_string(filters)
+    
+    assert query_string == "(name == ['Abc', 'Def', 'Ghi'])"
+
+
+def test_dataframe_query_string_in_floats(api):
+    filters = [
+        {"field": "rating",
+         "op": "in",
+         "value": [ 9.9, 8.7, 0.1 ] }
+    ]
+
+    query_string = api.dataframe_query_string(filters)
+    
+    assert query_string == "(rating == [9.9, 8.7, 0.1])"
+
+
+def test_dataframe_query_string_is_boolean(api):
+    filters = [
+        {"field": "fact_check",
+         "op": "is",
+         "value": False }
+    ]
+
+    query_string = api.dataframe_query_string(filters)
+    
+    assert query_string == "(fact_check == False)"
+
+
+def test_dataframe_query_string_multi_filters(api,
+                                              example_filters):
+    query_string = api.dataframe_query_string(example_filters)
+    
+    assert query_string == ("(p_dg <= 0.001) & (pref_dir_dg == 45) & "
+                            "(area == ['VISpm']) & " 
+                            "(tld1_name == "
+                            "['Rbp4-Cre', 'Cux2-CreERT2', 'Rorb-IRES2-Cre'])")
