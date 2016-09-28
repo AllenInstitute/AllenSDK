@@ -26,3 +26,5 @@ RUN mkdir allensdk; \
     rm allensdk.zip; \
     pip install .; \
     pip install -r test_requirements.txt
+
+ENV PYTHONPATH /usr/local/nrn/lib/python
