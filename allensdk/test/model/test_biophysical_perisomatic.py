@@ -20,6 +20,7 @@ from allensdk.core.dat_utilities import DatUtilities
 from allensdk.api.queries.biophysical_api import BiophysicalApi
 
 
+@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true')
 def test_biophysical():
     neuronal_model_id = 472451419    # get this from the web site
 
