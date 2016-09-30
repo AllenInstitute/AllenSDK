@@ -105,7 +105,7 @@ class MouseConnectivityCache(Cache):
         """
 
         file_name = self.get_cache_path(
-            file_name, self.ANNOTATION_KEY, self.resolution)
+            file_name, self.ANNOTATION_KEY, self.ccf_version, self.resolution)
 
         if file_name is None:
             raise Exception(
