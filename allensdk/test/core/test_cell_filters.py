@@ -198,10 +198,10 @@ def test_dataframe_query(brain_observatory_cache,
     with patch('os.path.exists',
                MagicMock(return_value=True)):
         with patch('allensdk.core.json_utilities.read',
-                   MagicMock(return_value=cells)) as mju:
+                   MagicMock(return_value=cells)):
             cells = brain_observatory_cache.get_cell_specimens(
                 filters=between_filter)
-    
+
             assert len(cells) > 0
 
 
@@ -212,7 +212,7 @@ def test_dataframe_query_unmocked(unmocked_boc,
 
     cells = brain_observatory_cache.get_cell_specimens(
         filters=example_filters)
-    
+
     # total lines = 18260, can make fail by passing no filters
     expected = 105
     assert len(cells) == expected
@@ -225,7 +225,7 @@ def test_dataframe_query_between_unmocked(unmocked_boc,
 
     cells = brain_observatory_cache.get_cell_specimens(
         filters=between_filter)
-    
+
     # total lines = 18260, can make fail by passing no filters
     expected = 9
     assert len(cells) == expected
@@ -244,7 +244,7 @@ def test_dataframe_query_is_unmocked(unmocked_boc,
 
     cells = brain_observatory_cache.get_cell_specimens(
         filters=is_filter)
-    
+
     # total lines = 18260, can make fail by passing no filters
     expected = 9800
     assert len(cells) == expected
@@ -258,7 +258,7 @@ def test_dataframe_query_string_between(api):
     ]
 
     query_string = api.dataframe_query_string(filters)
-    
+
     assert query_string == '(p_ns >= 0.00034) and (p_ns <= 0.00035)'
 
 
@@ -270,7 +270,7 @@ def test_dataframe_query_string_in(api):
     ]
 
     query_string = api.dataframe_query_string(filters)
-    
+
     assert query_string == "(name == ['Abc', 'Def', 'Ghi'])"
 
 
@@ -282,7 +282,7 @@ def test_dataframe_query_string_in_floats(api):
     ]
 
     query_string = api.dataframe_query_string(filters)
-    
+
     assert query_string == "(rating == [9.9, 8.7, 0.1])"
 
 
@@ -294,14 +294,14 @@ def test_dataframe_query_string_is_boolean(api):
     ]
 
     query_string = api.dataframe_query_string(filters)
-    
+
     assert query_string == "(fact_check == False)"
 
 
 def test_dataframe_query_string_multi_filters(api,
                                               example_filters):
     query_string = api.dataframe_query_string(example_filters)
-    
+
     assert query_string == ("(p_dg <= 0.001) & (pref_dir_dg == 45) & "
                             "(area == ['VISpm']) & " 
                             "(tld1_name == "

@@ -17,17 +17,7 @@
 import requests
 from requests_toolbelt import exceptions
 from requests_toolbelt.downloadutils import stream
-from requests.exceptions import ConnectionError
 
-try:
-    import urllib.request as urllib_request
-except:
-    import urllib2 as urllib_request
-
-try:
-    import urllib.error as urllib_error
-except:
-    import urllib2 as urllib_error
 
 from contextlib import closing
 import allensdk.core.json_utilities as json_utilities
@@ -170,7 +160,7 @@ class Api(object):
         kwargs : keyword arguments
             Keyword arguments to be passed to the rma builder function.
 
-        Returnsurllib_re
+        Returns
         -------
         any type
             The data extracted from the json response.
@@ -287,13 +277,16 @@ class Api(object):
                 with open(file_path, 'wb') as f:
                     stream.stream_response_to_file(response, path=f)
         except exceptions.StreamingError as e:
-            self._log.error("Couldn't retrieve file %s from %s" % (file_path,url))
+            self._log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
             raise(e)
         except requests.exceptions.RequestException as e:
-            self._log.error("Couldn't retrieve file %s from %s" % (file_path,url))
+            self._log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
             raise(e)
         except requests.exceptions.ConnectionError as e:
-            self._log.error("Couldn't retrieve file %s from %s" % (file_path,url))
+            self._log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
+            raise(e)
+        except requests.exceptions.ReadTimeout as e:
+            self._log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
             raise(e)
         except Exception as e:
             self._log.error("Couldn't retrieve file %s from %s" % (file_path, url))
@@ -318,8 +311,10 @@ class Api(object):
         '''
 
         if post is False:
-            data = json_utilities.read_url(urllib_request.quote(url, ';/?:@&=+$,'),
-                                           'GET')
+            data = json_utilities.read_url(
+                requests.utils.quote(url,
+                                     ';/?:@&=+$,'),
+                'GET')
         else:
             data = json_utilities.read_url(url, 'POST')
 
@@ -338,6 +333,6 @@ class Api(object):
         string
             Unparsed xml string.
         '''
-        response = urllib_request.urlopen(url)
+        response = requests.get(url)
 
-        return response.read()
+        return response.content

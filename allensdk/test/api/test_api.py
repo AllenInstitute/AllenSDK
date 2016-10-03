@@ -19,15 +19,6 @@ from allensdk.api.api import Api
 import allensdk.core.json_utilities as ju
 import requests
 
-try:
-    import urllib.request as urllib_request
-except:
-    import urllib2 as urllib_request
-try:
-    import urllib.error as urllib_error
-except:
-    import urllib2 as urllib_error
-
 
 @pytest.fixture
 def api():
@@ -41,7 +32,8 @@ def api():
 
 
 def test_failed_download(api):
-    with pytest.raises(requests.exceptions.RequestException) as e_info:
+    with pytest.raises(requests.exceptions.ReadTimeout) as e_info:
+        
         api.retrieve_file_over_http('http://example.com/yo.jpg',
                                     '/tmp/testfile')
 

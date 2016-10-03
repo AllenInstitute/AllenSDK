@@ -41,8 +41,8 @@ def test_get_sweep_numbers(data_set):
     sweep_numbers = data_set.get_sweep_numbers()
 
     assert len(sweep_numbers) > 0
- 
- 
+
+
 def test_get_experiment_sweep_numbers(data_set):
     sweep_numbers = data_set.get_experiment_sweep_numbers()
 
@@ -54,7 +54,7 @@ def test_get_spike_times(data_set):
 
     found_spikes = False
 
-    for n in sweep_numbers: 
+    for n in sweep_numbers:
         spike_times = data_set.get_spike_times(n)
         if len(spike_times > 0):
             found_spikes = True
@@ -88,7 +88,7 @@ def mock_data_set():
 def test_fill_sweep_responses(mock_data_set):
     data_set = mock_data_set
     DATA_LENGTH = 5
-    
+
     h5 = {
         'stimulus': {
             'presentation': {
@@ -128,7 +128,7 @@ def test_fill_sweep_responses(mock_data_set):
 def test_set_spike_times(mock_data_set):
     data_set = mock_data_set
     DATA_LENGTH = 5
-    
+
     h5 = {
         'analysis': {
             'spike_times': {
@@ -161,7 +161,7 @@ def test_set_spike_times(mock_data_set):
         }
     }
 
-    with patch('h5py.File', mock_h5py_file(data=h5)) as f:
+    with patch('h5py.File', mock_h5py_file(data=h5)):
         data_set.set_spike_times(1, [0.1, 0.2, 0.3, 0.4, 0.5])
 
     assert False
@@ -169,5 +169,5 @@ def test_set_spike_times(mock_data_set):
 
 def test_get_sweep_metadata(data_set):
     sweep_metadata = data_set.get_sweep_metadata(1)
- 
+
     assert sweep_metadata is not None

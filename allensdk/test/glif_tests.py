@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
-
 from allensdk.api.queries.glif_api import GlifApi
 import allensdk.core.json_utilities as json_utilities
 from allensdk.model.glif.glif_neuron import GlifNeuron
@@ -24,6 +24,7 @@ from allensdk.model.glif.simulate_neuron import simulate_neuron
 import os
 import shutil
 import logging
+
 
 # NEURONAL_MODEL_ID = 491547163 # level 1 LIF
 NEURONAL_MODEL_ID = 491547171  # level 5 GLIF
@@ -52,8 +53,6 @@ def test_download():
 
 
 def test_run():
-    import allensdk.core.json_utilities as json_utilities
-
     # initialize the neuron
     neuron_config = json_utilities.read(os.path.join(
         OUTPUT_DIR, '%d_neuron_config.json' % NEURONAL_MODEL_ID))
