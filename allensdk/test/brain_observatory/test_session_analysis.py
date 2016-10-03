@@ -20,7 +20,7 @@ import os
 
 @pytest.fixture
 def session_a():
-    filename = '/data/informatics/keithg/out_510390912.nwb'
+    filename = '/data/informatics/CAM/test_nwb/out_510390912.nwb'
     save_path = 'xyza'
     
     sa = SessionAnalysis(filename, save_path)
@@ -30,7 +30,7 @@ def session_a():
 
 @pytest.fixture
 def session_b():
-    filename = '/data/informatics/keithg/506278598.nwb'
+    filename = '/data/informatics/CAM/test_nwb/506278598.nwb'
     save_path = 'xyzb'
     
     sa = SessionAnalysis(filename, save_path)
@@ -40,7 +40,7 @@ def session_b():
 
 @pytest.fixture
 def session_c():
-    filename = '/data/informatics/keithg/out_510221121.nwb'
+    filename = '/data/informatics/CAM/test_nwb/out_510221121.nwb'
     save_path = 'xyzc'
     
     sa = SessionAnalysis(filename, save_path)
