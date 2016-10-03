@@ -86,9 +86,12 @@ class MouseConnectivityCache(Cache):
         super(MouseConnectivityCache, self).__init__(
             manifest=manifest_file, cache=cache)
 
-        self.ccf_version = ccf_version
         self.resolution = resolution
         self.api = MouseConnectivityApi(base_uri=base_uri)
+        
+        if ccf_version is None:
+            ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
+        self.ccf_version = ccf_version
 
     def get_annotation_volume(self, file_name=None):
         """
@@ -105,7 +108,7 @@ class MouseConnectivityCache(Cache):
         """
 
         file_name = self.get_cache_path(
-            file_name, self.ANNOTATION_KEY, self.resolution)
+            file_name, self.ANNOTATION_KEY, self.ccf_version, self.resolution)
 
         if file_name is None:
             raise Exception(
@@ -696,7 +699,7 @@ class MouseConnectivityCache(Cache):
                                   typename='file')
 
         manifest_builder.add_path(self.CCF_VERSION_KEY,
-                                  'annotation/ccf_%d',
+                                  '%s',
                                   parent_key='BASEDIR',
                                   typename='dir')
 
