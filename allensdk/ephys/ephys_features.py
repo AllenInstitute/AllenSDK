@@ -407,9 +407,10 @@ def find_widths(v, t, spike_indexes, peak_indexes, trough_indexes):
                     np.flatnonzero(v[pk:spk:-1] <= wl).size > 0 else np.nan for pk, spk, wl
                     in zip(peak_indexes[use_indexes], spike_indexes[use_indexes], width_levels[use_indexes])])
     width_ends = np.zeros_like(trough_indexes) * np.nan
+
     width_ends[use_indexes] = np.array([pk + np.flatnonzero(v[pk:tr] <= wl)[0] if
                     np.flatnonzero(v[pk:tr] <= wl).size > 0 else np.nan for pk, tr, wl
-                    in zip(peak_indexes[use_indexes], trough_indexes[use_indexes], width_levels[use_indexes])])
+                    in zip(peak_indexes[use_indexes], trough_indexes[use_indexes].astype(int), width_levels[use_indexes])])
 
     missing_widths = np.isnan(width_starts) | np.isnan(width_ends)
     widths = np.zeros_like(width_starts, dtype=np.float64)
@@ -423,7 +424,7 @@ def find_widths(v, t, spike_indexes, peak_indexes, trough_indexes):
 
 def analyze_trough_details(v, t, spike_indexes, peak_indexes, end=None, filter=10.,
                            heavy_filter=1., term_frac=0.01, adp_thresh=0.5, tol=0.5,
-                           flat_interval=0.002, dvdt=None):
+                           flat_interval=0.002, adp_max_delta_t=0.005, adp_max_delta_v=10., dvdt=None):
     """Analyze trough to determine if an ADP exists and whether the reset is a 'detour' or 'direct'
 
     Parameters
@@ -438,7 +439,9 @@ def analyze_trough_details(v, t, spike_indexes, peak_indexes, end=None, filter=1
     thresh_frac : fraction of average upstroke for threshold calculation (optional, default 0.05)
     adp_thresh: minimum dV/dt in V/s to exceed to be considered to have an ADP (optional, default 1.5)
     tol : tolerance for evaluating whether Vm drops appreciably further after end of spike (default 1.0 mV)
-    flat_interval: if the trace is flat for this duration, stop looking for an ADP (default 0.002)
+    flat_interval: if the trace is flat for this duration, stop looking for an ADP (default 0.002 s)
+    adp_max_delta_t: max possible ADP delta t (default 0.005 s)
+    adp_max_delta_v: max possible ADP delta v (default 10 mV)
     dvdt : pre-calculated time-derivative of voltage (optional)
 
     Returns
@@ -500,7 +503,9 @@ def analyze_trough_details(v, t, spike_indexes, peak_indexes, end=None, filter=1
                 if zero_return_vals.size:
                     putative_adp_index = zero_return_vals[0] + cross
                     min_index = v[putative_adp_index:next_spk].argmin() + putative_adp_index
-                    if v[putative_adp_index] - v[min_index] >= tol:
+                    if (v[putative_adp_index] - v[min_index] >= tol and
+                            v[putative_adp_index] - v[terminated] <= adp_max_delta_v and
+                            t[putative_adp_index] - t[terminated] <= adp_max_delta_t):
                         adp_index = putative_adp_index
                         slow_phase_min_index = min_index
                         isi_type = "detour"
@@ -691,7 +696,7 @@ def has_fixed_dt(t):
     return np.allclose(dt, np.ones_like(dt) * dt[0])
 
 
-def fit_membrane_time_constant(v, t, start, end):
+def fit_membrane_time_constant(v, t, start, end, min_rsme=1e-4):
     """Fit an exponential to estimate membrane time constant between start and end
 
     Parameters
@@ -700,6 +705,7 @@ def fit_membrane_time_constant(v, t, start, end):
     t : numpy array of times in seconds
     start : start of time window for exponential fit
     end : end of time window for exponential fit
+    min_rsme: minimal acceptable root mean square error (default 1e-4)
 
     Returns
     -------
@@ -718,6 +724,12 @@ def fit_membrane_time_constant(v, t, start, end):
         popt, pcov = curve_fit(_exp_curve, t_window, v_window, p0=guess)
     except RuntimeError:
         logging.info("Curve fit for membrane time constant failed")
+        return np.nan, np.nan, np.nan
+
+    pred = _exp_curve(t_window, *popt)
+    rsme = np.sqrt(np.mean(pred - v_window))
+    if rsme > min_rsme:
+        logging.debug("Curve fit for membrane time constant did not meet RSME standard")
         return np.nan, np.nan, np.nan
 
     return popt

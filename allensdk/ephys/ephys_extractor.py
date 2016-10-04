@@ -30,7 +30,7 @@ SHORT_SQUARES_WINDOW_START = 1.02
 SHORT_SQUARES_WINDOW_END = 1.021
 
 
-class EphysSweepFeatureExtractor:    
+class EphysSweepFeatureExtractor:
     """Feature calculation for a sweep (voltage and/or current time series)."""
 
     def __init__(self, t=None, v=None, i=None, start=None, end=None, filter=10.,
@@ -377,7 +377,7 @@ class EphysSweepFeatureExtractor:
         deflect_index = deflect_func(v_window) + start_index
 
         return self.v[deflect_index], deflect_index
-    
+
     def stimulus_amplitude(self):
         """ """
         if self.stimulus_amplitude_calculator is not None:
@@ -693,16 +693,20 @@ class EphysCellFeatureExtractor:
         ext = self._ramps_ext
         ext.process_spikes()
 
+        self._all_ramps_ext = ext
+
         # pull out the spiking sweeps
         spiking_sweeps = [ sweep for sweep in self._ramps_ext.sweeps() if sweep.sweep_feature("avg_rate") > 0 ]
         ext = EphysSweepSetFeatureExtractor.from_sweeps(spiking_sweeps)
         self._ramps_ext = ext
 
-        self._features["ramps"]["spiking_sweeps"] = ext.sweeps() 
+        self._features["ramps"]["spiking_sweeps"] = ext.sweeps()
 
-
-    def ramps_features(self):
-        return self._ramps_ext
+    def ramps_features(self, all=False):
+        if all:
+            return self._all_ramps_ext
+        else:
+            return self._ramps_ext
 
     def _analyze_short_squares(self):
         ext = self._short_squares_ext
@@ -771,7 +775,7 @@ class EphysCellFeatureExtractor:
         subthresh_sweeps = [sweep for sweep in ext.sweeps() if sweep.sweep_feature("avg_rate") == 0]
         subthresh_ext = EphysSweepSetFeatureExtractor.from_sweeps(subthresh_sweeps)
         self._subthreshold_long_squares_ext = subthresh_ext
-        
+
         if len(subthresh_ext.sweeps()) == 0:
             raise ft.FeatureError("No subthreshold long square sweeps, cannot evaluate cell features.")
 
@@ -795,7 +799,7 @@ class EphysCellFeatureExtractor:
         self._features["long_squares"]["subthreshold_membrane_property_sweeps"] = calc_subthresh_ext.sweeps()
         self._features["long_squares"]["input_resistance"] = input_resistance(calc_subthresh_ext)
         self._features["long_squares"]["tau"] = membrane_time_constant(calc_subthresh_ext)
-
+        self._features["long_squares"]["v_baseline"] = np.nanmean(ext.sweep_features("v_baseline"))
 
     def long_squares_features(self, option=None):
         option_table = {
@@ -833,7 +837,7 @@ class EphysCellFeatureExtractor:
             "short_squares": self._features["short_squares"].copy(),
             "ramps": self._features["ramps"].copy(),
             }
-        
+
         # convert feature extractor lists to sweep dictionarsweep extract lists
         ls_sweeps = [ s.as_dict() for s in out["long_squares"]["sweeps"] ]
         ls_spike_sweeps = [ s.as_dict() for s in out["long_squares"]["spiking_sweeps"] ]
@@ -850,7 +854,7 @@ class EphysCellFeatureExtractor:
         out["long_squares"]["rheobase_sweep"] = rheo_sweep
         out["short_squares"]["common_amp_sweeps"] = ss_sweeps
         out["ramps"]["spiking_sweeps"] = ramp_sweeps
-        
+
         return out
 
 
