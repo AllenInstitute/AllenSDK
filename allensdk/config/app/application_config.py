@@ -46,18 +46,11 @@ class ApplicationConfig(object):
         self.help = halp
         self.debug_enabled = False
 
-<<<<<<< HEAD
-        if default_log_config == None:
-            default_log_config = ApplicationConfig._DEFAULT_LOG_CONFIG
-
-        ApplicationConfig._log.info("default log config: %s" % (default_log_config))
-=======
         if default_log_config is None:
             default_log_config = ApplicationConfig._DEFAULT_LOG_CONFIG
 
         ApplicationConfig._log.info(
             "default log config: %s" % (default_log_config))
->>>>>>> dev
 
         self.defaults = {
             'config_file_path': {
@@ -79,10 +72,6 @@ class ApplicationConfig(object):
         for key, value in self.defaults.items():
             setattr(self, key, value['default'])
 
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
     def load(self, command_line_args, disable_existing_loggers=True):
         ''' Load application configuration options, first from the environment,
         then from the configuration file, then from the command line.
@@ -135,10 +124,6 @@ class ApplicationConfig(object):
             # TODO: configure default logging
             pass
 
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
     def create_argparser(self):
         '''Initialization for the command-line parsing stage.
 
@@ -168,19 +153,11 @@ class ApplicationConfig(object):
                 parser.add_argument(
                     "%s" % (key), default=None, help=value['help'])
             else:
-<<<<<<< HEAD
-                parser.add_argument("--%s" % (key), default=None, help=value['help'])
-
-        return parser
-
-
-=======
                 parser.add_argument("--%s" %
                                     (key), default=None, help=value['help'])
 
         return parser
 
->>>>>>> dev
     def parse_command_line_args(self, args):
         '''Simply call the internal argparser object.
 
@@ -196,10 +173,6 @@ class ApplicationConfig(object):
         '''
         return self.argparser.parse_args(args)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
     def apply_configuration_from_command_line(self, parsed_args):
         '''Read application configuration variables from the command line.
 
@@ -223,10 +196,6 @@ class ApplicationConfig(object):
             if parsed_value and getattr(self, key) is None:
                 setattr(self, key, parsed_value)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
     def apply_configuration_from_environment(self):
         '''Read application configuration variables from the environment.
 
@@ -242,10 +211,6 @@ class ApplicationConfig(object):
             if environment_value:
                 setattr(self, key, environment_value)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
     def from_json_file(self, json_path):
         '''Read an application configuration from a JSON format file.
 
@@ -264,10 +229,6 @@ class ApplicationConfig(object):
 
         return self.to_config_string(description)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
     def from_json_string(self, json_string):
         '''Read a configuration from a JSON format string.
 
@@ -285,10 +246,6 @@ class ApplicationConfig(object):
 
         return self.to_config_string(description)
 
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
     def to_config_string(self, description):
         '''Create a configuration string from a dict.
 
@@ -315,23 +272,15 @@ class ApplicationConfig(object):
         cfg_array = ['[biophys]']
 
         if 'log_config_path' in bps_config:
-<<<<<<< HEAD
-            cfg_array.append(str('log_config_path: %s' % bps_config['log_config_path']))
-=======
             cfg_array.append(str('log_config_path: %s' %
                                  bps_config['log_config_path']))
->>>>>>> dev
 
         if 'debug' in bps_config:
             cfg_array.append(str('debug: %s' % bps_config['debug']))
 
         if 'model_file' in bps_config:
-<<<<<<< HEAD
-            cfg_array.append(str('model_file: %s' % ','.join(bps_config['model_file'])))
-=======
             cfg_array.append(str('model_file: %s' %
                                  ','.join(bps_config['model_file'])))
->>>>>>> dev
 
         cfg_array.append("\n")
 
@@ -340,10 +289,6 @@ class ApplicationConfig(object):
 
         return bps_cfg_string
 
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
     def apply_configuration_from_file(self, config_file_path):
         ''' Read application configuration variables from a .conf file.
 
