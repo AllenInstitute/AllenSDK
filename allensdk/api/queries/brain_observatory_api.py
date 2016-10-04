@@ -21,6 +21,7 @@ from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import logging
 
+
 class BrainObservatoryApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')
 
@@ -362,8 +363,8 @@ class BrainObservatoryApi(RmaTemplate):
 
         return experiments
 
-    def filter_cell_specimens(self, cell_specimens, 
-                              ids=None, 
+    def filter_cell_specimens(self, cell_specimens,
+                              ids=None,
                               experiment_container_ids=None,
                               filters=None):
         if ids is not None:
@@ -396,18 +397,17 @@ class BrainObservatoryApi(RmaTemplate):
                 query_args = [field] + map(_quote_string, value)
             else:
                 query_args = [field, str(value)]
-            
+
             cluster_string = self._QUERY_TEMPLATES[op].\
                 format(*query_args)
-            
+
             return cluster_string
 
         query_string = ' & '.join(_filter_clause(f['op'],
                                                  f['field'],
                                                  f['value']) for f in filters)
-        
-        return query_string
 
+        return query_string
 
     def dataframe_query(self,
                         datas,
@@ -416,10 +416,10 @@ class BrainObservatoryApi(RmaTemplate):
         queries = self.dataframe_query_string(filters)
         result_dataframe = pd.DataFrame(datas)
         result_dataframe = result_dataframe.query(queries)
-        
-        result_keys = set(result_dataframe[primary_key]) 
+
+        result_keys = set(result_dataframe[primary_key])
         result = [d for d in datas
                   if d[primary_key]
                   in result_keys]
-        
+
         return result

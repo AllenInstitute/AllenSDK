@@ -82,7 +82,7 @@ class BrainObservatoryCache(Cache):
         reporter_lines = set([_find_specimen_reporter_line(c['specimen'])
                               for c in containers])
         return sorted(list(reporter_lines))
-    
+
     def get_all_imaging_depths(self):
         """ Return a list of all imaging depths in the data set. """
         containers = self.get_experiment_containers(simple=False)
@@ -254,7 +254,7 @@ class BrainObservatoryCache(Cache):
                 ju.write(file_name, exps)
 
         transgenic_lines = _merge_transgenic_lines(cre_lines, transgenic_lines)
-        
+
         exps = self.api.filter_ophys_experiments(exps,
                                                  ids=ids,
                                                  experiment_container_ids=experiment_container_ids,
@@ -276,7 +276,7 @@ class BrainObservatoryCache(Cache):
                 'session_type': e['stimulus_name'],
                 'donor_name': e['specimen']['donor']['external_donor_name'],
                 'specimen_name': e['specimen']['name']
-                    } for e in exps]
+            } for e in exps]
         return exps
 
     def _get_stimulus_mappings(self, file_name=None):
@@ -294,10 +294,10 @@ class BrainObservatoryCache(Cache):
 
         return mappings
 
-    def get_cell_specimens(self, 
-                           file_name=None, 
-                           ids=None, 
-                           experiment_container_ids=None, 
+    def get_cell_specimens(self,
+                           file_name=None,
+                           ids=None,
+                           experiment_container_ids=None,
                            simple=True,
                            filters=None):
         """ Return cell specimens that have certain properies.
@@ -407,8 +407,8 @@ class BrainObservatoryCache(Cache):
 
 def _find_specimen_cre_line(specimen):
     return next(tl['name'] for tl in specimen['donor']['transgenic_lines']
-                if tl['transgenic_line_type_name'] == 'driver'
-                and 'Cre' in tl['name'])
+                if tl['transgenic_line_type_name'] == 'driver' and
+                'Cre' in tl['name'])
 
 
 def _find_specimen_reporter_line(specimen):
@@ -428,7 +428,7 @@ def _merge_transgenic_lines(*lines_list):
         return list(transgenic_lines)
     else:
         return None
-    
+
 
 def _assert_not_string(arg, name):
     if isinstance(arg, six.string_types):

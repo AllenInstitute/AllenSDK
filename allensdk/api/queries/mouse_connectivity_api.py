@@ -62,10 +62,9 @@ class MouseConnectivityApi(RmaApi):
             Where to save the annotation volume.
         '''
 
-        if ccf_version == None:
+        if ccf_version is None:
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
-        
-        
+
         try:
             os.makedirs(os.path.dirname(file_name))
         except:
