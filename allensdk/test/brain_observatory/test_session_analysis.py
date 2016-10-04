@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-
+import matplotlib
+matplotlib.use('agg')
 import pytest
 from allensdk.brain_observatory.session_analysis import SessionAnalysis
 import os
