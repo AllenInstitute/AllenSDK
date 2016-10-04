@@ -58,7 +58,7 @@ class BiophysicalApi(Api):
             'ephys_sweeps),',
             'well_known_files(well_known_file_type)'])
         criteria_associations = ''.join([
-            ("[id$eq%d]," % (neuronal_model_id)),
+            ("[id$eq%d],ephys_result[failed$eqfalse]" % (neuronal_model_id)),
             include_associations])
 
         return ''.join([self.rma_endpoint,
