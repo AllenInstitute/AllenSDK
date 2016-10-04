@@ -29,14 +29,26 @@ THREE_SESSION_B = 'three_session_B'
 THREE_SESSION_C = 'three_session_C'
 
 SESSION_STIMULUS_MAP = {
-    THREE_SESSION_A: [ DRIFTING_GRATINGS, NATURAL_MOVIE_ONE, NATURAL_MOVIE_THREE, SPONTANEOUS_ACTIVITY ],
-    THREE_SESSION_B: [ STATIC_GRATINGS, NATURAL_SCENES, NATURAL_MOVIE_ONE, SPONTANEOUS_ACTIVITY ],
-    THREE_SESSION_C: [ LOCALLY_SPARSE_NOISE, NATURAL_MOVIE_ONE, NATURAL_MOVIE_TWO, SPONTANEOUS_ACTIVITY ]
-    }
+    THREE_SESSION_A: [DRIFTING_GRATINGS, NATURAL_MOVIE_ONE, NATURAL_MOVIE_THREE, SPONTANEOUS_ACTIVITY],
+    THREE_SESSION_B: [STATIC_GRATINGS, NATURAL_SCENES, NATURAL_MOVIE_ONE, SPONTANEOUS_ACTIVITY],
+    THREE_SESSION_C: [LOCALLY_SPARSE_NOISE, NATURAL_MOVIE_ONE, NATURAL_MOVIE_TWO, SPONTANEOUS_ACTIVITY]
+}
+
+
+def sessions_with_stimulus(stimulus):
+    """ Return the names of the sessions that contain a given stimulus. """
+    
+    sessions = set()
+    for session, session_stimuli in SESSION_STIMULUS_MAP.iteritems():
+        if stimulus in session_stimuli:
+            sessions.add(session)
+
+    return sorted(list(sessions))
+
 
 def stimuli_in_session(session):
-    """ Return a list what stimuli are available in a given session. 
-    
+    """ Return a list what stimuli are available in a given session.
+
     Parameters
     ----------
     session: string
@@ -44,6 +56,7 @@ def stimuli_in_session(session):
     """
     return SESSION_STIMULUS_MAP[session]
 
+
 def all_stimuli():
     """ Return a list of all stimuli in the data set """
-    return set([ v for k,vl in SESSION_STIMULUS_MAP.iteritems() for v in vl ])
+    return set([v for k, vl in SESSION_STIMULUS_MAP.iteritems() for v in vl])

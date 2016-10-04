@@ -86,13 +86,18 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.12.0 (June 9, 2016)
-------------------------------------------
+What's New - Release 0.12.2 (September 1, 2016)
+---------------------------------------------
 
-The 0.12.0 release debuts functionality related to the Allen Brain Observatory.  Changes include:
+The 0.12.2 release has minor fixes.  Changes include:
 
-    * BrainObservatoryCache and BrainObservatoryApi data/file manipulation classes
-    * Code for neurpil subtraction, dF/F estimation, and tuning analysis.
-    * New ephys feature extractor: ephys_features.py, ephys_extractor.py.  The old one is still there (feature_extractor.py) but should be considered deprecated.
+    * fixed typeo in r_neuropil.py
+    * jinja2 dependency is installed by pip
+
+The 0.12.1 release addresses a few bugs and code style issues.  Changes include:
+
+    * The Brain Observatory neuropil subtraction algorithm is faster and more robust now.
+    * Addressing Github issue #17
+    * Updated code style to be more PEP8 compliant
 
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

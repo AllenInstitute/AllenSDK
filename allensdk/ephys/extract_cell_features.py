@@ -13,28 +13,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import argparse
-import h5py
-import sys
-import json
 import numpy as np
-from scipy.optimize import curve_fit
-from collections import Counter
-
 import logging
-
-from allensdk.core.nwb_data_set import NwbDataSet
-
-import allensdk.ephys.ephys_extractor as efex
-import allensdk.ephys.ephys_features as ft
+from . import ephys_extractor as efex
+from . import ephys_features as ft
 
 HERO_MIN_AMP_OFFSET = 39.0
 HERO_MAX_AMP_OFFSET = 61.0
 
-SHORT_SQUARE_TYPES = ["Short Square", 
-                      "Short Square - Triple", 
-                      "Short Square - Hold -60mv", 
-                      "Short Square - Hold -70mv", 
+SHORT_SQUARE_TYPES = ["Short Square",
+                      "Short Square - Triple",
+                      "Short Square - Hold -60mv",
+                      "Short Square - Hold -70mv",
                       "Short Square - Hold -80mv"]
 
 SHORT_SQUARE_MAX_THRESH_FRAC = 0.1
@@ -67,17 +57,17 @@ def extract_sweep_features(data_set, sweeps_by_type):
             fex = efex.extractor_for_nwb_sweeps(data_set, sweep_numbers)
 
         fex.process_spikes()
-        
-        sweep_features.update({ f.id:f.as_dict() for f in fex.sweeps() })            
+
+        sweep_features.update({ f.id:f.as_dict() for f in fex.sweeps() })
 
     return sweep_features
 
 def extract_cell_features(data_set,
-                          ramp_sweep_numbers, 
-                          short_square_sweep_numbers, 
+                          ramp_sweep_numbers,
+                          short_square_sweep_numbers,
                           long_square_sweep_numbers):
 
-    fex = efex.cell_extractor_for_nwb(data_set, 
+    fex = efex.cell_extractor_for_nwb(data_set,
                                       ramp_sweep_numbers,
                                       short_square_sweep_numbers,
                                       long_square_sweep_numbers)
@@ -94,7 +84,7 @@ def extract_cell_features(data_set,
     for sweep in fex.long_squares_features("spiking").sweeps():
         nspikes = len(sweep.spikes())
         amp = sweep.sweep_feature("stim_amp")
-        
+
         if nspikes > 0 and amp > hero_min and amp < hero_max and amp < hero_amp:
             hero_amp = amp
             hero_sweep = sweep
@@ -104,7 +94,7 @@ def extract_cell_features(data_set,
         latency = hero_sweep.sweep_feature("latency")
         mean_isi = hero_sweep.sweep_feature("mean_isi")
     else:
-        raise ft.FeatureError("Could not find hero sweep.")  
+        raise ft.FeatureError("Could not find hero sweep.")
 
     # find the mean features of the first spike for the ramps and short squares
     ramps_ms0 = mean_features_spike_zero(fex.ramps_features().sweeps())
@@ -119,7 +109,7 @@ def extract_cell_features(data_set,
     cell_features["short_squares"]["mean_spike_0"] = ss_ms0
 
     return cell_features
-    
+
 def mean_features_spike_zero(sweeps):
     """ Compute mean feature values for the first spike in list of extractors """
 
@@ -132,7 +122,7 @@ def mean_features_spike_zero(sweeps):
 def get_stim_characteristics(i, t, no_test_pulse=False):
     '''
     Identify the start time, duration, amplitude, start index, and
-    end index of a general stimulus.  
+    end index of a general stimulus.
     This assumes that there is a test pulse followed by the stimulus square.
     '''
 
@@ -142,9 +132,9 @@ def get_stim_characteristics(i, t, no_test_pulse=False):
     if len(diff_idx) == 0:
         return (None, None, 0.0, None, None)
 
-    # skip the first up/down 
+    # skip the first up/down
     idx = 0 if no_test_pulse else 1
-    
+
     # shift by one to compensate for diff()
     start_idx = diff_idx[idx] + 1
     end_idx = diff_idx[-1] + 1
@@ -161,14 +151,14 @@ def get_ramp_stim_characteristics(i, t):
     # Assumes that there is a test pulse followed by the stimulus ramp
     di = np.diff(i)
     up_idx = np.flatnonzero(di > 0)
-    
+
     start_idx = up_idx[1] + 1 # shift by one to compensate for diff()
     return (t[start_idx], start_idx)
 
 def get_square_stim_characteristics(i, t, no_test_pulse=False):
     '''
     Identify the start time, duration, amplitude, start index, and
-    end index of a square stimulus.  
+    end index of a square stimulus.
     This assumes that there is a test pulse followed by the stimulus square.
     '''
 
@@ -177,7 +167,7 @@ def get_square_stim_characteristics(i, t, no_test_pulse=False):
     down_idx = np.flatnonzero(di < 0)
 
     idx = 0 if no_test_pulse else 1
-    
+
     # second square is the stimulus
     if up_idx[idx] < down_idx[idx]: # positive square
         start_idx = up_idx[idx] + 1 # shift by one to compensate for diff()

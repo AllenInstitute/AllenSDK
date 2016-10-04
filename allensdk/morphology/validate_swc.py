@@ -1,216 +1,78 @@
-import os, sys
-import swc as swc
+# Copyright 2016 Allen Institute for Brain Science
+# This file is part of Allen SDK.
+#
+# Allen SDK is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, version 3 of the License.
+#
+# Allen SDK is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-
-def resave_swc(orig_swc, new_file):
-    """ Reads SWC file into AllenSDK Morphology object and resaves
-    it. This can fix some problems in an SWC file that may disrupt
-    other software tools reading the file (e.g., NEURON)
-
-    Parameters
-    ----------
-        orig_swc: string
-        Name of SWC file to read
-
-        new_file: string
-        Name of output SWC file
-    """
-    try:
-        morphology = swc.read_swc(orig_swc)
-    except:
-        print("Failed to read SWC file '%s'" % orig_swc)
-        raise
-    try:
-        morphology.save(new_file)
-    except:
-        print("Failed to save SWC file '%s'" % new_file)
-
-
-class TestNode(object):
-    def __init__(self, n, t, x, y, z, r, pn):
-        # these values correspond to columns in an SWC file
-        self.n = n
-        self.t = t
-        self.x = x
-        self.y = y
-        self.z = z
-        self.r = r
-        self.pn = pn
-        self.children = []  # IDs of child nodes
-
-    def __str__(self):
-        """ create string with node information in succinct, 
-        single-line form """
-        return "%d %d %.4f %.4f %.4f %.4f %d %s" % (self.n, self.t, self.x, self.y, self.z, self.r, self.pn, str(self.children))
-
+import argparse
+import allensdk.core.swc as swc
 
 
 def validate_swc(swc_file):
-    """ 
-    Tests SWC files for compatibility with AllenSDK
-
+    """
     To be compatible with NEURON, SWC files must have the following properties:
         1) a single root node with parent ID '-1'
         2) sequentially increasing ID numbers
         3) immediate children of the soma cannot branch
-
-    To be compatible with feature analysis, SWC files can only have node
-    types in the range 1-4:
-        1 = soma
-        2 = axon
-        3 = [basal] dendrite
-        4 = apical dendrite
     """
-
-    # see if SWC file is readable by internal tools
-    print("Validating " + swc_file)
-    try:
-        morphology = swc.read_swc(swc_file)
-    except:
-        print("Fatal error reading SWC file")
-        return False
-
-    for node in morphology.node_list:
-        if node.t < 1 or node.t > 4:
-            print("Expecting type between 1 and 4, but found %d" % node.t)
-            print("File has unrecognized node type(s)")
-            return False
-
-    # make sure all dendrite nodes are in tree 0
-    # this is because modeling requires a full dendrite morphology
-    for node in morphology.node_list:
-        print str(node)
-        if (node.t == 3 or node.t == 4) and node.tree_id != 0:
-            print("Dendrite node(s) exist in disconnected trees")
-            print("This breaks an SDK modeling requirement")
-            return False
-
-    # if we've made it here, file is OK for using Morphology class, and 
-    #   should be valid with internal processing. It may also be able
-    #   to be convertable for NEURON use by resaving it
-
-    nodes = []
-    node_table = [] # lookup table by node num
-    line_num = 1
-    try:
-        with open(swc_file, "r") as f:
-            for line in f:
-                # remove comments
-                if line.lstrip().startswith('#'):
-                    continue
-                # read values. expected SWC format is:
-                #   ID, type, x, y, z, rad, parent
-                # x, y, z and rad are floats. the others are ints
-                toks = line.split()
-                vals = TestNode(
-                        n =  int(toks[0]),
-                        t =  int(toks[1]),
-                        x =  float(toks[2]),
-                        y =  float(toks[3]),
-                        z =  float(toks[4]),
-                        r =  float(toks[5]),
-                        pn = int(toks[6].rstrip()),
-                    )
-                # store this node
-                nodes.append(vals)
-                #
-                if vals.n < 0:
-                    print("Negative node ID not allowed")
-                    print("Node: " + str(vals))
-                    return False
-                while vals.n >= len(node_table):
-                    node_table.append(None)
-                node_table[vals.n] = vals
-                # increment line number (used for error reporting only)
-                line_num += 1
-    except:
-        err = "File not recognized as valid SWC file.\n"
-        err += "Problem parsing line %d\n" % line_num
-        if line is not None:
-            err += "Content: '%s'\n" % line
-        raise IOError(err)
-
-    try:
-        for node in nodes:
-            par = None
-            if node.pn >= 0:
-                par = node_table[node.pn]
-                par.children.append(node.n)
-    except:
-        print("Error reading SWC file -- fail to link child to parent")
-        print("Node:    %s" % str(node))
-        return False
-
-    # verify presence and number of soma and root nodes
-    num_soma_nodes = sum([ int(c.t == 1) for c in nodes ])
-    if num_soma_nodes == 0:
-        print("SWC must have at least one soma node.  Found: %d" % num_soma_nodes)
-        return False
-    elif num_soma_nodes > 1:
-        print("Warning: File has multiple soma nodes. This can interfere with feature analysis in some external software (e.g., vaa3d)")
-
-    num_root_nodes = sum([ int(c.pn == -1) for c in nodes ])
-    # case of no root nodes covered by rule below that ID of child must
-    #   be greater than that of parent
-    if num_root_nodes > 1:
-        print("Warning: File has multiple root nodes. This can interfere with feature analysis in some external software (e.g., vaa3d)")
-
+    soma_id = swc.Morphology.SOMA
+    morphology = swc.read_swc(swc_file)
+    # verify that there is a single root node
+    num_soma_nodes = sum([(int(c['type']) == soma_id)
+                          for c in morphology.compartment_list])
+    if num_soma_nodes != 1:
+        raise Exception(
+            "SWC must have single soma compartment.  Found: %d" % num_soma_nodes)
+    # sanity check
+    root = morphology.root
+    if root is None:
+        raise Exception("Morphology has no root node")
+    # verify that children of the root have max one child
+    for root_child_id in root['children']:
+        root_child = morphology.compartment_index[root_child_id]
+        num_grand_children = len(root_child['children'])
+        if num_grand_children > 1:
+            raise Exception("Child of root (%s) has more than one child (%d)" % (
+                root_child_id, num_grand_children))
     # get a list of all of the ids, make sure they are unique while we're at it
     all_ids = set()
-    for node in nodes:
-        iid = int(node.n)
+    for compartment in morphology.compartment_list:
+        iid = int(compartment["id"])
         if iid in all_ids:
-            print("Node ID %s is not unique." % node.n)
-            return False
-        pid = int(node.pn)
+            raise Exception("Compartment ID %s is not unique." %
+                            compartment["id"])
+        pid = int(compartment["parent"])
         if iid < pid:
-            print("Node (%d) has a smaller ID that its parent (%d)" % (iid, pid))
-            return False
+            raise Exception(
+                "Compartment (%d) has a smaller ID that its parent (%d)" % (iid, pid))
         all_ids.add(iid)
-        
-    # make sure that first root node is soma
-    root = nodes[0]
-    if root.t != 1:
-        # see if soma has a root
-        if sum([int(c.t == 2 and c.pn == -1) for c in nodes]) == 0:
-            print("No soma root found in file")
-            return False
-        print("First root node is not soma")
-        print("This should be fixable by calling resave_swc() on the file if there is a soma root in the file")
-        return False
-
-    # verify that children of the root have max one child
-    for root_child_id in root.children:
-        root_child = nodes[root_child_id]
-        num_grand_children = len(root_child.children)
-        if num_grand_children > 1:
-            print("Child of root (%s) has more than one child (%d)" % ( root_child_id, num_grand_children ))
-            return False
 
     # sort the ids and make sure there are no gaps
     sorted_ids = sorted(all_ids)
     for i in xrange(1, len(sorted_ids)):
-        if sorted_ids[i] - sorted_ids[i-1] != 1:
-            print("Node IDs are not sequential")
-            print("This can be fixed by calling resave_swc() on the file")
-            return False
+        if sorted_ids[i] - sorted_ids[i - 1] != 1:
+            raise Exception("Compartment IDs are not sequential")
     return True
-    
-    
-    
+
+
 def main():
-    argc = len(sys.argv)
-    if argc < 1:
-        print("usage: python %s <swc_file> [<swc_file ...]")
-        print("")
-        print("Validate an SWC file for use with NEURON")
-        sys.exit(1)
     try:
-        for i in range(1, argc):
-            validate_swc(sys.argv[i])
-            print "    PASS"
+        parser = argparse.ArgumentParser(
+            "validate an SWC file for use with NEURON")
+        parser.add_argument('swc_file')
+        args = parser.parse_args()
+        validate_swc(args.swc_file)
     except Exception as e:
-        print "    FAIL"
-        print str(e)
+        print(str(e))
         exit(1)
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

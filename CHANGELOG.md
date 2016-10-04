@@ -1,6 +1,26 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.12.2] - 2016-9-1
+
+### Fixed
+
+- Github issue #16 (jinja2 requirement)
+- Github pull request #21 (spurious "i" typeo) in r_neuropil.py
+
+## [0.12.1] - 2016-8-17
+
+### Changed
+
+- neuropil subtraction algorithm (brain_observatory.r_neuropil) faster and more robust
+- formatting changes for better PEP8 compliance
+- preparation for Python 3 support
+- updated Dockerfiles
+
+### Fixed
+
+- Github issue #17 (scipy requirement)
+
 ## [0.12.0] - 2016-6-9
 
 ### Added

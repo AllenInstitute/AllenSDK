@@ -22,7 +22,7 @@ from allensdk.config.manifest_builder import ManifestBuilder
 def builder():
     b = ManifestBuilder()
     b.add_path('BASEDIR', '/home/username/example')
-    
+
     return b
 
 
@@ -48,12 +48,12 @@ def testManifestBuilderDataFrame(builder):
                      'work',
                      parent_key='BASEDIR')
     builder_df = builder.as_dataframe()
-    
+
     assert('key' in builder_df.keys())
     assert('type' in builder_df.keys())
     assert('spec' in builder_df.keys())
     assert('parent_key' in builder_df.keys())
-    assert('format' in builder_df.keys())        
+    assert('format' in builder_df.keys())
     assert(5 == len(builder_df.keys()))
 
 
@@ -61,10 +61,10 @@ def testManifestDataFrame(builder):
     builder.add_path('WORKDIR',
                      'work',
                      parent_key='BASEDIR')
-    
+
     manifest = builder.get_manifest()
     df = manifest.as_dataframe()
-    
+
     assert('type' in df.keys())
     assert('spec' in df.keys())
     assert(2 == len(df.keys()))

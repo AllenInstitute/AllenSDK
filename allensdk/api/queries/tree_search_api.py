@@ -13,26 +13,26 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.api import Api
+from ..api import Api
+
 
 class TreeSearchApi(Api):
     '''
-    
+
     See `Searching a Specimen or Structure Tree <http://help.brain-map.org/display/api/Image-to-Image+Synchronization>`_
     for additional documentation.
     '''
-    
+
     def __init__(self, base_uri=None):
-        super(TreeSearchApi, self).__init__(base_uri)    
-        
-    
+        super(TreeSearchApi, self).__init__(base_uri)
+
     def get_tree(self,
                  kind,
                  db_id,
                  ancestors=None,
                  descendants=None):
         '''Fetch meta data for the specified structure or specimen.
-        
+
         Parameters
         ----------
         kind : string
@@ -43,7 +43,7 @@ class TreeSearchApi(Api):
             whether to include ancestors in the response (defaults to False)
         descendants : boolean, optional
             whether to include descendants in the response (defaults to False)
-        
+
         Returns
         -------
         dict
@@ -51,22 +51,22 @@ class TreeSearchApi(Api):
         '''
         params = []
         url_params = ''
-        
-        if ancestors == True:
+
+        if ancestors is True:
             params.append('ancestors=true')
-        elif ancestors == False:
+        elif ancestors is False:
             params.append('ancestors=false')
-        
-        if descendants == True:
+
+        if descendants is True:
             params.append('descendants=true')
-        elif descendants == False:
+        elif descendants is False:
             params.append('descendants=false')
-        
+
         if len(params) > 0:
             url_params = '?' + '&'.join(params)
         else:
             url_params = ''
-        
+
         url = ''.join([self.tree_search_endpoint,
                        '/',
                        kind,
@@ -74,5 +74,5 @@ class TreeSearchApi(Api):
                        str(db_id),
                        '.json',
                        url_params])
-        
+
         return self.json_msg_query(url)

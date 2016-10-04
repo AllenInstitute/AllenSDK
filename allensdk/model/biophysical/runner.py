@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.model.biophys_sim.config import Config
-from allensdk.model.biophysical.utils import create_utils
+from ..biophys_sim.config import Config
+from .utils import create_utils
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
 from shutil import copy
@@ -28,7 +28,7 @@ _runner_log = logging.getLogger('allensdk.model.biophysical.runner')
 
 def run(description, sweeps=None):
     '''Main function for running a biophysical experiment.
-    
+
     Parameters
     ----------
     description : Config
@@ -39,25 +39,25 @@ def run(description, sweeps=None):
     # configure NEURON
     utils = create_utils(description, model_type)
     h = utils.h
-    
+
     # configure model
     manifest = description.manifest
     morphology_path = description.manifest.get_path('MORPHOLOGY')
     utils.generate_morphology(morphology_path.encode('ascii', 'ignore'))
     utils.load_cell_parameters()
-    
+
     # configure stimulus and recording
     stimulus_path = description.manifest.get_path('stimulus_path')
     run_params = description.data['runs'][0]
-    if sweeps == None:
+    if sweeps is None:
         sweeps = run_params['sweeps']
     sweeps_by_type = run_params['sweeps_by_type']
     junction_potential = description.data['fitting'][0]['junction_potential']
     mV = 1.0e-3
-    
+
     prepare_nwb_output(manifest.get_path('stimulus_path'),
                        manifest.get_path('output_path'))
-    
+
     # run sweeps
     for sweep in sweeps:
         _runner_log.info("Running sweep: %d" % (sweep))
@@ -68,20 +68,20 @@ def run(description, sweeps=None):
         h.finitialize()
         h.run()
         tstop = time.time()
-        _runner_log.info("Time: %f" % (tstop-tstart))
-        
+        _runner_log.info("Time: %f" % (tstop - tstart))
+
         # write to an NWB File
         output_data = (numpy.array(vec['v']) - junction_potential) * mV
-        
+
         output_path = manifest.get_path("output_path")
-        
+
         save_nwb(output_path, output_data, sweep, sweeps_by_type)
 
 
 def prepare_nwb_output(nwb_stimulus_path,
                        nwb_result_path):
     '''Copy the stimulus file, zero out the recorded voltages and spike times.
-    
+
     Parameters
     ----------
     nwb_stimulus_path : string
@@ -104,7 +104,7 @@ def prepare_nwb_output(nwb_stimulus_path,
 def save_nwb(output_path, v, sweep, sweeps_by_type):
     '''Save a single voltage output result into an existing sweep in a NWB file.
     This is intended to overwrite a recorded trace with a simulated voltage.
-    
+
     Parameters
     ----------
     output_path : string
@@ -116,44 +116,43 @@ def save_nwb(output_path, v, sweep, sweeps_by_type):
     '''
     output = NwbDataSet(output_path)
     output.set_sweep(sweep, None, v)
-    
-    sweep_by_type = {t: [ sweep ] for t, ss in sweeps_by_type.items() if sweep in ss }
+
+    sweep_by_type = {t: [sweep]
+                     for t, ss in sweeps_by_type.items() if sweep in ss}
     sweep_features = extract_cell_features.extract_sweep_features(output,
                                                                   sweep_by_type)
     try:
         spikes = sweep_features[sweep]['spikes']
-        spike_times = [ s['threshold_t'] for s in spikes ]
+        spike_times = [s['threshold_t'] for s in spikes]
         output.set_spike_times(sweep, spike_times)
-    except Exception, e:
-        logging.info("sweep %d has no sweep features. %s" % (sweep, e.message) )
-        
+    except Exception as e:
+        logging.info("sweep %d has no sweep features. %s" % (sweep, e.message))
 
 
 def load_description(manifest_json_path):
     '''Read configuration file.
-    
+
     Parameters
     ----------
     manifest_json_path : string
         File containing the experiment configuration.
-    
+
     Returns
     -------
     Config
         Object with all information needed to run the experiment.
     '''
     description = Config().load(manifest_json_path)
-    
+
     # fix nonstandard description sections
     fix_sections = ['passive', 'axon_morph,', 'conditions', 'fitting']
     description.fix_unary_sections(fix_sections)
-    
+
     return description
 
 
 if '__main__' == __name__:
     import sys
-    
+
     description = load_description(sys.argv[-1])
     run(description)
-

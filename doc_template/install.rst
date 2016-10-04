@@ -26,28 +26,24 @@ To uninstall the SDK::
 Other Distribution Formats
 --------------------------
 
-The Allen SDK is also available from the source repository or as a downloadable .zip or .tar.gz archive.
-The package can also be `installed from these formats <https://packaging.python.org/en/latest/installing.html>`_.
-
-.. include:: links.rst
-
+The Allen SDK is also available from the Github source repository.
 
 Required Dependencies
 ---------------------
 
  * `NumPy <http://wiki.scipy.org/Tentative_NumPy_Tutorial>`_
  * `SciPy <http://www.scipy.org/>`_
-
+ * `matplotlib <http://matplotlib.org/>`_
+ * `h5py <http://www.h5py.org>`_
+ * `pandas <http://pandas.pydata.org>`_
+ * `pynrrd <http://pypi.python.org/pypi/pynrrd>`_
+ * `Jinja2 <http://jinja.pocoo.org>`_
 
 Optional Dependencies
 ---------------------
 
  * `pytest <http://pytest.org/latest>`_
  * `coverage <http://nedbatchelder.com/code/coverage>`_
- * `matplotlib <http://matplotlib.org/>`_
- * `h5py <http://www.h5py.org>`_
- * `pandas <http://pandas.pydata.org>`_
- * `pynrrd <http://pypi.python.org/pypi/pynrrd>`_
 
 Installation with Docker (Optional)
 -----------------------------------
@@ -60,19 +56,22 @@ example Dockerfiles are available.
 
  #. Ensure you have Docker installed.
 
- #. Download one of the example Docker files:
-     * :download:`Anaconda and NEURON <./_static/examples/docker/Dockerfile.anaconda>`.
-     * :download:`Neural Ensemble combined simulators <./_static/examples/docker/Dockerfile.neuralensemble>`.
-     * :download:`Ubuntu and NEURON <./_static/examples/docker/Dockerfile.ubuntu>`.
-
- #. Use Docker to build the image::
+ #. Use Docker to build the image one of the images.
  
-     mkdir docker_build
-     cp Dockerfile.anaconca docker_build/Dockerfile
-     cd docker_build
-     docker build --tag alleninstitute/allensdk:anaconda .
+     Anaconda::
      
+         docker build -t alleninstitute/allensdk:anaconda git://github.com/github.com/AllenInstitute/AllenSDK/tree/v0.12.2/doc_template:docker/anaconda
+ 
+     Other docker configurations are also available under docker directory in the source repository.
+ 
  #. Run the docker image::
  
-     docker run -it -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
-
+     docker run -i -t -p 8888:8888 -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
+     cd allensdk
+     make pytest_lax
+ 
+ #. Start a Jupyter Notebook::
+ 
+     cd allensdk/doc_template/examples/nb
+     jupyter-notebook --ip=* --no-browser
+     

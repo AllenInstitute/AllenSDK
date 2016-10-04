@@ -14,11 +14,10 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-import pandas as pd
-from pandas import DataFrame, Series
+from pandas import DataFrame
 import warnings
 import logging
-from collections import defaultdict, Counter
+from collections import Counter
 
 import ephys_features as ft
 
@@ -326,7 +325,7 @@ class EphysSweepFeatureExtractor:
             return ft.average_voltage(v, t, baseline_end_time - self.baseline_interval,
                                       baseline_end_time)
         else:
-            log.info("Could not find sufficiently flat interval for automatic baseline voltage", RuntimeWarning)
+            logging.info("Could not find sufficiently flat interval for automatic baseline voltage", RuntimeWarning)
             return np.nan
 
     def voltage_deflection(self, deflect_type=None):
@@ -725,6 +724,7 @@ class EphysCellFeatureExtractor:
                 break
             if c[0] < common_amp:
                 common_amp = c[0]
+
         self._features["short_squares"]["stimulus_amplitude"] = common_amp
         ext = EphysSweepSetFeatureExtractor.from_sweeps([sweep for sweep in spiking_sweeps if _short_step_stim_amp(sweep) == common_amp])
         self._short_squares_ext = ext

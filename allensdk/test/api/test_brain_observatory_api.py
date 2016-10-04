@@ -14,19 +14,17 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from allensdk.api.queries.brain_observatory_api \
-    import BrainObservatoryApi
-
-
+from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 import pytest
 from mock import patch, MagicMock
 from collections import Counter
+
 
 @pytest.fixture
 def bo_api():
     bo = BrainObservatoryApi('http://testwarehouse:9000')
     bo.json_msg_query = MagicMock(name='json_msg_query')
-    
+
     return bo
 
 
@@ -35,67 +33,67 @@ def bo_api_save_ophys():
     bo = BrainObservatoryApi('http://testwarehouse:9000')
     bo.json_msg_query = \
         MagicMock(name='json_msg_query',
-                  return_value=[ {'download_link': '/url/path/to/file' } ])
-    
+                  return_value=[{'download_link': '/url/path/to/file'}])
+
     return bo
 
 
 @pytest.fixture
 def mock_containers():
     containers = [
-        { 'targeted_structure': { 'acronym': 'CBS' },
-          'imaging_depth': 100,
-          'specimen': {
-            'donor': { 'transgenic_lines': [ { 'name': 'Shiny' }] } }
-        },
-        { 'targeted_structure': { 'acronym': 'NBC' },
-          'imaging_depth': 200,
-          'specimen': {
-            'donor': { 'transgenic_lines': [ { 'name': 'Don' }] } }
-        }
+        {'targeted_structure': {'acronym': 'CBS'},
+         'imaging_depth': 100,
+         'specimen': {
+            'donor': {'transgenic_lines': [{'name': 'Shiny'}]}}
+         },
+        {'targeted_structure': {'acronym': 'NBC'},
+         'imaging_depth': 200,
+         'specimen': {
+            'donor': {'transgenic_lines': [{'name': 'Don'}]}}
+         }
     ]
-    
+
     return containers
 
 
 @pytest.fixture
 def mock_ophys_experiments():
     containers = [
-        { 'experiment_container_id': 1,
-          'targeted_structure': { 'acronym': 'CBS' },
-          'imaging_depth': 100,
-          'specimen': { 'donor': {
-              'transgenic_lines': [ { 'name': 'Shiny' }] } },
-          'stimulus_name': 'three_session_B'
-        },
-        { 'experiment_container_id': 2,
-          'targeted_structure': { 'acronym': 'NBC' },
-          'imaging_depth': 200,
-          'specimen': { 'donor': {
-              'transgenic_lines': [ { 'name': 'Don' }] } },
-          'stimulus_name': 'three_session_C'
-        }
+        {'experiment_container_id': 1,
+         'targeted_structure': {'acronym': 'CBS'},
+         'imaging_depth': 100,
+         'specimen': {'donor': {
+             'transgenic_lines': [{'name': 'Shiny'}]}},
+         'stimulus_name': 'three_session_B'
+         },
+        {'experiment_container_id': 2,
+         'targeted_structure': {'acronym': 'NBC'},
+         'imaging_depth': 200,
+         'specimen': {'donor': {
+             'transgenic_lines': [{'name': 'Don'}]}},
+         'stimulus_name': 'three_session_C'
+         }
     ]
-    
+
     return containers
 
 
 @pytest.fixture
 def mock_specimens():
-    specimens = [ 
-        { "experiment_container_id": 511498500, 
-          "cell_specimen_id": 517394843
-          },
-        { "experiment_container_id": 511498742, 
-          "cell_specimen_id": 517398740
-          },
-        { "experiment_container_id": 511498500, 
-          "cell_specimen_id": 517394874
-          }
-        ]        
+    specimens = [
+        {"experiment_container_id": 511498500,
+         "cell_specimen_id": 517394843
+         },
+        {"experiment_container_id": 511498742,
+         "cell_specimen_id": 517398740
+         },
+        {"experiment_container_id": 511498500,
+         "cell_specimen_id": 517394874
+         }
+    ]
     return specimens
-    
-    
+
+
 def test_list_isi_experiments(bo_api):
     bo_api.list_isi_experiments()
     bo_api.json_msg_query.assert_called_once_with(
@@ -103,8 +101,8 @@ def test_list_isi_experiments(bo_api):
         "model::IsiExperiment,rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_isi_experiments(bo_api):      
-    isi_experiment_id = 503316697     
+def test_get_isi_experiments(bo_api):
+    isi_experiment_id = 503316697
     bo_api.get_isi_experiments(isi_experiment_id)
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
@@ -147,7 +145,7 @@ def test_get_experiment_containers(bo_api):
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
 
-def test_get_column_definitions(bo_api):      
+def test_get_column_definitions(bo_api):
     api_class_name = bo_api.quote_string('ApiTbiDonorMetric')
     bo_api.get_column_definitions(api_class_name=api_class_name)
     bo_api.json_msg_query.assert_called_once_with(
@@ -213,15 +211,15 @@ def test_get_cell_metrics_one_ids(bo_api):
 
 
 def test_get_cell_metrics_two_ids(bo_api):
-    ids = [517394843,517394850]
+    ids = [517394843, 517394850]
     bo_api.get_cell_metrics(cell_specimen_ids=ids)
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::ApiCamCellMetric,"
         "rma::criteria,[cell_specimen_id$in517394843,517394850],"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
-    
-    
+
+
 def test_filter_experiment_containers_no_filters(bo_api, mock_containers):
     containers = bo_api.filter_experiment_containers(mock_containers)
     assert len(containers) == 2
@@ -271,7 +269,8 @@ def test_filter_cell_specimens(bo_api, mock_specimens):
     specimens = bo_api.filter_cell_specimens(mock_specimens)
     assert specimens == mock_specimens
 
-    specimens = bo_api.filter_cell_specimens(mock_specimens, ids=[mock_specimens[0]['cell_specimen_id']])
+    specimens = bo_api.filter_cell_specimens(
+        mock_specimens, ids=[mock_specimens[0]['cell_specimen_id']])
     assert len(specimens) == 1
     assert specimens[0] == mock_specimens[0]
 
@@ -280,21 +279,22 @@ def test_filter_cell_specimens(bo_api, mock_specimens):
         cnt[sp['experiment_container_id']] += 1
 
     ecid = mock_specimens[0]['experiment_container_id']
-    specimens = bo_api.filter_cell_specimens(mock_specimens, experiment_container_ids=[ecid])
+    specimens = bo_api.filter_cell_specimens(
+        mock_specimens, experiment_container_ids=[ecid])
     assert len(specimens) == cnt[ecid]
     assert specimens[0] == mock_specimens[0]
 
 
 def test_save_ophys_experiment_data(bo_api_save_ophys):
     bo_api = bo_api_save_ophys
-    
+
     with patch('allensdk.config.manifest.Manifest.safe_mkdir') as mkdir:
         bo_api.retrieve_file_over_http = \
             MagicMock(name='retrieve_file_over_http')
         bo_api.save_ophys_experiment_data(1, '/path/to/filename')
-        
+
         mkdir.assert_called_once_with('/path/to')
-    
+
     bo_api.json_msg_query.assert_called_once_with(
         "http://testwarehouse:9000/api/v2/data/query.json?q="
         "model::WellKnownFile,"
