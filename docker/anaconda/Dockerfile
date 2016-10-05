@@ -3,7 +3,7 @@
 # docker build --tag alleninstitute/allensdk:anaconda .
 # docker run -it alleninstitute/allensdk:anaconda /bin/bash
 #
-FROM continuumio/anaconda:2.5.0
+FROM continuumio/anaconda:4.1.1
 
 MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
