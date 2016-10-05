@@ -18,6 +18,7 @@ from mock import MagicMock
 from allensdk.api.api import Api
 import allensdk.core.json_utilities as ju
 import requests
+from requests.exceptions import HTTPError
 
 
 @pytest.fixture
@@ -32,8 +33,7 @@ def api():
 
 
 def test_failed_download(api):
-    with pytest.raises(requests.exceptions.ReadTimeout) as e_info:
-        
+    with pytest.raises(HTTPError) as e_info:
         api.retrieve_file_over_http('http://example.com/yo.jpg',
                                     '/tmp/testfile')
 

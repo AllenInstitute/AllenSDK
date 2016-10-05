@@ -64,7 +64,7 @@ def session_c():
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
-@pytest.mark.parametrize('plot_flag',[True, False])
+@pytest.mark.parametrize('plot_flag',[False])
 def test_session_a(session_a, plot_flag):
     with patch('allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table',
                mock_stimulus_table):
@@ -75,7 +75,7 @@ def test_session_a(session_a, plot_flag):
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
-@pytest.mark.parametrize('plot_flag',[True, False])
+@pytest.mark.parametrize('plot_flag',[False])
 def test_session_b(session_b, plot_flag):
     with patch('allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table',
                mock_stimulus_table):
@@ -85,7 +85,7 @@ def test_session_b(session_b, plot_flag):
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial_testing")
-@pytest.mark.parametrize('plot_flag',[True, False])
+@pytest.mark.parametrize('plot_flag',[False])
 def test_session_c(session_c, plot_flag):
     with patch('allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table',
                mock_stimulus_table):
