@@ -3,7 +3,7 @@ from mock import Mock, MagicMock, patch
 import numpy as np
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-
+import os
 
 @pytest.fixture
 def mcc():

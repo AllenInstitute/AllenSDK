@@ -104,7 +104,8 @@ def rma():
              'count': False
              }
         ]}
-    rma = RmaTemplate(query_manifest=templates)
+    rma = RmaTemplate(base_uri="http://lims2",
+                      query_manifest=templates)
 
     return rma
 
