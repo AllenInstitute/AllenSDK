@@ -507,6 +507,32 @@ class EphysSweepFeatureExtractor:
 
         return self._sweep_features[key]
 
+    def process_new_spike_feature(self, feature_name, feature_func):
+        """Add new spike-level feature calculation function
+
+           The function should take this sweep extractor as its argument. Its results
+           can be accessed by calling the method spike_feature(<feature_name>).
+        """
+
+        if feature_name in self._spikes_df.columns:
+            raise KeyError("Feature {:s} already exists for sweep".format(feature_name))
+
+        features = feature_func(self)
+        self._spikes_df[feature_name] = np.nan
+        self._spikes_df.ix[:len(features) - 1, feature_name] = features
+
+    def process_new_sweep_feature(self, feature_name, feature_func):
+        """Add new sweep-level feature calculation function
+
+           The function should take this sweep extractor as its argument. Its results
+           can be accessed by calling the method sweep_feature(<feature_name>).
+        """
+
+        if feature_name in self._sweep_features:
+            raise KeyError("Feature {:s} already exists for sweep".format(feature_name))
+
+        self._sweep_features[feature_name] = feature_func(self)
+
     def set_stimulus_amplitude_calculator(self, function):
         self.stimulus_amplitude_calculator = function
 

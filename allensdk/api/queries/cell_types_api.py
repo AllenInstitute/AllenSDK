@@ -48,7 +48,7 @@ class CellTypesApi(RmaApi):
             Meta data for all cells.
         """
 
-        criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types']"
+        criteria = "[is_cell_specimen$eq'true'],products[name$eq'Mouse Cell Types'],ephys_result[failed$eqfalse]"
 
         include = ('structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,' +
                    'ephys_features,data_sets,neuron_reconstructions,cell_reporter')
@@ -144,7 +144,7 @@ class CellTypesApi(RmaApi):
         """
 
         features = self.model_query(
-            'EphysFeature', criteria='specimen', num_rows='all')
+            'EphysFeature', criteria='specimen(ephys_result[failed$eqfalse])', num_rows='all')
 
         if dataframe:
             return pd.DataFrame(features)
@@ -164,7 +164,7 @@ class CellTypesApi(RmaApi):
         """
 
         features = self.model_query(
-            'NeuronReconstruction', criteria="specimen", num_rows='all')
+            'NeuronReconstruction', criteria="specimen(ephys_result[failed$eqfalse])", num_rows='all')
 
         # the tags column isn't useful
         for f in features:

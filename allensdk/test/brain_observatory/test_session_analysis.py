@@ -16,8 +16,20 @@
 import matplotlib
 matplotlib.use('agg')
 import pytest
+from mock import patch
+from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 from allensdk.brain_observatory.session_analysis import SessionAnalysis
 import os
+
+
+_orig_get_stimulus_table = BrainObservatoryNwbDataSet.get_stimulus_table
+
+def mock_stimulus_table(dset, name):
+    t = _orig_get_stimulus_table(dset, name)
+    t.set_value(0, 'end',
+                t.loc[0,'start'] + 10)
+    
+    return t
 
 
 @pytest.fixture
@@ -52,29 +64,34 @@ def session_c():
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
-@pytest.mark.parametrize('plot_flag',[True,False])
+@pytest.mark.parametrize('plot_flag',[False])
 def test_session_a(session_a, plot_flag):
-    session_a.session_a(plot_flag=plot_flag)
+    with patch('allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table',
+               mock_stimulus_table):
+        session_a.session_a(plot_flag=plot_flag)
 
-    assert True
+        assert True
 
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial testing")
-@pytest.mark.parametrize('plot_flag',[True,False])
+@pytest.mark.parametrize('plot_flag',[False])
 def test_session_b(session_b, plot_flag):
-    session_b.session_b(plot_flag=plot_flag)
-        
-    assert True
+    with patch('allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table',
+               mock_stimulus_table):
+        session_b.session_b(plot_flag=plot_flag)
 
+        assert True
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial_testing")
-@pytest.mark.parametrize('plot_flag',[True,False])
+@pytest.mark.parametrize('plot_flag',[False])
 def test_session_c(session_c, plot_flag):
-    session_c.session_c(plot_flag=plot_flag)
+    with patch('allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table',
+               mock_stimulus_table):
+        session_c.session_c(plot_flag=plot_flag)
 
-    assert True
+        assert True
 
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
