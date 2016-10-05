@@ -17,9 +17,9 @@ import pytest
 from mock import patch, mock_open, MagicMock
 from allensdk.core.brain_observatory_cache import BrainObservatoryCache
 try:
-    import __builtin__ as builtins # @UnresolvedImport
+    import __builtin__ as builtins  # @UnresolvedImport
 except:
-    import builtins # @UnresolvedImport
+    import builtins  # @UnresolvedImport
 
 
 CACHE_MANIFEST = """

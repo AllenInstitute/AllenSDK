@@ -21,9 +21,9 @@ from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.cache import Cache
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
-import allensdk.core.json_utilities as json_utilities
-from allensdk.core.nwb_data_set import NwbDataSet
-import allensdk.core.swc as swc
+from . import json_utilities as json_utilities
+from .nwb_data_set import NwbDataSet
+from . import  swc
 
 import logging
 

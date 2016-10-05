@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.api import Api
+from ..api import Api
 import os
 import json
 from collections import OrderedDict
@@ -58,7 +58,7 @@ class BiophysicalApi(Api):
             'ephys_sweeps),',
             'well_known_files(well_known_file_type)'])
         criteria_associations = ''.join([
-            ("[id$eq%d]," % (neuronal_model_id)),
+            ("[id$eq%d],ephys_result[failed$eqfalse]" % (neuronal_model_id)),
             include_associations])
 
         return ''.join([self.rma_endpoint,

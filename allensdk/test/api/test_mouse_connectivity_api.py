@@ -14,22 +14,21 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from allensdk.api.queries.mouse_connectivity_api import \
-    MouseConnectivityApi
+from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 import pytest
 from mock import patch, MagicMock
 import itertools as it
 import numpy as np
 import nrrd
 
-CCF_VERSIONS=[MouseConnectivityApi.CCF_2015,
+CCF_VERSIONS = [MouseConnectivityApi.CCF_2015,
+                MouseConnectivityApi.CCF_2016]
+DATA_PATHS = [MouseConnectivityApi.AVERAGE_TEMPLATE,
+              MouseConnectivityApi.ARA_NISSL,
+              MouseConnectivityApi.MOUSE_2011,
+              MouseConnectivityApi.DEVMOUSE_2012,
+              MouseConnectivityApi.CCF_2015,
               MouseConnectivityApi.CCF_2016]
-DATA_PATHS=[MouseConnectivityApi.AVERAGE_TEMPLATE,
-            MouseConnectivityApi.ARA_NISSL,
-            MouseConnectivityApi.MOUSE_2011,
-            MouseConnectivityApi.DEVMOUSE_2012,
-            MouseConnectivityApi.CCF_2015,
-            MouseConnectivityApi.CCF_2016]
 RESOLUTIONS = [MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS,
                MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS,
                MouseConnectivityApi.VOXEL_RESOLUTION_50_MICRONS,
@@ -38,11 +37,12 @@ RESOLUTIONS = [MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS,
 MOCK_ANNOTATION_DATA = 'mock_annotation_data'
 MOCK_ANNOTATION_IMAGE = 'mock_annotation_image'
 
+
 @pytest.fixture
 def connectivity():
     nrrd.read = MagicMock(name='nrrd_read_file',
-                          return_value = ('mock_annotation_data',
-                                          'mock_annotation_image'))
+                          return_value=('mock_annotation_data',
+                                        'mock_annotation_image'))
     conn_api = MouseConnectivityApi()
     download_link = '/path/to/link'
     conn_api.do_query = MagicMock(return_value=download_link)
@@ -204,9 +204,9 @@ def test_build_reference_aligned_channel_volumes_url(connectivity):
         connectivity.build_reference_aligned_image_channel_volumes_url(123456)
 
     assert url == ("http://api.brain-map.org/api/v2/data/query.json?q="
-                  "model::WellKnownFile,rma::criteria,"
-                  "well_known_file_type[name$eq'ImagesResampledTo25MicronARA']"
-                  "[attachable_id$eq123456]")
+                   "model::WellKnownFile,rma::criteria,"
+                   "well_known_file_type[name$eq'ImagesResampledTo25MicronARA']"
+                   "[attachable_id$eq123456]")
 
 
 def test_reference_aligned_channel_volumes(connectivity):
@@ -346,7 +346,6 @@ def test_calculate_injection_centroid(connectivity):
                          [1,1,1,1],
                          [1,1,1,1]))
 
-    
     centroid = connectivity.calculate_injection_centroid(
         density, fraction, resolution=25)
     

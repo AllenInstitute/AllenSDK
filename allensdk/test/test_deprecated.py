@@ -28,8 +28,8 @@ def deprecated_method():
 
 
 def test_deprecated(deprecated_method):
-    expected = "Call to deprecated function i_am_deprecated."
-    
+    expected = "Function i_am_deprecated is deprecated."
+
     with warnings.catch_warnings(record=True) as c:
         warnings.simplefilter('always')
         deprecated_method()

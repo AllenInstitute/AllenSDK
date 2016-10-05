@@ -14,10 +14,13 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from allensdk.api.queries.rma_template import RmaTemplate
+import pandas as pd
+from six import string_types
+from .rma_template import RmaTemplate
 from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import logging
+
 
 class BrainObservatoryApi(RmaTemplate):
     _log = logging.getLogger('allensdk.api.queries.brain_observatory_api')
@@ -108,6 +111,17 @@ class BrainObservatoryApi(RmaTemplate):
              'criteria_params': ['cell_specimen_ids']
              }
         ]}
+
+    _QUERY_TEMPLATES = {
+        "=": '({0} == {1})',
+        "<": '({0} < {1})',
+        ">": '({0} > {1})',
+        "<=": '({0} <= {1})',
+        ">=": '({0} >= {1})',
+        "between": '({0} >= {1}) and ({0} <= {2})',
+        "in": '({0} == {1})',
+        "is": '({0} == {1})'
+    }
 
     def __init__(self, base_uri=None):
         super(BrainObservatoryApi, self).__init__(base_uri,
@@ -349,8 +363,8 @@ class BrainObservatoryApi(RmaTemplate):
 
         return experiments
 
-    def filter_cell_specimens(self, cell_specimens, 
-                              ids=None, 
+    def filter_cell_specimens(self, cell_specimens,
+                              ids=None,
                               experiment_container_ids=None,
                               filters=None):
         if ids is not None:
@@ -362,27 +376,50 @@ class BrainObservatoryApi(RmaTemplate):
                 'experiment_container_id'] in experiment_container_ids]
 
         if filters is not None:
-            cell_specimens = [c for c in cell_specimens 
-                              if self.cell_matches_filters(c, filters)]
+            cell_specimens = self.dataframe_query(cell_specimens,
+                                                  filters,
+                                                  'cell_specimen_id')
 
         return cell_specimens
 
-    def cell_matches_filters(self, cell, filters):
-        for flt in filters:
-            field = flt['field']
-            if field not in cell:
-                raise Exception("Could not find field '%s' in cell" % flt['field'])
+    def dataframe_query_string(self,
+                               filters):
+        def _quote_string(v):
+            if isinstance(v, string_types):
+                return "'%s'" % (v)
+            else:
+                return str(v)
 
-            op = flt['op']
-            value = flt['value']
-            field = cell[field]
+        def _filter_clause(op, field, value):
+            if op == 'in':
+                query_args = [field, str(value)]
+            elif type(value) is list:
+                query_args = [field] + map(_quote_string, value)
+            else:
+                query_args = [field, str(value)]
 
-            if op == "=":
-                if not (field == value):
-                    return False
-            elif op == "in":
-                if not (field in value):
-                    return False
+            cluster_string = self._QUERY_TEMPLATES[op].\
+                format(*query_args)
 
-        return True
+            return cluster_string
 
+        query_string = ' & '.join(_filter_clause(f['op'],
+                                                 f['field'],
+                                                 f['value']) for f in filters)
+
+        return query_string
+
+    def dataframe_query(self,
+                        datas,
+                        filters,
+                        primary_key):
+        queries = self.dataframe_query_string(filters)
+        result_dataframe = pd.DataFrame(datas)
+        result_dataframe = result_dataframe.query(queries)
+
+        result_keys = set(result_dataframe[primary_key])
+        result = [d for d in datas
+                  if d[primary_key]
+                  in result_keys]
+
+        return result

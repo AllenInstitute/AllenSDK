@@ -14,10 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from allensdk.api.queries.brain_observatory_api \
-    import BrainObservatoryApi
-
-
+from allensdk.api.queries.brain_observatory_api import BrainObservatoryApi
 import pytest
 from mock import patch, MagicMock
 from collections import Counter

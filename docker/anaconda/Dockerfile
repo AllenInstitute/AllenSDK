@@ -3,7 +3,7 @@
 # docker build --tag alleninstitute/allensdk:anaconda .
 # docker run -it alleninstitute/allensdk:anaconda /bin/bash
 #
-FROM continuumio/anaconda
+FROM continuumio/anaconda:4.1.1
 
 MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
@@ -26,3 +26,5 @@ RUN mkdir allensdk; \
     rm allensdk.zip; \
     pip install .; \
     pip install -r test_requirements.txt
+
+ENV PYTHONPATH /usr/local/nrn/lib/python

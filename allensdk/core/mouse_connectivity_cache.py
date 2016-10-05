@@ -18,8 +18,8 @@ from allensdk.api.cache import Cache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.api.queries.ontologies_api import OntologiesApi
 
-import allensdk.core.json_utilities as json_utilities
-from allensdk.core.ontology import Ontology
+from . import json_utilities
+from .ontology import Ontology
 
 import nrrd
 import os
@@ -77,8 +77,9 @@ class MouseConnectivityCache(Cache):
     STRUCTURES_KEY = 'STRUCTURES'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
 
+
     def __init__(self,
-                 resolution=25,
+                 resolution=None,
                  cache=True,
                  manifest_file='mouse_connectivity_manifest.json',
                  ccf_version=None,
@@ -86,9 +87,15 @@ class MouseConnectivityCache(Cache):
         super(MouseConnectivityCache, self).__init__(
             manifest=manifest_file, cache=cache)
 
-        self.ccf_version = ccf_version
-        self.resolution = resolution
+        if resolution is None:
+            self.resolution = MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS
+        else:
+            self.resolution = resolution
         self.api = MouseConnectivityApi(base_uri=base_uri)
+
+        if ccf_version is None:
+            ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
+        self.ccf_version = ccf_version
 
     def get_annotation_volume(self, file_name=None):
         """
@@ -105,7 +112,7 @@ class MouseConnectivityCache(Cache):
         """
 
         file_name = self.get_cache_path(
-            file_name, self.ANNOTATION_KEY, self.resolution)
+            file_name, self.ANNOTATION_KEY, self.ccf_version, self.resolution)
 
         if file_name is None:
             raise Exception(
@@ -696,7 +703,7 @@ class MouseConnectivityCache(Cache):
                                   typename='file')
 
         manifest_builder.add_path(self.CCF_VERSION_KEY,
-                                  'annotation/ccf_%d',
+                                  '%s',
                                   parent_key='BASEDIR',
                                   typename='dir')
 

@@ -18,7 +18,7 @@ import numpy as np
 import json
 import allensdk.core.json_utilities as ju
 import copy
-from allensdk.model.glif.glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
+from .glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
 
 
 class GlifBadResetException( Exception ):

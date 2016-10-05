@@ -21,7 +21,7 @@ import numpy as np
 import allensdk.core.json_utilities as json_utilities
 from allensdk.core.nwb_data_set import NwbDataSet
 from allensdk.api.queries.glif_api import GlifApi
-from allensdk.model.glif.glif_neuron import GlifNeuron
+from .glif_neuron import GlifNeuron
 
 DEFAULT_SPIKE_CUT_VALUE = 0.05 # 50mV
 

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.queries.rma_api import RmaApi
+from .rma_api import RmaApi
 
 
 class ImageDownloadApi(RmaApi):
