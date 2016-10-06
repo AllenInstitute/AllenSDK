@@ -38,7 +38,7 @@ pytest:
 	find -L . -name "test_*.py" -exec py.test --boxed --pep8 --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 pytest_lax:
-	find -L . -name "test_session*.py" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
+	find -L . -name "test_*.py" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 pytest_lite:
 	find -L . -name "test_*.py" -exec py.test --boxed --assert=reinterp --junitxml=test-reports/test.xml {} \+
