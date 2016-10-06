@@ -38,10 +38,18 @@ pytest:
 	find -L . -name "test_*.py" -exec py.test --boxed --pep8 --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 pytest_lax:
-	find -L . -name "test_*.py" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
+	find -L . -name "test_session*.py" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --assert=reinterp --junitxml=test-reports/test.xml {} \+
 
 pytest_lite:
 	find -L . -name "test_*.py" -exec py.test --boxed --assert=reinterp --junitxml=test-reports/test.xml {} \+
+
+pylint:
+	pylint --disable=C allensdk > htmlcov/pylint.txt || exit 0
+	grep import-error htmlcov/pylint.txt > htmlcov/pylint_imports.txt
+
+flake8:
+	flake8 --ignore=E201,E202,E226 --max-line-length=200 allensdk | grep -v "local variable '_' is assigned to but never used" > htmlcov/flake8.txt
+	grep "imported but unused" htmlcov/flake8.txt > htmlcov/imports.txt
 
 EXAMPLES=doc/_static/examples
 
