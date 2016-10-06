@@ -53,12 +53,12 @@ class BiophysicalApi(Api):
         include_associations = ''.join([
             'neuronal_model_template(well_known_files(well_known_file_type)),',
             'specimen',
-            '(ephys_result(well_known_files(well_known_file_type)),'
+            '(ephys_result(well_known_files(well_known_file_type)),',
             'neuron_reconstructions(well_known_files(well_known_file_type)),',
             'ephys_sweeps),',
             'well_known_files(well_known_file_type)'])
         criteria_associations = ''.join([
-            ("[id$eq%d],ephys_result[failed$eqfalse]" % (neuronal_model_id)),
+            ("[id$eq%d],specimen(ephys_result[failed$eqfalse])," % (neuronal_model_id)),
             include_associations])
 
         return ''.join([self.rma_endpoint,
