@@ -15,10 +15,6 @@
 
 
 import requests
-from requests_toolbelt import exceptions
-from requests_toolbelt.downloadutils import stream
-
-
 from contextlib import closing
 import allensdk.core.json_utilities as json_utilities
 import pandas as pd
@@ -270,6 +266,9 @@ class Api(object):
         ----------
         .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
         '''
+        from requests_toolbelt import exceptions
+        from requests_toolbelt.downloadutils import stream
+
         try:
             with closing(requests.get(url,
                                       stream=True,
