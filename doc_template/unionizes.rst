@@ -16,6 +16,9 @@ mouse ontology:
 
     :py:meth:`allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes` 
 
+Take a look at the Structure Signal Unionization section of the 
+`Mouse Connectivity Jupyter notebook <_static/examples/nb/mouse_connectivity.html#Structure-Signal-Unionization>`_ to see how these methods can be used.
+
 
 Record Properties
 -----------------
