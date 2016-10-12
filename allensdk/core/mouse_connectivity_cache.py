@@ -431,8 +431,12 @@ class MouseConnectivityCache(Cache):
 
         return experiments
 
-    def get_experiment_structure_unionizes(self, experiment_id, file_name=None, is_injection=None,
-                                           structure_ids=None, hemisphere_ids=None):
+    def get_experiment_structure_unionizes(self, experiment_id, 
+                                           file_name=None, 
+                                           is_injection=None,
+                                           structure_ids=None, 
+                                           include_descendants=False,
+                                           hemisphere_ids=None):
         """
         Retrieve the structure unionize data for a specific experiment.  Filter by
         structure, injection status, and hemisphere.
@@ -454,8 +458,11 @@ class MouseConnectivityCache(Cache):
             If None, return all records.  Default None.
 
         structure_ids: list
-            Only return unionize records that are inside a specific set of structures.
+            Only return unionize records for a specific set of structures.
             If None, return all records. Default None.
+
+        include_descendants: boolean
+            Include all descendant records for specified structures. Default False.
 
         hemisphere_ids: list
             Only return unionize records that disregard pixels outside of a hemisphere.
@@ -483,9 +490,17 @@ class MouseConnectivityCache(Cache):
 
                 unionizes.to_csv(file_name)
 
-        return self.filter_structure_unionizes(unionizes, is_injection, structure_ids, hemisphere_ids)
+        return self.filter_structure_unionizes(unionizes, 
+                                               is_injection, 
+                                               structure_ids,
+                                               include_descendants,
+                                               hemisphere_ids)
 
-    def filter_structure_unionizes(self, unionizes, is_injection=None, structure_ids=None, hemisphere_ids=None):
+    def filter_structure_unionizes(self, unionizes, 
+                                   is_injection=None, 
+                                   structure_ids=None, 
+                                   include_descendants=False,
+                                   hemisphere_ids=None):
         """
         Take a list of unionzes and return a subset of records filtered by injection status, structure, and
         hemisphere.
@@ -498,8 +513,11 @@ class MouseConnectivityCache(Cache):
             If None, return all records.  Default None.
 
         structure_ids: list
-            Only return unionize records that are inside a specific set of structures.
+            Only return unionize records for a set of structures.
             If None, return all records. Default None.
+
+        include_descendants: boolean
+            Include all descendant records for specified structures. Default False.
 
         hemisphere_ids: list
             Only return unionize records that disregard pixels outside of a hemisphere.
@@ -510,9 +528,14 @@ class MouseConnectivityCache(Cache):
             unionizes = unionizes[unionizes.is_injection == is_injection]
 
         if structure_ids is not None:
-            descendant_ids = self.get_ontology().get_descendant_ids(structure_ids)
+            if include_descendants:
+                structure_ids = self.get_ontology().get_descendant_ids(structure_ids)
+            else:
+                structure_ids = set(structure_ids)
+
+
             unionizes = unionizes[
-                unionizes['structure_id'].isin(descendant_ids)]
+                unionizes['structure_id'].isin(structure_ids)]
 
         if hemisphere_ids is not None:
             unionizes = unionizes[
@@ -520,7 +543,11 @@ class MouseConnectivityCache(Cache):
 
         return unionizes
 
-    def get_structure_unionizes(self, experiment_ids, is_injection=None, structure_ids=None, hemisphere_ids=None):
+    def get_structure_unionizes(self, experiment_ids, 
+                                is_injection=None, 
+                                structure_ids=None, 
+                                include_descendants=False,
+                                hemisphere_ids=None):
         """
         Get structure unionizes for a set of experiment IDs.  Filter the results by injection status,
         structure, and hemisphere.
@@ -536,8 +563,11 @@ class MouseConnectivityCache(Cache):
             If None, return all records.  Default None.
 
         structure_ids: list
-            Only return unionize records that are inside a specific set of structures.
+            Only return unionize records for a specific set of structures.
             If None, return all records. Default None.
+
+        include_descendants: boolean
+            Include all descendant records for specified structures. Default False.
 
         hemisphere_ids: list
             Only return unionize records that disregard pixels outside of a hemisphere.
@@ -548,23 +578,24 @@ class MouseConnectivityCache(Cache):
         unionizes = [self.get_experiment_structure_unionizes(eid,
                                                              is_injection=is_injection,
                                                              structure_ids=structure_ids,
+                                                             include_descendants=include_descendants,
                                                              hemisphere_ids=hemisphere_ids)
                      for eid in experiment_ids]
 
         return pd.concat(unionizes, ignore_index=True)
 
-    def get_projection_matrix(self, experiment_ids, projection_structure_ids,
-                              hemisphere_ids=None, parameter='projection_volume', dataframe=False):
+    def get_projection_matrix(self, experiment_ids, 
+                              projection_structure_ids,
+                              hemisphere_ids=None, 
+                              parameter='projection_volume', 
+                              dataframe=False):
 
         unionizes = self.get_structure_unionizes(experiment_ids,
                                                  is_injection=False,
+                                                 structure_ids=projection_structure_ids,
+                                                 include_descendants=False,
                                                  hemisphere_ids=hemisphere_ids)
 
-        unionizes = unionizes[
-            unionizes.structure_id.isin(projection_structure_ids)]
-
-        projection_structure_ids = set(
-            unionizes['structure_id'].values.tolist())
         hemisphere_ids = set(unionizes['hemisphere_id'].values.tolist())
 
         nrows = len(experiment_ids)
