@@ -188,8 +188,7 @@ class CellTypesApi(RmaApi):
             Path to save the NWB file.
         """
 
-        dirname = os.path.dirname(file_name)
-        Manifest.safe_mkdir(dirname)
+        Manifest.safe_make_parent_dirs(file_name)
 
         criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eq%s]))' % (
             specimen_id, self.NWB_FILE_TYPE)
@@ -221,10 +220,7 @@ class CellTypesApi(RmaApi):
             Path to save the SWC file.
         """
 
-        try:
-            os.makedirs(os.path.dirname(file_name))
-        except:
-            pass
+        Manifest.safe_make_parent_dirs(file_name)
 
         criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
         includes = 'neuron_reconstructions(well_known_files(well_known_file_type[name$eq\'%s\']))' % self.SWC_FILE_TYPE
@@ -257,10 +253,7 @@ class CellTypesApi(RmaApi):
             Path to save the marker file.
         """
 
-        try:
-            os.makedirs(os.path.dirname(file_name))
-        except:
-            pass
+        Manifest.safe_make_parent_dirs(file_name)
 
         criteria = '[id$eq%d],neuron_reconstructions(well_known_files)' % specimen_id
         includes = 'neuron_reconstructions(well_known_files(well_known_file_type[name$eq\'%s\']))' % self.MARKER_FILE_TYPE

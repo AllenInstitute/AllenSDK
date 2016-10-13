@@ -240,6 +240,23 @@ class Manifest(object):
         return path_format
 
     @classmethod
+    def safe_make_parent_dirs(cls, file_name):
+        ''' Create a parent directories for file.
+
+        Parameters
+        ----------
+        file_name : string
+        '''
+
+        dirname = os.path.dirname(file_name)
+
+        # do nothing if there are no parent directories
+        if not dirname:
+            return
+
+        Manifest.safe_mkdir(dirname)
+
+    @classmethod
     def safe_mkdir(cls, directory):
         '''Create path if not already there.
 
@@ -248,6 +265,8 @@ class Manifest(object):
         directory : string
             create it if it doesn't exist
         '''
+        
+
         try:
             os.makedirs(directory)
         except OSError as e:
