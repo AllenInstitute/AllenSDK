@@ -121,7 +121,7 @@ class MouseConnectivityCache(Cache):
         if os.path.exists(file_name):
             annotation, info = nrrd.read(file_name)
         else:
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
 
             annotation, info = self.api.download_annotation_volume(
                 self.ccf_version,
@@ -153,7 +153,7 @@ class MouseConnectivityCache(Cache):
         if os.path.exists(file_name):
             annotation, info = nrrd.read(file_name)
         else:
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
 
             annotation, info = self.api.download_template_volume(
                 self.resolution, file_name)
@@ -187,7 +187,8 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
+
             self.api.download_projection_density(
                 file_name, experiment_id, self.resolution)
 
@@ -221,7 +222,7 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
 
             self.api.download_injection_density(
                 file_name, experiment_id, self.resolution)
@@ -255,7 +256,7 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
 
             self.api.download_injection_fraction(
                 file_name, experiment_id, self.resolution)
@@ -289,7 +290,7 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
 
             self.api.download_data_mask(
                 file_name, experiment_id, self.resolution)
@@ -333,7 +334,7 @@ class MouseConnectivityCache(Cache):
             structures = pd.DataFrame(structures)
 
             if self.cache:
-                Manifest.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_make_parent_dirs(file_name)
 
                 structures.to_csv(file_name)
 
@@ -385,7 +386,7 @@ class MouseConnectivityCache(Cache):
                 del e['name']
 
             if self.cache:
-                Manifest.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_make_parent_dirs(file_name)
 
                 json_utilities.write(file_name, experiments)
 
@@ -486,7 +487,7 @@ class MouseConnectivityCache(Cache):
                                  for c in unionizes.columns]
 
             if self.cache:
-                Manifest.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_make_parent_dirs(file_name)
 
                 unionizes.to_csv(file_name)
 
@@ -675,7 +676,7 @@ class MouseConnectivityCache(Cache):
             mask = self.make_structure_mask(structure_ids, annotation)
 
             if self.cache:
-                Manifest.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_make_parent_dirs(file_name)
                 nrrd.write(file_name, mask)
 
             return mask, None
