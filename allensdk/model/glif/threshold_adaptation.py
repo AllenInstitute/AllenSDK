@@ -134,7 +134,7 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
                 plt.show(block=False)
     
             if PUBLICATION_PLOT:       
-                plt.figure(figsize=[14, 8])
+                plt.figure(figsize=[14, 5])
                 ax1=plt.subplot2grid((2, 2), (0,0))
                 ax2=plt.subplot2grid((2, 2), (1,0))
                 ax3=plt.subplot2grid((2, 2), (0,1), rowspan=2)
@@ -144,7 +144,8 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
                     ax1.plot(np.arange(0, len(multi_SS_i[k]))*dt, multi_SS_i[k]*1.e12, lw=2)
                     ax1.set_ylabel('Current (pA)', fontsize=16)
                     ax1.set_xlim([2., 2.12])
-                    ax1.set_title('Triple Short Square', fontsize=20)
+                    ax1.axes.xaxis.set_ticklabels([])
+                    #ax1.set_title('Triple Short Square', fontsize=20)
     
                     ax2.plot(np.arange(0, len(multi_SS_v[k]))*dt, multi_SS_v[k]*1.e3, lw=2)
                     ax2.plot(spike_ind[k]*dt, np.array(thresh)*1.e3, '.k', ms=16)
@@ -156,8 +157,8 @@ def calc_spike_component_of_threshold_from_multiblip(multi_SS, dt, MAKE_PLOT=Fal
                 ax3.plot(time_previous_spike, np.array(threshold)*1.e3, '.k', ms=16)
                 ax3.set_ylabel('Threshold (mV)', fontsize=16)
                 ax3.set_xlabel('Time since last spike (s)', fontsize=16)
-                ax3.set_title('Spiking component of threshold', fontsize=20)
-                ax3.plot(time_previous_spike, fit_force*1.e3, 'r', lw=4, label="exp fit: k=%.3g, amp=%.3g" % (popt_force[1], popt_force[0]))
+#                ax3.set_title('Spiking component of threshold', fontsize=20)
+                ax3.plot(time_previous_spike, fit_force*1.e3, 'r', lw=4)#, label="exp fit: k=%.3g, amp=%.3g" % (popt_force[1], popt_force[0]))
                 ax3.legend() 
                 plt.tight_layout()
                 plt.show()

@@ -120,6 +120,7 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
             # plt.plot(truncatedTime[aligned_peakInd[ii]],spikewave[aligned_peakInd[ii]], '.k'
             plt.plot(truncatedTime[all_thresholdInd[ii]], temp_v_spike_shape_list[ii][all_thresholdInd[ii]], '*k')
             plt.title('Non adusted spikes')
+            
             plt.subplot(2,1,2)
             plt.plot(truncatedTime, all_v_spike_shape_list[ii])
             plt.plot(time_at_minExpVar, all_v_at_min_expVar_list, '*k')
@@ -129,7 +130,7 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
         
         if PUBLICATION_PLOT:
             truncatedTime = np.arange(0, len(all_v_spike_shape_list[0])) * dt
-            plt.figure(figsize=(20, 10))
+            plt.figure(figsize=(20, 5))
             for ii in range(0, len(all_v_spike_shape_list)):
                 plt.plot(truncatedTime*1000, temp_v_spike_shape_list[ii]*1e3, lw=2)
                 # plt.plot(truncatedTime[aligned_peakInd[ii]],spikewave[aligned_peakInd[ii]], '.k'
@@ -141,6 +142,7 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
                 plt.xlabel('Time (ms)', fontsize=16)
                 plt.ylabel('Voltage (mV)', fontsize=16)
                 plt.xlim([0,12])
+                plt.tight_layout()
 #                plt.title("Adjusted spikes (RP=%.3g, deltaV=%.3g)" % (El_reference,deltaV))  
             
         if SHOW_PLOT:
@@ -181,19 +183,20 @@ def calc_spike_cut_and_v_reset_via_expvar_residuals(all_current_list,
 
     if PUBLICATION_PLOT:
         
-        plt.figure(figsize=(20, 10))
+        plt.figure(figsize=(7, 5))
         plt.plot(np.array(all_v_spike_init_list)*1e3, np.array(all_v_at_min_expVar_list)*1e3, 'b.', ms=16)  # list of voltage traces for blip
-        plt.xlabel('voltage at spike initiation (mV)', fontsize=16)
-        plt.ylabel('voltage after spike (mV)', fontsize=16)
-        plt.title('Voltage reset rules', fontsize=20)
+        plt.xlabel('Voltage at spike initiation (mV)', fontsize=16)
+        plt.ylabel('Voltage after spike (mV)', fontsize=16)
+#        plt.title('Voltage reset rules', fontsize=20)
         xlim = np.array([min(all_v_spike_init_list), max(all_v_spike_init_list)])
         
         def plot_hack(slope, intercept, r,xlim):
             y=slope*xlim+intercept
-            plt.plot(xlim, y, '-k', lw=4, label='slope='+"%.2f"%slope+', intercept='+"%.3f"%intercept)
+            plt.plot(xlim, y, '-k', lw=4)# label='slope='+"%.2f"%slope+', intercept='+"%.3f"%intercept)
             
         plot_hack(slope_at_min_expVar_list, intercept_at_min_expVar_list*1e3, r_value_at_min_expVar_list, xlim*1e3)
         plt.legend(loc=2, fontsize=16)
+        plt.tight_layout()
         plt.show(block=BLOCK)
 
     #TODO:  Corinne look to see if these were calculated with zeroed out El if not does is matter?
