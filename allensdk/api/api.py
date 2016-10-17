@@ -277,6 +277,7 @@ class Api(object):
         .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
         '''
         try:
+            self._log.info("Downloading %s", url)
             response = urllib_request.urlopen(url)
             with open(file_path, 'wb') as f:
                 shutil.copyfileobj(response, f)
@@ -303,6 +304,8 @@ class Api(object):
             Result document as parsed by the JSON library.
         '''
 
+        self._log.info("Downloading %s", url)
+        
         if post is False:
             data = json_utilities.read_url(urllib_request.quote(url, ';/?:@&=+$,'),
                                            'GET')
@@ -324,6 +327,8 @@ class Api(object):
         string
             Unparsed xml string.
         '''
+        self._log.info("Downloading %s", url)
+        
         response = urllib_request.urlopen(url)
 
         return response.read()
