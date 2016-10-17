@@ -101,6 +101,7 @@ def test_api_doc_url_download_section_image_downsampled_low_quality(image_api):
         "?downsample=3&quality=50",
         path)
 
+
 def test_api_doc_url_download_section_image_tumor_feature_annotation(image_api):
     path = '126862575.jpg'
 

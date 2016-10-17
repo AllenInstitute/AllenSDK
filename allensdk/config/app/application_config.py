@@ -263,7 +263,7 @@ class ApplicationConfig(object):
         -----
         The Python configparser library natively supports this functionality in Python 3.
         '''
-        if not 'biophys' in description:
+        if 'biophys' not in description:
             bps_config_string = '[biophys]\n\n'
             return bps_config_string
 

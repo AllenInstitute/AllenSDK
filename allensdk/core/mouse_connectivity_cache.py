@@ -18,8 +18,8 @@ from allensdk.api.cache import Cache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.api.queries.ontologies_api import OntologiesApi
 
-import allensdk.core.json_utilities as json_utilities
-from allensdk.core.ontology import Ontology
+from . import json_utilities
+from .ontology import Ontology
 
 import nrrd
 import os
@@ -77,8 +77,9 @@ class MouseConnectivityCache(Cache):
     STRUCTURES_KEY = 'STRUCTURES'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
 
+
     def __init__(self,
-                 resolution=25,
+                 resolution=None,
                  cache=True,
                  manifest_file='mouse_connectivity_manifest.json',
                  ccf_version=None,
@@ -86,9 +87,15 @@ class MouseConnectivityCache(Cache):
         super(MouseConnectivityCache, self).__init__(
             manifest=manifest_file, cache=cache)
 
-        self.ccf_version = ccf_version
-        self.resolution = resolution
+        if resolution is None:
+            self.resolution = MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS
+        else:
+            self.resolution = resolution
         self.api = MouseConnectivityApi(base_uri=base_uri)
+
+        if ccf_version is None:
+            ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
+        self.ccf_version = ccf_version
 
     def get_annotation_volume(self, file_name=None):
         """
@@ -105,7 +112,7 @@ class MouseConnectivityCache(Cache):
         """
 
         file_name = self.get_cache_path(
-            file_name, self.ANNOTATION_KEY, self.resolution)
+            file_name, self.ANNOTATION_KEY, self.ccf_version, self.resolution)
 
         if file_name is None:
             raise Exception(
@@ -114,7 +121,7 @@ class MouseConnectivityCache(Cache):
         if os.path.exists(file_name):
             annotation, info = nrrd.read(file_name)
         else:
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
 
             annotation, info = self.api.download_annotation_volume(
                 self.ccf_version,
@@ -146,7 +153,7 @@ class MouseConnectivityCache(Cache):
         if os.path.exists(file_name):
             annotation, info = nrrd.read(file_name)
         else:
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
 
             annotation, info = self.api.download_template_volume(
                 self.resolution, file_name)
@@ -180,7 +187,8 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
+
             self.api.download_projection_density(
                 file_name, experiment_id, self.resolution)
 
@@ -214,7 +222,7 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
 
             self.api.download_injection_density(
                 file_name, experiment_id, self.resolution)
@@ -248,7 +256,7 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
 
             self.api.download_injection_fraction(
                 file_name, experiment_id, self.resolution)
@@ -282,7 +290,7 @@ class MouseConnectivityCache(Cache):
             raise Exception("No file name to save volume.")
 
         if not os.path.exists(file_name):
-            Manifest.safe_mkdir(os.path.dirname(file_name))
+            Manifest.safe_make_parent_dirs(file_name)
 
             self.api.download_data_mask(
                 file_name, experiment_id, self.resolution)
@@ -326,7 +334,7 @@ class MouseConnectivityCache(Cache):
             structures = pd.DataFrame(structures)
 
             if self.cache:
-                Manifest.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_make_parent_dirs(file_name)
 
                 structures.to_csv(file_name)
 
@@ -378,7 +386,7 @@ class MouseConnectivityCache(Cache):
                 del e['name']
 
             if self.cache:
-                Manifest.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_make_parent_dirs(file_name)
 
                 json_utilities.write(file_name, experiments)
 
@@ -424,8 +432,12 @@ class MouseConnectivityCache(Cache):
 
         return experiments
 
-    def get_experiment_structure_unionizes(self, experiment_id, file_name=None, is_injection=None,
-                                           structure_ids=None, hemisphere_ids=None):
+    def get_experiment_structure_unionizes(self, experiment_id, 
+                                           file_name=None, 
+                                           is_injection=None,
+                                           structure_ids=None, 
+                                           include_descendants=False,
+                                           hemisphere_ids=None):
         """
         Retrieve the structure unionize data for a specific experiment.  Filter by
         structure, injection status, and hemisphere.
@@ -447,8 +459,11 @@ class MouseConnectivityCache(Cache):
             If None, return all records.  Default None.
 
         structure_ids: list
-            Only return unionize records that are inside a specific set of structures.
+            Only return unionize records for a specific set of structures.
             If None, return all records. Default None.
+
+        include_descendants: boolean
+            Include all descendant records for specified structures. Default False.
 
         hemisphere_ids: list
             Only return unionize records that disregard pixels outside of a hemisphere.
@@ -472,13 +487,21 @@ class MouseConnectivityCache(Cache):
                                  for c in unionizes.columns]
 
             if self.cache:
-                Manifest.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_make_parent_dirs(file_name)
 
                 unionizes.to_csv(file_name)
 
-        return self.filter_structure_unionizes(unionizes, is_injection, structure_ids, hemisphere_ids)
+        return self.filter_structure_unionizes(unionizes, 
+                                               is_injection, 
+                                               structure_ids,
+                                               include_descendants,
+                                               hemisphere_ids)
 
-    def filter_structure_unionizes(self, unionizes, is_injection=None, structure_ids=None, hemisphere_ids=None):
+    def filter_structure_unionizes(self, unionizes, 
+                                   is_injection=None, 
+                                   structure_ids=None, 
+                                   include_descendants=False,
+                                   hemisphere_ids=None):
         """
         Take a list of unionzes and return a subset of records filtered by injection status, structure, and
         hemisphere.
@@ -491,8 +514,11 @@ class MouseConnectivityCache(Cache):
             If None, return all records.  Default None.
 
         structure_ids: list
-            Only return unionize records that are inside a specific set of structures.
+            Only return unionize records for a set of structures.
             If None, return all records. Default None.
+
+        include_descendants: boolean
+            Include all descendant records for specified structures. Default False.
 
         hemisphere_ids: list
             Only return unionize records that disregard pixels outside of a hemisphere.
@@ -503,9 +529,14 @@ class MouseConnectivityCache(Cache):
             unionizes = unionizes[unionizes.is_injection == is_injection]
 
         if structure_ids is not None:
-            descendant_ids = self.get_ontology().get_descendant_ids(structure_ids)
+            if include_descendants:
+                structure_ids = self.get_ontology().get_descendant_ids(structure_ids)
+            else:
+                structure_ids = set(structure_ids)
+
+
             unionizes = unionizes[
-                unionizes['structure_id'].isin(descendant_ids)]
+                unionizes['structure_id'].isin(structure_ids)]
 
         if hemisphere_ids is not None:
             unionizes = unionizes[
@@ -513,7 +544,11 @@ class MouseConnectivityCache(Cache):
 
         return unionizes
 
-    def get_structure_unionizes(self, experiment_ids, is_injection=None, structure_ids=None, hemisphere_ids=None):
+    def get_structure_unionizes(self, experiment_ids, 
+                                is_injection=None, 
+                                structure_ids=None, 
+                                include_descendants=False,
+                                hemisphere_ids=None):
         """
         Get structure unionizes for a set of experiment IDs.  Filter the results by injection status,
         structure, and hemisphere.
@@ -529,8 +564,11 @@ class MouseConnectivityCache(Cache):
             If None, return all records.  Default None.
 
         structure_ids: list
-            Only return unionize records that are inside a specific set of structures.
+            Only return unionize records for a specific set of structures.
             If None, return all records. Default None.
+
+        include_descendants: boolean
+            Include all descendant records for specified structures. Default False.
 
         hemisphere_ids: list
             Only return unionize records that disregard pixels outside of a hemisphere.
@@ -541,23 +579,24 @@ class MouseConnectivityCache(Cache):
         unionizes = [self.get_experiment_structure_unionizes(eid,
                                                              is_injection=is_injection,
                                                              structure_ids=structure_ids,
+                                                             include_descendants=include_descendants,
                                                              hemisphere_ids=hemisphere_ids)
                      for eid in experiment_ids]
 
         return pd.concat(unionizes, ignore_index=True)
 
-    def get_projection_matrix(self, experiment_ids, projection_structure_ids,
-                              hemisphere_ids=None, parameter='projection_volume', dataframe=False):
+    def get_projection_matrix(self, experiment_ids, 
+                              projection_structure_ids,
+                              hemisphere_ids=None, 
+                              parameter='projection_volume', 
+                              dataframe=False):
 
         unionizes = self.get_structure_unionizes(experiment_ids,
                                                  is_injection=False,
+                                                 structure_ids=projection_structure_ids,
+                                                 include_descendants=False,
                                                  hemisphere_ids=hemisphere_ids)
 
-        unionizes = unionizes[
-            unionizes.structure_id.isin(projection_structure_ids)]
-
-        projection_structure_ids = set(
-            unionizes['structure_id'].values.tolist())
         hemisphere_ids = set(unionizes['hemisphere_id'].values.tolist())
 
         nrows = len(experiment_ids)
@@ -637,7 +676,7 @@ class MouseConnectivityCache(Cache):
             mask = self.make_structure_mask(structure_ids, annotation)
 
             if self.cache:
-                Manifest.safe_mkdir(os.path.dirname(file_name))
+                Manifest.safe_make_parent_dirs(file_name)
                 nrrd.write(file_name, mask)
 
             return mask, None
@@ -696,7 +735,7 @@ class MouseConnectivityCache(Cache):
                                   typename='file')
 
         manifest_builder.add_path(self.CCF_VERSION_KEY,
-                                  'annotation/ccf_%d',
+                                  '%s',
                                   parent_key='BASEDIR',
                                   typename='dir')
 

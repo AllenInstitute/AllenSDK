@@ -14,7 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
+from .stimulus_analysis import StimulusAnalysis
 
 
 class LocallySparseNoise(StimulusAnalysis):

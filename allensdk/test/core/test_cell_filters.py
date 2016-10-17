@@ -13,20 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 import pytest
-import pandas as pd
 from mock import patch, mock_open, MagicMock
 from test_brain_observatory_cache import CACHE_MANIFEST
-from allensdk.core.brain_observatory_cache import BrainObservatoryCache
+from allensdk.core.brain_observatory_cache \
+    import BrainObservatoryCache
+from allensdk.api.queries.brain_observatory_api \
+    import BrainObservatoryApi
+
 
 try:
-    import __builtin__ as builtins # @UnresolvedImport
+    import __builtin__ as builtins  # @UnresolvedImport
 except:
-    import builtins # @UnresolvedImport
+    import builtins  # @UnresolvedImport
+
 
 @pytest.fixture
 def cells():
     return [{u'tld1_id': 177839004,
-             u'natural_movie_one_b_large': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394843/natural_movie_one_large.png',
              u'natural_movie_two_small': None,
              u'natural_movie_one_a_small': None,
              u'speed_tuning_c_large': None,
@@ -34,10 +37,8 @@ def cells():
              u'drifting_grating_small': None,
              u'tld1_name': u'Cux2-CreERT2',
              u'imaging_depth': 275,
-             u'natural_scene_large': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394843/natural_scenes_large.png',
-             u'tlr1_id': 265943423, u'natural_movie_one_b_small': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394843/natural_movie_one_small.png', u'natural_movie_two_large': None, u'speed_tuning_a_small': None, u'speed_tuning_b_large': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394843/speed_tuning_large.png',
+             u'tlr1_id': 265943423,
              u'pref_dir_dg': None,
-             u'natural_scene_small': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394843/natural_scenes_small.png',
              u'osi_sg': 0.728589701688166,
              u'osi_dg': None,
              u'tlr1_name': u'Ai93(TITL-GCaMP6f)',
@@ -51,7 +52,6 @@ def cells():
              u'natural_movie_one_c_large': None,
              u'tld2_name': u'Camk2a-tTA',
              u'p_ns': 2.64407299505246e-05,
-             u'static_gratings_small': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394843/static_gratings_all_small.png',
              u'natural_movie_three_large': None,
              u'pref_ori_sg': 30.0,
              u'speed_tuning_a_large': None,
@@ -60,19 +60,17 @@ def cells():
              u'p_sg': 7.60972815250796e-05,
              u'time_to_peak_ns': 0.299249999999998,
              u'locally_sparse_noise_on_large': None,
-             u'speed_tuning_b_small': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394843/speed_tuning_small.png',
              u'dsi_dg': None,
              u'pref_tf_dg': None,
-             u'static_gratings_large': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394843/static_gratings_all_large.png',
              u'natural_movie_three_small': None,
              u'pref_sf_sg': 0.32,
              u'tld2_id': 177837320,
              u'locally_sparse_noise_off_large': None,
              u'locally_sparse_noise_off_small': None,
              u'cell_specimen_id': 517394843,
-             u'pref_phase_sg': 0.5},
-             {u'tld1_id': 177839004,
-             u'natural_movie_one_b_large': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394850/natural_movie_one_large.png',
+             u'pref_phase_sg': 0.5
+            },
+            {u'tld1_id': 177839004,
              u'natural_movie_two_small': None,
              u'natural_movie_one_a_small': None,
              u'speed_tuning_c_large': None,
@@ -80,14 +78,10 @@ def cells():
              u'drifting_grating_small': None,
              u'tld1_name': u'Cux2-CreERT2',
              u'imaging_depth': 275,
-             u'natural_scene_large': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394850/natural_scenes_large.png',
              u'tlr1_id': 265943423,
-             u'natural_movie_one_b_small': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394850/natural_movie_one_small.png',
              u'natural_movie_two_large': None,
              u'speed_tuning_a_small': None,
-             u'speed_tuning_b_large': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394850/speed_tuning_large.png',
              u'pref_dir_dg': None,
-             u'natural_scene_small': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394850/natural_scenes_small.png',
              u'osi_sg': 0.899272239777491,
              u'osi_dg': None,
              u'tlr1_name': u'Ai93(TITL-GCaMP6f)',
@@ -101,7 +95,6 @@ def cells():
              u'natural_movie_one_c_large': None,
              u'tld2_name': u'Camk2a-tTA',
              u'p_ns': 0.000356823517642681,
-             u'static_gratings_small': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394850/static_gratings_all_small.png',
              u'natural_movie_three_large': None,
              u'pref_ori_sg': 0.0,
              u'speed_tuning_a_large': None,
@@ -110,10 +103,8 @@ def cells():
              u'p_sg': 0.0565790644804479,
              u'time_to_peak_ns': 0.432249999999997,
              u'locally_sparse_noise_on_large': None,
-             u'speed_tuning_b_small': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394850/speed_tuning_small.png',
              u'dsi_dg': None,
              u'pref_tf_dg': None,
-             u'static_gratings_large': u'/external/neuralcoding/prod6/specimen_503292439/ophys_experiment_510518066/thumbnails/517394850/static_gratings_all_large.png',
              u'natural_movie_three_small': None,
              u'pref_sf_sg': 0.32,
              u'tld2_id': 177837320,
@@ -122,11 +113,20 @@ def cells():
              u'cell_specimen_id': 517394850,
              u'pref_phase_sg': 0.5}]
 
+
+@pytest.fixture
+def api():
+    boi = BrainObservatoryApi()
+    
+    return boi
+
+
 @pytest.fixture
 def unmocked_boc():
     boc = BrainObservatoryCache()
     
     return boc
+
 
 @pytest.fixture
 def brain_observatory_cache():
@@ -134,7 +134,7 @@ def brain_observatory_cache():
 
     try:
         manifest_data = bytes(CACHE_MANIFEST,
-             'UTF-8')  # Python 3
+                              'UTF-8')  # Python 3
     except:
         manifest_data = bytes(CACHE_MANIFEST)  # Python 2.7
 
@@ -153,17 +153,29 @@ def brain_observatory_cache():
 
 @pytest.fixture
 def example_filters():
-    f = [
-        { "field": "p_dg",
-             "op": "<=",
-             "value": 0.001 },
-        { "field": "pref_dir_dg",
-             "op": "=", "value": 45 },
-        { "field": "area", "op": "in", "value": [ "VISpm" ] },
-        { "field": "tld1_name", "op": "in", "value": [ "Rbp4-Cre", "Cux2-CreERT2", "Rorb-IRES2-Cre" ] }
+    f = [{"field": "p_dg",
+          "op": "<=",
+          "value": 0.001 },
+         {"field": "pref_dir_dg",
+          "op": "=", "value": 45 },
+         {"field": "area", "op": "in", "value": [ "VISpm" ] },
+         {"field": "tld1_name",
+          "op": "in",
+          "value": [ "Rbp4-Cre", "Cux2-CreERT2", "Rorb-IRES2-Cre" ] }
     ]
     
     return f
+
+
+@pytest.fixture
+def between_filter():
+    f = [{"field": "p_ns",
+          "op": "between",
+          "value": [ 0.00034, 0.00035 ] }
+    ]
+    
+    return f
+
 
 FILTER_OPERATORS = ["=", "<", ">", "<=", ">=", "between", "in", "is"]
 QUERY_TEMPLATES = {
@@ -180,16 +192,16 @@ QUERY_TEMPLATES = {
 
 @pytest.mark.skipif(True, reason="not done")
 def test_dataframe_query(brain_observatory_cache,
-                         example_filters,
+                         between_filter,
                          cells):
     brain_observatory_cache = unmocked_boc
     with patch('os.path.exists',
-               MagicMock(return_value=True)) as ope:
+               MagicMock(return_value=True)):
         with patch('allensdk.core.json_utilities.read',
-                   MagicMock(return_value=cells)) as mju:
+                   MagicMock(return_value=cells)):
             cells = brain_observatory_cache.get_cell_specimens(
-                filters=example_filters)
-    
+                filters=between_filter)
+
             assert len(cells) > 0
 
 
@@ -200,7 +212,97 @@ def test_dataframe_query_unmocked(unmocked_boc,
 
     cells = brain_observatory_cache.get_cell_specimens(
         filters=example_filters)
-    
+
     # total lines = 18260, can make fail by passing no filters
     expected = 105
     assert len(cells) == expected
+
+
+def test_dataframe_query_between_unmocked(unmocked_boc,
+                                          between_filter,
+                                          cells):
+    brain_observatory_cache = unmocked_boc
+
+    cells = brain_observatory_cache.get_cell_specimens(
+        filters=between_filter)
+
+    # total lines = 18260, can make fail by passing no filters
+    expected = 9
+    assert len(cells) == expected
+
+
+@pytest.mark.xfail
+def test_dataframe_query_is_unmocked(unmocked_boc,
+                                     cells):
+    brain_observatory_cache = unmocked_boc
+
+    is_filter = [
+        {"field": "all_stim",
+         "op": "is",
+         "value": True }
+    ]
+
+    cells = brain_observatory_cache.get_cell_specimens(
+        filters=is_filter)
+
+    # total lines = 18260, can make fail by passing no filters
+    expected = 9800
+    assert len(cells) == expected
+
+
+def test_dataframe_query_string_between(api):
+    filters = [
+        {"field": "p_ns",
+         "op": "between",
+         "value": [ 0.00034, 0.00035 ] }
+    ]
+
+    query_string = api.dataframe_query_string(filters)
+
+    assert query_string == '(p_ns >= 0.00034) and (p_ns <= 0.00035)'
+
+
+def test_dataframe_query_string_in(api):
+    filters = [
+        {"field": "name",
+         "op": "in",
+         "value": [ 'Abc', 'Def', 'Ghi' ] }
+    ]
+
+    query_string = api.dataframe_query_string(filters)
+
+    assert query_string == "(name == ['Abc', 'Def', 'Ghi'])"
+
+
+def test_dataframe_query_string_in_floats(api):
+    filters = [
+        {"field": "rating",
+         "op": "in",
+         "value": [ 9.9, 8.7, 0.1 ] }
+    ]
+
+    query_string = api.dataframe_query_string(filters)
+
+    assert query_string == "(rating == [9.9, 8.7, 0.1])"
+
+
+def test_dataframe_query_string_is_boolean(api):
+    filters = [
+        {"field": "fact_check",
+         "op": "is",
+         "value": False }
+    ]
+
+    query_string = api.dataframe_query_string(filters)
+
+    assert query_string == "(fact_check == False)"
+
+
+def test_dataframe_query_string_multi_filters(api,
+                                              example_filters):
+    query_string = api.dataframe_query_string(example_filters)
+
+    assert query_string == ("(p_dg <= 0.001) & (pref_dir_dg == 45) & "
+                            "(area == ['VISpm']) & " 
+                            "(tld1_name == "
+                            "['Rbp4-Cre', 'Cux2-CreERT2', 'Rorb-IRES2-Cre'])")

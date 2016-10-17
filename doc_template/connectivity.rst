@@ -42,10 +42,18 @@ all experiments with injections in the isocortex and download the projetion dens
 .. literalinclude:: _static/examples/connectivity_ex2.py
 
 
+Structure-Level Projection Data
+-------------------------------
+
+All AAV projection signal in the Allen Mouse Connectivity Atlas has been registered to the expert-annotated Common Coordinate Framework
+and summarized to structures in the adult mouse structure ontology.  This data is available for download and is described
+in more detail on the :doc:`structure unionizes page </unionizes>`.
+
+
 File Formats
 ------------
 
-This section provides a short description of the file formats used for Allen Cell Types data.
+This section provides a short description of the file formats used for data in the Allen Mouse Connectivity Atlas.
 
 
 NRRD Files

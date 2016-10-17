@@ -15,7 +15,7 @@
 
 import logging
 import os
-from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
+from ..biophys_sim.neuron.hoc_utils import HocUtils
 from allensdk.core.nwb_data_set import NwbDataSet
 
 PERISOMATIC_TYPE = "Biophysical - perisomatic"

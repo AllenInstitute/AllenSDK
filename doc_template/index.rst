@@ -17,6 +17,7 @@ Welcome to the Allen SDK
    data_resources
    models
    examples
+   contributors
    Source Documentation <allensdk>
    Github Profile <https://github.com/AllenInstitute/AllenSDK>
    
@@ -86,12 +87,20 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.12.2 (September 1, 2016)
----------------------------------------------
+What's New - Release 0.12.3 (October 27th, 2016)
+------------------------------------------------
+
+The 0.12.3 release addresses issues from the Github issue tracker:
+  
+    * issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded
+    API database for more reliable large file downloads.
+    * issue #27 - MouseConnectivityCache.get_structure_unionizes returns only requested structures, not all descendants.  Added a separate argument for descendant inclusion.
+    * issue #26 - documentation for structure unionize records `here </unionizes.html>`_.
+    * issue #25 - documentation errors in brain observatory analysis.
 
 The 0.12.2 release has minor fixes.  Changes include:
 
-    * fixed typeo in r_neuropil.py
+    * fixed typo in r_neuropil.py
     * jinja2 dependency is installed by pip
 
 The 0.12.1 release addresses a few bugs and code style issues.  Changes include:

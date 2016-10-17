@@ -17,9 +17,8 @@ import scipy.stats as st
 import numpy as np
 import pandas as pd
 import logging
-from allensdk.brain_observatory.findlevel import findlevel
-from allensdk.brain_observatory.brain_observatory_exceptions import \
-    BrainObservatoryAnalysisException
+from .findlevel import findlevel
+from .brain_observatory_exceptions import BrainObservatoryAnalysisException
 
 
 class StimulusAnalysis(object):
