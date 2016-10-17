@@ -15,14 +15,11 @@
 
 
 import requests
-from requests_toolbelt import exceptions
-from requests_toolbelt.downloadutils import stream
-
-
 from contextlib import closing
 import allensdk.core.json_utilities as json_utilities
 import pandas as pd
 import logging
+import os
 
 
 class Api(object):
@@ -35,7 +32,7 @@ class Api(object):
             api_base_url_string = Api.default_api_url
 
         self.set_api_urls(api_base_url_string)
-        self.default_working_directory = None
+        self.default_working_directory = os.getcwd()
 
     def set_api_urls(self, api_base_url_string):
         '''Set the internal RMA and well known file download endpoint urls
@@ -269,6 +266,9 @@ class Api(object):
         ----------
         .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
         '''
+        from requests_toolbelt import exceptions
+        from requests_toolbelt.downloadutils import stream
+
         try:
             with closing(requests.get(url,
                                       stream=True,

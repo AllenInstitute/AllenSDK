@@ -35,8 +35,7 @@ class BrainObservatoryCache(Cache):
 
     api: BrainObservatoryApi instance
         The object used for making API queries related to the Brain
-
- Observatory.
+        Observatory.
 
     Parameters
     ----------
@@ -318,6 +317,18 @@ class BrainObservatoryCache(Cache):
         simple: boolean
             Whether or not to simplify the dictionary properties returned by this method
             to a more concise subset.
+
+        filters: list of dicts
+            List of filter dictionaries.  The Allen Brain Observatory web site can 
+            generate filters in this format to reproduce a filtered set of cells
+            found there.  To see what these look like, visit 
+            http://observatory.brain-map.org/visualcoding, perform a cell search
+            and apply some filters (e.g. find cells in a particular area), then 
+            click the "view these cells in the AllenSDK" link on the bottom-left
+            of the search results page.  This will take you to a page that contains
+            a code sample you can use to apply those same filters via this argument.
+            For more detail on the filter syntax, see BrainObservatoryApi.dataframe_query.
+            
 
         Returns
         -------
