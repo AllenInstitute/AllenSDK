@@ -17,7 +17,7 @@ Welcome to the Allen SDK
    data_resources
    models
    examples
-   contributors
+   authors
    Source Documentation <allensdk>
    Github Profile <https://github.com/AllenInstitute/AllenSDK>
    
