@@ -144,6 +144,34 @@ class BrainObservatoryNwbDataSet(object):
 
         return timestamps, np_traces
 
+
+    def get_neuropil_r(self, cell_specimen_ids=None):
+        ''' Returns a scalar value of r for neuropil correction of flourescence traces
+
+        Parameters
+        ----------
+        cell_specimen_ids: list or array (optional)
+            List of cell IDs to return traces for. If this is None (default)
+            then results for all are returned
+
+        Returns
+        -------
+        r: 1D numpy array, len(r)=len(cell_specimen_ids)
+            Scalar for neuropil subtraction for each cell
+        '''
+
+        with h5py.File(self.nwb_file, 'r') as f:
+            r_ds = f['processing'][self.PIPELINE_DATASET][
+                'Fluorescence']['imaging_plane_1']['r']
+
+            if cell_specimen_ids is None:
+                r = r_ds.value
+            else:
+                inds = self.get_cell_specimen_indices(cell_specimen_ids)
+                r = r_ds[inds]
+
+        return r
+
     def get_corrected_fluorescence_traces(self, cell_specimen_ids=None):
         ''' Returns an array of neuropil-corrected fluorescence traces
         for all ROIs and the timestamps for each datapoint
@@ -165,17 +193,11 @@ class BrainObservatoryNwbDataSet(object):
         
         timestamps, cell_traces = self.get_fluorescence_traces(cell_specimen_ids)
 
+        r = self.get_neuropil_r(cell_specimen_ids)
+
         _, neuropil_traces = self.get_neuropil_traces(cell_specimen_ids)
 
-        with h5py.File(self.nwb_file, 'r') as f:
-            r_ds = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['r']
 
-            if cell_specimen_ids is None:
-                r = r_ds.value
-            else:
-                inds = self.get_cell_specimen_indices(cell_specimen_ids)
-                r = r_ds[inds]
 
         fc = cell_traces - neuropil_traces * r[:, np.newaxis]
 
