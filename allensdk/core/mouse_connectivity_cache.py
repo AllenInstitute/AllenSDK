@@ -330,7 +330,7 @@ class MouseConnectivityCache(Cache):
         if os.path.exists(file_name):
             structures = pd.DataFrame.from_csv(file_name)
         else:
-            structures = OntologiesApi().get_structures(1)
+            structures = OntologiesApi(base_uri=self.api.api_url).get_structures(1)
             structures = pd.DataFrame(structures)
 
             if self.cache:
