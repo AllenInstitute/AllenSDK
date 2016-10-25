@@ -21,9 +21,9 @@ from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.cache import Cache
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
-import allensdk.core.json_utilities as json_utilities
-from allensdk.core.nwb_data_set import NwbDataSet
-import allensdk.core.swc as swc
+from . import json_utilities as json_utilities
+from .nwb_data_set import NwbDataSet
+from . import  swc
 
 import logging
 
@@ -327,7 +327,7 @@ class CellTypesCache(Cache):
             try:
                 self.api.save_reconstruction_markers(specimen_id, file_name)
             except LookupError as e:
-                logging.warning(e.message)
+                logging.warning(e.args)
                 return []
 
         return swc.read_marker_file(file_name)

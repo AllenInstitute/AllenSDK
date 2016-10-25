@@ -17,6 +17,7 @@ Welcome to the Allen SDK
    data_resources
    models
    examples
+   authors
    Source Documentation <allensdk>
    Github Profile <https://github.com/AllenInstitute/AllenSDK>
    
@@ -86,18 +87,14 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.12.2 (September 1, 2016)
----------------------------------------------
+What's New - Release 0.12.3 (October 27th, 2016)
+------------------------------------------------
 
-The 0.12.2 release has minor fixes.  Changes include:
-
-    * fixed typo in r_neuropil.py
-    * jinja2 dependency is installed by pip
-
-The 0.12.1 release addresses a few bugs and code style issues.  Changes include:
-
-    * The Brain Observatory neuropil subtraction algorithm is faster and more robust now.
-    * Addressing Github issue #17
-    * Updated code style to be more PEP8 compliant
+The 0.12.3 release addresses issues from the Github issue tracker:
+  
+    * issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
+    * issue #27 - MouseConnectivityCache.get_structure_unionizes returns only requested structures, not all descendants.  Added a separate argument for descendant inclusion.
+    * issue #26 - documentation for structure unionize records `here </unionizes.html>`_.
+    * issue #25 - documentation errors in brain observatory analysis.
 
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

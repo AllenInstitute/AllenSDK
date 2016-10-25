@@ -17,9 +17,8 @@ import scipy.stats as st
 import numpy as np
 import pandas as pd
 import logging
-from allensdk.brain_observatory.findlevel import findlevel
-from allensdk.brain_observatory.brain_observatory_exceptions import \
-    BrainObservatoryAnalysisException
+from .findlevel import findlevel
+from .brain_observatory_exceptions import BrainObservatoryAnalysisException
 
 
 class StimulusAnalysis(object):
@@ -193,6 +192,12 @@ class StimulusAnalysis(object):
         binned_dx_vis = np.zeros((nbins, 2))
         for i in range(nbins):
             offset = findlevel(dx_sorted, 1, 'up')
+
+            if offset is None:
+                logging.info(
+                    "dx never crosses 1, all speed data going into single bin")
+                offset = len(dx_sorted)
+
             if i == 0:
                 binned_dx_vis[i, 0] = np.mean(dx_sorted[:offset])
                 binned_dx_vis[i, 1] = np.std(
@@ -219,6 +224,12 @@ class StimulusAnalysis(object):
                 :, np.argsort(dx_vis)]
             for i in range(nbins):
                 offset = findlevel(dx_sorted, 1, 'up')
+
+                if offset is None:
+                    logging.info(
+                        "dx never crosses 1, all speed data going into single bin")
+                    offset = len(dx_sorted)
+
                 if i == 0:
                     binned_cells_shuffled_vis[:, i, 0, shuf] = np.mean(
                         celltraces_shuffled_sorted[:, :offset], axis=1)

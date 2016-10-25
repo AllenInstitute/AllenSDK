@@ -14,22 +14,12 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import shutil
-import socket
-
-try:
-    import urllib.request as urllib_request
-except:
-    import urllib2 as urllib_request
-
-try:
-    import urllib.error as urllib_error
-except:
-    import urllib2 as urllib_error
-
+import requests
+from contextlib import closing
 import allensdk.core.json_utilities as json_utilities
 import pandas as pd
 import logging
+import os
 
 
 class Api(object):
@@ -42,7 +32,7 @@ class Api(object):
             api_base_url_string = Api.default_api_url
 
         self.set_api_urls(api_base_url_string)
-        self.default_working_directory = None
+        self.default_working_directory = os.getcwd()
 
     def set_api_urls(self, api_base_url_string):
         '''Set the internal RMA and well known file download endpoint urls
@@ -94,6 +84,8 @@ class Api(object):
             '/api/v2/atlas_image_download'
         self.projection_image_download_endpoint = api_base_url_string + \
             '/api/v2/projection_image_download'
+        self.image_download_endpoint = api_base_url_string + \
+            '/api/v2/image_download'
         self.informatics_archive_endpoint = Api.download_url + '/informatics-archive'
 
         self.rma_endpoint = api_base_url_string + '/api/v2/data'
@@ -165,7 +157,7 @@ class Api(object):
         kwargs : keyword arguments
             Keyword arguments to be passed to the rma builder function.
 
-        Returnsurllib_re
+        Returns
         -------
         any type
             The data extracted from the json response.
@@ -274,16 +266,36 @@ class Api(object):
         ----------
         .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile <http://help.brain-map.org/display/api/Downloading+a+WellKnownFile>`_.
         '''
+
+        self._log.info("Downloading URL: %s", url)
+        
+        from requests_toolbelt import exceptions
+        from requests_toolbelt.downloadutils import stream
+
         try:
-            response = urllib_request.urlopen(url)
-            with open(file_path, 'wb') as f:
-                shutil.copyfileobj(response, f)
-        except urllib_error.HTTPError:
-            self._log.error("Couldn't retrieve file from %s" % url)
-            raise
-        except socket.timeout:
-            self._log.error("Timed out retrieving file from %s" % url)
-            raise
+            with closing(requests.get(url,
+                                      stream=True,
+                                      timeout=(9.05,31.1))) as response:
+                response.raise_for_status()
+                with open(file_path, 'wb') as f:
+                    stream.stream_response_to_file(response, path=f)
+        except exceptions.StreamingError as e:
+            self._log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
+            raise(e)
+        except requests.exceptions.RequestException as e:
+            self._log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
+            raise(e)
+        except requests.exceptions.ConnectionError as e:
+            self._log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
+            raise(e)
+        except requests.exceptions.ReadTimeout as e:
+            self._log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
+            raise(e)
+        except Exception as e:
+            self._log.error("Couldn't retrieve file %s from %s" % (file_path, url))
+            raise(e)
+
+
 
     def retrieve_parsed_json_over_http(self, url, post=False):
         '''Get the document and put it in a Python data structure
@@ -300,10 +312,13 @@ class Api(object):
         dict
             Result document as parsed by the JSON library.
         '''
-
+        self._log.info("Downloading URL: %s", url)
+        
         if post is False:
-            data = json_utilities.read_url(urllib_request.quote(url, ';/?:@&=+$,'),
-                                           'GET')
+            data = json_utilities.read_url(
+                requests.utils.quote(url,
+                                     ';/?:@&=+$,'),
+                'GET')
         else:
             data = json_utilities.read_url(url, 'POST')
 
@@ -322,6 +337,8 @@ class Api(object):
         string
             Unparsed xml string.
         '''
-        response = urllib_request.urlopen(url)
+        self._log.info("Downloading URL: %s", url)
+                
+        response = requests.get(url)
 
-        return response.read()
+        return response.content

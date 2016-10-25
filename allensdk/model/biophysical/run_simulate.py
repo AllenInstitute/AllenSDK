@@ -13,14 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import allensdk.model.biophysical.runner as single_cell
+from . import runner as single_cell
 import logging
 import os
 import sys
 import traceback
 import subprocess
 import logging.config as lc
-from allensdk.model.biophys_sim.config import Config
+from ..biophys_sim.config import Config
 from pkg_resources import resource_filename  # @UnresolvedImport
 
 

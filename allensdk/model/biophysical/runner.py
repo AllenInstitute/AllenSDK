@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.model.biophys_sim.config import Config
-from allensdk.model.biophysical.utils import create_utils
+from ..biophys_sim.config import Config
+from .utils import create_utils
 from allensdk.core.nwb_data_set import NwbDataSet
 import allensdk.ephys.extract_cell_features as extract_cell_features
 from shutil import copy

@@ -1,4 +1,4 @@
-# Copyright 2014 Allen Institute for Brain Science
+# Copyright 2014-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -38,12 +38,12 @@ class Description(object):
         '''
         if section is None:
             for (section, entries) in data.items():
-                if not section in self.data:
+                if section not in self.data:
                     self.data[section] = entries
                 else:
                     self.data[section].extend(entries)
         else:
-            if not section in self.data:
+            if section not in self.data:
                 self.data[section] = []
 
             self.data[section].append(data)

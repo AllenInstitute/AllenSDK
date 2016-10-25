@@ -15,8 +15,8 @@
 
 import numpy as np
 import logging
-import allensdk.ephys.ephys_extractor as efex
-import allensdk.ephys.ephys_features as ft
+from . import ephys_extractor as efex
+from . import ephys_features as ft
 
 HERO_MIN_AMP_OFFSET = 39.0
 HERO_MAX_AMP_OFFSET = 61.0
