@@ -14,6 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import h5py
+import logging
 import pandas as pd
 import numpy as np
 import allensdk.brain_observatory.roi_masks as roi
@@ -22,14 +23,15 @@ from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
 import allensdk.brain_observatory.stimulus_info as si
 import dateutil
 import re
-
+import os
+from pkg_resources import parse_version
 
 class MissingStimulusException(Exception):
     pass
 
-
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
+    SUPPORTED_PIPELINE_VERSION = "1.0"
 
     FILE_METADATA_MAPPING = {
         'age': 'general/subject/age',
@@ -44,7 +46,9 @@ class BrainObservatoryNwbDataSet(object):
         'fov': 'general/fov',
         'genotype': 'general/subject/genotype',
         'session_start_time': 'session_start_time',
-        'session_type': 'general/session_type'
+        'session_type': 'general/session_type',
+        'specimen_name': 'general/specimen_name',
+        'generated_by': 'general/generated_by'
     }
 
     STIMULUS_TABLE_TYPES = {
@@ -53,8 +57,21 @@ class BrainObservatoryNwbDataSet(object):
                                 si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE]
     }
 
+    MOTION_CORRECTION_DATASETS = [ "MotionCorrection/2p_image_series/xy_translations", 
+                                   "MotionCorrection/2p_image_series/xy_translation" ]
+
     def __init__(self, nwb_file):
+
         self.nwb_file = nwb_file
+        
+        if os.path.exists(self.nwb_file):
+            meta = self.get_metadata()
+            if meta and 'pipeline_version' in meta:
+                pipeline_version = meta['pipeline_version']
+        
+                if parse_version(pipeline_version) > parse_version(self.SUPPORTED_PIPELINE_VERSION):
+                    logging.warning("File %s has a pipeline version newer than the version supported by this class (%s vs %s)."
+                                    " Please update your AllenSDK." % (nwb_file, pipeline_version, self.SUPPORTED_PIPELINE_VERSION))
 
     def get_fluorescence_traces(self, cell_specimen_ids=None):
         ''' Returns an array of fluorescence traces for all ROI and
@@ -74,9 +91,8 @@ class BrainObservatoryNwbDataSet(object):
         traces: 2D numpy array
             Fluorescence traces for each cell
         '''
+        timestamps = self.get_fluorescence_timestamps()
         with h5py.File(self.nwb_file, 'r') as f:
-            timestamps = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['timestamps'].value
             ds = f['processing'][self.PIPELINE_DATASET][
                 'Fluorescence']['imaging_plane_1']['data']
 
@@ -87,6 +103,14 @@ class BrainObservatoryNwbDataSet(object):
                 cell_traces = ds[inds, :]
 
         return timestamps, cell_traces
+
+    def get_fluorescence_timestamps(self):
+        ''' Returns an array of timestamps in seconds for the fluorescence traces '''
+
+        with h5py.File(self.nwb_file, 'r') as f:
+            timestamps = f['processing'][self.PIPELINE_DATASET][
+                'Fluorescence']['imaging_plane_1']['timestamps'].value
+        return timestamps
 
     def get_neuropil_traces(self, cell_specimen_ids=None):
         ''' Returns an array of fluorescence traces for all ROIs
@@ -106,10 +130,10 @@ class BrainObservatoryNwbDataSet(object):
         traces: 2D numpy array
             Neuropil fluorescence traces for each cell
         '''
-        with h5py.File(self.nwb_file, 'r') as f:
-            timestamps = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['timestamps'].value
 
+        timestamps = self.get_fluorescence_timestamps()
+
+        with h5py.File(self.nwb_file, 'r') as f:
             ds = f['processing'][self.PIPELINE_DATASET][
                 'Fluorescence']['imaging_plane_1']['neuropil_traces']
             if cell_specimen_ids is None:
@@ -138,27 +162,22 @@ class BrainObservatoryNwbDataSet(object):
         traces: 2D numpy array
             Corrected fluorescence traces for each cell
         '''
+        
+        timestamps, cell_traces = self.get_fluorescence_traces(cell_specimen_ids)
+
+        _, neuropil_traces = self.get_neuropil_traces(cell_specimen_ids)
+
         with h5py.File(self.nwb_file, 'r') as f:
-            timestamps = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['timestamps'].value
-            cell_traces_ds = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['data']
-            np_traces_ds = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['neuropil_traces']
             r_ds = f['processing'][self.PIPELINE_DATASET][
                 'Fluorescence']['imaging_plane_1']['r']
 
             if cell_specimen_ids is None:
-                cell_traces = cell_traces_ds.value
-                np_traces = np_traces_ds.value
                 r = r_ds.value
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
-                cell_traces = cell_traces_ds[inds, :]
-                np_traces = np_traces_ds[inds, :]
                 r = r_ds[inds]
 
-        fc = cell_traces - np_traces * r[:, np.newaxis]
+        fc = cell_traces - neuropil_traces * r[:, np.newaxis]
 
         return timestamps, fc
 
@@ -200,16 +219,16 @@ class BrainObservatoryNwbDataSet(object):
             dF/F values for each cell
         '''
         with h5py.File(self.nwb_file, 'r') as f:
-            timestamps = f['processing'][self.PIPELINE_DATASET][
-                'DfOverF']['imaging_plane_1']['timestamps'].value
+            dff_ds = f['processing'][self.PIPELINE_DATASET][
+                'DfOverF']['imaging_plane_1']
+
+            timestamps = dff_ds['timestamps'].value
 
             if cell_specimen_ids is None:
-                cell_traces = f['processing'][self.PIPELINE_DATASET][
-                    'DfOverF']['imaging_plane_1']['data'].value
+                cell_traces = dff_ds['data'].value
             else:
                 inds = self.get_cell_specimen_indices(cell_specimen_ids)
-                cell_traces = f['processing'][self.PIPELINE_DATASET][
-                    'DfOverF']['imaging_plane_1']['data'][inds, :]
+                cell_traces = dff_ds['data'][inds, :]
 
         return timestamps, cell_traces
 
@@ -455,38 +474,71 @@ class BrainObservatoryNwbDataSet(object):
 
         with h5py.File(self.nwb_file, 'r') as f:
             for memory_key, disk_key in BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING.items():
-                v = f[disk_key].value
-                if v.dtype.type is np.string_:
-                    v = str(v)
-                meta[memory_key] = v
+                try:
+                    v = f[disk_key].value
 
-        meta['cre_line'] = meta['genotype'].split(';')[0]
-        meta['imaging_depth_um'] = int(meta['imaging_depth'].split()[0])
-        del meta['imaging_depth']
-        meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
-        meta['experiment_container_id'] = int(meta['experiment_container_id'])
-        meta['session_start_time'] = dateutil.parser.parse(
-            meta['session_start_time'])
+                    # convert numpy strings to python strings
+                    if v.dtype.type is np.string_:
+                        if len(v.shape) == 0:
+                            v = v.decode('UTF-8')
+                        elif len(v.shape) == 1:
+                            v = [ s.decode('UTF-8') for s in v ]
+                        else:
+                            raise Exception("Unrecognized metadata formatting for field %s" % disk_key)
 
-        # parse the age in days
-        m = re.match("(.*?) days", meta['age'])
-        if m:
-            meta['age_days'] = int(m.groups()[0])
-            del meta['age']
-        else:
-            raise IOError("Could not find age.")
+                    meta[memory_key] = v
+                except KeyError as e:
+                    logging.warning("could not find key %s", disk_key)
+
+        if 'genotye' in meta:
+            meta['cre_line'] = meta['genotype'].split(';')[0]
+
+        if 'imaging_depth' in meta:
+            meta['imaging_depth_um'] = int(meta['imaging_depth'].split()[0])
+            del meta['imaging_depth']
+            
+        if 'ophys_experiment_id' in meta:
+            meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
+
+        if 'experiment_container_id' in meta:
+            meta['experiment_container_id'] = \
+                int(meta['experiment_container_id'])
+
+        if 'session_start_time' in meta:
+            meta['session_start_time'] = \
+                dateutil.parser.parse(meta['session_start_time'])
+
+        if 'age' in meta:
+            # parse the age in days
+            m = re.match("(.*?) days", meta['age'])
+            if m:
+                meta['age_days'] = int(m.groups()[0])
+                del meta['age']
+            else:
+                raise IOError("Could not parse age.")
 
         # parse the device string (ugly, sorry)
-        device_string = meta['device_string']
-        del meta['device_string']
+        if 'device_string' in meta:
+            device_string = meta['device_string']
+            del meta['device_string']
 
-        m = re.match("(.*?)\.\s(.*?)\sPlease*", device_string)
-        if m:
-            device, device_name = m.groups()
-            meta['device'] = device
-            meta['device_name'] = device_name
-        else:
-            raise IOError("Could not find device.")
+            m = re.match("(.*?)\.\s(.*?)\sPlease*", device_string)
+            if m:
+                device, device_name = m.groups()
+                meta['device'] = device
+                meta['device_name'] = device_name
+            else:
+                raise IOError("Could not parse device string.")
+
+        # file version
+        if 'generated_by' in meta:
+            generated_by = meta.get("generated_by", None)
+            if generated_by is not None:
+                del meta["generated_by"]
+                version = generated_by[-1]
+            else:
+                version = "0.9"
+            meta["pipeline_version"] = version
 
         return meta
 
@@ -494,36 +546,49 @@ class BrainObservatoryNwbDataSet(object):
         ''' Returns the mouse running speed in cm/s
         '''
         with h5py.File(self.nwb_file, 'r') as f:
-            dxcm = f['processing'][self.PIPELINE_DATASET][
-                'BehavioralTimeSeries']['running_speed']['data'].value
-            dxtime = f['processing'][self.PIPELINE_DATASET][
-                'BehavioralTimeSeries']['running_speed']['timestamps'].value
-            timestamps = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['timestamps'].value
+            dx_ds = f['processing'][self.PIPELINE_DATASET][
+                'BehavioralTimeSeries']['running_speed']
+            dxcm = dx_ds['data'].value
+            dxtime = dx_ds['timestamps'].value
 
-        dxcm = dxcm[:, 0]
-        if dxtime[0] != timestamps[0]:
-            adjust = np.where(timestamps == dxtime[0])[0][0]
-            dxtime = np.insert(dxtime, 0, timestamps[:adjust])
-            dxcm = np.insert(dxcm, 0, np.repeat(np.NaN, adjust))
-        adjust = len(timestamps) - len(dxtime)
-        if adjust > 0:
-            dxtime = np.append(dxtime, timestamps[(-1 * adjust):])
-            dxcm = np.append(dxcm, np.repeat(np.NaN, adjust))
+        timestamps = self.get_fluorescence_timestamps()
+
+        # v0.9 stored this as an Nx1 array instead of a flat 1-d array
+        if len(dxcm.shape) == 2:
+            dxcm = dxcm[:, 0]
+
+        dxcm, dxtime = align_running_speed(dxcm, dxtime, timestamps)
+
         return dxcm, dxtime
 
     def get_motion_correction(self):
         ''' Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment
         '''
+        
+        motion_correction = None
         with h5py.File(self.nwb_file, 'r') as f:
-            motion_log = f['processing'][self.PIPELINE_DATASET]['MotionCorrection'][
-                '2p_image_series']['xy_translations']['data'].value
-            motion_time = f['processing'][self.PIPELINE_DATASET]['MotionCorrection'][
-                '2p_image_series']['xy_translations']['timestamps'].value
-            motion_names = f['processing'][self.PIPELINE_DATASET]['MotionCorrection'][
-                '2p_image_series']['xy_translations']['feature_description'].value
-            motion_correction = pd.DataFrame(motion_log, columns=motion_names)
-            motion_correction['timestamp'] = motion_time
+            pipeline_ds = f['processing'][self.PIPELINE_DATASET]
+
+            # pipeline 0.9 stores this in xy_translations
+            # pipeline 1.0 stores this in xy_translation
+            for mc_ds_name in self.MOTION_CORRECTION_DATASETS:
+                try:
+                    mc_ds = pipeline_ds[mc_ds_name]
+
+                    motion_log = mc_ds['data'].value
+                    motion_time = mc_ds['timestamps'].value
+                    motion_names = mc_ds['feature_description'].value
+
+                    motion_correction = pd.DataFrame(motion_log, columns=motion_names)
+                    motion_correction['timestamp'] = motion_time
+
+                    # break out if we found it
+                    break
+                except KeyError as e:
+                    pass
+        
+        if motion_correction is None:
+            raise KeyError("Could not find motion correction data.")
 
         return motion_correction
 
@@ -548,6 +613,25 @@ class BrainObservatoryNwbDataSet(object):
                     del f['analysis'][k]
                 f.create_dataset('analysis/%s' % k, data=v)
 
+
+def align_running_speed(dxcm, dxtime, timestamps):
+    ''' If running speed timestamps differ from fluorescence
+    timestamps, adjust by inserting NaNs to running speed.
+
+    Returns
+    -------
+    tuple: dxcm, dxtime
+    '''
+    if dxtime[0] != timestamps[0]:
+        adjust = np.where(timestamps == dxtime[0])[0][0]
+        dxtime = np.insert(dxtime, 0, timestamps[:adjust])
+        dxcm = np.insert(dxcm, 0, np.repeat(np.NaN, adjust))
+    adjust = len(timestamps) - len(dxtime)
+    if adjust > 0:
+        dxtime = np.append(dxtime, timestamps[(-1 * adjust):])
+        dxcm = np.append(dxcm, np.repeat(np.NaN, adjust))
+        
+    return dxcm, dxtime
 
 def warp_stimulus_coords(vertices,
                          distance=15.0,

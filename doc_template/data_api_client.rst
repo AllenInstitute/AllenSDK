@@ -156,7 +156,7 @@ Alternatively, it can be accessed using normal python dict and list operations.
 
 ::
 
-    print(summary_structures.loc[:,'ontology'][0].name) 
+    print(summary_structures.ontology[0]['name'])
 
 Pandas Dataframes can be written to a CSV file using to_csv and read using load_csv.
 

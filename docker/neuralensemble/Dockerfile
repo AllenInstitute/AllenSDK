@@ -42,7 +42,7 @@ WORKDIR /home/docker
 # TODO: replace w/ install from Github
 RUN mkdir allensdk; \
     cd allensdk; \
-    wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.1.zip; \
+    wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.3.zip; \
     unzip allensdk.zip; \
     rm allensdk.zip; \
     $VENV/bin/pip install .; \

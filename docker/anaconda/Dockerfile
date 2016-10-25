@@ -3,7 +3,7 @@
 # docker build --tag alleninstitute/allensdk:anaconda .
 # docker run -it alleninstitute/allensdk:anaconda /bin/bash
 #
-FROM continuumio/anaconda
+FROM continuumio/anaconda:4.1.1
 
 MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
@@ -21,8 +21,10 @@ RUN apt-get install -yq \
 
 RUN mkdir allensdk; \
     cd allensdk; \
-    wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.1.zip; \
+    wget -O allensdk.zip wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.3.zip; \
     unzip allensdk.zip; \
     rm allensdk.zip; \
     pip install .; \
     pip install -r test_requirements.txt
+
+ENV PYTHONPATH /usr/local/nrn/lib/python

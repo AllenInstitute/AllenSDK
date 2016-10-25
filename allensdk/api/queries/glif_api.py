@@ -16,7 +16,7 @@
 import json
 import logging
 
-from allensdk.api.queries.rma_api import RmaApi
+from .rma_api import RmaApi
 
 
 class GlifApi(RmaApi):
@@ -38,7 +38,7 @@ class GlifApi(RmaApi):
             Meta data for all GLIF neuronal models.
         '''
 
-        include = "specimen(ephys_result),neuronal_model_template[name$il'*LIF*']"
+        include = "specimen(ephys_result[failed$eqfalse]),neuronal_model_template[name$il'*LIF*']"
 
         return self.model_query('NeuronalModel', include=include, num_rows='all')
 

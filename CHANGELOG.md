@@ -1,6 +1,18 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.12.3] - 2016-10-27
+
+### Fixed
+
+- Gitub issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
+- Github issue #26 - better documentation for structure unionize records.
+- Github issue #25 - documentation errors in brain observatory analysis.
+
+### Changed
+
+- Github issue #27 - MouseConnectivityCache.get_structure_unionizes returns only requested structures, not all descendants.  Added a separate argument for descendant inclusion.
+
 ## [0.12.2] - 2016-9-1
 
 ### Fixed

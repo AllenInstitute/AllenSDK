@@ -507,6 +507,32 @@ class EphysSweepFeatureExtractor:
 
         return self._sweep_features[key]
 
+    def process_new_spike_feature(self, feature_name, feature_func):
+        """Add new spike-level feature calculation function
+
+           The function should take this sweep extractor as its argument. Its results
+           can be accessed by calling the method spike_feature(<feature_name>).
+        """
+
+        if feature_name in self._spikes_df.columns:
+            raise KeyError("Feature {:s} already exists for sweep".format(feature_name))
+
+        features = feature_func(self)
+        self._spikes_df[feature_name] = np.nan
+        self._spikes_df.ix[:len(features) - 1, feature_name] = features
+
+    def process_new_sweep_feature(self, feature_name, feature_func):
+        """Add new sweep-level feature calculation function
+
+           The function should take this sweep extractor as its argument. Its results
+           can be accessed by calling the method sweep_feature(<feature_name>).
+        """
+
+        if feature_name in self._sweep_features:
+            raise KeyError("Feature {:s} already exists for sweep".format(feature_name))
+
+        self._sweep_features[feature_name] = feature_func(self)
+
     def set_stimulus_amplitude_calculator(self, function):
         self.stimulus_amplitude_calculator = function
 
@@ -720,6 +746,7 @@ class EphysCellFeatureExtractor:
                 break
             if c[0] < common_amp:
                 common_amp = c[0]
+
         self._features["short_squares"]["stimulus_amplitude"] = common_amp
         ext = EphysSweepSetFeatureExtractor.from_sweeps([sweep for sweep in spiking_sweeps if _short_step_stim_amp(sweep) == common_amp])
         self._short_squares_ext = ext
@@ -960,7 +987,7 @@ def extractor_for_nwb_sweeps(dataset, sweep_numbers,
     for sweep_number in sweep_numbers:
         data = dataset.get_sweep(sweep_number)
         v = data['response'] * 1e3 # mV
-        i = data['stimulus'] * 1e12 # nA
+        i = data['stimulus'] * 1e12 # pA
         hz = data['sampling_rate']
         dt = 1. / hz
         t = np.arange(0, len(v)) * dt # sec

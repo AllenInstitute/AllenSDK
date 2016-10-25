@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.api.api import Api
+from ..api import Api
 import os
 import json
 from collections import OrderedDict
@@ -52,8 +52,7 @@ class BiophysicalApi(Api):
         '''
         include_associations = ''.join([
             'neuronal_model_template(well_known_files(well_known_file_type)),',
-            'specimen',
-            '(ephys_result(well_known_files(well_known_file_type)),'
+            'specimen(ephys_result(well_known_files(well_known_file_type)),',
             'neuron_reconstructions(well_known_files(well_known_file_type)),',
             'ephys_sweeps),',
             'well_known_files(well_known_file_type)'])

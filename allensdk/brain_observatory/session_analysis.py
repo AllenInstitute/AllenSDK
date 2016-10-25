@@ -13,17 +13,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.brain_observatory.static_gratings import StaticGratings
-from allensdk.brain_observatory.locally_sparse_noise import LocallySparseNoise
-from allensdk.brain_observatory.natural_scenes import NaturalScenes
-from allensdk.brain_observatory.drifting_gratings import DriftingGratings
-from allensdk.brain_observatory.natural_movie import NaturalMovie
+from .static_gratings import StaticGratings
+from .locally_sparse_noise import LocallySparseNoise
+from .natural_scenes import NaturalScenes
+from .drifting_gratings import DriftingGratings
+from .natural_movie import NaturalMovie
 from allensdk.core.brain_observatory_nwb_data_set \
     import BrainObservatoryNwbDataSet
-import allensdk.brain_observatory.stimulus_info as stimulus_info
+from . import stimulus_info
 from allensdk.brain_observatory.brain_observatory_exceptions \
     import BrainObservatoryAnalysisException
-import allensdk.brain_observatory.brain_observatory_plotting as cp
+from . import brain_observatory_plotting as cp
 import argparse
 import logging
 import os

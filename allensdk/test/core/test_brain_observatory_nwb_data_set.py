@@ -14,22 +14,30 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
+from pkg_resources import resource_filename  # @UnresolvedImport
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import pytest
 import os
 
+NWB_FLAVORS = []
 
-@pytest.fixture
-def data_set():
-    nwb_file = '/projects/neuralcoding/vol1/prod6/specimen_497258322/ophys_experiment_506954308/506954308.nwb'
-    data_set = BrainObservatoryNwbDataSet(nwb_file)
+if 'TEST_NWB_FILES' in os.environ:
+    nwb_list_file = os.environ['TEST_NWB_FILES']
+else:
+    nwb_list_file = resource_filename(__name__, 'nwb_files.txt')
+with open(nwb_list_file, 'r') as f:
+    NWB_FLAVORS = [l.strip() for l in f]
+
+
+@pytest.fixture(params=NWB_FLAVORS)
+def data_set(request):
+    data_set = BrainObservatoryNwbDataSet(request.param)
+
     return data_set
 
 
-@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
-                    reason="test NWB file not available")
 def test_acceptance(data_set):
-    ids = data_set.get_cell_specimen_ids()
+    data_set.get_cell_specimen_ids()
     data_set.get_session_type()
     data_set.get_metadata()
     data_set.get_running_speed()
@@ -96,7 +104,7 @@ def test_get_dff_traces(data_set):
     ids = data_set.get_cell_specimen_ids()
 
     timestamps, traces = data_set.get_dff_traces()
-    #assert len(timestamps) == traces.shape[1]
+    # assert len(timestamps) == traces.shape[1]
     assert len(ids) == traces.shape[0]
 
     timestamps, traces = data_set.get_dff_traces(ids)
