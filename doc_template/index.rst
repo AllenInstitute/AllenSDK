@@ -92,8 +92,7 @@ What's New - Release 0.12.3 (October 27th, 2016)
 
 The 0.12.3 release addresses issues from the Github issue tracker:
   
-    * issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded
-    API database for more reliable large file downloads.
+    * issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
     * issue #27 - MouseConnectivityCache.get_structure_unionizes returns only requested structures, not all descendants.  Added a separate argument for descendant inclusion.
     * issue #26 - documentation for structure unionize records `here </unionizes.html>`_.
     * issue #25 - documentation errors in brain observatory analysis.
