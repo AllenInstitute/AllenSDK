@@ -97,15 +97,4 @@ The 0.12.3 release addresses issues from the Github issue tracker:
     * issue #26 - documentation for structure unionize records `here </unionizes.html>`_.
     * issue #25 - documentation errors in brain observatory analysis.
 
-The 0.12.2 release has minor fixes.  Changes include:
-
-    * fixed typo in r_neuropil.py
-    * jinja2 dependency is installed by pip
-
-The 0.12.1 release addresses a few bugs and code style issues.  Changes include:
-
-    * The Brain Observatory neuropil subtraction algorithm is faster and more robust now.
-    * Addressing Github issue #17
-    * Updated code style to be more PEP8 compliant
-
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 
