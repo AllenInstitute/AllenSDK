@@ -8,17 +8,28 @@ Please visit http://alleninstitute.github.io/AllenSDK for more information.
 # Authors
 
 Tim Fliss @tfliss
+
 David Feng @dyf
 
-Michael Buice @mabuice
-Nicholas Cain @nicain
-Werner Van Geit @wvangeit
-Richard Gerkin @rgerkin
-Nathan Gouwens @gouwens
-Nile Graddis
-Gabe Ocker
-Corinne Teeter
-Shreejoy Tripathy @stripathy
-Saskia de Vries @saskiad
-Derric Williams @derricw
 
+Michael Buice @mabuice
+
+Nicholas Cain @nicain
+
+Werner Van Geit @wvangeit
+
+Richard Gerkin @rgerkin
+
+Nathan Gouwens @gouwens
+
+Nile Graddis
+
+Gabe Ocker
+
+Corinne Teeter
+
+Shreejoy Tripathy @stripathy
+
+Saskia de Vries @saskiad
+
+Derric Williams @derricw
