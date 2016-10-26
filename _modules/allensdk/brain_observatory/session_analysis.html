@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.brain_observatory.session_analysis</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">.static_gratings</span> <span class="kn">import</span> <span class="n">StaticGratings</span>
 <span class="kn">from</span> <span class="nn">.locally_sparse_noise</span> <span class="kn">import</span> <span class="n">LocallySparseNoise</span>
@@ -669,16 +669,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">out_df</span> <span class="o">=</span> <span class="n">df</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out_df</span> <span class="o">=</span> <span class="n">out_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                                  <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;_deleteme&#39;</span><span class="p">])</span>
+                                  <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;_deleteme&#39;</span><span class="p">])</span>
 
-    <span class="n">bad_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">out_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;deleteme&#39;</span><span class="p">)])</span>
+    <span class="n">bad_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">out_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;deleteme&#39;</span><span class="p">)])</span>
     <span class="n">out_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">bad_columns</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">out_df</span>
 
 </div>
 <div class="viewcode-block" id="SessionAnalysis"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis">[docs]</a><span class="k">class</span> <span class="nc">SessionAnalysis</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;allensdk.brain_observatory.session_analysis&#39;</span><span class="p">)</span>
+    <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;allensdk.brain_observatory.session_analysis&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nwb_path</span><span class="p">,</span> <span class="n">save_path</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nwb</span> <span class="o">=</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="n">nwb_path</span><span class="p">)</span>
@@ -698,105 +698,105 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="SessionAnalysis.save_session_a"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_a">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm3</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
         <span class="n">nwb</span> <span class="o">=</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span>
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_dataframes</span><span class="p">(</span>
-            <span class="p">(</span><span class="s">&#39;stim_table_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;sweep_response_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;mean_sweep_response_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;peak&#39;</span><span class="p">,</span> <span class="n">peak</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;sweep_response_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;stim_table_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;sweep_response_nm3&#39;</span><span class="p">,</span> <span class="n">nm3</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">))</span>
+            <span class="p">(</span><span class="s1">&#39;stim_table_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;sweep_response_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;mean_sweep_response_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;peak&#39;</span><span class="p">,</span> <span class="n">peak</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;sweep_response_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;stim_table_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;sweep_response_nm3&#39;</span><span class="p">,</span> <span class="n">nm3</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">))</span>
 
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_arrays</span><span class="p">(</span>
-            <span class="p">(</span><span class="s">&#39;celltraces_dff&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">dfftraces</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;response_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_cells_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_sp</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_dx_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_sp</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">))</span>
+            <span class="p">(</span><span class="s1">&#39;celltraces_dff&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">dfftraces</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;response_dg&#39;</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_cells_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_sp</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_dx_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_sp</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="SessionAnalysis.save_session_b"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_b">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">ns</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
         <span class="n">nwb</span> <span class="o">=</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span>
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_dataframes</span><span class="p">(</span>
-            <span class="p">(</span><span class="s">&#39;stim_table_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;sweep_response_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;mean_sweep_response_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;sweep_response_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;stim_table_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;sweep_response_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;stim_table_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;mean_sweep_response_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;peak&#39;</span><span class="p">,</span> <span class="n">peak</span><span class="p">))</span>
+            <span class="p">(</span><span class="s1">&#39;stim_table_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;sweep_response_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;mean_sweep_response_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;sweep_response_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;stim_table_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;sweep_response_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;stim_table_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;mean_sweep_response_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;peak&#39;</span><span class="p">,</span> <span class="n">peak</span><span class="p">))</span>
 
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_arrays</span><span class="p">(</span>
-            <span class="p">(</span><span class="s">&#39;celltraces_dff&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">dfftraces</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;response_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;response_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_cells_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_sp</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_dx_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_sp</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">))</span>
+            <span class="p">(</span><span class="s1">&#39;celltraces_dff&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">dfftraces</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;response_sg&#39;</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;response_ns&#39;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_cells_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_sp</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_dx_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_sp</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="SessionAnalysis.save_session_c"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c">[docs]</a>    <span class="k">def</span> <span class="nf">save_session_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lsn</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">):</span>
         <span class="n">nwb</span> <span class="o">=</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span>
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_dataframes</span><span class="p">(</span>
-            <span class="p">(</span><span class="s">&#39;stim_table_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;sweep_response_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;peak&#39;</span><span class="p">,</span> <span class="n">peak</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;sweep_response_nm2&#39;</span><span class="p">,</span> <span class="n">nm2</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;sweep_response_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;mean_sweep_response_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">))</span>
+            <span class="p">(</span><span class="s1">&#39;stim_table_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">stim_table</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;sweep_response_nm1&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;peak&#39;</span><span class="p">,</span> <span class="n">peak</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;sweep_response_nm2&#39;</span><span class="p">,</span> <span class="n">nm2</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;sweep_response_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">sweep_response</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;mean_sweep_response_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">mean_sweep_response</span><span class="p">))</span>
 
         <span class="n">nwb</span><span class="o">.</span><span class="n">save_analysis_arrays</span><span class="p">(</span>
-            <span class="p">(</span><span class="s">&#39;receptive_field_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">receptive_field</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;celltraces_dff&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">dfftraces</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_dx_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_sp</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_cells_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_sp</span><span class="p">),</span>
-            <span class="p">(</span><span class="s">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">))</span>
+            <span class="p">(</span><span class="s1">&#39;receptive_field_lsn&#39;</span><span class="p">,</span> <span class="n">lsn</span><span class="o">.</span><span class="n">receptive_field</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;celltraces_dff&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">dfftraces</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_dx_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_sp</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_dx_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_dx_vis</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_cells_sp&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_sp</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;binned_cells_vis&#39;</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">binned_cells_vis</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="SessionAnalysis.append_metrics_drifting_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_drifting_grating">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_drifting_grating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">dg</span><span class="p">):</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;osi_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;osi_dg&quot;</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;dsi_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;dsi_dg&quot;</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;pref_dir_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dg</span><span class="o">.</span><span class="n">orivals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                                  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;ori_dg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;pref_tf_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dg</span><span class="o">.</span><span class="n">tfvals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;tf_dg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;p_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;ptest_dg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;osi_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;osi_dg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;dsi_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;dsi_dg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_dir_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dg</span><span class="o">.</span><span class="n">orivals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                                  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ori_dg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_tf_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">dg</span><span class="o">.</span><span class="n">tfvals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;tf_dg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_dg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ptest_dg&quot;</span><span class="p">]</span>
 </div>
 <div class="viewcode-block" id="SessionAnalysis.append_metrics_static_grating"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_static_grating">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_static_grating</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">sg</span><span class="p">):</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;osi_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;osi_sg&quot;</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;pref_ori_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sg</span><span class="o">.</span><span class="n">orivals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                                  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;ori_sg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;pref_sf_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sg</span><span class="o">.</span><span class="n">sfvals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;sf_sg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;pref_phase_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sg</span><span class="o">.</span><span class="n">phasevals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;phase_sg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;p_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;ptest_sg&quot;</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;time_to_peak_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;time_to_peak_sg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;osi_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;osi_sg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_ori_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sg</span><span class="o">.</span><span class="n">orivals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                                  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ori_sg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_sf_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sg</span><span class="o">.</span><span class="n">sfvals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;sf_sg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_phase_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sg</span><span class="o">.</span><span class="n">phasevals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;phase_sg&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ptest_sg&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;time_to_peak_sg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;time_to_peak_sg&quot;</span><span class="p">]</span>
 </div>
 <div class="viewcode-block" id="SessionAnalysis.append_metrics_natural_scene"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_natural_scene">[docs]</a>    <span class="k">def</span> <span class="nf">append_metrics_natural_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">ns</span><span class="p">):</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;pref_image_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;scene_ns&quot;</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;p_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;ptest_ns&quot;</span><span class="p">]</span>
-        <span class="n">metrics</span><span class="p">[</span><span class="s">&quot;time_to_peak_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s">&quot;time_to_peak_ns&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pref_image_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;scene_ns&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;p_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;ptest_ns&quot;</span><span class="p">]</span>
+        <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;time_to_peak_ns&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">[</span><span class="s2">&quot;time_to_peak_ns&quot;</span><span class="p">]</span>
 </div>
 <div class="viewcode-block" id="SessionAnalysis.verify_roi_lists_equal"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.verify_roi_lists_equal">[docs]</a>    <span class="k">def</span> <span class="nf">verify_roi_lists_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi1</span><span class="p">,</span> <span class="n">roi2</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">roi2</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">BrainObservatoryAnalysisException</span><span class="p">(</span>
-                <span class="s">&quot;Error -- ROI lists are of different length&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;Error -- ROI lists are of different length&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">roi1</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">roi1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">roi2</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="n">BrainObservatoryAnalysisException</span><span class="p">(</span>
-                    <span class="s">&quot;Error -- ROI lists have different entries&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot;Error -- ROI lists have different entries&quot;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="SessionAnalysis.session_a"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_a">[docs]</a>    <span class="k">def</span> <span class="nf">session_a</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-        <span class="n">nm1</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s">&#39;natural_movie_one&#39;</span><span class="p">,</span> <span class="n">speed_tuning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">nm3</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s">&#39;natural_movie_three&#39;</span><span class="p">)</span>
+        <span class="n">nm1</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_one&#39;</span><span class="p">,</span> <span class="n">speed_tuning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">nm3</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_three&#39;</span><span class="p">)</span>
         <span class="n">dg</span> <span class="o">=</span> <span class="n">DriftingGratings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">)</span>
 
-        <span class="n">SessionAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Session A analyzed&quot;</span><span class="p">)</span>
+        <span class="n">SessionAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Session A analyzed&quot;</span><span class="p">)</span>
         <span class="n">peak</span> <span class="o">=</span> <span class="n">multi_dataframe_merge</span><span class="p">(</span>
             <span class="p">[</span><span class="n">nm1</span><span class="o">.</span><span class="n">peak_run</span><span class="p">,</span> <span class="n">dg</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm3</span><span class="o">.</span><span class="n">peak</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_drifting_grating</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span><span class="p">,</span> <span class="n">dg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span><span class="p">[</span><span class="s">&quot;roi_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">roi_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_a</span><span class="p">[</span><span class="s2">&quot;roi_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dg</span><span class="o">.</span><span class="n">roi_id</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">append_metadata</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
 
@@ -810,8 +810,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="SessionAnalysis.session_b"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_b">[docs]</a>    <span class="k">def</span> <span class="nf">session_b</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="n">ns</span> <span class="o">=</span> <span class="n">NaturalScenes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">)</span>
         <span class="n">sg</span> <span class="o">=</span> <span class="n">StaticGratings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">)</span>
-        <span class="n">nm1</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s">&#39;natural_movie_one&#39;</span><span class="p">,</span> <span class="n">speed_tuning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">SessionAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Session B analyzed&quot;</span><span class="p">)</span>
+        <span class="n">nm1</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_one&#39;</span><span class="p">,</span> <span class="n">speed_tuning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">SessionAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Session B analyzed&quot;</span><span class="p">)</span>
         <span class="n">peak</span> <span class="o">=</span> <span class="n">multi_dataframe_merge</span><span class="p">(</span>
             <span class="p">[</span><span class="n">nm1</span><span class="o">.</span><span class="n">peak_run</span><span class="p">,</span> <span class="n">sg</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">peak</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">append_metadata</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
@@ -819,7 +819,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_static_grating</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">,</span> <span class="n">sg</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">append_metrics_natural_scene</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">,</span> <span class="n">ns</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verify_roi_lists_equal</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">roi_id</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">roi_id</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">[</span><span class="s">&quot;roi_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">roi_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_b</span><span class="p">[</span><span class="s2">&quot;roi_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">roi_id</span>
 
         <span class="k">if</span> <span class="n">save_flag</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">save_session_b</span><span class="p">(</span><span class="n">sg</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">ns</span><span class="p">,</span> <span class="n">peak</span><span class="p">)</span>
@@ -831,13 +831,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </div>
 <div class="viewcode-block" id="SessionAnalysis.session_c"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c">[docs]</a>    <span class="k">def</span> <span class="nf">session_c</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot_flag</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="n">lsn</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">)</span>
-        <span class="n">nm2</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s">&#39;natural_movie_two&#39;</span><span class="p">)</span>
-        <span class="n">nm1</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s">&#39;natural_movie_one&#39;</span><span class="p">,</span> <span class="n">speed_tuning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-        <span class="n">SessionAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Session C analyzed&quot;</span><span class="p">)</span>
+        <span class="n">nm2</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_two&#39;</span><span class="p">)</span>
+        <span class="n">nm1</span> <span class="o">=</span> <span class="n">NaturalMovie</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb</span><span class="p">,</span> <span class="s1">&#39;natural_movie_one&#39;</span><span class="p">,</span> <span class="n">speed_tuning</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">SessionAnalysis</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Session C analyzed&quot;</span><span class="p">)</span>
         <span class="n">peak</span> <span class="o">=</span> <span class="n">multi_dataframe_merge</span><span class="p">([</span><span class="n">nm1</span><span class="o">.</span><span class="n">peak_run</span><span class="p">,</span> <span class="n">nm1</span><span class="o">.</span><span class="n">peak</span><span class="p">,</span> <span class="n">nm2</span><span class="o">.</span><span class="n">peak</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">append_metadata</span><span class="p">(</span><span class="n">peak</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s">&quot;roi_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nm1</span><span class="o">.</span><span class="n">roi_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics_c</span><span class="p">[</span><span class="s2">&quot;roi_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nm1</span><span class="o">.</span><span class="n">roi_id</span>
 
         <span class="k">if</span> <span class="n">save_flag</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">save_session_c</span><span class="p">(</span><span class="n">lsn</span><span class="p">,</span> <span class="n">nm1</span><span class="p">,</span> <span class="n">nm2</span><span class="p">,</span> <span class="n">peak</span><span class="p">)</span>
@@ -867,17 +867,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">session_analysis</span><span class="o">.</span><span class="n">session_c</span><span class="p">(</span><span class="n">plot_flag</span><span class="o">=</span><span class="n">plot_flag</span><span class="p">,</span> <span class="n">save_flag</span><span class="o">=</span><span class="n">save_flag</span><span class="p">)</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="n">session_analysis</span><span class="o">.</span><span class="n">metrics_c</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&quot;Unknown session: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">session</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Unknown session: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">session</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">metrics</span>
 
 </div>
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;input_nwb&quot;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;output_h5&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;input_nwb&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;output_h5&quot;</span><span class="p">)</span>
 
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;--plot&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&#39;store_true&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--plot&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">)</span>
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">()</span>
@@ -886,7 +886,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">run_session_analysis</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">input_nwb</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">output_h5</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">plot</span><span class="p">)</span>
 
 </div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
@@ -958,7 +958,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

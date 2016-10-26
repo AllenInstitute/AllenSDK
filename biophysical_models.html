@@ -29,17 +29,17 @@
     <link rel="prev" title="Generalized LIF Models" href="glif_models.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -181,11 +181,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -609,7 +609,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -622,7 +622,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -688,13 +688,13 @@ for a cell has a neuronal model download link.  Specifically:</p>
 The neuronal model id can be found to the left of
 the corresponding &#8216;Biophysical - perisomatic&#8217; or
 &#8216;Biophysical - all active&#8217; &#8220;download model&#8221; link.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.biophysical_api</span> <span class="kn">import</span> \
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.biophysical_api</span> <span class="kn">import</span> \
     <span class="n">BiophysicalApi</span>
 
 <span class="n">bp</span> <span class="o">=</span> <span class="n">BiophysicalApi</span><span class="p">()</span>
-<span class="n">bp</span><span class="o">.</span><span class="n">cache_stimulus</span> <span class="o">=</span> <span class="bp">True</span> <span class="c"># change to False to not download the large stimulus NWB file</span>
-<span class="n">neuronal_model_id</span> <span class="o">=</span> <span class="mi">472451419</span>    <span class="c"># get this from the web site as above</span>
-<span class="n">bp</span><span class="o">.</span><span class="n">cache_data</span><span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">,</span> <span class="n">working_directory</span><span class="o">=</span><span class="s">&#39;neuronal_model&#39;</span><span class="p">)</span>
+<span class="n">bp</span><span class="o">.</span><span class="n">cache_stimulus</span> <span class="o">=</span> <span class="bp">True</span> <span class="c1"># change to False to not download the large stimulus NWB file</span>
+<span class="n">neuronal_model_id</span> <span class="o">=</span> <span class="mi">472451419</span>    <span class="c1"># get this from the web site as above</span>
+<span class="n">bp</span><span class="o">.</span><span class="n">cache_data</span><span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">,</span> <span class="n">working_directory</span><span class="o">=</span><span class="s1">&#39;neuronal_model&#39;</span><span class="p">)</span>
 <span class="k">pass</span>
 </pre></div>
 </div>
@@ -707,7 +707,7 @@ for the Allen Cell Types Database web application.</p>
 <p>The structure of the directory created looks like this.
 It includes stimulus files, model parameters, morphology, cellular mechanisms
 and application configuration.</p>
-<div class="highlight-python"><div class="highlight"><pre>neuronal_model
+<div class="highlight-python"><div class="highlight"><pre><span></span>neuronal_model
 |-- manifest.json
 |-- 472451419_fit.json
 |-- Nr5a1-Cre_Ai14_IVSCC_-169248.04.02.01.nwb
@@ -728,7 +728,7 @@ and application configuration.</p>
 <h2>Running the Simulation (Linux shell prompt)<a class="headerlink" href="#running-the-simulation-linux-shell-prompt" title="Permalink to this headline">¶</a></h2>
 <p>All of the sweeps available from the web site are included in manifest.json and will be run by default.
 This can take some time.</p>
-<div class="highlight-python"><div class="highlight"><pre>cd neuronal_model
+<div class="highlight-python"><div class="highlight"><pre><span></span>cd neuronal_model
 nrnivmodl ./modfiles   # compile the model (only needs to be done once)
 python -m allensdk.model.biophysical.runner manifest.json
 </pre></div>
@@ -748,32 +748,32 @@ module.  The implementation of the method is discussed here step-by-step:</p>
 <p>First configure NEURON based on the configuration file, which was
 read in from the command line at the very bottom of the script.</p>
 <p><a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.runner.run" title="allensdk.model.biophysical.runner.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># configure NEURON</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># configure NEURON</span>
 <span class="n">utils</span> <span class="o">=</span> <span class="n">Utils</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 <span class="n">h</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">h</span>
 </pre></div>
 </div>
 <p>The next step is to get the path of the morphology file and pass it to NEURON.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># configure model</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># configure model</span>
 <span class="n">manifest</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span>
-<span class="n">morphology_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;MORPHOLOGY&#39;</span><span class="p">)</span>
-<span class="n">utils</span><span class="o">.</span><span class="n">generate_morphology</span><span class="p">(</span><span class="n">morphology_path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;ascii&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">))</span>
+<span class="n">morphology_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;MORPHOLOGY&#39;</span><span class="p">)</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">generate_morphology</span><span class="p">(</span><span class="n">morphology_path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">))</span>
 <span class="n">utils</span><span class="o">.</span><span class="n">load_cell_parameters</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Then read the stimulus and recording configuration and configure NEURON</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># configure stimulus and recording</span>
-<span class="n">stimulus_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;stimulus_path&#39;</span><span class="p">)</span>
-<span class="n">nwb_out_path</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># configure stimulus and recording</span>
+<span class="n">stimulus_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;stimulus_path&#39;</span><span class="p">)</span>
+<span class="n">nwb_out_path</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">)</span>
 <span class="n">output</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">nwb_out_path</span><span class="p">)</span>
-<span class="n">run_params</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;runs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">sweeps</span> <span class="o">=</span> <span class="n">run_params</span><span class="p">[</span><span class="s">&#39;sweeps&#39;</span><span class="p">]</span>
-<span class="n">junction_potential</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;fitting&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;junction_potential&#39;</span><span class="p">]</span>
+<span class="n">run_params</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;runs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">sweeps</span> <span class="o">=</span> <span class="n">run_params</span><span class="p">[</span><span class="s1">&#39;sweeps&#39;</span><span class="p">]</span>
+<span class="n">junction_potential</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;fitting&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;junction_potential&#39;</span><span class="p">]</span>
 <span class="n">mV</span> <span class="o">=</span> <span class="mf">1.0e-3</span>
 </pre></div>
 </div>
 <p>Loop through the stimulus sweeps and write the output.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># run sweeps</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># run sweeps</span>
 <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">sweeps</span><span class="p">:</span>
     <span class="n">utils</span><span class="o">.</span><span class="n">setup_iclamp</span><span class="p">(</span><span class="n">stimulus_path</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=</span><span class="n">sweep</span><span class="p">)</span>
     <span class="n">vec</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">record_values</span><span class="p">()</span>
@@ -781,8 +781,8 @@ read in from the command line at the very bottom of the script.</p>
     <span class="n">h</span><span class="o">.</span><span class="n">finitialize</span><span class="p">()</span>
     <span class="n">h</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
-    <span class="c"># write to an NWB File</span>
-    <span class="n">output_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="n">junction_potential</span><span class="p">)</span> <span class="o">*</span> <span class="n">mV</span>
+    <span class="c1"># write to an NWB File</span>
+    <span class="n">output_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="n">junction_potential</span><span class="p">)</span> <span class="o">*</span> <span class="n">mV</span>
     <span class="n">output</span><span class="o">.</span><span class="n">set_sweep</span><span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">output_data</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -802,7 +802,7 @@ The various methods called by the runner.script are implemented here, including:
 and
 <a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.record_values" title="allensdk.model.biophysical.utils.Utils.record_values"><tt class="xref py py-meth docutils literal"><span class="pre">record_values()</span></tt></a>.</p>
 <p><a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils" title="allensdk.model.biophysical.utils.Utils"><tt class="xref py py-class docutils literal"><span class="pre">Utils</span></tt></a>:</p>
-<div class="highlight-python"><div class="highlight"><pre>from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
+<div class="highlight-python"><div class="highlight"><pre><span></span>from allensdk.model.biophys_sim.neuron.hoc_utils import HocUtils
 
 .....
 
@@ -819,11 +819,11 @@ simply model your directory structure on one of the downloaded simulations
 or one of the examples below.
 Add your own runner.py and utils.py module to the simulation directory.</p>
 <p>Compile the .mod files using NEURON&#8217;s nrnivmodl command (Linux shell):</p>
-<div class="highlight-python"><div class="highlight"><pre>nrnivmodl modfiles
+<div class="highlight-python"><div class="highlight"><pre><span></span>nrnivmodl modfiles
 </pre></div>
 </div>
 <p>Then call your runner script directly, passing in the manifest file to your script:</p>
-<div class="highlight-python"><div class="highlight"><pre>python runner.py manifest.json
+<div class="highlight-python"><div class="highlight"><pre><span></span>python runner.py manifest.json
 </pre></div>
 </div>
 <p>The output from your simulation and any intermediate files will go in the work directory.</p>
@@ -836,14 +836,14 @@ are available to download as a starting point for your own projects.</p>
 <p>Each example provides its own utils.py file along with a main script (Linux shell)
 and supporting configuration files.</p>
 <p>simple_example.tgz:</p>
-<div class="highlight-python"><div class="highlight"><pre>tar xvzf simple_example.tgz
+<div class="highlight-python"><div class="highlight"><pre><span></span>tar xvzf simple_example.tgz
 cd simple
 nrnivmodl modfiles
 python simple.py
 </pre></div>
 </div>
 <p>multicell_example.tgz:</p>
-<div class="highlight-python"><div class="highlight"><pre>tar xvzf multicell_example.tgz
+<div class="highlight-python"><div class="highlight"><pre><span></span>tar xvzf multicell_example.tgz
 cd multicell
 nrnivmodl modfiles
 python multi.py
@@ -855,38 +855,38 @@ python multicell_diff.py
 <h2>Exporting Output to Text Format or Image<a class="headerlink" href="#exporting-output-to-text-format-or-image" title="Permalink to this headline">¶</a></h2>
 <p>This is an example of using the AllenSDK
 to save a response voltage to other formats.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.core.dat_utilities</span> <span class="kn">import</span> \
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.core.dat_utilities</span> <span class="kn">import</span> \
     <span class="n">DatUtilities</span>
 <span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> \
     <span class="n">NwbDataSet</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span>
-<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s">&quot;Agg&quot;</span><span class="p">)</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;Agg&quot;</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
 
-<span class="n">nwb_file</span> <span class="o">=</span> <span class="s">&#39;313862020.nwb&#39;</span>
+<span class="n">nwb_file</span> <span class="o">=</span> <span class="s1">&#39;313862020.nwb&#39;</span>
 <span class="n">sweep_number</span> <span class="o">=</span> <span class="mi">52</span>
-<span class="n">dat_file</span> <span class="o">=</span> <span class="s">&#39;313862020_</span><span class="si">%d</span><span class="s">.dat&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep_number</span><span class="p">)</span>
+<span class="n">dat_file</span> <span class="o">=</span> <span class="s1">&#39;313862020_</span><span class="si">%d</span><span class="s1">.dat&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep_number</span><span class="p">)</span>
 
 <span class="n">nwb</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">)</span>
 <span class="n">sweep</span> <span class="o">=</span> <span class="n">nwb</span><span class="o">.</span><span class="n">get_sweep</span><span class="p">(</span><span class="n">sweep_number</span><span class="p">)</span>
 
-<span class="c"># read v and t as numpy arrays</span>
-<span class="n">v</span> <span class="o">=</span> <span class="n">sweep</span><span class="p">[</span><span class="s">&#39;response&#39;</span><span class="p">]</span>
-<span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0e3</span> <span class="o">/</span> <span class="n">sweep</span><span class="p">[</span><span class="s">&#39;sampling_rate&#39;</span><span class="p">]</span>
+<span class="c1"># read v and t as numpy arrays</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">sweep</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">]</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0e3</span> <span class="o">/</span> <span class="n">sweep</span><span class="p">[</span><span class="s1">&#39;sampling_rate&#39;</span><span class="p">]</span>
 <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span>
 
-<span class="c"># save as text file</span>
+<span class="c1"># save as text file</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="n">v</span><span class="p">)))</span>
-<span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">dat_file</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span> <span class="p">(</span><span class="n">dat_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
     <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
-<span class="c"># save image using matplotlib</span>
+<span class="c1"># save image using matplotlib</span>
 <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Sweep </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep_number</span><span class="p">))</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;out.png&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Sweep </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep_number</span><span class="p">))</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;out.png&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -897,7 +897,7 @@ to save a response voltage to other formats.</p>
 <blockquote>
 <div><p>A model description file is simply a JSON object with several sections at the top level
 and an array of JSON objects within each section.</p>
-<div class="highlight-python"><div class="highlight"><pre> {
+<div class="highlight-python"><div class="highlight"><pre><span></span> {
     &quot;cell_section&quot;: [
         {
           &quot;name&quot;: &quot;cell 1&quot;,
@@ -951,7 +951,7 @@ and single-line comments start with //.
 Commented description files will not be recognized by strict json parsers
 unless the comments are stripped.</p>
 <p>commented.json:</p>
-<div class="highlight-python"><div class="highlight"><pre>{
+<div class="highlight-python"><div class="highlight"><pre><span></span>{
    /*
     *  multi-line comment
     */
@@ -975,7 +975,7 @@ memory will behave the same way as if the files were not split.
 This allows a small experiment to be described in a single file
 and large experiments to be more modular.</p>
 <p>cells.json:</p>
-<div class="highlight-python"><div class="highlight"><pre>{
+<div class="highlight-python"><div class="highlight"><pre><span></span>{
    &quot;cell_section&quot;: [
        {
          &quot;name&quot;: &quot;cell 1&quot;,
@@ -992,11 +992,11 @@ and large experiments to be more modular.</p>
 </pre></div>
 </div>
 <p>extras.json:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
-    <span class="s">&quot;extra&quot;</span><span class="p">:</span> <span class="p">[</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;extra&quot;</span><span class="p">:</span> <span class="p">[</span>
        <span class="p">{</span>
-         <span class="s">&quot;what&quot;</span><span class="p">:</span> <span class="s">&quot;wood&quot;</span><span class="p">,</span>
-         <span class="s">&quot;who&quot;</span><span class="p">:</span> <span class="s">&quot;woodchuck&quot;</span>
+         <span class="s2">&quot;what&quot;</span><span class="p">:</span> <span class="s2">&quot;wood&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;who&quot;</span><span class="p">:</span> <span class="s2">&quot;woodchuck&quot;</span>
        <span class="p">}</span>
     <span class="p">]</span>
 <span class="p">}</span>
@@ -1013,7 +1013,7 @@ The sub-networks can then be composed into a larger network with an additional
 description of the interconnections.</p>
 <blockquote>
 <div><p>network1.json:</p>
-<div class="highlight-python"><div class="highlight"><pre>/* A self-contained sub-network */
+<div class="highlight-python"><div class="highlight"><pre><span></span>/* A self-contained sub-network */
 {
     &quot;cells&quot;: [
         { &quot;name&quot;: &quot;cell1&quot; },
@@ -1027,7 +1027,7 @@ description of the interconnections.</p>
 </pre></div>
 </div>
 <p>network2.json:</p>
-<div class="highlight-python"><div class="highlight"><pre>/* Another self-contained sub-network */
+<div class="highlight-python"><div class="highlight"><pre><span></span>/* Another self-contained sub-network */
 {
     &quot;cells&quot;: [
         { &quot;name&quot;: &quot;cell3&quot; },
@@ -1040,7 +1040,7 @@ description of the interconnections.</p>
 </pre></div>
 </div>
 <p>interconnect.json:</p>
-<div class="highlight-python"><div class="highlight"><pre>{
+<div class="highlight-python"><div class="highlight"><pre><span></span>{
     // the additional connections needed to
     // connect the network1 and network2
     // into a ring topology.
@@ -1071,7 +1071,7 @@ Files and directories may be organized in a parent-child relationship.</p>
 <h3>A Simple Manifest<a class="headerlink" href="#a-simple-manifest" title="Permalink to this headline">¶</a></h3>
 <p>This is a simple manifest file that specifies the BASEDIR directory
 using &#8221;.&#8221;, meaning the current directory:</p>
-<div class="highlight-python"><div class="highlight"><pre>{
+<div class="highlight-python"><div class="highlight"><pre><span></span>{
     &quot;manifest&quot;: [
         {   &quot;key&quot;: &quot;BASEDIR&quot;,
             &quot;type&quot;: &quot;dir&quot;,
@@ -1087,7 +1087,7 @@ using &#8221;.&#8221;, meaning the current directory:</p>
 <p>Adding the optional &#8220;parent_key&#8221; member to a manifest object
 creates a parent-child relation.  In this case WORKDIR will
 be found in &#8221;./work&#8221;:</p>
-<div class="highlight-python"><div class="highlight"><pre>{
+<div class="highlight-python"><div class="highlight"><pre><span></span>{
     &quot;manifest&quot;: [
         {   &quot;key&quot;: &quot;BASEDIR&quot;,
             &quot;type&quot;: &quot;dir&quot;,
@@ -1109,7 +1109,7 @@ be found in &#8221;./work&#8221;:</p>
 If a sequence of many files is needed, the spec may contain patterns
 to indicate where the sequence number (%d) or string (%s) will be
 interpolated:</p>
-<div class="highlight-python"><div class="highlight"><pre>{
+<div class="highlight-python"><div class="highlight"><pre><span></span>{
     &quot;manifest&quot;: [
         {   &quot;key&quot;: &quot;BASEDIR&quot;,
             &quot;type&quot;: &quot;dir&quot;,
@@ -1220,7 +1220,7 @@ URLs that provide model data, but it is a planned future use case.</p>
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

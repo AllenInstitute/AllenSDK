@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.api.queries.rma_api</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">..api</span> <span class="kn">import</span> <span class="n">Api</span>
 
@@ -653,33 +653,33 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    See: `RESTful Model Access (RMA) &lt;http://help.brain-map.org/display/api/RESTful+Model+Access+%28RMA%29&gt;`_</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">MODEL</span> <span class="o">=</span> <span class="s">&#39;model::&#39;</span>
-    <span class="n">PIPE</span> <span class="o">=</span> <span class="s">&#39;pipe::&#39;</span>
-    <span class="n">SERVICE</span> <span class="o">=</span> <span class="s">&#39;service::&#39;</span>
-    <span class="n">CRITERIA</span> <span class="o">=</span> <span class="s">&#39;rma::criteria&#39;</span>
-    <span class="n">INCLUDE</span> <span class="o">=</span> <span class="s">&#39;rma::include&#39;</span>
-    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="s">&#39;rma::options&#39;</span>
-    <span class="n">ORDER</span> <span class="o">=</span> <span class="s">&#39;order&#39;</span>
-    <span class="n">NUM_ROWS</span> <span class="o">=</span> <span class="s">&#39;num_rows&#39;</span>
-    <span class="n">ALL</span> <span class="o">=</span> <span class="s">&#39;all&#39;</span>
-    <span class="n">START_ROW</span> <span class="o">=</span> <span class="s">&#39;start_row&#39;</span>
-    <span class="n">COUNT</span> <span class="o">=</span> <span class="s">&#39;count&#39;</span>
-    <span class="n">ONLY</span> <span class="o">=</span> <span class="s">&#39;only&#39;</span>
-    <span class="n">EXCEPT</span> <span class="o">=</span> <span class="s">&#39;except&#39;</span>
-    <span class="n">TABULAR</span> <span class="o">=</span> <span class="s">&#39;tabular&#39;</span>
-    <span class="n">DEBUG</span> <span class="o">=</span> <span class="s">&#39;debug&#39;</span>
-    <span class="n">PREVIEW</span> <span class="o">=</span> <span class="s">&#39;preview&#39;</span>
-    <span class="n">TRUE</span> <span class="o">=</span> <span class="s">&#39;true&#39;</span>
-    <span class="n">FALSE</span> <span class="o">=</span> <span class="s">&#39;false&#39;</span>
-    <span class="n">IS</span> <span class="o">=</span> <span class="s">&#39;$is&#39;</span>
-    <span class="n">EQ</span> <span class="o">=</span> <span class="s">&#39;$eq&#39;</span>
+    <span class="n">MODEL</span> <span class="o">=</span> <span class="s1">&#39;model::&#39;</span>
+    <span class="n">PIPE</span> <span class="o">=</span> <span class="s1">&#39;pipe::&#39;</span>
+    <span class="n">SERVICE</span> <span class="o">=</span> <span class="s1">&#39;service::&#39;</span>
+    <span class="n">CRITERIA</span> <span class="o">=</span> <span class="s1">&#39;rma::criteria&#39;</span>
+    <span class="n">INCLUDE</span> <span class="o">=</span> <span class="s1">&#39;rma::include&#39;</span>
+    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="s1">&#39;rma::options&#39;</span>
+    <span class="n">ORDER</span> <span class="o">=</span> <span class="s1">&#39;order&#39;</span>
+    <span class="n">NUM_ROWS</span> <span class="o">=</span> <span class="s1">&#39;num_rows&#39;</span>
+    <span class="n">ALL</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
+    <span class="n">START_ROW</span> <span class="o">=</span> <span class="s1">&#39;start_row&#39;</span>
+    <span class="n">COUNT</span> <span class="o">=</span> <span class="s1">&#39;count&#39;</span>
+    <span class="n">ONLY</span> <span class="o">=</span> <span class="s1">&#39;only&#39;</span>
+    <span class="n">EXCEPT</span> <span class="o">=</span> <span class="s1">&#39;except&#39;</span>
+    <span class="n">TABULAR</span> <span class="o">=</span> <span class="s1">&#39;tabular&#39;</span>
+    <span class="n">DEBUG</span> <span class="o">=</span> <span class="s1">&#39;debug&#39;</span>
+    <span class="n">PREVIEW</span> <span class="o">=</span> <span class="s1">&#39;preview&#39;</span>
+    <span class="n">TRUE</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span>
+    <span class="n">FALSE</span> <span class="o">=</span> <span class="s1">&#39;false&#39;</span>
+    <span class="n">IS</span> <span class="o">=</span> <span class="s1">&#39;$is&#39;</span>
+    <span class="n">EQ</span> <span class="o">=</span> <span class="s1">&#39;$eq&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RmaApi.build_query_url"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.build_query_url">[docs]</a>    <span class="k">def</span> <span class="nf">build_query_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                         <span class="n">stage_clauses</span><span class="p">,</span>
-                        <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
+                        <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Combine one or more RMA query stages into a single RMA query.</span>
 
 <span class="sd">        Parameters</span>
@@ -697,12 +697,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">stage_clauses</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
             <span class="n">stage_clauses</span> <span class="o">=</span> <span class="p">[</span><span class="n">stage_clauses</span><span class="p">]</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span>
-            <span class="s">&#39;/query.&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;/query.&#39;</span><span class="p">,</span>
             <span class="n">fmt</span><span class="p">,</span>
-            <span class="s">&#39;?q=&#39;</span><span class="p">,</span>
-            <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stage_clauses</span><span class="p">)])</span>
+            <span class="s1">&#39;?q=&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stage_clauses</span><span class="p">)])</span>
 
         <span class="k">return</span> <span class="n">url</span>
 </div>
@@ -748,34 +748,34 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">clauses</span> <span class="o">=</span> <span class="p">[</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">MODEL</span> <span class="o">+</span> <span class="n">model</span><span class="p">]</span>
 
-        <span class="n">filters</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;filters&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">filters</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filters&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filters</span><span class="p">(</span><span class="n">filters</span><span class="p">))</span>
 
-        <span class="n">criteria</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;criteria&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;criteria&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">criteria</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+            <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">CRITERIA</span><span class="p">)</span>
-            <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+            <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span>
 
-        <span class="n">include</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;include&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">include</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;include&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+            <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">INCLUDE</span><span class="p">)</span>
-            <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+            <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">include</span><span class="p">)</span>
 
         <span class="n">options_clause</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options_clause</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">options_clause</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
-            <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">options_clause</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">options_clause</span><span class="p">)</span>
 
-        <span class="n">stage</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clauses</span><span class="p">)</span>
+        <span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clauses</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">stage</span>
 </div>
@@ -794,7 +794,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tuple_filters</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
 
-        <span class="n">stage</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clauses</span><span class="p">)</span>
+        <span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clauses</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">stage</span>
 </div>
@@ -821,7 +821,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tuple_filters</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
 
-        <span class="n">stage</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clauses</span><span class="p">)</span>
+        <span class="n">stage</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clauses</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">stage</span>
 </div>
@@ -902,7 +902,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        num_rows : int or string, optional</span>
 <span class="sd">        start_row : int or string, optional</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="n">clause</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">options_params</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">only</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">ONLY</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
@@ -930,15 +930,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">if</span> <span class="n">num_rows</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">num_rows</span> <span class="o">==</span> <span class="n">RmaApi</span><span class="o">.</span><span class="n">ALL</span><span class="p">:</span>
-                <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;[</span><span class="si">%s</span><span class="s">$eq&#39;all&#39;]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">NUM_ROWS</span><span class="p">))</span>
+                <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">$eq&#39;all&#39;]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">NUM_ROWS</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">NUM_ROWS</span><span class="p">,</span>
+                <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">$eq</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">NUM_ROWS</span><span class="p">,</span>
                                                      <span class="n">num_rows</span><span class="p">))</span>
 
         <span class="n">start_row</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">START_ROW</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">start_row</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">START_ROW</span><span class="p">,</span>
+            <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">$eq</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">START_ROW</span><span class="p">,</span>
                                                  <span class="n">start_row</span><span class="p">))</span>
 
         <span class="n">order</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">ORDER</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
@@ -954,17 +954,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">cnt</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">COUNT</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">cnt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">cnt</span> <span class="ow">is</span> <span class="bp">True</span> <span class="ow">or</span> <span class="n">cnt</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
-                <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">COUNT</span><span class="p">,</span>
+            <span class="k">if</span> <span class="n">cnt</span> <span class="ow">is</span> <span class="bp">True</span> <span class="ow">or</span> <span class="n">cnt</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+                <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">$eq</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">COUNT</span><span class="p">,</span>
                                                      <span class="n">RmaApi</span><span class="o">.</span><span class="n">TRUE</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">cnt</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">or</span> <span class="n">cnt</span> <span class="o">==</span> <span class="s">&#39;false&#39;</span><span class="p">:</span>
-                <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">COUNT</span><span class="p">,</span>
+            <span class="k">elif</span> <span class="n">cnt</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">or</span> <span class="n">cnt</span> <span class="o">==</span> <span class="s1">&#39;false&#39;</span><span class="p">:</span>
+                <span class="n">options_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">$eq</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">RmaApi</span><span class="o">.</span><span class="n">COUNT</span><span class="p">,</span>
                                                      <span class="n">RmaApi</span><span class="o">.</span><span class="n">FALSE</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">pass</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">options_params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">clause</span> <span class="o">=</span> <span class="n">RmaApi</span><span class="o">.</span><span class="n">OPTIONS</span> <span class="o">+</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">options_params</span><span class="p">)</span>
+            <span class="n">clause</span> <span class="o">=</span> <span class="n">RmaApi</span><span class="o">.</span><span class="n">OPTIONS</span> <span class="o">+</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">options_params</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">clause</span>
 </div>
@@ -996,11 +996,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        clause.</span>
 <span class="sd">        The tabular filter is required for .csv format RMA requests.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="n">clause</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">attribute_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filter_type</span><span class="p">,</span>
-                                    <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attribute_list</span><span class="p">))</span>
+            <span class="n">clause</span> <span class="o">=</span> <span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">$eq</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filter_type</span><span class="p">,</span>
+                                    <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">attribute_list</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">clause</span>
 </div>
@@ -1022,10 +1022,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        Optionally adding &#39;+asc&#39; (default) or &#39;+desc&#39; after an attribute</span>
 <span class="sd">        will change the sort order.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="n">clause</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">order_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;[order$eq</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">order_list</span><span class="p">))</span>
+            <span class="n">clause</span> <span class="o">=</span> <span class="s1">&#39;[order$eq</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">order_list</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">clause</span>
 </div>
@@ -1049,20 +1049,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;preview&#39; will request debugging information without the query being run.</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="n">clause</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">debug_value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="k">if</span> <span class="n">debug_value</span> <span class="ow">is</span> <span class="bp">True</span> <span class="ow">or</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
-            <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;[debug$eqtrue]&#39;</span>
-        <span class="k">elif</span> <span class="n">debug_value</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">or</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s">&#39;false&#39;</span><span class="p">:</span>
-            <span class="n">clause</span> <span class="o">=</span> <span class="s">&#39;[debug$eqfalse]&#39;</span>
-        <span class="k">elif</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s">&#39;preview&#39;</span><span class="p">:</span>
-            <span class="n">clause</span> <span class="o">=</span> <span class="s">&quot;[debug$eq&#39;preview&#39;]&quot;</span>
+            <span class="n">clause</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">debug_value</span> <span class="ow">is</span> <span class="bp">True</span> <span class="ow">or</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">:</span>
+            <span class="n">clause</span> <span class="o">=</span> <span class="s1">&#39;[debug$eqtrue]&#39;</span>
+        <span class="k">elif</span> <span class="n">debug_value</span> <span class="ow">is</span> <span class="bp">False</span> <span class="ow">or</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s1">&#39;false&#39;</span><span class="p">:</span>
+            <span class="n">clause</span> <span class="o">=</span> <span class="s1">&#39;[debug$eqfalse]&#39;</span>
+        <span class="k">elif</span> <span class="n">debug_value</span> <span class="o">==</span> <span class="s1">&#39;preview&#39;</span><span class="p">:</span>
+            <span class="n">clause</span> <span class="o">=</span> <span class="s2">&quot;[debug$eq&#39;preview&#39;]&quot;</span>
 
         <span class="k">return</span> <span class="n">clause</span>
 
-    <span class="c"># TODO: deprecate for something that can preserve order</span></div>
+    <span class="c1"># TODO: deprecate for something that can preserve order</span></div>
 <div class="viewcode-block" id="RmaApi.filters"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.filters">[docs]</a>    <span class="k">def</span> <span class="nf">filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;serialize RMA query filter clauses.</span>
 
@@ -1081,9 +1081,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filters_builder</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filters_builder</span><span class="p">)</span>
 
-    <span class="c"># TODO: this needs to be more rigorous.</span></div>
+    <span class="c1"># TODO: this needs to be more rigorous.</span></div>
 <div class="viewcode-block" id="RmaApi.tuple_filters"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.tuple_filters">[docs]</a>    <span class="k">def</span> <span class="nf">tuple_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct an RMA filter clause.</span>
 
@@ -1106,23 +1106,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                             <span class="n">val_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">val_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
-                    <span class="n">val</span> <span class="o">=</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">val_array</span><span class="p">)</span>
-                    <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%s</span><span class="s">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">val</span><span class="p">))</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">val_array</span><span class="p">)</span>
+                    <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">$eq</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">val</span><span class="p">))</span>
                 <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
-                    <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%d</span><span class="s">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">val</span><span class="p">))</span>
+                    <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">$eq</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">val</span><span class="p">))</span>
                 <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">bool</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">val</span><span class="p">:</span>
-                        <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;[</span><span class="si">%s</span><span class="s">$eqtrue]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                        <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">$eqtrue]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;[</span><span class="si">%s</span><span class="s">$eqfalse]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                        <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">$eqfalse]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
                 <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
-                    <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;[</span><span class="si">%s</span><span class="s">$eq</span><span class="si">%s</span><span class="s">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">filt</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                    <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">$eq</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">filt</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">filt</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;[</span><span class="si">%s%s%s</span><span class="s">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">filters_builder</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s%s%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                      <span class="n">filt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                                                      <span class="nb">str</span><span class="p">(</span><span class="n">filt</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
 
-        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filters_builder</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filters_builder</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="RmaApi.quote_string"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.quote_string">[docs]</a>    <span class="k">def</span> <span class="nf">quote_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">the_string</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Wrap a clause in single quotes.</span>
@@ -1137,7 +1137,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        string</span>
 <span class="sd">            input wrapped in single quotes</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">the_string</span><span class="p">,</span> <span class="s">&quot;&#39;&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">the_string</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">])</span>
 </div>
 <div class="viewcode-block" id="RmaApi.filter"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;serialize a single RMA query filter clause.</span>
@@ -1154,13 +1154,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        string</span>
 <span class="sd">            a single filter clause for an RMA query string.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;[&#39;</span><span class="p">,</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;[&#39;</span><span class="p">,</span>
                         <span class="n">key</span><span class="p">,</span>
                         <span class="n">RmaApi</span><span class="o">.</span><span class="n">EQ</span><span class="p">,</span>
                         <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
-                        <span class="s">&#39;]&#39;</span><span class="p">])</span>
+                        <span class="s1">&#39;]&#39;</span><span class="p">])</span>
 </div>
-<div class="viewcode-block" id="RmaApi.build_schema_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.build_schema_query">[docs]</a>    <span class="k">def</span> <span class="nf">build_schema_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clazz</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="RmaApi.build_schema_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.build_schema_query">[docs]</a>    <span class="k">def</span> <span class="nf">build_schema_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clazz</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Build the URL that will fetch the data schema.</span>
 
 <span class="sd">        Parameters</span>
@@ -1181,13 +1181,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        will be requested, otherwise the url requests the entire schema.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">clazz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">class_clause</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="n">clazz</span>
+            <span class="n">class_clause</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">clazz</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">class_clause</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="n">class_clause</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span>
                        <span class="n">class_clause</span><span class="p">,</span>
-                       <span class="s">&#39;.&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;.&#39;</span><span class="p">,</span>
                        <span class="n">fmt</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">url</span>
@@ -1269,7 +1269,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

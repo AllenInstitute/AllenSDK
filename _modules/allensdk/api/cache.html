@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.api.cache</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
 <span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">ju</span>
@@ -698,7 +698,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
 
-                <span class="c"># make the directory if it doesn&#39;t exist already</span>
+                <span class="c1"># make the directory if it doesn&#39;t exist already</span>
                 <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">dirname</span><span class="p">:</span>
                     <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
@@ -706,7 +706,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="bp">self</span><span class="o">.</span><span class="n">build_manifest</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">Manifest</span><span class="p">(</span>
-                <span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)[</span><span class="s">&#39;manifest&#39;</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+                <span class="n">ju</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)[</span><span class="s1">&#39;manifest&#39;</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="bp">None</span>
 </div>
@@ -719,13 +719,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            where to save it</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-            <span class="s">&quot;This function must be defined in the appropriate subclass&quot;</span><span class="p">)</span>
+            <span class="s2">&quot;This function must be defined in the appropriate subclass&quot;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Cache.manifest_dataframe"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.manifest_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">manifest_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Convenience method to view manifest as a pandas dataframe.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">path_info</span><span class="p">,</span>
-                                      <span class="n">orient</span><span class="o">=</span><span class="s">&#39;index&#39;</span><span class="p">)</span>
+                                      <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Cache.rename_columns"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.cache.Cache.rename_columns">[docs]</a>    <span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                        <span class="n">data</span><span class="p">,</span>
@@ -780,7 +780,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        index : string, optional</span>
 <span class="sd">            post-rename column to use as the row label.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">pj</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pj</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
 
@@ -839,10 +839,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
                 <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
-        <span class="c"># read it back in</span>
+        <span class="c1"># read it back in</span>
         <span class="k">if</span> <span class="n">save_as_json</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">return_dataframe</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">pj</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">pj</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">rename_columns</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">rename</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                     <span class="n">data</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="n">index</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
@@ -852,7 +852,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s">&#39;save_as_json=False cannot be used with return_dataframe=False&#39;</span><span class="p">)</span>
+                <span class="s1">&#39;save_as_json=False cannot be used with return_dataframe=False&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">data</span></div></div>
 </pre></div>
@@ -925,7 +925,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

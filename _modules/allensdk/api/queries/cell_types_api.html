@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.api.queries.cell_types_api</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
@@ -653,9 +653,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 
 <div class="viewcode-block" id="CellTypesApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi">[docs]</a><span class="k">class</span> <span class="nc">CellTypesApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
-    <span class="n">NWB_FILE_TYPE</span> <span class="o">=</span> <span class="s">&#39;NWBDownload&#39;</span>
-    <span class="n">SWC_FILE_TYPE</span> <span class="o">=</span> <span class="s">&#39;3DNeuronReconstruction&#39;</span>
-    <span class="n">MARKER_FILE_TYPE</span> <span class="o">=</span> <span class="s">&#39;3DNeuronMarker&#39;</span>
+    <span class="n">NWB_FILE_TYPE</span> <span class="o">=</span> <span class="s1">&#39;NWBDownload&#39;</span>
+    <span class="n">SWC_FILE_TYPE</span> <span class="o">=</span> <span class="s1">&#39;3DNeuronReconstruction&#39;</span>
+    <span class="n">MARKER_FILE_TYPE</span> <span class="o">=</span> <span class="s1">&#39;3DNeuronMarker&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CellTypesApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
@@ -681,34 +681,34 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Meta data for all cells.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&quot;[is_cell_specimen$eq&#39;true&#39;],products[name$eq&#39;Mouse Cell Types&#39;],ephys_result[failed$eqfalse]&quot;</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s2">&quot;[is_cell_specimen$eq&#39;true&#39;],products[name$eq&#39;Mouse Cell Types&#39;],ephys_result[failed$eqfalse]&quot;</span>
 
-        <span class="n">include</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,&#39;</span> <span class="o">+</span>
-                   <span class="s">&#39;ephys_features,data_sets,neuron_reconstructions,cell_reporter&#39;</span><span class="p">)</span>
+        <span class="n">include</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;structure,donor(transgenic_lines),specimen_tags,cell_soma_locations,&#39;</span> <span class="o">+</span>
+                   <span class="s1">&#39;ephys_features,data_sets,neuron_reconstructions,cell_reporter&#39;</span><span class="p">)</span>
 
         <span class="n">cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span>
-            <span class="s">&#39;Specimen&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+            <span class="s1">&#39;Specimen&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">cells</span><span class="p">:</span>
-            <span class="c"># specimen tags</span>
-            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">cell</span><span class="p">[</span><span class="s">&#39;specimen_tags&#39;</span><span class="p">]:</span>
-                <span class="n">tag_name</span><span class="p">,</span> <span class="n">tag_value</span> <span class="o">=</span> <span class="n">tag</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39; - &#39;</span><span class="p">)</span>
-                <span class="n">tag_name</span> <span class="o">=</span> <span class="n">tag_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;_&#39;</span><span class="p">)</span>
+            <span class="c1"># specimen tags</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;specimen_tags&#39;</span><span class="p">]:</span>
+                <span class="n">tag_name</span><span class="p">,</span> <span class="n">tag_value</span> <span class="o">=</span> <span class="n">tag</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; - &#39;</span><span class="p">)</span>
+                <span class="n">tag_name</span> <span class="o">=</span> <span class="n">tag_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
                 <span class="n">cell</span><span class="p">[</span><span class="n">tag_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_value</span>
 
-            <span class="c"># morphology and reconstuction</span>
-            <span class="n">cell</span><span class="p">[</span><span class="s">&#39;has_reconstruction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
-                <span class="n">cell</span><span class="p">[</span><span class="s">&#39;neuron_reconstructions&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
-            <span class="n">cell</span><span class="p">[</span><span class="s">&#39;has_morphology&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">[</span><span class="s">&#39;data_sets&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="c1"># morphology and reconstuction</span>
+            <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;has_reconstruction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;neuron_reconstructions&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;has_morphology&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="p">[</span><span class="s1">&#39;data_sets&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
-            <span class="c"># transgenic line</span>
-            <span class="n">cell</span><span class="p">[</span><span class="s">&#39;transgenic_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
-            <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">cell</span><span class="p">[</span><span class="s">&#39;donor&#39;</span><span class="p">][</span><span class="s">&#39;transgenic_lines&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s">&#39;transgenic_line_type_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;driver&#39;</span><span class="p">:</span>
-                    <span class="n">cell</span><span class="p">[</span><span class="s">&#39;transgenic_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tl</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+            <span class="c1"># transgenic line</span>
+            <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;transgenic_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;donor&#39;</span><span class="p">][</span><span class="s1">&#39;transgenic_lines&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;transgenic_line_type_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;driver&#39;</span><span class="p">:</span>
+                    <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;transgenic_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tl</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
 
-            <span class="c"># cell reporter status</span>
-            <span class="n">cell</span><span class="p">[</span><span class="s">&#39;reporter_status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span><span class="p">[</span><span class="s">&#39;cell_reporter&#39;</span><span class="p">][</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+            <span class="c1"># cell reporter status</span>
+            <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;reporter_status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span><span class="p">[</span><span class="s1">&#39;cell_reporter&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_cells</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">,</span> <span class="n">reporter_status</span><span class="p">)</span>
 </div>
@@ -726,10 +726,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        -------</span>
 <span class="sd">        list: List of sweep dictionaries belonging to a cell</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&quot;[specimen_id$eq</span><span class="si">%d</span><span class="s">]&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s2">&quot;[specimen_id$eq</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span>
         <span class="n">sweeps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span>
-            <span class="s">&#39;EphysSweep&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sweeps</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">])</span>
+            <span class="s1">&#39;EphysSweep&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sweeps</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;sweep_number&#39;</span><span class="p">])</span>
 </div>
 <div class="viewcode-block" id="CellTypesApi.filter_cells"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.filter_cells">[docs]</a>    <span class="k">def</span> <span class="nf">filter_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cells</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">,</span> <span class="n">reporter_status</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -753,14 +753,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">require_morphology</span><span class="p">:</span>
-            <span class="n">cells</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cells</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;has_morphology&#39;</span><span class="p">]]</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cells</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;has_morphology&#39;</span><span class="p">]]</span>
 
         <span class="k">if</span> <span class="n">require_reconstruction</span><span class="p">:</span>
-            <span class="n">cells</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cells</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;has_reconstruction&#39;</span><span class="p">]]</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cells</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;has_reconstruction&#39;</span><span class="p">]]</span>
 
         <span class="k">if</span> <span class="n">reporter_status</span><span class="p">:</span>
             <span class="n">cells</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cells</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span>
-                <span class="s">&#39;reporter_status&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">reporter_status</span><span class="p">]</span>
+                <span class="s1">&#39;reporter_status&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">reporter_status</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">cells</span>
 </div>
@@ -777,7 +777,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span>
-            <span class="s">&#39;EphysFeature&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="s">&#39;specimen(ephys_result[failed$eqfalse])&#39;</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+            <span class="s1">&#39;EphysFeature&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="s1">&#39;specimen(ephys_result[failed$eqfalse])&#39;</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dataframe</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
@@ -797,11 +797,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span>
-            <span class="s">&#39;NeuronReconstruction&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="s">&quot;specimen(ephys_result[failed$eqfalse])&quot;</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+            <span class="s1">&#39;NeuronReconstruction&#39;</span><span class="p">,</span> <span class="n">criteria</span><span class="o">=</span><span class="s2">&quot;specimen(ephys_result[failed$eqfalse])&quot;</span><span class="p">,</span> <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
-        <span class="c"># the tags column isn&#39;t useful</span>
+        <span class="c1"># the tags column isn&#39;t useful</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
-            <span class="k">del</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;tags&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">dataframe</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
@@ -823,20 +823,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_make_parent_dirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
-        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&#39;[id$eq</span><span class="si">%d</span><span class="s">],ephys_result(well_known_files(well_known_file_type[name$eq</span><span class="si">%s</span><span class="s">]))&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s1">&#39;[id$eq</span><span class="si">%d</span><span class="s1">],ephys_result(well_known_files(well_known_file_type[name$eq</span><span class="si">%s</span><span class="s1">]))&#39;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="n">specimen_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">NWB_FILE_TYPE</span><span class="p">)</span>
-        <span class="n">includes</span> <span class="o">=</span> <span class="s">&#39;ephys_result(well_known_files(well_known_file_type))&#39;</span>
+        <span class="n">includes</span> <span class="o">=</span> <span class="s1">&#39;ephys_result(well_known_files(well_known_file_type))&#39;</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Specimen&#39;</span><span class="p">,</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;Specimen&#39;</span><span class="p">,</span>
                                    <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
                                    <span class="n">include</span><span class="o">=</span><span class="n">includes</span><span class="p">,</span>
-                                   <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+                                   <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">file_url</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;ephys_result&#39;</span><span class="p">][</span>
-                <span class="s">&#39;well_known_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;download_link&#39;</span><span class="p">]</span>
+            <span class="n">file_url</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;ephys_result&#39;</span><span class="p">][</span>
+                <span class="s1">&#39;well_known_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;download_link&#39;</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Specimen </span><span class="si">%d</span><span class="s"> has no ephys data&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Specimen </span><span class="si">%d</span><span class="s2"> has no ephys data&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="n">file_url</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
 </div>
@@ -855,19 +855,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_make_parent_dirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
-        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&#39;[id$eq</span><span class="si">%d</span><span class="s">],neuron_reconstructions(well_known_files)&#39;</span> <span class="o">%</span> <span class="n">specimen_id</span>
-        <span class="n">includes</span> <span class="o">=</span> <span class="s">&#39;neuron_reconstructions(well_known_files(well_known_file_type[name$eq</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s">]))&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">SWC_FILE_TYPE</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s1">&#39;[id$eq</span><span class="si">%d</span><span class="s1">],neuron_reconstructions(well_known_files)&#39;</span> <span class="o">%</span> <span class="n">specimen_id</span>
+        <span class="n">includes</span> <span class="o">=</span> <span class="s1">&#39;neuron_reconstructions(well_known_files(well_known_file_type[name$eq</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">]))&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">SWC_FILE_TYPE</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Specimen&#39;</span><span class="p">,</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;Specimen&#39;</span><span class="p">,</span>
                                    <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
                                    <span class="n">include</span><span class="o">=</span><span class="n">includes</span><span class="p">,</span>
-                                   <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+                                   <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">file_url</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;neuron_reconstructions&#39;</span><span class="p">][</span>
-                <span class="mi">0</span><span class="p">][</span><span class="s">&#39;well_known_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;download_link&#39;</span><span class="p">]</span>
+            <span class="n">file_url</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;neuron_reconstructions&#39;</span><span class="p">][</span>
+                <span class="mi">0</span><span class="p">][</span><span class="s1">&#39;well_known_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;download_link&#39;</span><span class="p">]</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Specimen </span><span class="si">%d</span><span class="s"> has no reconstruction&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Specimen </span><span class="si">%d</span><span class="s2"> has no reconstruction&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="n">file_url</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
 </div>
@@ -888,19 +888,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_make_parent_dirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
-        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&#39;[id$eq</span><span class="si">%d</span><span class="s">],neuron_reconstructions(well_known_files)&#39;</span> <span class="o">%</span> <span class="n">specimen_id</span>
-        <span class="n">includes</span> <span class="o">=</span> <span class="s">&#39;neuron_reconstructions(well_known_files(well_known_file_type[name$eq</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s">]))&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">MARKER_FILE_TYPE</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s1">&#39;[id$eq</span><span class="si">%d</span><span class="s1">],neuron_reconstructions(well_known_files)&#39;</span> <span class="o">%</span> <span class="n">specimen_id</span>
+        <span class="n">includes</span> <span class="o">=</span> <span class="s1">&#39;neuron_reconstructions(well_known_files(well_known_file_type[name$eq</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s1">]))&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">MARKER_FILE_TYPE</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Specimen&#39;</span><span class="p">,</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;Specimen&#39;</span><span class="p">,</span>
                                    <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
                                    <span class="n">include</span><span class="o">=</span><span class="n">includes</span><span class="p">,</span>
-                                   <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+                                   <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">file_url</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;neuron_reconstructions&#39;</span><span class="p">][</span>
-                <span class="mi">0</span><span class="p">][</span><span class="s">&#39;well_known_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;download_link&#39;</span><span class="p">]</span>
+            <span class="n">file_url</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;neuron_reconstructions&#39;</span><span class="p">][</span>
+                <span class="mi">0</span><span class="p">][</span><span class="s1">&#39;well_known_files&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;download_link&#39;</span><span class="p">]</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s">&quot;Specimen </span><span class="si">%d</span><span class="s"> has no marker file&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s2">&quot;Specimen </span><span class="si">%d</span><span class="s2"> has no marker file&quot;</span> <span class="o">%</span> <span class="n">specimen_id</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="n">file_url</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span></div></div>
 </pre></div>
@@ -973,7 +973,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,39 +631,39 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.core.swc</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">csv</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
-<span class="c"># Morphology nodes have the following fields. SWC fields are numeric.</span>
-<span class="n">NODE_ID</span> <span class="o">=</span> <span class="s">&#39;id&#39;</span>
-<span class="n">NODE_TYPE</span> <span class="o">=</span> <span class="s">&#39;type&#39;</span>
-<span class="n">NODE_X</span> <span class="o">=</span> <span class="s">&#39;x&#39;</span>
-<span class="n">NODE_Y</span> <span class="o">=</span> <span class="s">&#39;y&#39;</span>
-<span class="n">NODE_Z</span> <span class="o">=</span> <span class="s">&#39;z&#39;</span>
-<span class="n">NODE_R</span> <span class="o">=</span> <span class="s">&#39;radius&#39;</span>
-<span class="n">NODE_PN</span> <span class="o">=</span> <span class="s">&#39;parent&#39;</span>
+<span class="c1"># Morphology nodes have the following fields. SWC fields are numeric.</span>
+<span class="n">NODE_ID</span> <span class="o">=</span> <span class="s1">&#39;id&#39;</span>
+<span class="n">NODE_TYPE</span> <span class="o">=</span> <span class="s1">&#39;type&#39;</span>
+<span class="n">NODE_X</span> <span class="o">=</span> <span class="s1">&#39;x&#39;</span>
+<span class="n">NODE_Y</span> <span class="o">=</span> <span class="s1">&#39;y&#39;</span>
+<span class="n">NODE_Z</span> <span class="o">=</span> <span class="s1">&#39;z&#39;</span>
+<span class="n">NODE_R</span> <span class="o">=</span> <span class="s1">&#39;radius&#39;</span>
+<span class="n">NODE_PN</span> <span class="o">=</span> <span class="s1">&#39;parent&#39;</span>
 <span class="n">SWC_COLUMNS</span> <span class="o">=</span> <span class="p">[</span><span class="n">NODE_ID</span><span class="p">,</span> <span class="n">NODE_TYPE</span><span class="p">,</span> <span class="n">NODE_X</span><span class="p">,</span> <span class="n">NODE_Y</span><span class="p">,</span> <span class="n">NODE_Z</span><span class="p">,</span> <span class="n">NODE_R</span><span class="p">,</span> <span class="n">NODE_PN</span><span class="p">]</span>
 
-<span class="n">NODE_TREE_ID</span> <span class="o">=</span> <span class="s">&#39;tree_id&#39;</span>
-<span class="n">NODE_CHILDREN</span> <span class="o">=</span> <span class="s">&#39;children&#39;</span>
+<span class="n">NODE_TREE_ID</span> <span class="o">=</span> <span class="s1">&#39;tree_id&#39;</span>
+<span class="n">NODE_CHILDREN</span> <span class="o">=</span> <span class="s1">&#39;children&#39;</span>
 
-<span class="c"># shorthand for dictionary entries, to shorten sometimes long code lines</span>
+<span class="c1"># shorthand for dictionary entries, to shorten sometimes long code lines</span>
 <span class="n">_N</span> <span class="o">=</span> <span class="n">NODE_ID</span>
 <span class="n">_TYP</span> <span class="o">=</span> <span class="n">NODE_TYPE</span>
 <span class="n">_X</span> <span class="o">=</span> <span class="n">NODE_X</span>
@@ -675,8 +675,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="n">_TID</span> <span class="o">=</span> <span class="n">NODE_TREE_ID</span>
 
 
-<span class="c">########################################################################</span>
-<div class="viewcode-block" id="read_swc"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.read_swc">[docs]</a><span class="k">def</span> <span class="nf">read_swc</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s">&quot;NOT_USED&quot;</span><span class="p">,</span> <span class="n">numeric_columns</span><span class="o">=</span><span class="s">&quot;NOT_USED&quot;</span><span class="p">):</span>
+<span class="c1">########################################################################</span>
+<div class="viewcode-block" id="read_swc"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.read_swc">[docs]</a><span class="k">def</span> <span class="nf">read_swc</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;NOT_USED&quot;</span><span class="p">,</span> <span class="n">numeric_columns</span><span class="o">=</span><span class="s2">&quot;NOT_USED&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read in an SWC file and return a Morphology object.</span>
 
@@ -693,15 +693,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">compartments</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">line_num</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="c"># remove comments</span>
-                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">):</span>
+                <span class="c1"># remove comments</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
                     <span class="k">continue</span>
-                <span class="c"># read values. expected SWC format is:</span>
-                <span class="c">#   ID, type, x, y, z, rad, parent</span>
-                <span class="c"># x, y, z and rad are floats. the others are ints</span>
-                <span class="n">toks</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+                <span class="c1"># read values. expected SWC format is:</span>
+                <span class="c1">#   ID, type, x, y, z, rad, parent</span>
+                <span class="c1"># x, y, z and rad are floats. the others are ints</span>
+                <span class="n">toks</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
                 <span class="n">vals</span> <span class="o">=</span> <span class="n">Compartment</span><span class="p">({</span>
                     <span class="n">NODE_ID</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
                     <span class="n">NODE_TYPE</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
@@ -711,22 +711,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                     <span class="n">NODE_R</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span>
                     <span class="n">NODE_PN</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">toks</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
                 <span class="p">})</span>
-                <span class="c"># store this compartment</span>
+                <span class="c1"># store this compartment</span>
                 <span class="n">compartments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
-                <span class="c"># increment line number (used for error reporting only)</span>
+                <span class="c1"># increment line number (used for error reporting only)</span>
                 <span class="n">line_num</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-        <span class="n">err</span> <span class="o">=</span> <span class="s">&quot;File not recognized as valid SWC file.</span><span class="se">\n</span><span class="s">&quot;</span>
-        <span class="n">err</span> <span class="o">+=</span> <span class="s">&quot;Problem parsing line </span><span class="si">%d</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">line_num</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="s2">&quot;File not recognized as valid SWC file.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">err</span> <span class="o">+=</span> <span class="s2">&quot;Problem parsing line </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line_num</span>
         <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">err</span> <span class="o">+=</span> <span class="s">&quot;Content: &#39;</span><span class="si">%s</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">line</span>
+            <span class="n">err</span> <span class="o">+=</span> <span class="s2">&quot;Content: &#39;</span><span class="si">%s</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Morphology</span><span class="p">(</span><span class="n">compartment_list</span><span class="o">=</span><span class="n">compartments</span><span class="p">)</span>
 
 
-<span class="c">########################################################################</span>
-<span class="c">########################################################################</span>
+<span class="c1">########################################################################</span>
+<span class="c1">########################################################################</span>
 </div>
 <div class="viewcode-block" id="Compartment"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Compartment">[docs]</a><span class="k">class</span> <span class="nc">Compartment</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -743,17 +743,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">NODE_R</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span> <span class="ow">or</span>
                 <span class="n">NODE_PN</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s">&quot;Compartment was not initialized with requisite fields&quot;</span><span class="p">)</span>
-        <span class="c"># Each unconnected graph has its own ID. This is the ID</span>
-        <span class="c">#   of graph that the node resides in</span>
+                <span class="s2">&quot;Compartment was not initialized with requisite fields&quot;</span><span class="p">)</span>
+        <span class="c1"># Each unconnected graph has its own ID. This is the ID</span>
+        <span class="c1">#   of graph that the node resides in</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">NODE_TREE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
-        <span class="c"># IDs of child nodes</span>
+        <span class="c1"># IDs of child nodes</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="Compartment.print_node"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Compartment.print_node">[docs]</a>    <span class="k">def</span> <span class="nf">print_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; print out compartment information with field names &quot;&quot;&quot;</span>
-        <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%d</span><span class="s"> </span><span class="si">%d</span><span class="s"> </span><span class="si">%.4f</span><span class="s"> </span><span class="si">%.4f</span><span class="s"> </span><span class="si">%.4f</span><span class="s"> </span><span class="si">%.4f</span><span class="s"> </span><span class="si">%d</span><span class="s"> </span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">_N</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_TYP</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">_N</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_TYP</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span>
               <span class="n">_X</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_Y</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_Z</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_R</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_P</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">_C</span><span class="p">]),</span> <span class="bp">self</span><span class="p">[</span><span class="n">_TID</span><span class="p">]))</span>
 
 </div></div>
@@ -788,38 +788,38 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_index</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="c">##############################################</span>
-        <span class="c"># define tree list here for clarity, even though it&#39;s reset below</span>
-        <span class="c">#   when nodes are assigned</span>
+        <span class="c1">##############################################</span>
+        <span class="c1"># define tree list here for clarity, even though it&#39;s reset below</span>
+        <span class="c1">#   when nodes are assigned</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="c">##############################################</span>
-        <span class="c"># construct the compartment list and index</span>
-        <span class="c"># first try to do so using the compartment list, then try using</span>
-        <span class="c">#   the compartment index and if that fails then complain</span>
+        <span class="c1">##############################################</span>
+        <span class="c1"># construct the compartment list and index</span>
+        <span class="c1"># first try to do so using the compartment list, then try using</span>
+        <span class="c1">#   the compartment index and if that fails then complain</span>
         <span class="k">if</span> <span class="n">compartment_list</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span> <span class="o">=</span> <span class="n">compartment_list</span>
         <span class="k">elif</span> <span class="n">compartment_index</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">compartment_index</span> <span class="o">=</span> <span class="n">compartment_index</span>
-        <span class="c">##############################################</span>
-        <span class="c"># verify morphology is consistent with morphology rules (e.g.,</span>
-        <span class="c">#   no dendrite branching from an axon)</span>
+        <span class="c1">##############################################</span>
+        <span class="c1"># verify morphology is consistent with morphology rules (e.g.,</span>
+        <span class="c1">#   no dendrite branching from an axon)</span>
         <span class="n">num_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_consistency</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">num_errors</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Morphology appears to be inconsistent&quot;</span><span class="p">)</span>
-        <span class="c">##############################################</span>
-        <span class="c"># root node (this must be part of the soma)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Morphology appears to be inconsistent&quot;</span><span class="p">)</span>
+        <span class="c1">##############################################</span>
+        <span class="c1"># root node (this must be part of the soma)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)):</span>
             <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">SOMA</span> <span class="ow">and</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Multiple somas detected in SWC file&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Multiple somas detected in SWC file&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span> <span class="o">=</span> <span class="n">seg</span>
 
-    <span class="c">####################################################################</span>
-    <span class="c">####################################################################</span>
-    <span class="c"># class properties, and helper functions for them</span>
+    <span class="c1">####################################################################</span>
+    <span class="c1">####################################################################</span>
+    <span class="c1"># class properties, and helper functions for them</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">compartment_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -849,13 +849,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        defined as everything following from a single root compartment. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">)</span>
 
-    <span class="c"># TODO add filter for number of nodes of a particular type</span></div>
+    <span class="c1"># TODO add filter for number of nodes of a particular type</span></div>
     <span class="nd">@property</span>
 <div class="viewcode-block" id="Morphology.num_nodes"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.num_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">num_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the number of compartments in the morphology. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)</span>
 
-    <span class="c"># internal function</span></div>
+    <span class="c1"># internal function</span></div>
     <span class="k">def</span> <span class="nf">_set_compartments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        take a list of SWC-like objects and turn those into morphology</span>
@@ -872,7 +872,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TREE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="n">seg</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
-        <span class="c"># list data now set. remove holes in sequence and re-index</span>
+        <span class="c1"># list data now set. remove holes in sequence and re-index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
 
     <span class="nd">@property</span>
@@ -885,9 +885,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="sd">&quot;&quot;&quot; [deprecated] Returns root node of soma, if present. Use &#39;soma&#39; instead of &#39;root&#39;&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span>
 
-    <span class="c">####################################################################</span>
-    <span class="c">####################################################################</span>
-    <span class="c"># tree and node access</span>
+    <span class="c1">####################################################################</span>
+    <span class="c1">####################################################################</span>
+    <span class="c1"># tree and node access</span>
 </div>
 <div class="viewcode-block" id="Morphology.tree"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.tree">[docs]</a>    <span class="k">def</span> <span class="nf">tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -923,8 +923,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        A morphology object having the specified ID, or None if such a</span>
 <span class="sd">        node doesn&#39;t exist</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># undocumented feature -- if a node is supplied instead of a</span>
-        <span class="c">#   node ID, the node is returned and no error is triggered</span>
+        <span class="c1"># undocumented feature -- if a node is supplied instead of a</span>
+        <span class="c1">#   node ID, the node is returned and no error is triggered</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_node_type</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Morphology.parent_of"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.parent_of">[docs]</a>    <span class="k">def</span> <span class="nf">parent_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg</span><span class="p">):</span>
@@ -940,11 +940,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        A morphology object, or None if no parent exists or if the</span>
 <span class="sd">        specified node ID doesn&#39;t exist</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># if ID passed in, make sure it&#39;s converted to a compartment</span>
-        <span class="c"># don&#39;t trap for exception here -- if supplied segment is</span>
-        <span class="c">#   incorrect, make sure the user knows about it</span>
+        <span class="c1"># if ID passed in, make sure it&#39;s converted to a compartment</span>
+        <span class="c1"># don&#39;t trap for exception here -- if supplied segment is</span>
+        <span class="c1">#   incorrect, make sure the user knows about it</span>
         <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_node_type</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
-        <span class="c"># return parent of specified node</span>
+        <span class="c1"># return parent of specified node</span>
         <span class="k">if</span> <span class="n">seg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]]</span>
         <span class="k">return</span> <span class="bp">None</span>
@@ -965,16 +965,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_node_type</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]]</span>
 
-    <span class="c">###################################################################</span>
-    <span class="c">###################################################################</span>
-    <span class="c"># Information querying and data manipulation</span>
+    <span class="c1">###################################################################</span>
+    <span class="c1">###################################################################</span>
+    <span class="c1"># Information querying and data manipulation</span>
 
-    <span class="c"># internal function. takes an integer and returns the node having</span>
-    <span class="c">#   that ID. IF a node is passed in instead, it is returned</span></div>
+    <span class="c1"># internal function. takes an integer and returns the node having</span>
+    <span class="c1">#   that ID. IF a node is passed in instead, it is returned</span></div>
     <span class="k">def</span> <span class="nf">_resolve_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg</span><span class="p">):</span>
-        <span class="c"># if compartment passed then we don&#39;t need to convert anything</span>
-        <span class="c"># if compartment not passed, try converting value to int</span>
-        <span class="c">#   and using that as an index</span>
+        <span class="c1"># if compartment passed then we don&#39;t need to convert anything</span>
+        <span class="c1"># if compartment not passed, try converting value to int</span>
+        <span class="c1">#   and using that as an index</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">seg</span><span class="p">,</span> <span class="n">Compartment</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">seg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
@@ -983,7 +983,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">[</span><span class="n">seg</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="s">&quot;Object not recognized as morphology node or index&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot;Object not recognized as morphology node or index&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">seg</span>
 
 <div class="viewcode-block" id="Morphology.change_parent"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.change_parent">[docs]</a>    <span class="k">def</span> <span class="nf">change_parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">child</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
@@ -1005,14 +1005,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">child_seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_node_type</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
         <span class="n">parent_seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_node_type</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
-        <span class="c"># if child has former parent, remove it from parent&#39;s child list</span>
+        <span class="c1"># if child has former parent, remove it from parent&#39;s child list</span>
         <span class="k">if</span> <span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">old_par</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">])</span>
             <span class="n">old_par</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">])</span>
         <span class="n">parent_seg</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">])</span>
         <span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span>
 
-    <span class="c"># returns a list of nodes located within dist of x,y,z</span></div>
+    <span class="c1"># returns a list of nodes located within dist of x,y,z</span></div>
 <div class="viewcode-block" id="Morphology.find"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns a list of Morphology Objects located within &#39;dist&#39;</span>
 <span class="sd">        of coordinate (x,y,z). If node_type is specified, the search</span>
@@ -1082,18 +1082,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        file_name: string</span>
 <span class="sd">            desired name of your SWC file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;#n,type,x,y,z,radius,parent</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;#n,type,x,y,z,radius,parent</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%d</span><span class="s"> </span><span class="si">%d</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">],</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%0.4f</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_X</span><span class="p">])</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%0.4f</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_Y</span><span class="p">])</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%0.4f</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_Z</span><span class="p">])</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%0.4f</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_R</span><span class="p">])</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%d</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">],</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_X</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_Y</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_Z</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_R</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">])</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="c"># keep for backward compatibility, but don&#39;t publish in docs</span></div>
+    <span class="c1"># keep for backward compatibility, but don&#39;t publish in docs</span></div>
 <div class="viewcode-block" id="Morphology.write"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 </div>
@@ -1117,21 +1117,21 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">compartments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_index</span>
         <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
         <span class="n">keep</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="c"># figure out which compartments to toss</span>
+        <span class="c1"># figure out which compartments to toss</span>
         <span class="n">ct</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">compartments</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
             <span class="n">pid</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span>
             <span class="n">cid</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span>
             <span class="n">ctype</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span>
-            <span class="c"># keep the root, soma, junctions, and the first child of the root</span>
-            <span class="c"># (for visualization)</span>
+            <span class="c1"># keep the root, soma, junctions, and the first child of the root</span>
+            <span class="c1"># (for visualization)</span>
             <span class="k">if</span> <span class="n">pid</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">pid</span> <span class="o">==</span> <span class="n">root</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="ow">or</span> <span class="n">ctype</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">SOMA</span><span class="p">:</span>
                 <span class="n">keep</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">keep</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ct</span> <span class="o">%</span> <span class="n">modulo</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
             <span class="n">ct</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="c"># hook children up to their new parents</span>
+        <span class="c1"># hook children up to their new parents</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">compartments</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
             <span class="n">comp_id</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">keep</span><span class="p">[</span><span class="n">comp_id</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
@@ -1141,14 +1141,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="k">for</span> <span class="n">child_id</span> <span class="ow">in</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]:</span>
                     <span class="n">compartments</span><span class="p">[</span><span class="n">child_id</span><span class="p">][</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_id</span>
 
-        <span class="c"># filter out the orphans</span>
+        <span class="c1"># filter out the orphans</span>
         <span class="n">sparsified_compartments</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span>
                                    <span class="n">v</span> <span class="ow">in</span> <span class="n">compartments</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="k">if</span> <span class="n">keep</span><span class="p">[</span><span class="n">k</span><span class="p">]}</span>
         <span class="k">if</span> <span class="n">compress_ids</span><span class="p">:</span>
             <span class="n">ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sparsified_compartments</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
             <span class="n">id_hash</span> <span class="o">=</span> <span class="p">{</span><span class="n">fid</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ids</span><span class="p">)}</span>
             <span class="n">id_hash</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="c"># build the final compartment index</span>
+            <span class="c1"># build the final compartment index</span>
             <span class="n">out_compartments</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">compartment</span> <span class="ow">in</span> <span class="n">sparsified_compartments</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
                 <span class="n">compartment</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">id_hash</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span>
@@ -1158,8 +1158,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Morphology</span><span class="p">(</span><span class="n">compartment_index</span><span class="o">=</span><span class="n">sparsified_compartments</span><span class="p">)</span>
 
-    <span class="c">####################################################################</span>
-    <span class="c">####################################################################</span>
+    <span class="c1">####################################################################</span>
+    <span class="c1">####################################################################</span>
 </div>
     <span class="k">def</span> <span class="nf">_reconstruct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1171,12 +1171,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        construct a map between new and old IDs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">remap</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="c"># everything defaults to root. this way if a parent was deleted</span>
-        <span class="c">#   the child will become a new root</span>
+        <span class="c1"># everything defaults to root. this way if a parent was deleted</span>
+        <span class="c1">#   the child will become a new root</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)):</span>
             <span class="n">remap</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="c"># map old old node numbers to new ones. reset n to the new ID</span>
-        <span class="c">#   and put node in new list</span>
+        <span class="c1"># map old old node numbers to new ones. reset n to the new ID</span>
+        <span class="c1">#   and put node in new list</span>
         <span class="n">new_id</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">tmp_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
@@ -1185,44 +1185,44 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_id</span>
                 <span class="n">tmp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
                 <span class="n">new_id</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="c"># use map to reset parent values. copy objs to new list</span>
+        <span class="c1"># use map to reset parent values. copy objs to new list</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">tmp_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="n">remap</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]]</span>
-        <span class="c"># replace compartment list with newly created node list</span>
+        <span class="c1"># replace compartment list with newly created node list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span> <span class="o">=</span> <span class="n">tmp_list</span>
-        <span class="c"># reconstruct parent/child relationship links</span>
-        <span class="c"># forget old relations</span>
+        <span class="c1"># reconstruct parent/child relationship links</span>
+        <span class="c1"># forget old relations</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="n">seg</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="c"># add each object to its parents child list</span>
+        <span class="c1"># add each object to its parents child list</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="n">par_num</span> <span class="o">=</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">par_num</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">par_num</span><span class="p">][</span>
                     <span class="n">NODE_CHILDREN</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">])</span>
-        <span class="c"># update tree lists</span>
+        <span class="c1"># update tree lists</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_separate_trees</span><span class="p">()</span>
-        <span class="c">############################</span>
-        <span class="c"># Rebuild internal index and links between parents and children</span>
+        <span class="c1">############################</span>
+        <span class="c1"># Rebuild internal index and links between parents and children</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_index</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">c</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">}</span>
-        <span class="c"># compartment list is complete and sequential so don&#39;t need index</span>
-        <span class="c">#   to resolve relationships</span>
-        <span class="c"># for each node, reset children array</span>
-        <span class="c"># for each node, add self to parent&#39;s child list</span>
+        <span class="c1"># compartment list is complete and sequential so don&#39;t need index</span>
+        <span class="c1">#   to resolve relationships</span>
+        <span class="c1"># for each node, reset children array</span>
+        <span class="c1"># for each node, add self to parent&#39;s child list</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">:</span>
             <span class="n">seg</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]][</span>
                     <span class="n">NODE_CHILDREN</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">])</span>
-        <span class="c"># verify that each node ID is the same as its position in the</span>
-        <span class="c">#   compartment list</span>
+        <span class="c1"># verify that each node ID is the same as its position in the</span>
+        <span class="c1">#   compartment list</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)):</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="n">i</span><span class="p">)[</span><span class="n">NODE_ID</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="s">&quot;Internal error detected -- compartment list not properly formed&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot;Internal error detected -- compartment list not properly formed&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Morphology.append"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add additional nodes to this Morphology. Those nodes must</span>
@@ -1232,12 +1232,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        ----------</span>
 <span class="sd">        node_list: list of Morphology nodes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># construct a map between new and old IDs of added nodes</span>
+        <span class="c1"># construct a map between new and old IDs of added nodes</span>
         <span class="n">remap</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">node_list</span><span class="p">)):</span>
             <span class="n">remap</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="c"># map old old node numbers to new ones. reset n to the new ID</span>
-        <span class="c"># append new nodes to existing node list</span>
+        <span class="c1"># map old old node numbers to new ones. reset n to the new ID</span>
+        <span class="c1"># append new nodes to existing node list</span>
         <span class="n">old_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)</span>
         <span class="n">new_id</span> <span class="o">=</span> <span class="n">old_count</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">node_list</span><span class="p">:</span>
@@ -1246,7 +1246,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_id</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
                 <span class="n">new_id</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="c"># use map to reset parent values. copy objs to new list</span>
+        <span class="c1"># use map to reset parent values. copy objs to new list</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">old_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)):</span>
             <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
@@ -1262,7 +1262,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        count: Integer</span>
 <span class="sd">            The length of the axon &#39;stump&#39;, in number of compartments</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># find connected axon root</span>
+        <span class="c1"># find connected axon root</span>
         <span class="n">axon_root</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">AXON</span><span class="p">:</span>
@@ -1274,23 +1274,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                         <span class="k">break</span>
         <span class="k">if</span> <span class="n">axon_root</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">return</span>
-        <span class="c"># flag the first &#39;count&#39; nodes from the axon root</span>
+        <span class="c1"># flag the first &#39;count&#39; nodes from the axon root</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">axon_root</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
-            <span class="c"># ignore bifurcations -- go &#39;count&#39; deep on one line only</span>
-            <span class="n">ax</span><span class="p">[</span><span class="s">&quot;flag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="c1"># ignore bifurcations -- go &#39;count&#39; deep on one line only</span>
+            <span class="n">ax</span><span class="p">[</span><span class="s2">&quot;flag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
             <span class="n">children</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">ax</span> <span class="o">=</span> <span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="c"># strip out all axons that aren&#39;t flagged</span>
+        <span class="c1"># strip out all axons that aren&#39;t flagged</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)):</span>
             <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">AXON</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s">&quot;flag&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seg</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;flag&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seg</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
 
-    <span class="c"># strip out everything but the soma and the specified SWC type</span></div>
+    <span class="c1"># strip out everything but the soma and the specified SWC type</span></div>
 <div class="viewcode-block" id="Morphology.strip_all_other_types"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.strip_all_other_types">[docs]</a>    <span class="k">def</span> <span class="nf">strip_all_other_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">keep_soma</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Strips everything from the morphology except for the</span>
 <span class="sd">        specified type.</span>
@@ -1309,8 +1309,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            morpyhology, and False if the soma should also be stripped</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">flagged_for_removal</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="c"># scan nodes and see which ones should be removed. keep a record</span>
-        <span class="c">#   of them</span>
+        <span class="c1"># scan nodes and see which ones should be removed. keep a record</span>
+        <span class="c1">#   of them</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_type</span><span class="p">:</span>
                 <span class="n">remove</span> <span class="o">=</span> <span class="bp">False</span>
@@ -1320,18 +1320,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">remove</span> <span class="o">=</span> <span class="bp">True</span>
             <span class="k">if</span> <span class="n">remove</span><span class="p">:</span>
                 <span class="n">flagged_for_removal</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="c"># remove selected nodes andreset parent links</span>
+        <span class="c1"># remove selected nodes andreset parent links</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)):</span>
             <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="ow">in</span> <span class="n">flagged_for_removal</span><span class="p">:</span>
-                <span class="c"># eliminate node</span>
+                <span class="c1"># eliminate node</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="k">elif</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="ow">in</span> <span class="n">flagged_for_removal</span><span class="p">:</span>
-                <span class="c"># parent was eliminated. make this a new root</span>
+                <span class="c1"># parent was eliminated. make this a new root</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
 
-    <span class="c"># strip out the specified SWC type</span></div>
+    <span class="c1"># strip out the specified SWC type</span></div>
 <div class="viewcode-block" id="Morphology.strip_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.strip_type">[docs]</a>    <span class="k">def</span> <span class="nf">strip_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Strips all compartments of the specified type from the</span>
 <span class="sd">        morphology.</span>
@@ -1356,14 +1356,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)):</span>
             <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="ow">in</span> <span class="n">flagged_for_removal</span><span class="p">:</span>
-                <span class="c"># eliminate node</span>
+                <span class="c1"># eliminate node</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="k">elif</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="ow">in</span> <span class="n">flagged_for_removal</span><span class="p">:</span>
-                <span class="c"># parent was eliminated. make this a new root</span>
+                <span class="c1"># parent was eliminated. make this a new root</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
 
-    <span class="c"># strip out the specified SWC type</span></div>
+    <span class="c1"># strip out the specified SWC type</span></div>
 <div class="viewcode-block" id="Morphology.convert_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.convert_type">[docs]</a>    <span class="k">def</span> <span class="nf">convert_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_type</span><span class="p">,</span> <span class="n">new_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Converts all compartments from one type to another.</span>
 <span class="sd">        Nodes of the original type are not affected so this</span>
@@ -1408,34 +1408,34 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        aff: 3x4 array of floats (python 2D list, or numpy 2D array)</span>
 <span class="sd">            the transformation matrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c"># In addition to transforming the locations of the morphology</span>
-        <span class="c">#   nodes, the radius of each node must be adjusted.</span>
-        <span class="c"># There are 2 ways to measure scale from a transform. Assuming</span>
-        <span class="c">#   an isotropic transform, the scale is the cube root of the</span>
-        <span class="c">#   matrix determinant. The other ways is to measure scale</span>
-        <span class="c">#   independently along each axis.</span>
-        <span class="c"># For now, the node radius is only updated based on the average</span>
-        <span class="c">#   scale along all 3 axes (eg, isotropic assumption), so calculate</span>
-        <span class="c">#   scale using the determinant</span>
-        <span class="c">#</span>
+        <span class="c1"># In addition to transforming the locations of the morphology</span>
+        <span class="c1">#   nodes, the radius of each node must be adjusted.</span>
+        <span class="c1"># There are 2 ways to measure scale from a transform. Assuming</span>
+        <span class="c1">#   an isotropic transform, the scale is the cube root of the</span>
+        <span class="c1">#   matrix determinant. The other ways is to measure scale</span>
+        <span class="c1">#   independently along each axis.</span>
+        <span class="c1"># For now, the node radius is only updated based on the average</span>
+        <span class="c1">#   scale along all 3 axes (eg, isotropic assumption), so calculate</span>
+        <span class="c1">#   scale using the determinant</span>
+        <span class="c1">#</span>
         <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="c"># calculate the determinant</span>
+            <span class="c1"># calculate the determinant</span>
             <span class="n">det0</span> <span class="o">=</span> <span class="n">aff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">aff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">-</span> <span class="n">aff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
             <span class="n">det1</span> <span class="o">=</span> <span class="n">aff</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">aff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="o">-</span> <span class="n">aff</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
             <span class="n">det2</span> <span class="o">=</span> <span class="n">aff</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">aff</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">-</span> <span class="n">aff</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
             <span class="n">det</span> <span class="o">=</span> <span class="n">det0</span> <span class="o">+</span> <span class="n">det1</span> <span class="o">+</span> <span class="n">det2</span>
-            <span class="c"># determinant is change of volume that occurred during transform</span>
-            <span class="c"># assume equal scaling along all axes. take 3rd root to get</span>
-            <span class="c">#   scale factor</span>
+            <span class="c1"># determinant is change of volume that occurred during transform</span>
+            <span class="c1"># assume equal scaling along all axes. take 3rd root to get</span>
+            <span class="c1">#   scale factor</span>
             <span class="n">det_scale</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">det</span><span class="p">),</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
-            <span class="c"># measure scale along each axis</span>
-            <span class="c"># keep this code here in case</span>
-            <span class="c">#scale_x = abs(aff[0] + aff[3] + aff[6])</span>
-            <span class="c">#scale_y = abs(aff[1] + aff[4] + aff[7])</span>
-            <span class="c">#scale_z = abs(aff[2] + aff[5] + aff[8])</span>
-            <span class="c">#avg_scale = (scale_x + scale_y + scale_z) / 3.0;</span>
-            <span class="c">#</span>
-            <span class="c"># use determinant for scaling for now as it&#39;s most simple</span>
+            <span class="c1"># measure scale along each axis</span>
+            <span class="c1"># keep this code here in case</span>
+            <span class="c1">#scale_x = abs(aff[0] + aff[3] + aff[6])</span>
+            <span class="c1">#scale_y = abs(aff[1] + aff[4] + aff[7])</span>
+            <span class="c1">#scale_z = abs(aff[2] + aff[5] + aff[8])</span>
+            <span class="c1">#avg_scale = (scale_x + scale_y + scale_z) / 3.0;</span>
+            <span class="c1">#</span>
+            <span class="c1"># use determinant for scaling for now as it&#39;s most simple</span>
             <span class="n">scale</span> <span class="o">=</span> <span class="n">det_scale</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_X</span><span class="p">]</span> <span class="o">*</span> <span class="n">aff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_Y</span><span class="p">]</span> <span class="o">*</span> \
@@ -1454,14 +1454,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        construct list of independent trees (each tree has a root of -1)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">trees</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="c"># reset each node&#39;s tree ID to indicate that it&#39;s not assigned</span>
+        <span class="c1"># reset each node&#39;s tree ID to indicate that it&#39;s not assigned</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TREE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="c"># construct trees for each node</span>
-        <span class="c"># if a node is adjacent an existing tree, merge to it</span>
-        <span class="c"># if a node is adjacent multiple trees, merge all</span>
+        <span class="c1"># construct trees for each node</span>
+        <span class="c1"># if a node is adjacent an existing tree, merge to it</span>
+        <span class="c1"># if a node is adjacent multiple trees, merge all</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
-            <span class="c"># see what trees this node is adjacent to</span>
+            <span class="c1"># see what trees this node is adjacent to</span>
             <span class="n">local_trees</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]][</span><span class="n">NODE_TREE_ID</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">local_trees</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span>
@@ -1470,15 +1470,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">child</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">child_id</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">child</span><span class="p">[</span><span class="n">NODE_TREE_ID</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">local_trees</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">[</span><span class="n">NODE_TREE_ID</span><span class="p">])</span>
-            <span class="c"># figure out which tree to put node into</span>
-            <span class="c"># if there are muliple possibilities, merge all of them</span>
+            <span class="c1"># figure out which tree to put node into</span>
+            <span class="c1"># if there are muliple possibilities, merge all of them</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_trees</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">tree_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>  <span class="c"># create new tree</span>
+                <span class="n">tree_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span>  <span class="c1"># create new tree</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_trees</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">tree_num</span> <span class="o">=</span> <span class="n">local_trees</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>   <span class="c"># use existing tree</span>
+                <span class="n">tree_num</span> <span class="o">=</span> <span class="n">local_trees</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>   <span class="c1"># use existing tree</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_trees</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="c"># this node is an intersection of multiple trees</span>
-                <span class="c"># merge all trees into the first one found</span>
+                <span class="c1"># this node is an intersection of multiple trees</span>
+                <span class="c1"># merge all trees into the first one found</span>
                 <span class="n">tree_num</span> <span class="o">=</span> <span class="n">local_trees</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_trees</span><span class="p">)):</span>
                     <span class="n">dead_tree</span> <span class="o">=</span> <span class="n">local_trees</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
@@ -1486,31 +1486,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                     <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">node</span><span class="p">[</span><span class="n">NODE_TREE_ID</span><span class="p">]</span> <span class="o">==</span> <span class="n">dead_tree</span><span class="p">:</span>
                             <span class="n">node</span><span class="p">[</span><span class="n">NODE_TREE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree_num</span>
-            <span class="c"># merge node into tree</span>
-            <span class="c"># ensure there&#39;s space</span>
+            <span class="c1"># merge node into tree</span>
+            <span class="c1"># ensure there&#39;s space</span>
             <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">trees</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">tree_num</span><span class="p">:</span>
                 <span class="n">trees</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
             <span class="n">trees</span><span class="p">[</span><span class="n">tree_num</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
             <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TREE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">tree_num</span>
-        <span class="c"># consolidate tree lists into class&#39;s tree list object</span>
+        <span class="c1"># consolidate tree lists into class&#39;s tree list object</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">trees</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
-        <span class="c"># make soma&#39;s tree be the first tree, if soma present</span>
-        <span class="c"># this should be the case if the file is properly ordered, but</span>
-        <span class="c">#   don&#39;t assume that</span>
+        <span class="c1"># make soma&#39;s tree be the first tree, if soma present</span>
+        <span class="c1"># this should be the case if the file is properly ordered, but</span>
+        <span class="c1">#   don&#39;t assume that</span>
         <span class="n">soma_tree</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">soma_tree</span> <span class="o">=</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TREE_ID</span><span class="p">]</span>
                 <span class="k">break</span>
         <span class="k">if</span> <span class="n">soma_tree</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c"># swap soma tree for first tree in list</span>
+            <span class="c1"># swap soma tree for first tree in list</span>
             <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">[</span><span class="n">soma_tree</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">[</span><span class="n">soma_tree</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
-        <span class="c"># reset node tree_id to correct tree number</span>
+        <span class="c1"># reset node tree_id to correct tree number</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reset_tree_ids</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_reset_tree_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1528,31 +1528,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        Return value: number of errors detected in file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">errs</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="c"># Make sure that the parents are of proper ID range</span>
+        <span class="c1"># Make sure that the parents are of proper ID range</span>
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">:</span>
-                    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Parent for node </span><span class="si">%d</span><span class="s"> is invalid (</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span>
+                    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Parent for node </span><span class="si">%d</span><span class="s2"> is invalid (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span>
                           <span class="p">(</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">],</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]))</span>
                     <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="c"># make sure that each tree has exactly one root</span>
+        <span class="c1"># make sure that each tree has exactly one root</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_trees</span><span class="p">):</span>
             <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="n">root</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">)):</span>
                 <span class="k">if</span> <span class="n">tree</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">root</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Too many roots in tree </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Too many roots in tree </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
                         <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="n">root</span> <span class="o">=</span> <span class="n">j</span>
             <span class="k">if</span> <span class="n">root</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="s">&quot;No root present in tree </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;No root present in tree </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
                 <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="c"># make sure each axon has at most one root</span>
-        <span class="c"># find type boundaries. at each axon boundary, walk back up</span>
-        <span class="c">#   tree to root and make sure another axon segment not</span>
-        <span class="c">#   encountered</span>
+        <span class="c1"># make sure each axon has at most one root</span>
+        <span class="c1"># find type boundaries. at each axon boundary, walk back up</span>
+        <span class="c1">#   tree to root and make sure another axon segment not</span>
+        <span class="c1">#   encountered</span>
         <span class="n">adoptees</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_type_boundary</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">adoptees</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">child</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">AXON</span><span class="p">:</span>
@@ -1560,14 +1560,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="k">while</span> <span class="n">par_id</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">par</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">par_id</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">par</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">AXON</span><span class="p">:</span>
-                        <span class="k">print</span><span class="p">(</span><span class="s">&quot;Branch has multiple axon roots&quot;</span><span class="p">)</span>
+                        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Branch has multiple axon roots&quot;</span><span class="p">)</span>
                         <span class="k">print</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
                         <span class="k">print</span><span class="p">(</span><span class="n">par</span><span class="p">)</span>
                         <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
                         <span class="k">break</span>
                     <span class="n">par_id</span> <span class="o">=</span> <span class="n">par</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">errs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Failed consistency check: </span><span class="si">%d</span><span class="s"> errors encountered&quot;</span> <span class="o">%</span> <span class="n">errs</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Failed consistency check: </span><span class="si">%d</span><span class="s2"> errors encountered&quot;</span> <span class="o">%</span> <span class="n">errs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">errs</span>
 
     <span class="k">def</span> <span class="nf">_find_type_boundary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1583,7 +1583,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">adoptees</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">adoptees</span>
 
-    <span class="c"># remove tree from swc&#39;s &quot;forest&quot;</span>
+    <span class="c1"># remove tree from swc&#39;s &quot;forest&quot;</span>
 <div class="viewcode-block" id="Morphology.delete_tree"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.delete_tree">[docs]</a>    <span class="k">def</span> <span class="nf">delete_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Delete tree, and all of its compartments, from the morphology.</span>
 
@@ -1595,14 +1595,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_trees</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Error -- attempted to delete non-existing tree (</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error -- attempted to delete non-existing tree (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span>
         <span class="n">tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">tree</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
-        <span class="c"># reset node tree_id to correct tree number</span>
+        <span class="c1"># reset node tree_id to correct tree number</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reset_tree_ids</span><span class="p">()</span>
 </div>
     <span class="k">def</span> <span class="nf">_print_all_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1612,7 +1612,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
 
-<span class="c">########################################################################</span>
+<span class="c1">########################################################################</span>
 
 </div>
 <div class="viewcode-block" id="Marker"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Marker">[docs]</a><span class="k">class</span> <span class="nc">Marker</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
@@ -1626,25 +1626,25 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Marker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="c"># marker file x,y,z coordinates are offset by a single image-space</span>
-        <span class="c"># pixel</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="c1"># marker file x,y,z coordinates are offset by a single image-space</span>
+        <span class="c1"># pixel</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
 </div>
 <div class="viewcode-block" id="read_marker_file"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.read_marker_file">[docs]</a><span class="k">def</span> <span class="nf">read_marker_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; read in a marker file and return a list of dictionaries &quot;&quot;&quot;</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">rows</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">((</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">f</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">)),</span>
-                              <span class="n">fieldnames</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">,</span> <span class="s">&#39;y&#39;</span><span class="p">,</span> <span class="s">&#39;z&#39;</span><span class="p">,</span> <span class="s">&#39;radius&#39;</span><span class="p">,</span> <span class="s">&#39;shape&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;comment&#39;</span><span class="p">,</span>
-                                          <span class="s">&#39;color_r&#39;</span><span class="p">,</span> <span class="s">&#39;color_g&#39;</span><span class="p">,</span> <span class="s">&#39;color_b&#39;</span><span class="p">])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">((</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">f</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)),</span>
+                              <span class="n">fieldnames</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;radius&#39;</span><span class="p">,</span> <span class="s1">&#39;shape&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;comment&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;color_r&#39;</span><span class="p">,</span> <span class="s1">&#39;color_g&#39;</span><span class="p">,</span> <span class="s1">&#39;color_b&#39;</span><span class="p">])</span>
 
-        <span class="k">return</span> <span class="p">[</span><span class="n">Marker</span><span class="p">({</span><span class="s">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">]),</span>
-                        <span class="s">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">]),</span>
-                        <span class="s">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">]),</span>
-                        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">])})</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">Marker</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]),</span>
+                        <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]),</span>
+                        <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]),</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])})</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span></div>
 </pre></div>
 
           </div>
@@ -1715,7 +1715,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,14 +631,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.model.glif.glif_neuron_methods</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot; The methods in this module are used for configuring dynamics and reset rules for the GlifNeuron.</span>
+<span></span><span class="sd">&quot;&quot;&quot; The methods in this module are used for configuring dynamics and reset rules for the GlifNeuron.</span>
 <span class="sd">For more details on how to use these methods, see :doc:`glif_models`.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
-<span class="c">#fast_threshold=[]</span>
-<span class="c">#slow_threshold=[]</span>
+<span class="c1">#fast_threshold=[]</span>
+<span class="c1">#slow_threshold=[]</span>
 
 <div class="viewcode-block" id="GlifNeuronMethod"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod">[docs]</a><span class="k">class</span> <span class="nc">GlifNeuronMethod</span><span class="p">(</span> <span class="nb">object</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A simple class to keep track of the name and parameters associated with a neuron method.</span>
@@ -670,8 +670,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div class="viewcode-block" id="GlifNeuronMethod.to_dict"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="s">&#39;params&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
         <span class="p">}</span>
 </div>
 <div class="viewcode-block" id="GlifNeuronMethod.modify_parameter"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod.modify_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">modify_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
@@ -695,7 +695,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 </div></div>
 <div class="viewcode-block" id="max_of_line_and_const"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.max_of_line_and_const">[docs]</a><span class="k">def</span> <span class="nf">max_of_line_and_const</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">):</span>
-    <span class="c">#TODO: move to other library</span>
+    <span class="c1">#TODO: move to other library</span>
     <span class="sd">&quot;&quot;&quot; Find the maximum of a value and a position on a line</span>
 
 <span class="sd">    Parameters</span>
@@ -719,34 +719,34 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">two</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="n">d</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">one</span><span class="p">,</span><span class="n">two</span><span class="p">)</span>
 
-<span class="c">#commenting this out to make sure it doest get called and I forgot to switch is somewhere</span>
-<span class="c">#def min_of_line_and_const(x,b,c,d):</span>
-<span class="c">#    #TODO: move to other library</span>
-<span class="c">#    &quot;&quot;&quot; Find the minimum of a value and a position on a line</span>
-<span class="c">#</span>
-<span class="c">#    Parameters</span>
-<span class="c">#    ----------</span>
-<span class="c">#    x: float</span>
-<span class="c">#        x position on line 1</span>
-<span class="c">#    c: float</span>
-<span class="c">#        slope of line 1</span>
-<span class="c">#    d: float</span>
-<span class="c">#        y-intercept of line 1</span>
-<span class="c">#    b: float</span>
-<span class="c">#        y-intercept of line 2</span>
-<span class="c">#</span>
-<span class="c">#    Returns</span>
-<span class="c">#    -------</span>
-<span class="c">#    float</span>
-<span class="c">#        the max of a line value and a constant</span>
-<span class="c">#    &quot;&quot;&quot;</span>
-<span class="c">#</span>
-<span class="c">#    one = b</span>
-<span class="c">#    two = c*x+d</span>
-<span class="c">#    return np.minimum(one,two)</span>
+<span class="c1">#commenting this out to make sure it doest get called and I forgot to switch is somewhere</span>
+<span class="c1">#def min_of_line_and_const(x,b,c,d):</span>
+<span class="c1">#    #TODO: move to other library</span>
+<span class="c1">#    &quot;&quot;&quot; Find the minimum of a value and a position on a line</span>
+<span class="c1">#</span>
+<span class="c1">#    Parameters</span>
+<span class="c1">#    ----------</span>
+<span class="c1">#    x: float</span>
+<span class="c1">#        x position on line 1</span>
+<span class="c1">#    c: float</span>
+<span class="c1">#        slope of line 1</span>
+<span class="c1">#    d: float</span>
+<span class="c1">#        y-intercept of line 1</span>
+<span class="c1">#    b: float</span>
+<span class="c1">#        y-intercept of line 2</span>
+<span class="c1">#</span>
+<span class="c1">#    Returns</span>
+<span class="c1">#    -------</span>
+<span class="c1">#    float</span>
+<span class="c1">#        the max of a line value and a constant</span>
+<span class="c1">#    &quot;&quot;&quot;</span>
+<span class="c1">#</span>
+<span class="c1">#    one = b</span>
+<span class="c1">#    two = c*x+d</span>
+<span class="c1">#    return np.minimum(one,two)</span>
 </div>
 <div class="viewcode-block" id="min_of_line_and_zero"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.min_of_line_and_zero">[docs]</a><span class="k">def</span> <span class="nf">min_of_line_and_zero</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">):</span>
-    <span class="c">#TODO: move to other library</span>
+    <span class="c1">#TODO: move to other library</span>
     <span class="sd">&quot;&quot;&quot; Find the minimum of a value and a position on a line</span>
 
 <span class="sd">    Parameters</span>
@@ -776,8 +776,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    a time step later.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="c">#     print(&#39;HERE: dynamics_threshold_inf&#39;)</span>
-<span class="c">#    return AScurrents_t0*(1.0 - neuron.k*neuron.dt)</span>
+<span class="c1">#     print(&#39;HERE: dynamics_threshold_inf&#39;)</span>
+<span class="c1">#    return AScurrents_t0*(1.0 - neuron.k*neuron.dt)</span>
     <span class="k">return</span> <span class="n">AScurrents_t0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">k</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
 
 </div>
@@ -791,13 +791,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    vector : np.ndarray</span>
 <span class="sd">        an array of all running afterspike current values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c"># a hack to convert lists into numpy arrays</span>
+    <span class="c1"># a hack to convert lists into numpy arrays</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="n">vector</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">AScurrent_dynamics_method</span><span class="o">.</span><span class="n">modify_parameter</span><span class="p">(</span><span class="s">&#39;vector&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
+        <span class="n">vector</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">AScurrent_dynamics_method</span><span class="o">.</span><span class="n">modify_parameter</span><span class="p">(</span><span class="s1">&#39;vector&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
 
     <span class="n">total</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vector</span><span class="p">))</span>
 
-    <span class="c"># run through all of the spikes, adding ascurrents based on how long its been since the spike occurred</span>
+    <span class="c1"># run through all of the spikes, adding ascurrents based on how long its been since the spike occurred</span>
     <span class="k">for</span> <span class="n">spike_time_step</span> <span class="ow">in</span> <span class="n">spike_time_steps</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">total</span> <span class="o">+=</span> <span class="n">vector</span><span class="p">[:,</span> <span class="n">time_step</span> <span class="o">-</span> <span class="n">spike_time_step</span><span class="p">]</span>
@@ -814,14 +814,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </div>
 <div class="viewcode-block" id="dynamics_voltage_linear_forward_euler"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler">[docs]</a><span class="k">def</span> <span class="nf">dynamics_voltage_linear_forward_euler</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; (TODO) Linear voltage dynamics. &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;G&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span>
 </div>
 <div class="viewcode-block" id="dynamics_voltage_linear_exact"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact">[docs]</a><span class="k">def</span> <span class="nf">dynamics_voltage_linear_exact</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; (TODO) Linear voltage dynamics. &quot;&quot;&quot;</span>
 
-    <span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span>
     <span class="n">I</span> <span class="o">=</span> <span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;G&#39;</span><span class="p">]</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span>
     <span class="n">tau</span> <span class="o">=</span> <span class="n">g</span><span class="o">/</span><span class="n">C</span>
     <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">I</span><span class="o">+</span> <span class="n">g</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">)</span><span class="o">/</span><span class="n">C</span>
 
@@ -830,9 +830,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="dynamics_voltage_piecewise_linear_exact"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_piecewise_linear_exact">[docs]</a><span class="k">def</span> <span class="nf">dynamics_voltage_piecewise_linear_exact</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">,</span> <span class="n">El_slope_param</span><span class="p">,</span> <span class="n">El_intercept_param</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; (TODO) Linear voltage dynamics. &quot;&quot;&quot;</span>
 
-    <span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span>
     <span class="n">I</span> <span class="o">=</span> <span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;G&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">max_of_line_and_const</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">max_of_line_and_const</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">)</span>
     <span class="n">tau</span> <span class="o">=</span> <span class="n">g</span><span class="o">/</span><span class="n">C</span>
     <span class="n">El</span> <span class="o">=</span> <span class="n">min_of_line_and_zero</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">El_slope_param</span><span class="p">,</span> <span class="n">El_intercept_param</span><span class="p">)</span>
     <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">I</span><span class="o">+</span> <span class="n">g</span><span class="o">*</span><span class="n">El</span><span class="p">)</span><span class="o">/</span><span class="n">C</span>
@@ -864,7 +864,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">if</span> <span class="n">voltage_t0</span> <span class="o">&gt;</span> <span class="n">d</span><span class="p">:</span>
         <span class="n">I_of_v</span><span class="o">=</span><span class="n">e</span>
 
-    <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">I_of_v</span><span class="p">)</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">I_of_v</span><span class="p">)</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span>
 
 </div>
 <div class="viewcode-block" id="dynamics_voltage_piecewise_linear_forward_euler"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_piecewise_linear_forward_euler">[docs]</a><span class="k">def</span> <span class="nf">dynamics_voltage_piecewise_linear_forward_euler</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">,</span> <span class="n">El_slope_param</span><span class="p">,</span> <span class="n">El_intercept_param</span><span class="p">):</span>
@@ -885,12 +885,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    El_tlparam3 : float</span>
 <span class="sd">        TOOD</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c">#confirm this is being implimented correctly.</span>
+    <span class="c1">#confirm this is being implimented correctly.</span>
     <span class="n">G</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_of_line_and_const</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">))</span>
-<span class="c">#    El = min_of_line_and_const(voltage_t0, El_tlparam1, El_tlparam2, El_t1param3) #this is for when El wasnt forced to zero</span>
+<span class="c1">#    El = min_of_line_and_const(voltage_t0, El_tlparam1, El_tlparam2, El_t1param3) #this is for when El wasnt forced to zero</span>
     <span class="n">El</span> <span class="o">=</span> <span class="n">min_of_line_and_zero</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">El_slope_param</span><span class="p">,</span> <span class="n">El_intercept_param</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;G&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span> <span class="o">-</span> <span class="n">El</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span> <span class="o">-</span> <span class="n">El</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span>
 
 </div>
 <div class="viewcode-block" id="dynamics_threshold_adapt_standard"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_adapt_standard">[docs]</a><span class="k">def</span> <span class="nf">dynamics_threshold_adapt_standard</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
@@ -906,89 +906,89 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    AScurrents_t0 : not used here</span>
 <span class="sd">    inj : not used here</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<span class="c">#     print(&#39;HERE: dynamics_threshold_adapt_standard&#39;)</span>
-    <span class="k">return</span> <span class="n">threshold_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">)</span> <span class="o">-</span>
-                           <span class="n">b</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">threshold_t0</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span>
+<span class="c1">#     print(&#39;HERE: dynamics_threshold_adapt_standard&#39;)</span>
+    <span class="k">return</span> <span class="n">threshold_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">)</span> <span class="o">-</span>
+                           <span class="n">b</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">threshold_t0</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span>
 
-<span class="c">#TODO: depricate when sure that dynamics_threshold_three_sep_components will be the official function</span>
-<span class="c">#def dynamics_threshold_adapt_slow_plus_fast(neuron, threshold_t0, voltage_t0):</span>
-<span class="c">#    &quot;&quot;&quot;The threshold will adapt via two mechanisms: 1. a slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard.</span>
-<span class="c">#    These are the components which are fit via optimization and inditial conditions are supplied via the GLM. 2. A fast component initiated</span>
-<span class="c">#    by a spike which quickly decays.  These values are estimated via the multi short square stimuli.</span>
-<span class="c">#    &quot;&quot;&quot;</span>
-<span class="c">#</span>
-<span class="c">#    md = neuron.update_method_data</span>
-<span class="c">#</span>
-<span class="c">#    # initial conditions</span>
-<span class="c">#    if &#39;th_spike&#39; not in md:</span>
-<span class="c">#        md[&#39;th_spike&#39;] = [ 0 ]</span>
-<span class="c">#    if &#39;th_voltage&#39; not in md:</span>
-<span class="c">#        md[&#39;th_voltage&#39;] = [ neuron.th_inf * neuron.coeffs[&#39;th_inf&#39;] ]</span>
-<span class="c">#</span>
-<span class="c">#    th_spike = md[&#39;th_spike&#39;][-1]</span>
-<span class="c">#    th_voltage = md[&#39;th_voltage&#39;][-1]</span>
-<span class="c">#</span>
-<span class="c">##     print(&#39;a_spike&#39;, md[&#39;a_spike&#39;])</span>
-<span class="c">##     print(&#39;b_spike&#39;, md[&#39;b_spike&#39;])</span>
-<span class="c">##     print(&#39;a_voltage&#39;, md[&#39;a_voltage&#39;])</span>
-<span class="c">##     print(&#39;b_voltage&#39;, md[&#39;b_voltage&#39;])</span>
-<span class="c">#</span>
-<span class="c">#    voltage_component = th_voltage + ( md[&#39;a_voltage&#39;] * neuron.coeffs[&#39;a&#39;] * ( voltage_t0 - neuron.El ) -</span>
-<span class="c">#                                       md[&#39;b_voltage&#39;] * neuron.coeffs[&#39;b&#39;] * ( th_voltage - neuron.coeffs[&#39;th_inf&#39;] * neuron.th_inf ) ) * neuron.dt</span>
-<span class="c">#    spike_component = th_spike - md[&#39;b_spike&#39;] * th_spike * neuron.dt</span>
-<span class="c">#</span>
-<span class="c">#</span>
-<span class="c">#    #------hack to plot slow and fast component</span>
-<span class="c">##    global fast_threshold</span>
-<span class="c">##    global slow_threshold</span>
-<span class="c">##    fast_threshold.append(spike_component)</span>
-<span class="c">##    slow_threshold.append(voltage_component)</span>
-<span class="c">#</span>
-<span class="c">#    #------update the voltage and spiking values of the the</span>
-<span class="c">#    md[&#39;th_spike&#39;].append(spike_component)</span>
-<span class="c">#    md[&#39;th_voltage&#39;].append(voltage_component)</span>
-<span class="c">#</span>
-<span class="c">#    return voltage_component+spike_component</span>
+<span class="c1">#TODO: depricate when sure that dynamics_threshold_three_sep_components will be the official function</span>
+<span class="c1">#def dynamics_threshold_adapt_slow_plus_fast(neuron, threshold_t0, voltage_t0):</span>
+<span class="c1">#    &quot;&quot;&quot;The threshold will adapt via two mechanisms: 1. a slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard.</span>
+<span class="c1">#    These are the components which are fit via optimization and inditial conditions are supplied via the GLM. 2. A fast component initiated</span>
+<span class="c1">#    by a spike which quickly decays.  These values are estimated via the multi short square stimuli.</span>
+<span class="c1">#    &quot;&quot;&quot;</span>
+<span class="c1">#</span>
+<span class="c1">#    md = neuron.update_method_data</span>
+<span class="c1">#</span>
+<span class="c1">#    # initial conditions</span>
+<span class="c1">#    if &#39;th_spike&#39; not in md:</span>
+<span class="c1">#        md[&#39;th_spike&#39;] = [ 0 ]</span>
+<span class="c1">#    if &#39;th_voltage&#39; not in md:</span>
+<span class="c1">#        md[&#39;th_voltage&#39;] = [ neuron.th_inf * neuron.coeffs[&#39;th_inf&#39;] ]</span>
+<span class="c1">#</span>
+<span class="c1">#    th_spike = md[&#39;th_spike&#39;][-1]</span>
+<span class="c1">#    th_voltage = md[&#39;th_voltage&#39;][-1]</span>
+<span class="c1">#</span>
+<span class="c1">##     print(&#39;a_spike&#39;, md[&#39;a_spike&#39;])</span>
+<span class="c1">##     print(&#39;b_spike&#39;, md[&#39;b_spike&#39;])</span>
+<span class="c1">##     print(&#39;a_voltage&#39;, md[&#39;a_voltage&#39;])</span>
+<span class="c1">##     print(&#39;b_voltage&#39;, md[&#39;b_voltage&#39;])</span>
+<span class="c1">#</span>
+<span class="c1">#    voltage_component = th_voltage + ( md[&#39;a_voltage&#39;] * neuron.coeffs[&#39;a&#39;] * ( voltage_t0 - neuron.El ) -</span>
+<span class="c1">#                                       md[&#39;b_voltage&#39;] * neuron.coeffs[&#39;b&#39;] * ( th_voltage - neuron.coeffs[&#39;th_inf&#39;] * neuron.th_inf ) ) * neuron.dt</span>
+<span class="c1">#    spike_component = th_spike - md[&#39;b_spike&#39;] * th_spike * neuron.dt</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#    #------hack to plot slow and fast component</span>
+<span class="c1">##    global fast_threshold</span>
+<span class="c1">##    global slow_threshold</span>
+<span class="c1">##    fast_threshold.append(spike_component)</span>
+<span class="c1">##    slow_threshold.append(voltage_component)</span>
+<span class="c1">#</span>
+<span class="c1">#    #------update the voltage and spiking values of the the</span>
+<span class="c1">#    md[&#39;th_spike&#39;].append(spike_component)</span>
+<span class="c1">#    md[&#39;th_voltage&#39;].append(voltage_component)</span>
+<span class="c1">#</span>
+<span class="c1">#    return voltage_component+spike_component</span>
 
-<span class="c">#TODO: deprecate when confirm the forward and exact equations are doing the right thing.</span>
-<span class="c"># def dynamics_threshold_three_sep_components_hybrid(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj):</span>
-<span class="c">#     &quot;&quot;&quot;This is the sequel to the dynamics_threshold_adapt_slow_plus_fast module. Here as in</span>
-<span class="c">#     dynamics_threshold_adapt_slow_plus_fast. The threshold will adapt via two mechanisms: 1. a</span>
-<span class="c">#     slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard. and 2. a</span>
-<span class="c">#     fast component initiated by a spike which quickly decays.  These two component are</span>
-<span class="c">#     in reference to zero and are recorded in the md parameters.  The third component refers to</span>
-<span class="c">#     th_inf which is added on in the end as opposed to being encompassed in the voltage component</span>
-<span class="c">#     of the threshold which caused a problem in optimizing th_inf.</span>
-<span class="c">#     AScurrents_t0 : not used here</span>
-<span class="c">#     inj : not used here</span>
-<span class="c">#     &quot;&quot;&quot;</span>
-<span class="c">#     md = neuron.update_method_data</span>
-<span class="c">#</span>
-<span class="c">#     # initial conditions</span>
-<span class="c">#     if &#39;th_spike&#39; not in md:</span>
-<span class="c">#         md[&#39;th_spike&#39;] = [ 0 ]</span>
-<span class="c">#         logging.warning(&#39;delete this function it is a hybrid&#39;)</span>
-<span class="c">#     if &#39;th_voltage&#39; not in md:</span>
-<span class="c">#         md[&#39;th_voltage&#39;] = [ 0 ]</span>
-<span class="c">#</span>
-<span class="c">#     th_spike = md[&#39;th_spike&#39;][-1]</span>
-<span class="c">#     th_voltage = md[&#39;th_voltage&#39;][-1]</span>
-<span class="c">#</span>
-<span class="c">#     #why are this variables being saved in an md variable?</span>
-<span class="c">#     #TODO: HOW CAN NEURON.COEFFS[&#39;A&#39;] BE MULTIPLIED AFTERWARD SINCE IT IS ALSO MULTIPLYING THE</span>
-<span class="c">#     #VOLTAGE COMPONENT.</span>
-<span class="c">#     voltage_component = th_voltage + ( md[&#39;a_voltage&#39;] *  ( voltage_t0 - neuron.El ) -</span>
-<span class="c">#                                        md[&#39;b_voltage&#39;] * neuron.coeffs[&#39;b&#39;] * ( th_voltage ) ) * neuron.dt</span>
-<span class="c">#</span>
-<span class="c">#     #spike_component = th_spike - md[&#39;b_spike&#39;] * th_spike * neuron.dt</span>
-<span class="c">#     spike_component = th_spike*np.exp(-md[&#39;b_spike&#39;] * neuron.dt)</span>
-<span class="c">#</span>
-<span class="c">#     #------update the voltage and spiking values of the the</span>
-<span class="c">#     md[&#39;th_spike&#39;].append(spike_component)</span>
-<span class="c">#     md[&#39;th_voltage&#39;].append(voltage_component)</span>
-<span class="c">#</span>
-<span class="c">#     #TODO: I dont trust the a_coeff being multiplied by the whole function</span>
-<span class="c">#     return neuron.coeffs[&#39;a&#39;]*voltage_component+spike_component+neuron.th_inf * neuron.coeffs[&#39;th_inf&#39;]</span>
+<span class="c1">#TODO: deprecate when confirm the forward and exact equations are doing the right thing.</span>
+<span class="c1"># def dynamics_threshold_three_sep_components_hybrid(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj):</span>
+<span class="c1">#     &quot;&quot;&quot;This is the sequel to the dynamics_threshold_adapt_slow_plus_fast module. Here as in</span>
+<span class="c1">#     dynamics_threshold_adapt_slow_plus_fast. The threshold will adapt via two mechanisms: 1. a</span>
+<span class="c1">#     slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard. and 2. a</span>
+<span class="c1">#     fast component initiated by a spike which quickly decays.  These two component are</span>
+<span class="c1">#     in reference to zero and are recorded in the md parameters.  The third component refers to</span>
+<span class="c1">#     th_inf which is added on in the end as opposed to being encompassed in the voltage component</span>
+<span class="c1">#     of the threshold which caused a problem in optimizing th_inf.</span>
+<span class="c1">#     AScurrents_t0 : not used here</span>
+<span class="c1">#     inj : not used here</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     md = neuron.update_method_data</span>
+<span class="c1">#</span>
+<span class="c1">#     # initial conditions</span>
+<span class="c1">#     if &#39;th_spike&#39; not in md:</span>
+<span class="c1">#         md[&#39;th_spike&#39;] = [ 0 ]</span>
+<span class="c1">#         logging.warning(&#39;delete this function it is a hybrid&#39;)</span>
+<span class="c1">#     if &#39;th_voltage&#39; not in md:</span>
+<span class="c1">#         md[&#39;th_voltage&#39;] = [ 0 ]</span>
+<span class="c1">#</span>
+<span class="c1">#     th_spike = md[&#39;th_spike&#39;][-1]</span>
+<span class="c1">#     th_voltage = md[&#39;th_voltage&#39;][-1]</span>
+<span class="c1">#</span>
+<span class="c1">#     #why are this variables being saved in an md variable?</span>
+<span class="c1">#     #TODO: HOW CAN NEURON.COEFFS[&#39;A&#39;] BE MULTIPLIED AFTERWARD SINCE IT IS ALSO MULTIPLYING THE</span>
+<span class="c1">#     #VOLTAGE COMPONENT.</span>
+<span class="c1">#     voltage_component = th_voltage + ( md[&#39;a_voltage&#39;] *  ( voltage_t0 - neuron.El ) -</span>
+<span class="c1">#                                        md[&#39;b_voltage&#39;] * neuron.coeffs[&#39;b&#39;] * ( th_voltage ) ) * neuron.dt</span>
+<span class="c1">#</span>
+<span class="c1">#     #spike_component = th_spike - md[&#39;b_spike&#39;] * th_spike * neuron.dt</span>
+<span class="c1">#     spike_component = th_spike*np.exp(-md[&#39;b_spike&#39;] * neuron.dt)</span>
+<span class="c1">#</span>
+<span class="c1">#     #------update the voltage and spiking values of the the</span>
+<span class="c1">#     md[&#39;th_spike&#39;].append(spike_component)</span>
+<span class="c1">#     md[&#39;th_voltage&#39;].append(voltage_component)</span>
+<span class="c1">#</span>
+<span class="c1">#     #TODO: I dont trust the a_coeff being multiplied by the whole function</span>
+<span class="c1">#     return neuron.coeffs[&#39;a&#39;]*voltage_component+spike_component+neuron.th_inf * neuron.coeffs[&#39;th_inf&#39;]</span>
 </div>
 <div class="viewcode-block" id="spike_component_of_threshold_forward_euler"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.spike_component_of_threshold_forward_euler">[docs]</a><span class="k">def</span> <span class="nf">spike_component_of_threshold_forward_euler</span><span class="p">(</span><span class="n">th_t0</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Spike component of threshold modeled as an exponential decay. Implemented</span>
@@ -1003,7 +1003,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    dt : float</span>
 <span class="sd">        time step</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">b_spike</span><span class="o">=-</span><span class="n">b_spike</span> <span class="c">#TODO: this is here because b_spike is always input as positive although it is negative</span>
+    <span class="n">b_spike</span><span class="o">=-</span><span class="n">b_spike</span> <span class="c1">#TODO: this is here because b_spike is always input as positive although it is negative</span>
     <span class="k">return</span> <span class="n">th_t0</span> <span class="o">+</span> <span class="n">th_t0</span><span class="o">*</span><span class="n">b_spike</span> <span class="o">*</span> <span class="n">dt</span>
 </div>
 <div class="viewcode-block" id="spike_component_of_threshold_exact"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.spike_component_of_threshold_exact">[docs]</a><span class="k">def</span> <span class="nf">spike_component_of_threshold_exact</span><span class="p">(</span><span class="n">th0</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
@@ -1103,18 +1103,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">get_threshold_components</span><span class="p">()</span>
 
-    <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="n">a_voltage</span> <span class="o">=</span> <span class="n">a_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">]</span>
-    <span class="n">b_voltage</span> <span class="o">=</span> <span class="n">b_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span>
+    <span class="n">a_voltage</span> <span class="o">=</span> <span class="n">a_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+    <span class="n">b_voltage</span> <span class="o">=</span> <span class="n">b_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
 
     <span class="n">spike_component</span> <span class="o">=</span> <span class="n">spike_component_of_threshold_forward_euler</span><span class="p">(</span><span class="n">th_t0</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
     <span class="n">voltage_component</span> <span class="o">=</span> <span class="n">voltage_component_of_threshold_forward_euler</span><span class="p">(</span><span class="n">th_voltage</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">)</span>
 
     <span class="n">neuron</span><span class="o">.</span><span class="n">add_threshold_components</span><span class="p">(</span><span class="n">spike_component</span><span class="p">,</span> <span class="n">voltage_component</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">voltage_component</span><span class="o">+</span><span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;th_inf&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">voltage_component</span><span class="o">+</span><span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span>
 
 </div>
 <div class="viewcode-block" id="dynamics_threshold_three_components_exact"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact">[docs]</a><span class="k">def</span> <span class="nf">dynamics_threshold_three_components_exact</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span>
@@ -1142,23 +1142,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">get_threshold_components</span><span class="p">()</span>
 
-    <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="n">a_voltage</span> <span class="o">=</span> <span class="n">a_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;a&#39;</span><span class="p">]</span>
-    <span class="n">b_voltage</span> <span class="o">=</span> <span class="n">b_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;b&#39;</span><span class="p">]</span>
+    <span class="n">a_voltage</span> <span class="o">=</span> <span class="n">a_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+    <span class="n">b_voltage</span> <span class="o">=</span> <span class="n">b_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
 
     <span class="n">I</span> <span class="o">=</span> <span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span>
-    <span class="n">C</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">]</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;G&#39;</span><span class="p">]</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">]</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span>
 
     <span class="n">voltage_component</span><span class="o">=</span><span class="n">voltage_component_of_threshold_exact</span><span class="p">(</span><span class="n">th_voltage</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">)</span>
     <span class="n">spike_component</span> <span class="o">=</span> <span class="n">spike_component_of_threshold_exact</span><span class="p">(</span><span class="n">th_spike</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
 
-    <span class="c">#------update the voltage and spiking values of the the</span>
+    <span class="c1">#------update the voltage and spiking values of the the</span>
     <span class="n">neuron</span><span class="o">.</span><span class="n">add_threshold_components</span><span class="p">(</span><span class="n">spike_component</span><span class="p">,</span> <span class="n">voltage_component</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">voltage_component</span><span class="o">+</span><span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;th_inf&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">voltage_component</span><span class="o">+</span><span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span>
 </div>
 <div class="viewcode-block" id="dynamics_threshold_spike_component"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component">[docs]</a><span class="k">def</span> <span class="nf">dynamics_threshold_spike_component</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span>
                                        <span class="n">a_spike</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">):</span>
@@ -1185,15 +1185,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">get_threshold_components</span><span class="p">()</span>
 
-    <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="n">spike_component</span> <span class="o">=</span> <span class="n">spike_component_of_threshold_exact</span><span class="p">(</span><span class="n">th_spike</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
 
-    <span class="c">#------update the voltage and spiking values of the the</span>
+    <span class="c1">#------update the voltage and spiking values of the the</span>
     <span class="n">neuron</span><span class="o">.</span><span class="n">add_threshold_components</span><span class="p">(</span><span class="n">spike_component</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;th_inf&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span>
 
 </div>
 <div class="viewcode-block" id="dynamics_threshold_inf"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf">[docs]</a><span class="k">def</span> <span class="nf">dynamics_threshold_inf</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">):</span>
@@ -1209,7 +1209,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    AScurrents_t0 : not used here</span>
 <span class="sd">    inj : not used here</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span>
+    <span class="k">return</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span>
 
 </div>
 <div class="viewcode-block" id="reset_AScurrent_sum"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum">[docs]</a><span class="k">def</span> <span class="nf">reset_AScurrent_sum</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
@@ -1224,8 +1224,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    r : np.ndarray</span>
 <span class="sd">        a coefficient vector applied to the afterspike currents</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">new_currents</span><span class="o">=</span><span class="n">neuron</span><span class="o">.</span><span class="n">asc_amp_array</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;asc_amp_array&#39;</span><span class="p">]</span> <span class="c">#neuron.asc_amp_array are amplitudes initiating after the spike is cut</span>
-    <span class="n">left_over_currents</span><span class="o">=</span><span class="n">AScurrents_t0</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">spike_cut_length</span><span class="p">))</span> <span class="c">#advancing cut currents though the spike</span>
+    <span class="n">new_currents</span><span class="o">=</span><span class="n">neuron</span><span class="o">.</span><span class="n">asc_amp_array</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;asc_amp_array&#39;</span><span class="p">]</span> <span class="c1">#neuron.asc_amp_array are amplitudes initiating after the spike is cut</span>
+    <span class="n">left_over_currents</span><span class="o">=</span><span class="n">AScurrents_t0</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">spike_cut_length</span><span class="p">))</span> <span class="c1">#advancing cut currents though the spike</span>
 
     <span class="k">return</span> <span class="n">new_currents</span><span class="o">+</span><span class="n">left_over_currents</span>
 
@@ -1234,7 +1234,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="sd">&quot;&quot;&quot; Reset afterspike currents to zero. &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;You are running a LIF but the AScurrents are not zero!&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;You are running a LIF but the AScurrents are not zero!&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">))</span>
 
 </div>
@@ -1254,7 +1254,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </div>
 <div class="viewcode-block" id="reset_voltage_i_v_before"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_i_v_before">[docs]</a><span class="k">def</span> <span class="nf">reset_voltage_i_v_before</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; This method is not implemented yet.  It will raise an exception. &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;reset_voltage_IandVbefore not implemented&quot;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;reset_voltage_IandVbefore not implemented&quot;</span><span class="p">)</span>
 
 </div>
 <div class="viewcode-block" id="reset_voltage_zero"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_zero">[docs]</a><span class="k">def</span> <span class="nf">reset_voltage_zero</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">):</span>
@@ -1280,7 +1280,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    delta : float</span>
 <span class="sd">        value used to offset the return threshold.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c">#This is a bit dangerous as it would change if El was not choosen to be zero. Perhaps could change it to absolute value.</span>
+    <span class="c1">#This is a bit dangerous as it would change if El was not choosen to be zero. Perhaps could change it to absolute value.</span>
     <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_v1</span><span class="p">)</span> <span class="o">+</span> <span class="n">delta</span>
 
 </div>
@@ -1292,13 +1292,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    delta : float</span>
 <span class="sd">        value used to offset the return threshold.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s">&#39;reset_threshold_th_before should not be called&#39;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;reset_threshold_th_before should not be called&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">threshold_t0</span> <span class="o">+</span> <span class="n">delta</span>
 
 </div>
 <div class="viewcode-block" id="reset_threshold_inf"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_inf">[docs]</a><span class="k">def</span> <span class="nf">reset_threshold_inf</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_v1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Reset the threshold to instantaneous threshold. &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span>
+    <span class="k">return</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span>
 
 </div>
 <div class="viewcode-block" id="reset_threshold_fixed"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_fixed">[docs]</a><span class="k">def</span> <span class="nf">reset_threshold_fixed</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_v1</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -1309,7 +1309,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    value : float</span>
 <span class="sd">        value to return as the reset threshold</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;reset_threshold_fixed should not be called&#39;</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;reset_threshold_fixed should not be called&#39;</span><span class="p">)</span>
     <span class="k">return</span>  <span class="n">value</span>
 
 </div>
@@ -1318,50 +1318,50 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    component and a (voltage) component which are summed.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">get_threshold_components</span><span class="p">()</span>
-    <span class="n">neuron</span><span class="o">.</span><span class="n">add_threshold_components</span><span class="p">(</span> <span class="n">tcs</span><span class="p">[</span><span class="s">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">a_spike</span><span class="p">,</span>  <span class="c">#adding spiking component of threshold ontop of already existent spike component.</span>
-                                     <span class="n">tcs</span><span class="p">[</span><span class="s">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="c">#note these are the same value.</span>
+    <span class="n">neuron</span><span class="o">.</span><span class="n">add_threshold_components</span><span class="p">(</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">a_spike</span><span class="p">,</span>  <span class="c1">#adding spiking component of threshold ontop of already existent spike component.</span>
+                                     <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="c1">#note these are the same value.</span>
 
-    <span class="k">return</span> <span class="n">tcs</span><span class="p">[</span><span class="s">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tcs</span><span class="p">[</span><span class="s">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s">&#39;th_inf&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span>
 
 
-<span class="c">#: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. &#39;voltage_dynamics_method&#39;).</span>
-<span class="c">#Those groups assign each method in this file a string name.  This is used by the GlifNeuron when initializing</span>
-<span class="c">#its dynamics and reset methods.</span></div>
+<span class="c1">#: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. &#39;voltage_dynamics_method&#39;).</span>
+<span class="c1">#Those groups assign each method in this file a string name.  This is used by the GlifNeuron when initializing</span>
+<span class="c1">#its dynamics and reset methods.</span></div>
 <span class="n">METHOD_LIBRARY</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s">&#39;AScurrent_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;exp&#39;</span><span class="p">:</span>    <span class="n">dynamics_AScurrent_exp</span><span class="p">,</span>
-        <span class="s">&#39;vector&#39;</span><span class="p">:</span> <span class="n">dynamics_AScurrent_vector</span><span class="p">,</span>
-        <span class="s">&#39;none&#39;</span><span class="p">:</span>   <span class="n">dynamics_AScurrent_none</span>
+    <span class="s1">&#39;AScurrent_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;exp&#39;</span><span class="p">:</span>    <span class="n">dynamics_AScurrent_exp</span><span class="p">,</span>
+        <span class="s1">&#39;vector&#39;</span><span class="p">:</span> <span class="n">dynamics_AScurrent_vector</span><span class="p">,</span>
+        <span class="s1">&#39;none&#39;</span><span class="p">:</span>   <span class="n">dynamics_AScurrent_none</span>
         <span class="p">},</span>
-    <span class="s">&#39;voltage_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;linear_forward_euler&#39;</span><span class="p">:</span>           <span class="n">dynamics_voltage_linear_forward_euler</span><span class="p">,</span>
-        <span class="s">&#39;quadratic_forward_euler&#39;</span><span class="p">:</span>        <span class="n">dynamics_voltage_quadratic_forward_euler</span><span class="p">,</span>
-        <span class="s">&#39;piecewise_linear_forward_euler&#39;</span><span class="p">:</span> <span class="n">dynamics_voltage_piecewise_linear_forward_euler</span><span class="p">,</span>
-        <span class="s">&#39;linear_exact&#39;</span><span class="p">:</span>                   <span class="n">dynamics_voltage_linear_exact</span><span class="p">,</span>
-        <span class="s">&#39;piecewise_linear_exact&#39;</span><span class="p">:</span>         <span class="n">dynamics_voltage_piecewise_linear_exact</span><span class="p">,</span>
+    <span class="s1">&#39;voltage_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;linear_forward_euler&#39;</span><span class="p">:</span>           <span class="n">dynamics_voltage_linear_forward_euler</span><span class="p">,</span>
+        <span class="s1">&#39;quadratic_forward_euler&#39;</span><span class="p">:</span>        <span class="n">dynamics_voltage_quadratic_forward_euler</span><span class="p">,</span>
+        <span class="s1">&#39;piecewise_linear_forward_euler&#39;</span><span class="p">:</span> <span class="n">dynamics_voltage_piecewise_linear_forward_euler</span><span class="p">,</span>
+        <span class="s1">&#39;linear_exact&#39;</span><span class="p">:</span>                   <span class="n">dynamics_voltage_linear_exact</span><span class="p">,</span>
+        <span class="s1">&#39;piecewise_linear_exact&#39;</span><span class="p">:</span>         <span class="n">dynamics_voltage_piecewise_linear_exact</span><span class="p">,</span>
         <span class="p">},</span>
-    <span class="s">&#39;threshold_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;spike_component&#39;</span><span class="p">:</span>          <span class="n">dynamics_threshold_spike_component</span><span class="p">,</span>
-        <span class="s">&#39;inf&#39;</span><span class="p">:</span>                      <span class="n">dynamics_threshold_inf</span><span class="p">,</span>
-        <span class="s">&#39;three_components_forward&#39;</span><span class="p">:</span> <span class="n">dynamics_threshold_three_components_forward</span><span class="p">,</span>
-        <span class="s">&#39;three_components_exact&#39;</span><span class="p">:</span>   <span class="n">dynamics_threshold_three_components_exact</span>
+    <span class="s1">&#39;threshold_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;spike_component&#39;</span><span class="p">:</span>          <span class="n">dynamics_threshold_spike_component</span><span class="p">,</span>
+        <span class="s1">&#39;inf&#39;</span><span class="p">:</span>                      <span class="n">dynamics_threshold_inf</span><span class="p">,</span>
+        <span class="s1">&#39;three_components_forward&#39;</span><span class="p">:</span> <span class="n">dynamics_threshold_three_components_forward</span><span class="p">,</span>
+        <span class="s1">&#39;three_components_exact&#39;</span><span class="p">:</span>   <span class="n">dynamics_threshold_three_components_exact</span>
         <span class="p">},</span>
-    <span class="s">&#39;AScurrent_reset_method&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;sum&#39;</span><span class="p">:</span>  <span class="n">reset_AScurrent_sum</span><span class="p">,</span>
-        <span class="s">&#39;none&#39;</span><span class="p">:</span> <span class="n">reset_AScurrent_none</span>
+    <span class="s1">&#39;AScurrent_reset_method&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;sum&#39;</span><span class="p">:</span>  <span class="n">reset_AScurrent_sum</span><span class="p">,</span>
+        <span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="n">reset_AScurrent_none</span>
         <span class="p">},</span>
-    <span class="s">&#39;voltage_reset_method&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;v_before&#39;</span><span class="p">:</span>   <span class="n">reset_voltage_v_before</span><span class="p">,</span>
-        <span class="s">&#39;i_v_before&#39;</span><span class="p">:</span> <span class="n">reset_voltage_i_v_before</span><span class="p">,</span>
-        <span class="s">&#39;zero&#39;</span><span class="p">:</span>       <span class="n">reset_voltage_zero</span><span class="p">,</span>
-        <span class="s">&#39;fixed&#39;</span><span class="p">:</span>      <span class="n">reset_voltage_fixed</span>
+    <span class="s1">&#39;voltage_reset_method&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;v_before&#39;</span><span class="p">:</span>   <span class="n">reset_voltage_v_before</span><span class="p">,</span>
+        <span class="s1">&#39;i_v_before&#39;</span><span class="p">:</span> <span class="n">reset_voltage_i_v_before</span><span class="p">,</span>
+        <span class="s1">&#39;zero&#39;</span><span class="p">:</span>       <span class="n">reset_voltage_zero</span><span class="p">,</span>
+        <span class="s1">&#39;fixed&#39;</span><span class="p">:</span>      <span class="n">reset_voltage_fixed</span>
         <span class="p">},</span>
-    <span class="s">&#39;threshold_reset_method&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s">&#39;max_v_th&#39;</span><span class="p">:</span>         <span class="n">reset_threshold_max_v_th</span><span class="p">,</span>
-        <span class="s">&#39;th_before&#39;</span><span class="p">:</span>        <span class="n">reset_threshold_th_before</span><span class="p">,</span>
-        <span class="s">&#39;inf&#39;</span><span class="p">:</span>              <span class="n">reset_threshold_inf</span><span class="p">,</span>
-        <span class="s">&#39;fixed&#39;</span><span class="p">:</span>            <span class="n">reset_threshold_fixed</span><span class="p">,</span>
-        <span class="s">&#39;three_components&#39;</span><span class="p">:</span> <span class="n">reset_threshold_three_components</span>
+    <span class="s1">&#39;threshold_reset_method&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;max_v_th&#39;</span><span class="p">:</span>         <span class="n">reset_threshold_max_v_th</span><span class="p">,</span>
+        <span class="s1">&#39;th_before&#39;</span><span class="p">:</span>        <span class="n">reset_threshold_th_before</span><span class="p">,</span>
+        <span class="s1">&#39;inf&#39;</span><span class="p">:</span>              <span class="n">reset_threshold_inf</span><span class="p">,</span>
+        <span class="s1">&#39;fixed&#39;</span><span class="p">:</span>            <span class="n">reset_threshold_fixed</span><span class="p">,</span>
+        <span class="s1">&#39;three_components&#39;</span><span class="p">:</span> <span class="n">reset_threshold_three_components</span>
         <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
@@ -1434,7 +1434,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

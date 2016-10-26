@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.api.queries.biophysical_api</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">..api</span> <span class="kn">import</span> <span class="n">Api</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -654,11 +654,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 
 <div class="viewcode-block" id="BiophysicalApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi">[docs]</a><span class="k">class</span> <span class="nc">BiophysicalApi</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
-    <span class="n">_NWB_file_type</span> <span class="o">=</span> <span class="s">&#39;NWBDownload&#39;</span>
-    <span class="n">_SWC_file_type</span> <span class="o">=</span> <span class="s">&#39;3DNeuronReconstruction&#39;</span>
-    <span class="n">_MOD_file_type</span> <span class="o">=</span> <span class="s">&#39;BiophysicalModelDescription&#39;</span>
-    <span class="n">_FIT_file_type</span> <span class="o">=</span> <span class="s">&#39;NeuronalModelParameters&#39;</span>
-    <span class="n">_MARKER_file_type</span> <span class="o">=</span> <span class="s">&#39;3DNeuronMarker&#39;</span>
+    <span class="n">_NWB_file_type</span> <span class="o">=</span> <span class="s1">&#39;NWBDownload&#39;</span>
+    <span class="n">_SWC_file_type</span> <span class="o">=</span> <span class="s1">&#39;3DNeuronReconstruction&#39;</span>
+    <span class="n">_MOD_file_type</span> <span class="o">=</span> <span class="s1">&#39;BiophysicalModelDescription&#39;</span>
+    <span class="n">_FIT_file_type</span> <span class="o">=</span> <span class="s1">&#39;NeuronalModelParameters&#39;</span>
+    <span class="n">_MARKER_file_type</span> <span class="o">=</span> <span class="s1">&#39;3DNeuronMarker&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">BiophysicalApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
@@ -668,7 +668,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="bp">None</span>
 
-<div class="viewcode-block" id="BiophysicalApi.build_rma"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.build_rma">[docs]</a>    <span class="k">def</span> <span class="nf">build_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="BiophysicalApi.build_rma"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.build_rma">[docs]</a>    <span class="k">def</span> <span class="nf">build_rma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Construct a query to find all files related to a neuronal model.</span>
 
 <span class="sd">        Parameters</span>
@@ -683,24 +683,24 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        string</span>
 <span class="sd">            RMA query url.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">include_associations</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
-            <span class="s">&#39;neuronal_model_template(well_known_files(well_known_file_type)),&#39;</span><span class="p">,</span>
-            <span class="s">&#39;specimen(ephys_result(well_known_files(well_known_file_type)),&#39;</span><span class="p">,</span>
-            <span class="s">&#39;neuron_reconstructions(well_known_files(well_known_file_type)),&#39;</span><span class="p">,</span>
-            <span class="s">&#39;ephys_sweeps),&#39;</span><span class="p">,</span>
-            <span class="s">&#39;well_known_files(well_known_file_type)&#39;</span><span class="p">])</span>
-        <span class="n">criteria_associations</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
-            <span class="p">(</span><span class="s">&quot;[id$eq</span><span class="si">%d</span><span class="s">],&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">)),</span>
+        <span class="n">include_associations</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s1">&#39;neuronal_model_template(well_known_files(well_known_file_type)),&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;specimen(ephys_result(well_known_files(well_known_file_type)),&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;neuron_reconstructions(well_known_files(well_known_file_type)),&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ephys_sweeps),&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;well_known_files(well_known_file_type)&#39;</span><span class="p">])</span>
+        <span class="n">criteria_associations</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="p">(</span><span class="s2">&quot;[id$eq</span><span class="si">%d</span><span class="s2">],&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">)),</span>
             <span class="n">include_associations</span><span class="p">])</span>
 
-        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span>
-                        <span class="s">&#39;/query.&#39;</span><span class="p">,</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span><span class="p">,</span>
+                        <span class="s1">&#39;/query.&#39;</span><span class="p">,</span>
                         <span class="n">fmt</span><span class="p">,</span>
-                        <span class="s">&#39;?q=&#39;</span><span class="p">,</span>
-                        <span class="s">&#39;model::NeuronalModel,&#39;</span><span class="p">,</span>
-                        <span class="s">&#39;rma::criteria,&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;?q=&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;model::NeuronalModel,&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;rma::criteria,&#39;</span><span class="p">,</span>
                         <span class="n">criteria_associations</span><span class="p">,</span>
-                        <span class="s">&#39;,rma::include,&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;,rma::include,&#39;</span><span class="p">,</span>
                         <span class="n">include_associations</span><span class="p">])</span>
 </div>
 <div class="viewcode-block" id="BiophysicalApi.read_json"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.read_json">[docs]</a>    <span class="k">def</span> <span class="nf">read_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_parsed_data</span><span class="p">):</span>
@@ -718,69 +718,69 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Well known file ids.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&#39;stimulus&#39;</span><span class="p">:</span> <span class="p">{},</span>
-            <span class="s">&#39;morphology&#39;</span><span class="p">:</span> <span class="p">{},</span>
-            <span class="s">&#39;marker&#39;</span><span class="p">:</span> <span class="p">{},</span>
-            <span class="s">&#39;modfiles&#39;</span><span class="p">:</span> <span class="p">{},</span>
-            <span class="s">&#39;fit&#39;</span><span class="p">:</span> <span class="p">{}</span>
+            <span class="s1">&#39;stimulus&#39;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s1">&#39;morphology&#39;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s1">&#39;marker&#39;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s1">&#39;modfiles&#39;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s1">&#39;fit&#39;</span><span class="p">:</span> <span class="p">{}</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">if</span> <span class="s">&#39;msg&#39;</span> <span class="ow">in</span> <span class="n">json_parsed_data</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">neuronal_model</span> <span class="ow">in</span> <span class="n">json_parsed_data</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="s">&#39;well_known_files&#39;</span> <span class="ow">in</span> <span class="n">neuronal_model</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">well_known_file</span> <span class="ow">in</span> <span class="n">neuronal_model</span><span class="p">[</span><span class="s">&#39;well_known_files&#39;</span><span class="p">]:</span>
-                        <span class="k">if</span> <span class="p">(</span><span class="s">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
-                            <span class="s">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
+        <span class="k">if</span> <span class="s1">&#39;msg&#39;</span> <span class="ow">in</span> <span class="n">json_parsed_data</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">neuronal_model</span> <span class="ow">in</span> <span class="n">json_parsed_data</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s1">&#39;well_known_files&#39;</span> <span class="ow">in</span> <span class="n">neuronal_model</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">well_known_file</span> <span class="ow">in</span> <span class="n">neuronal_model</span><span class="p">[</span><span class="s1">&#39;well_known_files&#39;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
+                            <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">is_well_known_file_type</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">,</span>
                                                          <span class="n">BiophysicalApi</span><span class="o">.</span><span class="n">_FIT_file_type</span><span class="p">)):</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s">&#39;fit&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])]</span> <span class="o">=</span> \
-                                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s">&#39;path&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;fit&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])]</span> <span class="o">=</span> \
+                                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
 
-                <span class="k">if</span> <span class="s">&#39;neuronal_model_template&#39;</span> <span class="ow">in</span> <span class="n">neuronal_model</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;neuronal_model_template&#39;</span> <span class="ow">in</span> <span class="n">neuronal_model</span><span class="p">:</span>
                     <span class="n">neuronal_model_template</span> <span class="o">=</span> <span class="n">neuronal_model</span><span class="p">[</span>
-                        <span class="s">&#39;neuronal_model_template&#39;</span><span class="p">]</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="n">neuronal_model_template</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="s">&#39;well_known_files&#39;</span> <span class="ow">in</span> <span class="n">neuronal_model_template</span><span class="p">:</span>
-                        <span class="k">for</span> <span class="n">well_known_file</span> <span class="ow">in</span> <span class="n">neuronal_model_template</span><span class="p">[</span><span class="s">&#39;well_known_files&#39;</span><span class="p">]:</span>
-                            <span class="k">if</span> <span class="p">(</span><span class="s">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
-                                <span class="s">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
+                        <span class="s1">&#39;neuronal_model_template&#39;</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="n">neuronal_model_template</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s1">&#39;well_known_files&#39;</span> <span class="ow">in</span> <span class="n">neuronal_model_template</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">well_known_file</span> <span class="ow">in</span> <span class="n">neuronal_model_template</span><span class="p">[</span><span class="s1">&#39;well_known_files&#39;</span><span class="p">]:</span>
+                            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
+                                <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
                                 <span class="bp">self</span><span class="o">.</span><span class="n">is_well_known_file_type</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">,</span>
                                                              <span class="n">BiophysicalApi</span><span class="o">.</span><span class="n">_MOD_file_type</span><span class="p">)):</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s">&#39;modfiles&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])]</span> <span class="o">=</span> \
-                                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;modfiles&#39;</span><span class="p">,</span>
-                                                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s">&#39;path&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">])</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;modfiles&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])]</span> <span class="o">=</span> \
+                                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;modfiles&#39;</span><span class="p">,</span>
+                                                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">])</span>
 
-                <span class="k">if</span> <span class="s">&#39;specimen&#39;</span> <span class="ow">in</span> <span class="n">neuronal_model</span><span class="p">:</span>
-                    <span class="n">specimen</span> <span class="o">=</span> <span class="n">neuronal_model</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;specimen&#39;</span> <span class="ow">in</span> <span class="n">neuronal_model</span><span class="p">:</span>
+                    <span class="n">specimen</span> <span class="o">=</span> <span class="n">neuronal_model</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">]</span>
 
-                    <span class="k">if</span> <span class="s">&#39;neuron_reconstructions&#39;</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">:</span>
-                        <span class="k">for</span> <span class="n">neuron_reconstruction</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s">&#39;neuron_reconstructions&#39;</span><span class="p">]:</span>
-                            <span class="k">if</span> <span class="s">&#39;well_known_files&#39;</span> <span class="ow">in</span> <span class="n">neuron_reconstruction</span><span class="p">:</span>
-                                <span class="k">for</span> <span class="n">well_known_file</span> <span class="ow">in</span> <span class="n">neuron_reconstruction</span><span class="p">[</span><span class="s">&#39;well_known_files&#39;</span><span class="p">]:</span>
-                                    <span class="k">if</span> <span class="p">(</span><span class="s">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span> <span class="s">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="s1">&#39;neuron_reconstructions&#39;</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">neuron_reconstruction</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s1">&#39;neuron_reconstructions&#39;</span><span class="p">]:</span>
+                            <span class="k">if</span> <span class="s1">&#39;well_known_files&#39;</span> <span class="ow">in</span> <span class="n">neuron_reconstruction</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">well_known_file</span> <span class="ow">in</span> <span class="n">neuron_reconstruction</span><span class="p">[</span><span class="s1">&#39;well_known_files&#39;</span><span class="p">]:</span>
+                                    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span> <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span><span class="p">):</span>
                                         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_well_known_file_type</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">,</span> <span class="n">BiophysicalApi</span><span class="o">.</span><span class="n">_SWC_file_type</span><span class="p">):</span>
-                                            <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s">&#39;morphology&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])]</span> <span class="o">=</span> \
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;morphology&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])]</span> <span class="o">=</span> \
                                                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
-                                                    <span class="n">well_known_file</span><span class="p">[</span><span class="s">&#39;path&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+                                                    <span class="n">well_known_file</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
                                         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_well_known_file_type</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">,</span> <span class="n">BiophysicalApi</span><span class="o">.</span><span class="n">_MARKER_file_type</span><span class="p">):</span>
-                                            <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s">&#39;marker&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])]</span> <span class="o">=</span> \
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;marker&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])]</span> <span class="o">=</span> \
                                                 <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
-                                                    <span class="n">well_known_file</span><span class="p">[</span><span class="s">&#39;path&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
+                                                    <span class="n">well_known_file</span><span class="p">[</span><span class="s1">&#39;path&#39;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
 
-                    <span class="k">if</span> <span class="s">&#39;ephys_result&#39;</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">:</span>
-                        <span class="n">ephys_result</span> <span class="o">=</span> <span class="n">specimen</span><span class="p">[</span><span class="s">&#39;ephys_result&#39;</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="s">&#39;well_known_files&#39;</span> <span class="ow">in</span> <span class="n">ephys_result</span><span class="p">:</span>
-                            <span class="k">for</span> <span class="n">well_known_file</span> <span class="ow">in</span> <span class="n">ephys_result</span><span class="p">[</span><span class="s">&#39;well_known_files&#39;</span><span class="p">]:</span>
-                                <span class="k">if</span> <span class="p">(</span><span class="s">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
-                                    <span class="s">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
+                    <span class="k">if</span> <span class="s1">&#39;ephys_result&#39;</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">:</span>
+                        <span class="n">ephys_result</span> <span class="o">=</span> <span class="n">specimen</span><span class="p">[</span><span class="s1">&#39;ephys_result&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="s1">&#39;well_known_files&#39;</span> <span class="ow">in</span> <span class="n">ephys_result</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">well_known_file</span> <span class="ow">in</span> <span class="n">ephys_result</span><span class="p">[</span><span class="s1">&#39;well_known_files&#39;</span><span class="p">]:</span>
+                                <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
+                                    <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">well_known_file</span> <span class="ow">and</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">is_well_known_file_type</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">,</span> <span class="n">BiophysicalApi</span><span class="o">.</span><span class="n">_NWB_file_type</span><span class="p">)):</span>
-                                        <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])]</span> <span class="o">=</span> \
-                                            <span class="s">&quot;</span><span class="si">%d</span><span class="s">.nwb&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ephys_result</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">well_known_file</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])]</span> <span class="o">=</span> \
+                                            <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">.nwb&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ephys_result</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
 
-                    <span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">]</span>
-                                   <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s">&#39;ephys_sweeps&#39;</span><span class="p">]</span>
-                                   <span class="k">if</span> <span class="n">sweep</span><span class="p">[</span><span class="s">&#39;stimulus_name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;Test&#39;</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span><span class="p">[</span><span class="s1">&#39;sweep_number&#39;</span><span class="p">]</span>
+                                   <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s1">&#39;ephys_sweeps&#39;</span><span class="p">]</span>
+                                   <span class="k">if</span> <span class="n">sweep</span><span class="p">[</span><span class="s1">&#39;stimulus_name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Test&#39;</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span>
 </div>
@@ -799,7 +799,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        read_json: where this helper function is used.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">wkf</span><span class="p">[</span><span class="s">&#39;well_known_file_type&#39;</span><span class="p">][</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span>
+            <span class="k">return</span> <span class="n">wkf</span><span class="p">[</span><span class="s1">&#39;well_known_file_type&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">name</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">False</span>
 </div>
@@ -818,11 +818,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_query</span><span class="p">(</span><span class="n">rma_builder_fn</span><span class="p">,</span> <span class="n">json_traversal_fn</span><span class="p">,</span> <span class="n">neuronal_model_id</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="BiophysicalApi.create_manifest"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.create_manifest">[docs]</a>    <span class="k">def</span> <span class="nf">create_manifest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                        <span class="n">fit_path</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
-                        <span class="n">model_type</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
-                        <span class="n">stimulus_filename</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
-                        <span class="n">swc_morphology_path</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
-                        <span class="n">marker_path</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">fit_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">stimulus_filename</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">swc_morphology_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">marker_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                         <span class="n">sweeps</span><span class="o">=</span><span class="p">[]):</span>
         <span class="sd">&#39;&#39;&#39;Generate a json configuration file with parameters for a</span>
 <span class="sd">        a biophysical experiment.</span>
@@ -839,55 +839,55 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            which sweeps in the stimulus file are to be used.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">[</span><span class="s">&#39;biophys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="s">&#39;model_file&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;manifest.json&#39;</span><span class="p">,</span> <span class="n">fit_path</span><span class="p">],</span>
-            <span class="s">&#39;model_type&#39;</span><span class="p">:</span> <span class="n">model_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;biophys&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span>
+            <span class="s1">&#39;model_file&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;manifest.json&#39;</span><span class="p">,</span> <span class="n">fit_path</span><span class="p">],</span>
+            <span class="s1">&#39;model_type&#39;</span><span class="p">:</span> <span class="n">model_type</span>
         <span class="p">}]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">[</span><span class="s">&#39;runs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="s">&#39;sweeps&#39;</span><span class="p">:</span> <span class="n">sweeps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;runs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span>
+            <span class="s1">&#39;sweeps&#39;</span><span class="p">:</span> <span class="n">sweeps</span>
         <span class="p">}]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">[</span><span class="s">&#39;neuron&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span>
-            <span class="s">&#39;hoc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;stdgui.hoc&#39;</span><span class="p">,</span> <span class="s">&#39;import3d.hoc&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;neuron&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span>
+            <span class="s1">&#39;hoc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;stdgui.hoc&#39;</span><span class="p">,</span> <span class="s1">&#39;import3d.hoc&#39;</span><span class="p">]</span>
         <span class="p">}]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">[</span><span class="s">&#39;manifest&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;manifest&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">{</span>
-                <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;dir&#39;</span><span class="p">,</span>
-                <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="s">&#39;.&#39;</span><span class="p">,</span>
-                <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="s">&#39;BASEDIR&#39;</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dir&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;BASEDIR&#39;</span>
             <span class="p">},</span>
             <span class="p">{</span>
-                <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;dir&#39;</span><span class="p">,</span>
-                <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="s">&#39;work&#39;</span><span class="p">,</span>
-                <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="s">&#39;WORKDIR&#39;</span><span class="p">,</span>
-                <span class="s">&#39;parent&#39;</span><span class="p">:</span> <span class="s">&#39;BASEDIR&#39;</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dir&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="s1">&#39;work&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;WORKDIR&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;parent&#39;</span><span class="p">:</span> <span class="s1">&#39;BASEDIR&#39;</span>
             <span class="p">},</span>
             <span class="p">{</span>
-                <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;file&#39;</span><span class="p">,</span>
-                <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">swc_morphology_path</span><span class="p">,</span>
-                <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="s">&#39;MORPHOLOGY&#39;</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="n">swc_morphology_path</span><span class="p">,</span>
+                <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;MORPHOLOGY&#39;</span>
             <span class="p">},</span>
             <span class="p">{</span>
-                <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;file&#39;</span><span class="p">,</span>
-                <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">marker_path</span><span class="p">,</span>
-                <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="s">&#39;MARKER&#39;</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="n">marker_path</span><span class="p">,</span>
+                <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;MARKER&#39;</span>
             <span class="p">},</span>
             <span class="p">{</span>
-                <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;dir&#39;</span><span class="p">,</span>
-                <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="s">&#39;modfiles&#39;</span><span class="p">,</span>
-                <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="s">&#39;MODFILE_DIR&#39;</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dir&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="s1">&#39;modfiles&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;MODFILE_DIR&#39;</span>
             <span class="p">},</span>
             <span class="p">{</span>
-                <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;file&#39;</span><span class="p">,</span>
-                <span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="s">&#39;NWB&#39;</span><span class="p">,</span>
-                <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">stimulus_filename</span><span class="p">,</span>
-                <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="s">&#39;stimulus_path&#39;</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;NWB&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="n">stimulus_filename</span><span class="p">,</span>
+                <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;stimulus_path&#39;</span>
             <span class="p">},</span>
             <span class="p">{</span>
-                <span class="s">&#39;parent_key&#39;</span><span class="p">:</span> <span class="s">&#39;WORKDIR&#39;</span><span class="p">,</span>
-                <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="s">&#39;file&#39;</span><span class="p">,</span>
-                <span class="s">&#39;format&#39;</span><span class="p">:</span> <span class="s">&#39;NWB&#39;</span><span class="p">,</span>
-                <span class="s">&#39;spec&#39;</span><span class="p">:</span> <span class="n">stimulus_filename</span><span class="p">,</span>
-                <span class="s">&#39;key&#39;</span><span class="p">:</span> <span class="s">&#39;output_path&#39;</span>
+                <span class="s1">&#39;parent_key&#39;</span><span class="p">:</span> <span class="s1">&#39;WORKDIR&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;NWB&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="n">stimulus_filename</span><span class="p">,</span>
+                <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="s1">&#39;output_path&#39;</span>
             <span class="p">}</span>
         <span class="p">]</span>
 </div>
@@ -912,19 +912,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">well_known_file_id_dict</span> <span class="ow">or</span> \
            <span class="p">(</span><span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">well_known_file_id_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())):</span>
-            <span class="k">raise</span><span class="p">(</span><span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No data found for neuronal model id </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span>
+            <span class="k">raise</span><span class="p">(</span><span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No data found for neuronal model id </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span>
                             <span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">)))</span>
 
         <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">working_directory</span><span class="p">)</span>
 
-        <span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_directory</span><span class="p">,</span> <span class="s">&#39;work&#39;</span><span class="p">)</span>
+        <span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_directory</span><span class="p">,</span> <span class="s1">&#39;work&#39;</span><span class="p">)</span>
         <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">work_dir</span><span class="p">)</span>
 
-        <span class="n">modfile_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_directory</span><span class="p">,</span> <span class="s">&#39;modfiles&#39;</span><span class="p">)</span>
+        <span class="n">modfile_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_directory</span><span class="p">,</span> <span class="s1">&#39;modfiles&#39;</span><span class="p">)</span>
         <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">modfile_dir</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">id_dict</span> <span class="ow">in</span> <span class="n">well_known_file_id_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_stimulus</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">key</span> <span class="o">==</span> <span class="s">&#39;stimulus&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_stimulus</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;stimulus&#39;</span><span class="p">):</span>
                 <span class="k">continue</span>
 
             <span class="k">for</span> <span class="n">well_known_id</span><span class="p">,</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">id_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -934,11 +934,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span>
                     <span class="n">well_known_file_url</span><span class="p">,</span> <span class="n">cached_file_path</span><span class="p">)</span>
 
-        <span class="n">fit_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s">&#39;fit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">stimulus_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">swc_morphology_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s">&#39;morphology&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">fit_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;fit&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">stimulus_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">swc_morphology_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;morphology&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">marker_path</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s">&#39;marker&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="s">&#39;marker&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="k">else</span> <span class="s">&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;marker&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;marker&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ids</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
         <span class="n">sweeps</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sweeps</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">create_manifest</span><span class="p">(</span><span class="n">fit_path</span><span class="p">,</span>
@@ -948,8 +948,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                              <span class="n">marker_path</span><span class="p">,</span>
                              <span class="n">sweeps</span><span class="p">)</span>
 
-        <span class="n">manifest_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_directory</span><span class="p">,</span> <span class="s">&#39;manifest.json&#39;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">manifest_path</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">manifest_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">working_directory</span><span class="p">,</span> <span class="s1">&#39;manifest.json&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">manifest_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span></div></div>
 </pre></div>
 
@@ -1021,7 +1021,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

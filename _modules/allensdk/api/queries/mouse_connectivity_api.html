@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.api.queries.mouse_connectivity_api</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
 <span class="kn">from</span> <span class="nn">.grid_data_api</span> <span class="kn">import</span> <span class="n">GridDataApi</span>
@@ -664,12 +664,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MouseConnectivityApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">)</span>
 
-    <span class="n">AVERAGE_TEMPLATE</span> <span class="o">=</span> <span class="s">&#39;average_template&#39;</span>
-    <span class="n">ARA_NISSL</span> <span class="o">=</span> <span class="s">&#39;ara_nissl&#39;</span>
-    <span class="n">MOUSE_2011</span> <span class="o">=</span> <span class="s">&#39;annotation/mouse_2011&#39;</span>
-    <span class="n">DEVMOUSE_2012</span> <span class="o">=</span> <span class="s">&#39;annotation/devmouse_2012&#39;</span>
-    <span class="n">CCF_2015</span> <span class="o">=</span> <span class="s">&#39;annotation/ccf_2015&#39;</span>
-    <span class="n">CCF_2016</span> <span class="o">=</span> <span class="s">&#39;annotation/ccf_2016&#39;</span>
+    <span class="n">AVERAGE_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;average_template&#39;</span>
+    <span class="n">ARA_NISSL</span> <span class="o">=</span> <span class="s1">&#39;ara_nissl&#39;</span>
+    <span class="n">MOUSE_2011</span> <span class="o">=</span> <span class="s1">&#39;annotation/mouse_2011&#39;</span>
+    <span class="n">DEVMOUSE_2012</span> <span class="o">=</span> <span class="s1">&#39;annotation/devmouse_2012&#39;</span>
+    <span class="n">CCF_2015</span> <span class="o">=</span> <span class="s1">&#39;annotation/ccf_2015&#39;</span>
+    <span class="n">CCF_2016</span> <span class="o">=</span> <span class="s1">&#39;annotation/ccf_2016&#39;</span>
     <span class="n">CCF_VERSION_DEFAULT</span> <span class="o">=</span> <span class="n">CCF_2016</span>
 
     <span class="n">VOXEL_RESOLUTION_10_MICRONS</span> <span class="o">=</span> <span class="mi">10</span>
@@ -704,7 +704,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">pass</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">download_volumetric_data</span><span class="p">(</span><span class="n">ccf_version</span><span class="p">,</span>
-                                      <span class="s">&#39;annotation_</span><span class="si">%d</span><span class="s">.nrrd&#39;</span> <span class="o">%</span> <span class="n">resolution</span><span class="p">,</span>
+                                      <span class="s1">&#39;annotation_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span> <span class="o">%</span> <span class="n">resolution</span><span class="p">,</span>
                                       <span class="n">save_file_path</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
 
         <span class="n">annotation_data</span><span class="p">,</span> <span class="n">annotation_image</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -730,7 +730,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">pass</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">download_volumetric_data</span><span class="p">(</span><span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">AVERAGE_TEMPLATE</span><span class="p">,</span>
-                                      <span class="s">&#39;average_template_</span><span class="si">%d</span><span class="s">.nrrd&#39;</span> <span class="o">%</span> <span class="n">resolution</span><span class="p">,</span>
+                                      <span class="s1">&#39;average_template_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span> <span class="o">%</span> <span class="n">resolution</span><span class="p">,</span>
                                       <span class="n">save_file_path</span><span class="o">=</span><span class="n">file_name</span><span class="p">)</span>
 
         <span class="n">annotation_data</span><span class="p">,</span> <span class="n">annotation_image</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -753,18 +753,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        url : string</span>
 <span class="sd">            The constructed URL</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">criteria_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;[failed$eqfalse]&#39;</span><span class="p">,</span>
-                         <span class="s">&#39;products[id$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">PRODUCT_IDS</span><span class="p">))]</span>
+        <span class="n">criteria_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;[failed$eqfalse]&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;products[id$in</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">PRODUCT_IDS</span><span class="p">))]</span>
 
         <span class="k">if</span> <span class="n">structure_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
                 <span class="n">structure_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">structure_ids</span><span class="p">]</span>
-            <span class="n">criteria_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;[id$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">criteria_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;[id$in</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
                                                         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">structure_ids</span><span class="p">))</span>
 
-        <span class="n">criteria_string</span> <span class="o">=</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">criteria_list</span><span class="p">)</span>
+        <span class="n">criteria_string</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">criteria_list</span><span class="p">)</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;SectionDataSet&#39;</span><span class="p">,</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;SectionDataSet&#39;</span><span class="p">,</span>
                                 <span class="n">criteria</span><span class="o">=</span><span class="n">criteria_string</span><span class="p">,</span>
                                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
@@ -772,44 +772,44 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="MouseConnectivityApi.get_manual_injection_summary"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_manual_injection_summary">[docs]</a>    <span class="k">def</span> <span class="nf">get_manual_injection_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Retrieve manual injection summary. &#39;&#39;&#39;</span>
 
-        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&#39;[id$in</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s1">&#39;[id$in</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
 
-        <span class="n">include</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;specimen(donor(transgenic_mouse(transgenic_lines)),&#39;</span><span class="p">,</span>
-                   <span class="s">&#39;injections(structure,age)),&#39;</span><span class="p">,</span>
-                   <span class="s">&#39;equalization,products&#39;</span><span class="p">]</span>
+        <span class="n">include</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;specimen(donor(transgenic_mouse(transgenic_lines)),&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;injections(structure,age)),&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;equalization,products&#39;</span><span class="p">]</span>
 
-        <span class="n">only</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">,</span>
-                <span class="s">&#39;failed&#39;</span><span class="p">,</span>
-                <span class="s">&#39;storage_directory&#39;</span><span class="p">,</span>
-                <span class="s">&#39;red_lower&#39;</span><span class="p">,</span>
-                <span class="s">&#39;red_upper&#39;</span><span class="p">,</span>
-                <span class="s">&#39;green_lower&#39;</span><span class="p">,</span>
-                <span class="s">&#39;green_upper&#39;</span><span class="p">,</span>
-                <span class="s">&#39;blue_lower&#39;</span><span class="p">,</span>
-                <span class="s">&#39;blue_upper&#39;</span><span class="p">,</span>
-                <span class="s">&#39;products.id&#39;</span><span class="p">,</span>
-                <span class="s">&#39;specimen_id&#39;</span><span class="p">,</span>
-                <span class="s">&#39;structure_id&#39;</span><span class="p">,</span>
-                <span class="s">&#39;reference_space_id&#39;</span><span class="p">,</span>
-                <span class="s">&#39;primary_injection_structure_id&#39;</span><span class="p">,</span>
-                <span class="s">&#39;registration_point&#39;</span><span class="p">,</span>
-                <span class="s">&#39;coordinates_ap&#39;</span><span class="p">,</span>
-                <span class="s">&#39;coordinates_dv&#39;</span><span class="p">,</span>
-                <span class="s">&#39;coordinates_ml&#39;</span><span class="p">,</span>
-                <span class="s">&#39;angle&#39;</span><span class="p">,</span>
-                <span class="s">&#39;sex&#39;</span><span class="p">,</span>
-                <span class="s">&#39;strain&#39;</span><span class="p">,</span>
-                <span class="s">&#39;injection_materials&#39;</span><span class="p">,</span>
-                <span class="s">&#39;acronym&#39;</span><span class="p">,</span>
-                <span class="s">&#39;structures.name&#39;</span><span class="p">,</span>
-                <span class="s">&#39;days&#39;</span><span class="p">,</span>
-                <span class="s">&#39;transgenic_mice.name&#39;</span><span class="p">,</span>
-                <span class="s">&#39;transgenic_lines.name&#39;</span><span class="p">,</span>
-                <span class="s">&#39;transgenic_lines.description&#39;</span><span class="p">,</span>
-                <span class="s">&#39;transgenic_lines.id&#39;</span><span class="p">,</span>
-                <span class="s">&#39;donors.id&#39;</span><span class="p">]</span>
+        <span class="n">only</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;failed&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;storage_directory&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;red_lower&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;red_upper&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;green_lower&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;green_upper&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;blue_lower&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;blue_upper&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;products.id&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;specimen_id&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;structure_id&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;reference_space_id&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;primary_injection_structure_id&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;registration_point&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;coordinates_ap&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;coordinates_dv&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;coordinates_ml&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;angle&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;sex&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;strain&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;injection_materials&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;acronym&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;structures.name&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;days&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;transgenic_mice.name&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;transgenic_lines.name&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;transgenic_lines.description&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;transgenic_lines.id&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;donors.id&#39;</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;SectionDataSet&#39;</span><span class="p">,</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;SectionDataSet&#39;</span><span class="p">,</span>
                                 <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
                                 <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span>
                                 <span class="n">only</span><span class="o">=</span><span class="n">only</span><span class="p">)</span>
@@ -817,13 +817,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="MouseConnectivityApi.get_experiment_detail"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_experiment_detail">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_detail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Retrieve the experiments data.&#39;&#39;&#39;</span>
 
-        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&#39;[id$eq</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
-        <span class="n">include</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;specimen(stereotaxic_injections(primary_injection_structure,structures,stereotaxic_injection_coordinates)),&#39;</span><span class="p">,</span>
-                   <span class="s">&#39;equalization,&#39;</span><span class="p">,</span>
-                   <span class="s">&#39;sub_images&#39;</span><span class="p">]</span>
-        <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;&#39;sub_images.section_number$asc&#39;&quot;</span><span class="p">]</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s1">&#39;[id$eq</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
+        <span class="n">include</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;specimen(stereotaxic_injections(primary_injection_structure,structures,stereotaxic_injection_coordinates)),&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;equalization,&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;sub_images&#39;</span><span class="p">]</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&#39;sub_images.section_number$asc&#39;&quot;</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;SectionDataSet&#39;</span><span class="p">,</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;SectionDataSet&#39;</span><span class="p">,</span>
                                 <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
                                 <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span>
                                 <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
@@ -847,11 +847,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        Download the image using :py:meth:`allensdk.api.queries.image_download_api.ImageDownloadApi.download_section_image`</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">criteria</span> <span class="o">=</span> <span class="s">&#39;[id$eq</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
-        <span class="n">include</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;equalization,sub_images[section_number$eq</span><span class="si">%d</span><span class="s">]&#39;</span> <span class="o">%</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="s1">&#39;[id$eq</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">experiment_id</span><span class="p">)</span>
+        <span class="n">include</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;equalization,sub_images[section_number$eq</span><span class="si">%d</span><span class="s1">]&#39;</span> <span class="o">%</span>
                    <span class="p">(</span><span class="n">section_number</span><span class="p">)]</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;SectionDataSet&#39;</span><span class="p">,</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;SectionDataSet&#39;</span><span class="p">,</span>
                                 <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">,</span>
                                 <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">)</span>
 </div>
@@ -882,15 +882,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">voxel_resolution</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">VOXEL_RESOLUTION_10_MICRONS</span>
 
         <span class="k">if</span> <span class="n">release</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">release</span> <span class="o">=</span> <span class="s">&#39;current-release&#39;</span>
+            <span class="n">release</span> <span class="o">=</span> <span class="s1">&#39;current-release&#39;</span>
 
         <span class="k">if</span> <span class="n">coordinate_framework</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">coordinate_framework</span> <span class="o">=</span> <span class="s">&#39;mouse_ccf&#39;</span>
+            <span class="n">coordinate_framework</span> <span class="o">=</span> <span class="s1">&#39;mouse_ccf&#39;</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">informatics_archive_endpoint</span><span class="p">,</span>
-                       <span class="s">&#39;/</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">/&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">release</span><span class="p">,</span> <span class="n">coordinate_framework</span><span class="p">),</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">informatics_archive_endpoint</span><span class="p">,</span>
+                       <span class="s1">&#39;/</span><span class="si">%s</span><span class="s1">/</span><span class="si">%s</span><span class="s1">/&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">release</span><span class="p">,</span> <span class="n">coordinate_framework</span><span class="p">),</span>
                        <span class="n">data_path</span><span class="p">,</span>
-                       <span class="s">&#39;/&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;/&#39;</span><span class="p">,</span>
                        <span class="n">file_name</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">url</span>
@@ -930,7 +930,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">save_file_path</span> <span class="o">=</span> <span class="n">file_name</span>
 
         <span class="k">if</span> <span class="n">save_file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">save_file_path</span> <span class="o">=</span> <span class="s">&#39;volumetric_data.nrrd&#39;</span>
+            <span class="n">save_file_path</span> <span class="o">=</span> <span class="s1">&#39;volumetric_data.nrrd&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">save_file_path</span><span class="p">)</span>
 </div>
@@ -946,7 +946,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">data_set_id</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">save_file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">save_file_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_set_id</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.zip&#39;</span>
+            <span class="n">save_file_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_set_id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.zip&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">well_known_file_url</span><span class="p">,</span> <span class="n">save_file_path</span><span class="p">)</span>
 </div>
@@ -966,11 +966,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        for additional documentation.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">criteria</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;well_known_file_type&#39;</span><span class="p">,</span>
-                    <span class="s">&quot;[name$eq&#39;ImagesResampledTo25MicronARA&#39;]&quot;</span><span class="p">,</span>
-                    <span class="s">&quot;[attachable_id$eq</span><span class="si">%d</span><span class="s">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data_set_id</span><span class="p">)]</span>
+        <span class="n">criteria</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;well_known_file_type&#39;</span><span class="p">,</span>
+                    <span class="s2">&quot;[name$eq&#39;ImagesResampledTo25MicronARA&#39;]&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;[attachable_id$eq</span><span class="si">%d</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data_set_id</span><span class="p">)]</span>
 
-        <span class="n">model_stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_stage</span><span class="p">(</span><span class="s">&#39;WellKnownFile&#39;</span><span class="p">,</span>
+        <span class="n">model_stage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_stage</span><span class="p">(</span><span class="s1">&#39;WellKnownFile&#39;</span><span class="p">,</span>
                                        <span class="n">criteria</span><span class="o">=</span><span class="n">criteria</span><span class="p">)</span>
 
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_query_url</span><span class="p">([</span><span class="n">model_stage</span><span class="p">])</span>
@@ -988,7 +988,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">download_link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">build_reference_aligned_image_channel_volumes_url</span><span class="p">,</span>
                                       <span class="k">lambda</span> <span class="n">parsed_json</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span>
-                                          <span class="n">parsed_json</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;download_link&#39;</span><span class="p">]),</span>
+                                          <span class="n">parsed_json</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;download_link&#39;</span><span class="p">]),</span>
                                       <span class="n">data_set_id</span><span class="p">)</span>
 
         <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="n">download_link</span>
@@ -1030,7 +1030,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">tuples</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_query</span><span class="p">(</span><span class="s">&#39;mouse_connectivity_injection_structure&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">tuples</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_query</span><span class="p">(</span><span class="s1">&#39;mouse_connectivity_injection_structure&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">tuples</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MouseConnectivityApi.experiment_spatial_search"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_spatial_search">[docs]</a>    <span class="k">def</span> <span class="nf">experiment_spatial_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Displays all SectionDataSets</span>
@@ -1066,7 +1066,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">tuples</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_query</span><span class="p">(</span><span class="s">&#39;mouse_connectivity_target_spatial&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">tuples</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_query</span><span class="p">(</span><span class="s1">&#39;mouse_connectivity_target_spatial&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">tuples</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MouseConnectivityApi.experiment_injection_coordinate_search"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_injection_coordinate_search">[docs]</a>    <span class="k">def</span> <span class="nf">experiment_injection_coordinate_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;User specifies a seed location within the 3D reference space.</span>
@@ -1097,7 +1097,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">tuples</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_query</span><span class="p">(</span><span class="s">&#39;mouse_connectivity_injection_coordinate&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">tuples</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_query</span><span class="p">(</span><span class="s1">&#39;mouse_connectivity_injection_coordinate&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">tuples</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MouseConnectivityApi.experiment_correlation_search"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.experiment_correlation_search">[docs]</a>    <span class="k">def</span> <span class="nf">experiment_correlation_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Select a seed experiment and a domain over</span>
@@ -1132,7 +1132,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">tuples</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_query</span><span class="p">(</span><span class="s">&#39;mouse_connectivity_correlation&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">tuples</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_query</span><span class="p">(</span><span class="s1">&#39;mouse_connectivity_correlation&#39;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">tuples</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MouseConnectivityApi.get_structure_unionizes"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_structure_unionizes">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_unionizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                 <span class="n">experiment_ids</span><span class="p">,</span>
@@ -1145,46 +1145,46 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                 <span class="n">debug</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                 <span class="n">order</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
 
-        <span class="n">experiment_filter</span> <span class="o">=</span> <span class="s">&#39;[section_data_set_id$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span>\
-                            <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">experiment_ids</span><span class="p">)</span>
+        <span class="n">experiment_filter</span> <span class="o">=</span> <span class="s1">&#39;[section_data_set_id$in</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span>\
+                            <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">experiment_ids</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">is_injection</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">is_injection_filter</span> <span class="o">=</span> <span class="s">&#39;[is_injection$eqtrue]&#39;</span>
+            <span class="n">is_injection_filter</span> <span class="o">=</span> <span class="s1">&#39;[is_injection$eqtrue]&#39;</span>
         <span class="k">elif</span> <span class="n">is_injection</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
-            <span class="n">is_injection_filter</span> <span class="o">=</span> <span class="s">&#39;[is_injection$eqfalse]&#39;</span>
+            <span class="n">is_injection_filter</span> <span class="o">=</span> <span class="s1">&#39;[is_injection$eqfalse]&#39;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">is_injection_filter</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="n">is_injection_filter</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">normalized_projection_volume_limit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">volume_filter</span> <span class="o">=</span> <span class="s">&#39;[normalized_projection_volume$gt</span><span class="si">%f</span><span class="s">]&#39;</span> <span class="o">%</span>\
+            <span class="n">volume_filter</span> <span class="o">=</span> <span class="s1">&#39;[normalized_projection_volume$gt</span><span class="si">%f</span><span class="s1">]&#39;</span> <span class="o">%</span>\
                             <span class="p">(</span><span class="n">normalized_projection_volume_limit</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">volume_filter</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="n">volume_filter</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">hemisphere_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">hemisphere_filter</span> <span class="o">=</span> <span class="s">&#39;[hemisphere_id$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span>\
-                <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hemisphere_ids</span><span class="p">)</span>
+            <span class="n">hemisphere_filter</span> <span class="o">=</span> <span class="s1">&#39;[hemisphere_id$in</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span>\
+                <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">hemisphere_ids</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">hemisphere_filter</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="n">hemisphere_filter</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">structure_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">structure_filter</span> <span class="o">=</span> <span class="s">&quot;,structure[name$eq&#39;</span><span class="si">%s</span><span class="s">&#39;]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">structure_name</span><span class="p">)</span>
+            <span class="n">structure_filter</span> <span class="o">=</span> <span class="s2">&quot;,structure[name$eq&#39;</span><span class="si">%s</span><span class="s2">&#39;]&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">structure_name</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">structure_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">structure_filter</span> <span class="o">=</span> <span class="s">&#39;[structure_id$in</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span>\
-                               <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">structure_ids</span><span class="p">)</span>
+            <span class="n">structure_filter</span> <span class="o">=</span> <span class="s1">&#39;[structure_id$in</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span>\
+                               <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">structure_ids</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">structure_filter</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+            <span class="n">structure_filter</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span>
-            <span class="s">&#39;ProjectionStructureUnionize&#39;</span><span class="p">,</span>
-            <span class="n">criteria</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">experiment_filter</span><span class="p">,</span>
+            <span class="s1">&#39;ProjectionStructureUnionize&#39;</span><span class="p">,</span>
+            <span class="n">criteria</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">experiment_filter</span><span class="p">,</span>
                               <span class="n">is_injection_filter</span><span class="p">,</span>
                               <span class="n">volume_filter</span><span class="p">,</span>
                               <span class="n">hemisphere_filter</span><span class="p">,</span>
                               <span class="n">structure_filter</span><span class="p">]),</span>
             <span class="n">include</span><span class="o">=</span><span class="n">include</span><span class="p">,</span>
             <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span>
-            <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span>
+            <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
             <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">,</span>
             <span class="n">count</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 </div>
@@ -1222,13 +1222,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="c"># find all voxels with injection_fraction &gt; 0</span>
+        <span class="c1"># find all voxels with injection_fraction &gt; 0</span>
         <span class="n">injection_voxels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">injection_fraction</span><span class="p">)</span>
         <span class="n">injection_density_computed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">injection_density</span><span class="p">[</span><span class="n">injection_voxels</span><span class="p">],</span>
                                                  <span class="n">injection_fraction</span><span class="p">[</span><span class="n">injection_voxels</span><span class="p">])</span>
         <span class="n">sum_density</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">injection_density_computed</span><span class="p">)</span>
 
-        <span class="c"># compute centroid in CCF coordinates</span>
+        <span class="c1"># compute centroid in CCF coordinates</span>
         <span class="k">if</span> <span class="n">sum_density</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">centroid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">injection_density_computed</span><span class="p">,</span>
                               <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">injection_voxels</span><span class="p">))</span> <span class="o">/</span> <span class="n">sum_density</span> <span class="o">*</span> <span class="n">resolution</span>
@@ -1306,7 +1306,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

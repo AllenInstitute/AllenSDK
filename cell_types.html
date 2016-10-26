@@ -29,17 +29,17 @@
     <link rel="prev" title="Brain Observatory" href="brain_observatory.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -181,11 +181,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -609,7 +609,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -622,7 +622,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -666,18 +666,18 @@ started with analysis:</p>
 in the Allen Cell Types Database.  The following example demonstrates how to download meta data for
 all cells with 3D reconstructions, then download the reconstruction and electrophysiology recordings
 for one of those cells:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.cell_types_api</span> <span class="kn">import</span> <span class="n">CellTypesApi</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.cell_types_api</span> <span class="kn">import</span> <span class="n">CellTypesApi</span>
 
 <span class="n">ct</span> <span class="o">=</span> <span class="n">CellTypesApi</span><span class="p">()</span>
 
-<span class="c"># a list of dictionaries containing metadata for cells with reconstructions</span>
+<span class="c1"># a list of dictionaries containing metadata for cells with reconstructions</span>
 <span class="n">cells</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">list_cells</span><span class="p">(</span><span class="n">require_reconstruction</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
-<span class="c"># download the electrophysiology data for one cell</span>
-<span class="n">ct</span><span class="o">.</span><span class="n">save_ephys_data</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">],</span> <span class="s">&#39;example.nwb&#39;</span><span class="p">)</span>
+<span class="c1"># download the electrophysiology data for one cell</span>
+<span class="n">ct</span><span class="o">.</span><span class="n">save_ephys_data</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="s1">&#39;example.nwb&#39;</span><span class="p">)</span>
 
-<span class="c"># download the reconstruction for the same cell</span>
-<span class="n">ct</span><span class="o">.</span><span class="n">save_reconstruction</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">],</span> <span class="s">&#39;example.swc&#39;</span><span class="p">)</span>
+<span class="c1"># download the reconstruction for the same cell</span>
+<span class="n">ct</span><span class="o">.</span><span class="n">save_reconstruction</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="s1">&#39;example.swc&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -688,18 +688,18 @@ for one of those cells:</p>
 about file names and directories.  It also takes care of knowing if you&#8217;ve already downloaded some files and reads
 them from disk instead of downloading them again.  The following example demonstrates how to download meta data for
 all cells with 3D reconstructions:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.core.cell_types_cache</span> <span class="kn">import</span> <span class="n">CellTypesCache</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.core.cell_types_cache</span> <span class="kn">import</span> <span class="n">CellTypesCache</span>
 
 <span class="n">ctc</span> <span class="o">=</span> <span class="n">CellTypesCache</span><span class="p">()</span>
 
-<span class="c"># a list of cell metadata for cells with reconstructions, download if necessary</span>
+<span class="c1"># a list of cell metadata for cells with reconstructions, download if necessary</span>
 <span class="n">cells</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_cells</span><span class="p">(</span><span class="n">require_reconstruction</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
-<span class="c"># open the electrophysiology data of one cell, download if necessary</span>
-<span class="n">data_set</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_ephys_data</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
+<span class="c1"># open the electrophysiology data of one cell, download if necessary</span>
+<span class="n">data_set</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_ephys_data</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
 
-<span class="c"># read the reconstruction, download if necessary</span>
-<span class="n">reconstruction</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_reconstruction</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
+<span class="c1"># read the reconstruction, download if necessary</span>
+<span class="n">reconstruction</span> <span class="o">=</span> <span class="n">ctc</span><span class="o">.</span><span class="n">get_reconstruction</span><span class="p">(</span><span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -708,30 +708,30 @@ all cells with 3D reconstructions:</p>
 <p>The <tt class="xref py py-class docutils literal"><span class="pre">EphysFeatureExtractor</span></tt> class calculates electrophysiology
 features from cell recordings.  <a class="reference internal" href="allensdk.ephys.html#allensdk.ephys.extract_cell_features.extract_cell_features" title="allensdk.ephys.extract_cell_features.extract_cell_features"><tt class="xref py py-func docutils literal"><span class="pre">extract_cell_features()</span></tt></a> can
 be used to extract the precise feature values available in the Cell Types Database:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.cell_types_api</span> <span class="kn">import</span> <span class="n">CellTypesApi</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.cell_types_api</span> <span class="kn">import</span> <span class="n">CellTypesApi</span>
 <span class="kn">from</span> <span class="nn">allensdk.ephys.extract_cell_features</span> <span class="kn">import</span> <span class="n">extract_cell_features</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> <span class="n">NwbDataSet</span>
 
-<span class="c"># pick a cell to analyze</span>
+<span class="c1"># pick a cell to analyze</span>
 <span class="n">specimen_id</span> <span class="o">=</span> <span class="mi">324257146</span>
-<span class="n">nwb_file</span> <span class="o">=</span> <span class="s">&#39;ephys.nwb&#39;</span>
+<span class="n">nwb_file</span> <span class="o">=</span> <span class="s1">&#39;ephys.nwb&#39;</span>
 
-<span class="c"># download the ephys data and sweep metadata</span>
+<span class="c1"># download the ephys data and sweep metadata</span>
 <span class="n">cta</span> <span class="o">=</span> <span class="n">CellTypesApi</span><span class="p">()</span>
 <span class="n">sweeps</span> <span class="o">=</span> <span class="n">cta</span><span class="o">.</span><span class="n">get_ephys_sweeps</span><span class="p">(</span><span class="n">specimen_id</span><span class="p">)</span>
 <span class="n">cta</span><span class="o">.</span><span class="n">save_ephys_data</span><span class="p">(</span><span class="n">specimen_id</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">)</span>
 
-<span class="c"># group the sweeps by stimulus </span>
+<span class="c1"># group the sweeps by stimulus </span>
 <span class="n">sweep_numbers</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">sweeps</span><span class="p">:</span>
-    <span class="n">sweep_numbers</span><span class="p">[</span><span class="n">sweep</span><span class="p">[</span><span class="s">&#39;stimulus_name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sweep</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">])</span>
+    <span class="n">sweep_numbers</span><span class="p">[</span><span class="n">sweep</span><span class="p">[</span><span class="s1">&#39;stimulus_name&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sweep</span><span class="p">[</span><span class="s1">&#39;sweep_number&#39;</span><span class="p">])</span>
 
-<span class="c"># calculate features</span>
+<span class="c1"># calculate features</span>
 <span class="n">cell_features</span> <span class="o">=</span> <span class="n">extract_cell_features</span><span class="p">(</span><span class="n">NwbDataSet</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">),</span>
-                                      <span class="n">sweep_numbers</span><span class="p">[</span><span class="s">&#39;Ramp&#39;</span><span class="p">],</span>
-                                      <span class="n">sweep_numbers</span><span class="p">[</span><span class="s">&#39;Short Square&#39;</span><span class="p">],</span>
-                                      <span class="n">sweep_numbers</span><span class="p">[</span><span class="s">&#39;Long Square&#39;</span><span class="p">])</span>
+                                      <span class="n">sweep_numbers</span><span class="p">[</span><span class="s1">&#39;Ramp&#39;</span><span class="p">],</span>
+                                      <span class="n">sweep_numbers</span><span class="p">[</span><span class="s1">&#39;Short Square&#39;</span><span class="p">],</span>
+                                      <span class="n">sweep_numbers</span><span class="p">[</span><span class="s1">&#39;Long Square&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -814,27 +814,27 @@ be used to extract the precise feature values available in the Cell Types Databa
 </tbody>
 </table>
 <p>The Allen SDK comes with a <a class="reference internal" href="allensdk.core.html#module-allensdk.core.swc" title="allensdk.core.swc"><tt class="xref py py-mod docutils literal"><span class="pre">swc</span></tt></a> Python module that provides helper functions and classes for manipulating SWC files.  Consider the following example:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">allensdk.core.swc</span> <span class="kn">as</span> <span class="nn">swc</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">allensdk.core.swc</span> <span class="kn">as</span> <span class="nn">swc</span>
 
-<span class="n">file_name</span> <span class="o">=</span> <span class="s">&#39;example.swc&#39;</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;example.swc&#39;</span>
 <span class="n">morphology</span> <span class="o">=</span> <span class="n">swc</span><span class="o">.</span><span class="n">read_swc</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
-<span class="c"># subsample the morphology 3x. root, soma, junctions, and the first child of the root are preserved.</span>
+<span class="c1"># subsample the morphology 3x. root, soma, junctions, and the first child of the root are preserved.</span>
 <span class="n">sparse_morphology</span> <span class="o">=</span> <span class="n">morphology</span><span class="o">.</span><span class="n">sparsify</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 
-<span class="c"># compartments in the order that they were specified in the file</span>
+<span class="c1"># compartments in the order that they were specified in the file</span>
 <span class="n">compartment_list</span> <span class="o">=</span> <span class="n">sparse_morphology</span><span class="o">.</span><span class="n">compartment_list</span>
 
-<span class="c"># a dictionary of compartments indexed by compartment id</span>
+<span class="c1"># a dictionary of compartments indexed by compartment id</span>
 <span class="n">compartments_by_id</span> <span class="o">=</span> <span class="n">sparse_morphology</span><span class="o">.</span><span class="n">compartment_index</span>
 
-<span class="c"># the root soma compartment </span>
+<span class="c1"># the root soma compartment </span>
 <span class="n">soma</span> <span class="o">=</span> <span class="n">morphology</span><span class="o">.</span><span class="n">soma</span>
 
-<span class="c"># all compartments are dictionaries of compartment properties</span>
-<span class="c"># compartments also keep track of ids of their children</span>
+<span class="c1"># all compartments are dictionaries of compartment properties</span>
+<span class="c1"># compartments also keep track of ids of their children</span>
 <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">morphology</span><span class="o">.</span><span class="n">children_of</span><span class="p">(</span><span class="n">soma</span><span class="p">):</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">child</span><span class="p">[</span><span class="s">&#39;x&#39;</span><span class="p">],</span> <span class="n">child</span><span class="p">[</span><span class="s">&#39;y&#39;</span><span class="p">],</span> <span class="n">child</span><span class="p">[</span><span class="s">&#39;z&#39;</span><span class="p">],</span> <span class="n">child</span><span class="p">[</span><span class="s">&#39;radius&#39;</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">child</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">child</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">child</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">],</span> <span class="n">child</span><span class="p">[</span><span class="s1">&#39;radius&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -854,29 +854,29 @@ voltage response is recorded.  The file stores both stimulus and response for
 several experimental trials, here called &#8220;sweeps.&#8221;  The following code snippet
 demonstrates how to extract a sweep&#8217;s stimulus, response, sampling rate,
 and estimated spike times:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> <span class="n">NwbDataSet</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> <span class="n">NwbDataSet</span>
 
-<span class="n">file_name</span> <span class="o">=</span> <span class="s">&#39;example.nwb&#39;</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;example.nwb&#39;</span>
 <span class="n">data_set</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
 <span class="n">sweep_numbers</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_sweep_numbers</span><span class="p">()</span>
 <span class="n">sweep_number</span> <span class="o">=</span> <span class="n">sweep_numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> 
 <span class="n">sweep_data</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_sweep</span><span class="p">(</span><span class="n">sweep_number</span><span class="p">)</span>
 
-<span class="c"># spike times are in seconds relative to the start of the sweep</span>
+<span class="c1"># spike times are in seconds relative to the start of the sweep</span>
 <span class="n">spike_times</span> <span class="o">=</span> <span class="n">data_set</span><span class="o">.</span><span class="n">get_spike_times</span><span class="p">(</span><span class="n">sweep_number</span><span class="p">)</span>
 
-<span class="c"># stimulus is a numpy array in amps</span>
-<span class="n">stimulus</span> <span class="o">=</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">]</span>
+<span class="c1"># stimulus is a numpy array in amps</span>
+<span class="n">stimulus</span> <span class="o">=</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span>
 
-<span class="c"># response is a numpy array in volts</span>
-<span class="n">reponse</span> <span class="o">=</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s">&#39;response&#39;</span><span class="p">]</span>
+<span class="c1"># response is a numpy array in volts</span>
+<span class="n">reponse</span> <span class="o">=</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">]</span>
 
-<span class="c"># sampling rate is in Hz</span>
-<span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s">&#39;sampling_rate&#39;</span><span class="p">]</span>
+<span class="c1"># sampling rate is in Hz</span>
+<span class="n">sampling_rate</span> <span class="o">=</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s1">&#39;sampling_rate&#39;</span><span class="p">]</span>
 
-<span class="c"># start/stop indices that exclude the experimental test pulse (if applicable)</span>
-<span class="n">index_range</span> <span class="o">=</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s">&#39;index_range&#39;</span><span class="p">]</span>
+<span class="c1"># start/stop indices that exclude the experimental test pulse (if applicable)</span>
+<span class="n">index_range</span> <span class="o">=</span> <span class="n">sweep_data</span><span class="p">[</span><span class="s1">&#39;index_range&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -957,7 +957,7 @@ and estimated spike times:</p>
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

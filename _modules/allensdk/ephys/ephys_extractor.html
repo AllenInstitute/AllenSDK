@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.ephys.ephys_extractor</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">DataFrame</span>
@@ -654,7 +654,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="kn">import</span> <span class="nn">ephys_features</span> <span class="kn">as</span> <span class="nn">ft</span>
 
-<span class="c"># Constants for stimulus-specific analysis</span>
+<span class="c1"># Constants for stimulus-specific analysis</span>
 <span class="n">RAMPS_START</span> <span class="o">=</span> <span class="mf">1.02</span>
 <span class="n">LONG_SQUARES_START</span> <span class="o">=</span> <span class="mf">1.02</span>
 <span class="n">LONG_SQUARES_END</span> <span class="o">=</span> <span class="mf">2.02</span>
@@ -715,7 +715,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span>
         <span class="n">dvdt</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">)</span>
 
-        <span class="c"># Basic features of spikes</span>
+        <span class="c1"># Basic features of spikes</span>
         <span class="n">putative_spikes</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">detect_putative_spikes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">,</span>
                                                     <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dv_cutoff</span><span class="p">)</span>
         <span class="n">peaks</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_peak_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">putative_spikes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
@@ -723,7 +723,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                                            <span class="bp">self</span><span class="o">.</span><span class="n">min_height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_peak</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">putative_spikes</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-            <span class="c"># Save time if no spikes detected</span>
+            <span class="c1"># Save time if no spikes detected</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
             <span class="k">return</span>
 
@@ -734,12 +734,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                                                      <span class="n">upstrokes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_interval</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">thresholds</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-            <span class="c"># Save time if no spikes detected</span>
+            <span class="c1"># Save time if no spikes detected</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">()</span>
             <span class="k">return</span>
 
 
-        <span class="c"># Spike list and thresholds have been refined - now find other features</span>
+        <span class="c1"># Spike list and thresholds have been refined - now find other features</span>
         <span class="n">upstrokes</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_upstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="n">dvdt</span><span class="p">)</span>
         <span class="n">troughs</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_trough_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
         <span class="n">downstrokes</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_downstroke_indexes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">troughs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="n">dvdt</span><span class="p">)</span>
@@ -747,76 +747,76 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                                    <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">,</span> <span class="n">dvdt</span><span class="o">=</span><span class="n">dvdt</span><span class="p">)</span>
         <span class="n">widths</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_widths</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="n">peaks</span><span class="p">,</span> <span class="n">trough_details</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-        <span class="c"># Points where we care about t, v, and i if available</span>
+        <span class="c1"># Points where we care about t, v, and i if available</span>
         <span class="n">vit_data_indexes</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;threshold&quot;</span><span class="p">:</span> <span class="n">thresholds</span><span class="p">,</span>
-            <span class="s">&quot;peak&quot;</span><span class="p">:</span> <span class="n">peaks</span><span class="p">,</span>
-            <span class="s">&quot;trough&quot;</span><span class="p">:</span> <span class="n">troughs</span><span class="p">,</span>
+            <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="n">thresholds</span><span class="p">,</span>
+            <span class="s2">&quot;peak&quot;</span><span class="p">:</span> <span class="n">peaks</span><span class="p">,</span>
+            <span class="s2">&quot;trough&quot;</span><span class="p">:</span> <span class="n">troughs</span><span class="p">,</span>
         <span class="p">}</span>
 
-        <span class="c"># Points where we care about t and dv/dt</span>
+        <span class="c1"># Points where we care about t and dv/dt</span>
         <span class="n">dvdt_data_indexes</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;upstroke&quot;</span><span class="p">:</span> <span class="n">upstrokes</span><span class="p">,</span>
-            <span class="s">&quot;downstroke&quot;</span><span class="p">:</span> <span class="n">downstrokes</span>
+            <span class="s2">&quot;upstroke&quot;</span><span class="p">:</span> <span class="n">upstrokes</span><span class="p">,</span>
+            <span class="s2">&quot;downstroke&quot;</span><span class="p">:</span> <span class="n">downstrokes</span>
         <span class="p">}</span>
 
-        <span class="c"># Trough details</span>
+        <span class="c1"># Trough details</span>
         <span class="n">isi_types</span> <span class="o">=</span> <span class="n">trough_details</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">trough_detail_indexes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s">&quot;fast_trough&quot;</span><span class="p">,</span> <span class="s">&quot;adp&quot;</span><span class="p">,</span> <span class="s">&quot;slow_trough&quot;</span><span class="p">],</span> <span class="n">trough_details</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="n">trough_detail_indexes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="s2">&quot;fast_trough&quot;</span><span class="p">,</span> <span class="s2">&quot;adp&quot;</span><span class="p">,</span> <span class="s2">&quot;slow_trough&quot;</span><span class="p">],</span> <span class="n">trough_details</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
 
-        <span class="c"># Redundant, but ensures that DataFrame has right number of rows</span>
-        <span class="c"># Any better way to do it?</span>
-        <span class="n">spikes_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;threshold_index&quot;</span><span class="p">])</span>
+        <span class="c1"># Redundant, but ensures that DataFrame has right number of rows</span>
+        <span class="c1"># Any better way to do it?</span>
+        <span class="n">spikes_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;threshold_index&quot;</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">vit_data_indexes</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                    <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">dvdt_data_indexes</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
                 <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="n">vals</span><span class="p">]</span>
 
-        <span class="n">spikes_df</span><span class="p">[</span><span class="s">&quot;isi_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">isi_types</span>
+        <span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;isi_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">isi_types</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">trough_detail_indexes</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)):</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span>
 
-            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)):</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_t&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
 
-            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)):</span>
-                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+                <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                <span class="n">spikes_df</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
                 <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)):</span>
-                    <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
+                    <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">),</span> <span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">vals</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">vals</span><span class="p">)]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)]</span>
 
-        <span class="n">spikes_df</span><span class="p">[</span><span class="s">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">widths</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widths</span>
+        <span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">spikes_df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">widths</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widths</span>
 
 
-        <span class="n">spikes_df</span><span class="p">[</span><span class="s">&quot;upstroke_downstroke_ratio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spikes_df</span><span class="p">[</span><span class="s">&quot;upstroke&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="o">-</span><span class="n">spikes_df</span><span class="p">[</span><span class="s">&quot;downstroke&quot;</span><span class="p">]</span>
+        <span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;upstroke_downstroke_ratio&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;upstroke&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="o">-</span><span class="n">spikes_df</span><span class="p">[</span><span class="s2">&quot;downstroke&quot;</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span> <span class="o">=</span> <span class="n">spikes_df</span>
 
@@ -824,33 +824,33 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">[</span><span class="s">&quot;avg_rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">[</span><span class="s2">&quot;avg_rate&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">return</span>
 
-        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;threshold_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;threshold_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">isis</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">get_isis</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-            <span class="c"># ignore mean of empty slice warnings here</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s">&quot;numpy&quot;</span><span class="p">)</span>
+            <span class="c1"># ignore mean of empty slice warnings here</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
 
             <span class="n">sweep_level_features</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s">&quot;adapt&quot;</span><span class="p">:</span> <span class="n">ft</span><span class="o">.</span><span class="n">adaptation_index</span><span class="p">(</span><span class="n">isis</span><span class="p">),</span>
-                <span class="s">&quot;latency&quot;</span><span class="p">:</span> <span class="n">ft</span><span class="o">.</span><span class="n">latency</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">),</span>
-                <span class="s">&quot;isi_cv&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">isis</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">/</span> <span class="n">isis</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-                <span class="s">&quot;mean_isi&quot;</span><span class="p">:</span> <span class="n">isis</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
-                <span class="s">&quot;median_isi&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">isis</span><span class="p">),</span>
-                <span class="s">&quot;first_isi&quot;</span><span class="p">:</span> <span class="n">isis</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-                <span class="s">&quot;avg_rate&quot;</span><span class="p">:</span> <span class="n">ft</span><span class="o">.</span><span class="n">average_rate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">),</span>
+                <span class="s2">&quot;adapt&quot;</span><span class="p">:</span> <span class="n">ft</span><span class="o">.</span><span class="n">adaptation_index</span><span class="p">(</span><span class="n">isis</span><span class="p">),</span>
+                <span class="s2">&quot;latency&quot;</span><span class="p">:</span> <span class="n">ft</span><span class="o">.</span><span class="n">latency</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">),</span>
+                <span class="s2">&quot;isi_cv&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">isis</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">/</span> <span class="n">isis</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="s2">&quot;mean_isi&quot;</span><span class="p">:</span> <span class="n">isis</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+                <span class="s2">&quot;median_isi&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">isis</span><span class="p">),</span>
+                <span class="s2">&quot;first_isi&quot;</span><span class="p">:</span> <span class="n">isis</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="s2">&quot;avg_rate&quot;</span><span class="p">:</span> <span class="n">ft</span><span class="o">.</span><span class="n">average_rate</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">),</span>
             <span class="p">}</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sweep_level_features</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
 
     <span class="k">def</span> <span class="nf">_process_pauses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cost_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="c"># Pauses are unusually long ISIs with a &quot;detour reset&quot; among delay resets</span>
-        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;threshold_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="c1"># Pauses are unusually long ISIs with a &quot;detour reset&quot; among delay resets</span>
+        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;threshold_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">isis</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">get_isis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">)</span>
-        <span class="n">isi_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;isi_type&quot;</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">isi_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;isi_type&quot;</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
         <span class="k">return</span> <span class="n">ft</span><span class="o">.</span><span class="n">detect_pauses</span><span class="p">(</span><span class="n">isis</span><span class="p">,</span> <span class="n">isi_types</span><span class="p">,</span> <span class="n">cost_weight</span><span class="p">)</span>
 
@@ -869,7 +869,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        n_max_rel_pauses : number of pauses detected with `max_reliability`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;threshold_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;threshold_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">isis</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">get_isis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">)</span>
 
         <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -885,16 +885,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">return</span> <span class="n">n_pauses</span><span class="p">,</span> <span class="n">pause_frac</span>
 </div>
     <span class="k">def</span> <span class="nf">_process_bursts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">pause_cost</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;threshold_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;threshold_index&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">isis</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">get_isis</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">thresholds</span><span class="p">)</span>
 
-        <span class="n">isi_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;isi_type&quot;</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">isi_types</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;isi_type&quot;</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
-        <span class="n">fast_tr_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;fast_trough_v&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">fast_tr_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;fast_trough_t&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">slow_tr_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;slow_trough_v&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">slow_tr_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;slow_trough_t&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-        <span class="n">thr_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;threshold_v&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">fast_tr_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;fast_trough_v&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">fast_tr_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;fast_trough_t&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">slow_tr_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;slow_trough_v&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">slow_tr_t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;slow_trough_t&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">thr_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;threshold_v&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 
         <span class="n">bursts</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">detect_bursts</span><span class="p">(</span><span class="n">isis</span><span class="p">,</span> <span class="n">isi_types</span><span class="p">,</span> <span class="n">fast_tr_v</span><span class="p">,</span> <span class="n">fast_tr_t</span><span class="p">,</span> <span class="n">slow_tr_v</span><span class="p">,</span> <span class="n">slow_tr_t</span><span class="p">,</span>
                   <span class="n">thr_v</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">pause_cost</span><span class="p">)</span>
@@ -927,10 +927,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;No spikes available for delay calculation&quot;</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No spikes available for delay calculation&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span>
         <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
-        <span class="n">spike_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s">&quot;threshold_t&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">spike_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="s2">&quot;threshold_t&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">tau</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">fit_prespike_time_constant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">spike_time</span><span class="p">)</span>
         <span class="n">latency</span> <span class="o">=</span> <span class="n">spike_time</span> <span class="o">-</span> <span class="n">start</span>
@@ -941,13 +941,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">def</span> <span class="nf">_get_baseline_voltage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span>
         <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span>
-        <span class="n">filter_frequency</span> <span class="o">=</span> <span class="mf">1.</span> <span class="c"># in kHz</span>
+        <span class="n">filter_frequency</span> <span class="o">=</span> <span class="mf">1.</span> <span class="c1"># in kHz</span>
 
-        <span class="c"># Look at baseline interval before start if start is defined</span>
+        <span class="c1"># Look at baseline interval before start if start is defined</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ft</span><span class="o">.</span><span class="n">average_voltage</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_interval</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
 
-        <span class="c"># Otherwise try to find an interval where things are pretty flat</span>
+        <span class="c1"># Otherwise try to find an interval where things are pretty flat</span>
         <span class="n">dv</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">filter_frequency</span><span class="p">)</span>
         <span class="n">non_flat_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dv</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_detect_thresh</span><span class="p">))</span>
         <span class="n">flat_intervals</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">non_flat_points</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">non_flat_points</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
@@ -958,7 +958,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">return</span> <span class="n">ft</span><span class="o">.</span><span class="n">average_voltage</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">baseline_end_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_interval</span><span class="p">,</span>
                                       <span class="n">baseline_end_time</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Could not find sufficiently flat interval for automatic baseline voltage&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Could not find sufficiently flat interval for automatic baseline voltage&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
 <div class="viewcode-block" id="EphysSweepFeatureExtractor.voltage_deflection"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.voltage_deflection">[docs]</a>    <span class="k">def</span> <span class="nf">voltage_deflection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deflect_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -978,8 +978,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">deflect_dispatch</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;min&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">,</span>
-            <span class="s">&quot;max&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">,</span>
+            <span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">,</span>
+            <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
@@ -997,11 +997,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">halfway_index</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_time_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">+</span> <span class="n">start</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">halfway_index</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">deflect_type</span> <span class="o">=</span> <span class="s">&quot;max&quot;</span>
+                    <span class="n">deflect_type</span> <span class="o">=</span> <span class="s2">&quot;max&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">deflect_type</span> <span class="o">=</span> <span class="s">&quot;min&quot;</span>
+                    <span class="n">deflect_type</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">deflect_type</span> <span class="o">=</span> <span class="s">&quot;min&quot;</span>
+                <span class="n">deflect_type</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span>
 
         <span class="n">deflect_func</span> <span class="o">=</span> <span class="n">deflect_dispatch</span><span class="p">[</span><span class="n">deflect_type</span><span class="p">]</span>
 
@@ -1026,9 +1026,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        tau : membrane time constant in seconds</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c"># Assumes this is being done on a hyperpolarizing step</span>
-        <span class="n">v_peak</span><span class="p">,</span> <span class="n">peak_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage_deflection</span><span class="p">(</span><span class="s">&quot;min&quot;</span><span class="p">)</span>
-        <span class="n">v_baseline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;v_baseline&quot;</span><span class="p">)</span>
+        <span class="c1"># Assumes this is being done on a hyperpolarizing step</span>
+        <span class="n">v_peak</span><span class="p">,</span> <span class="n">peak_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage_deflection</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">)</span>
+        <span class="n">v_baseline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;v_baseline&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
             <span class="n">start_index</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">find_time_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
@@ -1038,7 +1038,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">frac</span> <span class="o">=</span> <span class="mf">0.1</span>
         <span class="n">search_result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">[</span><span class="n">start_index</span><span class="p">:]</span> <span class="o">&lt;=</span> <span class="n">frac</span> <span class="o">*</span> <span class="p">(</span><span class="n">v_peak</span> <span class="o">-</span> <span class="n">v_baseline</span><span class="p">)</span> <span class="o">+</span> <span class="n">v_baseline</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">search_result</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;could not find interval for time constant estimate&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;could not find interval for time constant estimate&quot;</span><span class="p">)</span>
         <span class="n">fit_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">search_result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">start_index</span><span class="p">]</span>
         <span class="n">fit_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="n">peak_index</span><span class="p">]</span>
 
@@ -1069,17 +1069,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="ow">not</span> <span class="n">end</span><span class="p">:</span>
             <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="n">v_peak</span><span class="p">,</span> <span class="n">peak_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage_deflection</span><span class="p">(</span><span class="s">&quot;min&quot;</span><span class="p">)</span>
+        <span class="n">v_peak</span><span class="p">,</span> <span class="n">peak_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage_deflection</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">)</span>
         <span class="n">v_peak_avg</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">average_voltage</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="n">peak_index</span><span class="p">]</span> <span class="o">-</span> <span class="n">peak_width</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span>
                                       <span class="n">end</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="n">peak_index</span><span class="p">]</span> <span class="o">+</span> <span class="n">peak_width</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
-        <span class="n">v_baseline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;v_baseline&quot;</span><span class="p">)</span>
+        <span class="n">v_baseline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;v_baseline&quot;</span><span class="p">)</span>
         <span class="n">v_steady</span> <span class="o">=</span> <span class="n">ft</span><span class="o">.</span><span class="n">average_voltage</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_interval</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
         <span class="n">sag</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_peak_avg</span> <span class="o">-</span> <span class="n">v_steady</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">v_peak_avg</span> <span class="o">-</span> <span class="n">v_baseline</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sag</span>
 </div>
 <div class="viewcode-block" id="EphysSweepFeatureExtractor.spikes"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spikes">[docs]</a>    <span class="k">def</span> <span class="nf">spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get all features for each spike as a list of records.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="EphysSweepFeatureExtractor.spike_feature"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.spike_feature">[docs]</a>    <span class="k">def</span> <span class="nf">spike_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get specified feature for every spike.</span>
@@ -1097,7 +1097,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s">&quot;requested feature &#39;{:s}&#39; not available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;requested feature &#39;{:s}&#39; not available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
 </div>
@@ -1119,24 +1119,24 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">on_request_dispatch</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;v_baseline&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_baseline_voltage</span><span class="p">,</span>
-            <span class="s">&quot;tau&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_time_constant</span><span class="p">,</span>
-            <span class="s">&quot;sag&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_sag</span><span class="p">,</span>
-            <span class="s">&quot;peak_deflect&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage_deflection</span><span class="p">,</span>
-            <span class="s">&quot;stim_amp&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_amplitude</span><span class="p">,</span>
+            <span class="s2">&quot;v_baseline&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_baseline_voltage</span><span class="p">,</span>
+            <span class="s2">&quot;tau&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_time_constant</span><span class="p">,</span>
+            <span class="s2">&quot;sag&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_sag</span><span class="p">,</span>
+            <span class="s2">&quot;peak_deflect&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage_deflection</span><span class="p">,</span>
+            <span class="s2">&quot;stim_amp&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stimulus_amplitude</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">allow_missing</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">on_request_dispatch</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">on_request_dispatch</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s">&quot;requested feature &#39;{:s}&#39; not available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;requested feature &#39;{:s}&#39; not available&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">on_request_dispatch</span><span class="p">:</span>
             <span class="n">fn</span> <span class="o">=</span> <span class="n">on_request_dispatch</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s">&quot;requested feature &#39;{:s}&#39; not defined&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;requested feature &#39;{:s}&#39; not defined&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 </div>
@@ -1148,7 +1148,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s">&quot;Feature {:s} already exists for sweep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Feature {:s} already exists for sweep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
 
         <span class="n">features</span> <span class="o">=</span> <span class="n">feature_func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_spikes_df</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -1162,7 +1162,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s">&quot;Feature {:s} already exists for sweep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Feature {:s} already exists for sweep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="p">[</span><span class="n">feature_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">feature_func</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </div>
@@ -1176,9 +1176,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="EphysSweepFeatureExtractor.as_dict"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create dict of features and spikes.&quot;&quot;&quot;</span>
         <span class="n">output_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sweep_features</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">output_dict</span><span class="p">[</span><span class="s">&quot;spikes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spikes</span><span class="p">()</span>
+        <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;spikes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spikes</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">output_dict</span><span class="p">[</span><span class="s">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+            <span class="n">output_dict</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
         <span class="k">return</span> <span class="n">output_dict</span>
 
 </div></div>
@@ -1227,24 +1227,24 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                     <span class="n">min_height</span><span class="p">,</span> <span class="n">min_peak</span><span class="p">,</span> <span class="n">thresh_frac</span><span class="p">,</span> <span class="n">baseline_interval</span><span class="p">,</span>
                     <span class="n">baseline_detect_thresh</span><span class="p">,</span> <span class="n">id_set</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">t_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;t_set must be a list&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;t_set must be a list&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">v_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;v_set must be a list&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;v_set must be a list&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">i_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">i_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;i_set must be a list&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;i_set must be a list&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_set</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;t_set and v_set must have the same number of items&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;t_set and v_set must have the same number of items&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">i_set</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">i_set</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;t_set and i_set must have the same number of items&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;t_set and i_set must have the same number of items&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">id_set</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">id_set</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">id_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;t_set and id_set must have the same number of items&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;t_set and id_set must have the same number of items&quot;</span><span class="p">)</span>
 
         <span class="n">sweeps</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">i_set</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -1296,7 +1296,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 </div></div>
 <div class="viewcode-block" id="EphysCellFeatureExtractor"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">EphysCellFeatureExtractor</span><span class="p">:</span>
-    <span class="c"># Class constants for specific processing</span>
+    <span class="c1"># Class constants for specific processing</span>
     <span class="n">SUBTHRESH_MAX_AMP</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">SUBTHRESH_MIN_AMP</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
     <span class="n">SAG_TARGET</span> <span class="o">=</span> <span class="o">-</span><span class="mf">100.</span>
@@ -1318,9 +1318,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">_long_squares_ext</span> <span class="o">=</span> <span class="n">long_squares_ext</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_features</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;ramps&quot;</span><span class="p">:</span> <span class="p">{},</span>
-            <span class="s">&quot;short_squares&quot;</span><span class="p">:</span> <span class="p">{},</span>
-            <span class="s">&quot;long_squares&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s2">&quot;ramps&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s2">&quot;short_squares&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s2">&quot;long_squares&quot;</span><span class="p">:</span> <span class="p">{},</span>
         <span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span> <span class="o">=</span> <span class="bp">None</span>
@@ -1332,10 +1332,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="sd">&quot;&quot;&quot;Processes features. Can take a specific key (or set of keys) to do a subset of processing.&quot;&quot;&quot;</span>
 
         <span class="n">dispatch</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;ramps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_ramps</span><span class="p">,</span>
-            <span class="s">&quot;short_squares&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_short_squares</span><span class="p">,</span>
-            <span class="s">&quot;long_squares&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_long_squares</span><span class="p">,</span>
-            <span class="s">&quot;long_squares_spiking&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_long_squares_spiking</span><span class="p">,</span>
+            <span class="s2">&quot;ramps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_ramps</span><span class="p">,</span>
+            <span class="s2">&quot;short_squares&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_short_squares</span><span class="p">,</span>
+            <span class="s2">&quot;long_squares&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_long_squares</span><span class="p">,</span>
+            <span class="s2">&quot;long_squares_spiking&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_long_squares_spiking</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -1351,12 +1351,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramps_ext</span>
         <span class="n">ext</span><span class="o">.</span><span class="n">process_spikes</span><span class="p">()</span>
 
-        <span class="c"># pull out the spiking sweeps</span>
-        <span class="n">spiking_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramps_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;avg_rate&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
+        <span class="c1"># pull out the spiking sweeps</span>
+        <span class="n">spiking_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ramps_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;avg_rate&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="n">EphysSweepSetFeatureExtractor</span><span class="o">.</span><span class="n">from_sweeps</span><span class="p">(</span><span class="n">spiking_sweeps</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ramps_ext</span> <span class="o">=</span> <span class="n">ext</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;ramps&quot;</span><span class="p">][</span><span class="s">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;ramps&quot;</span><span class="p">][</span><span class="s2">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="EphysCellFeatureExtractor.ramps_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features">[docs]</a>    <span class="k">def</span> <span class="nf">ramps_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1366,11 +1366,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_short_squares_ext</span>
         <span class="n">ext</span><span class="o">.</span><span class="n">process_spikes</span><span class="p">()</span>
 
-        <span class="c"># Need to count how many had spikes at each amplitude; find most; ties go to lower amplitude</span>
-        <span class="n">spiking_sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;avg_rate&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Need to count how many had spikes at each amplitude; find most; ties go to lower amplitude</span>
+        <span class="n">spiking_sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;avg_rate&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spiking_sweeps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;No spiking short square sweeps, cannot compute cell features.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;No spiking short square sweeps, cannot compute cell features.&quot;</span><span class="p">)</span>
 
         <span class="n">most_common</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_short_step_stim_amp</span><span class="p">,</span> <span class="n">spiking_sweeps</span><span class="p">))</span><span class="o">.</span><span class="n">most_common</span><span class="p">()</span>
         <span class="n">common_amp</span><span class="p">,</span> <span class="n">common_count</span> <span class="o">=</span> <span class="n">most_common</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1380,12 +1380,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">common_amp</span><span class="p">:</span>
                 <span class="n">common_amp</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;short_squares&quot;</span><span class="p">][</span><span class="s">&quot;stimulus_amplitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">common_amp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;short_squares&quot;</span><span class="p">][</span><span class="s2">&quot;stimulus_amplitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">common_amp</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="n">EphysSweepSetFeatureExtractor</span><span class="o">.</span><span class="n">from_sweeps</span><span class="p">([</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">spiking_sweeps</span> <span class="k">if</span> <span class="n">_short_step_stim_amp</span><span class="p">(</span><span class="n">sweep</span><span class="p">)</span> <span class="o">==</span> <span class="n">common_amp</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_short_squares_ext</span> <span class="o">=</span> <span class="n">ext</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;short_squares&quot;</span><span class="p">][</span><span class="s">&quot;common_amp_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;short_squares&quot;</span><span class="p">][</span><span class="s">&quot;common_amp_sweeps&quot;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;short_squares&quot;</span><span class="p">][</span><span class="s2">&quot;common_amp_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;short_squares&quot;</span><span class="p">][</span><span class="s2">&quot;common_amp_sweeps&quot;</span><span class="p">]:</span>
             <span class="n">s</span><span class="o">.</span><span class="n">set_stimulus_amplitude_calculator</span><span class="p">(</span><span class="n">_short_step_stim_amp</span><span class="p">)</span>
 
 <div class="viewcode-block" id="EphysCellFeatureExtractor.short_squares_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.short_squares_features">[docs]</a>    <span class="k">def</span> <span class="nf">short_squares_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1401,66 +1401,66 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_long_squares_ext</span>
         <span class="n">ext</span><span class="o">.</span><span class="n">process_spikes</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;sweeps&quot;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;sweeps&quot;</span><span class="p">]:</span>
             <span class="n">s</span><span class="o">.</span><span class="n">set_stimulus_amplitude_calculator</span><span class="p">(</span><span class="n">_step_stim_amp</span><span class="p">)</span>
 
-        <span class="n">spiking_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s">&quot;avg_rate&quot;</span><span class="p">))</span>
+        <span class="n">spiking_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s2">&quot;avg_rate&quot;</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spiking_indexes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;No spiking long square sweeps, cannot compute cell features.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;No spiking long square sweeps, cannot compute cell features.&quot;</span><span class="p">)</span>
 
-        <span class="n">amps</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s">&quot;stim_amp&quot;</span><span class="p">)</span><span class="c">#self.long_squares_stim_amps()</span>
+        <span class="n">amps</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s2">&quot;stim_amp&quot;</span><span class="p">)</span><span class="c1">#self.long_squares_stim_amps()</span>
         <span class="n">min_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">amps</span><span class="p">[</span><span class="n">spiking_indexes</span><span class="p">])</span>
         <span class="n">rheobase_index</span> <span class="o">=</span> <span class="n">spiking_indexes</span><span class="p">[</span><span class="n">min_index</span><span class="p">]</span>
         <span class="n">rheobase_i</span> <span class="o">=</span> <span class="n">_step_stim_amp</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()[</span><span class="n">rheobase_index</span><span class="p">])</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;rheobase_extractor_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rheobase_index</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;rheobase_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rheobase_i</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;rheobase_sweep&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()[</span><span class="n">rheobase_index</span><span class="p">]</span>
-        <span class="n">spiking_sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;avg_rate&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;rheobase_extractor_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rheobase_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;rheobase_i&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rheobase_i</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;rheobase_sweep&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()[</span><span class="n">rheobase_index</span><span class="p">]</span>
+        <span class="n">spiking_sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;avg_rate&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span> <span class="o">=</span> <span class="n">EphysSweepSetFeatureExtractor</span><span class="o">.</span><span class="n">from_sweeps</span><span class="p">(</span><span class="n">spiking_sweeps</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;fi_fit_slope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit_fi_slope</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;fi_fit_slope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fit_fi_slope</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="p">)</span>
 
 
     <span class="k">def</span> <span class="nf">_analyze_long_squares_subthreshold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_long_squares_ext</span>
-        <span class="n">subthresh_sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;avg_rate&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">subthresh_sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span> <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;avg_rate&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">subthresh_ext</span> <span class="o">=</span> <span class="n">EphysSweepSetFeatureExtractor</span><span class="o">.</span><span class="n">from_sweeps</span><span class="p">(</span><span class="n">subthresh_sweeps</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_long_squares_ext</span> <span class="o">=</span> <span class="n">subthresh_ext</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subthresh_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;No subthreshold long square sweeps, cannot evaluate cell features.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;No subthreshold long square sweeps, cannot evaluate cell features.&quot;</span><span class="p">)</span>
 
-        <span class="n">peaks</span> <span class="o">=</span> <span class="n">subthresh_ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s">&quot;peak_deflect&quot;</span><span class="p">)</span>
-        <span class="n">sags</span> <span class="o">=</span> <span class="n">subthresh_ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s">&quot;sag&quot;</span><span class="p">)</span>
+        <span class="n">peaks</span> <span class="o">=</span> <span class="n">subthresh_ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s2">&quot;peak_deflect&quot;</span><span class="p">)</span>
+        <span class="n">sags</span> <span class="o">=</span> <span class="n">subthresh_ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s2">&quot;sag&quot;</span><span class="p">)</span>
         <span class="n">sag_eval_levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sweep</span><span class="o">.</span><span class="n">voltage_deflection</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">subthresh_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()])</span>
         <span class="n">target_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SAG_TARGET</span>
         <span class="n">closest_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">sag_eval_levels</span> <span class="o">-</span> <span class="n">target_level</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;sag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sags</span><span class="p">[</span><span class="n">closest_index</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;vm_for_sag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sag_eval_levels</span><span class="p">[</span><span class="n">closest_index</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;subthreshold_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subthresh_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;subthreshold_sweeps&quot;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;sag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sags</span><span class="p">[</span><span class="n">closest_index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;vm_for_sag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sag_eval_levels</span><span class="p">[</span><span class="n">closest_index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subthresh_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_sweeps&quot;</span><span class="p">]:</span>
             <span class="n">s</span><span class="o">.</span><span class="n">set_stimulus_amplitude_calculator</span><span class="p">(</span><span class="n">_step_stim_amp</span><span class="p">)</span>
 
         <span class="n">calc_subthresh_sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="n">sweep</span> <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">subthresh_sweeps</span> <span class="k">if</span>
-                                 <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;stim_amp&quot;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUBTHRESH_MAX_AMP</span> <span class="ow">and</span>
-                                 <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;stim_amp&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUBTHRESH_MIN_AMP</span><span class="p">]</span>
+                                 <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;stim_amp&quot;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUBTHRESH_MAX_AMP</span> <span class="ow">and</span>
+                                 <span class="n">sweep</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;stim_amp&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUBTHRESH_MIN_AMP</span><span class="p">]</span>
 
         <span class="n">calc_subthresh_ext</span> <span class="o">=</span> <span class="n">EphysSweepSetFeatureExtractor</span><span class="o">.</span><span class="n">from_sweeps</span><span class="p">(</span><span class="n">calc_subthresh_sweeps</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_membrane_property_ext</span> <span class="o">=</span> <span class="n">calc_subthresh_ext</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;subthreshold_membrane_property_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_subthresh_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;input_resistance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_resistance</span><span class="p">(</span><span class="n">calc_subthresh_ext</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;tau&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">membrane_time_constant</span><span class="p">(</span><span class="n">calc_subthresh_ext</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_membrane_property_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_subthresh_ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;input_resistance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_resistance</span><span class="p">(</span><span class="n">calc_subthresh_ext</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;tau&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">membrane_time_constant</span><span class="p">(</span><span class="n">calc_subthresh_ext</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="EphysCellFeatureExtractor.long_squares_features"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_features">[docs]</a>    <span class="k">def</span> <span class="nf">long_squares_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">option_table</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;spiking&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="p">,</span>
-            <span class="s">&quot;subthreshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_long_squares_ext</span><span class="p">,</span>
-            <span class="s">&quot;subthreshold_membrane_property&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_membrane_property_ext</span><span class="p">,</span>
+            <span class="s2">&quot;spiking&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="p">,</span>
+            <span class="s2">&quot;subthreshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_long_squares_ext</span><span class="p">,</span>
+            <span class="s2">&quot;subthreshold_membrane_property&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_membrane_property_ext</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">option</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">option_table</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
@@ -1469,9 +1469,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </div>
 <div class="viewcode-block" id="EphysCellFeatureExtractor.long_squares_stim_amps"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.long_squares_stim_amps">[docs]</a>    <span class="k">def</span> <span class="nf">long_squares_stim_amps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="n">option_table</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;spiking&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="p">,</span>
-            <span class="s">&quot;subthreshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_long_squares_ext</span><span class="p">,</span>
-            <span class="s">&quot;subthreshold_membrane_property&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_membrane_property_ext</span><span class="p">,</span>
+            <span class="s2">&quot;spiking&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spiking_long_squares_ext</span><span class="p">,</span>
+            <span class="s2">&quot;subthreshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_long_squares_ext</span><span class="p">,</span>
+            <span class="s2">&quot;subthreshold_membrane_property&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subthreshold_membrane_property_ext</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="k">if</span> <span class="n">option</span><span class="p">:</span>
             <span class="n">ext</span> <span class="o">=</span> <span class="n">option_table</span><span class="p">[</span><span class="n">option</span><span class="p">]</span>
@@ -1486,29 +1486,29 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="EphysCellFeatureExtractor.as_dict"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.as_dict">[docs]</a>    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create dict of cell features.&quot;&quot;&quot;</span>
 
-        <span class="c"># get shallow copies of the sub-type dictionaries</span>
+        <span class="c1"># get shallow copies of the sub-type dictionaries</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&quot;long_squares&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-            <span class="s">&quot;short_squares&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;short_squares&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-            <span class="s">&quot;ramps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s">&quot;ramps&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+            <span class="s2">&quot;long_squares&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+            <span class="s2">&quot;short_squares&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;short_squares&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+            <span class="s2">&quot;ramps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span><span class="p">[</span><span class="s2">&quot;ramps&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="p">}</span>
 
-        <span class="c"># convert feature extractor lists to sweep dictionarsweep extract lists</span>
-        <span class="n">ls_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
-        <span class="n">ls_spike_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
-        <span class="n">rheo_sweep</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;rheobase_sweep&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
-        <span class="n">ls_sub_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;subthreshold_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
-        <span class="n">ls_sub_mem_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;subthreshold_membrane_property_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
-        <span class="n">ss_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s">&quot;short_squares&quot;</span><span class="p">][</span><span class="s">&quot;common_amp_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
-        <span class="n">ramp_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s">&quot;ramps&quot;</span><span class="p">][</span><span class="s">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
+        <span class="c1"># convert feature extractor lists to sweep dictionarsweep extract lists</span>
+        <span class="n">ls_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">ls_spike_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">rheo_sweep</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;rheobase_sweep&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+        <span class="n">ls_sub_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">ls_sub_mem_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_membrane_property_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">ss_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;short_squares&quot;</span><span class="p">][</span><span class="s2">&quot;common_amp_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
+        <span class="n">ramp_sweeps</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;ramps&quot;</span><span class="p">][</span><span class="s2">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="p">]</span>
 
-        <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ls_sweeps</span>
-        <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ls_spike_sweeps</span>
-        <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;subthreshold_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ls_sub_sweeps</span>
-        <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;subthreshold_membrane_property_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ls_sub_mem_sweeps</span>
-        <span class="n">out</span><span class="p">[</span><span class="s">&quot;long_squares&quot;</span><span class="p">][</span><span class="s">&quot;rheobase_sweep&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rheo_sweep</span>
-        <span class="n">out</span><span class="p">[</span><span class="s">&quot;short_squares&quot;</span><span class="p">][</span><span class="s">&quot;common_amp_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ss_sweeps</span>
-        <span class="n">out</span><span class="p">[</span><span class="s">&quot;ramps&quot;</span><span class="p">][</span><span class="s">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramp_sweeps</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ls_sweeps</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ls_spike_sweeps</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ls_sub_sweeps</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;subthreshold_membrane_property_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ls_sub_mem_sweeps</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;long_squares&quot;</span><span class="p">][</span><span class="s2">&quot;rheobase_sweep&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rheo_sweep</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;short_squares&quot;</span><span class="p">][</span><span class="s2">&quot;common_amp_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ss_sweeps</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;ramps&quot;</span><span class="p">][</span><span class="s2">&quot;spiking_sweeps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramp_sweeps</span>
 
         <span class="k">return</span> <span class="n">out</span>
 
@@ -1519,15 +1519,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">sweeps</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">sweeps</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;no sweeps available for input resistance calculation&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;no sweeps available for input resistance calculation&quot;</span><span class="p">)</span>
 
     <span class="n">v_vals</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">i_vals</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">sweeps</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">sweep</span><span class="o">.</span><span class="n">i</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;cannot calculate input resistance: i not defined for a sweep&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;cannot calculate input resistance: i not defined for a sweep&quot;</span><span class="p">)</span>
 
-        <span class="n">v_peak</span><span class="p">,</span> <span class="n">min_index</span> <span class="o">=</span> <span class="n">sweep</span><span class="o">.</span><span class="n">voltage_deflection</span><span class="p">(</span><span class="s">&#39;min&#39;</span><span class="p">)</span>
+        <span class="n">v_peak</span><span class="p">,</span> <span class="n">min_index</span> <span class="o">=</span> <span class="n">sweep</span><span class="o">.</span><span class="n">voltage_deflection</span><span class="p">(</span><span class="s1">&#39;min&#39;</span><span class="p">)</span>
         <span class="n">v_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v_peak</span><span class="p">)</span>
         <span class="n">i_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sweep</span><span class="o">.</span><span class="n">i</span><span class="p">[</span><span class="n">min_index</span><span class="p">])</span>
 
@@ -1535,9 +1535,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i_vals</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="c"># If there&#39;s just one sweep, we&#39;ll have to use its own baseline to estimate</span>
-        <span class="c"># the input resistance</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">sweeps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s">&quot;v_baseline&quot;</span><span class="p">))</span>
+        <span class="c1"># If there&#39;s just one sweep, we&#39;ll have to use its own baseline to estimate</span>
+        <span class="c1"># the input resistance</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">sweeps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sweep_feature</span><span class="p">(</span><span class="s2">&quot;v_baseline&quot;</span><span class="p">))</span>
         <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
 
     <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
@@ -1550,18 +1550,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="sd">&quot;&quot;&quot;Average the membrane time constant values estimated from each sweep in passed extractor.&quot;&quot;&quot;</span>
 
     <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s">&quot;numpy&quot;</span><span class="p">)</span>
-        <span class="n">avg_tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s">&quot;tau&quot;</span><span class="p">))</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
+        <span class="n">avg_tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s2">&quot;tau&quot;</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">avg_tau</span>
 
 </div>
 <div class="viewcode-block" id="fit_fi_slope"><a class="viewcode-back" href="../../../allensdk.ephys.html#allensdk.ephys.ephys_extractor.fit_fi_slope">[docs]</a><span class="k">def</span> <span class="nf">fit_fi_slope</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Fit the rate and stimulus amplitude to a line and return the slope of the fit.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Cannot fit f-I curve slope with less than two suprathreshold sweeps&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Cannot fit f-I curve slope with less than two suprathreshold sweeps&quot;</span><span class="p">)</span>
 
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">_step_stim_amp</span><span class="p">,</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweeps</span><span class="p">()))</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s">&quot;avg_rate&quot;</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">sweep_features</span><span class="p">(</span><span class="s2">&quot;avg_rate&quot;</span><span class="p">)</span>
 
     <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">x</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span>
     <span class="n">m</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -1581,11 +1581,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">short_squares</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;no short square sweep numbers provided&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;no short square sweep numbers provided&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ramps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;no ramp sweep numbers provided&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;no ramp sweep numbers provided&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">long_squares</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;no long_square sweep numbers provided&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ft</span><span class="o">.</span><span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;no long_square sweep numbers provided&quot;</span><span class="p">)</span>
 
     <span class="n">ramps_ext</span> <span class="o">=</span> <span class="n">extractor_for_nwb_sweeps</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ramps</span><span class="p">,</span> <span class="n">fixed_start</span><span class="o">=</span><span class="n">RAMPS_START</span><span class="p">)</span>
 
@@ -1619,13 +1619,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="k">for</span> <span class="n">sweep_number</span> <span class="ow">in</span> <span class="n">sweep_numbers</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_sweep</span><span class="p">(</span><span class="n">sweep_number</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;response&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e3</span> <span class="c"># mV</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e12</span> <span class="c"># pA</span>
-        <span class="n">hz</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;sampling_rate&#39;</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e3</span> <span class="c1"># mV</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">1e12</span> <span class="c1"># pA</span>
+        <span class="n">hz</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;sampling_rate&#39;</span><span class="p">]</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">hz</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">*</span> <span class="n">dt</span> <span class="c"># sec</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="o">*</span> <span class="n">dt</span> <span class="c1"># sec</span>
 
-        <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;index_range&#39;</span><span class="p">])</span>
+        <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;index_range&#39;</span><span class="p">])</span>
         <span class="n">v_set</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="n">i_set</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="n">t_set</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
@@ -1721,7 +1721,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

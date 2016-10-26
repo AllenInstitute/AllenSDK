@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.core.mouse_connectivity_cache</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="kn">import</span> <span class="n">ManifestBuilder</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">Cache</span>
@@ -698,23 +698,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">CCF_VERSION_KEY</span> <span class="o">=</span> <span class="s">&#39;CCF_VERSION&#39;</span>
-    <span class="n">ANNOTATION_KEY</span> <span class="o">=</span> <span class="s">&#39;ANNOTATION&#39;</span>
-    <span class="n">TEMPLATE_KEY</span> <span class="o">=</span> <span class="s">&#39;TEMPLATE&#39;</span>
-    <span class="n">PROJECTION_DENSITY_KEY</span> <span class="o">=</span> <span class="s">&#39;PROJECTION_DENSITY&#39;</span>
-    <span class="n">INJECTION_DENSITY_KEY</span> <span class="o">=</span> <span class="s">&#39;INJECTION_DENSITY&#39;</span>
-    <span class="n">INJECTION_FRACTION_KEY</span> <span class="o">=</span> <span class="s">&#39;INJECTION_FRACTION&#39;</span>
-    <span class="n">DATA_MASK_KEY</span> <span class="o">=</span> <span class="s">&#39;DATA_MASK&#39;</span>
-    <span class="n">STRUCTURE_UNIONIZES_KEY</span> <span class="o">=</span> <span class="s">&#39;STRUCTURE_UNIONIZES&#39;</span>
-    <span class="n">EXPERIMENTS_KEY</span> <span class="o">=</span> <span class="s">&#39;EXPERIMENTS&#39;</span>
-    <span class="n">STRUCTURES_KEY</span> <span class="o">=</span> <span class="s">&#39;STRUCTURES&#39;</span>
-    <span class="n">STRUCTURE_MASK_KEY</span> <span class="o">=</span> <span class="s">&#39;STRUCTURE_MASK&#39;</span>
+    <span class="n">CCF_VERSION_KEY</span> <span class="o">=</span> <span class="s1">&#39;CCF_VERSION&#39;</span>
+    <span class="n">ANNOTATION_KEY</span> <span class="o">=</span> <span class="s1">&#39;ANNOTATION&#39;</span>
+    <span class="n">TEMPLATE_KEY</span> <span class="o">=</span> <span class="s1">&#39;TEMPLATE&#39;</span>
+    <span class="n">PROJECTION_DENSITY_KEY</span> <span class="o">=</span> <span class="s1">&#39;PROJECTION_DENSITY&#39;</span>
+    <span class="n">INJECTION_DENSITY_KEY</span> <span class="o">=</span> <span class="s1">&#39;INJECTION_DENSITY&#39;</span>
+    <span class="n">INJECTION_FRACTION_KEY</span> <span class="o">=</span> <span class="s1">&#39;INJECTION_FRACTION&#39;</span>
+    <span class="n">DATA_MASK_KEY</span> <span class="o">=</span> <span class="s1">&#39;DATA_MASK&#39;</span>
+    <span class="n">STRUCTURE_UNIONIZES_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURE_UNIONIZES&#39;</span>
+    <span class="n">EXPERIMENTS_KEY</span> <span class="o">=</span> <span class="s1">&#39;EXPERIMENTS&#39;</span>
+    <span class="n">STRUCTURES_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURES&#39;</span>
+    <span class="n">STRUCTURE_MASK_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURE_MASK&#39;</span>
 
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                 <span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;mouse_connectivity_manifest.json&#39;</span><span class="p">,</span>
+                 <span class="n">manifest_file</span><span class="o">=</span><span class="s1">&#39;mouse_connectivity_manifest.json&#39;</span><span class="p">,</span>
                  <span class="n">ccf_version</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MouseConnectivityCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
@@ -749,7 +749,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s">&quot;No save file name provided for annotation volume.&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;No save file name provided for annotation volume.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -781,7 +781,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_KEY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No save file provided for annotation volume.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No save file provided for annotation volume.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -817,7 +817,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">PROJECTION_DENSITY_KEY</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_make_parent_dirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -852,7 +852,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INJECTION_DENSITY_KEY</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_make_parent_dirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -886,7 +886,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INJECTION_FRACTION_KEY</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_make_parent_dirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -920,7 +920,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DATA_MASK_KEY</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No file name to save volume.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_make_parent_dirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -971,7 +971,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
                 <span class="n">structures</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
-        <span class="n">structures</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s">&#39;id&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">structures</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">structures</span>
 </div>
 <div class="viewcode-block" id="MouseConnectivityCache.get_experiments"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiments">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cre</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">injection_structure_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -1008,28 +1008,28 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">experiments</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">experiment_source_search</span><span class="p">(</span>
-                <span class="n">injection_structures</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">)</span>
+                <span class="n">injection_structures</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">)</span>
 
-            <span class="c"># removing these elements because they are specific to a particular</span>
-            <span class="c"># resolution</span>
+            <span class="c1"># removing these elements because they are specific to a particular</span>
+            <span class="c1"># resolution</span>
             <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span><span class="p">:</span>
-                <span class="k">del</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;num-voxels&#39;</span><span class="p">]</span>
-                <span class="k">del</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;injection-volume&#39;</span><span class="p">]</span>
-                <span class="k">del</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;sum&#39;</span><span class="p">]</span>
-                <span class="k">del</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;num-voxels&#39;</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;injection-volume&#39;</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;sum&#39;</span><span class="p">]</span>
+                <span class="k">del</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
                 <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_make_parent_dirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
                 <span class="n">json_utilities</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">experiments</span><span class="p">)</span>
 
-        <span class="c"># filter the read/downloaded list of experiments</span>
+        <span class="c1"># filter the read/downloaded list of experiments</span>
         <span class="n">experiments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_experiments</span><span class="p">(</span>
             <span class="n">experiments</span><span class="p">,</span> <span class="n">cre</span><span class="p">,</span> <span class="n">injection_structure_ids</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dataframe</span><span class="p">:</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">experiments</span><span class="p">)</span>
-            <span class="n">experiments</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s">&#39;id&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="n">experiments</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">experiments</span>
 </div>
@@ -1051,17 +1051,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">cre</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;transgenic-line&#39;</span><span class="p">]]</span>
+            <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;transgenic-line&#39;</span><span class="p">]]</span>
         <span class="k">elif</span> <span class="n">cre</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
-            <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;transgenic-line&#39;</span><span class="p">]]</span>
+            <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;transgenic-line&#39;</span><span class="p">]]</span>
         <span class="k">elif</span> <span class="n">cre</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span>
-                <span class="s">&#39;transgenic-line&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">cre</span><span class="p">]</span>
+                <span class="s1">&#39;transgenic-line&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">cre</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">injection_structure_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">descendant_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ontology</span><span class="p">()</span><span class="o">.</span><span class="n">get_descendant_ids</span><span class="p">(</span><span class="n">injection_structure_ids</span><span class="p">)</span>
             <span class="n">experiments</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">experiments</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span>
-                <span class="s">&#39;structure-id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">descendant_ids</span><span class="p">]</span>
+                <span class="s1">&#39;structure-id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">descendant_ids</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">experiments</span>
 </div>
@@ -1114,9 +1114,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">unionizes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_structure_unionizes</span><span class="p">([</span><span class="n">experiment_id</span><span class="p">])</span>
             <span class="n">unionizes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">unionizes</span><span class="p">)</span>
 
-            <span class="c"># rename section_data_set_id column to experiment_id</span>
-            <span class="n">unionizes</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;experiment_id&#39;</span>
-                                 <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;section_data_set_id&#39;</span> <span class="k">else</span> <span class="n">c</span>
+            <span class="c1"># rename section_data_set_id column to experiment_id</span>
+            <span class="n">unionizes</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;experiment_id&#39;</span>
+                                 <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;section_data_set_id&#39;</span> <span class="k">else</span> <span class="n">c</span>
                                  <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">unionizes</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
@@ -1169,11 +1169,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 
             <span class="n">unionizes</span> <span class="o">=</span> <span class="n">unionizes</span><span class="p">[</span>
-                <span class="n">unionizes</span><span class="p">[</span><span class="s">&#39;structure_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)]</span>
+                <span class="n">unionizes</span><span class="p">[</span><span class="s1">&#39;structure_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)]</span>
 
         <span class="k">if</span> <span class="n">hemisphere_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">unionizes</span> <span class="o">=</span> <span class="n">unionizes</span><span class="p">[</span>
-                <span class="n">unionizes</span><span class="p">[</span><span class="s">&#39;hemisphere_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">hemisphere_ids</span><span class="p">)]</span>
+                <span class="n">unionizes</span><span class="p">[</span><span class="s1">&#39;hemisphere_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">hemisphere_ids</span><span class="p">)]</span>
 
         <span class="k">return</span> <span class="n">unionizes</span>
 </div>
@@ -1221,7 +1221,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="MouseConnectivityCache.get_projection_matrix"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_projection_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment_ids</span><span class="p">,</span> 
                               <span class="n">projection_structure_ids</span><span class="p">,</span>
                               <span class="n">hemisphere_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
-                              <span class="n">parameter</span><span class="o">=</span><span class="s">&#39;projection_volume&#39;</span><span class="p">,</span> 
+                              <span class="n">parameter</span><span class="o">=</span><span class="s1">&#39;projection_volume&#39;</span><span class="p">,</span> 
                               <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
 
         <span class="n">unionizes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_structure_unionizes</span><span class="p">(</span><span class="n">experiment_ids</span><span class="p">,</span>
@@ -1230,7 +1230,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                                  <span class="n">include_descendants</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                                                  <span class="n">hemisphere_ids</span><span class="o">=</span><span class="n">hemisphere_ids</span><span class="p">)</span>
 
-        <span class="n">hemisphere_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">unionizes</span><span class="p">[</span><span class="s">&#39;hemisphere_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">hemisphere_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">unionizes</span><span class="p">[</span><span class="s1">&#39;hemisphere_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 
         <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">experiment_ids</span><span class="p">)</span>
         <span class="n">ncolumns</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">projection_structure_ids</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">hemisphere_ids</span><span class="p">)</span>
@@ -1246,21 +1246,21 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">columns</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">cidx</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">hlabel</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s">&#39;-L&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s">&#39;-R&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">}</span>
+        <span class="n">hlabel</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;-L&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;-R&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">}</span>
 
         <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ontology</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">hid</span> <span class="ow">in</span> <span class="n">hemisphere_ids</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">projection_structure_ids</span><span class="p">:</span>
                 <span class="n">column_lookup</span><span class="p">[(</span><span class="n">hid</span><span class="p">,</span> <span class="n">sid</span><span class="p">)]</span> <span class="o">=</span> <span class="n">cidx</span>
-                <span class="n">label</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;acronym&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">hlabel</span><span class="p">[</span><span class="n">hid</span><span class="p">]</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;acronym&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">hlabel</span><span class="p">[</span><span class="n">hid</span><span class="p">]</span>
                 <span class="n">columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="p">{</span><span class="s">&#39;hemisphere_id&#39;</span><span class="p">:</span> <span class="n">hid</span><span class="p">,</span> <span class="s">&#39;structure_id&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span> <span class="s">&#39;label&#39;</span><span class="p">:</span> <span class="n">label</span><span class="p">})</span>
+                    <span class="p">{</span><span class="s1">&#39;hemisphere_id&#39;</span><span class="p">:</span> <span class="n">hid</span><span class="p">,</span> <span class="s1">&#39;structure_id&#39;</span><span class="p">:</span> <span class="n">sid</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">label</span><span class="p">})</span>
                 <span class="n">cidx</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">unionizes</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-            <span class="n">ridx</span> <span class="o">=</span> <span class="n">row_lookup</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;experiment_id&#39;</span><span class="p">]]</span>
-            <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;hemisphere_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s">&#39;structure_id&#39;</span><span class="p">])</span>
+            <span class="n">ridx</span> <span class="o">=</span> <span class="n">row_lookup</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;experiment_id&#39;</span><span class="p">]]</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;hemisphere_id&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;structure_id&#39;</span><span class="p">])</span>
             <span class="n">cidx</span> <span class="o">=</span> <span class="n">column_lookup</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="n">matrix</span><span class="p">[</span><span class="n">ridx</span><span class="p">,</span> <span class="n">cidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">parameter</span><span class="p">]</span>
 
@@ -1271,9 +1271,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
             <span class="n">cols_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
 
-            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;matrix&#39;</span><span class="p">:</span> <span class="n">matrix</span><span class="p">,</span> <span class="s">&#39;rows&#39;</span><span class="p">:</span> <span class="n">rows_df</span><span class="p">,</span> <span class="s">&#39;columns&#39;</span><span class="p">:</span> <span class="n">cols_df</span><span class="p">}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;matrix&#39;</span><span class="p">:</span> <span class="n">matrix</span><span class="p">,</span> <span class="s1">&#39;rows&#39;</span><span class="p">:</span> <span class="n">rows_df</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">:</span> <span class="n">cols_df</span><span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span><span class="s">&#39;matrix&#39;</span><span class="p">:</span> <span class="n">matrix</span><span class="p">,</span> <span class="s">&#39;rows&#39;</span><span class="p">:</span> <span class="n">experiment_ids</span><span class="p">,</span> <span class="s">&#39;columns&#39;</span><span class="p">:</span> <span class="n">columns</span><span class="p">}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;matrix&#39;</span><span class="p">:</span> <span class="n">matrix</span><span class="p">,</span> <span class="s1">&#39;rows&#39;</span><span class="p">:</span> <span class="n">experiment_ids</span><span class="p">,</span> <span class="s1">&#39;columns&#39;</span><span class="p">:</span> <span class="n">columns</span><span class="p">}</span>
 </div>
 <div class="viewcode-block" id="MouseConnectivityCache.get_structure_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">annotation_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1350,62 +1350,62 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">manifest_builder</span> <span class="o">=</span> <span class="n">ManifestBuilder</span><span class="p">()</span>
-        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span> <span class="s">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENTS_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;experiments.json&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                                  <span class="s1">&#39;experiments.json&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURES_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;structures.csv&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                                  <span class="s1">&#39;structures.csv&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_UNIONIZES_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;experiment_</span><span class="si">%d</span><span class="s">/structure_unionizes.csv&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                                  <span class="s1">&#39;experiment_</span><span class="si">%d</span><span class="s1">/structure_unionizes.csv&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CCF_VERSION_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;</span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;dir&#39;</span><span class="p">)</span>
+                                  <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;dir&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ANNOTATION_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;annotation_</span><span class="si">%d</span><span class="s">.nrrd&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;annotation_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
                                   <span class="n">parent_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">CCF_VERSION_KEY</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;average_template_</span><span class="si">%d</span><span class="s">.nrrd&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                                  <span class="s1">&#39;average_template_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">INJECTION_DENSITY_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;experiment_</span><span class="si">%d</span><span class="s">/injection_density_</span><span class="si">%d</span><span class="s">.nrrd&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                                  <span class="s1">&#39;experiment_</span><span class="si">%d</span><span class="s1">/injection_density_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">INJECTION_FRACTION_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;experiment_</span><span class="si">%d</span><span class="s">/injection_fraction_</span><span class="si">%d</span><span class="s">.nrrd&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                                  <span class="s1">&#39;experiment_</span><span class="si">%d</span><span class="s1">/injection_fraction_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DATA_MASK_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;experiment_</span><span class="si">%d</span><span class="s">/data_mask_</span><span class="si">%d</span><span class="s">.nrrd&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                                  <span class="s1">&#39;experiment_</span><span class="si">%d</span><span class="s1">/data_mask_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PROJECTION_DENSITY_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;experiment_</span><span class="si">%d</span><span class="s">/projection_density_</span><span class="si">%d</span><span class="s">.nrrd&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                                  <span class="s1">&#39;experiment_</span><span class="si">%d</span><span class="s1">/projection_density_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_MASK_KEY</span><span class="p">,</span>
-                                  <span class="s">&#39;structure_masks/structure_</span><span class="si">%d</span><span class="s">.nrrd&#39;</span><span class="p">,</span>
-                                  <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span>
-                                  <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">)</span>
+                                  <span class="s1">&#39;structure_masks/structure_</span><span class="si">%d</span><span class="s1">.nrrd&#39;</span><span class="p">,</span>
+                                  <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span>
+                                  <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">write_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div></div>
 </pre></div>
@@ -1478,7 +1478,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

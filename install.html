@@ -28,17 +28,17 @@
     <link rel="prev" title="Welcome to the Allen SDK" href="index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -180,11 +180,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -608,7 +608,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -621,7 +621,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -643,11 +643,11 @@ consistent behavior with other Python versions.</p>
 <h2>Quick Start Using Pip<a class="headerlink" href="#quick-start-using-pip" title="Permalink to this headline">¶</a></h2>
 <p>First ensure you have <a class="reference external" href="http://pypi.python.org/pypi/pip">pip</a> installed.
 It is included with the Anaconda distribution.</p>
-<div class="highlight-python"><div class="highlight"><pre>pip install allensdk
+<div class="highlight-python"><div class="highlight"><pre><span></span>pip install allensdk
 </pre></div>
 </div>
 <p>To uninstall the SDK:</p>
-<div class="highlight-python"><div class="highlight"><pre>pip uninstall allensdk
+<div class="highlight-python"><div class="highlight"><pre><span></span>pip uninstall allensdk
 </pre></div>
 </div>
 </div>
@@ -692,21 +692,21 @@ example Dockerfiles are available.</p>
 <li><p class="first">Use Docker to build the image one of the images.</p>
 <blockquote>
 <div><p>Anaconda:</p>
-<div class="highlight-python"><div class="highlight"><pre>docker build -t alleninstitute/allensdk:anaconda git://github.com/github.com/AllenInstitute/AllenSDK/tree/v0.12.3/doc_template:docker/anaconda
+<div class="highlight-python"><div class="highlight"><pre><span></span>docker build -t alleninstitute/allensdk:anaconda git://github.com/github.com/AllenInstitute/AllenSDK/tree/v0.12.3/doc_template:docker/anaconda
 </pre></div>
 </div>
 <p>Other docker configurations are also available under docker directory in the source repository.</p>
 </div></blockquote>
 </li>
 <li><p class="first">Run the docker image:</p>
-<div class="highlight-python"><div class="highlight"><pre>docker run -i -t -p 8888:8888 -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
+<div class="highlight-python"><div class="highlight"><pre><span></span>docker run -i -t -p 8888:8888 -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
 cd allensdk
 make pytest_lax
 </pre></div>
 </div>
 </li>
 <li><p class="first">Start a Jupyter Notebook:</p>
-<div class="highlight-python"><div class="highlight"><pre>cd allensdk/doc_template/examples/nb
+<div class="highlight-python"><div class="highlight"><pre><span></span>cd allensdk/doc_template/examples/nb
 jupyter-notebook --ip=* --no-browser
 </pre></div>
 </div>
@@ -785,7 +785,7 @@ jupyter-notebook --ip=* --no-browser
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

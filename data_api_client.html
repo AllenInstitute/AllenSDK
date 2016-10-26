@@ -29,17 +29,17 @@
     <link rel="prev" title="Mouse Connectivity" href="connectivity.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -181,11 +181,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -609,7 +609,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -622,7 +622,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -665,34 +665,34 @@ It is intended to simplify
 package, but it may be used directly to customize queries or to
 build queries from scratch.</p>
 <p>Often a query will simply request a table of data of one type:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
 
 <span class="n">rma</span> <span class="o">=</span> <span class="n">RmaApi</span><span class="p">()</span>
 
-<span class="n">data</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Atlas&#39;</span><span class="p">,</span>
-                       <span class="n">criteria</span><span class="o">=</span><span class="s">&quot;[name$il&#39;*Mouse*&#39;]&quot;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;Atlas&#39;</span><span class="p">,</span>
+                       <span class="n">criteria</span><span class="o">=</span><span class="s2">&quot;[name$il&#39;*Mouse*&#39;]&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This will construct the RMA query url, make the query and parse the resulting JSON
 into an array of Python dicts with the names, ids and other information about the atlases
 that can be accessed via the API.</p>
 <p>Using the criteria, include and other parameter, specific data can be requested.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">associations</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;[id$eq1]&#39;</span><span class="p">,</span>
-                        <span class="s">&#39;structure_graph(ontology),&#39;</span><span class="p">,</span>
-                        <span class="s">&#39;graphic_group_labels&#39;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">associations</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;[id$eq1]&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;structure_graph(ontology),&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;graphic_group_labels&#39;</span><span class="p">])</span>
 
-<span class="n">atlas_data</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Atlas&#39;</span><span class="p">,</span>
+<span class="n">atlas_data</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;Atlas&#39;</span><span class="p">,</span>
                              <span class="n">include</span><span class="o">=</span><span class="n">associations</span><span class="p">,</span>
                              <span class="n">criteria</span><span class="o">=</span><span class="n">associations</span><span class="p">,</span>
-                             <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;atlases.id&#39;</span><span class="p">,</span>
-                                   <span class="s">&#39;atlases.name&#39;</span><span class="p">,</span>
-                                   <span class="s">&#39;atlases.image_type&#39;</span><span class="p">,</span>
-                                   <span class="s">&#39;ontologies.id&#39;</span><span class="p">,</span>
-                                   <span class="s">&#39;ontologies.name&#39;</span><span class="p">,</span>
-                                   <span class="s">&#39;structure_graphs.id&#39;</span><span class="p">,</span>
-                                   <span class="s">&#39;structure_graphs.name&#39;</span><span class="p">,</span>
-                                   <span class="s">&#39;graphic_group_labels.id&#39;</span><span class="p">,</span>
-                                   <span class="s">&#39;graphic_group_labels.name&#39;</span><span class="p">])</span>
+                             <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;atlases.id&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;atlases.name&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;atlases.image_type&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;ontologies.id&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;ontologies.name&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;structure_graphs.id&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;structure_graphs.name&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;graphic_group_labels.id&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;graphic_group_labels.name&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>Note that a &#8216;class&#8217; name is used for the first parameter.
@@ -703,19 +703,19 @@ which is generally a plural lower-case version of the class name.
 The only clause selects specific &#8216;fields&#8217; to be returned.
 The schema that includes the classes, fields, associations and tables
 can be accessed in JSON form using:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="c"># http://api.brain-map.org/api/v2/data.json</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># http://api.brain-map.org/api/v2/data.json</span>
 <span class="n">schema</span> <span class="o">=</span> <span class="n">rma</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
-    <span class="n">data_description</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s">&#39;DataDescription&#39;</span><span class="p">]</span>
+    <span class="n">data_description</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;DataDescription&#39;</span><span class="p">]</span>
     <span class="n">clz</span> <span class="o">=</span> <span class="n">data_description</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">data_description</span><span class="o">.</span><span class="n">values</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">fields</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;fields&#39;</span><span class="p">]</span>
-    <span class="n">associations</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;associations&#39;</span><span class="p">]</span>
-    <span class="n">table</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s">&#39;table&#39;</span><span class="p">]</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;class: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">clz</span><span class="p">))</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;fields: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">)))</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;associations: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">associations</span><span class="p">)))</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;table: </span><span class="si">%s</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">table</span><span class="p">))</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;fields&#39;</span><span class="p">]</span>
+    <span class="n">associations</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;associations&#39;</span><span class="p">]</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">]</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;class: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">clz</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;fields: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">)))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;associations: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">associations</span><span class="p">)))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;table: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">table</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -727,25 +727,25 @@ operations on the client side.  The pandas library can be useful
 for this.</p>
 <p>Data from the API can be read directly into a pandas
 <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html">Dataframe</a> object.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 
 <span class="n">structures</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Structure&#39;</span><span class="p">,</span>
-                    <span class="n">criteria</span><span class="o">=</span><span class="s">&#39;[graph_id$eq1]&#39;</span><span class="p">,</span>
-                    <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">))</span>
+    <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;Structure&#39;</span><span class="p">,</span>
+                    <span class="n">criteria</span><span class="o">=</span><span class="s1">&#39;[graph_id$eq1]&#39;</span><span class="p">,</span>
+                    <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
 <p><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/indexing.html">Indexing</a>
 subsets of the data (certain columns, certain rows) is one use of pandas:
 specifically <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/indexing.html#selection-by-label">.loc</a>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">names_and_acronyms</span> <span class="o">=</span> <span class="n">structures</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;acronym&#39;</span><span class="p">]]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">names_and_acronyms</span> <span class="o">=</span> <span class="n">structures</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;acronym&#39;</span><span class="p">]]</span>
 </pre></div>
 </div>
 <p>and <a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/indexing.html#boolean-indexing">Boolean indexing</a></p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">mea</span> <span class="o">=</span> <span class="n">structures</span><span class="p">[</span><span class="n">structures</span><span class="o">.</span><span class="n">acronym</span> <span class="o">==</span> <span class="s">&#39;MEA&#39;</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">mea</span> <span class="o">=</span> <span class="n">structures</span><span class="p">[</span><span class="n">structures</span><span class="o">.</span><span class="n">acronym</span> <span class="o">==</span> <span class="s1">&#39;MEA&#39;</span><span class="p">]</span>
 <span class="n">mea_id</span> <span class="o">=</span> <span class="n">mea</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">.</span><span class="n">id</span>
 <span class="n">mea_children</span> <span class="o">=</span> <span class="n">structures</span><span class="p">[</span><span class="n">structures</span><span class="o">.</span><span class="n">parent_structure_id</span> <span class="o">==</span> <span class="n">mea_id</span><span class="p">]</span>
-<span class="k">print</span><span class="p">(</span><span class="n">mea_children</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mea_children</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p><a class="reference external" href="http://pandas.pydata.org/pandas-docs/stable/merging.html">Concatenate, merge and join</a>
@@ -753,37 +753,37 @@ are used to add columns or rows:</p>
 <p>When an RMA call contains an include clause, the associated data will be represented
 as a python dict in a single column.  The column may be converted
 to a proper Dataframe and optionally dropped.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">criteria_string</span> <span class="o">=</span> <span class="s">&quot;structure_sets[name$eq&#39;Mouse Connectivity - Summary&#39;]&quot;</span>
-<span class="n">include_string</span> <span class="o">=</span> <span class="s">&quot;ontology&quot;</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">criteria_string</span> <span class="o">=</span> <span class="s2">&quot;structure_sets[name$eq&#39;Mouse Connectivity - Summary&#39;]&quot;</span>
+<span class="n">include_string</span> <span class="o">=</span> <span class="s2">&quot;ontology&quot;</span>
 <span class="n">summary_structures</span> <span class="o">=</span> \
     <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-        <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s">&#39;Structure&#39;</span><span class="p">,</span>
+        <span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">(</span><span class="s1">&#39;Structure&#39;</span><span class="p">,</span>
                         <span class="n">criteria</span><span class="o">=</span><span class="n">criteria_string</span><span class="p">,</span>
                         <span class="n">include</span><span class="o">=</span><span class="n">include_string</span><span class="p">,</span>
-                        <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">))</span>
+                        <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">))</span>
 <span class="n">ontologies</span> <span class="o">=</span> \
     <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
         <span class="nb">list</span><span class="p">(</span><span class="n">summary_structures</span><span class="o">.</span><span class="n">ontology</span><span class="p">))</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
-<span class="n">flat_structures_dataframe</span> <span class="o">=</span> <span class="n">summary_structures</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">&#39;ontology&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">flat_structures_dataframe</span> <span class="o">=</span> <span class="n">summary_structures</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;ontology&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Alternatively, it can be accessed using normal python dict and list operations.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="n">summary_structures</span><span class="o">.</span><span class="n">ontology</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;name&#39;</span><span class="p">])</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="n">summary_structures</span><span class="o">.</span><span class="n">ontology</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 <p>Pandas Dataframes can be written to a CSV file using to_csv and read using load_csv.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">summary_structures</span><span class="p">[[</span><span class="s">&#39;id&#39;</span><span class="p">,</span>
-                    <span class="s">&#39;parent_structure_id&#39;</span><span class="p">,</span>
-                    <span class="s">&#39;acronym&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s">&#39;summary_structures.csv&#39;</span><span class="p">,</span>
-                                       <span class="n">index_label</span><span class="o">=</span><span class="s">&#39;structure_id&#39;</span><span class="p">)</span>
-<span class="n">reread</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s">&#39;summary_structures.csv&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">summary_structures</span><span class="p">[[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;parent_structure_id&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;acronym&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s1">&#39;summary_structures.csv&#39;</span><span class="p">,</span>
+                                       <span class="n">index_label</span><span class="o">=</span><span class="s1">&#39;structure_id&#39;</span><span class="p">)</span>
+<span class="n">reread</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_csv</span><span class="p">(</span><span class="s1">&#39;summary_structures.csv&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Iteration over a Dataframe of API data can be done in several ways.
 The .itertuples method is one way to do it.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent_structure_id</span> <span class="ow">in</span> <span class="n">summary_structures</span><span class="p">[[</span><span class="s">&#39;name&#39;</span><span class="p">,</span>
-                                                         <span class="s">&#39;parent_structure_id&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%d</span><span class="s"> </span><span class="si">%s</span><span class="s"> </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent_structure_id</span><span class="p">))</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent_structure_id</span> <span class="ow">in</span> <span class="n">summary_structures</span><span class="p">[[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span>
+                                                         <span class="s1">&#39;parent_structure_id&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent_structure_id</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -791,17 +791,17 @@ The .itertuples method is one way to do it.</p>
 <h2>Caching Queries on Disk<a class="headerlink" href="#caching-queries-on-disk" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="allensdk.api.html#allensdk.api.cache.Cache.wrap" title="allensdk.api.cache.Cache.wrap"><tt class="xref py py-meth docutils literal"><span class="pre">wrap()</span></tt></a> has several parameters for querying the API,
 saving the results as CSV or JSON and reading the results as a pandas dataframe.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">Cache</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">Cache</span>
 
 <span class="n">cache_writer</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">()</span>
 <span class="n">do_cache</span><span class="o">=</span><span class="bp">True</span>
 <span class="n">structures_from_api</span> <span class="o">=</span> \
     <span class="n">cache_writer</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">rma</span><span class="o">.</span><span class="n">model_query</span><span class="p">,</span>
-                      <span class="n">path</span><span class="o">=</span><span class="s">&#39;summary.csv&#39;</span><span class="p">,</span>
+                      <span class="n">path</span><span class="o">=</span><span class="s1">&#39;summary.csv&#39;</span><span class="p">,</span>
                       <span class="n">cache</span><span class="o">=</span><span class="n">do_cache</span><span class="p">,</span>
-                      <span class="n">model</span><span class="o">=</span><span class="s">&#39;Structure&#39;</span><span class="p">,</span>
-                      <span class="n">criteria</span><span class="o">=</span><span class="s">&#39;[graph_id$eq1]&#39;</span><span class="p">,</span>
-                      <span class="n">num_rows</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">)</span>
+                      <span class="n">model</span><span class="o">=</span><span class="s1">&#39;Structure&#39;</span><span class="p">,</span>
+                      <span class="n">criteria</span><span class="o">=</span><span class="s1">&#39;[graph_id$eq1]&#39;</span><span class="p">,</span>
+                      <span class="n">num_rows</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If you change to_cache to False and run the code again it will read the data
@@ -878,7 +878,7 @@ from disk rather than executing the query.</p>
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

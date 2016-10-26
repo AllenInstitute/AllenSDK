@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.core.nwb_data_set</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">h5py</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -654,8 +654,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="sd">&quot;&quot;&quot; A very simple interface for exracting electrophysiology data</span>
 <span class="sd">    from an NWB file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">SPIKE_TIMES</span> <span class="o">=</span> <span class="s">&quot;spike_times&quot;</span>
-    <span class="n">DEPRECATED_SPIKE_TIMES</span> <span class="o">=</span> <span class="s">&quot;aibs_spike_times&quot;</span>
+    <span class="n">SPIKE_TIMES</span> <span class="o">=</span> <span class="s2">&quot;spike_times&quot;</span>
+    <span class="n">DEPRECATED_SPIKE_TIMES</span> <span class="o">=</span> <span class="s2">&quot;aibs_spike_times&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">spike_time_key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initialize the NwbDataSet instance with a file name</span>
@@ -696,40 +696,40 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            the first element indicates the end of the test pulse and the</span>
 <span class="sd">            second index is the end of valid response data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 
-            <span class="n">swp</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">][</span><span class="s">&#39;Sweep_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">]</span>
+            <span class="n">swp</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">][</span><span class="s1">&#39;Sweep_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">]</span>
 
-            <span class="n">stimulus</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;timeseries&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s">&#39;response&#39;</span><span class="p">][</span><span class="s">&#39;timeseries&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">stimulus</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">][</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
-            <span class="n">swp_idx_start</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;idx_start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">swp_length</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">swp_idx_start</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;idx_start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">swp_length</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
             <span class="n">swp_idx_stop</span> <span class="o">=</span> <span class="n">swp_idx_start</span> <span class="o">+</span> <span class="n">swp_length</span> <span class="o">-</span> <span class="mi">1</span>
             <span class="n">sweep_index_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">swp_idx_start</span><span class="p">,</span> <span class="n">swp_idx_stop</span><span class="p">)</span>
 
-            <span class="c"># if the sweep has an experiment, extract the experiment&#39;s index</span>
-            <span class="c"># range</span>
+            <span class="c1"># if the sweep has an experiment, extract the experiment&#39;s index</span>
+            <span class="c1"># range</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">exp</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">][</span><span class="s">&#39;Experiment_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">]</span>
-                <span class="n">exp_idx_start</span> <span class="o">=</span> <span class="n">exp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;idx_start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-                <span class="n">exp_length</span> <span class="o">=</span> <span class="n">exp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">exp</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">][</span><span class="s1">&#39;Experiment_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">]</span>
+                <span class="n">exp_idx_start</span> <span class="o">=</span> <span class="n">exp</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;idx_start&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">exp_length</span> <span class="o">=</span> <span class="n">exp</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
                 <span class="n">exp_idx_stop</span> <span class="o">=</span> <span class="n">exp_idx_start</span> <span class="o">+</span> <span class="n">exp_length</span> <span class="o">-</span> <span class="mi">1</span>
                 <span class="n">experiment_index_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">exp_idx_start</span><span class="p">,</span> <span class="n">exp_idx_stop</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="c"># this sweep has no experiment.  return the index range of the</span>
-                <span class="c"># entire sweep.</span>
+                <span class="c1"># this sweep has no experiment.  return the index range of the</span>
+                <span class="c1"># entire sweep.</span>
                 <span class="n">experiment_index_range</span> <span class="o">=</span> <span class="n">sweep_index_range</span>
 
             <span class="k">assert</span> <span class="n">sweep_index_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s">&quot;index range of the full sweep does not start at 0.&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;index range of the full sweep does not start at 0.&quot;</span><span class="p">)</span>
 
             <span class="k">return</span> <span class="p">{</span>
-                <span class="s">&#39;stimulus&#39;</span><span class="p">:</span> <span class="n">stimulus</span><span class="p">,</span>
-                <span class="s">&#39;response&#39;</span><span class="p">:</span> <span class="n">response</span><span class="p">,</span>
-                <span class="s">&#39;index_range&#39;</span><span class="p">:</span> <span class="n">experiment_index_range</span><span class="p">,</span>
-                <span class="s">&#39;sampling_rate&#39;</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">swp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;timeseries&#39;</span><span class="p">][</span><span class="s">&#39;starting_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;rate&#39;</span><span class="p">]</span>
+                <span class="s1">&#39;stimulus&#39;</span><span class="p">:</span> <span class="n">stimulus</span><span class="p">,</span>
+                <span class="s1">&#39;response&#39;</span><span class="p">:</span> <span class="n">response</span><span class="p">,</span>
+                <span class="s1">&#39;index_range&#39;</span><span class="p">:</span> <span class="n">experiment_index_range</span><span class="p">,</span>
+                <span class="s1">&#39;sampling_rate&#39;</span><span class="p">:</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">swp</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;starting_time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;rate&#39;</span><span class="p">]</span>
             <span class="p">}</span>
 </div>
 <div class="viewcode-block" id="NwbDataSet.set_sweep"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.set_sweep">[docs]</a>    <span class="k">def</span> <span class="nf">set_sweep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">stimulus</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
@@ -749,32 +749,32 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Overwrite the response with this array.  If None, response is unchanged.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">swp</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">][</span><span class="s">&#39;Sweep_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">]</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">swp</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">][</span><span class="s1">&#39;Sweep_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">]</span>
 
-            <span class="c"># this is the length of the entire sweep data, including test pulse and</span>
-            <span class="c"># whatever might be in front of it</span>
-            <span class="c"># TODO: remove deprecated &#39;idx_stop&#39;</span>
-            <span class="k">if</span> <span class="s">&#39;idx_stop&#39;</span> <span class="ow">in</span> <span class="n">swp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">]:</span>
-                <span class="n">sweep_length</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;idx_stop&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="c1"># this is the length of the entire sweep data, including test pulse and</span>
+            <span class="c1"># whatever might be in front of it</span>
+            <span class="c1"># TODO: remove deprecated &#39;idx_stop&#39;</span>
+            <span class="k">if</span> <span class="s1">&#39;idx_stop&#39;</span> <span class="ow">in</span> <span class="n">swp</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">]:</span>
+                <span class="n">sweep_length</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;idx_stop&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">sweep_length</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">sweep_length</span> <span class="o">=</span> <span class="n">swp</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;count&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
             <span class="k">if</span> <span class="n">stimulus</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="c"># if the data is shorter than the sweep, pad it with zeros</span>
+                <span class="c1"># if the data is shorter than the sweep, pad it with zeros</span>
                 <span class="n">missing_data</span> <span class="o">=</span> <span class="n">sweep_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">missing_data</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">stimulus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stimulus</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">missing_data</span><span class="p">))</span>
 
-                <span class="n">swp</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;timeseries&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">stimulus</span>
+                <span class="n">swp</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">stimulus</span>
 
             <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="c"># if the data is shorter than the sweep, pad it with zeros</span>
+                <span class="c1"># if the data is shorter than the sweep, pad it with zeros</span>
                 <span class="n">missing_data</span> <span class="o">=</span> <span class="n">sweep_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">missing_data</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">response</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">missing_data</span><span class="p">))</span>
 
-                <span class="n">swp</span><span class="p">[</span><span class="s">&#39;response&#39;</span><span class="p">][</span><span class="s">&#39;timeseries&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span>
+                <span class="n">swp</span><span class="p">[</span><span class="s1">&#39;response&#39;</span><span class="p">][</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span>
 </div>
 <div class="viewcode-block" id="NwbDataSet.get_spike_times"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_spike_times">[docs]</a>    <span class="k">def</span> <span class="nf">get_spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return any spike times stored in the NWB file for a sweep.</span>
@@ -795,10 +795,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spike_time_key</span>
 
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">sweep_name</span> <span class="o">=</span> <span class="s">&quot;Sweep_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
-            <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;analysis/</span><span class="si">%s</span><span class="s">/Sweep_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">),</span>
-                        <span class="s">&quot;analysis/</span><span class="si">%s</span><span class="s">/Sweep_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEPRECATED_SPIKE_TIMES</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">)]</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">sweep_name</span> <span class="o">=</span> <span class="s2">&quot;Sweep_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
+            <span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;analysis/</span><span class="si">%s</span><span class="s2">/Sweep_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">),</span>
+                        <span class="s2">&quot;analysis/</span><span class="si">%s</span><span class="s2">/Sweep_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEPRECATED_SPIKE_TIMES</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">)]</span>
 
             <span class="k">for</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
@@ -822,46 +822,46 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spike_time_key</span>
 
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="c"># make sure expected directory structure is in place</span>
-            <span class="k">if</span> <span class="s">&quot;analysis&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s">&quot;analysis&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># make sure expected directory structure is in place</span>
+            <span class="k">if</span> <span class="s2">&quot;analysis&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s2">&quot;analysis&quot;</span><span class="p">)</span>
 
-            <span class="n">analysis_dir</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&quot;analysis&quot;</span><span class="p">]</span>
+            <span class="n">analysis_dir</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s2">&quot;analysis&quot;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">NwbDataSet</span><span class="o">.</span><span class="n">SPIKE_TIMES</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">analysis_dir</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="c">#   analysis_dir.create_group(NwbDataSet.SPIKE_TIMES)</span>
+                <span class="c1">#   analysis_dir.create_group(NwbDataSet.SPIKE_TIMES)</span>
                 <span class="n">g</span> <span class="o">=</span> <span class="n">analysis_dir</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">NwbDataSet</span><span class="o">.</span><span class="n">SPIKE_TIMES</span><span class="p">)</span>
-                <span class="c"># mixup in specification for validator resulted everything</span>
-                <span class="c">#   in &#39;analysis&#39; requiring a custom label, even though</span>
-                <span class="c">#   it&#39;s already known to be custom. don&#39;t argue, just</span>
-                <span class="c">#   support the metadata redundancy</span>
-                <span class="n">g</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s">&quot;neurodata_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;Custom&quot;</span>
+                <span class="c1"># mixup in specification for validator resulted everything</span>
+                <span class="c1">#   in &#39;analysis&#39; requiring a custom label, even though</span>
+                <span class="c1">#   it&#39;s already known to be custom. don&#39;t argue, just</span>
+                <span class="c1">#   support the metadata redundancy</span>
+                <span class="n">g</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;neurodata_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Custom&quot;</span>
 
             <span class="n">spike_dir</span> <span class="o">=</span> <span class="n">analysis_dir</span><span class="p">[</span><span class="n">NwbDataSet</span><span class="o">.</span><span class="n">SPIKE_TIMES</span><span class="p">]</span>
 
-            <span class="c"># see if desired dataset already exists</span>
-            <span class="n">sweep_name</span> <span class="o">=</span> <span class="s">&quot;Sweep_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
+            <span class="c1"># see if desired dataset already exists</span>
+            <span class="n">sweep_name</span> <span class="o">=</span> <span class="s2">&quot;Sweep_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span>
             <span class="k">if</span> <span class="n">sweep_name</span> <span class="ow">in</span> <span class="n">spike_dir</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="c"># rewriting data -- delete old dataset</span>
+                <span class="c1"># rewriting data -- delete old dataset</span>
                 <span class="k">del</span> <span class="n">spike_dir</span><span class="p">[</span><span class="n">sweep_name</span><span class="p">]</span>
 
             <span class="n">spike_dir</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
-                <span class="n">sweep_name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;f8&#39;</span><span class="p">,</span> <span class="n">maxshape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,))</span>
+                <span class="n">sweep_name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="n">maxshape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,))</span>
 </div>
 <div class="viewcode-block" id="NwbDataSet.get_sweep_numbers"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_numbers">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweep_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get all of the sweep numbers in the file, including test sweeps. &quot;&quot;&quot;</span>
 
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-                      <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;Sweep_&#39;</span><span class="p">)]</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                      <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Sweep_&#39;</span><span class="p">)]</span>
             <span class="k">return</span> <span class="n">sweeps</span>
 </div>
 <div class="viewcode-block" id="NwbDataSet.get_experiment_sweep_numbers"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_experiment_sweep_numbers">[docs]</a>    <span class="k">def</span> <span class="nf">get_experiment_sweep_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get all of the sweep numbers for experiment epochs in the file, not including test sweeps. &quot;&quot;&quot;</span>
 
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-                      <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;Experiment_&#39;</span><span class="p">)]</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">sweeps</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                      <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Experiment_&#39;</span><span class="p">)]</span>
             <span class="k">return</span> <span class="n">sweeps</span>
 </div>
 <div class="viewcode-block" id="NwbDataSet.fill_sweep_responses"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.fill_sweep_responses">[docs]</a>    <span class="k">def</span> <span class="nf">fill_sweep_responses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -877,19 +877,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">sweep_numbers</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="c"># no sweep numbers given, grab all of them</span>
+                <span class="c1"># no sweep numbers given, grab all of them</span>
                 <span class="n">epochs</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span>
-                    <span class="s">&#39;epochs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;Sweep_&#39;</span><span class="p">)]</span>
+                    <span class="s1">&#39;epochs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Sweep_&#39;</span><span class="p">)]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">epochs</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;Sweep_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span>
+                <span class="n">epochs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Sweep_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
                           <span class="n">sweep_number</span> <span class="k">for</span> <span class="n">sweep_number</span> <span class="ow">in</span> <span class="n">sweep_numbers</span><span class="p">]</span>
 
             <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">epochs</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">]:</span>
-                    <span class="n">f</span><span class="p">[</span><span class="s">&#39;epochs&#39;</span><span class="p">][</span><span class="n">epoch</span><span class="p">][</span><span class="s">&#39;response&#39;</span><span class="p">][</span>
-                        <span class="s">&#39;timeseries&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill_value</span>
+                <span class="k">if</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">]:</span>
+                    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;epochs&#39;</span><span class="p">][</span><span class="n">epoch</span><span class="p">][</span><span class="s1">&#39;response&#39;</span><span class="p">][</span>
+                        <span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">fill_value</span>
 </div>
 <div class="viewcode-block" id="NwbDataSet.get_sweep_metadata"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_sweep_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_sweep_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Retrieve the sweep level metadata associated with each sweep.</span>
@@ -908,21 +908,21 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            &#39;gain&#39;, &#39;initial_access_resistance&#39;, &#39;seal&#39; elements.  These specific</span>
 <span class="sd">            fields are ones encoded in the original AIBS in vitro .nwb files.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
 
             <span class="n">sweep_metadata</span> <span class="o">=</span> <span class="p">{}</span>
 
-            <span class="c"># the sweep level metadata is stored in</span>
-            <span class="c"># stimulus/presentation/Sweep_XX in the .nwb file</span>
+            <span class="c1"># the sweep level metadata is stored in</span>
+            <span class="c1"># stimulus/presentation/Sweep_XX in the .nwb file</span>
 
-            <span class="c"># indicates which metadata fields to return</span>
-            <span class="n">metadata_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;aibs_stimulus_amplitude_pa&#39;</span><span class="p">,</span> <span class="s">&#39;aibs_stimulus_name&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;gain&#39;</span><span class="p">,</span> <span class="s">&#39;initial_access_resistance&#39;</span><span class="p">,</span> <span class="s">&#39;seal&#39;</span><span class="p">]</span>
+            <span class="c1"># indicates which metadata fields to return</span>
+            <span class="n">metadata_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;aibs_stimulus_amplitude_pa&#39;</span><span class="p">,</span> <span class="s1">&#39;aibs_stimulus_name&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;gain&#39;</span><span class="p">,</span> <span class="s1">&#39;initial_access_resistance&#39;</span><span class="p">,</span> <span class="s1">&#39;seal&#39;</span><span class="p">]</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">stim_details</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">][</span><span class="s">&#39;presentation&#39;</span><span class="p">][</span>
-                    <span class="s">&#39;Sweep_</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">]</span>
+                <span class="n">stim_details</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;presentation&#39;</span><span class="p">][</span>
+                    <span class="s1">&#39;Sweep_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">metadata_fields</span><span class="p">:</span>
-                    <span class="c"># check if sweep contains the specific metadata field</span>
+                    <span class="c1"># check if sweep contains the specific metadata field</span>
                     <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">stim_details</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                         <span class="n">sweep_metadata</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">stim_details</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
@@ -1000,7 +1000,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

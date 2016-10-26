@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.brain_observatory.r_neuropil</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="kn">as</span> <span class="nn">sparse</span>
@@ -664,7 +664,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    dictionary: diagonals keyed by offsets</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="n">mat_dia</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">todia</span><span class="p">()</span>  <span class="c"># make sure the matrix is in diagonal format</span>
+    <span class="n">mat_dia</span> <span class="o">=</span> <span class="n">mat</span><span class="o">.</span><span class="n">todia</span><span class="p">()</span>  <span class="c1"># make sure the matrix is in diagonal format</span>
 
     <span class="n">offsets</span> <span class="o">=</span> <span class="n">mat_dia</span><span class="o">.</span><span class="n">offsets</span>
     <span class="n">diagonals</span> <span class="o">=</span> <span class="n">mat_dia</span><span class="o">.</span><span class="n">data</span>
@@ -723,9 +723,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 </div>
 <div class="viewcode-block" id="ab_from_T"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.ab_from_T">[docs]</a><span class="k">def</span> <span class="nf">ab_from_T</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">lam</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-    <span class="c"># using csr because multiplication is fast</span>
-    <span class="n">Ls</span> <span class="o">=</span> <span class="o">-</span><span class="n">sparse</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">T</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;csr&#39;</span><span class="p">)</span> <span class="o">+</span> \
-        <span class="n">sparse</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">T</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;csr&#39;</span><span class="p">)</span>
+    <span class="c1"># using csr because multiplication is fast</span>
+    <span class="n">Ls</span> <span class="o">=</span> <span class="o">-</span><span class="n">sparse</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">T</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s1">&#39;csr&#39;</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="n">sparse</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">T</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s1">&#39;csr&#39;</span><span class="p">)</span>
     <span class="n">Ls</span> <span class="o">/=</span> <span class="n">dt</span>
     <span class="n">Ls2</span> <span class="o">=</span> <span class="n">Ls</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Ls</span><span class="p">)</span>
 
@@ -739,7 +739,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="normalize_F"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.normalize_F">[docs]</a><span class="k">def</span> <span class="nf">normalize_F</span><span class="p">(</span><span class="n">F_M</span><span class="p">,</span> <span class="n">F_N</span><span class="p">):</span>
     <span class="n">F_N_min</span><span class="p">,</span> <span class="n">F_N_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span><span class="n">F_N</span><span class="p">)),</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">F_N</span><span class="p">))</span>
 
-    <span class="c"># rescale so F_N is [0,1]</span>
+    <span class="c1"># rescale so F_N is [0,1]</span>
     <span class="n">F_M_s</span> <span class="o">=</span> <span class="p">(</span><span class="n">F_M</span> <span class="o">-</span> <span class="n">F_N_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">F_N_max</span> <span class="o">-</span> <span class="n">F_N_min</span><span class="p">)</span>
     <span class="n">F_N_s</span> <span class="o">=</span> <span class="p">(</span><span class="n">F_N</span> <span class="o">-</span> <span class="n">F_N_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">F_N_max</span> <span class="o">-</span> <span class="n">F_N_min</span><span class="p">)</span>
 
@@ -764,7 +764,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">F_M_truth</span><span class="p">,</span> <span class="n">F_N_truth</span><span class="p">,</span> <span class="n">F_C_truth</span><span class="p">,</span> <span class="n">r_truth</span> <span class="o">=</span> <span class="n">synthesize_F</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">af1</span><span class="p">,</span> <span class="n">af2</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">estimate_contamination_ratios</span><span class="p">(</span><span class="n">F_M_truth</span><span class="p">,</span> <span class="n">F_N_truth</span><span class="p">)</span>
 
-        <span class="n">r_est</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s">&#39;r&#39;</span><span class="p">]</span>
+        <span class="n">r_est</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">]</span>
 
         <span class="n">r_truth_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r_truth</span><span class="p">)</span>
         <span class="n">r_est_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r_est</span><span class="p">)</span>
@@ -777,10 +777,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    TODO: docs</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">p1</span>
-    <span class="n">F_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">af1</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;full&#39;</span><span class="p">)[:</span><span class="n">T</span><span class="p">]</span>
+    <span class="n">F_C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">af1</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)[:</span><span class="n">T</span><span class="p">]</span>
 
     <span class="n">x2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">p2</span>
-    <span class="n">F_N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">af2</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;full&#39;</span><span class="p">)[:</span><span class="n">T</span><span class="p">]</span>
+    <span class="n">F_N</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">af2</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">)[:</span><span class="n">T</span><span class="p">]</span>
 
     <span class="n">r</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
 
@@ -820,10 +820,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">if</span> <span class="n">F_M_len</span> <span class="o">!=</span> <span class="n">F_N_len</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s">&quot;F_M and F_N must have the same length (</span><span class="si">%d</span><span class="s"> vs </span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">F_M_len</span><span class="p">,</span> <span class="n">F_N_len</span><span class="p">))</span>
+                <span class="s2">&quot;F_M and F_N must have the same length (</span><span class="si">%d</span><span class="s2"> vs </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">F_M_len</span><span class="p">,</span> <span class="n">F_N_len</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">!=</span> <span class="n">F_M_len</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;updating ab matrix for new T=</span><span class="si">%d</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">F_M_len</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;updating ab matrix for new T=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">F_M_len</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">=</span> <span class="n">F_M_len</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">T_f</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">folds</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ab</span> <span class="o">=</span> <span class="n">ab_from_T</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">T_f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lam</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
@@ -832,8 +832,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">F_N</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">fi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folds</span><span class="p">):</span>
-            <span class="c"># F_M_i_s, F_N_i_s = normalize_F(F_M[fi*self.T_f:(fi+1)*self.T_f],</span>
-            <span class="c">#                               F_N[fi*self.T_f:(fi+1)*self.T_f])</span>
+            <span class="c1"># F_M_i_s, F_N_i_s = normalize_F(F_M[fi*self.T_f:(fi+1)*self.T_f],</span>
+            <span class="c1">#                               F_N[fi*self.T_f:(fi+1)*self.T_f])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">F_M</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">F_M</span><span class="p">[</span><span class="n">fi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">T_f</span><span class="p">:(</span><span class="n">fi</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">T_f</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">F_N</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">F_N</span><span class="p">[</span><span class="n">fi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">T_f</span><span class="p">:(</span><span class="n">fi</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">T_f</span><span class="p">])</span>
 </div>
@@ -886,10 +886,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">while</span> <span class="n">it</span> <span class="o">&lt;</span> <span class="n">iterations</span><span class="p">:</span>
             <span class="n">it_errors</span> <span class="o">=</span> <span class="p">[]</span>
 
-            <span class="c"># build a set of r values evenly distributed in a current range</span>
+            <span class="c1"># build a set of r values evenly distributed in a current range</span>
             <span class="n">rs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">it_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">it_dr</span><span class="p">)</span>
 
-            <span class="c"># estimate error for each r</span>
+            <span class="c1"># estimate error for each r</span>
             <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rs</span><span class="p">:</span>
                 <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_error</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
                 <span class="n">it_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
@@ -897,7 +897,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">r_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
                 <span class="n">error_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
 
-            <span class="c"># find the minimum in this range and update the global minimum</span>
+            <span class="c1"># find the minimum in this range and update the global minimum</span>
             <span class="n">min_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">it_errors</span><span class="p">)</span>
             <span class="n">min_error</span> <span class="o">=</span> <span class="n">it_errors</span><span class="p">[</span><span class="n">min_i</span><span class="p">]</span>
 
@@ -905,17 +905,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">global_min_error</span> <span class="o">=</span> <span class="n">min_error</span>
                 <span class="n">global_min_r</span> <span class="o">=</span> <span class="n">rs</span><span class="p">[</span><span class="n">min_i</span><span class="p">]</span>
 
-            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;iteration </span><span class="si">%d</span><span class="s">, r=</span><span class="si">%0.4f</span><span class="s">, e=</span><span class="si">%.6e</span><span class="s">&quot;</span><span class="p">,</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;iteration </span><span class="si">%d</span><span class="s2">, r=</span><span class="si">%0.4f</span><span class="s2">, e=</span><span class="si">%.6e</span><span class="s2">&quot;</span><span class="p">,</span>
                           <span class="n">it</span><span class="p">,</span> <span class="n">global_min_r</span><span class="p">,</span> <span class="n">global_min_error</span><span class="p">)</span>
 
-            <span class="c"># if the minimum error is on the upper boundary,</span>
-            <span class="c"># extend the boundary and redo this iteration</span>
+            <span class="c1"># if the minimum error is on the upper boundary,</span>
+            <span class="c1"># extend the boundary and redo this iteration</span>
             <span class="k">if</span> <span class="n">min_i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">it_errors</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="s">&quot;minimum error found on upper r bound, extending range&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot;minimum error found on upper r bound, extending range&quot;</span><span class="p">)</span>
                 <span class="n">it_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">rs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">rs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">rs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">rs</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c"># error is somewhere on either side of the minimum error index</span>
+                <span class="c1"># error is somewhere on either side of the minimum error index</span>
                 <span class="n">it_range</span> <span class="o">=</span> <span class="p">[</span><span class="n">rs</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">min_i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
                             <span class="n">rs</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">min_i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]]</span>
                 <span class="n">it_dr</span> <span class="o">*=</span> <span class="n">dr_factor</span>
@@ -967,19 +967,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
            <span class="n">dr</span><span class="o">=</span><span class="n">dr</span><span class="p">,</span>
            <span class="n">dr_factor</span><span class="o">=</span><span class="n">dr_factor</span><span class="p">)</span>
 
-    <span class="c"># ns.fit_block_coordinate_desc()</span>
+    <span class="c1"># ns.fit_block_coordinate_desc()</span>
 
     <span class="k">if</span> <span class="n">ns</span><span class="o">.</span><span class="n">r</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;r is negative (</span><span class="si">%f</span><span class="s">). return 0.0.&quot;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;r is negative (</span><span class="si">%f</span><span class="s2">). return 0.0.&quot;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
         <span class="n">ns</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">return</span> <span class="p">{</span>
-        <span class="s">&quot;r&quot;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">r</span><span class="p">,</span>
-        <span class="s">&quot;r_vals&quot;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">r_vals</span><span class="p">,</span>
-        <span class="s">&quot;err&quot;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">error</span><span class="p">,</span>
-        <span class="s">&quot;err_vals&quot;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">error_vals</span><span class="p">,</span>
-        <span class="s">&quot;min_error&quot;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">error</span><span class="p">,</span>
-        <span class="s">&quot;it&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">r_vals</span><span class="p">)</span>
+        <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">r</span><span class="p">,</span>
+        <span class="s2">&quot;r_vals&quot;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">r_vals</span><span class="p">,</span>
+        <span class="s2">&quot;err&quot;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">error</span><span class="p">,</span>
+        <span class="s2">&quot;err_vals&quot;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">error_vals</span><span class="p">,</span>
+        <span class="s2">&quot;min_error&quot;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">error</span><span class="p">,</span>
+        <span class="s2">&quot;it&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">r_vals</span><span class="p">)</span>
     <span class="p">}</span></div>
 </pre></div>
 
@@ -1051,7 +1051,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.model.biophys_sim.neuron.hoc_utils</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
 
@@ -678,33 +678,33 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">hoc_files</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;neuron&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;hoc&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hoc_files</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;neuron&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;hoc&#39;</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_hoc</span><span class="p">()</span>
 
 <div class="viewcode-block" id="HocUtils.initialize_hoc"><a class="viewcode-back" href="../../../../../allensdk.model.biophys_sim.neuron.html#allensdk.model.biophys_sim.neuron.hoc_utils.HocUtils.initialize_hoc">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_hoc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Basic setup for NEURON.&#39;&#39;&#39;</span>
         <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;conditions&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;conditions&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">hoc_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hoc_files</span><span class="p">:</span>
-            <span class="n">HocUtils</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;loading hoc file </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">hoc_file</span><span class="p">))</span>
+            <span class="n">HocUtils</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;loading hoc file </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">hoc_file</span><span class="p">))</span>
             <span class="n">HocUtils</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">hoc_file</span><span class="p">))</span>
 
-        <span class="n">h</span><span class="p">(</span><span class="s">&#39;starttime = startsw()&#39;</span><span class="p">)</span>
+        <span class="n">h</span><span class="p">(</span><span class="s1">&#39;starttime = startsw()&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s">&#39;celsius&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">h</span><span class="o">.</span><span class="n">celsius</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;celsius&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;celsius&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">celsius</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;celsius&#39;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="s">&#39;v_init&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">h</span><span class="o">.</span><span class="n">v_init</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;v_init&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;v_init&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">v_init</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;v_init&#39;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="s">&#39;dt&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">h</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;dt&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;dt&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
             <span class="n">h</span><span class="o">.</span><span class="n">steps_per_ms</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">h</span><span class="o">.</span><span class="n">dt</span>
 
-        <span class="k">if</span> <span class="s">&#39;tstop&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">h</span><span class="o">.</span><span class="n">tstop</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s">&#39;tstop&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;tstop&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">tstop</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span>
             <span class="n">h</span><span class="o">.</span><span class="n">runStopAt</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">tstop</span></div></div>
 </pre></div>
 
@@ -776,7 +776,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.core.cell_types_cache</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
@@ -687,16 +687,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">       File name of the manifest to be read.  Default is &quot;cell_types_manifest.json&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="c"># manifest keys</span>
-    <span class="n">CELLS_KEY</span> <span class="o">=</span> <span class="s">&#39;CELLS&#39;</span>
-    <span class="n">EPHYS_FEATURES_KEY</span> <span class="o">=</span> <span class="s">&#39;EPHYS_FEATURES&#39;</span>
-    <span class="n">MORPHOLOGY_FEATURES_KEY</span> <span class="o">=</span> <span class="s">&#39;MORPHOLOGY_FEATURES&#39;</span>
-    <span class="n">EPHYS_DATA_KEY</span> <span class="o">=</span> <span class="s">&#39;EPHYS_DATA&#39;</span>
-    <span class="n">EPHYS_SWEEPS_KEY</span> <span class="o">=</span> <span class="s">&#39;EPHYS_SWEEPS&#39;</span>
-    <span class="n">RECONSTRUCTION_KEY</span> <span class="o">=</span> <span class="s">&#39;RECONSTRUCTION&#39;</span>
-    <span class="n">MARKER_KEY</span> <span class="o">=</span> <span class="s">&#39;MARKER&#39;</span>
+    <span class="c1"># manifest keys</span>
+    <span class="n">CELLS_KEY</span> <span class="o">=</span> <span class="s1">&#39;CELLS&#39;</span>
+    <span class="n">EPHYS_FEATURES_KEY</span> <span class="o">=</span> <span class="s1">&#39;EPHYS_FEATURES&#39;</span>
+    <span class="n">MORPHOLOGY_FEATURES_KEY</span> <span class="o">=</span> <span class="s1">&#39;MORPHOLOGY_FEATURES&#39;</span>
+    <span class="n">EPHYS_DATA_KEY</span> <span class="o">=</span> <span class="s1">&#39;EPHYS_DATA&#39;</span>
+    <span class="n">EPHYS_SWEEPS_KEY</span> <span class="o">=</span> <span class="s1">&#39;EPHYS_SWEEPS&#39;</span>
+    <span class="n">RECONSTRUCTION_KEY</span> <span class="o">=</span> <span class="s1">&#39;RECONSTRUCTION&#39;</span>
+    <span class="n">MARKER_KEY</span> <span class="o">=</span> <span class="s1">&#39;MARKER&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">manifest_file</span><span class="o">=</span><span class="s">&#39;cell_types_manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">manifest_file</span><span class="o">=</span><span class="s1">&#39;cell_types_manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CellTypesCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
             <span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">CellTypesApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="n">base_uri</span><span class="p">)</span>
@@ -737,7 +737,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reporter_status</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
             <span class="n">reporter_status</span> <span class="o">=</span> <span class="p">[</span><span class="n">reporter_status</span><span class="p">]</span>
 
-        <span class="c"># filter the cells on the way out</span>
+        <span class="c1"># filter the cells on the way out</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">filter_cells</span><span class="p">(</span><span class="n">cells</span><span class="p">,</span> <span class="n">require_morphology</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="p">,</span> <span class="n">reporter_status</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="CellTypesCache.get_ephys_sweeps"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_sweeps">[docs]</a>    <span class="k">def</span> <span class="nf">get_ephys_sweeps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -795,7 +795,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">dataframe</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">features_df</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">features_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">features_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="CellTypesCache.get_morphology_features"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_morphology_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_morphology_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -829,7 +829,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">dataframe</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">features_df</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">features_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">features_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="CellTypesCache.get_all_features"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_all_features">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">require_reconstruction</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -851,16 +851,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">ephys_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ephys_features</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="n">morphology_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_morphology_features</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
-        <span class="n">how</span> <span class="o">=</span> <span class="s">&#39;inner&#39;</span> <span class="k">if</span> <span class="n">require_reconstruction</span> <span class="k">else</span> <span class="s">&#39;outer&#39;</span>
+        <span class="n">how</span> <span class="o">=</span> <span class="s1">&#39;inner&#39;</span> <span class="k">if</span> <span class="n">require_reconstruction</span> <span class="k">else</span> <span class="s1">&#39;outer&#39;</span>
 
         <span class="n">all_features</span> <span class="o">=</span> <span class="n">ephys_features</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">morphology_features</span><span class="p">,</span>
                                             <span class="n">how</span><span class="o">=</span><span class="n">how</span><span class="p">,</span>
-                                            <span class="n">on</span><span class="o">=</span><span class="s">&#39;specimen_id&#39;</span><span class="p">)</span>
+                                            <span class="n">on</span><span class="o">=</span><span class="s1">&#39;specimen_id&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">dataframe</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">all_features</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">all_features</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s">&#39;records&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">all_features</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="CellTypesCache.get_ephys_data"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.get_ephys_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_ephys_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -920,7 +920,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s">&quot;Please enable caching (CellTypes.cache = True) or specify a save_file_name.&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;Please enable caching (CellTypes.cache = True) or specify a save_file_name.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">save_reconstruction</span><span class="p">(</span><span class="n">specimen_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
@@ -954,7 +954,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">if</span> <span class="n">file_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s">&quot;Please enable caching (CellTypes.cache = True) or specify a save_file_name.&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;Please enable caching (CellTypes.cache = True) or specify a save_file_name.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
@@ -979,21 +979,21 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">mb</span> <span class="o">=</span> <span class="n">ManifestBuilder</span><span class="p">()</span>
 
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">,</span> <span class="s">&#39;.&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CELLS_KEY</span><span class="p">,</span> <span class="s">&#39;cells.json&#39;</span><span class="p">,</span>
-                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_DATA_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/ephys.nwb&#39;</span><span class="p">,</span>
-                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_FEATURES_KEY</span><span class="p">,</span> <span class="s">&#39;ephys_features.csv&#39;</span><span class="p">,</span>
-                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MORPHOLOGY_FEATURES_KEY</span><span class="p">,</span> <span class="s">&#39;morphology_features.csv&#39;</span><span class="p">,</span>
-                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RECONSTRUCTION_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/reconstruction.swc&#39;</span><span class="p">,</span>
-                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MARKER_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/reconstruction.marker&#39;</span><span class="p">,</span>
-                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
-        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_SWEEPS_KEY</span><span class="p">,</span> <span class="s">&#39;specimen_</span><span class="si">%d</span><span class="s">/ephys_sweeps.json&#39;</span><span class="p">,</span>
-                    <span class="n">typename</span><span class="o">=</span><span class="s">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CELLS_KEY</span><span class="p">,</span> <span class="s1">&#39;cells.json&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_DATA_KEY</span><span class="p">,</span> <span class="s1">&#39;specimen_</span><span class="si">%d</span><span class="s1">/ephys.nwb&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_FEATURES_KEY</span><span class="p">,</span> <span class="s1">&#39;ephys_features.csv&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MORPHOLOGY_FEATURES_KEY</span><span class="p">,</span> <span class="s1">&#39;morphology_features.csv&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RECONSTRUCTION_KEY</span><span class="p">,</span> <span class="s1">&#39;specimen_</span><span class="si">%d</span><span class="s1">/reconstruction.swc&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MARKER_KEY</span><span class="p">,</span> <span class="s1">&#39;specimen_</span><span class="si">%d</span><span class="s1">/reconstruction.marker&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">)</span>
+        <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EPHYS_SWEEPS_KEY</span><span class="p">,</span> <span class="s1">&#39;specimen_</span><span class="si">%d</span><span class="s1">/ephys_sweeps.json&#39;</span><span class="p">,</span>
+                    <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">)</span>
 
         <span class="n">mb</span><span class="o">.</span><span class="n">write_json_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
@@ -1003,10 +1003,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    Valid strings for filtering by cell reporter status.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">POSITIVE</span> <span class="o">=</span> <span class="s">&#39;cre reporter positive&#39;</span>
-    <span class="n">NEGATIVE</span> <span class="o">=</span> <span class="s">&#39;cre reporter negative&#39;</span>
-    <span class="n">NA</span> <span class="o">=</span> <span class="s">&#39;not applicable&#39;</span>
-    <span class="n">INDETERMINATE</span> <span class="o">=</span> <span class="s">&#39;cre reporter indeterminate&#39;</span></div>
+    <span class="n">POSITIVE</span> <span class="o">=</span> <span class="s1">&#39;cre reporter positive&#39;</span>
+    <span class="n">NEGATIVE</span> <span class="o">=</span> <span class="s1">&#39;cre reporter negative&#39;</span>
+    <span class="n">NA</span> <span class="o">=</span> <span class="s1">&#39;not applicable&#39;</span>
+    <span class="n">INDETERMINATE</span> <span class="o">=</span> <span class="s1">&#39;cre reporter indeterminate&#39;</span></div>
 </pre></div>
 
           </div>
@@ -1077,7 +1077,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

@@ -29,17 +29,17 @@
     <link rel="prev" title="Cell Types" href="cell_types.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -181,11 +181,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -609,7 +609,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -622,7 +622,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -656,15 +656,15 @@ started with analysis:</p>
 <p>The <a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi"><tt class="xref py py-class docutils literal"><span class="pre">MouseConnectivityApi</span></tt></a> class provides a Python interface
 for downloading data in the Allen Mouse Brain Connectivity Atlas.  The following example demonstrates how to download
 meta data for all wild-type mice and the projection signal density for one cell:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.mouse_connectivity_api</span> <span class="kn">import</span> <span class="n">MouseConnectivityApi</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.mouse_connectivity_api</span> <span class="kn">import</span> <span class="n">MouseConnectivityApi</span>
 
 <span class="n">mca</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="p">()</span>
 
-<span class="c"># get metadata for all non-Cre experiments</span>
-<span class="n">experiments</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">experiment_source_search</span><span class="p">(</span><span class="n">injection_structures</span><span class="o">=</span><span class="s">&#39;root&#39;</span><span class="p">,</span> <span class="n">transgenic_lines</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># get metadata for all non-Cre experiments</span>
+<span class="n">experiments</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">experiment_source_search</span><span class="p">(</span><span class="n">injection_structures</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="n">transgenic_lines</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-<span class="c"># download the projection density volume for one of the experiments</span>
-<span class="n">pd</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">download_projection_density</span><span class="p">(</span><span class="s">&#39;example.nrrd&#39;</span><span class="p">,</span> <span class="n">experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">],</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="c1"># download the projection density volume for one of the experiments</span>
+<span class="n">pd</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">download_projection_density</span><span class="p">(</span><span class="s1">&#39;example.nrrd&#39;</span><span class="p">,</span> <span class="n">experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -675,21 +675,21 @@ via the <tt class="xref py py-class docutils literal"><span class="pre">MouseCon
 don&#8217;t have to think about file names and directories.  It also takes care of knowing if you&#8217;ve already downloaded some files
 and reads them from disk instead of downloading them again.  The following example demonstrates how to download meta data for
 all experiments with injections in the isocortex and download the projetion density volume for one of them:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">allensdk.core.mouse_connectivity_cache</span> <span class="kn">import</span> <span class="n">MouseConnectivityCache</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.core.mouse_connectivity_cache</span> <span class="kn">import</span> <span class="n">MouseConnectivityCache</span>
 
-<span class="c"># tell the cache class what resolution (in microns) of data you want to download</span>
+<span class="c1"># tell the cache class what resolution (in microns) of data you want to download</span>
 <span class="n">mcc</span> <span class="o">=</span> <span class="n">MouseConnectivityCache</span><span class="p">(</span><span class="n">resolution</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 
-<span class="c"># use the ontology class to get the id of the isocortex structure</span>
-<span class="n">ontology</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_ontology</span><span class="p">(</span><span class="s">&#39;ontology.csv&#39;</span><span class="p">)</span>
-<span class="n">isocortex</span> <span class="o">=</span> <span class="n">ontology</span><span class="p">[</span><span class="s">&#39;Isocortex&#39;</span><span class="p">]</span>
+<span class="c1"># use the ontology class to get the id of the isocortex structure</span>
+<span class="n">ontology</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_ontology</span><span class="p">(</span><span class="s1">&#39;ontology.csv&#39;</span><span class="p">)</span>
+<span class="n">isocortex</span> <span class="o">=</span> <span class="n">ontology</span><span class="p">[</span><span class="s1">&#39;Isocortex&#39;</span><span class="p">]</span>
 
-<span class="c"># a list of dictionaries containing metadata for non-Cre experiments</span>
-<span class="n">experiments</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_experiments</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s">&#39;non_cre.json&#39;</span><span class="p">,</span>
-                                  <span class="n">injection_structure_ids</span><span class="o">=</span><span class="n">isocortex</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
+<span class="c1"># a list of dictionaries containing metadata for non-Cre experiments</span>
+<span class="n">experiments</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_experiments</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;non_cre.json&#39;</span><span class="p">,</span>
+                                  <span class="n">injection_structure_ids</span><span class="o">=</span><span class="n">isocortex</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
 
-<span class="c"># download the projection density volume for one of the experiments</span>
-<span class="n">pd</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_projection_density</span><span class="p">(</span><span class="n">experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
+<span class="c1"># download the projection density volume for one of the experiments</span>
+<span class="n">pd</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_projection_density</span><span class="p">(</span><span class="n">experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -709,9 +709,9 @@ in more detail on the <a class="reference internal" href="unionizes.html"><em>st
 consists of a short ASCII header followed by a binary array of data values.</p>
 <p>To read these in Python, we recommend the <a class="reference external" href="https://github.com/mhe/pynrrd">pynrrd package</a>.
 Usage is straightforward:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">nrrd</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nrrd</span>
 
-<span class="n">file_name</span> <span class="o">=</span> <span class="s">&#39;experiment_180435652/projection_density_25.nrrd&#39;</span>
+<span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;experiment_180435652/projection_density_25.nrrd&#39;</span>
 <span class="n">data_array</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -788,7 +788,7 @@ Usage is straightforward:</p>
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

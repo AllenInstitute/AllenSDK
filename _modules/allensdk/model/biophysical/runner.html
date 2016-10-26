@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.model.biophysical.runner</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">..biophys_sim.config</span> <span class="kn">import</span> <span class="n">Config</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">create_utils</span>
@@ -656,7 +656,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="n">_runner_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;allensdk.model.biophysical.runner&#39;</span><span class="p">)</span>
+<span class="n">_runner_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;allensdk.model.biophysical.runner&#39;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="run"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.runner.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">sweeps</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -667,46 +667,46 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    description : Config</span>
 <span class="sd">        All information needed to run the experiment.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">model_type</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;biophys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;model_type&#39;</span><span class="p">]</span>
+    <span class="n">model_type</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;biophys&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;model_type&#39;</span><span class="p">]</span>
 
-    <span class="c"># configure NEURON</span>
+    <span class="c1"># configure NEURON</span>
     <span class="n">utils</span> <span class="o">=</span> <span class="n">create_utils</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">model_type</span><span class="p">)</span>
     <span class="n">h</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">h</span>
 
-    <span class="c"># configure model</span>
+    <span class="c1"># configure model</span>
     <span class="n">manifest</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span>
-    <span class="n">morphology_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;MORPHOLOGY&#39;</span><span class="p">)</span>
-    <span class="n">utils</span><span class="o">.</span><span class="n">generate_morphology</span><span class="p">(</span><span class="n">morphology_path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;ascii&#39;</span><span class="p">,</span> <span class="s">&#39;ignore&#39;</span><span class="p">))</span>
+    <span class="n">morphology_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;MORPHOLOGY&#39;</span><span class="p">)</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">generate_morphology</span><span class="p">(</span><span class="n">morphology_path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">,</span> <span class="s1">&#39;ignore&#39;</span><span class="p">))</span>
     <span class="n">utils</span><span class="o">.</span><span class="n">load_cell_parameters</span><span class="p">()</span>
 
-    <span class="c"># configure stimulus and recording</span>
-    <span class="n">stimulus_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;stimulus_path&#39;</span><span class="p">)</span>
-    <span class="n">run_params</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;runs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># configure stimulus and recording</span>
+    <span class="n">stimulus_path</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;stimulus_path&#39;</span><span class="p">)</span>
+    <span class="n">run_params</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;runs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">sweeps</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="n">sweeps</span> <span class="o">=</span> <span class="n">run_params</span><span class="p">[</span><span class="s">&#39;sweeps&#39;</span><span class="p">]</span>
-    <span class="n">sweeps_by_type</span> <span class="o">=</span> <span class="n">run_params</span><span class="p">[</span><span class="s">&#39;sweeps_by_type&#39;</span><span class="p">]</span>
-    <span class="n">junction_potential</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;fitting&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;junction_potential&#39;</span><span class="p">]</span>
+        <span class="n">sweeps</span> <span class="o">=</span> <span class="n">run_params</span><span class="p">[</span><span class="s1">&#39;sweeps&#39;</span><span class="p">]</span>
+    <span class="n">sweeps_by_type</span> <span class="o">=</span> <span class="n">run_params</span><span class="p">[</span><span class="s1">&#39;sweeps_by_type&#39;</span><span class="p">]</span>
+    <span class="n">junction_potential</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;fitting&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;junction_potential&#39;</span><span class="p">]</span>
     <span class="n">mV</span> <span class="o">=</span> <span class="mf">1.0e-3</span>
 
-    <span class="n">prepare_nwb_output</span><span class="p">(</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;stimulus_path&#39;</span><span class="p">),</span>
-                       <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;output_path&#39;</span><span class="p">))</span>
+    <span class="n">prepare_nwb_output</span><span class="p">(</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;stimulus_path&#39;</span><span class="p">),</span>
+                       <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;output_path&#39;</span><span class="p">))</span>
 
-    <span class="c"># run sweeps</span>
+    <span class="c1"># run sweeps</span>
     <span class="k">for</span> <span class="n">sweep</span> <span class="ow">in</span> <span class="n">sweeps</span><span class="p">:</span>
-        <span class="n">_runner_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Running sweep: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep</span><span class="p">))</span>
+        <span class="n">_runner_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running sweep: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep</span><span class="p">))</span>
         <span class="n">utils</span><span class="o">.</span><span class="n">setup_iclamp</span><span class="p">(</span><span class="n">stimulus_path</span><span class="p">,</span> <span class="n">sweep</span><span class="o">=</span><span class="n">sweep</span><span class="p">)</span>
-        <span class="n">_runner_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Done loading sweep: </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep</span><span class="p">))</span>
+        <span class="n">_runner_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done loading sweep: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep</span><span class="p">))</span>
         <span class="n">vec</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">record_values</span><span class="p">()</span>
         <span class="n">tstart</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">h</span><span class="o">.</span><span class="n">finitialize</span><span class="p">()</span>
         <span class="n">h</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
         <span class="n">tstop</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">_runner_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Time: </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tstop</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">))</span>
+        <span class="n">_runner_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Time: </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tstop</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">))</span>
 
-        <span class="c"># write to an NWB File</span>
-        <span class="n">output_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="s">&#39;v&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="n">junction_potential</span><span class="p">)</span> <span class="o">*</span> <span class="n">mV</span>
+        <span class="c1"># write to an NWB File</span>
+        <span class="n">output_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="n">junction_potential</span><span class="p">)</span> <span class="o">*</span> <span class="n">mV</span>
 
-        <span class="n">output_path</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&quot;output_path&quot;</span><span class="p">)</span>
+        <span class="n">output_path</span> <span class="o">=</span> <span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s2">&quot;output_path&quot;</span><span class="p">)</span>
 
         <span class="n">save_nwb</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">output_data</span><span class="p">,</span> <span class="n">sweep</span><span class="p">,</span> <span class="n">sweeps_by_type</span><span class="p">)</span>
 
@@ -755,11 +755,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">sweep_features</span> <span class="o">=</span> <span class="n">extract_cell_features</span><span class="o">.</span><span class="n">extract_sweep_features</span><span class="p">(</span><span class="n">output</span><span class="p">,</span>
                                                                   <span class="n">sweep_by_type</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">spikes</span> <span class="o">=</span> <span class="n">sweep_features</span><span class="p">[</span><span class="n">sweep</span><span class="p">][</span><span class="s">&#39;spikes&#39;</span><span class="p">]</span>
-        <span class="n">spike_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s">&#39;threshold_t&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">spikes</span><span class="p">]</span>
+        <span class="n">spikes</span> <span class="o">=</span> <span class="n">sweep_features</span><span class="p">[</span><span class="n">sweep</span><span class="p">][</span><span class="s1">&#39;spikes&#39;</span><span class="p">]</span>
+        <span class="n">spike_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;threshold_t&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">spikes</span><span class="p">]</span>
         <span class="n">output</span><span class="o">.</span><span class="n">set_spike_times</span><span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;sweep </span><span class="si">%d</span><span class="s"> has no sweep features. </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;sweep </span><span class="si">%d</span><span class="s2"> has no sweep features. </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sweep</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">))</span>
 
 </div>
 <div class="viewcode-block" id="load_description"><a class="viewcode-back" href="../../../../allensdk.model.biophysical.html#allensdk.model.biophysical.runner.load_description">[docs]</a><span class="k">def</span> <span class="nf">load_description</span><span class="p">(</span><span class="n">manifest_json_path</span><span class="p">):</span>
@@ -777,14 +777,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">manifest_json_path</span><span class="p">)</span>
 
-    <span class="c"># fix nonstandard description sections</span>
-    <span class="n">fix_sections</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;passive&#39;</span><span class="p">,</span> <span class="s">&#39;axon_morph,&#39;</span><span class="p">,</span> <span class="s">&#39;conditions&#39;</span><span class="p">,</span> <span class="s">&#39;fitting&#39;</span><span class="p">]</span>
+    <span class="c1"># fix nonstandard description sections</span>
+    <span class="n">fix_sections</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;passive&#39;</span><span class="p">,</span> <span class="s1">&#39;axon_morph,&#39;</span><span class="p">,</span> <span class="s1">&#39;conditions&#39;</span><span class="p">,</span> <span class="s1">&#39;fitting&#39;</span><span class="p">]</span>
     <span class="n">description</span><span class="o">.</span><span class="n">fix_unary_sections</span><span class="p">(</span><span class="n">fix_sections</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">description</span>
 
 </div>
-<span class="k">if</span> <span class="s">&#39;__main__&#39;</span> <span class="o">==</span> <span class="n">__name__</span><span class="p">:</span>
+<span class="k">if</span> <span class="s1">&#39;__main__&#39;</span> <span class="o">==</span> <span class="n">__name__</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">sys</span>
 
     <span class="n">description</span> <span class="o">=</span> <span class="n">load_description</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -859,7 +859,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

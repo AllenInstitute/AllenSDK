@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.model.glif.glif_neuron</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -708,7 +708,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        initial afterspike current vector. one element per element of asc_tau_array.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">TYPE</span> <span class="o">=</span> <span class="s">&quot;GLIF&quot;</span>
+    <span class="n">TYPE</span> <span class="o">=</span> <span class="s2">&quot;GLIF&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">El</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">asc_tau_array</span><span class="p">,</span> <span class="n">R_input</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">asc_amp_array</span><span class="p">,</span> <span class="n">spike_cut_length</span><span class="p">,</span> <span class="n">th_inf</span><span class="p">,</span> <span class="n">th_adapt</span><span class="p">,</span> <span class="n">coeffs</span><span class="p">,</span>
                  <span class="n">AScurrent_dynamics_method</span><span class="p">,</span> <span class="n">voltage_dynamics_method</span><span class="p">,</span> <span class="n">threshold_dynamics_method</span><span class="p">,</span>
@@ -736,38 +736,38 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">init_threshold</span> <span class="o">=</span> <span class="n">init_threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">init_AScurrents</span> <span class="o">=</span> <span class="n">init_AScurrents</span>
 
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">asc_tau_array</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">asc_amp_array</span><span class="p">),</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;After-spike current vector must have same length as asc_tau_array (</span><span class="si">%d</span><span class="s"> vs </span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">asc_amp_array</span><span class="p">,</span> <span class="n">asc_tau_array</span><span class="p">))</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_AScurrents</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asc_tau_array</span><span class="p">),</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;init_AScurrents length (</span><span class="si">%d</span><span class="s">) must have same length as asc_tau_array (</span><span class="si">%d</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_AScurrents</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asc_tau_array</span><span class="p">)))</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">asc_tau_array</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">asc_amp_array</span><span class="p">),</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;After-spike current vector must have same length as asc_tau_array (</span><span class="si">%d</span><span class="s2"> vs </span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">asc_amp_array</span><span class="p">,</span> <span class="n">asc_tau_array</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_AScurrents</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asc_tau_array</span><span class="p">),</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;init_AScurrents length (</span><span class="si">%d</span><span class="s2">) must have same length as asc_tau_array (</span><span class="si">%d</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_AScurrents</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asc_tau_array</span><span class="p">)))</span>
 
 
-        <span class="c"># values computed based on inputs</span>
+        <span class="c1"># values computed based on inputs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">asc_tau_array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_input</span>
 
-        <span class="c"># Values that can be fit: They scale the input values.</span>
-        <span class="c"># These are allowed to have default values because they are going to get optimized.</span>
+        <span class="c1"># Values that can be fit: They scale the input values.</span>
+        <span class="c1"># These are allowed to have default values because they are going to get optimized.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s">&#39;th_inf&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s">&#39;C&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s">&#39;G&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s">&#39;b&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="s">&#39;asc_amp_array&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asc_tau_array</span><span class="p">))</span>
+            <span class="s1">&#39;th_inf&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;G&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;asc_amp_array&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asc_tau_array</span><span class="p">))</span>
         <span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
 
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;spike cut length: </span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span>  <span class="bp">self</span><span class="o">.</span><span class="n">spike_cut_length</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;spike cut length: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>  <span class="bp">self</span><span class="o">.</span><span class="n">spike_cut_length</span><span class="p">)</span>
 
-        <span class="c"># initialize dynamics methods</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AScurrent_dynamics_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s">&#39;AScurrent_dynamics_method&#39;</span><span class="p">,</span> <span class="n">AScurrent_dynamics_method</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">voltage_dynamics_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s">&#39;voltage_dynamics_method&#39;</span><span class="p">,</span> <span class="n">voltage_dynamics_method</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_dynamics_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s">&#39;threshold_dynamics_method&#39;</span><span class="p">,</span> <span class="n">threshold_dynamics_method</span><span class="p">)</span>
+        <span class="c1"># initialize dynamics methods</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AScurrent_dynamics_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s1">&#39;AScurrent_dynamics_method&#39;</span><span class="p">,</span> <span class="n">AScurrent_dynamics_method</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage_dynamics_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s1">&#39;voltage_dynamics_method&#39;</span><span class="p">,</span> <span class="n">voltage_dynamics_method</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_dynamics_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s1">&#39;threshold_dynamics_method&#39;</span><span class="p">,</span> <span class="n">threshold_dynamics_method</span><span class="p">)</span>
 
-        <span class="c"># initialize reset methods</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AScurrent_reset_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s">&#39;AScurrent_reset_method&#39;</span><span class="p">,</span> <span class="n">AScurrent_reset_method</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">voltage_reset_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s">&#39;voltage_reset_method&#39;</span><span class="p">,</span> <span class="n">voltage_reset_method</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_reset_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s">&#39;threshold_reset_method&#39;</span><span class="p">,</span> <span class="n">threshold_reset_method</span><span class="p">)</span>
+        <span class="c1"># initialize reset methods</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AScurrent_reset_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s1">&#39;AScurrent_reset_method&#39;</span><span class="p">,</span> <span class="n">AScurrent_reset_method</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage_reset_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s1">&#39;voltage_reset_method&#39;</span><span class="p">,</span> <span class="n">voltage_reset_method</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_reset_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configure_library_method</span><span class="p">(</span><span class="s1">&#39;threshold_reset_method&#39;</span><span class="p">,</span> <span class="n">threshold_reset_method</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">default</span><span class="o">=</span><span class="n">ju</span><span class="o">.</span><span class="n">json_handler</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -778,49 +778,49 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </div>
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="GlifNeuron.from_dict"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.from_dict">[docs]</a>    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">El</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;El&#39;</span><span class="p">],</span>
-                   <span class="n">dt</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;dt&#39;</span><span class="p">],</span>
-                   <span class="n">asc_tau_array</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;asc_tau_array&#39;</span><span class="p">],</span>
-                   <span class="n">R_input</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;R_input&#39;</span><span class="p">],</span>
-                   <span class="n">C</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">],</span>
-                   <span class="n">asc_amp_array</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;asc_amp_array&#39;</span><span class="p">],</span>
-                   <span class="n">spike_cut_length</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;spike_cut_length&#39;</span><span class="p">],</span>
-                   <span class="n">th_inf</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;th_inf&#39;</span><span class="p">],</span>
-                   <span class="n">th_adapt</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;th_adapt&#39;</span><span class="p">],</span>
-                   <span class="n">coeffs</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;coeffs&#39;</span><span class="p">,</span> <span class="p">{}),</span>
-                   <span class="n">AScurrent_dynamics_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;AScurrent_dynamics_method&#39;</span><span class="p">],</span>
-                   <span class="n">voltage_dynamics_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;voltage_dynamics_method&#39;</span><span class="p">],</span>
-                   <span class="n">threshold_dynamics_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;threshold_dynamics_method&#39;</span><span class="p">],</span>
-                   <span class="n">voltage_reset_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;voltage_reset_method&#39;</span><span class="p">],</span>
-                   <span class="n">AScurrent_reset_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;AScurrent_reset_method&#39;</span><span class="p">],</span>
-                   <span class="n">threshold_reset_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;threshold_reset_method&#39;</span><span class="p">],</span>
-                   <span class="n">init_voltage</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;init_voltage&#39;</span><span class="p">],</span>
-                   <span class="n">init_threshold</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;init_threshold&#39;</span><span class="p">],</span>
-                   <span class="n">init_AScurrents</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s">&#39;init_AScurrents&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">El</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;El&#39;</span><span class="p">],</span>
+                   <span class="n">dt</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">],</span>
+                   <span class="n">asc_tau_array</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;asc_tau_array&#39;</span><span class="p">],</span>
+                   <span class="n">R_input</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;R_input&#39;</span><span class="p">],</span>
+                   <span class="n">C</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">],</span>
+                   <span class="n">asc_amp_array</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;asc_amp_array&#39;</span><span class="p">],</span>
+                   <span class="n">spike_cut_length</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;spike_cut_length&#39;</span><span class="p">],</span>
+                   <span class="n">th_inf</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">],</span>
+                   <span class="n">th_adapt</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;th_adapt&#39;</span><span class="p">],</span>
+                   <span class="n">coeffs</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;coeffs&#39;</span><span class="p">,</span> <span class="p">{}),</span>
+                   <span class="n">AScurrent_dynamics_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;AScurrent_dynamics_method&#39;</span><span class="p">],</span>
+                   <span class="n">voltage_dynamics_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;voltage_dynamics_method&#39;</span><span class="p">],</span>
+                   <span class="n">threshold_dynamics_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;threshold_dynamics_method&#39;</span><span class="p">],</span>
+                   <span class="n">voltage_reset_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;voltage_reset_method&#39;</span><span class="p">],</span>
+                   <span class="n">AScurrent_reset_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;AScurrent_reset_method&#39;</span><span class="p">],</span>
+                   <span class="n">threshold_reset_method</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;threshold_reset_method&#39;</span><span class="p">],</span>
+                   <span class="n">init_voltage</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;init_voltage&#39;</span><span class="p">],</span>
+                   <span class="n">init_threshold</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;init_threshold&#39;</span><span class="p">],</span>
+                   <span class="n">init_AScurrents</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;init_AScurrents&#39;</span><span class="p">])</span>
 </div>
 <div class="viewcode-block" id="GlifNeuron.to_dict"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.to_dict">[docs]</a>    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Convert the neuron to a serializable dictionary. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
-            <span class="s">&#39;El&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">El</span><span class="p">,</span>
-            <span class="s">&#39;dt&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
-            <span class="s">&#39;asc_tau_array&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asc_tau_array</span><span class="p">),</span>
-            <span class="s">&#39;R_input&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_input</span><span class="p">,</span>
-            <span class="s">&#39;C&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span>
-            <span class="s">&#39;asc_amp_array&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asc_amp_array</span><span class="p">),</span>
-            <span class="s">&#39;spike_cut_length&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spike_cut_length</span><span class="p">,</span>
-            <span class="s">&#39;th_inf&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">th_inf</span><span class="p">,</span>
-            <span class="s">&#39;th_adapt&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">th_adapt</span><span class="p">,</span>
-            <span class="s">&#39;coeffs&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">),</span>
-            <span class="s">&#39;AScurrent_dynamics_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AScurrent_dynamics_method</span><span class="p">),</span>
-            <span class="s">&#39;voltage_dynamics_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage_dynamics_method</span><span class="p">),</span>
-            <span class="s">&#39;threshold_dynamics_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_dynamics_method</span><span class="p">),</span>
-            <span class="s">&#39;AScurrent_reset_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AScurrent_reset_method</span><span class="p">),</span>
-            <span class="s">&#39;voltage_reset_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage_reset_method</span><span class="p">),</span>
-            <span class="s">&#39;threshold_reset_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_reset_method</span><span class="p">),</span>
-            <span class="s">&#39;init_voltage&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_voltage</span><span class="p">,</span>
-            <span class="s">&#39;init_threshold&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_threshold</span><span class="p">,</span>
-            <span class="s">&#39;init_AScurrents&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_AScurrents</span><span class="p">)</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+            <span class="s1">&#39;El&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">El</span><span class="p">,</span>
+            <span class="s1">&#39;dt&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span>
+            <span class="s1">&#39;asc_tau_array&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asc_tau_array</span><span class="p">),</span>
+            <span class="s1">&#39;R_input&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">R_input</span><span class="p">,</span>
+            <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span>
+            <span class="s1">&#39;asc_amp_array&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asc_amp_array</span><span class="p">),</span>
+            <span class="s1">&#39;spike_cut_length&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spike_cut_length</span><span class="p">,</span>
+            <span class="s1">&#39;th_inf&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">th_inf</span><span class="p">,</span>
+            <span class="s1">&#39;th_adapt&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">th_adapt</span><span class="p">,</span>
+            <span class="s1">&#39;coeffs&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">coeffs</span><span class="p">),</span>
+            <span class="s1">&#39;AScurrent_dynamics_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AScurrent_dynamics_method</span><span class="p">),</span>
+            <span class="s1">&#39;voltage_dynamics_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage_dynamics_method</span><span class="p">),</span>
+            <span class="s1">&#39;threshold_dynamics_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_dynamics_method</span><span class="p">),</span>
+            <span class="s1">&#39;AScurrent_reset_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AScurrent_reset_method</span><span class="p">),</span>
+            <span class="s1">&#39;voltage_reset_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage_reset_method</span><span class="p">),</span>
+            <span class="s1">&#39;threshold_reset_method&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_reset_method</span><span class="p">),</span>
+            <span class="s1">&#39;init_voltage&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_voltage</span><span class="p">,</span>
+            <span class="s1">&#39;init_threshold&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_threshold</span><span class="p">,</span>
+            <span class="s1">&#39;init_AScurrents&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_AScurrents</span><span class="p">)</span>
         <span class="p">}</span>
 </div>
     <span class="nd">@staticmethod</span>
@@ -865,17 +865,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">method_options</span> <span class="o">=</span> <span class="n">METHOD_LIBRARY</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">method_type</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">method_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Unknown method type (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="n">method_type</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">method_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown method type (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="n">method_type</span><span class="p">)</span>
 
-        <span class="n">method_name</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        <span class="n">method_params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;params&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">method_name</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">method_params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">method_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Method configuration for </span><span class="si">%s</span><span class="s"> has no &#39;name&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">method_type</span><span class="p">))</span>
-        <span class="k">assert</span> <span class="n">method_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Method configuration for </span><span class="si">%s</span><span class="s"> has no &#39;params&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">method_params</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">method_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Method configuration for </span><span class="si">%s</span><span class="s2"> has no &#39;name&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">method_type</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">method_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Method configuration for </span><span class="si">%s</span><span class="s2"> has no &#39;params&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">method_params</span><span class="p">))</span>
 
         <span class="n">method</span> <span class="o">=</span> <span class="n">method_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;unknown method name </span><span class="si">%s</span><span class="s"> of type </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="n">method_type</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;unknown method name </span><span class="si">%s</span><span class="s2"> of type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="n">method_type</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">configure_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">method_params</span><span class="p">)</span>
 </div>
@@ -933,8 +933,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">bad_reset_flag</span><span class="o">=</span><span class="bp">False</span>
         <span class="k">if</span> <span class="n">voltage_t1</span> <span class="o">&gt;</span> <span class="n">threshold_t1</span><span class="p">:</span>
             <span class="n">bad_reset_flag</span><span class="o">=</span><span class="bp">True</span>
-            <span class="c">#TODO put this back in eventually but would rather debug right now</span>
-<span class="c">#            raise GlifBadResetException(&quot;Voltage reset above threshold: voltage_t1 (%f) threshold_t1 (%f), voltage_t0 (%f) threshold_t0 (%f) AScurrents_t0 (%s)&quot; % ( voltage_t1, threshold_t1, voltage_t0, threshold_t0, repr(AScurrents_t0)), voltage_t1 - threshold_t1)</span>
+            <span class="c1">#TODO put this back in eventually but would rather debug right now</span>
+<span class="c1">#            raise GlifBadResetException(&quot;Voltage reset above threshold: voltage_t1 (%f) threshold_t1 (%f), voltage_t0 (%f) threshold_t0 (%f) AScurrents_t0 (%s)&quot; % ( voltage_t1, threshold_t1, voltage_t0, threshold_t0, repr(AScurrents_t0)), voltage_t1 - threshold_t1)</span>
 
         <span class="k">return</span> <span class="n">voltage_t1</span><span class="p">,</span> <span class="n">threshold_t1</span><span class="p">,</span> <span class="n">AScurrents_t1</span><span class="p">,</span> <span class="n">bad_reset_flag</span>
 </div>
@@ -964,17 +964,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">bad_reset_flag</span><span class="o">=</span><span class="bp">False</span>
 
-        <span class="c"># initialize the voltage, threshold, and afterspike current values</span>
+        <span class="c1"># initialize the voltage, threshold, and afterspike current values</span>
         <span class="n">voltage_t0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_voltage</span>
         <span class="n">threshold_t0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_threshold</span>
         <span class="n">AScurrents_t0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_AScurrents</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">reset_threshold_components</span><span class="p">()</span> <span class="c">#get rid of lingering method data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_threshold_components</span><span class="p">()</span> <span class="c1">#get rid of lingering method data</span>
 
         <span class="n">num_time_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stim</span><span class="p">)</span>
         <span class="n">num_AScurrents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span>
 
-        <span class="c"># pre-allocate the output voltages, thresholds, and after-spike currents</span>
+        <span class="c1"># pre-allocate the output voltages, thresholds, and after-spike currents</span>
         <span class="n">voltage_out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">num_time_steps</span><span class="p">)</span>
         <span class="n">voltage_out</span><span class="p">[:]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">threshold_out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">num_time_steps</span><span class="p">)</span>
@@ -982,7 +982,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">AScurrents_out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_time_steps</span><span class="p">,</span> <span class="n">num_AScurrents</span><span class="p">))</span>
         <span class="n">AScurrents_out</span><span class="p">[:]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
-        <span class="c"># array that will hold spike indices</span>
+        <span class="c1"># array that will hold spike indices</span>
         <span class="n">spike_time_steps</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">grid_spike_times</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">interpolated_spike_times</span> <span class="o">=</span> <span class="p">[]</span>
@@ -992,29 +992,29 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">time_step</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">time_step</span> <span class="o">&lt;</span> <span class="n">num_time_steps</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">time_step</span> <span class="o">%</span> <span class="mi">10000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;time step </span><span class="si">%d</span><span class="s"> / </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_step</span><span class="p">,</span>  <span class="n">num_time_steps</span><span class="p">))</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;time step </span><span class="si">%d</span><span class="s2"> / </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_step</span><span class="p">,</span>  <span class="n">num_time_steps</span><span class="p">))</span>
 
-            <span class="c"># compute voltage, threshold, and ascurrents at current time step</span>
+            <span class="c1"># compute voltage, threshold, and ascurrents at current time step</span>
             <span class="p">(</span><span class="n">voltage_t1</span><span class="p">,</span> <span class="n">threshold_t1</span><span class="p">,</span> <span class="n">AScurrents_t1</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamics</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">stim</span><span class="p">[</span><span class="n">time_step</span><span class="p">],</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">spike_time_steps</span><span class="p">)</span>
 
-            <span class="c">#if the voltage is bigger than the threshold record the spike and reset the values</span>
+            <span class="c1">#if the voltage is bigger than the threshold record the spike and reset the values</span>
             <span class="k">if</span> <span class="n">voltage_t1</span> <span class="o">&gt;</span> <span class="n">threshold_t1</span><span class="p">:</span>
 
-                <span class="c"># spike_time_steps are stimulus indices when voltage surpassed threshold</span>
+                <span class="c1"># spike_time_steps are stimulus indices when voltage surpassed threshold</span>
                 <span class="n">spike_time_steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span>
                 <span class="n">grid_spike_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time_step</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
 
-                <span class="c"># compute higher fidelity spike time/voltage/threshold by linearly interpolating</span>
+                <span class="c1"># compute higher fidelity spike time/voltage/threshold by linearly interpolating</span>
                 <span class="n">interpolated_spike_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interpolate_spike_time</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">threshold_t1</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">voltage_t1</span><span class="p">))</span>
 
                 <span class="n">interpolated_spike_time_offset</span> <span class="o">=</span> <span class="n">interpolated_spike_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">time_step</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dt</span>
                 <span class="n">interpolated_spike_voltage</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interpolate_spike_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">interpolated_spike_time_offset</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">voltage_t1</span><span class="p">))</span>
                 <span class="n">interpolated_spike_threshold</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interpolate_spike_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">interpolated_spike_time_offset</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">threshold_t1</span><span class="p">))</span>
 
-                <span class="c"># reset voltage, threshold, and afterspike currents</span>
+                <span class="c1"># reset voltage, threshold, and afterspike currents</span>
                 <span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">bad_reset_flag</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">voltage_t1</span><span class="p">,</span> <span class="n">threshold_t1</span><span class="p">,</span> <span class="n">AScurrents_t1</span><span class="p">)</span>
 
-                <span class="c"># if we are not integrating during the spike (which includes right now), insert nans then jump ahead</span>
+                <span class="c1"># if we are not integrating during the spike (which includes right now), insert nans then jump ahead</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spike_cut_length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spike_cut_length</span>
                     <span class="n">voltage_out</span><span class="p">[</span><span class="n">time_step</span><span class="p">:</span><span class="n">time_step</span><span class="o">+</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -1023,7 +1023,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
                     <span class="n">time_step</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spike_cut_length</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="c"># we are integrating during the spike, so store the reset values</span>
+                    <span class="c1"># we are integrating during the spike, so store the reset values</span>
                     <span class="n">voltage_out</span><span class="p">[</span><span class="n">time_step</span><span class="p">]</span> <span class="o">=</span> <span class="n">voltage_t0</span>
                     <span class="n">threshold_out</span><span class="p">[</span><span class="n">time_step</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold_t0</span>
                     <span class="n">AScurrents_out</span><span class="p">[</span><span class="n">time_step</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">AScurrents_t0</span>
@@ -1035,7 +1035,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                     <span class="n">AScurrents_out</span><span class="p">[</span><span class="n">time_step</span><span class="p">:</span><span class="n">time_step</span><span class="o">+</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">AScurrents_t0</span>
                     <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c"># there was no spike, store the next voltages</span>
+                <span class="c1"># there was no spike, store the next voltages</span>
                 <span class="n">voltage_out</span><span class="p">[</span><span class="n">time_step</span><span class="p">]</span> <span class="o">=</span> <span class="n">voltage_t1</span>
                 <span class="n">threshold_out</span><span class="p">[</span><span class="n">time_step</span><span class="p">]</span> <span class="o">=</span> <span class="n">threshold_t1</span>
                 <span class="n">AScurrents_out</span><span class="p">[</span><span class="n">time_step</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">AScurrents_t1</span>
@@ -1047,25 +1047,25 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">time_step</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">return</span> <span class="p">{</span>
-            <span class="s">&#39;voltage&#39;</span><span class="p">:</span> <span class="n">voltage_out</span><span class="p">,</span>
-            <span class="s">&#39;threshold&#39;</span><span class="p">:</span> <span class="n">threshold_out</span><span class="p">,</span>
-            <span class="s">&#39;AScurrents&#39;</span><span class="p">:</span> <span class="n">AScurrents_out</span><span class="p">,</span>
-            <span class="s">&#39;grid_spike_times&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">grid_spike_times</span><span class="p">),</span>
-            <span class="s">&#39;interpolated_spike_times&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interpolated_spike_times</span><span class="p">),</span>
-            <span class="s">&#39;spike_time_steps&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">spike_time_steps</span><span class="p">),</span>
-            <span class="s">&#39;interpolated_spike_voltage&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interpolated_spike_voltage</span><span class="p">),</span>
-            <span class="s">&#39;interpolated_spike_threshold&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interpolated_spike_threshold</span><span class="p">)</span>
+            <span class="s1">&#39;voltage&#39;</span><span class="p">:</span> <span class="n">voltage_out</span><span class="p">,</span>
+            <span class="s1">&#39;threshold&#39;</span><span class="p">:</span> <span class="n">threshold_out</span><span class="p">,</span>
+            <span class="s1">&#39;AScurrents&#39;</span><span class="p">:</span> <span class="n">AScurrents_out</span><span class="p">,</span>
+            <span class="s1">&#39;grid_spike_times&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">grid_spike_times</span><span class="p">),</span>
+            <span class="s1">&#39;interpolated_spike_times&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interpolated_spike_times</span><span class="p">),</span>
+            <span class="s1">&#39;spike_time_steps&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">spike_time_steps</span><span class="p">),</span>
+            <span class="s1">&#39;interpolated_spike_voltage&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interpolated_spike_voltage</span><span class="p">),</span>
+            <span class="s1">&#39;interpolated_spike_threshold&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">interpolated_spike_threshold</span><span class="p">)</span>
             <span class="p">}</span>
 </div>
 <div class="viewcode-block" id="GlifNeuron.get_threshold_components"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.get_threshold_components">[docs]</a>    <span class="k">def</span> <span class="nf">get_threshold_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_components</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">threshold_components</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;spike&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;voltage&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">threshold_components</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;spike&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;voltage&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">}</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold_components</span>
 </div>
 <div class="viewcode-block" id="GlifNeuron.add_threshold_components"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.add_threshold_components">[docs]</a>    <span class="k">def</span> <span class="nf">add_threshold_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike</span><span class="p">,</span> <span class="n">voltage</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_components</span><span class="p">[</span><span class="s">&#39;spike&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spike</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_components</span><span class="p">[</span><span class="s">&#39;voltage&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">voltage</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_components</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spike</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_components</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">voltage</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="GlifNeuron.reset_threshold_components"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.reset_threshold_components">[docs]</a>    <span class="k">def</span> <span class="nf">reset_threshold_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">threshold_components</span> <span class="o">=</span> <span class="bp">None</span>
@@ -1086,7 +1086,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </div>
 <div class="viewcode-block" id="line_crossing_x"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron.line_crossing_x">[docs]</a><span class="k">def</span> <span class="nf">line_crossing_x</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">b1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Find the x value of the intersection of two lines. &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">b0</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Do not pass integers into this function!&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">b0</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Do not pass integers into this function!&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dx</span> <span class="o">*</span> <span class="p">(</span><span class="n">b0</span> <span class="o">-</span> <span class="n">a0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="p">(</span><span class="n">a1</span> <span class="o">-</span> <span class="n">a0</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">b1</span> <span class="o">-</span> <span class="n">b0</span><span class="p">)</span> <span class="p">)</span>
 
 </div>
@@ -1163,7 +1163,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

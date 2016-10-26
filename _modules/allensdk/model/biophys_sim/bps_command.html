@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.model.biophys_sim.bps_command</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2014-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2014-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">subprocess</span> <span class="kn">as</span> <span class="nn">sp</span>
@@ -652,27 +652,27 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">Config</span>
 
 
-<div class="viewcode-block" id="choose_bps_command"><a class="viewcode-back" href="../../../../allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.bps_command.choose_bps_command">[docs]</a><span class="k">def</span> <span class="nf">choose_bps_command</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="s">&#39;bps_simple&#39;</span><span class="p">,</span> <span class="n">conf_file</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&#39;allensdk.model.biophys_sim.bps_command&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="choose_bps_command"><a class="viewcode-back" href="../../../../allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.bps_command.choose_bps_command">[docs]</a><span class="k">def</span> <span class="nf">choose_bps_command</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="s1">&#39;bps_simple&#39;</span><span class="p">,</span> <span class="n">conf_file</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;allensdk.model.biophys_sim.bps_command&#39;</span><span class="p">)</span>
 
-    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;bps command: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">command</span><span class="p">))</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;bps command: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">command</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">conf_file</span><span class="p">:</span>
         <span class="n">conf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">conf_file</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&#39;help&#39;</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">argparser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="s">&#39;--help&#39;</span><span class="p">]))</span>
-    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&#39;nrnivmodl&#39;</span><span class="p">:</span>
-        <span class="n">sp</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s">&#39;nrnivmodl&#39;</span><span class="p">,</span> <span class="s">&#39;modfiles&#39;</span><span class="p">])</span>
-    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s">&#39;run_simple&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;help&#39;</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">Config</span><span class="p">()</span><span class="o">.</span><span class="n">argparser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="s1">&#39;--help&#39;</span><span class="p">]))</span>
+    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;nrnivmodl&#39;</span><span class="p">:</span>
+        <span class="n">sp</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s1">&#39;nrnivmodl&#39;</span><span class="p">,</span> <span class="s1">&#39;modfiles&#39;</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">command</span> <span class="o">==</span> <span class="s1">&#39;run_simple&#39;</span><span class="p">:</span>
         <span class="n">app_config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
         <span class="n">description</span> <span class="o">=</span> <span class="n">app_config</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">conf_file</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s">&#39;CODE_DIR&#39;</span><span class="p">))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">get_path</span><span class="p">(</span><span class="s1">&#39;CODE_DIR&#39;</span><span class="p">))</span>
         <span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">function_name</span><span class="p">)</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">data</span><span class="p">[</span>
-            <span class="s">&#39;runs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;main&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;#&#39;</span><span class="p">)</span>
+            <span class="s1">&#39;runs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;main&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
         <span class="n">run_module</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">function_name</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;unknown command </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">command</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;unknown command </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">command</span><span class="p">))</span>
 
 </div>
 <div class="viewcode-block" id="run_module"><a class="viewcode-back" href="../../../../allensdk.model.biophys_sim.html#allensdk.model.biophys_sim.bps_command.run_module">[docs]</a><span class="k">def</span> <span class="nf">run_module</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">module_name</span><span class="p">,</span> <span class="n">function_name</span><span class="p">):</span>
@@ -682,28 +682,28 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">func</span><span class="p">(</span><span class="n">description</span><span class="p">)</span>
 
 
-<span class="c"># this module is designed to be called from the bps script,</span>
-<span class="c"># which may use nrniv which does not pass in command line arguments</span>
-<span class="c"># So the configuration file path must be set in an environment variable.</span></div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="c1"># this module is designed to be called from the bps script,</span>
+<span class="c1"># which may use nrniv which does not pass in command line arguments</span>
+<span class="c1"># So the configuration file path must be set in an environment variable.</span></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">sys</span>
     <span class="n">conf_file</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;nrniv&#39;</span><span class="p">:</span>
-            <span class="n">command</span> <span class="o">=</span> <span class="s">&#39;run_simple&#39;</span>
+        <span class="k">if</span> <span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;nrniv&#39;</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;run_simple&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">command</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">command</span> <span class="o">=</span> <span class="s">&#39;run_simple&#39;</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="s1">&#39;run_simple&#39;</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.conf&#39;</span><span class="p">)</span> <span class="ow">or</span>
-                          <span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.json&#39;</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.conf&#39;</span><span class="p">)</span> <span class="ow">or</span>
+                          <span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">)):</span>
         <span class="n">conf_file</span> <span class="o">=</span> <span class="n">argv</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">conf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;CONF_FILE&#39;</span><span class="p">]</span>
+            <span class="n">conf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CONF_FILE&#39;</span><span class="p">]</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 
@@ -778,7 +778,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.core.json_utilities</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -665,8 +665,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div class="viewcode-block" id="read"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.json_utilities.read">[docs]</a><span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Shortcut reading JSON from a file. &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">json_string</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json_string</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
         <span class="n">json_obj</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">json_obj</span>
@@ -674,11 +674,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </div>
 <div class="viewcode-block" id="write"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.json_utilities.write">[docs]</a><span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Shortcut for writing JSON to a file.  This also takes care of serializing numpy and data types. &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">write_string</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>   <span class="c"># Python 2.7</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">write_string</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>   <span class="c1"># Python 2.7</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">write_string</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="s">&#39;utf-8&#39;</span><span class="p">))</span>  <span class="c"># Python 3</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">write_string</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>  <span class="c1"># Python 3</span>
 
 </div>
 <div class="viewcode-block" id="write_string"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.json_utilities.write_string">[docs]</a><span class="k">def</span> <span class="nf">write_string</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
@@ -686,13 +686,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">json_handler</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="read_url"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.json_utilities.read_url">[docs]</a><span class="k">def</span> <span class="nf">read_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">&#39;POST&#39;</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s">&#39;GET&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="read_url"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.json_utilities.read_url">[docs]</a><span class="k">def</span> <span class="nf">read_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;POST&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">read_url_get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">read_url_post</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Unknown request method: (</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="n">method</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Unknown request method: (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">method</span><span class="p">)</span>
 
 </div>
 <div class="viewcode-block" id="read_url_get"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.json_utilities.read_url_get">[docs]</a><span class="k">def</span> <span class="nf">read_url_get</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
@@ -713,7 +713,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    the output will be of the corresponding type.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">urllib_request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    <span class="n">json_string</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+    <span class="n">json_string</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
 
@@ -737,15 +737,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">urlp</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="n">main_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlunsplit</span><span class="p">(</span>
-        <span class="p">(</span><span class="n">urlp</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">urlp</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">urlp</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">))</span>
+        <span class="p">(</span><span class="n">urlp</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">urlp</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">urlp</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">urlparse</span><span class="o">.</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">urlp</span><span class="o">.</span><span class="n">query</span><span class="p">)))</span>
 
     <span class="n">handler</span> <span class="o">=</span> <span class="n">urllib_request</span><span class="o">.</span><span class="n">HTTPHandler</span><span class="p">()</span>
     <span class="n">opener</span> <span class="o">=</span> <span class="n">urllib_request</span><span class="o">.</span><span class="n">build_opener</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
 
     <span class="n">request</span> <span class="o">=</span> <span class="n">urllib_request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">main_url</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-    <span class="n">request</span><span class="o">.</span><span class="n">add_header</span><span class="p">(</span><span class="s">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s">&#39;application/json&#39;</span><span class="p">)</span>
-    <span class="n">request</span><span class="o">.</span><span class="n">get_method</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">add_header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">get_method</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="s1">&#39;POST&#39;</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
@@ -762,7 +762,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </div>
 <div class="viewcode-block" id="json_handler"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.json_utilities.json_handler">[docs]</a><span class="k">def</span> <span class="nf">json_handler</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Used by write_json convert a few non-standard types to things that the json package can handle. &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;to_dict&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;to_dict&#39;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
@@ -779,25 +779,25 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span> <span class="ow">or</span>
           <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)):</span>
         <span class="k">return</span> <span class="nb">long</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;isoformat&#39;</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;isoformat&#39;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="s">&#39;Object of type </span><span class="si">%s</span><span class="s"> with value of </span><span class="si">%s</span><span class="s"> is not JSON serializable&#39;</span> <span class="o">%</span>
+            <span class="s1">&#39;Object of type </span><span class="si">%s</span><span class="s1"> with value of </span><span class="si">%s</span><span class="s1"> is not JSON serializable&#39;</span> <span class="o">%</span>
             <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">obj</span><span class="p">)))</span>
 
 </div>
 <div class="viewcode-block" id="JsonComments"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.json_utilities.JsonComments">[docs]</a><span class="k">class</span> <span class="nc">JsonComments</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="n">_oneline_comment</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;\/\/.*$&quot;</span><span class="p">,</span>
+    <span class="n">_oneline_comment</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">r&quot;\/\/.*$&quot;</span><span class="p">,</span>
                                   <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
-    <span class="n">_multiline_comment_start</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;\/\*&quot;</span><span class="p">,</span>
+    <span class="n">_multiline_comment_start</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">r&quot;\/\*&quot;</span><span class="p">,</span>
                                           <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span> <span class="o">|</span>
                                           <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
-    <span class="n">_multiline_comment_end</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;\*\/&quot;</span><span class="p">,</span>
+    <span class="n">_multiline_comment_end</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">r&quot;\*\/&quot;</span><span class="p">,</span>
                                         <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span> <span class="o">|</span>
                                         <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
-    <span class="n">_blank_line</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;\n?^\s*$&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
-    <span class="n">_carriage_return</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&quot;\r$&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+    <span class="n">_blank_line</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">r&quot;\n?^\s*$&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
+    <span class="n">_carriage_return</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">r&quot;\r$&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="JsonComments.read_string"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.json_utilities.JsonComments.read_string">[docs]</a>    <span class="k">def</span> <span class="nf">read_string</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">json_string</span><span class="p">):</span>
@@ -814,7 +814,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="k">return</span> <span class="n">json_object</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="n">ju_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="s">&quot;Could not load json object from file: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
+                <span class="s2">&quot;Could not load json object from file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_name</span><span class="p">))</span>
             <span class="k">raise</span>
 </div>
     <span class="nd">@classmethod</span>
@@ -833,10 +833,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        Note: A JSON decoder MAY accept and ignore comments.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">json_string</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">_oneline_comment</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">json_string</span><span class="p">)</span>
-        <span class="n">json_string</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">_carriage_return</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">json_string</span><span class="p">)</span>
+        <span class="n">json_string</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">_oneline_comment</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">json_string</span><span class="p">)</span>
+        <span class="n">json_string</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">_carriage_return</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">json_string</span><span class="p">)</span>
         <span class="n">json_string</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">remove_multiline_comments</span><span class="p">(</span><span class="n">json_string</span><span class="p">)</span>
-        <span class="n">json_string</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">_blank_line</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">json_string</span><span class="p">)</span>
+        <span class="n">json_string</span> <span class="o">=</span> <span class="n">JsonComments</span><span class="o">.</span><span class="n">_blank_line</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">json_string</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">json_string</span>
 </div>
@@ -871,7 +871,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">json_slice_start</span> <span class="o">=</span> <span class="n">search_start</span> <span class="o">+</span> <span class="n">comment_end</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
         <span class="n">new_json</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">json_string</span><span class="p">[</span><span class="n">json_slice_start</span><span class="p">:])</span>
 
-        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_json</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_json</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>
@@ -942,7 +942,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

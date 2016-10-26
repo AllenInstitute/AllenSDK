@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.model.glif.simulate_neuron</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015-2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">time</span>
@@ -656,19 +656,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">from</span> <span class="nn">allensdk.api.queries.glif_api</span> <span class="kn">import</span> <span class="n">GlifApi</span>
 <span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="kn">import</span> <span class="n">GlifNeuron</span>
 
-<span class="n">DEFAULT_SPIKE_CUT_VALUE</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="c"># 50mV</span>
+<span class="n">DEFAULT_SPIKE_CUT_VALUE</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="c1"># 50mV</span>
 
 <div class="viewcode-block" id="parse_arguments"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.parse_arguments">[docs]</a><span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">():</span>
     <span class="sd">&#39;&#39;&#39; Use argparse to get required arguments from the command line &#39;&#39;&#39;</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s">&#39;fit a neuron&#39;</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;fit a neuron&#39;</span><span class="p">)</span>
 
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--ephys_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;ephys file name&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--sweeps_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;JSON file listing sweep properties&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--neuron_config_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;neuron configuration JSON file &#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--neuronal_model_id&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;id of the neuronal model. Used when downloading sweep properties.&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--output_ephys_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;output file name&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--log_level&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;log level&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;--spike_cut_value&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&#39;value to fill in for spike duration&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_SPIKE_CUT_VALUE</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--ephys_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;ephys file name&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--sweeps_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;JSON file listing sweep properties&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--neuron_config_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;neuron configuration JSON file &#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--neuronal_model_id&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;id of the neuronal model. Used when downloading sweep properties.&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--output_ephys_file&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;output file name&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--log_level&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;log level&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--spike_cut_value&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;value to fill in for spike duration&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_SPIKE_CUT_VALUE</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
@@ -678,26 +678,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;simulating&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;simulating&quot;</span><span class="p">)</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
 
-    <span class="n">voltage</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;voltage&#39;</span><span class="p">]</span>
+    <span class="n">voltage</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">]</span>
     <span class="n">voltage</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">voltage</span><span class="p">)]</span> <span class="o">=</span> <span class="n">spike_cut_value</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;simulation time </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;simulation time </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">data</span>
 
 </div>
 <div class="viewcode-block" id="load_sweep"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.load_sweep">[docs]</a><span class="k">def</span> <span class="nf">load_sweep</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Load the stimulus for a sweep from file. &#39;&#39;&#39;</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;loading sweep </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;loading sweep </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">sweep_number</span><span class="p">)</span>
 
     <span class="n">load_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">get_sweep</span><span class="p">(</span><span class="n">sweep_number</span><span class="p">)</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;load time </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">load_start_time</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;load time </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">load_start_time</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">data</span>
 
@@ -705,7 +705,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="write_sweep_response"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.write_sweep_response">[docs]</a><span class="k">def</span> <span class="nf">write_sweep_response</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Overwrite the response in a file. &#39;&#39;&#39;</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;writing sweep&quot;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;writing sweep&quot;</span><span class="p">)</span>
 
     <span class="n">write_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">ephds</span> <span class="o">=</span> <span class="n">NwbDataSet</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
@@ -713,7 +713,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">ephds</span><span class="o">.</span><span class="n">set_sweep</span><span class="p">(</span><span class="n">sweep_number</span><span class="p">,</span> <span class="n">stimulus</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">)</span>
     <span class="n">ephds</span><span class="o">.</span><span class="n">set_spike_times</span><span class="p">(</span><span class="n">sweep_number</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">)</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;write time </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">write_start_time</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;write time </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">write_start_time</span><span class="p">))</span>
 
 </div>
 <div class="viewcode-block" id="simulate_sweep_from_file"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.simulate_sweep_from_file">[docs]</a><span class="k">def</span> <span class="nf">simulate_sweep_from_file</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">input_file_name</span><span class="p">,</span> <span class="n">output_file_name</span><span class="p">,</span> <span class="n">spike_cut_value</span><span class="p">):</span>
@@ -724,17 +724,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">try</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">load_sweep</span><span class="p">(</span><span class="n">input_file_name</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Failed to load sweep, skipping. (</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Failed to load sweep, skipping. (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
         <span class="k">raise</span>
 
-        <span class="c"># tell the neuron what dt should be for this sweep</span>
-    <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;sampling_rate&#39;</span><span class="p">]</span>
+        <span class="c1"># tell the neuron what dt should be for this sweep</span>
+    <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;sampling_rate&#39;</span><span class="p">]</span>
 
-    <span class="n">sim_data</span> <span class="o">=</span> <span class="n">simulate_sweep</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;stimulus&#39;</span><span class="p">],</span> <span class="n">spike_cut_value</span><span class="p">)</span>
+    <span class="n">sim_data</span> <span class="o">=</span> <span class="n">simulate_sweep</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">],</span> <span class="n">spike_cut_value</span><span class="p">)</span>
 
-    <span class="n">write_sweep_response</span><span class="p">(</span><span class="n">output_file_name</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">[</span><span class="s">&#39;voltage&#39;</span><span class="p">],</span> <span class="n">sim_data</span><span class="p">[</span><span class="s">&#39;interpolated_spike_times&#39;</span><span class="p">])</span>
+    <span class="n">write_sweep_response</span><span class="p">(</span><span class="n">output_file_name</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">],</span> <span class="n">sim_data</span><span class="p">[</span><span class="s1">&#39;interpolated_spike_times&#39;</span><span class="p">])</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;total sweep time </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">sweep_start_time</span> <span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;total sweep time </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">sweep_start_time</span> <span class="p">))</span>
 </div>
 <div class="viewcode-block" id="simulate_neuron"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.simulate_neuron">[docs]</a><span class="k">def</span> <span class="nf">simulate_neuron</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">,</span> <span class="n">input_file_name</span><span class="p">,</span> <span class="n">output_file_name</span><span class="p">,</span> <span class="n">spike_cut_value</span><span class="p">):</span>
 
@@ -743,7 +743,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">for</span> <span class="n">sweep_number</span> <span class="ow">in</span> <span class="n">sweep_numbers</span><span class="p">:</span>
         <span class="n">simulate_sweep_from_file</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep_number</span><span class="p">,</span> <span class="n">input_file_name</span><span class="p">,</span> <span class="n">output_file_name</span><span class="p">,</span> <span class="n">spike_cut_value</span><span class="p">)</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;total elapsed time </span><span class="si">%f</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;total elapsed time </span><span class="si">%f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parse_arguments</span><span class="p">()</span>
@@ -755,7 +755,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">args</span><span class="o">.</span><span class="n">sweeps_file</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span>
         <span class="n">args</span><span class="o">.</span><span class="n">ephys_file</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">):</span>
 
-        <span class="k">assert</span> <span class="n">args</span><span class="o">.</span><span class="n">neuronal_model_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;A neuronal model id is required if no neuron config file, sweeps file, or ephys data file is provided.&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">args</span><span class="o">.</span><span class="n">neuronal_model_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;A neuronal model id is required if no neuron config file, sweeps file, or ephys data file is provided.&quot;</span><span class="p">)</span>
 
         <span class="n">glif_api</span> <span class="o">=</span> <span class="n">GlifApi</span><span class="p">()</span>
         <span class="n">glif_api</span><span class="o">.</span><span class="n">get_neuronal_model</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">neuronal_model_id</span><span class="p">)</span>
@@ -773,31 +773,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">ephys_file</span><span class="p">:</span>
         <span class="n">ephys_file</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">ephys_file</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">ephys_file</span> <span class="o">=</span> <span class="s">&#39;stimulus_</span><span class="si">%d</span><span class="s">.nwb&#39;</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">neuronal_model_id</span>
+        <span class="n">ephys_file</span> <span class="o">=</span> <span class="s1">&#39;stimulus_</span><span class="si">%d</span><span class="s1">.nwb&#39;</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">neuronal_model_id</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ephys_file</span><span class="p">):</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Downloading stimulus to </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span> <span class="n">ephys_file</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloading stimulus to </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">ephys_file</span><span class="p">)</span>
             <span class="n">glif_api</span><span class="o">.</span><span class="n">cache_stimulus_file</span><span class="p">(</span><span class="n">ephys_file</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Reusing </span><span class="si">%s</span><span class="s"> because it already exists.&quot;</span> <span class="o">%</span> <span class="n">ephys_file</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Reusing </span><span class="si">%s</span><span class="s2"> because it already exists.&quot;</span> <span class="o">%</span> <span class="n">ephys_file</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">output_ephys_file</span><span class="p">:</span>
         <span class="n">output_ephys_file</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">output_ephys_file</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;Overwriting input file data with simulated data in place.&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Overwriting input file data with simulated data in place.&quot;</span><span class="p">)</span>
         <span class="n">output_ephys_file</span> <span class="o">=</span> <span class="n">ephys_file</span>
 
 
     <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
-    <span class="c"># filter out test sweeps</span>
-    <span class="n">sweep_numbers</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;sweep_number&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sweeps</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s">&#39;stimulus_name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;Test&#39;</span> <span class="p">]</span>
+    <span class="c1"># filter out test sweeps</span>
+    <span class="n">sweep_numbers</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;sweep_number&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sweeps</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;stimulus_name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Test&#39;</span> <span class="p">]</span>
 
     <span class="n">simulate_neuron</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">sweep_numbers</span><span class="p">,</span> <span class="n">ephys_file</span><span class="p">,</span> <span class="n">output_ephys_file</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">spike_cut_value</span><span class="p">)</span>
 
 
 </div>
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span> <span class="n">main</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span> <span class="n">main</span><span class="p">()</span>
 </pre></div>
 
           </div>
@@ -868,7 +868,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

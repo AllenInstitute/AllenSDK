@@ -27,17 +27,17 @@
     <link rel="up" title="allensdk.config" href="../../../config.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,18 +631,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.config.model.formats.hdf5_util</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2014 Allen Institute for Brain Science</span>
-<span class="c"># Licensed under the Allen Institute Terms of Use (the &quot;License&quot;);</span>
-<span class="c"># you may not use this file except in compliance with the License.</span>
-<span class="c"># You may obtain a copy of the License at</span>
-<span class="c">#</span>
-<span class="c"># http://www.alleninstitute.org/Media/policies/terms_of_use_content.html</span>
-<span class="c">#</span>
-<span class="c"># Unless required by applicable law or agreed to in writing, software</span>
-<span class="c"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
-<span class="c"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
-<span class="c"># See the License for the specific language governing permissions and</span>
-<span class="c"># limitations under the License.</span>
+<span></span><span class="c1"># Copyright 2014 Allen Institute for Brain Science</span>
+<span class="c1"># Licensed under the Allen Institute Terms of Use (the &quot;License&quot;);</span>
+<span class="c1"># you may not use this file except in compliance with the License.</span>
+<span class="c1"># You may obtain a copy of the License at</span>
+<span class="c1">#</span>
+<span class="c1"># http://www.alleninstitute.org/Media/policies/terms_of_use_content.html</span>
+<span class="c1">#</span>
+<span class="c1"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c1"># distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c1"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c1"># See the License for the specific language governing permissions and</span>
+<span class="c1"># limitations under the License.</span>
 
 <span class="kn">import</span> <span class="nn">h5py</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -657,24 +657,24 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div class="viewcode-block" id="Hdf5Util.read"><a class="viewcode-back" href="../../../../../allensdk.config.model.formats.html#allensdk.config.model.formats.hdf5_util.Hdf5Util.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csr</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">csr_matrix</span><span class="p">((</span><span class="n">csr</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">],</span>
-                                   <span class="n">csr</span><span class="p">[</span><span class="s">&#39;indices&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">],</span>
-                                   <span class="n">csr</span><span class="p">[</span><span class="s">&#39;indptr&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]))</span>
+            <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csr</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">csr_matrix</span><span class="p">((</span><span class="n">csr</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">],</span>
+                                   <span class="n">csr</span><span class="p">[</span><span class="s1">&#39;indices&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">],</span>
+                                   <span class="n">csr</span><span class="p">[</span><span class="s1">&#39;indptr&#39;</span><span class="p">][</span><span class="o">...</span><span class="p">]))</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-                <span class="s">&quot;Couldn&#39;t read AllenSDK HDF5 CSR configuration: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">file_path</span><span class="p">)</span>
+                <span class="s2">&quot;Couldn&#39;t read AllenSDK HDF5 CSR configuration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">file_path</span><span class="p">)</span>
             <span class="k">raise</span>
 </div>
 <div class="viewcode-block" id="Hdf5Util.write"><a class="viewcode-back" href="../../../../../allensdk.config.model.formats.html#allensdk.config.model.formats.hdf5_util.Hdf5Util.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csr</span><span class="p">:</span>
-                <span class="n">csr</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
-                <span class="n">csr</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s">&#39;indices&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
-                <span class="n">csr</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s">&#39;indptr&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">indptr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">csr</span><span class="p">:</span>
+                <span class="n">csr</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+                <span class="n">csr</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;indices&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+                <span class="n">csr</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;indptr&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">indptr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s">&quot;Couldn&#39;t write AllenSDK HDF5 CSR configuration: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">file_path</span><span class="p">)</span>
+                <span class="s2">&quot;Couldn&#39;t write AllenSDK HDF5 CSR configuration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">file_path</span><span class="p">)</span>
             <span class="k">raise</span></div></div>
 </pre></div>
 
@@ -746,7 +746,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.ephys.ephys_features</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -672,13 +672,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;v is not an np.ndarray&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;v is not an np.ndarray&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&quot;t is not an np.ndarray&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;t is not an np.ndarray&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Voltage and time series do not have the same dimensions&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Voltage and time series do not have the same dimensions&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -693,18 +693,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">dvdt</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v_window</span><span class="p">,</span> <span class="n">t_window</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
 
-    <span class="c"># Find positive-going crossings of dV/dt cutoff level</span>
+    <span class="c1"># Find positive-going crossings of dV/dt cutoff level</span>
     <span class="n">putative_spikes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">greater_equal</span><span class="p">(</span><span class="n">dvdt</span><span class="p">,</span> <span class="n">dv_cutoff</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">putative_spikes</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="c"># Set back to original index space (not just window)</span>
+        <span class="c1"># Set back to original index space (not just window)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">putative_spikes</span><span class="p">)</span> <span class="o">+</span> <span class="n">start_index</span>
 
-    <span class="c"># Only keep spike times if dV/dt has dropped all the way to zero between putative spikes</span>
+    <span class="c1"># Only keep spike times if dV/dt has dropped all the way to zero between putative spikes</span>
     <span class="n">putative_spikes</span> <span class="o">=</span> <span class="p">[</span><span class="n">putative_spikes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">putative_spikes</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">putative_spikes</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">s</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)]</span>
 
-    <span class="c"># Set back to original index space (not just window)</span>
+    <span class="c1"># Set back to original index space (not just window)</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">putative_spikes</span><span class="p">)</span> <span class="o">+</span> <span class="n">start_index</span>
 
 </div>
@@ -822,8 +822,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">for</span> <span class="n">upstk</span><span class="p">,</span> <span class="n">upstk_prev</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">upstrokes_and_start</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">upstrokes_and_start</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
         <span class="n">potential_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">upstk</span><span class="p">:</span><span class="n">upstk_prev</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">target</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">potential_indexes</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-            <span class="c"># couldn&#39;t find a matching value for threshold,</span>
-            <span class="c"># so just going to the start of the search interval</span>
+            <span class="c1"># couldn&#39;t find a matching value for threshold,</span>
+            <span class="c1"># so just going to the start of the search interval</span>
             <span class="n">threshold_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">upstk_prev</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">threshold_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">upstk</span> <span class="o">-</span> <span class="n">potential_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -873,12 +873,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">upstroke_mask</span><span class="p">[</span><span class="n">overlaps</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="n">upstroke_indexes</span> <span class="o">=</span> <span class="n">upstroke_indexes</span><span class="p">[</span><span class="n">upstroke_mask</span><span class="p">]</span>
 
-    <span class="c"># Validate that peaks don&#39;t occur too long after the threshold</span>
-    <span class="c"># If they do, try to re-find threshold from the peak</span>
+    <span class="c1"># Validate that peaks don&#39;t occur too long after the threshold</span>
+    <span class="c1"># If they do, try to re-find threshold from the peak</span>
     <span class="n">too_long_spikes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">spk</span><span class="p">,</span> <span class="n">peak</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">spike_indexes</span><span class="p">,</span> <span class="n">peak_indexes</span><span class="p">)):</span>
         <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">peak</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">spk</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">max_interval</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Need to recalculate threshold-peak pair that exceeds maximum allowed interval ({:f} s)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_interval</span><span class="p">))</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Need to recalculate threshold-peak pair that exceeds maximum allowed interval ({:f} s)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">max_interval</span><span class="p">))</span>
             <span class="n">too_long_spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">too_long_spikes</span><span class="p">:</span>
@@ -888,28 +888,28 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">target</span> <span class="o">=</span> <span class="n">avg_upstroke</span> <span class="o">*</span> <span class="n">thresh_frac</span>
         <span class="n">drop_spikes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">too_long_spikes</span><span class="p">:</span>
-            <span class="c"># First guessing that threshold is wrong and peak is right</span>
+            <span class="c1"># First guessing that threshold is wrong and peak is right</span>
             <span class="n">peak</span> <span class="o">=</span> <span class="n">peak_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">t_0</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="n">peak</span><span class="p">]</span> <span class="o">-</span> <span class="n">max_interval</span><span class="p">)</span>
             <span class="n">below_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">upstroke_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">t_0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">target</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">below_target</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-                <span class="c"># Now try to see if threshold was right but peak was wrong</span>
+                <span class="c1"># Now try to see if threshold was right but peak was wrong</span>
 
-                <span class="c"># Find the peak in a window twice the size of our allowed window</span>
+                <span class="c1"># Find the peak in a window twice the size of our allowed window</span>
                 <span class="n">spike</span> <span class="o">=</span> <span class="n">spike_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="n">t_0</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="n">spike</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">max_interval</span><span class="p">)</span>
                 <span class="n">new_peak</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">spike</span><span class="p">:</span><span class="n">t_0</span><span class="p">])</span> <span class="o">+</span> <span class="n">spike</span>
 
-                <span class="c"># If that peak is okay (not outside the allowed window, not past the next spike)</span>
-                <span class="c"># then keep it</span>
+                <span class="c1"># If that peak is okay (not outside the allowed window, not past the next spike)</span>
+                <span class="c1"># then keep it</span>
                 <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">new_peak</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">spike</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">max_interval</span> <span class="ow">and</span> \
                    <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">spike_indexes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">t</span><span class="p">[</span><span class="n">new_peak</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">t</span><span class="p">[</span><span class="n">spike_indexes</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]):</span>
                     <span class="n">peak_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_peak</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="c"># Otherwise, log and get rid of the spike</span>
-                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Could not redetermine threshold-peak pair - dropping that pair&quot;</span><span class="p">)</span>
+                    <span class="c1"># Otherwise, log and get rid of the spike</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Could not redetermine threshold-peak pair - dropping that pair&quot;</span><span class="p">)</span>
                     <span class="n">drop_spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-<span class="c">#                     raise FeatureError(&quot;Could not redetermine threshold&quot;)</span>
+<span class="c1">#                     raise FeatureError(&quot;Could not redetermine threshold&quot;)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">spike_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">upstroke_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">below_target</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -949,12 +949,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">trough_indexes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="n">peak</span><span class="p">:</span><span class="n">spk</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span> <span class="o">+</span> <span class="n">peak</span> <span class="k">for</span> <span class="n">peak</span><span class="p">,</span> <span class="n">spk</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">spike_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">:])]</span>
 
     <span class="k">if</span> <span class="n">peak_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">end_index</span><span class="p">:</span>
-        <span class="c"># If peak of last spike is the last point available, drop last point (since no trough exists)</span>
+        <span class="c1"># If peak of last spike is the last point available, drop last point (since no trough exists)</span>
         <span class="n">trough_indexes</span> <span class="o">=</span> <span class="n">trough_indexes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">trough_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">peak_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span><span class="n">end_index</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span> <span class="o">+</span> <span class="n">peak_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="c"># If peak is the same point as the trough, drop that point</span>
+    <span class="c1"># If peak is the same point as the trough, drop that point</span>
     <span class="n">trough_indexes</span> <span class="o">=</span> <span class="n">trough_indexes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">trough_indexes</span><span class="p">)]</span> <span class="o">!=</span> <span class="n">trough_indexes</span><span class="p">)]</span>
 
     <span class="k">return</span> <span class="n">trough_indexes</span>
@@ -984,11 +984,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">dvdt</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">trough_indexes</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Cannot have more troughs than peaks&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Cannot have more troughs than peaks&quot;</span><span class="p">)</span>
 
     <span class="n">peak_indexes</span> <span class="o">=</span> <span class="n">peak_indexes</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">trough_indexes</span><span class="p">)]</span>
 
-    <span class="c"># Can&#39;t handle cases where peak is</span>
+    <span class="c1"># Can&#39;t handle cases where peak is</span>
     <span class="n">downstroke_indexes</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dvdt</span><span class="p">[</span><span class="n">peak</span><span class="p">:</span><span class="n">trough</span><span class="p">])</span> <span class="o">+</span> <span class="n">peak</span> <span class="k">for</span> <span class="n">peak</span><span class="p">,</span> <span class="n">trough</span>
                          <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">,</span> <span class="n">trough_indexes</span><span class="p">)]</span>
 
@@ -1017,7 +1017,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spike_indexes</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">trough_indexes</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Cannot have more troughs than spikes&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Cannot have more troughs than spikes&quot;</span><span class="p">)</span>
 
     <span class="n">use_indexes</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">trough_indexes</span><span class="p">)</span>
 
@@ -1030,8 +1030,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">thresh_to_peak_levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">trough_indexes</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
     <span class="n">thresh_to_peak_levels</span><span class="p">[</span><span class="n">use_indexes</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">peak_indexes</span><span class="p">[</span><span class="n">use_indexes</span><span class="p">]]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="n">spike_indexes</span><span class="p">[</span><span class="n">use_indexes</span><span class="p">]])</span> <span class="o">/</span> <span class="mf">2.</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="n">spike_indexes</span><span class="p">[</span><span class="n">use_indexes</span><span class="p">]]</span>
 
-    <span class="c"># Some spikes in burst may have deep trough but short height, so can&#39;t use same</span>
-    <span class="c"># definition for width</span>
+    <span class="c1"># Some spikes in burst may have deep trough but short height, so can&#39;t use same</span>
+    <span class="c1"># definition for width</span>
     <span class="n">width_levels</span><span class="p">[</span><span class="n">width_levels</span> <span class="o">&lt;</span> <span class="n">v</span><span class="p">[</span><span class="n">spike_indexes</span><span class="p">]]</span> <span class="o">=</span> \
         <span class="n">thresh_to_peak_levels</span><span class="p">[</span><span class="n">width_levels</span> <span class="o">&lt;</span> <span class="n">v</span><span class="p">[</span><span class="n">spike_indexes</span><span class="p">]]</span>
 
@@ -1087,7 +1087,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">end</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">end_index</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
 
-    <span class="c"># Can&#39;t evaluate peaks that occur at or past end of the analysis interval</span>
+    <span class="c1"># Can&#39;t evaluate peaks that occur at or past end of the analysis interval</span>
     <span class="n">orig_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">peak_indexes</span><span class="p">)</span>
     <span class="n">peak_mask</span> <span class="o">=</span> <span class="n">peak_indexes</span> <span class="o">&lt;</span> <span class="n">end_index</span>
     <span class="n">spike_indexes</span> <span class="o">=</span> <span class="n">spike_indexes</span><span class="p">[</span><span class="n">peak_mask</span><span class="p">]</span>
@@ -1098,7 +1098,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">dvdt_hvy</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">heavy_filter</span><span class="p">)</span>
 
-    <span class="c"># Writing as for loop - see if I can vectorize any later</span>
+    <span class="c1"># Writing as for loop - see if I can vectorize any later</span>
     <span class="n">fast_trough_indexes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">adp_indexes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">slow_trough_indexes</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1118,17 +1118,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">slow_trough_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
             <span class="k">continue</span>
 
-        <span class="c"># Could there be an ADP?</span>
+        <span class="c1"># Could there be an ADP?</span>
         <span class="n">adp_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">dv_over_thresh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">dvdt_hvy</span><span class="p">[</span><span class="n">terminated</span><span class="p">:</span><span class="n">next_spk</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">adp_thresh</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dv_over_thresh</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
             <span class="n">cross</span> <span class="o">=</span> <span class="n">dv_over_thresh</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">terminated</span>
 
-            <span class="c"># only want to look for ADP before things get pretty flat</span>
-            <span class="c"># otherwise, could just pick up random transients long after the spike</span>
+            <span class="c1"># only want to look for ADP before things get pretty flat</span>
+            <span class="c1"># otherwise, could just pick up random transients long after the spike</span>
             <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="n">cross</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="n">terminated</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">flat_interval</span><span class="p">:</span>
-                <span class="c"># Going back up fast, but could just be going into another spike</span>
-                <span class="c"># so need to check for a reversal (zero-crossing) in dV/dt</span>
+                <span class="c1"># Going back up fast, but could just be going into another spike</span>
+                <span class="c1"># so need to check for a reversal (zero-crossing) in dV/dt</span>
                 <span class="n">zero_return_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">dvdt_hvy</span><span class="p">[</span><span class="n">cross</span><span class="p">:</span><span class="n">next_spk</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">zero_return_vals</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
                     <span class="n">putative_adp_index</span> <span class="o">=</span> <span class="n">zero_return_vals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">cross</span>
@@ -1136,27 +1136,27 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                     <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="n">putative_adp_index</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="n">min_index</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">tol</span><span class="p">:</span>
                         <span class="n">adp_index</span> <span class="o">=</span> <span class="n">putative_adp_index</span>
                         <span class="n">slow_phase_min_index</span> <span class="o">=</span> <span class="n">min_index</span>
-                        <span class="n">isi_type</span> <span class="o">=</span> <span class="s">&quot;detour&quot;</span>
+                        <span class="n">isi_type</span> <span class="o">=</span> <span class="s2">&quot;detour&quot;</span>
 
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">adp_index</span><span class="p">):</span>
             <span class="n">v_term</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">terminated</span><span class="p">]</span>
             <span class="n">min_index</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">terminated</span><span class="p">:</span><span class="n">next_spk</span><span class="p">]</span><span class="o">.</span><span class="n">argmin</span><span class="p">()</span> <span class="o">+</span> <span class="n">terminated</span>
             <span class="k">if</span> <span class="n">v_term</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="n">min_index</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">tol</span><span class="p">:</span>
-                <span class="c"># dropped further after end of spike -&gt; detour reset</span>
-                <span class="n">isi_type</span> <span class="o">=</span> <span class="s">&quot;detour&quot;</span>
+                <span class="c1"># dropped further after end of spike -&gt; detour reset</span>
+                <span class="n">isi_type</span> <span class="o">=</span> <span class="s2">&quot;detour&quot;</span>
                 <span class="n">slow_phase_min_index</span> <span class="o">=</span> <span class="n">min_index</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">isi_type</span> <span class="o">=</span> <span class="s">&quot;direct&quot;</span>
+                <span class="n">isi_type</span> <span class="o">=</span> <span class="s2">&quot;direct&quot;</span>
 
         <span class="n">isi_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">isi_type</span><span class="p">)</span>
         <span class="n">fast_trough_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">terminated</span><span class="p">)</span>
         <span class="n">adp_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adp_index</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">isi_type</span> <span class="o">==</span> <span class="s">&quot;detour&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">isi_type</span> <span class="o">==</span> <span class="s2">&quot;detour&quot;</span><span class="p">:</span>
             <span class="n">slow_trough_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slow_phase_min_index</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">slow_trough_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
 
-    <span class="c"># If we had to kick some spikes out before, need to add nans at the end</span>
+    <span class="c1"># If we had to kick some spikes out before, need to add nans at the end</span>
     <span class="n">output</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="p">(</span><span class="n">isi_types</span><span class="p">,</span> <span class="n">fast_trough_indexes</span><span class="p">,</span> <span class="n">adp_indexes</span><span class="p">,</span> <span class="n">slow_trough_indexes</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">orig_len</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">isi_types</span><span class="p">):</span>
         <span class="n">extra</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">orig_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">isi_types</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
@@ -1169,7 +1169,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">t_gte</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">t</span> <span class="o">&gt;=</span> <span class="n">t_0</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">t_gte</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Could not find given time in time vector&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Could not find given time in time vector&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">t_gte</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -1191,19 +1191,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">if</span> <span class="n">has_fixed_dt</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">filter</span><span class="p">:</span>
         <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">sample_freq</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">delta_t</span>
-        <span class="n">filt_coeff</span> <span class="o">=</span> <span class="p">(</span><span class="nb">filter</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sample_freq</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="c"># filter kHz -&gt; Hz, then get fraction of Nyquist frequency</span>
+        <span class="n">filt_coeff</span> <span class="o">=</span> <span class="p">(</span><span class="nb">filter</span> <span class="o">*</span> <span class="mf">1e3</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">sample_freq</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span> <span class="c1"># filter kHz -&gt; Hz, then get fraction of Nyquist frequency</span>
         <span class="k">if</span> <span class="n">filt_coeff</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">filt_coeff</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;bessel coeff (</span><span class="si">%f</span><span class="s">) is outside of valid range [0,1]. cannot compute features.&quot;</span> <span class="o">%</span> <span class="n">filt_coeff</span><span class="p">)</span>
-        <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">bessel</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">filt_coeff</span><span class="p">,</span> <span class="s">&quot;low&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;bessel coeff (</span><span class="si">%f</span><span class="s2">) is outside of valid range [0,1]. cannot compute features.&quot;</span> <span class="o">%</span> <span class="n">filt_coeff</span><span class="p">)</span>
+        <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">bessel</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">filt_coeff</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">)</span>
         <span class="n">v_filt</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">dv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">v_filt</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">dv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
     <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-    <span class="n">dvdt</span> <span class="o">=</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="n">dv</span> <span class="o">/</span> <span class="n">dt</span> <span class="c"># in V/s = mV/ms</span>
+    <span class="n">dvdt</span> <span class="o">=</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="n">dv</span> <span class="o">/</span> <span class="n">dt</span> <span class="c1"># in V/s = mV/ms</span>
 
-    <span class="c"># Remove nan values (in case any dt values == 0)</span>
+    <span class="c1"># Remove nan values (in case any dt values == 0)</span>
     <span class="n">dvdt</span> <span class="o">=</span> <span class="n">dvdt</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">dvdt</span><span class="p">)]</span>
 
     <span class="k">return</span> <span class="n">dvdt</span>
@@ -1303,7 +1303,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">norm_diffs</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">a</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">norm_diffs</span><span class="p">[(</span><span class="n">a</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">a</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.</span>
     <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s">&quot;numpy&quot;</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">RuntimeWarning</span><span class="p">,</span> <span class="n">module</span><span class="o">=</span><span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
         <span class="n">avg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">norm_diffs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">avg</span>
 
@@ -1350,7 +1350,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">try</span><span class="p">:</span>
         <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">_exp_curve</span><span class="p">,</span> <span class="n">t_window</span><span class="p">,</span> <span class="n">v_window</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">guess</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Curve fit for membrane time constant failed&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Curve fit for membrane time constant failed&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
     <span class="k">return</span> <span class="n">popt</span>
@@ -1376,15 +1376,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">isi_types</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Wrong number of ISIs&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Wrong number of ISIs&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">isi_types</span> <span class="o">==</span> <span class="s">&quot;direct&quot;</span><span class="p">):</span>
-        <span class="c"># Need some direct-type firing to have pauses</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">isi_types</span> <span class="o">==</span> <span class="s2">&quot;direct&quot;</span><span class="p">):</span>
+        <span class="c1"># Need some direct-type firing to have pauses</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
-    <span class="n">detour_candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">isi_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">isi_types</span><span class="p">)</span> <span class="k">if</span> <span class="n">isi_type</span> <span class="o">==</span> <span class="s">&quot;detour&quot;</span><span class="p">]</span>
-    <span class="n">median_direct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">isis</span><span class="p">[</span><span class="n">isi_types</span> <span class="o">==</span> <span class="s">&quot;direct&quot;</span><span class="p">])</span>
-    <span class="n">direct_candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">isi_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">isi_types</span><span class="p">)</span> <span class="k">if</span> <span class="n">isi_type</span> <span class="o">==</span> <span class="s">&quot;direct&quot;</span> <span class="ow">and</span> <span class="n">isis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">median_direct</span><span class="p">]</span>
+    <span class="n">detour_candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">isi_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">isi_types</span><span class="p">)</span> <span class="k">if</span> <span class="n">isi_type</span> <span class="o">==</span> <span class="s2">&quot;detour&quot;</span><span class="p">]</span>
+    <span class="n">median_direct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">isis</span><span class="p">[</span><span class="n">isi_types</span> <span class="o">==</span> <span class="s2">&quot;direct&quot;</span><span class="p">])</span>
+    <span class="n">direct_candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">isi_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">isi_types</span><span class="p">)</span> <span class="k">if</span> <span class="n">isi_type</span> <span class="o">==</span> <span class="s2">&quot;direct&quot;</span> <span class="ow">and</span> <span class="n">isis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">median_direct</span><span class="p">]</span>
     <span class="n">candidates</span> <span class="o">=</span> <span class="n">detour_candidates</span> <span class="o">+</span> <span class="n">direct_candidates</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
@@ -1442,9 +1442,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">isi_types</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Wrong number of ISIs&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Wrong number of ISIs&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span> <span class="c"># can&#39;t determine burstiness for a single ISI</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span> <span class="c1"># can&#39;t determine burstiness for a single ISI</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
     <span class="n">fast_tr_v</span> <span class="o">=</span> <span class="n">fast_tr_v</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -1452,36 +1452,36 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">slow_tr_v</span> <span class="o">=</span> <span class="n">slow_tr_v</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">slow_tr_t</span> <span class="o">=</span> <span class="n">slow_tr_t</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="n">isi_types</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">isi_types</span><span class="p">)</span> <span class="c"># don&#39;t want to change the actual isi types data</span>
+    <span class="n">isi_types</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">isi_types</span><span class="p">)</span> <span class="c1"># don&#39;t want to change the actual isi types data</span>
 
-    <span class="c"># Burst transitions can&#39;t be at &quot;pause&quot;-like ISIs</span>
+    <span class="c1"># Burst transitions can&#39;t be at &quot;pause&quot;-like ISIs</span>
     <span class="n">pauses</span> <span class="o">=</span> <span class="n">detect_pauses</span><span class="p">(</span><span class="n">isis</span><span class="p">,</span> <span class="n">isi_types</span><span class="p">,</span> <span class="n">cost_weight</span><span class="o">=</span><span class="n">pause_cost</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-    <span class="n">isi_types</span><span class="p">[</span><span class="n">pauses</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;pauselike&quot;</span>
+    <span class="n">isi_types</span><span class="p">[</span><span class="n">pauses</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;pauselike&quot;</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">isi_types</span> <span class="o">==</span> <span class="s">&quot;direct&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">isi_types</span> <span class="o">==</span> <span class="s">&quot;detour&quot;</span><span class="p">)):</span>
-        <span class="c"># no candidates that could be bursts</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">isi_types</span> <span class="o">==</span> <span class="s2">&quot;direct&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">isi_types</span> <span class="o">==</span> <span class="s2">&quot;detour&quot;</span><span class="p">)):</span>
+        <span class="c1"># no candidates that could be bursts</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
-    <span class="c"># Want to catch special case of detour in the middle of a large burst where</span>
-    <span class="c"># the slow trough value is higher than the previous spike&#39;s threshold</span>
-    <span class="n">isi_types</span><span class="p">[(</span><span class="n">thr_v</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">slow_tr_v</span> <span class="o">+</span> <span class="n">tol</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">isi_types</span> <span class="o">==</span> <span class="s">&quot;detour&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="s">&quot;midburst&quot;</span>
+    <span class="c1"># Want to catch special case of detour in the middle of a large burst where</span>
+    <span class="c1"># the slow trough value is higher than the previous spike&#39;s threshold</span>
+    <span class="n">isi_types</span><span class="p">[(</span><span class="n">thr_v</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">slow_tr_v</span> <span class="o">+</span> <span class="n">tol</span><span class="p">))</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">isi_types</span> <span class="o">==</span> <span class="s2">&quot;detour&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="s2">&quot;midburst&quot;</span>
 
-    <span class="c"># Find transitions from direct -&gt; detour and vice versa for burst boundaries</span>
+    <span class="c1"># Find transitions from direct -&gt; detour and vice versa for burst boundaries</span>
     <span class="n">into_burst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">prev</span><span class="p">,</span> <span class="n">cur</span><span class="p">)</span> <span class="ow">in</span>
                  <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">isi_types</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">isi_types</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span> <span class="k">if</span>
-                 <span class="n">cur</span> <span class="o">==</span> <span class="s">&quot;direct&quot;</span> <span class="ow">and</span> <span class="n">prev</span> <span class="o">==</span> <span class="s">&quot;detour&quot;</span><span class="p">],</span>
+                 <span class="n">cur</span> <span class="o">==</span> <span class="s2">&quot;direct&quot;</span> <span class="ow">and</span> <span class="n">prev</span> <span class="o">==</span> <span class="s2">&quot;detour&quot;</span><span class="p">],</span>
                  <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">isi_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;direct&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">isi_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;direct&quot;</span><span class="p">:</span>
         <span class="n">into_burst</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]),</span> <span class="n">into_burst</span><span class="p">)</span>
 
     <span class="n">drop_into</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">out_of_burst</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">into</span><span class="p">,</span> <span class="nb">next</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">into_burst</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">into_burst</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)))):</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">isi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">isi_types</span><span class="p">[</span><span class="n">into</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="nb">next</span><span class="p">]):</span>
-            <span class="k">if</span> <span class="n">isi</span> <span class="o">==</span> <span class="s">&quot;detour&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">isi</span> <span class="o">==</span> <span class="s2">&quot;detour&quot;</span><span class="p">:</span>
                 <span class="n">out_of_burst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">into</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                 <span class="k">break</span>
-            <span class="k">elif</span> <span class="n">isi</span> <span class="o">==</span> <span class="s">&quot;pauselike&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">isi</span> <span class="o">==</span> <span class="s2">&quot;pauselike&quot;</span><span class="p">:</span>
                 <span class="n">drop_into</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
                 <span class="k">break</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">into_burst</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
@@ -1496,7 +1496,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">into_burst</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">out_of_burst</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Inconsistent burst boundary identification&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Inconsistent burst boundary identification&quot;</span><span class="p">)</span>
 
     <span class="n">inout_pairs</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">into_burst</span><span class="p">,</span> <span class="n">out_of_burst</span><span class="p">)</span>
     <span class="n">delta_t</span> <span class="o">=</span> <span class="n">slow_tr_t</span> <span class="o">-</span> <span class="n">fast_tr_t</span>
@@ -1521,10 +1521,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">bursts</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">into</span><span class="p">,</span> <span class="n">outof</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inout_pairs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">inout_pairs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># last burst to evaluate</span>
-            <span class="k">if</span> <span class="n">outof</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="c"># are there spikes left after the burst?</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">inout_pairs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># last burst to evaluate</span>
+            <span class="k">if</span> <span class="n">outof</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># are there spikes left after the burst?</span>
                 <span class="n">metric</span> <span class="o">=</span> <span class="n">_burstiness_index</span><span class="p">(</span><span class="n">isis</span><span class="p">[</span><span class="n">into</span><span class="p">:</span><span class="n">outof</span><span class="p">],</span> <span class="n">isis</span><span class="p">[</span><span class="n">outof</span><span class="p">:])</span>
-            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c"># was this the first one (and there weren&#39;t spikes after)?</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># was this the first one (and there weren&#39;t spikes after)?</span>
                 <span class="n">metric</span> <span class="o">=</span> <span class="n">_burstiness_index</span><span class="p">(</span><span class="n">isis</span><span class="p">[</span><span class="n">into</span><span class="p">:</span><span class="n">outof</span><span class="p">],</span> <span class="n">isis</span><span class="p">[:</span><span class="n">into</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">prev_burst</span> <span class="o">=</span> <span class="n">inout_pairs</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
@@ -1560,23 +1560,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">start_index</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
     <span class="n">end_index</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">spike_time</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">end_index</span> <span class="o">&lt;=</span> <span class="n">start_index</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;Start for pre-spike time constant fit cannot be after the spike time.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;Start for pre-spike time constant fit cannot be after the spike time.&quot;</span><span class="p">)</span>
 
     <span class="n">v_slice</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span>
     <span class="n">t_slice</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span>
 
-    <span class="c"># Solve linear version with single exponential first to guess at the time constant</span>
-    <span class="n">y0</span> <span class="o">=</span> <span class="n">v_slice</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mf">5e-6</span> <span class="c"># set y0 slightly above v_slice maximum</span>
+    <span class="c1"># Solve linear version with single exponential first to guess at the time constant</span>
+    <span class="n">y0</span> <span class="o">=</span> <span class="n">v_slice</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mf">5e-6</span> <span class="c1"># set y0 slightly above v_slice maximum</span>
     <span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="n">v_slice</span> <span class="o">+</span> <span class="n">y0</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 
     <span class="n">dy</span> <span class="o">=</span> <span class="n">calculate_dvdt</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">t_slice</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 
-    <span class="c"># End the fit interval if the voltage starts dropping</span>
+    <span class="c1"># End the fit interval if the voltage starts dropping</span>
     <span class="n">new_end_indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flatnonzero</span><span class="p">(</span><span class="n">dy</span> <span class="o">&lt;=</span> <span class="n">dv_limit</span><span class="p">)</span>
-    <span class="n">cross_limit</span> <span class="o">=</span> <span class="mf">0.0005</span> <span class="c"># sec</span>
+    <span class="n">cross_limit</span> <span class="o">=</span> <span class="mf">0.0005</span> <span class="c1"># sec</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">new_end_indexes</span><span class="o">.</span><span class="n">size</span> <span class="ow">or</span> <span class="n">t_slice</span><span class="p">[</span><span class="n">new_end_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">-</span> <span class="n">t_slice</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">cross_limit</span><span class="p">:</span>
-        <span class="c"># either never crosses or crosses too early</span>
+        <span class="c1"># either never crosses or crosses too early</span>
         <span class="n">new_end_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_slice</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">new_end_index</span> <span class="o">=</span> <span class="n">new_end_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1588,20 +1588,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">try</span><span class="p">:</span>
         <span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">dbl_exp_y0</span><span class="p">,</span> <span class="n">t_slice</span> <span class="o">-</span> <span class="n">t_slice</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">v_slice</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">A</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">K</span><span class="p">,</span> <span class="o">-</span><span class="n">A</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">K</span><span class="p">))</span>
     <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
-        <span class="c"># Fall back to single fit</span>
+        <span class="c1"># Fall back to single fit</span>
         <span class="n">tau</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">K</span>
         <span class="k">return</span> <span class="n">tau</span>
 
-    <span class="c"># Find dominant time constant</span>
+    <span class="c1"># Find dominant time constant</span>
     <span class="k">if</span> <span class="n">popt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">popt</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
         <span class="n">faster_weight</span><span class="p">,</span> <span class="n">faster_tau</span><span class="p">,</span> <span class="n">slower_weight</span><span class="p">,</span> <span class="n">slower_tau</span> <span class="o">=</span> <span class="n">popt</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">slower_weight</span><span class="p">,</span> <span class="n">slower_tau</span><span class="p">,</span> <span class="n">faster_weight</span><span class="p">,</span> <span class="n">faster_tau</span> <span class="o">=</span> <span class="n">popt</span>
 
-    <span class="c"># These are all empirical values</span>
+    <span class="c1"># These are all empirical values</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">faster_weight</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">slower_weight</span><span class="p">):</span>
         <span class="n">tau</span> <span class="o">=</span> <span class="n">faster_tau</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">slower_tau</span> <span class="o">-</span> <span class="n">faster_tau</span><span class="p">)</span> <span class="o">/</span> <span class="n">slower_tau</span> <span class="o">&lt;=</span> <span class="mf">0.1</span><span class="p">:</span> <span class="c"># close enough; just use slower</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">slower_tau</span> <span class="o">-</span> <span class="n">faster_tau</span><span class="p">)</span> <span class="o">/</span> <span class="n">slower_tau</span> <span class="o">&lt;=</span> <span class="mf">0.1</span><span class="p">:</span> <span class="c1"># close enough; just use slower</span>
         <span class="n">tau</span> <span class="o">=</span> <span class="n">slower_tau</span>
     <span class="k">elif</span> <span class="n">slower_tau</span> <span class="o">&gt;</span> <span class="n">tau_limit</span> <span class="ow">and</span> <span class="n">slower_weight</span> <span class="o">/</span> <span class="n">faster_weight</span> <span class="o">&lt;</span> <span class="mf">2.0</span><span class="p">:</span>
         <span class="n">tau</span> <span class="o">=</span> <span class="n">faster_tau</span>
@@ -1637,10 +1637,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">t_set</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">t_set</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_set</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_set</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;t_set and v_set must be lists of equal size&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;t_set and v_set must be lists of equal size&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_set</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s">&quot;t_set and v_set are empty&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">FeatureError</span><span class="p">(</span><span class="s2">&quot;t_set and v_set are empty&quot;</span><span class="p">)</span>
 
     <span class="n">start_index</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t_set</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">interval_start</span><span class="p">)</span>
     <span class="n">end_index</span> <span class="o">=</span> <span class="n">find_time_index</span><span class="p">(</span><span class="n">t_set</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">interval_end</span><span class="p">)</span>
@@ -1681,7 +1681,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bursts</span><span class="p">:</span>
         <span class="n">in_burst</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="bp">True</span>
 
-    <span class="c"># If all ISIs are part of a burst, give it a bad score</span>
+    <span class="c1"># If all ISIs are part of a burst, give it a bad score</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">isis</span><span class="p">[</span><span class="o">~</span><span class="n">in_burst</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="o">-</span><span class="mf">1e12</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">bursts</span><span class="p">)</span>
 
@@ -1689,12 +1689,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bursts</span><span class="p">:</span>
-        <span class="n">score</span> <span class="o">=</span> <span class="n">_burstiness_index</span><span class="p">(</span><span class="n">isis</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">isis</span><span class="p">[</span><span class="o">~</span><span class="n">in_burst</span><span class="p">])</span> <span class="c"># base score</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="n">_burstiness_index</span><span class="p">(</span><span class="n">isis</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">isis</span><span class="p">[</span><span class="o">~</span><span class="n">in_burst</span><span class="p">])</span> <span class="c1"># base score</span>
         <span class="k">if</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">delta_t</span><span class="p">):</span>
-            <span class="n">score</span> <span class="o">-=</span> <span class="n">c_tx</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">delta_frac</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]]))</span> <span class="c"># cost for starting a burst</span>
+            <span class="n">score</span> <span class="o">-=</span> <span class="n">c_tx</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">delta_frac</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]]))</span> <span class="c1"># cost for starting a burst</span>
         <span class="k">if</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">score</span> <span class="o">-=</span> <span class="n">c_tx</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">delta_frac</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="c"># cost for ending a burst</span>
-        <span class="n">score</span> <span class="o">-=</span> <span class="n">c_n</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="c"># cost for extending a burst</span>
+            <span class="n">score</span> <span class="o">-=</span> <span class="n">c_tx</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="n">delta_frac</span><span class="p">[</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="c1"># cost for ending a burst</span>
+        <span class="n">score</span> <span class="o">-=</span> <span class="n">c_n</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># cost for extending a burst</span>
         <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">scores</span>
@@ -1790,7 +1790,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

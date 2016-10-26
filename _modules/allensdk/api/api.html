@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,20 +631,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.api.api</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2015 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2015 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 
 <span class="kn">import</span> <span class="nn">requests</span>
@@ -657,8 +657,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div class="viewcode-block" id="Api"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api">[docs]</a><span class="k">class</span> <span class="nc">Api</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">_log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
-    <span class="n">default_api_url</span> <span class="o">=</span> <span class="s">&#39;http://api.brain-map.org&#39;</span>
-    <span class="n">download_url</span> <span class="o">=</span> <span class="s">&#39;http://download.alleninstitute.org&#39;</span>
+    <span class="n">default_api_url</span> <span class="o">=</span> <span class="s1">&#39;http://api.brain-map.org&#39;</span>
+    <span class="n">download_url</span> <span class="o">=</span> <span class="s1">&#39;http://download.alleninstitute.org&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">api_base_url_string</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">api_base_url_string</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -678,50 +678,50 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">=</span> <span class="n">api_base_url_string</span>
 
-        <span class="c"># http://help.brain-map.org/display/api/Downloading+a+WellKnownFile</span>
+        <span class="c1"># http://help.brain-map.org/display/api/Downloading+a+WellKnownFile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">well_known_file_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
-            <span class="s">&#39;/api/v2/well_known_file_download&#39;</span>
+            <span class="s1">&#39;/api/v2/well_known_file_download&#39;</span>
 
-        <span class="c"># http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">grid_data_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/grid_data&#39;</span>
+        <span class="c1"># http://help.brain-map.org/display/api/Downloading+3-D+Expression+Grid+Data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid_data_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/grid_data&#39;</span>
 
-        <span class="c"># http://help.brain-map.org/display/api/Downloading+and+Displaying+SVG</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">svg_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/svg&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">svg_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/svg_download&#39;</span>
+        <span class="c1"># http://help.brain-map.org/display/api/Downloading+and+Displaying+SVG</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">svg_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/api/v2/svg&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">svg_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/api/v2/svg_download&#39;</span>
 
-        <span class="c"># http://help.brain-map.org/display/api/Downloading+an+Ontology%27s+Structure+Graph</span>
+        <span class="c1"># http://help.brain-map.org/display/api/Downloading+an+Ontology%27s+Structure+Graph</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">structure_graph_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
-            <span class="s">&#39;/api/v2/structure_graph_download&#39;</span>
+            <span class="s1">&#39;/api/v2/structure_graph_download&#39;</span>
 
-        <span class="c"># http://help.brain-map.org/display/api/Searching+a+Specimen+or+Structure+Tree</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tree_search_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/tree_search&#39;</span>
+        <span class="c1"># http://help.brain-map.org/display/api/Searching+a+Specimen+or+Structure+Tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree_search_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/api/v2/tree_search&#39;</span>
 
-        <span class="c"># http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets</span>
+        <span class="c1"># http://help.brain-map.org/display/api/Searching+Annotated+SectionDataSets</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">annotated_section_data_sets_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
-            <span class="s">&#39;/api/v2/annotated_section_data_sets&#39;</span>
+            <span class="s1">&#39;/api/v2/annotated_section_data_sets&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compound_annotated_section_data_sets_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
-            <span class="s">&#39;/api/v2/compound_annotated_section_data_sets&#39;</span>
+            <span class="s1">&#39;/api/v2/compound_annotated_section_data_sets&#39;</span>
 
-        <span class="c"># http://help.brain-map.org/display/api/Image-to-Image+Synchronization#Image-to-ImageSynchronization-ImagetoImage</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">image_to_atlas_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/image_to_atlas&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">image_to_image_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/image_to_image&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">image_to_image_2d_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/image_to_image_2d&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reference_to_image_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/reference_to_image&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">image_to_reference_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/image_to_reference&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">structure_to_image_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/structure_to_image&#39;</span>
+        <span class="c1"># http://help.brain-map.org/display/api/Image-to-Image+Synchronization#Image-to-ImageSynchronization-ImagetoImage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_to_atlas_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/api/v2/image_to_atlas&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_to_image_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/api/v2/image_to_image&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_to_image_2d_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/api/v2/image_to_image_2d&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference_to_image_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/api/v2/reference_to_image&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_to_reference_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/api/v2/image_to_reference&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure_to_image_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/api/v2/structure_to_image&#39;</span>
 
-        <span class="c"># http://help.brain-map.org/display/mouseconnectivity/API</span>
+        <span class="c1"># http://help.brain-map.org/display/mouseconnectivity/API</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">section_image_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
-            <span class="s">&#39;/api/v2/section_image_download&#39;</span>
+            <span class="s1">&#39;/api/v2/section_image_download&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atlas_image_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
-            <span class="s">&#39;/api/v2/atlas_image_download&#39;</span>
+            <span class="s1">&#39;/api/v2/atlas_image_download&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">projection_image_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
-            <span class="s">&#39;/api/v2/projection_image_download&#39;</span>
+            <span class="s1">&#39;/api/v2/projection_image_download&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">image_download_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> \
-            <span class="s">&#39;/api/v2/image_download&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">informatics_archive_endpoint</span> <span class="o">=</span> <span class="n">Api</span><span class="o">.</span><span class="n">download_url</span> <span class="o">+</span> <span class="s">&#39;/informatics-archive&#39;</span>
+            <span class="s1">&#39;/api/v2/image_download&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">informatics_archive_endpoint</span> <span class="o">=</span> <span class="n">Api</span><span class="o">.</span><span class="n">download_url</span> <span class="o">+</span> <span class="s1">&#39;/informatics-archive&#39;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s">&#39;/api/v2/data&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span> <span class="o">=</span> <span class="n">api_base_url_string</span> <span class="o">+</span> <span class="s1">&#39;/api/v2/data&#39;</span>
 </div>
 <div class="viewcode-block" id="Api.set_default_working_directory"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.set_default_working_directory">[docs]</a>    <span class="k">def</span> <span class="nf">set_default_working_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">working_directory</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Set the working directory where files will be saved.</span>
@@ -746,7 +746,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        See `API Response Formats - Response Envelope &lt;http://help.brain-map.org/display/api/API+Response+Formats#APIResponseFormats-ResponseEnvelope&gt;`_</span>
 <span class="sd">        for additional documentation.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="n">parsed_json</span><span class="p">[</span><span class="s">&#39;msg&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">parsed_json</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span>
 </div>
 <div class="viewcode-block" id="Api.json_msg_query"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.json_msg_query">[docs]</a>    <span class="k">def</span> <span class="nf">json_msg_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">dataframe</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Common case where the url is fully constructed</span>
@@ -802,7 +802,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">api_url</span> <span class="o">=</span> <span class="n">url_builder_fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">post</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;post&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="n">post</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
 
         <span class="n">json_parsed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_parsed_json_over_http</span><span class="p">(</span><span class="n">api_url</span><span class="p">,</span> <span class="n">post</span><span class="p">)</span>
 
@@ -856,7 +856,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        and `Class List &lt;http://api.brain-map.org/class_hierarchy&gt;`_.</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">schema_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span> <span class="o">+</span> <span class="s">&#39;/enumerate.json&#39;</span>
+        <span class="n">schema_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rma_endpoint</span> <span class="o">+</span> <span class="s1">&#39;/enumerate.json&#39;</span>
         <span class="n">json_parsed_schema_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_parsed_json_over_http</span><span class="p">(</span>
             <span class="n">schema_url</span><span class="p">)</span>
 
@@ -879,7 +879,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        --------</span>
 <span class="sd">        retrieve_file_over_http: Can be used to retrieve the file from the url.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">well_known_file_endpoint</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">well_known_file_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">well_known_file_endpoint</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">well_known_file_id</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="Api.retrieve_file_over_http"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.retrieve_file_over_http">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get a file from the data api and save it.</span>
@@ -900,7 +900,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        .. [1] Allen Brain Atlas Data Portal: `Downloading a WellKnownFile &lt;http://help.brain-map.org/display/api/Downloading+a+WellKnownFile&gt;`_.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Downloading URL: </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloading URL: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
         
         <span class="kn">from</span> <span class="nn">requests_toolbelt</span> <span class="kn">import</span> <span class="n">exceptions</span>
         <span class="kn">from</span> <span class="nn">requests_toolbelt.downloadutils</span> <span class="kn">import</span> <span class="n">stream</span>
@@ -910,22 +910,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                       <span class="n">stream</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
                                       <span class="n">timeout</span><span class="o">=</span><span class="p">(</span><span class="mf">9.05</span><span class="p">,</span><span class="mf">31.1</span><span class="p">)))</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
                 <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">stream</span><span class="o">.</span><span class="n">stream_response_to_file</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">StreamingError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s"> from </span><span class="si">%s</span><span class="s"> (streaming).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> (streaming).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
             <span class="k">raise</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s"> from </span><span class="si">%s</span><span class="s"> (request).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> (request).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
             <span class="k">raise</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s"> from </span><span class="si">%s</span><span class="s"> (connection).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> (connection).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
             <span class="k">raise</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ReadTimeout</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s"> from </span><span class="si">%s</span><span class="s"> (timeout).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> (timeout).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
             <span class="k">raise</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s"> from </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">url</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">url</span><span class="p">))</span>
             <span class="k">raise</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
 
@@ -945,15 +945,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        dict</span>
 <span class="sd">            Result document as parsed by the JSON library.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Downloading URL: </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloading URL: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="n">post</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read_url</span><span class="p">(</span>
                 <span class="n">requests</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">url</span><span class="p">,</span>
-                                     <span class="s">&#39;;/?:@&amp;=+$,&#39;</span><span class="p">),</span>
-                <span class="s">&#39;GET&#39;</span><span class="p">)</span>
+                                     <span class="s1">&#39;;/?:@&amp;=+$,&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;GET&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s">&#39;POST&#39;</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">data</span>
 </div>
@@ -970,7 +970,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        string</span>
 <span class="sd">            Unparsed xml string.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Downloading URL: </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloading URL: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
                 
         <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
 
@@ -1045,7 +1045,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

@@ -27,17 +27,17 @@
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -631,25 +631,25 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           <div class="body">
             
   <h1>Source code for allensdk.brain_observatory.roi_masks</h1><div class="highlight"><pre>
-<span class="c"># Copyright 2016 Allen Institute for Brain Science</span>
-<span class="c"># This file is part of Allen SDK.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is free software: you can redistribute it and/or modify</span>
-<span class="c"># it under the terms of the GNU General Public License as published by</span>
-<span class="c"># the Free Software Foundation, version 3 of the License.</span>
-<span class="c">#</span>
-<span class="c"># Allen SDK is distributed in the hope that it will be useful,</span>
-<span class="c"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
-<span class="c"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
-<span class="c"># GNU General Public License for more details.</span>
-<span class="c">#</span>
-<span class="c"># You should have received a copy of the GNU General Public License</span>
-<span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span></span><span class="c1"># Copyright 2016 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">scipy.ndimage.morphology</span> <span class="kn">as</span> <span class="nn">morphology</span>
 
-<span class="c"># constants used for accessing border array</span>
+<span class="c1"># constants used for accessing border array</span>
 <span class="n">RIGHT_SHIFT</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">LEFT_SHIFT</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="n">DOWN_SHIFT</span> <span class="o">=</span> <span class="mi">2</span>
@@ -690,23 +690,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="bp">self</span><span class="o">.</span><span class="n">img_rows</span> <span class="o">=</span> <span class="n">image_h</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">img_cols</span> <span class="o">=</span> <span class="n">image_w</span>
-        <span class="c"># initialize to invalid state. Mask must be manually initialized</span>
-        <span class="c">#   by pixel list or mask array</span>
+        <span class="c1"># initialize to invalid state. Mask must be manually initialized</span>
+        <span class="c1">#   by pixel list or mask array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="bp">True</span>
-        <span class="c"># label is for distinguishing neuropil from ROI, in case</span>
-        <span class="c">#   these masks are mixed together</span>
+        <span class="c1"># label is for distinguishing neuropil from ROI, in case</span>
+        <span class="c1">#   these masks are mixed together</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
-        <span class="c"># auxiliary metadata. if a particula mask is part of an group,</span>
-        <span class="c">#   that data can be stored here</span>
+        <span class="c1"># auxiliary metadata. if a particula mask is part of an group,</span>
+        <span class="c1">#   that data can be stored here</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask_group</span> <span class="o">=</span> <span class="n">mask_group</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: TL=</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="s"> w,h=</span><span class="si">%d</span><span class="s">,</span><span class="si">%d</span><span class="se">\n</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: TL=</span><span class="si">%d</span><span class="s2">,</span><span class="si">%d</span><span class="s2"> w,h=</span><span class="si">%d</span><span class="s2">,</span><span class="si">%d</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Mask.init_by_pixels"><a class="viewcode-back" href="../../../allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.Mask.init_by_pixels">[docs]</a>    <span class="k">def</span> <span class="nf">init_by_pixels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">border</span><span class="p">,</span> <span class="n">pix_list</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -720,10 +720,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        pix_list: integer[][2]</span>
 <span class="sd">            List of pixel coordinates (x,y) that define the mask</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">assert</span> <span class="n">pix_list</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;Pixel list not properly formed&quot;</span>
+        <span class="k">assert</span> <span class="n">pix_list</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Pixel list not properly formed&quot;</span>
         <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">img_rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_cols</span><span class="p">))</span>
 
-        <span class="c"># pix_list stores array of [x,y] coordinates</span>
+        <span class="c1"># pix_list stores array of [x,y] coordinates</span>
         <span class="n">array</span><span class="p">[</span><span class="n">pix_list</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">pix_list</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">init_by_mask</span><span class="p">(</span><span class="n">border</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span>
@@ -795,7 +795,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="k">elif</span> <span class="n">roi_mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">m</span><span class="o">.</span><span class="n">init_by_mask</span><span class="p">(</span><span class="n">border</span><span class="p">,</span> <span class="n">roi_mask</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s">&quot;Must specify either roi_mask or pix_list&quot;</span>
+        <span class="k">assert</span> <span class="bp">False</span><span class="p">,</span> <span class="s2">&quot;Must specify either roi_mask or pix_list&quot;</span>
     <span class="k">return</span> <span class="n">m</span>
 
 </div>
@@ -834,28 +834,28 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Image-sized array that describes the mask. Active parts of the</span>
 <span class="sd">            mask should have values &gt;0. Background pixels must be zero</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="c"># find lowest and highest non-zero indices on each axis</span>
+        <span class="c1"># find lowest and highest non-zero indices on each axis</span>
         <span class="n">px</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
         <span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">),</span> <span class="p">(</span><span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">px</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="c"># left and right border insets</span>
+        <span class="c1"># left and right border insets</span>
         <span class="n">l_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">border</span><span class="p">[</span><span class="n">RIGHT_SHIFT</span><span class="p">])</span>
         <span class="n">r_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_cols</span> <span class="o">-</span> <span class="n">border</span><span class="p">[</span><span class="n">LEFT_SHIFT</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="c"># top and bottom border insets</span>
+        <span class="c1"># top and bottom border insets</span>
         <span class="n">t_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">border</span><span class="p">[</span><span class="n">DOWN_SHIFT</span><span class="p">])</span>
         <span class="n">b_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_rows</span> <span class="o">-</span> <span class="n">border</span><span class="p">[</span><span class="n">UP_SHIFT</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
 
-        <span class="c"># if ROI crosses border, it&#39;s considered invalid</span>
+        <span class="c1"># if ROI crosses border, it&#39;s considered invalid</span>
         <span class="k">if</span> <span class="n">left</span> <span class="o">&lt;</span> <span class="n">l_inset</span> <span class="ow">or</span> <span class="n">right</span> <span class="o">&gt;</span> <span class="n">r_inset</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="k">if</span> <span class="n">top</span> <span class="o">&lt;</span> <span class="n">t_inset</span> <span class="ow">or</span> <span class="n">bottom</span> <span class="o">&gt;</span> <span class="n">b_inset</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">valid</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="c">#</span>
+        <span class="c1">#</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">left</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">top</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">bottom</span> <span class="o">-</span> <span class="n">top</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="c"># make copy of mask</span>
+        <span class="c1"># make copy of mask</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
 
 </div></div>
@@ -890,17 +890,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    -------</span>
 <span class="sd">        NeuropilMask object</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="c"># combined_binary_mask is a bitmap union of ALL ROI masks</span>
-    <span class="c"># create a binary mask of the ROI</span>
+    <span class="c1"># combined_binary_mask is a bitmap union of ALL ROI masks</span>
+    <span class="c1"># create a binary mask of the ROI</span>
     <span class="n">binary_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">roi</span><span class="o">.</span><span class="n">img_rows</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">img_cols</span><span class="p">))</span>
     <span class="n">binary_mask</span><span class="p">[</span><span class="n">roi</span><span class="o">.</span><span class="n">y</span><span class="p">:</span><span class="n">roi</span><span class="o">.</span><span class="n">y</span> <span class="o">+</span> <span class="n">roi</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">x</span><span class="p">:</span><span class="n">roi</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">roi</span><span class="o">.</span><span class="n">width</span><span class="p">]</span> <span class="o">=</span> <span class="n">roi</span><span class="o">.</span><span class="n">mask</span>
     <span class="n">binary_mask</span> <span class="o">=</span> <span class="n">binary_mask</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="c"># dilate the mask</span>
+    <span class="c1"># dilate the mask</span>
     <span class="n">binary_mask_dilated</span> <span class="o">=</span> <span class="n">morphology</span><span class="o">.</span><span class="n">binary_dilation</span><span class="p">(</span>
-        <span class="n">binary_mask</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>  <span class="c"># T/F</span>
-    <span class="c"># eliminate ROIs from the dilation</span>
+        <span class="n">binary_mask</span><span class="p">,</span> <span class="n">structure</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>  <span class="c1"># T/F</span>
+    <span class="c1"># eliminate ROIs from the dilation</span>
     <span class="n">binary_mask_dilated</span> <span class="o">=</span> <span class="n">binary_mask_dilated</span> <span class="o">&gt;</span> <span class="n">combined_binary_mask</span>
-    <span class="c"># create mask from binary dilation</span>
+    <span class="c1"># create mask from binary dilation</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">NeuropilMask</span><span class="p">(</span><span class="n">w</span><span class="o">=</span><span class="n">roi</span><span class="o">.</span><span class="n">img_cols</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="n">roi</span><span class="o">.</span><span class="n">img_rows</span><span class="p">,</span>
                      <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">mask_group</span><span class="o">=</span><span class="n">roi</span><span class="o">.</span><span class="n">mask_group</span><span class="p">)</span>
     <span class="n">m</span><span class="o">.</span><span class="n">init_by_mask</span><span class="p">(</span><span class="n">border</span><span class="p">,</span> <span class="n">binary_mask_dilated</span><span class="p">)</span>
@@ -937,18 +937,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Image-sized array that describes the mask. Active parts of the</span>
 <span class="sd">            mask should have values &gt;0. Background pixels must be zero</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="c"># find lowest and highest non-zero indices on each axis</span>
+        <span class="c1"># find lowest and highest non-zero indices on each axis</span>
         <span class="n">px</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
         <span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">left</span><span class="p">),</span> <span class="p">(</span><span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">px</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="c"># left and right border insets</span>
+        <span class="c1"># left and right border insets</span>
         <span class="n">l_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">border</span><span class="p">[</span><span class="n">RIGHT_SHIFT</span><span class="p">])</span>
         <span class="n">r_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_cols</span> <span class="o">-</span> <span class="n">border</span><span class="p">[</span><span class="n">LEFT_SHIFT</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="c"># top and bottom border insets</span>
+        <span class="c1"># top and bottom border insets</span>
         <span class="n">t_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">border</span><span class="p">[</span><span class="n">DOWN_SHIFT</span><span class="p">])</span>
         <span class="n">b_inset</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_rows</span> <span class="o">-</span> <span class="n">border</span><span class="p">[</span><span class="n">UP_SHIFT</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="c"># restrict neuropil masks to center area of frame (ie, exclude</span>
-        <span class="c">#   areas that overlap with movement correction buffer)</span>
+        <span class="c1"># restrict neuropil masks to center area of frame (ie, exclude</span>
+        <span class="c1">#   areas that overlap with movement correction buffer)</span>
         <span class="k">if</span> <span class="n">left</span> <span class="o">&lt;</span> <span class="n">l_inset</span><span class="p">:</span>
             <span class="n">left</span> <span class="o">=</span> <span class="n">l_inset</span>
             <span class="k">if</span> <span class="n">right</span> <span class="o">&lt;</span> <span class="n">l_inset</span><span class="p">:</span>
@@ -965,12 +965,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">bottom</span> <span class="o">=</span> <span class="n">b_inset</span>
             <span class="k">if</span> <span class="n">top</span> <span class="o">&gt;</span> <span class="n">b_inset</span><span class="p">:</span>
                 <span class="n">top</span> <span class="o">=</span> <span class="n">b_inset</span>
-        <span class="c">#</span>
+        <span class="c1">#</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">left</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">top</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">bottom</span> <span class="o">-</span> <span class="n">top</span> <span class="o">+</span> <span class="mi">1</span>
-        <span class="c"># make copy of mask</span>
+        <span class="c1"># make copy of mask</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">top</span><span class="p">:</span><span class="n">bottom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span><span class="n">right</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
 
 </div></div>
@@ -994,14 +994,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">traces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">mask_list</span><span class="p">),</span> <span class="n">stack</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
     <span class="n">num_frames</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="c"># make sure masks are numpy objects</span>
+    <span class="c1"># make sure masks are numpy objects</span>
     <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">mask_list</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">mask</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
-    <span class="c"># calcualte traces</span>
+    <span class="c1"># calcualte traces</span>
     <span class="k">for</span> <span class="n">frame_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_frames</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">frame_num</span> <span class="o">%</span> <span class="mi">1000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;frame &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame_num</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_frames</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;frame &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">frame_num</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; of &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_frames</span><span class="p">))</span>
         <span class="n">frame</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="n">frame_num</span><span class="p">]</span>
         <span class="n">mask</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1014,7 +1014,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">tvals</span> <span class="o">=</span> <span class="n">total</span> <span class="o">/</span> <span class="n">area</span>
                 <span class="n">traces</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">frame_num</span><span class="p">]</span> <span class="o">=</span> <span class="n">tvals</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Error encountered processing mask during frame </span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">frame_num</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Error encountered processing mask during frame </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">frame_num</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">print</span><span class="p">(</span><span class="n">subframe</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
                 <span class="k">print</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -1091,7 +1091,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>
