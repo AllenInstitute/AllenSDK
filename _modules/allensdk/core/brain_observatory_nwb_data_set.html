@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.brain_observatory_nwb_data_set &mdash; Allen SDK 0.12.0 documentation</title>
+    <title>allensdk.core.brain_observatory_nwb_data_set &mdash; Allen SDK 0.12.3 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.12.0',
+        VERSION:     '0.12.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,21 +23,21 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.3 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -647,6 +647,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">allensdk.brain_observatory.roi_masks</span> <span class="kn">as</span> <span class="nn">roi</span>
@@ -655,14 +656,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">si</span>
 <span class="kn">import</span> <span class="nn">dateutil</span>
 <span class="kn">import</span> <span class="nn">re</span>
-
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">parse_version</span>
 
 <div class="viewcode-block" id="MissingStimulusException"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.MissingStimulusException">[docs]</a><span class="k">class</span> <span class="nc">MissingStimulusException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="k">pass</span>
-
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet">[docs]</a><span class="k">class</span> <span class="nc">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">PIPELINE_DATASET</span> <span class="o">=</span> <span class="s">&#39;brain_observatory_pipeline&#39;</span>
+    <span class="n">SUPPORTED_PIPELINE_VERSION</span> <span class="o">=</span> <span class="s">&quot;1.0&quot;</span>
 
     <span class="n">FILE_METADATA_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s">&#39;age&#39;</span><span class="p">:</span> <span class="s">&#39;general/subject/age&#39;</span><span class="p">,</span>
@@ -677,7 +679,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="s">&#39;fov&#39;</span><span class="p">:</span> <span class="s">&#39;general/fov&#39;</span><span class="p">,</span>
         <span class="s">&#39;genotype&#39;</span><span class="p">:</span> <span class="s">&#39;general/subject/genotype&#39;</span><span class="p">,</span>
         <span class="s">&#39;session_start_time&#39;</span><span class="p">:</span> <span class="s">&#39;session_start_time&#39;</span><span class="p">,</span>
-        <span class="s">&#39;session_type&#39;</span><span class="p">:</span> <span class="s">&#39;general/session_type&#39;</span>
+        <span class="s">&#39;session_type&#39;</span><span class="p">:</span> <span class="s">&#39;general/session_type&#39;</span><span class="p">,</span>
+        <span class="s">&#39;specimen_name&#39;</span><span class="p">:</span> <span class="s">&#39;general/specimen_name&#39;</span><span class="p">,</span>
+        <span class="s">&#39;generated_by&#39;</span><span class="p">:</span> <span class="s">&#39;general/generated_by&#39;</span>
     <span class="p">}</span>
 
     <span class="n">STIMULUS_TABLE_TYPES</span> <span class="o">=</span> <span class="p">{</span>
@@ -686,8 +690,21 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                 <span class="n">si</span><span class="o">.</span><span class="n">NATURAL_SCENES</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">]</span>
     <span class="p">}</span>
 
+    <span class="n">MOTION_CORRECTION_DATASETS</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;MotionCorrection/2p_image_series/xy_translations&quot;</span><span class="p">,</span> 
+                                   <span class="s">&quot;MotionCorrection/2p_image_series/xy_translation&quot;</span> <span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nwb_file</span><span class="p">):</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span> <span class="o">=</span> <span class="n">nwb_file</span>
+        
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">):</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">meta</span> <span class="ow">and</span> <span class="s">&#39;pipeline_version&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+                <span class="n">pipeline_version</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;pipeline_version&#39;</span><span class="p">]</span>
+        
+                <span class="k">if</span> <span class="n">parse_version</span><span class="p">(</span><span class="n">pipeline_version</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">parse_version</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_PIPELINE_VERSION</span><span class="p">):</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;File </span><span class="si">%s</span><span class="s"> has a pipeline version newer than the version supported by this class (</span><span class="si">%s</span><span class="s"> vs </span><span class="si">%s</span><span class="s">).&quot;</span>
+                                    <span class="s">&quot; Please update your AllenSDK.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">pipeline_version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUPPORTED_PIPELINE_VERSION</span><span class="p">))</span>
 
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_fluorescence_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_fluorescence_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of fluorescence traces for all ROI and</span>
@@ -707,9 +724,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        traces: 2D numpy array</span>
 <span class="sd">            Fluorescence traces for each cell</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">timestamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fluorescence_timestamps</span><span class="p">()</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
             <span class="n">ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                 <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
 
@@ -720,6 +736,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span>
+</div>
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_fluorescence_timestamps"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_timestamps">[docs]</a>    <span class="k">def</span> <span class="nf">get_fluorescence_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Returns an array of timestamps in seconds for the fluorescence traces &#39;&#39;&#39;</span>
+
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">return</span> <span class="n">timestamps</span>
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_neuropil_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuropil_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of fluorescence traces for all ROIs</span>
@@ -739,10 +763,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        traces: 2D numpy array</span>
 <span class="sd">            Neuropil fluorescence traces for each cell</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
+        <span class="n">timestamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fluorescence_timestamps</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                 <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;neuropil_traces&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -771,27 +795,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        traces: 2D numpy array</span>
 <span class="sd">            Corrected fluorescence traces for each cell</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fluorescence_traces</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">neuropil_traces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_neuropil_traces</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">cell_traces_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span>
-            <span class="n">np_traces_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;neuropil_traces&#39;</span><span class="p">]</span>
             <span class="n">r_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                 <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;r&#39;</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">cell_traces_ds</span><span class="o">.</span><span class="n">value</span>
-                <span class="n">np_traces</span> <span class="o">=</span> <span class="n">np_traces_ds</span><span class="o">.</span><span class="n">value</span>
                 <span class="n">r</span> <span class="o">=</span> <span class="n">r_ds</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
-                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">cell_traces_ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
-                <span class="n">np_traces</span> <span class="o">=</span> <span class="n">np_traces_ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
                 <span class="n">r</span> <span class="o">=</span> <span class="n">r_ds</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
 
-        <span class="n">fc</span> <span class="o">=</span> <span class="n">cell_traces</span> <span class="o">-</span> <span class="n">np_traces</span> <span class="o">*</span> <span class="n">r</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">fc</span> <span class="o">=</span> <span class="n">cell_traces</span> <span class="o">-</span> <span class="n">neuropil_traces</span> <span class="o">*</span> <span class="n">r</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">fc</span>
 </div>
@@ -833,16 +852,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            dF/F values for each cell</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                <span class="s">&#39;DfOverF&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">dff_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;DfOverF&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">]</span>
+
+            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">dff_ds</span><span class="p">[</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
             <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                    <span class="s">&#39;DfOverF&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">dff_ds</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
-                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                    <span class="s">&#39;DfOverF&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
+                <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">dff_ds</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
 
         <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span>
 </div>
@@ -1088,38 +1107,71 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">memory_key</span><span class="p">,</span> <span class="n">disk_key</span> <span class="ow">in</span> <span class="n">BrainObservatoryNwbDataSet</span><span class="o">.</span><span class="n">FILE_METADATA_MAPPING</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">v</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">disk_key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-                <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">:</span>
-                    <span class="n">v</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                <span class="n">meta</span><span class="p">[</span><span class="n">memory_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">disk_key</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
-        <span class="n">meta</span><span class="p">[</span><span class="s">&#39;cre_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;genotype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s">&#39;imaging_depth_um&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s">&#39;imaging_depth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;imaging_depth&#39;</span><span class="p">]</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ophys_experiment_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s">&#39;ophys_experiment_id&#39;</span><span class="p">])</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s">&#39;experiment_container_id&#39;</span><span class="p">])</span>
-        <span class="n">meta</span><span class="p">[</span><span class="s">&#39;session_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
-            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;session_start_time&#39;</span><span class="p">])</span>
+                    <span class="c"># convert numpy strings to python strings</span>
+                    <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;UTF-8&#39;</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">v</span> <span class="o">=</span> <span class="p">[</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;UTF-8&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">v</span> <span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Unrecognized metadata formatting for field </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">disk_key</span><span class="p">)</span>
 
-        <span class="c"># parse the age in days</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&quot;(.*?) days&quot;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;age&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
-            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;age_days&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;age&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;Could not find age.&quot;</span><span class="p">)</span>
+                    <span class="n">meta</span><span class="p">[</span><span class="n">memory_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;could not find key </span><span class="si">%s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">disk_key</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s">&#39;genotye&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;cre_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;genotype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s">&#39;imaging_depth&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;imaging_depth_um&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s">&#39;imaging_depth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;imaging_depth&#39;</span><span class="p">]</span>
+            
+        <span class="k">if</span> <span class="s">&#39;ophys_experiment_id&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;ophys_experiment_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s">&#39;ophys_experiment_id&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s">&#39;experiment_container_id&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s">&#39;experiment_container_id&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s">&#39;session_start_time&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;session_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s">&#39;session_start_time&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s">&#39;age&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+            <span class="c"># parse the age in days</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&quot;(.*?) days&quot;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;age&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">meta</span><span class="p">[</span><span class="s">&#39;age_days&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;age&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;Could not parse age.&quot;</span><span class="p">)</span>
 
         <span class="c"># parse the device string (ugly, sorry)</span>
-        <span class="n">device_string</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;device_string&#39;</span><span class="p">]</span>
-        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;device_string&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s">&#39;device_string&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+            <span class="n">device_string</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;device_string&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s">&#39;device_string&#39;</span><span class="p">]</span>
 
-        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&quot;(.*?)\.\s(.*?)\sPlease*&quot;</span><span class="p">,</span> <span class="n">device_string</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
-            <span class="n">device</span><span class="p">,</span> <span class="n">device_name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
-            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
-            <span class="n">meta</span><span class="p">[</span><span class="s">&#39;device_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_name</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;Could not find device.&quot;</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&quot;(.*?)\.\s(.*?)\sPlease*&quot;</span><span class="p">,</span> <span class="n">device_string</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">device</span><span class="p">,</span> <span class="n">device_name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+                <span class="n">meta</span><span class="p">[</span><span class="s">&#39;device&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device</span>
+                <span class="n">meta</span><span class="p">[</span><span class="s">&#39;device_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">device_name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&quot;Could not parse device string.&quot;</span><span class="p">)</span>
+
+        <span class="c"># file version</span>
+        <span class="k">if</span> <span class="s">&#39;generated_by&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+            <span class="n">generated_by</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;generated_by&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">generated_by</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s">&quot;generated_by&quot;</span><span class="p">]</span>
+                <span class="n">version</span> <span class="o">=</span> <span class="n">generated_by</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">version</span> <span class="o">=</span> <span class="s">&quot;0.9&quot;</span>
+            <span class="n">meta</span><span class="p">[</span><span class="s">&quot;pipeline_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span>
 
         <span class="k">return</span> <span class="n">meta</span>
 </div>
@@ -1127,36 +1179,49 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="sd">&#39;&#39;&#39; Returns the mouse running speed in cm/s</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">dxcm</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                <span class="s">&#39;BehavioralTimeSeries&#39;</span><span class="p">][</span><span class="s">&#39;running_speed&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">dxtime</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                <span class="s">&#39;BehavioralTimeSeries&#39;</span><span class="p">][</span><span class="s">&#39;running_speed&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                <span class="s">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">dx_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s">&#39;BehavioralTimeSeries&#39;</span><span class="p">][</span><span class="s">&#39;running_speed&#39;</span><span class="p">]</span>
+            <span class="n">dxcm</span> <span class="o">=</span> <span class="n">dx_ds</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">dxtime</span> <span class="o">=</span> <span class="n">dx_ds</span><span class="p">[</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
 
-        <span class="n">dxcm</span> <span class="o">=</span> <span class="n">dxcm</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">dxtime</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">timestamps</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="n">adjust</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">timestamps</span> <span class="o">==</span> <span class="n">dxtime</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">dxtime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">dxtime</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">[:</span><span class="n">adjust</span><span class="p">])</span>
-            <span class="n">dxcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">adjust</span><span class="p">))</span>
-        <span class="n">adjust</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">dxtime</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">adjust</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">dxtime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">[(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">adjust</span><span class="p">):])</span>
-            <span class="n">dxcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">adjust</span><span class="p">))</span>
+        <span class="n">timestamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fluorescence_timestamps</span><span class="p">()</span>
+
+        <span class="c"># v0.9 stored this as an Nx1 array instead of a flat 1-d array</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dxcm</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">dxcm</span> <span class="o">=</span> <span class="n">dxcm</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span> <span class="o">=</span> <span class="n">align_running_speed</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span>
 </div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_motion_correction"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_motion_correction">[docs]</a>    <span class="k">def</span> <span class="nf">get_motion_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">motion_correction</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">motion_log</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;MotionCorrection&#39;</span><span class="p">][</span>
-                <span class="s">&#39;2p_image_series&#39;</span><span class="p">][</span><span class="s">&#39;xy_translations&#39;</span><span class="p">][</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">motion_time</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;MotionCorrection&#39;</span><span class="p">][</span>
-                <span class="s">&#39;2p_image_series&#39;</span><span class="p">][</span><span class="s">&#39;xy_translations&#39;</span><span class="p">][</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">motion_names</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s">&#39;MotionCorrection&#39;</span><span class="p">][</span>
-                <span class="s">&#39;2p_image_series&#39;</span><span class="p">][</span><span class="s">&#39;xy_translations&#39;</span><span class="p">][</span><span class="s">&#39;feature_description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-            <span class="n">motion_correction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">motion_log</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">motion_names</span><span class="p">)</span>
-            <span class="n">motion_correction</span><span class="p">[</span><span class="s">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">motion_time</span>
+            <span class="n">pipeline_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">]</span>
+
+            <span class="c"># pipeline 0.9 stores this in xy_translations</span>
+            <span class="c"># pipeline 1.0 stores this in xy_translation</span>
+            <span class="k">for</span> <span class="n">mc_ds_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">MOTION_CORRECTION_DATASETS</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">mc_ds</span> <span class="o">=</span> <span class="n">pipeline_ds</span><span class="p">[</span><span class="n">mc_ds_name</span><span class="p">]</span>
+
+                    <span class="n">motion_log</span> <span class="o">=</span> <span class="n">mc_ds</span><span class="p">[</span><span class="s">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                    <span class="n">motion_time</span> <span class="o">=</span> <span class="n">mc_ds</span><span class="p">[</span><span class="s">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                    <span class="n">motion_names</span> <span class="o">=</span> <span class="n">mc_ds</span><span class="p">[</span><span class="s">&#39;feature_description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+                    <span class="n">motion_correction</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">motion_log</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">motion_names</span><span class="p">)</span>
+                    <span class="n">motion_correction</span><span class="p">[</span><span class="s">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">motion_time</span>
+
+                    <span class="c"># break out if we found it</span>
+                    <span class="k">break</span>
+                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">pass</span>
+        
+        <span class="k">if</span> <span class="n">motion_correction</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s">&quot;Could not find motion correction data.&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">motion_correction</span>
 </div>
@@ -1182,6 +1247,25 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s">&#39;analysis/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
 
 </div></div>
+<div class="viewcode-block" id="align_running_speed"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.align_running_speed">[docs]</a><span class="k">def</span> <span class="nf">align_running_speed</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; If running speed timestamps differ from fluorescence</span>
+<span class="sd">    timestamps, adjust by inserting NaNs to running speed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple: dxcm, dxtime</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">dxtime</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">timestamps</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">adjust</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">timestamps</span> <span class="o">==</span> <span class="n">dxtime</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dxtime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">dxtime</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">[:</span><span class="n">adjust</span><span class="p">])</span>
+        <span class="n">dxcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">adjust</span><span class="p">))</span>
+    <span class="n">adjust</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">dxtime</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">adjust</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dxtime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">[(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">adjust</span><span class="p">):])</span>
+        <span class="n">dxcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">adjust</span><span class="p">))</span>
+        
+    <span class="k">return</span> <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span>
+</div>
 <div class="viewcode-block" id="warp_stimulus_coords"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords">[docs]</a><span class="k">def</span> <span class="nf">warp_stimulus_coords</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span>
                          <span class="n">distance</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>
                          <span class="n">mon_height_cm</span><span class="o">=</span><span class="mf">32.5</span><span class="p">,</span>
@@ -1406,6 +1490,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
@@ -1450,7 +1535,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

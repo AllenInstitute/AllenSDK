@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.config package &mdash; Allen SDK 0.12.0 documentation</title>
+    <title>allensdk.config package &mdash; Allen SDK 0.12.3 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.0',
+        VERSION:     '0.12.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,23 +23,23 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.3 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.config.app package" href="allensdk.config.app.html" />
     <link rel="prev" title="allensdk.brain_observatory package" href="allensdk.brain_observatory.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -181,11 +181,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -609,7 +609,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -622,7 +622,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -890,7 +890,7 @@ referenced in an Allen SDK configuration</p>
 
 <dl class="attribute">
 <dt id="allensdk.config.manifest.Manifest.log">
-<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x7fbe2c024750&gt;</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.log" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">log</tt><em class="property"> = &lt;logging.Logger object at 0x7fd7c0bd3d50&gt;</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.log" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -910,6 +910,20 @@ referenced in an Allen SDK configuration</p>
 <div><p>Indicates the entries to be expanded.</p>
 </div></blockquote>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="allensdk.config.manifest.Manifest.safe_make_parent_dirs">
+<em class="property">classmethod </em><tt class="descname">safe_make_parent_dirs</tt><big>(</big><em>file_name</em><big>)</big><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.safe_make_parent_dirs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.safe_make_parent_dirs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a parent directories for file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file_name</strong> : string</td>
 </tr>
 </tbody>
 </table>
@@ -992,6 +1006,25 @@ referenced in an Allen SDK configuration</p>
 </div>
 <div class="section" id="module-allensdk.config">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-allensdk.config" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="allensdk.config.enable_console_log">
+<tt class="descclassname">allensdk.config.</tt><tt class="descname">enable_console_log</tt><big>(</big><em>level=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/config.html#enable_console_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.enable_console_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>configure allensdk logging to output to the console.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>level</strong> : int</p>
+<blockquote>
+<div><p>logging level 0-50 (logging.INFO, logging.DEBUG, etc.)</p>
+</div></blockquote>
+<p class="last"><strong>See: `Logging Cookbook &lt;https://docs.python.org/2/howto/logging-cookbook.html&gt;`_.</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 
@@ -1019,6 +1052,7 @@ referenced in an Allen SDK configuration</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
@@ -1063,7 +1097,7 @@ referenced in an Allen SDK configuration</p>
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

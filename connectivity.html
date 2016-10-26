@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Mouse Connectivity &mdash; Allen SDK 0.12.0 documentation</title>
+    <title>Mouse Connectivity &mdash; Allen SDK 0.12.3 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.0',
+        VERSION:     '0.12.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,23 +23,23 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.3 documentation" href="index.html" />
     <link rel="up" title="Data Resources" href="data_resources.html" />
     <link rel="next" title="API Access" href="data_api_client.html" />
     <link rel="prev" title="Cell Types" href="cell_types.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -181,11 +181,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -609,7 +609,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -622,7 +622,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -693,9 +693,15 @@ all experiments with injections in the isocortex and download the projetion dens
 </pre></div>
 </div>
 </div>
+<div class="section" id="structure-level-projection-data">
+<h2>Structure-Level Projection Data<a class="headerlink" href="#structure-level-projection-data" title="Permalink to this headline">¶</a></h2>
+<p>All AAV projection signal in the Allen Mouse Connectivity Atlas has been registered to the expert-annotated Common Coordinate Framework
+and summarized to structures in the adult mouse structure ontology.  This data is available for download and is described
+in more detail on the <a class="reference internal" href="unionizes.html"><em>structure unionizes page</em></a>.</p>
+</div>
 <div class="section" id="file-formats">
 <h2>File Formats<a class="headerlink" href="#file-formats" title="Permalink to this headline">¶</a></h2>
-<p>This section provides a short description of the file formats used for Allen Cell Types data.</p>
+<p>This section provides a short description of the file formats used for data in the Allen Mouse Connectivity Atlas.</p>
 <div class="section" id="nrrd-files">
 <h3>NRRD Files<a class="headerlink" href="#nrrd-files" title="Permalink to this headline">¶</a></h3>
 <p>All of the volumetric data in the connectivity atlas are stored as
@@ -737,6 +743,7 @@ Usage is straightforward:</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
@@ -781,7 +788,7 @@ Usage is straightforward:</p>
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

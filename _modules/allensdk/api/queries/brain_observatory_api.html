@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.brain_observatory_api &mdash; Allen SDK 0.12.0 documentation</title>
+    <title>allensdk.api.queries.brain_observatory_api &mdash; Allen SDK 0.12.3 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.12.0',
+        VERSION:     '0.12.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,21 +23,21 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.3 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -647,7 +647,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_template</span> <span class="kn">import</span> <span class="n">RmaTemplate</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">string_types</span>
+<span class="kn">from</span> <span class="nn">.rma_template</span> <span class="kn">import</span> <span class="n">RmaTemplate</span>
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest</span> <span class="kn">import</span> <span class="n">Manifest</span>
 <span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stimulus_info</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -742,6 +744,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
              <span class="s">&#39;criteria_params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s">&#39;cell_specimen_ids&#39;</span><span class="p">]</span>
              <span class="p">}</span>
         <span class="p">]}</span>
+
+    <span class="n">_QUERY_TEMPLATES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;=&quot;</span><span class="p">:</span> <span class="s">&#39;({0} == {1})&#39;</span><span class="p">,</span>
+        <span class="s">&quot;&lt;&quot;</span><span class="p">:</span> <span class="s">&#39;({0} &lt; {1})&#39;</span><span class="p">,</span>
+        <span class="s">&quot;&gt;&quot;</span><span class="p">:</span> <span class="s">&#39;({0} &gt; {1})&#39;</span><span class="p">,</span>
+        <span class="s">&quot;&lt;=&quot;</span><span class="p">:</span> <span class="s">&#39;({0} &lt;= {1})&#39;</span><span class="p">,</span>
+        <span class="s">&quot;&gt;=&quot;</span><span class="p">:</span> <span class="s">&#39;({0} &gt;= {1})&#39;</span><span class="p">,</span>
+        <span class="s">&quot;between&quot;</span><span class="p">:</span> <span class="s">&#39;({0} &gt;= {1}) and ({0} &lt;= {2})&#39;</span><span class="p">,</span>
+        <span class="s">&quot;in&quot;</span><span class="p">:</span> <span class="s">&#39;({0} == {1})&#39;</span><span class="p">,</span>
+        <span class="s">&quot;is&quot;</span><span class="p">:</span> <span class="s">&#39;({0} == {1})&#39;</span>
+    <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryApi</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">base_uri</span><span class="p">,</span>
@@ -912,8 +925,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">return</span> <span class="n">data</span>
 </div>
 <div class="viewcode-block" id="BrainObservatoryApi.save_ophys_experiment_data"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.save_ophys_experiment_data">[docs]</a>    <span class="k">def</span> <span class="nf">save_ophys_experiment_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ophys_experiment_id</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
-        <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-        <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_mkdir</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+        <span class="n">Manifest</span><span class="o">.</span><span class="n">safe_make_parent_dirs</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_query</span><span class="p">(</span><span class="s">&#39;brain_observatory_queries&#39;</span><span class="p">,</span>
                                    <span class="s">&#39;ophys_experiment_data&#39;</span><span class="p">,</span>
@@ -983,7 +995,32 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">return</span> <span class="n">experiments</span>
 </div>
-<div class="viewcode-block" id="BrainObservatoryApi.filter_cell_specimens"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_cell_specimens">[docs]</a>    <span class="k">def</span> <span class="nf">filter_cell_specimens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimens</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">experiment_container_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryApi.filter_cell_specimens"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_cell_specimens">[docs]</a>    <span class="k">def</span> <span class="nf">filter_cell_specimens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimens</span><span class="p">,</span>
+                              <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                              <span class="n">experiment_container_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                              <span class="n">filters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filter a list of cell specimen records returned from the get_cell_metrics method according </span>
+<span class="sd">        some of their properties.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cell_specimens: list of dicts</span>
+<span class="sd">            List of records returned by the get_cell_metrics method.</span>
+
+<span class="sd">        ids: list of integers</span>
+<span class="sd">            Return only records for cells with cell specimen ids in this list</span>
+
+<span class="sd">        experiment_container_ids: list of integers</span>
+<span class="sd">            Return only records for cells that belong to experiment container ids in this list</span>
+
+<span class="sd">        filters: list of dicts</span>
+<span class="sd">            Custom query used to reproduce filter sets created in the Allen Brain Observatory</span>
+<span class="sd">            web application.  The general form is a list of dictionaries each of which</span>
+<span class="sd">            describes a filtering operation based on a metric.  For more information, see</span>
+<span class="sd">            dataframe_query.  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="n">ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">cell_specimens</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cell_specimens</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span>
                 <span class="s">&#39;cell_specimen_id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">]</span>
@@ -992,7 +1029,75 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">cell_specimens</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cell_specimens</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span>
                 <span class="s">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">experiment_container_ids</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">cell_specimens</span></div></div>
+        <span class="k">if</span> <span class="n">filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cell_specimens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe_query</span><span class="p">(</span><span class="n">cell_specimens</span><span class="p">,</span>
+                                                  <span class="n">filters</span><span class="p">,</span>
+                                                  <span class="s">&#39;cell_specimen_id&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">cell_specimens</span>
+</div>
+<div class="viewcode-block" id="BrainObservatoryApi.dataframe_query_string"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.dataframe_query_string">[docs]</a>    <span class="k">def</span> <span class="nf">dataframe_query_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                               <span class="n">filters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a list of cell metric filter dictionaries into a </span>
+<span class="sd">        Pandas query string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_quote_string</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
+                <span class="k">return</span> <span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_filter_clause</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s">&#39;in&#39;</span><span class="p">:</span>
+                <span class="n">query_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">query_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">+</span> <span class="nb">map</span><span class="p">(</span><span class="n">_quote_string</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">query_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span>
+
+            <span class="n">cluster_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_QUERY_TEMPLATES</span><span class="p">[</span><span class="n">op</span><span class="p">]</span><span class="o">.</span>\
+                <span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">query_args</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">cluster_string</span>
+
+        <span class="n">query_string</span> <span class="o">=</span> <span class="s">&#39; &amp; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_filter_clause</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;op&#39;</span><span class="p">],</span>
+                                                 <span class="n">f</span><span class="p">[</span><span class="s">&#39;field&#39;</span><span class="p">],</span>
+                                                 <span class="n">f</span><span class="p">[</span><span class="s">&#39;value&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filters</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query_string</span>
+</div>
+<div class="viewcode-block" id="BrainObservatoryApi.dataframe_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.dataframe_query">[docs]</a>    <span class="k">def</span> <span class="nf">dataframe_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                        <span class="n">data</span><span class="p">,</span>
+                        <span class="n">filters</span><span class="p">,</span>
+                        <span class="n">primary_key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Given a list of dictionary records and a list of filter dictionaries,</span>
+<span class="sd">        filter the records using Pandas and return the filtered set of records.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: list of dicts</span>
+<span class="sd">           List of dictionaries</span>
+
+<span class="sd">        filters: list of dicts</span>
+<span class="sd">           Each dictionary describes a filtering operation on a field in the dictionary.</span>
+<span class="sd">           The general form is { &#39;field&#39;: &lt;field&gt;, &#39;op&#39;: &lt;operation&gt;, &#39;value&#39;: &lt;filter_value(s)&gt; }.</span>
+<span class="sd">           For example, you can apply a threshold on the &quot;osi_dg&quot; column with something like this:</span>
+<span class="sd">           { &#39;field&#39;: &#39;osi_dg&#39;, &#39;op&#39;: &#39;&gt;&#39;, &#39;value&#39;: 1.0 }.  See _QUERY_TEMPLATES for a full list</span>
+<span class="sd">           of operators.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">queries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe_query_string</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
+        <span class="n">result_dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">result_dataframe</span> <span class="o">=</span> <span class="n">result_dataframe</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+
+        <span class="n">result_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">result_dataframe</span><span class="p">[</span><span class="n">primary_key</span><span class="p">])</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span>
+                  <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="n">primary_key</span><span class="p">]</span>
+                  <span class="ow">in</span> <span class="n">result_keys</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">result</span></div></div>
 </pre></div>
 
           </div>
@@ -1018,6 +1123,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
@@ -1062,7 +1168,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

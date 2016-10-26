@@ -6,38 +6,37 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.test.api.test_image_download_api &mdash; Allen SDK 0.12.0 documentation</title>
+    <title>Structure Unionize Records &mdash; Allen SDK 0.12.3 documentation</title>
     
-    <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../../',
-        VERSION:     '0.12.0',
+        URL_ROOT:    './',
+        VERSION:     '0.12.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../../index.html" />
-    <link rel="up" title="Module code" href="../../../index.html" /> 
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.12.3 documentation" href="index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +178,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +606,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +619,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -630,98 +629,128 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for allensdk.test.api.test_image_download_api</h1><div class="highlight"><pre>
-<span class="kn">import</span> <span class="nn">pytest</span>
-<span class="kn">from</span> <span class="nn">mock</span> <span class="kn">import</span> <span class="n">MagicMock</span>
-<span class="kn">from</span> <span class="nn">allensdk.api.queries.image_download_api</span> <span class="kn">import</span> <span class="n">ImageDownloadApi</span>
-
-
-<span class="nd">@pytest.fixture</span>
-<div class="viewcode-block" id="image_api"><a class="viewcode-back" href="../../../../allensdk.test.api.html#allensdk.test.api.test_image_download_api.image_api">[docs]</a><span class="k">def</span> <span class="nf">image_api</span><span class="p">():</span>
-    <span class="n">image_api</span> <span class="o">=</span> <span class="n">ImageDownloadApi</span><span class="p">()</span>
-    
-    <span class="n">image_api</span><span class="o">.</span><span class="n">retrieve_file_over_http</span> <span class="o">=</span> \
-        <span class="n">MagicMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;retrieve_file_over_http&#39;</span><span class="p">)</span>
-    
-    <span class="k">return</span> <span class="n">image_api</span>
-    
-    </div>
-<div class="viewcode-block" id="test_api_doc_url_download_image_downsampled"><a class="viewcode-back" href="../../../../allensdk.test.api.html#allensdk.test.api.test_image_download_api.test_api_doc_url_download_image_downsampled">[docs]</a><span class="k">def</span> <span class="nf">test_api_doc_url_download_image_downsampled</span><span class="p">(</span><span class="n">image_api</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    See: `Experimental Overview and Metadata `&lt;http://help.brain-map.org/display/mouseconnectivity/API#API-ExperimentalOverviewandMetadata&gt;_</span>
-<span class="sd">    , link labeled &#39;Download image downsampled by factor of 6 using default thresholds&#39;.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="s">&#39;126862575.jpg&#39;</span>
-    
-    <span class="n">section_image_id</span> <span class="o">=</span> <span class="mi">126862575</span>
-    <span class="n">image_api</span><span class="o">.</span><span class="n">download_section_image</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">,</span>
-                                     <span class="n">downsample</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
-                                     <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">932</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1279</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">4095</span><span class="p">])</span>
-    
-    <span class="n">image_api</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span>
-        <span class="s">&quot;http://api.brain-map.org/api/v2/section_image_download/126862575&quot;</span>
-        <span class="s">&quot;?downsample=6&amp;range=0,932,0,1279,0,4095&quot;</span><span class="p">,</span>
-        <span class="n">path</span><span class="p">)</span>
-
+  <div class="section" id="structure-unionize-records">
+<h1>Structure Unionize Records<a class="headerlink" href="#structure-unionize-records" title="Permalink to this headline">¶</a></h1>
+<p>All AAV Projection signal in the Allen Mouse Connectivity Atlas has been
+registered to the expert-annotated Common Coordinate Framework.  This enables
+signal quantification at all annotated levels of the brain structure ontology.
+In the AllenSDK and Allen Brain Atlas API we call structure-level signal
+integration &#8220;unionization&#8221;.</p>
+<p>AAV unionize records are available for download directly through the API or via
+the MouseConnectivityCache.  The following methods return a Pandas DataFrame
+of records that describe projection signal in all structures in the adult
+mouse ontology:</p>
+<blockquote>
+<div><p><a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes()</span></tt></a></p>
+<p><a class="reference internal" href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes" title="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes()</span></tt></a></p>
+</div></blockquote>
+<p>Take a look at the Structure Signal Unionization section of the
+<a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Structure-Signal-Unionization">Mouse Connectivity Jupyter notebook</a> to see how these methods can be used.</p>
 </div>
-<div class="viewcode-block" id="test_api_doc_url_download_image_full_resolution"><a class="viewcode-back" href="../../../../allensdk.test.api.html#allensdk.test.api.test_image_download_api.test_api_doc_url_download_image_full_resolution">[docs]</a><span class="k">def</span> <span class="nf">test_api_doc_url_download_image_full_resolution</span><span class="p">(</span><span class="n">image_api</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    See: `Experimental Overview and Metadata `&lt;http://help.brain-map.org/display/mouseconnectivity/API#API-ExperimentalOverviewandMetadata&gt;_</span>
-<span class="sd">    , link labeled &#39;Download a region of interest at full resolution using default thresholds&#39;.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">expected</span> <span class="o">=</span> <span class="s">&#39;http://api.brain-map.org/api/v2/section_image_download/126862575?left=19045&amp;top=11684&amp;width=1000&amp;height=1000&amp;range=0,932,0,1279,0,4095&#39;</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="s">&#39;126862575.jpg&#39;</span>
+<div class="section" id="record-properties">
+<h1>Record Properties<a class="headerlink" href="#record-properties" title="Permalink to this headline">¶</a></h1>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>experiment_id</td>
+<td>ID of the experiment (a.k.a SectionDataSet)</td>
+</tr>
+<tr class="row-odd"><td>structure_id</td>
+<td>ID of the structure (e.g. 315 for Isocortex)</td>
+</tr>
+<tr class="row-even"><td>hemisphere_id</td>
+<td>ID of the hemisphere (1 = left, 2 = right, 3 = both)</td>
+</tr>
+<tr class="row-odd"><td>is_injection</td>
+<td>If true, numbers only include voxels from injection site.  If false, numbers only include voxels outside of the injection site.</td>
+</tr>
+<tr class="row-even"><td>sum_pixels</td>
+<td>Number of valid pixels in the structure in this experiment.  Valid pixels are those not manually annotated as invalid data.</td>
+</tr>
+<tr class="row-odd"><td>sum_projection_pixels</td>
+<td>Number of pixels identified as projecting in this structure.</td>
+</tr>
+<tr class="row-even"><td>sum_pixel_intensity</td>
+<td>Sum of intensity values in this structure.</td>
+</tr>
+<tr class="row-odd"><td>sum_projection_pixel_intensity</td>
+<td>Sum of intensity values in projecting pixels in this structure.</td>
+</tr>
+<tr class="row-even"><td>projection_density</td>
+<td>sum_projection_pixels / sum_pixels</td>
+</tr>
+<tr class="row-odd"><td>projection_intensity</td>
+<td>sum_projection_pixel_intensity / sum_projection_pixels</td>
+</tr>
+<tr class="row-even"><td>projection_energy</td>
+<td>projection_density * projection_intensity</td>
+</tr>
+<tr class="row-odd"><td>volume</td>
+<td>volume of valid pixels in structure. Valid pixels are those not manually annotated as invalid data.</td>
+</tr>
+<tr class="row-even"><td>projection_volume</td>
+<td>volume of projection signal in structure in mm3</td>
+</tr>
+<tr class="row-odd"><td>normalized_projection_volume</td>
+<td>projection_volume / total volume of signal in brain</td>
+</tr>
+<tr class="row-even"><td>max_voxel_density</td>
+<td>density of projection signal in 10um3 grid voxel with largest density.</td>
+</tr>
+<tr class="row-odd"><td>max_voxel_x</td>
+<td>x coordinate in um of grid voxel with largest density.</td>
+</tr>
+<tr class="row-even"><td>max_voxel_y</td>
+<td>y coordinate in um of grid voxel with largest density.</td>
+</tr>
+<tr class="row-odd"><td>max_voxel_z</td>
+<td>z coordinate in um of grid voxel with largest density.</td>
+</tr>
+</tbody>
+</table>
+</div>
 
-    <span class="n">image_api</span><span class="o">.</span><span class="n">retrieve_file_over_http</span> <span class="o">=</span> \
-        <span class="n">MagicMock</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;retrieve_file_over_http&#39;</span><span class="p">)</span>
-    
-    <span class="n">section_image_id</span> <span class="o">=</span> <span class="mi">126862575</span>
-    <span class="n">image_api</span><span class="o">.</span><span class="n">download_section_image</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">,</span>
-                                     <span class="n">left</span><span class="o">=</span><span class="mi">19045</span><span class="p">,</span>
-                                     <span class="n">top</span><span class="o">=</span><span class="mi">11684</span><span class="p">,</span>
-                                     <span class="n">width</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-                                     <span class="n">height</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-                                     <span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">932</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1279</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">4095</span><span class="p">])</span>
-    
-    <span class="n">image_api</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="o">.</span><span class="n">assert_called_once_with</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
-</pre></div>
 
           </div>
         </div>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-<h3><a href="../../../../index.html">Contents</a></h3>
+<h3><a href="index.html">Contents</a></h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Install Guide</a><ul class="simple">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_resources.html">Data Resources</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../models.html">Models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../../glif_models.html">Generalized LIF</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../biophysical_models.html">Biophysical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.config.html">allensdk.config package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.core.html">allensdk.core package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test.html">allensdk.test package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -739,7 +768,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
-    <form class="search" action="../../../../search.html" method="get">
+    <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
@@ -758,7 +787,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

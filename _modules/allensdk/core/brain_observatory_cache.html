@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.brain_observatory_cache &mdash; Allen SDK 0.12.0 documentation</title>
+    <title>allensdk.core.brain_observatory_cache &mdash; Allen SDK 0.12.3 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.12.0',
+        VERSION:     '0.12.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,21 +23,21 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.3 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -647,11 +647,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">ju</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">json_utilities</span> <span class="k">as</span> <span class="n">ju</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.cache</span> <span class="kn">import</span> <span class="n">Cache</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.queries.brain_observatory_api</span> <span class="kn">import</span> <span class="n">BrainObservatoryApi</span>
 <span class="kn">from</span> <span class="nn">allensdk.config.manifest_builder</span> <span class="kn">import</span> <span class="n">ManifestBuilder</span>
-<span class="kn">from</span> <span class="nn">allensdk.core.brain_observatory_nwb_data_set</span> <span class="kn">import</span> <span class="n">BrainObservatoryNwbDataSet</span>
+<span class="kn">from</span> <span class="nn">.brain_observatory_nwb_data_set</span> <span class="kn">import</span> <span class="n">BrainObservatoryNwbDataSet</span>
 <span class="kn">import</span> <span class="nn">allensdk.brain_observatory.stimulus_info</span> <span class="kn">as</span> <span class="nn">stim_info</span>
 <span class="kn">import</span> <span class="nn">six</span>
 
@@ -668,8 +668,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">    api: BrainObservatoryApi instance</span>
 <span class="sd">        The object used for making API queries related to the Brain</span>
-
-<span class="sd"> Observatory.</span>
+<span class="sd">        Observatory.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -709,6 +708,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                          <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span><span class="p">])</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">))</span>
 </div>
+<div class="viewcode-block" id="BrainObservatoryCache.get_all_reporter_lines"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_reporter_lines">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_reporter_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return a list of all reporter lines in the data set. &quot;&quot;&quot;</span>
+        <span class="n">containers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">simple</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">reporter_lines</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">_find_specimen_reporter_line</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">])</span>
+                              <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">reporter_lines</span><span class="p">))</span>
+</div>
 <div class="viewcode-block" id="BrainObservatoryCache.get_all_imaging_depths"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_imaging_depths">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_imaging_depths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return a list of all imaging depths in the data set. &quot;&quot;&quot;</span>
         <span class="n">containers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_experiment_containers</span><span class="p">(</span><span class="n">simple</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
@@ -730,6 +736,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                   <span class="n">targeted_structures</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                   <span class="n">imaging_depths</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                   <span class="n">cre_lines</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                  <span class="n">transgenic_lines</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                   <span class="n">simple</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a list of experiment containers matching certain criteria.</span>
 
@@ -755,6 +762,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            List of cre lines.  Must be in the list returned by</span>
 <span class="sd">            BrainObservatoryCache.get_all_cre_lines().</span>
 
+<span class="sd">        transgenic_lines: list</span>
+<span class="sd">            List of transgenic lines. Must be in the list returned by</span>
+<span class="sd">            BrainObservatoryCache.get_all_cre_lines() or.</span>
+<span class="sd">            BrainObservatoryCache.get_all_reporter_lines().</span>
+
 <span class="sd">        simple: boolean</span>
 <span class="sd">            Whether or not to simplify the dictionary properties returned by this method</span>
 <span class="sd">            to a more concise subset.</span>
@@ -765,6 +777,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_assert_not_string</span><span class="p">(</span><span class="n">targeted_structures</span><span class="p">,</span> <span class="s">&quot;targeted_structures&quot;</span><span class="p">)</span>
         <span class="n">_assert_not_string</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">,</span> <span class="s">&quot;cre_lines&quot;</span><span class="p">)</span>
+        <span class="n">_assert_not_string</span><span class="p">(</span><span class="n">transgenic_lines</span><span class="p">,</span> <span class="s">&quot;transgenic_lines&quot;</span><span class="p">)</span>
 
         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_CONTAINERS_KEY</span><span class="p">)</span>
@@ -777,10 +790,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
                 <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">containers</span><span class="p">)</span>
 
+        <span class="n">transgenic_lines</span> <span class="o">=</span> <span class="n">_merge_transgenic_lines</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">,</span> <span class="n">transgenic_lines</span><span class="p">)</span>
+
         <span class="n">containers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">filter_experiment_containers</span><span class="p">(</span><span class="n">containers</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span>
                                                            <span class="n">targeted_structures</span><span class="o">=</span><span class="n">targeted_structures</span><span class="p">,</span>
                                                            <span class="n">imaging_depths</span><span class="o">=</span><span class="n">imaging_depths</span><span class="p">,</span>
-                                                           <span class="n">transgenic_lines</span><span class="o">=</span><span class="n">cre_lines</span><span class="p">)</span>
+                                                           <span class="n">transgenic_lines</span><span class="o">=</span><span class="n">transgenic_lines</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">simple</span><span class="p">:</span>
             <span class="n">containers</span> <span class="o">=</span> <span class="p">[{</span>
@@ -788,7 +803,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="s">&#39;imaging_depth&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;imaging_depth&#39;</span><span class="p">],</span>
                 <span class="s">&#39;targeted_structure&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;targeted_structure&#39;</span><span class="p">][</span><span class="s">&#39;acronym&#39;</span><span class="p">],</span>
                 <span class="s">&#39;cre_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_cre_line</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">]),</span>
-                <span class="s">&#39;age_days&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">][</span><span class="s">&#39;donor&#39;</span><span class="p">][</span><span class="s">&#39;age&#39;</span><span class="p">][</span><span class="s">&#39;days&#39;</span><span class="p">]</span>
+                <span class="s">&#39;reporter_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_reporter_line</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">]),</span>
+                <span class="s">&#39;age_days&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">][</span><span class="s">&#39;donor&#39;</span><span class="p">][</span><span class="s">&#39;age&#39;</span><span class="p">][</span><span class="s">&#39;days&#39;</span><span class="p">],</span>
+                <span class="s">&#39;donor_name&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">][</span><span class="s">&#39;donor&#39;</span><span class="p">][</span><span class="s">&#39;external_donor_name&#39;</span><span class="p">],</span>
+                <span class="s">&#39;specimen_name&#39;</span><span class="p">:</span> <span class="n">c</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">][</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
             <span class="p">}</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">containers</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">containers</span>
@@ -799,6 +817,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                               <span class="n">targeted_structures</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                               <span class="n">imaging_depths</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                               <span class="n">cre_lines</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                              <span class="n">transgenic_lines</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                               <span class="n">stimuli</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                               <span class="n">session_types</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                               <span class="n">simple</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
@@ -829,6 +848,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            List of cre lines.  Must be in the list returned by</span>
 <span class="sd">            BrainObservatoryCache.get_all_cre_lines().</span>
 
+<span class="sd">        transgenic_lines: list</span>
+<span class="sd">            List of transgenic lines. Must be in the list returned by</span>
+<span class="sd">            BrainObservatoryCache.get_all_cre_lines() or.</span>
+<span class="sd">            BrainObservatoryCache.get_all_reporter_lines().</span>
+
 <span class="sd">        stimuli: list</span>
 <span class="sd">            List of stimulus names.  Must be in the list returned by</span>
 <span class="sd">            BrainObservatoryCache.get_all_stimuli().</span>
@@ -847,6 +871,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_assert_not_string</span><span class="p">(</span><span class="n">targeted_structures</span><span class="p">,</span> <span class="s">&quot;targeted_structures&quot;</span><span class="p">)</span>
         <span class="n">_assert_not_string</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">,</span> <span class="s">&quot;cre_lines&quot;</span><span class="p">)</span>
+        <span class="n">_assert_not_string</span><span class="p">(</span><span class="n">transgenic_lines</span><span class="p">,</span> <span class="s">&quot;transgenic_lines&quot;</span><span class="p">)</span>
         <span class="n">_assert_not_string</span><span class="p">(</span><span class="n">stimuli</span><span class="p">,</span> <span class="s">&quot;stimuli&quot;</span><span class="p">)</span>
         <span class="n">_assert_not_string</span><span class="p">(</span><span class="n">session_types</span><span class="p">,</span> <span class="s">&quot;session_types&quot;</span><span class="p">)</span>
 
@@ -860,25 +885,30 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
                 <span class="n">ju</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">exps</span><span class="p">)</span>
 
+        <span class="n">transgenic_lines</span> <span class="o">=</span> <span class="n">_merge_transgenic_lines</span><span class="p">(</span><span class="n">cre_lines</span><span class="p">,</span> <span class="n">transgenic_lines</span><span class="p">)</span>
+
         <span class="n">exps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">filter_ophys_experiments</span><span class="p">(</span><span class="n">exps</span><span class="p">,</span>
                                                  <span class="n">ids</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span>
                                                  <span class="n">experiment_container_ids</span><span class="o">=</span><span class="n">experiment_container_ids</span><span class="p">,</span>
                                                  <span class="n">targeted_structures</span><span class="o">=</span><span class="n">targeted_structures</span><span class="p">,</span>
                                                  <span class="n">imaging_depths</span><span class="o">=</span><span class="n">imaging_depths</span><span class="p">,</span>
-                                                 <span class="n">transgenic_lines</span><span class="o">=</span><span class="n">cre_lines</span><span class="p">,</span>
+                                                 <span class="n">transgenic_lines</span><span class="o">=</span><span class="n">transgenic_lines</span><span class="p">,</span>
                                                  <span class="n">stimuli</span><span class="o">=</span><span class="n">stimuli</span><span class="p">,</span>
                                                  <span class="n">session_types</span><span class="o">=</span><span class="n">session_types</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">simple</span><span class="p">:</span>
             <span class="n">exps</span> <span class="o">=</span> <span class="p">[{</span>
                 <span class="s">&#39;id&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;id&#39;</span><span class="p">],</span>
-                    <span class="s">&#39;imaging_depth&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;imaging_depth&#39;</span><span class="p">],</span>
-                    <span class="s">&#39;targeted_structure&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;targeted_structure&#39;</span><span class="p">][</span><span class="s">&#39;acronym&#39;</span><span class="p">],</span>
-                    <span class="s">&#39;cre_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_cre_line</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">]),</span>
-                    <span class="s">&#39;age_days&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">][</span><span class="s">&#39;donor&#39;</span><span class="p">][</span><span class="s">&#39;age&#39;</span><span class="p">][</span><span class="s">&#39;days&#39;</span><span class="p">],</span>
-                    <span class="s">&#39;experiment_container_id&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;experiment_container_id&#39;</span><span class="p">],</span>
-                    <span class="s">&#39;session_type&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;stimulus_name&#39;</span><span class="p">]</span>
-                    <span class="p">}</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exps</span><span class="p">]</span>
+                <span class="s">&#39;imaging_depth&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;imaging_depth&#39;</span><span class="p">],</span>
+                <span class="s">&#39;targeted_structure&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;targeted_structure&#39;</span><span class="p">][</span><span class="s">&#39;acronym&#39;</span><span class="p">],</span>
+                <span class="s">&#39;cre_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_cre_line</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">]),</span>
+                <span class="s">&#39;reporter_line&#39;</span><span class="p">:</span> <span class="n">_find_specimen_reporter_line</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">]),</span>
+                <span class="s">&#39;age_days&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">][</span><span class="s">&#39;donor&#39;</span><span class="p">][</span><span class="s">&#39;age&#39;</span><span class="p">][</span><span class="s">&#39;days&#39;</span><span class="p">],</span>
+                <span class="s">&#39;experiment_container_id&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;experiment_container_id&#39;</span><span class="p">],</span>
+                <span class="s">&#39;session_type&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;stimulus_name&#39;</span><span class="p">],</span>
+                <span class="s">&#39;donor_name&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">][</span><span class="s">&#39;donor&#39;</span><span class="p">][</span><span class="s">&#39;external_donor_name&#39;</span><span class="p">],</span>
+                <span class="s">&#39;specimen_name&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s">&#39;specimen&#39;</span><span class="p">][</span><span class="s">&#39;name&#39;</span><span class="p">]</span>
+            <span class="p">}</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exps</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">exps</span>
 </div>
     <span class="k">def</span> <span class="nf">_get_stimulus_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -896,7 +926,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">return</span> <span class="n">mappings</span>
 
-<div class="viewcode-block" id="BrainObservatoryCache.get_cell_specimens"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">experiment_container_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">simple</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="BrainObservatoryCache.get_cell_specimens"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                           <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                           <span class="n">ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                           <span class="n">experiment_container_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                           <span class="n">simple</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                           <span class="n">filters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return cell specimens that have certain properies.</span>
 
 <span class="sd">        Parameters</span>
@@ -916,6 +951,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Whether or not to simplify the dictionary properties returned by this method</span>
 <span class="sd">            to a more concise subset.</span>
 
+<span class="sd">        filters: list of dicts</span>
+<span class="sd">            List of filter dictionaries.  The Allen Brain Observatory web site can </span>
+<span class="sd">            generate filters in this format to reproduce a filtered set of cells</span>
+<span class="sd">            found there.  To see what these look like, visit </span>
+<span class="sd">            http://observatory.brain-map.org/visualcoding, perform a cell search</span>
+<span class="sd">            and apply some filters (e.g. find cells in a particular area), then </span>
+<span class="sd">            click the &quot;view these cells in the AllenSDK&quot; link on the bottom-left</span>
+<span class="sd">            of the search results page.  This will take you to a page that contains</span>
+<span class="sd">            a code sample you can use to apply those same filters via this argument.</span>
+<span class="sd">            For more detail on the filter syntax, see BrainObservatoryApi.dataframe_query.</span>
+<span class="sd">            </span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list of dictionaries</span>
@@ -933,7 +980,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">cell_specimens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">filter_cell_specimens</span><span class="p">(</span><span class="n">cell_specimens</span><span class="p">,</span>
                                                         <span class="n">ids</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span>
-                                                        <span class="n">experiment_container_ids</span><span class="o">=</span><span class="n">experiment_container_ids</span><span class="p">)</span>
+                                                        <span class="n">experiment_container_ids</span><span class="o">=</span><span class="n">experiment_container_ids</span><span class="p">,</span>
+                                                        <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
 
         <span class="c"># drop the thumbnail columns</span>
         <span class="k">if</span> <span class="n">simple</span><span class="p">:</span>
@@ -1002,7 +1050,28 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 </div></div>
 <span class="k">def</span> <span class="nf">_find_specimen_cre_line</span><span class="p">(</span><span class="n">specimen</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s">&#39;donor&#39;</span><span class="p">][</span><span class="s">&#39;transgenic_lines&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s">&#39;Cre&#39;</span> <span class="ow">in</span> <span class="n">tl</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s">&#39;donor&#39;</span><span class="p">][</span><span class="s">&#39;transgenic_lines&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s">&#39;transgenic_line_type_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;driver&#39;</span> <span class="ow">and</span>
+                <span class="s">&#39;Cre&#39;</span> <span class="ow">in</span> <span class="n">tl</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">_find_specimen_reporter_line</span><span class="p">(</span><span class="n">specimen</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">tl</span> <span class="ow">in</span> <span class="n">specimen</span><span class="p">[</span><span class="s">&#39;donor&#39;</span><span class="p">][</span><span class="s">&#39;transgenic_lines&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">tl</span><span class="p">[</span><span class="s">&#39;transgenic_line_type_name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;reporter&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_merge_transgenic_lines</span><span class="p">(</span><span class="o">*</span><span class="n">lines_list</span><span class="p">):</span>
+    <span class="n">transgenic_lines</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">lines</span> <span class="ow">in</span> <span class="n">lines_list</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">lines</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="n">transgenic_lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">transgenic_lines</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">transgenic_lines</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
 
 
 <span class="k">def</span> <span class="nf">_assert_not_string</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -1034,6 +1103,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
@@ -1078,7 +1148,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

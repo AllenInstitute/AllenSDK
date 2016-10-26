@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core package &mdash; Allen SDK 0.12.0 documentation</title>
+    <title>allensdk.core package &mdash; Allen SDK 0.12.3 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.0',
+        VERSION:     '0.12.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,23 +23,23 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.3 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.ephys package" href="allensdk.ephys.html" />
     <link rel="prev" title="allensdk.config.model.formats package" href="allensdk.config.model.formats.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -181,11 +181,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -609,7 +609,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -622,7 +622,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -643,28 +643,24 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache">
 <em class="property">class </em><tt class="descclassname">allensdk.core.brain_observatory_cache.</tt><tt class="descname">BrainObservatoryCache</tt><big>(</big><em>cache=True</em>, <em>manifest_file='brain_observatory_manifest.json'</em>, <em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.cache.Cache" title="allensdk.api.cache.Cache"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.cache.Cache</span></tt></a></p>
-<blockquote>
-<div>Cache class for storing and accessing data from the Brain Observatory.
+<p>Cache class for storing and accessing data from the Brain Observatory.
 By default, this class will cache any downloaded metadata or files in
 well known locations defined in a manifest file.  This behavior can be
-disabled.</div></blockquote>
+disabled.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cache: boolean</strong></p>
-<blockquote class="last">
-<div><blockquote>
+<blockquote>
 <div><p>Whether the class should save results of API queries to locations specified
 in the manifest file.  Queries for files (as opposed to metadata) must have a
 file location.  If caching is disabled, those locations must be specified
 in the function call (e.g. get_ophys_experiment_data(file_name=&#8217;file.nwb&#8217;)).</p>
 </div></blockquote>
-<dl class="docutils">
-<dt>manifest_file: string</dt>
-<dd><p class="first last">File name of the manifest to be read.  Default is &#8220;brain_observatory_manifest.json&#8221;.</p>
-</dd>
-</dl>
+<p><strong>manifest_file: string</strong></p>
+<blockquote class="last">
+<div><p>File name of the manifest to be read.  Default is &#8220;brain_observatory_manifest.json&#8221;.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -673,15 +669,12 @@ in the function call (e.g. get_ophys_experiment_data(file_name=&#8217;file.nwb&#
 <p class="rubric">Attributes</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="36%" />
-<col width="64%" />
+<col width="31%" />
+<col width="69%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>api: BrainObservatoryApi instance</td>
-<td>The object used for making API queries related to the Brain</td>
-</tr>
-<tr class="row-even"><td>Observatory.</td>
-<td>&nbsp;</td>
+<td>The object used for making API queries related to the Brain Observatory.</td>
 </tr>
 </tbody>
 </table>
@@ -741,6 +734,12 @@ in the function call (e.g. get_ophys_experiment_data(file_name=&#8217;file.nwb&#
 </dd></dl>
 
 <dl class="method">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_reporter_lines">
+<tt class="descname">get_all_reporter_lines</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_reporter_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_reporter_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of all reporter lines in the data set.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_session_types">
 <tt class="descname">get_all_session_types</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_all_session_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_session_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of all stimulus sessions in the data set.</p>
@@ -760,7 +759,7 @@ in the function call (e.g. get_ophys_experiment_data(file_name=&#8217;file.nwb&#
 
 <dl class="method">
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens">
-<tt class="descname">get_cell_specimens</tt><big>(</big><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>simple=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_cell_specimens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_cell_specimens</tt><big>(</big><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>simple=True</em>, <em>filters=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_cell_specimens"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_cell_specimens" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return cell specimens that have certain properies.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -785,6 +784,18 @@ is disabled, no file will be saved. Default is None.</p>
 <div><p>Whether or not to simplify the dictionary properties returned by this method
 to a more concise subset.</p>
 </div></blockquote>
+<p><strong>filters: list of dicts</strong></p>
+<blockquote>
+<div><p>List of filter dictionaries.  The Allen Brain Observatory web site can 
+generate filters in this format to reproduce a filtered set of cells
+found there.  To see what these look like, visit 
+<a class="reference external" href="http://observatory.brain-map.org/visualcoding">http://observatory.brain-map.org/visualcoding</a>, perform a cell search
+and apply some filters (e.g. find cells in a particular area), then 
+click the &#8220;view these cells in the AllenSDK&#8221; link on the bottom-left
+of the search results page.  This will take you to a page that contains
+a code sample you can use to apply those same filters via this argument.
+For more detail on the filter syntax, see BrainObservatoryApi.dataframe_query.</p>
+</div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of dictionaries</p>
@@ -796,7 +807,7 @@ to a more concise subset.</p>
 
 <dl class="method">
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers">
-<tt class="descname">get_experiment_containers</tt><big>(</big><em>file_name=None</em>, <em>ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>simple=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_experiment_containers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_experiment_containers</tt><big>(</big><em>file_name=None</em>, <em>ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>transgenic_lines=None</em>, <em>simple=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_experiment_containers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_experiment_containers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a list of experiment containers matching certain criteria.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -826,6 +837,12 @@ BrainObservatoryCache.get_all_imaging_depths().</p>
 <blockquote>
 <div><p>List of cre lines.  Must be in the list returned by
 BrainObservatoryCache.get_all_cre_lines().</p>
+</div></blockquote>
+<p><strong>transgenic_lines: list</strong></p>
+<blockquote>
+<div><p>List of transgenic lines. Must be in the list returned by
+BrainObservatoryCache.get_all_cre_lines() or.
+BrainObservatoryCache.get_all_reporter_lines().</p>
 </div></blockquote>
 <p><strong>simple: boolean</strong></p>
 <blockquote>
@@ -871,7 +888,7 @@ is disabled, no file will be saved. Default is None.</p>
 
 <dl class="method">
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments">
-<tt class="descname">get_ophys_experiments</tt><big>(</big><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em>, <em>simple=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_ophys_experiments</tt><big>(</big><em>file_name=None</em>, <em>ids=None</em>, <em>experiment_container_ids=None</em>, <em>targeted_structures=None</em>, <em>imaging_depths=None</em>, <em>cre_lines=None</em>, <em>transgenic_lines=None</em>, <em>stimuli=None</em>, <em>session_types=None</em>, <em>simple=True</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_cache.html#BrainObservatoryCache.get_ophys_experiments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_ophys_experiments" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a list of ophys experiments matching certain criteria.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -905,6 +922,12 @@ BrainObservatoryCache.get_all_imaging_depths().</p>
 <blockquote>
 <div><p>List of cre lines.  Must be in the list returned by
 BrainObservatoryCache.get_all_cre_lines().</p>
+</div></blockquote>
+<p><strong>transgenic_lines: list</strong></p>
+<blockquote>
+<div><p>List of transgenic lines. Must be in the list returned by
+BrainObservatoryCache.get_all_cre_lines() or.
+BrainObservatoryCache.get_all_reporter_lines().</p>
 </div></blockquote>
 <p><strong>stimuli: list</strong></p>
 <blockquote>
@@ -941,7 +964,12 @@ to a more concise subset.</p>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <dl class="attribute">
 <dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING">
-<tt class="descname">FILE_METADATA_MAPPING</tt><em class="property"> = {'ophys_experiment_id': 'general/session_id', 'session_type': 'general/session_type', 'fov': 'general/fov', 'sex': 'general/subject/sex', 'imaging_depth': 'general/optophysiology/imaging_plane_1/imaging depth', 'device_string': 'general/devices/2-photon microscope', 'session_start_time': 'session_start_time', 'indicator': 'general/optophysiology/imaging_plane_1/indicator', 'genotype': 'general/subject/genotype', 'age': 'general/subject/age', 'excitation_lambda': 'general/optophysiology/imaging_plane_1/excitation_lambda', 'experiment_container_id': 'general/experiment_container_id', 'targeted_structure': 'general/optophysiology/imaging_plane_1/location'}</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">FILE_METADATA_MAPPING</tt><em class="property"> = {'ophys_experiment_id': 'general/session_id', 'session_type': 'general/session_type', 'fov': 'general/fov', 'sex': 'general/subject/sex', 'imaging_depth': 'general/optophysiology/imaging_plane_1/imaging depth', 'device_string': 'general/devices/2-photon microscope', 'session_start_time': 'session_start_time', 'indicator': 'general/optophysiology/imaging_plane_1/indicator', 'genotype': 'general/subject/genotype', 'age': 'general/subject/age', 'excitation_lambda': 'general/optophysiology/imaging_plane_1/excitation_lambda', 'generated_by': 'general/generated_by', 'experiment_container_id': 'general/experiment_container_id', 'targeted_structure': 'general/optophysiology/imaging_plane_1/location', 'specimen_name': 'general/specimen_name'}</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.FILE_METADATA_MAPPING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.MOTION_CORRECTION_DATASETS">
+<tt class="descname">MOTION_CORRECTION_DATASETS</tt><em class="property"> = ['MotionCorrection/2p_image_series/xy_translations', 'MotionCorrection/2p_image_series/xy_translation']</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.MOTION_CORRECTION_DATASETS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -952,6 +980,11 @@ to a more concise subset.</p>
 <dl class="attribute">
 <dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.STIMULUS_TABLE_TYPES">
 <tt class="descname">STIMULUS_TABLE_TYPES</tt><em class="property"> = {'abstract_feature_series': ['drifting_gratings', 'static_gratings'], 'indexed_time_series': ['natural_movie_one', 'natural_movie_two', 'natural_movie_three', 'natural_scenes', 'locally_sparse_noise']}</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.STIMULUS_TABLE_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.SUPPORTED_PIPELINE_VERSION">
+<tt class="descname">SUPPORTED_PIPELINE_VERSION</tt><em class="property"> = '1.0'</em><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.SUPPORTED_PIPELINE_VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -1040,6 +1073,12 @@ then all are returned</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_timestamps">
+<tt class="descname">get_fluorescence_timestamps</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#BrainObservatoryNwbDataSet.get_fluorescence_timestamps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_timestamps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of timestamps in seconds for the fluorescence traces</p>
 </dd></dl>
 
 <dl class="method">
@@ -1309,6 +1348,21 @@ following: three_session_A, three_session_B, three_session_C</p>
 <dt id="allensdk.core.brain_observatory_nwb_data_set.MissingStimulusException">
 <em class="property">exception </em><tt class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</tt><tt class="descname">MissingStimulusException</tt><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#MissingStimulusException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.MissingStimulusException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="allensdk.core.brain_observatory_nwb_data_set.align_running_speed">
+<tt class="descclassname">allensdk.core.brain_observatory_nwb_data_set.</tt><tt class="descname">align_running_speed</tt><big>(</big><em>dxcm</em>, <em>dxtime</em>, <em>timestamps</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/brain_observatory_nwb_data_set.html#align_running_speed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.brain_observatory_nwb_data_set.align_running_speed" title="Permalink to this definition">¶</a></dt>
+<dd><p>If running speed timestamps differ from fluorescence
+timestamps, adjust by inserting NaNs to running speed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">tuple: dxcm, dxtime</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -1931,7 +1985,7 @@ nested python dict.</p>
 <span id="allensdk-core-mouse-connectivity-cache-module"></span><h2>allensdk.core.mouse_connectivity_cache module<a class="headerlink" href="#module-allensdk.core.mouse_connectivity_cache" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache">
-<em class="property">class </em><tt class="descclassname">allensdk.core.mouse_connectivity_cache.</tt><tt class="descname">MouseConnectivityCache</tt><big>(</big><em>resolution=25</em>, <em>cache=True</em>, <em>manifest_file='mouse_connectivity_manifest.json'</em>, <em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">allensdk.core.mouse_connectivity_cache.</tt><tt class="descname">MouseConnectivityCache</tt><big>(</big><em>resolution=None</em>, <em>cache=True</em>, <em>manifest_file='mouse_connectivity_manifest.json'</em>, <em>ccf_version=None</em>, <em>base_uri=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="allensdk.api.html#allensdk.api.cache.Cache" title="allensdk.api.cache.Cache"><tt class="xref py py-class docutils literal"><span class="pre">allensdk.api.cache.Cache</span></tt></a></p>
 <p>Cache class for storing and accessing data related to the adult mouse
 Connectivity Atlas.  By default, this class will cache any downloaded
@@ -1980,6 +2034,11 @@ in the function call (e.g. get_projection_density(file_name=&#8217;file.nrrd&#82
 <dl class="attribute">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.ANNOTATION_KEY">
 <tt class="descname">ANNOTATION_KEY</tt><em class="property"> = 'ANNOTATION'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.ANNOTATION_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.CCF_VERSION_KEY">
+<tt class="descname">CCF_VERSION_KEY</tt><em class="property"> = 'CCF_VERSION'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.CCF_VERSION_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -2072,7 +2131,7 @@ If None, return all experiments.  Default None.</p>
 
 <dl class="method">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_structure_unionizes">
-<tt class="descname">filter_structure_unionizes</tt><big>(</big><em>unionizes</em>, <em>is_injection=None</em>, <em>structure_ids=None</em>, <em>hemisphere_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.filter_structure_unionizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_structure_unionizes" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">filter_structure_unionizes</tt><big>(</big><em>unionizes</em>, <em>is_injection=None</em>, <em>structure_ids=None</em>, <em>include_descendants=False</em>, <em>hemisphere_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.filter_structure_unionizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_structure_unionizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a list of unionzes and return a subset of records filtered by injection status, structure, and
 hemisphere.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2087,8 +2146,12 @@ If None, return all records.  Default None.</p>
 </div></blockquote>
 <p><strong>structure_ids: list</strong></p>
 <blockquote>
-<div><p>Only return unionize records that are inside a specific set of structures.
+<div><p>Only return unionize records for a set of structures.
 If None, return all records. Default None.</p>
+</div></blockquote>
+<p><strong>include_descendants: boolean</strong></p>
+<blockquote>
+<div><p>Include all descendant records for specified structures. Default False.</p>
 </div></blockquote>
 <p><strong>hemisphere_ids: list</strong></p>
 <blockquote class="last">
@@ -2151,7 +2214,7 @@ file_name will be pulled out of the manifest.  Default is None.</p>
 
 <dl class="method">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes">
-<tt class="descname">get_experiment_structure_unionizes</tt><big>(</big><em>experiment_id</em>, <em>file_name=None</em>, <em>is_injection=None</em>, <em>structure_ids=None</em>, <em>hemisphere_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_experiment_structure_unionizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_experiment_structure_unionizes</tt><big>(</big><em>experiment_id</em>, <em>file_name=None</em>, <em>is_injection=None</em>, <em>structure_ids=None</em>, <em>include_descendants=False</em>, <em>hemisphere_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_experiment_structure_unionizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_experiment_structure_unionizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the structure unionize data for a specific experiment.  Filter by
 structure, injection status, and hemisphere.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2176,8 +2239,12 @@ If None, return all records.  Default None.</p>
 </div></blockquote>
 <p><strong>structure_ids: list</strong></p>
 <blockquote>
-<div><p>Only return unionize records that are inside a specific set of structures.
+<div><p>Only return unionize records for a specific set of structures.
 If None, return all records. Default None.</p>
+</div></blockquote>
+<p><strong>include_descendants: boolean</strong></p>
+<blockquote>
+<div><p>Include all descendant records for specified structures. Default False.</p>
 </div></blockquote>
 <p><strong>hemisphere_ids: list</strong></p>
 <blockquote class="last">
@@ -2368,7 +2435,7 @@ file_name will be pulled out of the manifest.  Default is None.</p>
 
 <dl class="method">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes">
-<tt class="descname">get_structure_unionizes</tt><big>(</big><em>experiment_ids</em>, <em>is_injection=None</em>, <em>structure_ids=None</em>, <em>hemisphere_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_structure_unionizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_structure_unionizes</tt><big>(</big><em>experiment_ids</em>, <em>is_injection=None</em>, <em>structure_ids=None</em>, <em>include_descendants=False</em>, <em>hemisphere_ids=None</em><big>)</big><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_structure_unionizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_unionizes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get structure unionizes for a set of experiment IDs.  Filter the results by injection status,
 structure, and hemisphere.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2387,8 +2454,12 @@ If None, return all records.  Default None.</p>
 </div></blockquote>
 <p><strong>structure_ids: list</strong></p>
 <blockquote>
-<div><p>Only return unionize records that are inside a specific set of structures.
+<div><p>Only return unionize records for a specific set of structures.
 If None, return all records. Default None.</p>
+</div></blockquote>
+<p><strong>include_descendants: boolean</strong></p>
+<blockquote>
+<div><p>Include all descendant records for specified structures. Default False.</p>
 </div></blockquote>
 <p><strong>hemisphere_ids: list</strong></p>
 <blockquote class="last">
@@ -3353,6 +3424,7 @@ Each tree has exactly one root.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
@@ -3397,7 +3469,7 @@ Each tree has exactly one root.</p>
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

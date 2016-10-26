@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api.queries.image_download_api &mdash; Allen SDK 0.12.0 documentation</title>
+    <title>allensdk.api.queries.image_download_api &mdash; Allen SDK 0.12.3 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.12.0',
+        VERSION:     '0.12.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,21 +23,21 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.0 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.3 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -179,11 +179,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -607,7 +607,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -620,7 +620,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -646,7 +646,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="c"># You should have received a copy of the GNU General Public License</span>
 <span class="c"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
+<span class="kn">from</span> <span class="nn">.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
 
 
 <div class="viewcode-block" id="ImageDownloadApi"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi">[docs]</a><span class="k">class</span> <span class="nc">ImageDownloadApi</span><span class="p">(</span><span class="n">RmaApi</span><span class="p">):</span>
@@ -664,21 +664,52 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                <span class="n">section_image_id</span><span class="p">,</span>
                                <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_image</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">,</span>
+                            <span class="n">file_path</span><span class="p">,</span>
+                            <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">section_image_download_endpoint</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ImageDownloadApi.download_atlas_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.download_atlas_image">[docs]</a>    <span class="k">def</span> <span class="nf">download_atlas_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                             <span class="n">atlas_image_id</span><span class="p">,</span>
+                             <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_image</span><span class="p">(</span><span class="n">atlas_image_id</span><span class="p">,</span>
+                            <span class="n">file_path</span><span class="p">,</span>
+                            <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atlas_image_download_endpoint</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ImageDownloadApi.download_projection_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.download_projection_image">[docs]</a>    <span class="k">def</span> <span class="nf">download_projection_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                  <span class="n">projection_image_id</span><span class="p">,</span>
+                                  <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_image</span><span class="p">(</span><span class="n">projection_image_id</span><span class="p">,</span>
+                            <span class="n">file_path</span><span class="p">,</span>
+                            <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">projection_image_download_endpoint</span><span class="p">,</span>
+                            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ImageDownloadApi.download_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.download_image">[docs]</a>    <span class="k">def</span> <span class="nf">download_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">image_id</span><span class="p">,</span>
+                       <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                       <span class="n">endpoint</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                       <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Download whole or partial two-dimensional images</span>
-<span class="sd">        from the Allen Institute with the SectionImage service.</span>
+<span class="sd">        from the Allen Institute with the SectionImage or AtlasImage service.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        section_image_id : integer</span>
-<span class="sd">            Image to download.</span>
+<span class="sd">        image_id : integer</span>
+<span class="sd">            SubImage to download.</span>
 <span class="sd">        file_path : string, optional</span>
-<span class="sd">            where to put it</span>
+<span class="sd">            where to put it, defaults to image_id.jpg</span>
 <span class="sd">        downsample : int, optional</span>
 <span class="sd">            Number of times to downsample the original image.</span>
 <span class="sd">        quality : int, optional</span>
 <span class="sd">            jpeg quality of the returned image, 0 to 100 (default)</span>
 <span class="sd">        expression : boolean, optional</span>
-<span class="sd">            True to retrieve the specified SectionImage expression mask image.</span>
+<span class="sd">            Request the expression mask for the SectionImage.</span>
+<span class="sd">        view : string, optional</span>
+<span class="sd">            &#39;expression&#39;, &#39;projection&#39;, &#39;tumor_feature_annotation&#39;</span>
+<span class="sd">            or &#39;tumor_feature_boundary&#39;</span>
 <span class="sd">        top : int, optional</span>
 <span class="sd">            Index of the topmost row of the region of interest.</span>
 <span class="sd">        left :int, optional</span>
@@ -689,10 +720,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">            Number of rows in the output image.</span>
 <span class="sd">        range : list of ints, optional</span>
 <span class="sd">            Filter to specify the RGB channels.</span>
-<span class="sd">        tumor_feature_annotation : boolean, optional</span>
-<span class="sd">            True to retrieve the color block image for a Glioblastoma SectionImage.</span>
-<span class="sd">        tumor_feature_boundary : boolean, optional</span>
-<span class="sd">            True to retrieve the color boundary image for a Glioblastoma SectionImage.</span>
+<span class="sd">        annotation : boolean, optional</span>
+<span class="sd">            Request the annotated AtlasImage</span>
+<span class="sd">        atlas : int, optional</span>
+<span class="sd">            Specify the desired Atlas&#39; annotations.</span>
+<span class="sd">        projection : boolean, optional</span>
+<span class="sd">            Request projection for the specified image.</span>
+<span class="sd">        downsample_dimensions : boolean, optional</span>
+<span class="sd">            Indicates if the width and height should be adjusted</span>
+<span class="sd">            to account for downsampling.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -701,6 +737,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
+<span class="sd">        By default, an unfiltered full-sized image with the highest quality</span>
+<span class="sd">        is returned as a download if no parameters are provided.</span>
+
 <span class="sd">        &#39;downsample=1&#39; halves the number of pixels of the original image</span>
 <span class="sd">        both horizontally and vertically.</span>
 <span class="sd">        Specifying &#39;downsample=2&#39; quarters the height and width values.</span>
@@ -732,8 +771,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        section of the Allen Mouse Brain Connectivity Atlas:</span>
 <span class="sd">        `Projection Dataset &lt;http://help.brain-map.org/display/mouseconnectivity/Projection&gt;`_</span>
 <span class="sd">        help topic.</span>
+<span class="sd">        See: `Image Download Service `&lt;http://help.brain-map.org/display/api/Downloading+an+Image&gt;_</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">endpoint</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">endpoint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_download_endpoint</span>
 
         <span class="n">downsample</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;downsample&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
@@ -745,26 +788,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;quality=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">quality</span><span class="p">))</span>
 
-        <span class="n">expression</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;expression&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">expression</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">expression</span><span class="p">:</span>
-                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;expression=true&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;expression=false&#39;</span><span class="p">)</span>
-
-        <span class="c"># region of interest</span>
-        <span class="k">for</span> <span class="n">roi_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">,</span> <span class="s">&#39;height&#39;</span><span class="p">]:</span>
-            <span class="n">roi_value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">roi_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="n">roi_value</span><span class="p">))</span>
-
         <span class="n">range_list</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;range&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-
-        <span class="c"># see</span>
-        <span class="c"># http://api.brain-map.org/api/v2/data/SectionDataSet/100141599.xml?include=equalization,section_images</span>
-        <span class="k">if</span> <span class="n">range_list</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;range=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">range_list</span><span class="p">)))</span>
 
         <span class="n">tumor_feature_annotation</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;tumor_feature_annotation&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
@@ -782,196 +806,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;tumor_feature_boundary=false&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">url_params</span> <span class="o">=</span> <span class="s">&quot;?&quot;</span> <span class="o">+</span> <span class="s">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-
-        <span class="n">image_url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">section_image_download_endpoint</span><span class="p">,</span>
-                             <span class="s">&#39;/&#39;</span><span class="p">,</span>
-                             <span class="nb">str</span><span class="p">(</span><span class="n">section_image_id</span><span class="p">),</span>
-                             <span class="n">url_params</span><span class="p">])</span>
-
-        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">file_path</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s">.jpg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">section_image_id</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">image_url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="ImageDownloadApi.download_atlas_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.download_atlas_image">[docs]</a>    <span class="k">def</span> <span class="nf">download_atlas_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                             <span class="n">atlas_image_id</span><span class="p">,</span>
-                             <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Download whole or partial two-dimensional images</span>
-<span class="sd">        from the Allen Institute with the AtlasImage service.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        atlas_image_id : integer</span>
-<span class="sd">            Image to download.</span>
-<span class="sd">        file_path : string, optional</span>
-<span class="sd">            where to put it</span>
-<span class="sd">        annotation : boolean, optional</span>
-<span class="sd">            True to retrieve the specified AtlasImage with annotations.</span>
-<span class="sd">        atlas : integer, optional</span>
-<span class="sd">            Atlas.ID for the annotations.</span>
-<span class="sd">        downsample : int, optional</span>
-<span class="sd">            Number of times to downsample the original image.</span>
-<span class="sd">        quality : int, optional</span>
-<span class="sd">            jpeg quality of the returned image, 0 to 100 (default)</span>
-<span class="sd">        top : int, optional</span>
-<span class="sd">            Index of the topmost row of the region of interest.</span>
-<span class="sd">        left :int, optional</span>
-<span class="sd">            Index of the leftmost column of the region of interest.</span>
-<span class="sd">        width : int, optional</span>
-<span class="sd">            Number of columns in the output image.</span>
-<span class="sd">        height : int, optional</span>
-<span class="sd">            Number of rows in the output image.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        None</span>
-<span class="sd">            the file is downloaded and saved to the path.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        The P56 Adult Mouse Brain Atlas and Developing Mouse Brain Atlas</span>
-<span class="sd">        share a common AtlasDataSet, so the Atlas.ID should be specified.</span>
-
-<span class="sd">        &#39;downsample=1&#39; halves the number of pixels of the original image</span>
-<span class="sd">        both horizontally and vertically.</span>
-<span class="sd">        Specifying &#39;downsample=2&#39; quarters the height and width values.</span>
-
-<span class="sd">        Quality must be an integer from 0, for the lowest quality,</span>
-<span class="sd">        up to as high as 100. If it is not specified,</span>
-<span class="sd">        it defaults to the highest quality.</span>
-
-<span class="sd">        Top is specified in full-resolution (largest tier) pixel coordinates.</span>
-<span class="sd">        SectionImage.y is the default value.</span>
-
-<span class="sd">        Left is specified in full-resolution (largest tier) pixel coordinates.</span>
-<span class="sd">        SectionImage.x is the default value.</span>
-
-<span class="sd">        Width is specified in tier-resolution (desired tier) pixel coordinates.</span>
-<span class="sd">        SectionImage.width is the default value. It is automatically adjusted when downsampled.</span>
-
-<span class="sd">        Height is specified in tier-resolution (desired tier) pixel coordinates.</span>
-<span class="sd">        SectionImage.height is the default value. It is automatically adjusted when downsampled.</span>
-
-<span class="sd">        See: `Downloading an Image - ProjectionImage Download Service &lt;http://help.brain-map.org/display/api/Downloading+an+Image#DownloadinganImage-ProjectionImage%26nbsp%3BDownloadService&gt;`_</span>
-<span class="sd">        and</span>
-<span class="sd">        `Downloading Atlas Images and Graphics &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics&gt;`_.</span>
-
-<span class="sd">        Use :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table`</span>
-<span class="sd">        to get atlas ids programmatically.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="n">projection</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;projection&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">projection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">projection</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
-                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;projection=true&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;projection=false&#39;</span><span class="p">)</span>
-
-        <span class="n">downsample</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;downsample&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">downsample</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;downsample=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">downsample</span><span class="p">))</span>
-
-        <span class="n">quality</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;quality&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;quality=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">quality</span><span class="p">))</span>
-
-        <span class="c"># region of interest</span>
-        <span class="k">for</span> <span class="n">roi_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">,</span> <span class="s">&#39;height&#39;</span><span class="p">]:</span>
-            <span class="n">roi_value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">roi_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="n">roi_value</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">url_params</span> <span class="o">=</span> <span class="s">&quot;?&quot;</span> <span class="o">+</span> <span class="s">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">projection_image_download_endpoint</span><span class="p">,</span>
-                       <span class="s">&#39;/&#39;</span><span class="p">,</span>
-                       <span class="nb">str</span><span class="p">(</span><span class="n">atlas_image_id</span><span class="p">),</span>
-                       <span class="n">url_params</span><span class="p">])</span>
-
-        <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">file_path</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s">.jpg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atlas_image_id</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="ImageDownloadApi.download_projection_image"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.download_projection_image">[docs]</a>    <span class="k">def</span> <span class="nf">download_projection_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                                  <span class="n">projection_image_id</span><span class="p">,</span>
-                                  <span class="n">file_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Download whole or partial two-dimensional images</span>
-<span class="sd">        from the Allen Institute with the AtlasImage service.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        atlas_image_id : integer</span>
-<span class="sd">            Image to download.</span>
-<span class="sd">        file_path : string, optional</span>
-<span class="sd">            where to put it.  default is id.jpg</span>
-<span class="sd">        projection : boolean, optional</span>
-<span class="sd">            True to retrieve the specified SectionImage with projection.</span>
-<span class="sd">        downsample : int, optional</span>
-<span class="sd">            Number of times to downsample the original image.</span>
-<span class="sd">        quality : int, optional</span>
-<span class="sd">            jpeg quality of the returned image, 0 to 100 (default)</span>
-<span class="sd">        top : int, optional</span>
-<span class="sd">            Index of the topmost row of the region of interest.</span>
-<span class="sd">        left :int, optional</span>
-<span class="sd">            Index of the leftmost column of the region of interest.</span>
-<span class="sd">        width : int, optional</span>
-<span class="sd">            Number of columns in the output image.</span>
-<span class="sd">        height : int, optional</span>
-<span class="sd">            Number of rows in the output image.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        None</span>
-<span class="sd">            the file is downloaded and saved to the path.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        The P56 Adult Mouse Brain Atlas and Developing Mouse Brain Atlas</span>
-<span class="sd">        share a common AtlasDataSet, so the Atlas.ID should be specified.</span>
-
-<span class="sd">        &#39;downsample=1&#39; halves the number of pixels of the original image</span>
-<span class="sd">        both horizontally and vertically.</span>
-<span class="sd">        Specifying &#39;downsample=2&#39; quarters the height and width values.</span>
-
-<span class="sd">        Quality must be an integer from 0, for the lowest quality,</span>
-<span class="sd">        up to as high as 100. If it is not specified,</span>
-<span class="sd">        it defaults to the highest quality.</span>
-
-<span class="sd">        Top is specified in full-resolution (largest tier) pixel coordinates.</span>
-<span class="sd">        SectionImage.y is the default value.</span>
-
-<span class="sd">        Left is specified in full-resolution (largest tier) pixel coordinates.</span>
-<span class="sd">        SectionImage.x is the default value.</span>
-
-<span class="sd">        Width is specified in tier-resolution (desired tier) pixel coordinates.</span>
-<span class="sd">        SectionImage.width is the default value. It is automatically adjusted when downsampled.</span>
-
-<span class="sd">        Height is specified in tier-resolution (desired tier) pixel coordinates.</span>
-<span class="sd">        SectionImage.height is the default value. It is automatically adjusted when downsampled.</span>
-
-<span class="sd">        See: `Downloading an Image - AtlasImage Download Service &lt;http://help.brain-map.org/display/api/Downloading+an+Image#DownloadinganImage-AtlasImage%26nbsp%3BDownloadService&gt;`_</span>
-<span class="sd">        and</span>
-<span class="sd">        `Downloading Atlas Images and Graphics &lt;http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies#AtlasDrawingsandOntologies-DownloadingAtlasImagesAndGraphics&gt;`_.</span>
-
-<span class="sd">        Use :py:meth:`allensdk.api.queries.ontologies_api.OntologiesApi.get_atlases_table`</span>
-<span class="sd">        to get atlas ids programmatically.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
-
         <span class="n">annotation</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;annotation&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
@@ -985,15 +819,37 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">atlas</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;atlas=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atlas</span><span class="p">))</span>
 
-        <span class="n">downsample</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;downsample&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">projection</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;projection&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">downsample</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;downsample=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">downsample</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">projection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">projection</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;projection=true&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;projection=false&#39;</span><span class="p">)</span>
 
-        <span class="n">quality</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;quality&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">expression</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;expression&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;quality=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">quality</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">expression</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">expression</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;expression=true&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;expression=false&#39;</span><span class="p">)</span>
+
+        <span class="c"># see</span>
+        <span class="c"># http://api.brain-map.org/api/v2/data/SectionDataSet/100141599.xml?include=equalization,section_images</span>
+        <span class="k">if</span> <span class="n">range_list</span><span class="p">:</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;range=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">range_list</span><span class="p">)))</span>
+
+        <span class="n">view</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;view&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">view</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;expression&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;projection&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;tumor_feature_annotation&#39;</span><span class="p">,</span>
+                        <span class="s">&#39;tumor_feature_boundary&#39;</span><span class="p">]:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;view=</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">view</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;view argument should be &#39;expression&#39;, &#39;projection&#39;, &#39;tumor_feature_annotation&#39; or &#39;tumor_feature_boundary&#39;&quot;</span><span class="p">)</span>
 
         <span class="c"># region of interest</span>
         <span class="k">for</span> <span class="n">roi_key</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;left&#39;</span><span class="p">,</span> <span class="s">&#39;top&#39;</span><span class="p">,</span> <span class="s">&#39;width&#39;</span><span class="p">,</span> <span class="s">&#39;height&#39;</span><span class="p">]:</span>
@@ -1001,20 +857,29 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">if</span> <span class="n">roi_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">=</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">roi_key</span><span class="p">,</span> <span class="n">roi_value</span><span class="p">))</span>
 
+        <span class="n">downsample_dimensions</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;downsample_dimensions&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">downsample_dimensions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">downsample_dimensions</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;downsample_dimensions=true&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;downsample_dimensions=false&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&quot;?&quot;</span> <span class="o">+</span> <span class="s">&quot;&amp;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">url_params</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
 
-        <span class="n">url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">atlas_image_download_endpoint</span><span class="p">,</span>
-                       <span class="s">&#39;/&#39;</span><span class="p">,</span>
-                       <span class="nb">str</span><span class="p">(</span><span class="n">projection_image_id</span><span class="p">),</span>
-                       <span class="n">url_params</span><span class="p">])</span>
+        <span class="n">image_url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">endpoint</span><span class="p">,</span>
+                             <span class="s">&#39;/&#39;</span><span class="p">,</span>
+                             <span class="nb">str</span><span class="p">(</span><span class="n">image_id</span><span class="p">),</span>
+                             <span class="n">url_params</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="n">file_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">file_path</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s">.jpg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">projection_image_id</span><span class="p">)</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%d</span><span class="s">.jpg&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">image_id</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_file_over_http</span><span class="p">(</span><span class="n">image_url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+
 </div>
 <div class="viewcode-block" id="ImageDownloadApi.atlas_image_query"><a class="viewcode-back" href="../../../../allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.atlas_image_query">[docs]</a>    <span class="k">def</span> <span class="nf">atlas_image_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atlas_id</span><span class="p">,</span> <span class="n">image_type_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Build the URL.</span>
@@ -1096,6 +961,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
@@ -1140,7 +1006,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Biophysical Models &mdash; Allen SDK 0.12.0 documentation</title>
+    <title>Biophysical Models &mdash; Allen SDK 0.12.3 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.0',
+        VERSION:     '0.12.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,23 +23,23 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.3 documentation" href="index.html" />
     <link rel="up" title="Models" href="models.html" />
     <link rel="next" title="Examples" href="examples.html" />
     <link rel="prev" title="Generalized LIF Models" href="glif_models.html" /> 
   </head>
   <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 <style>
 
 	/* the icon font-family definition and helper classes */
 	@font-face {
 	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677');
+	  src: url('/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
+	       url('/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
+	       url('/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
+	       url('/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
 	  font-weight: normal;
 	  font-style: normal;
 	}
@@ -181,11 +181,11 @@
 
 	@font-face {
 	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot');
+	    src: url('/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
+	         url('/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
 	    font-weight: normal;
 	    font-style: normal;
 	}
@@ -609,7 +609,7 @@
 <div id="header_content">
 
 	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
+		<img id="portal_logo" style="border:0;" src="/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
 	</a>
 </div>
 </div>
@@ -622,7 +622,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 		console.log("touchstart");
 });
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -647,7 +647,8 @@ of the model parameters to match the experimentally-recorded firing behaviors.</
 <p>The biophysical models are run with the <a class="reference external" href="http://www.neuron.yale.edu/neuron/">NEURON</a>
 simulation environment.  The Allen SDK package contains libraries that assist
 in downloading and setting up the models available on the Allen Institute web site
-for users to run using NEURON.</p>
+for users to run using NEURON.
+The examples and scripts provided run on Linux using the bash shell.</p>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <p>You must have NEURON with the Python interpreter enabled and the Allen SDK installed.</p>
@@ -723,8 +724,8 @@ and application configuration.</p>
 </pre></div>
 </div>
 </div>
-<div class="section" id="running-the-simulation">
-<h2>Running the Simulation<a class="headerlink" href="#running-the-simulation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="running-the-simulation-linux-shell-prompt">
+<h2>Running the Simulation (Linux shell prompt)<a class="headerlink" href="#running-the-simulation-linux-shell-prompt" title="Permalink to this headline">¶</a></h2>
 <p>All of the sweeps available from the web site are included in manifest.json and will be run by default.
 This can take some time.</p>
 <div class="highlight-python"><div class="highlight"><pre>cd neuronal_model
@@ -743,7 +744,7 @@ You can remove all of the sweep numbers that you do not want run.</p>
 <p>The top level script is in the
 <a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.runner.run" title="allensdk.model.biophysical.runner.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a>
 method of the <a class="reference internal" href="allensdk.model.biophysical.html#module-allensdk.model.biophysical.runner" title="allensdk.model.biophysical.runner"><tt class="xref py py-mod docutils literal"><span class="pre">allensdk.model.biophysical.runner</span></tt></a>
-module.  The implementation of the method is shown here step-by-step:</p>
+module.  The implementation of the method is discussed here step-by-step:</p>
 <p>First configure NEURON based on the configuration file, which was
 read in from the command line at the very bottom of the script.</p>
 <p><a class="reference internal" href="allensdk.model.biophysical.html#allensdk.model.biophysical.runner.run" title="allensdk.model.biophysical.runner.run"><tt class="xref py py-meth docutils literal"><span class="pre">run()</span></tt></a>:</p>
@@ -817,7 +818,7 @@ class Utils(HocUtils):
 simply model your directory structure on one of the downloaded simulations
 or one of the examples below.
 Add your own runner.py and utils.py module to the simulation directory.</p>
-<p>Compile the .mod files using NEURON&#8217;s nrnivmodl command:</p>
+<p>Compile the .mod files using NEURON&#8217;s nrnivmodl command (Linux shell):</p>
 <div class="highlight-python"><div class="highlight"><pre>nrnivmodl modfiles
 </pre></div>
 </div>
@@ -832,7 +833,7 @@ Add your own runner.py and utils.py module to the simulation directory.</p>
 <p>A <a class="reference download internal" href="_downloads/simple_example.tgz"><tt class="xref download docutils literal"><span class="pre">minimal</span> <span class="pre">example</span> <span class="pre">(simple_example.tgz)</span></tt></a>
 and a <a class="reference download internal" href="_downloads/multicell_example.tgz"><tt class="xref download docutils literal"><span class="pre">multicell</span> <span class="pre">example</span> <span class="pre">(multicell_example.tgz)</span></tt></a>
 are available to download as a starting point for your own projects.</p>
-<p>Each example provides its own utils.py file along with a main script
+<p>Each example provides its own utils.py file along with a main script (Linux shell)
 and supporting configuration files.</p>
 <p>simple_example.tgz:</p>
 <div class="highlight-python"><div class="highlight"><pre>tar xvzf simple_example.tgz
@@ -1174,6 +1175,7 @@ URLs that provide model data, but it is a planned future use case.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
@@ -1218,7 +1220,7 @@ URLs that provide model data, but it is a planned future use case.</p>
 
     <div class="footer">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
 
   </body>
 </html>
