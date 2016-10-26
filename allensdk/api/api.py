@@ -20,6 +20,7 @@ import allensdk.core.json_utilities as json_utilities
 import pandas as pd
 import logging
 import os
+import errno
 
 
 class Api(object):
@@ -281,19 +282,25 @@ class Api(object):
                     stream.stream_response_to_file(response, path=f)
         except exceptions.StreamingError as e:
             self._log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
-            raise(e)
-        except requests.exceptions.RequestException as e:
-            self._log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
-            raise(e)
+            raise
         except requests.exceptions.ConnectionError as e:
             self._log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
-            raise(e)
+            raise
         except requests.exceptions.ReadTimeout as e:
             self._log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
-            raise(e)
+            raise
+        except requests.exceptions.RequestException as e:
+            self._log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
+            raise
         except Exception as e:
             self._log.error("Couldn't retrieve file %s from %s" % (file_path, url))
-            raise(e)
+            raise
+        finally:
+            try:
+                os.remove(file_path)
+            except OSError as e:
+                if e.errno != errno.ENOENT:
+                    raise
 
 
 
