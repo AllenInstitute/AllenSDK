@@ -24,6 +24,7 @@ import os
 
 _orig_get_stimulus_table = BrainObservatoryNwbDataSet.get_stimulus_table
 
+
 def mock_stimulus_table(dset, name):
     t = _orig_get_stimulus_table(dset, name)
     t.set_value(0, 'end',
@@ -82,6 +83,7 @@ def test_session_b(session_b, plot_flag):
         session_b.session_b(plot_flag=plot_flag)
 
         assert True
+
 
 @pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
                     reason="partial_testing")

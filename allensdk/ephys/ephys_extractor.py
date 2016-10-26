@@ -987,7 +987,7 @@ def extractor_for_nwb_sweeps(dataset, sweep_numbers,
     for sweep_number in sweep_numbers:
         data = dataset.get_sweep(sweep_number)
         v = data['response'] * 1e3 # mV
-        i = data['stimulus'] * 1e12 # nA
+        i = data['stimulus'] * 1e12 # pA
         hz = data['sampling_rate']
         dt = 1. / hz
         t = np.arange(0, len(v)) * dt # sec

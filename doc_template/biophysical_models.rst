@@ -15,7 +15,8 @@ of the model parameters to match the experimentally-recorded firing behaviors.
 The biophysical models are run with the `NEURON <http://www.neuron.yale.edu/neuron/>`_ 
 simulation environment.  The Allen SDK package contains libraries that assist
 in downloading and setting up the models available on the Allen Institute web site
-for users to run using NEURON. 
+for users to run using NEURON.
+The examples and scripts provided run on Linux using the bash shell.
 
 
 Prerequisites
@@ -90,8 +91,8 @@ and application configuration.
     `---work
 
 
-Running the Simulation
-----------------------
+Running the Simulation (Linux shell prompt)
+-------------------------------------------
 
 All of the sweeps available from the web site are included in manifest.json and will be run by default.
 This can take some time.
@@ -116,7 +117,7 @@ Simulation Main Loop
 The top level script is in the
 :py:meth:`~allensdk.model.biophysical.runner.run`
 method of the :py:mod:`allensdk.model.biophysical.runner`
-module.  The implementation of the method is shown here step-by-step:
+module.  The implementation of the method is discussed here step-by-step:
 
 First configure NEURON based on the configuration file, which was 
 read in from the command line at the very bottom of the script.
@@ -200,7 +201,7 @@ simply model your directory structure on one of the downloaded simulations
 or one of the examples below.
 Add your own runner.py and utils.py module to the simulation directory.
 
-Compile the .mod files using NEURON's nrnivmodl command:
+Compile the .mod files using NEURON's nrnivmodl command (Linux shell):
 ::
 
     nrnivmodl modfiles
@@ -220,7 +221,7 @@ A :download:`minimal example (simple_example.tgz)<./_static/examples/simple_exam
 and a :download:`multicell example (multicell_example.tgz)<./_static/examples/multicell_example.tgz>`
 are available to download as a starting point for your own projects.
 
-Each example provides its own utils.py file along with a main script
+Each example provides its own utils.py file along with a main script (Linux shell)
 and supporting configuration files.
 
 simple_example.tgz::

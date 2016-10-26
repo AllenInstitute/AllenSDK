@@ -556,19 +556,19 @@ class MouseConnectivityApi(RmaApi):
             count=False)
 
     def download_injection_density(self, path, experiment_id, resolution):
-        return GridDataApi().download_projection_grid_data(
+        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
 
     def download_projection_density(self, path, experiment_id, resolution):
-        return GridDataApi().download_projection_grid_data(
+        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
 
     def download_injection_fraction(self, path, experiment_id, resolution):
-        return GridDataApi().download_projection_grid_data(
+        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
 
     def download_data_mask(self, path, experiment_id, resolution):
-        return GridDataApi().download_projection_grid_data(
+        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.DATA_MASK], resolution, path)
 
     def calculate_injection_centroid(self,
