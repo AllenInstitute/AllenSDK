@@ -11,7 +11,7 @@ def enable_console_log(level=None):
         level : int
             logging level 0-50 (logging.INFO, logging.DEBUG, etc.) 
 
-        See: `Logging Cookbook <https://docs.python.org/2/howto/logging-cookbook.html>`_.
+        See: `Logging Cookbook <https://docs.python.org/2/howto/logging-cookbook.html>`_
     '''
     
     sdk_logger = logging.getLogger('allensdk')
