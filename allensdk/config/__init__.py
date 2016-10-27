@@ -17,7 +17,7 @@ def enable_console_log(level=None):
     sdk_logger = logging.getLogger('allensdk')
 
     if level is None:
-        sdk_logger.setLevel(logging.INFO)
+        sdk_logger.setLevel(logging.DEBUG)
     else:
         sdk_logger.setLevel(level)
 
