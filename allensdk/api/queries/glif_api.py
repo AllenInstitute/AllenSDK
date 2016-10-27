@@ -71,7 +71,7 @@ class GlifApi(RmaApi):
             specimen = self.neuronal_model['specimen']
             self.ephys_sweeps = specimen['ephys_sweeps']
         except Exception as e:
-            print(e.message)
+            logging.info(e.message)
             self.ephys_sweeps = None
 
         if self.ephys_sweeps is None:
@@ -136,7 +136,7 @@ class GlifApi(RmaApi):
         if self.neuron_config_url is None:
             raise Exception("URL for neuron config file is empty.")
 
-        print(self.api_url + self.neuron_config_url)
+        logging.info(self.api_url + self.neuron_config_url)
 
         neuron_config = self.retrieve_parsed_json_over_http(
             self.api_url + self.neuron_config_url)
