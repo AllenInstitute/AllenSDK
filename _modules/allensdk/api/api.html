@@ -653,6 +653,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">errno</span>
 
 
 <div class="viewcode-block" id="Api"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api">[docs]</a><span class="k">class</span> <span class="nc">Api</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -881,6 +882,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">well_known_file_endpoint</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">well_known_file_id</span><span class="p">)</span>
 </div>
+<div class="viewcode-block" id="Api.cleanup_truncated_file"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.cleanup_truncated_file">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup_truncated_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Helper for removing files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_path : string</span>
+<span class="sd">            Absolute path including the file name to remove.&#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">!=</span> <span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">:</span>
+                <span class="k">raise</span>
+</div>
 <div class="viewcode-block" id="Api.retrieve_file_over_http"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.retrieve_file_over_http">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_file_over_http</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Get a file from the data api and save it.</span>
 
@@ -914,20 +928,24 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                     <span class="n">stream</span><span class="o">.</span><span class="n">stream_response_to_file</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">StreamingError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> (streaming).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
-            <span class="k">raise</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> (request).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
-            <span class="k">raise</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_truncated_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="k">raise</span>
         <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> (connection).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
-            <span class="k">raise</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_truncated_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="k">raise</span>
         <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ReadTimeout</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> (timeout).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
-            <span class="k">raise</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_truncated_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> (request).&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">url</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_truncated_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="k">raise</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t retrieve file </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">url</span><span class="p">))</span>
-            <span class="k">raise</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_truncated_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="k">raise</span>
 
 </div>
 <div class="viewcode-block" id="Api.retrieve_parsed_json_over_http"><a class="viewcode-back" href="../../../allensdk.api.html#allensdk.api.api.Api.retrieve_parsed_json_over_http">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_parsed_json_over_http</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">post</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>

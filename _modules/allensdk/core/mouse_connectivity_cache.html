@@ -687,6 +687,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        the annotation volume, and the annotation volume.  Must be one of (10, 25,</span>
 <span class="sd">        50, 100).  Default is 25.</span>
 
+<span class="sd">    ccf_version: string</span>
+<span class="sd">        Desired version of the Common Coordinate Framework.  This affects the annotation </span>
+<span class="sd">        volume (get_annotation_volume) and structure masks (get_structure_mask). </span>
+<span class="sd">        Must be one of (MouseConnectivityApi.CCF_2015, MouseConnectivityApi.CCF_2016). </span>
+<span class="sd">        Default: MouseConnectivityApi.CCF_2016</span>
+
 <span class="sd">    cache: boolean</span>
 <span class="sd">        Whether the class should save results of API queries to locations specified</span>
 <span class="sd">        in the manifest file.  Queries for files (as opposed to metadata) must have a</span>

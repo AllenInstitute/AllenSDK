@@ -638,6 +638,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <p>This page describes how to use the SDK to access experimental projection data and metadata.  For more information,
 please visit the Connectivity Atlas <a class="reference external" href="http://connectivity.brain-map.org/">home page</a> and the
 <a class="reference external" href="http://help.brain-map.org/display/mouseconnectivity/ALLEN+Mouse+Brain+Connectivity+Atlas">API documentation</a></p>
+<div class="section" id="structure-level-projection-data">
+<h2>Structure-Level Projection Data<a class="headerlink" href="#structure-level-projection-data" title="Permalink to this headline">¶</a></h2>
+<p>All AAV projection signal in the Allen Mouse Connectivity Atlas has been registered to the expert-annotated Common Coordinate Framework (CCF)
+and summarized to structures in the adult mouse structure ontology.  Most commonly used for analysis are measures of the density of projection
+signal in all brain areas for every experiment.  This data is available for download and is described
+in more detail on the <a class="reference internal" href="unionizes.html"><em>structure unionizes page</em></a>.</p>
+</div>
+<div class="section" id="voxel-level-projection-data">
+<h2>Voxel-Level Projection Data<a class="headerlink" href="#voxel-level-projection-data" title="Permalink to this headline">¶</a></h2>
+<p>The CCF-registered AAV projection signal is also available for download as a set of 3D volumes for each experiment.  The following data volumes
+are available for download:</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>projection density</strong>: sum of detected projection pixels / sum of all pixels in voxel</li>
+<li><strong>injection_fraction</strong>: fraction of pixels belonging to manually annotated injection site</li>
+<li><strong>injection_density</strong>: density of detected projection pixels within the manually annotated injection site</li>
+<li><strong>data_mask</strong>: binary mask indicating if a voxel contains valid data. Only valid voxels should be used for analysis.</li>
+</ul>
+</div></blockquote>
+</div>
 <div class="section" id="code-examples">
 <h2>Code Examples<a class="headerlink" href="#code-examples" title="Permalink to this headline">¶</a></h2>
 <p>The Mouse Connectivity <a class="reference external" href="_static/examples/nb/mouse_connectivity.html">Jupyter notebook</a> has many code samples to help get
@@ -647,7 +667,7 @@ started with analysis:</p>
 <li><a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Mouse-Connectivity">Download experimental metadata by injection structure and transgenic line</a></li>
 <li><a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Structure-Signal-Unionization">Download projection signal statistics at a structure level</a></li>
 <li><a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Generating-a-Projection-Matrix">Build a structure-to-structure matrix of projection signal values</a></li>
-<li><a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Manipulating-Grid-Data">Download and visualized gridded projection signal volumes</a></li>
+<li><a class="reference external" href="_static/examples/nb/mouse_connectivity.html#Manipulating-Grid-Data">Download and visualize gridded projection signal volumes</a></li>
 </ul>
 </div></blockquote>
 </div>
@@ -655,8 +675,9 @@ started with analysis:</p>
 <h2>Mouse Connectivity API<a class="headerlink" href="#mouse-connectivity-api" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi" title="allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi"><tt class="xref py py-class docutils literal"><span class="pre">MouseConnectivityApi</span></tt></a> class provides a Python interface
 for downloading data in the Allen Mouse Brain Connectivity Atlas.  The following example demonstrates how to download
-meta data for all wild-type mice and the projection signal density for one cell:</p>
+meta data for all wild-type injections and the projection signal density for one experiment:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.mouse_connectivity_api</span> <span class="kn">import</span> <span class="n">MouseConnectivityApi</span>
+<span class="kn">import</span> <span class="nn">nrrd</span>
 
 <span class="n">mca</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="p">()</span>
 
@@ -664,7 +685,10 @@ meta data for all wild-type mice and the projection signal density for one cell:
 <span class="n">experiments</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">experiment_source_search</span><span class="p">(</span><span class="n">injection_structures</span><span class="o">=</span><span class="s1">&#39;root&#39;</span><span class="p">,</span> <span class="n">transgenic_lines</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># download the projection density volume for one of the experiments</span>
-<span class="n">pd</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">download_projection_density</span><span class="p">(</span><span class="s1">&#39;example.nrrd&#39;</span><span class="p">,</span> <span class="n">experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">mca</span><span class="o">.</span><span class="n">download_projection_density</span><span class="p">(</span><span class="s1">&#39;example.nrrd&#39;</span><span class="p">,</span> <span class="n">experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+
+<span class="c1"># read it into memory</span>
+<span class="n">pd_array</span><span class="p">,</span> <span class="n">pd_info</span> <span class="o">=</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;example.nrrd&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -692,12 +716,6 @@ all experiments with injections in the isocortex and download the projetion dens
 <span class="n">pd</span> <span class="o">=</span> <span class="n">mcc</span><span class="o">.</span><span class="n">get_projection_density</span><span class="p">(</span><span class="n">experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="structure-level-projection-data">
-<h2>Structure-Level Projection Data<a class="headerlink" href="#structure-level-projection-data" title="Permalink to this headline">¶</a></h2>
-<p>All AAV projection signal in the Allen Mouse Connectivity Atlas has been registered to the expert-annotated Common Coordinate Framework
-and summarized to structures in the adult mouse structure ontology.  This data is available for download and is described
-in more detail on the <a class="reference internal" href="unionizes.html"><em>structure unionizes page</em></a>.</p>
 </div>
 <div class="section" id="file-formats">
 <h2>File Formats<a class="headerlink" href="#file-formats" title="Permalink to this headline">¶</a></h2>

@@ -634,6 +634,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
+<span class="n">_console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
 
 <div class="viewcode-block" id="enable_console_log"><a class="viewcode-back" href="../../allensdk.config.html#allensdk.config.enable_console_log">[docs]</a><span class="k">def</span> <span class="nf">enable_console_log</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;configure allensdk logging to output to the console.</span>
@@ -643,17 +644,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        level : int</span>
 <span class="sd">            logging level 0-50 (logging.INFO, logging.DEBUG, etc.) </span>
 
-<span class="sd">        See: `Logging Cookbook &lt;https://docs.python.org/2/howto/logging-cookbook.html&gt;`_.</span>
+<span class="sd">        See: `Logging Cookbook &lt;https://docs.python.org/2/howto/logging-cookbook.html&gt;`_</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    
     <span class="n">sdk_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;allensdk&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="n">sdk_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+        <span class="n">sdk_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">sdk_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
 
-    <span class="n">console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
-    <span class="n">sdk_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span></div>
+    <span class="n">sdk_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">_console_handler</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

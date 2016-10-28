@@ -684,14 +684,15 @@ your own simulations using stimuli from the Allen Cell Types Database or custom 
 <p>The Allen SDK provides Python code for accessing experimental metadata along with projection signal volumes registered to a common coordinate framework.  This framework has structural annotations, which allows users to compute structure-level signal statistics.</p>
 <p>See the <a class="reference external" href="connectivity.html">mouse connectivity section</a> for more details.</p>
 </div>
-<div class="section" id="what-s-new-release-0-12-3-october-27th-2016">
-<h2>What&#8217;s New - Release 0.12.3 (October 27th, 2016)<a class="headerlink" href="#what-s-new-release-0-12-3-october-27th-2016" title="Permalink to this headline">¶</a></h2>
-<p>The 0.12.3 release addresses issues from the Github issue tracker:</p>
+<div class="section" id="what-s-new-release-0-12-4-october-28th-2016">
+<h2>What&#8217;s New - Release 0.12.4 (October 28th, 2016)<a class="headerlink" href="#what-s-new-release-0-12-4-october-28th-2016" title="Permalink to this headline">¶</a></h2>
+<p>The 0.12.4 release features a new 2016 version of the Allen Mouse Common Coordinate Framework.  This primarily affects Mouse Connectivity Atlas <a class="reference external" href="unionizes.html">structure unionize records</a> and structure masks.  All structure unionize records downloaded via the MouseConnectivityCache or API now correspond to the new CCF.  More details on CCF construction can be found in the <a class="reference external" href="http://help.brain-map.org/download/attachments/2818171/Mouse_Common_Coordinate_Framework.pdf?version=2&amp;modificationDate=1477414987120">CCF technical whitepaper</a>.  Users can download the old <a class="reference external" href="http://download.alleninstitute.org/informatics-archive/june-2016/mouse_projection/">unionize records here</a>.</p>
+<p>This release also addresses issues from the Github issue tracker:</p>
 <blockquote>
 <div><ul class="simple">
 <li>issues #23, #28 - added a new dependency &#8220;requests_toolbelt&#8221; and upgraded API database for more reliable large file downloads.</li>
 <li>issue #27 - MouseConnectivityCache.get_structure_unionizes returns only requested structures, not all descendants.  Added a separate argument for descendant inclusion.</li>
-<li>issue #26 - documentation for structure unionize records <a class="reference external" href="/unionizes.html">here</a>.</li>
+<li>issue #26 - documentation for structure unionize records <a class="reference external" href="unionizes.html">here</a>.</li>
 <li>issue #25 - documentation errors in brain observatory analysis.</li>
 </ul>
 </div></blockquote>

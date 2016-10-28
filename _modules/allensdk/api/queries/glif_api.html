@@ -704,7 +704,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">specimen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuronal_model</span><span class="p">[</span><span class="s1">&#39;specimen&#39;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="n">specimen</span><span class="p">[</span><span class="s1">&#39;ephys_sweeps&#39;</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="bp">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ephys_sweeps</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -769,7 +769,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;URL for neuron config file is empty.&quot;</span><span class="p">)</span>
 
-        <span class="k">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span><span class="p">)</span>
 
         <span class="n">neuron_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_parsed_json_over_http</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">neuron_config_url</span><span class="p">)</span>
