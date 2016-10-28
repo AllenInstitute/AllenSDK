@@ -20,7 +20,11 @@ from allensdk.core.swc import Marker
 import numpy as np
 import pytest
 from pandas.core.frame import DataFrame
+from allensdk.config import enable_console_log
 
+@pytest.fixture(scope="session", autouse=True)
+def console_log():
+    enable_console_log()
 
 @pytest.fixture
 def cell_id():
