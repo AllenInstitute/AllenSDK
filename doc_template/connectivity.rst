@@ -25,7 +25,7 @@ Mouse Connectivity API
 
 The :py:class:`~allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi` class provides a Python interface 
 for downloading data in the Allen Mouse Brain Connectivity Atlas.  The following example demonstrates how to download 
-meta data for all wild-type mice and the projection signal density for one cell:
+meta data for all wild-type mice and the projection signal density for one experiment:
 
 .. literalinclude:: _static/examples/connectivity_ex1.py
 
