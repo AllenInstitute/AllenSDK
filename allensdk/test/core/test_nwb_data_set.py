@@ -36,19 +36,24 @@ def data_set(request):
     data_set = NwbDataSet(nwb_file)
     return data_set
 
-
+@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
+                    reason="partial testing")
 def test_get_sweep_numbers(data_set):
     sweep_numbers = data_set.get_sweep_numbers()
 
     assert len(sweep_numbers) > 0
 
 
+@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
+                    reason="partial testing")
 def test_get_experiment_sweep_numbers(data_set):
     sweep_numbers = data_set.get_experiment_sweep_numbers()
 
     assert len(sweep_numbers) > 0
 
 
+@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
+                    reason="partial testing")
 def test_get_spike_times(data_set):
     sweep_numbers = data_set.get_experiment_sweep_numbers()
 
@@ -60,7 +65,6 @@ def test_get_spike_times(data_set):
             found_spikes = True
 
     assert found_spikes is True
-
 
 def mock_h5py_file(m=None, data=None):
     if m is None:
@@ -166,7 +170,8 @@ def test_set_spike_times(mock_data_set):
 
     assert False
 
-
+@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
+                    reason="partial testing")
 def test_get_sweep_metadata(data_set):
     sweep_metadata = data_set.get_sweep_metadata(1)
 
