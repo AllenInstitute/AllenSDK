@@ -87,14 +87,16 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.12.3 (October 27th, 2016)
+What's New - Release 0.12.4 (October 28th, 2016)
 ------------------------------------------------
 
-The 0.12.3 release addresses issues from the Github issue tracker:
+The 0.12.4 release features a new 2016 version of the Allen Mouse Common Coordinate Framework.  This primarily affects Mouse Connectivity Atlas `structure unionize records <unionizes.html>`_ and structure masks.  All structure unionize records downloaded via the MouseConnectivityCache or API now correspond to the new CCF.  More details on CCF construction can be found in the `CCF technical whitepaper <http://help.brain-map.org/download/attachments/2818171/Mouse_Common_Coordinate_Framework.pdf?version=2&modificationDate=1477414987120>`_.  Users can download the old `unionize records here <http://download.alleninstitute.org/informatics-archive/june-2016/mouse_projection/>`_.
+
+This release also addresses issues from the Github issue tracker:
   
     * issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
     * issue #27 - MouseConnectivityCache.get_structure_unionizes returns only requested structures, not all descendants.  Added a separate argument for descendant inclusion.
-    * issue #26 - documentation for structure unionize records `here </unionizes.html>`_.
+    * issue #26 - documentation for structure unionize records `here <unionizes.html>`_.
     * issue #25 - documentation errors in brain observatory analysis.
 
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

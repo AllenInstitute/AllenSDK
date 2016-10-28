@@ -54,6 +54,12 @@ class MouseConnectivityCache(Cache):
         the annotation volume, and the annotation volume.  Must be one of (10, 25,
         50, 100).  Default is 25.
 
+    ccf_version: string
+        Desired version of the Common Coordinate Framework.  This affects the annotation 
+        volume (get_annotation_volume) and structure masks (get_structure_mask). 
+        Must be one of (MouseConnectivityApi.CCF_2015, MouseConnectivityApi.CCF_2016). 
+        Default: MouseConnectivityApi.CCF_2016
+
     cache: boolean
         Whether the class should save results of API queries to locations specified
         in the manifest file.  Queries for files (as opposed to metadata) must have a
