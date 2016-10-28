@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [0.12.3] - 2016-10-27
+## [0.12.4] - 2016-10-28
 
 ### Fixed
 
@@ -11,7 +11,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- New CCF annotation volume with complete cortical areas and layers.
+- Mouse Connectivity structure unionize records have been computed for new CCF.  Previous records are available here: http://download.alleninstitute.org/informatics-archive/june-2016/mouse_projection/
 - Github issue #27 - MouseConnectivityCache.get_structure_unionizes returns only requested structures, not all descendants.  Added a separate argument for descendant inclusion.
+
+### Added
+
+- MouseConnectivityCache has a new constructor argument for specifying CCF version.
 
 ## [0.12.2] - 2016-9-1
 
