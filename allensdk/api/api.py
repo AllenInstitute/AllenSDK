@@ -20,6 +20,7 @@ import allensdk.core.json_utilities as json_utilities
 import pandas as pd
 import logging
 import os
+import errno
 
 
 class Api(object):
@@ -248,6 +249,19 @@ class Api(object):
         '''
         return self.well_known_file_endpoint + '/' + str(well_known_file_id)
 
+    def cleanup_truncated_file(self, file_path):
+        '''Helper for removing files.
+
+        Parameters
+        ----------
+        file_path : string
+            Absolute path including the file name to remove.'''
+        try:
+            os.remove(file_path)
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
+
     def retrieve_file_over_http(self, url, file_path):
         '''Get a file from the data api and save it.
 
@@ -281,20 +295,24 @@ class Api(object):
                     stream.stream_response_to_file(response, path=f)
         except exceptions.StreamingError as e:
             self._log.error("Couldn't retrieve file %s from %s (streaming)." % (file_path,url))
-            raise(e)
-        except requests.exceptions.RequestException as e:
-            self._log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
-            raise(e)
+            self.cleanup_truncated_file(file_path)
+            raise
         except requests.exceptions.ConnectionError as e:
             self._log.error("Couldn't retrieve file %s from %s (connection)." % (file_path,url))
-            raise(e)
+            self.cleanup_truncated_file(file_path)
+            raise
         except requests.exceptions.ReadTimeout as e:
             self._log.error("Couldn't retrieve file %s from %s (timeout)." % (file_path,url))
-            raise(e)
+            self.cleanup_truncated_file(file_path)
+            raise
+        except requests.exceptions.RequestException as e:
+            self._log.error("Couldn't retrieve file %s from %s (request)." % (file_path,url))
+            self.cleanup_truncated_file(file_path)
+            raise
         except Exception as e:
             self._log.error("Couldn't retrieve file %s from %s" % (file_path, url))
-            raise(e)
-
+            self.cleanup_truncated_file(file_path)
+            raise
 
 
     def retrieve_parsed_json_over_http(self, url, post=False):
