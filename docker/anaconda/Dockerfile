@@ -14,16 +14,15 @@ RUN wget http://www.neuron.yale.edu/ftp/neuron/versions/v7.4/v7.4.rel-1370/nrn-7
     apt-get install -f; \
     dpkg -i nrn-7.4.rel-1370.x86_64.deb 
 
-# TODO: replace w/ install from Github
 RUN apt-get install -yq \
     unzip \
     make
 
-RUN mkdir allensdk; \
-    cd allensdk; \
-    wget -O allensdk.zip wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.3.zip; \
+RUN wget -O allensdk.zip wget -O allensdk.zip https://github.com/AllenInstitute/AllenSDK/archive/v0.12.4.zip; \
     unzip allensdk.zip; \
     rm allensdk.zip; \
+    mv AllenSDK-0.12.4 allensdk; \
+    cd allensdk; \
     pip install .; \
     pip install -r test_requirements.txt
 
