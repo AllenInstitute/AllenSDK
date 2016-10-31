@@ -246,7 +246,7 @@ def plot_sg_traces(sg, save_dir):
         plt.close()
 
 
-def plot_lsn_traces(lsn, save_dir):
+def plot_lsn_traces(lsn, save_dir, suffix=''):
     logging.info("Plotting LSN traces for all cells")
     xtime = np.arange(-lsn.interlength / lsn.acquisition_rate,
                       (lsn.interlength + lsn.sweeplength) / lsn.acquisition_rate,
@@ -295,7 +295,7 @@ def plot_lsn_traces(lsn, save_dir):
         plt.tight_layout()
         plt.suptitle("Cell " + str(nc + 1), fontsize=20)
         plt.subplots_adjust(top=0.9)
-        filename = 'Traces LSN Cell_' + str(nc + 1) + '.png'
+        filename = 'Traces LSN Cell_' + str(nc + 1) + suffix + '.png'
         fullfilename = os.path.join(save_dir, filename)
         plt.savefig(fullfilename)
         plt.close()
@@ -477,7 +477,7 @@ def _plot_3sa(dg, nm1, nm3, save_dir):
         plt.close()
 
 
-def _plot_3sc(lsn, nm1, nm2, save_dir):
+def _plot_3sc(lsn, nm1, nm2, save_dir, suffix=''):
     logging.info("Plotting for all cells")
     for nc in range(lsn.numbercells):
         if np.mod(nc, 20) == 0:
@@ -635,7 +635,7 @@ def _plot_3sc(lsn, nm1, nm2, save_dir):
 
         plt.tick_params(labelsize=16)
         plt.tight_layout()
-        filename = 'Cell_' + str(nc + 1) + '_3SC.png'
+        filename = 'Cell_' + str(nc + 1) + '_3SC' + suffix + '.png'
         fullfilename = os.path.join(save_dir, filename)
         plt.savefig(fullfilename)
         plt.close()

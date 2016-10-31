@@ -40,9 +40,9 @@ SESSION_STIMULUS_MAP = {
 }
 
 LOCALLY_SPARSE_NOISE_DIMENSIONS = {
-    stim_info.LOCALLY_SPARSE_NOISE: [ 16, 28 ],
-    stim_info.LOCALLY_SPARSE_NOISE_4DEG: [ 16, 28 ],    
-    stim_info.LOCALLY_SPARSE_NOISE_8DEG: [ 8, 14 ],
+    LOCALLY_SPARSE_NOISE: [ 16, 28 ],
+    LOCALLY_SPARSE_NOISE_4DEG: [ 16, 28 ],    
+    LOCALLY_SPARSE_NOISE_8DEG: [ 8, 14 ],
     }
 
 def sessions_with_stimulus(stimulus):

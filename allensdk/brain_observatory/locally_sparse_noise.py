@@ -15,7 +15,7 @@
 
 import numpy as np
 from .stimulus_analysis import StimulusAnalysis
-import .stimulus_info as stim_info
+import stimulus_info
 import scipy.ndimage 
 
 class LocallySparseNoise(StimulusAnalysis):
@@ -44,7 +44,7 @@ class LocallySparseNoise(StimulusAnalysis):
         super(LocallySparseNoise, self).__init__(data_set, **kwargs)
         
         try:
-            lsn_dims = stim_info.LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus]
+            lsn_dims = stimulus_info.LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus]
         except KeyError as e:
             raise KeyError("Unknown stimulus name: %s" % stimulus)
         
@@ -53,8 +53,8 @@ class LocallySparseNoise(StimulusAnalysis):
 
         self.stim_table = self.data_set.get_stimulus_table(
             stimulus)
-        self.LSN, self.LSN_mask = self.data_set.get_stimulus_template(
-            stimulus)
+        self.LSN, self.LSN_mask = self.data_set.get_locally_sparse_noise_stimulus_template(
+            stimulus, mask_off_screen=False)
         self.sweeplength = self.stim_table['end'][
             1] - self.stim_table['start'][1]
         self.interlength = 4 * self.sweeplength
