@@ -15,7 +15,8 @@
 
 import numpy as np
 from .stimulus_analysis import StimulusAnalysis
-
+import .stimulus_info as stim_info
+import scipy.ndimage 
 
 class LocallySparseNoise(StimulusAnalysis):
     """ Perform tuning analysis specific to the locally sparse noise stimulus.
@@ -23,6 +24,9 @@ class LocallySparseNoise(StimulusAnalysis):
     Parameters
     ----------
     data_set: BrainObservatoryNwbDataSet object
+
+    stimulus: string
+       Name of locally sparse noise stimulus.  See brain_observatory.stimulus_info.
 
     nrows: int
        Number of rows in the stimulus template
@@ -36,15 +40,21 @@ class LocallySparseNoise(StimulusAnalysis):
     LSN_GREY = 127
     LSN_OFF_SCREEN = 64
 
-    def __init__(self, data_set, nrows=None, ncols=None, **kwargs):
+    def __init__(self, data_set, stimulus, **kwargs):
         super(LocallySparseNoise, self).__init__(data_set, **kwargs)
-        self.nrows = 16 if nrows is None else nrows
-        self.ncols = 28 if ncols is None else ncols
+        
+        try:
+            lsn_dims = stim_info.LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus]
+        except KeyError as e:
+            raise KeyError("Unknown stimulus name: %s" % stimulus)
+        
+        self.nrows = lsn_dims[0]
+        self.ncols = lsn_dims[1]
 
         self.stim_table = self.data_set.get_stimulus_table(
-            'locally_sparse_noise')
-        self.LSN, self.LSN_mask = self.data_set.get_locally_sparse_noise_stimulus_template(
-            mask_off_screen=False)
+            stimulus)
+        self.LSN, self.LSN_mask = self.data_set.get_stimulus_template(
+            stimulus)
         self.sweeplength = self.stim_table['end'][
             1] - self.stim_table['start'][1]
         self.interlength = 4 * self.sweeplength
@@ -70,3 +80,21 @@ class LocallySparseNoise(StimulusAnalysis):
                 receptive_field[xp, yp, :, 0] = subset_on.mean(axis=0)
                 receptive_field[xp, yp, :, 1] = subset_off.mean(axis=0)
         return receptive_field
+
+    @staticmethod
+    def merge_receptive_fields(rc1, rc2):
+        """ TODO
+        """
+
+        # make sure that rc1 is the larger one
+        if rc2.shape[0] > rc1.shape[0]:
+            rc1, rc2 = rc2, rc1
+
+        shape_mult = np.array(rc1.shape) / np.array(rc2.shape)
+
+        rc2_zoom = scipy.ndimage.zoom(rc2, shape_mult, order=0)
+
+        return rc1 + rc2_zoom
+        
+
+        
