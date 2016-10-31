@@ -16,6 +16,7 @@
 import csv
 import copy
 import math
+import six
 
 # Morphology nodes have the following fields. SWC fields are numeric.
 NODE_ID = 'id'
@@ -486,7 +487,7 @@ class Morphology(object):
         keep = {}
         # figure out which compartments to toss
         ct = 0
-        for i, c in compartments.iteritems():
+        for i, c in six.iteritems(compartments):
             pid = c[NODE_PN]
             cid = c[NODE_ID]
             ctype = c[NODE_TYPE]
@@ -499,7 +500,7 @@ class Morphology(object):
             ct += 1
 
         # hook children up to their new parents
-        for i, c in compartments.iteritems():
+        for i, c in six.iteritems(compartments):
             comp_id = c[NODE_ID]
             if keep[comp_id] is False:
                 parent_id = c[NODE_PN]
@@ -510,14 +511,14 @@ class Morphology(object):
 
         # filter out the orphans
         sparsified_compartments = {k: v for k,
-                                   v in compartments.iteritems() if keep[k]}
+                                   v in six.iteritems(compartments) if keep[k]}
         if compress_ids:
             ids = sorted(sparsified_compartments.keys(), key=lambda x: int(x))
             id_hash = {fid: str(i + 1) for i, fid in enumerate(ids)}
             id_hash[-1] = -1
             # build the final compartment index
             out_compartments = {}
-            for cid, compartment in sparsified_compartments.iteritems():
+            for cid, compartment in six.iteritems(sparsified_compartments):
                 compartment[NODE_ID] = id_hash[cid]
                 compartment[NODE_PN] = id_hash[compartment[NODE_PN]]
                 out_compartments[compartment[NODE_ID]] = compartment

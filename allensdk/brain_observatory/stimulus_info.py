@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
+import six
 
 # some handles for stimulus types
 DRIFTING_GRATINGS = 'drifting_gratings'
@@ -39,7 +40,7 @@ def sessions_with_stimulus(stimulus):
     """ Return the names of the sessions that contain a given stimulus. """
     
     sessions = set()
-    for session, session_stimuli in SESSION_STIMULUS_MAP.iteritems():
+    for session, session_stimuli in six.iteritems(SESSION_STIMULUS_MAP):
         if stimulus in session_stimuli:
             sessions.add(session)
 
@@ -59,4 +60,4 @@ def stimuli_in_session(session):
 
 def all_stimuli():
     """ Return a list of all stimuli in the data set """
-    return set([v for k, vl in SESSION_STIMULUS_MAP.iteritems() for v in vl])
+    return set([v for k, vl in six.iteritems(SESSION_STIMULUS_MAP) for v in vl])
