@@ -38,7 +38,7 @@ def extract_sweep_features(data_set, sweeps_by_type):
     # extract sweep-level features
     sweep_features = {}
 
-    for stimulus_type, sweep_numbers in sweeps_by_type.iteritems():
+    for stimulus_type, sweep_numbers in six.iteritems(sweeps_by_type):
         logging.debug("%s:%s" % (stimulus_type, ','.join(map(str, sweep_numbers))))
 
         if stimulus_type in SHORT_SQUARE_TYPES:

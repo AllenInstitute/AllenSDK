@@ -54,7 +54,9 @@ class BrainObservatoryNwbDataSet(object):
     STIMULUS_TABLE_TYPES = {
         'abstract_feature_series': [si.DRIFTING_GRATINGS, si.STATIC_GRATINGS],
         'indexed_time_series': [si.NATURAL_MOVIE_ONE, si.NATURAL_MOVIE_TWO, si.NATURAL_MOVIE_THREE,
-                                si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE]
+                                si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE, 
+                                si.LOCALLY_SPARSE_NOISE_4DEG, si.LOCALLY_SPARSE_NOISE_8DEG]
+
     }
 
     MOTION_CORRECTION_DATASETS = [ "MotionCorrection/2p_image_series/xy_translations", 
@@ -298,7 +300,10 @@ class BrainObservatoryNwbDataSet(object):
         if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
             return _get_abstract_feature_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
         elif stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
-            return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
+            try:
+                return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
+            except:
+                return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
         elif stimulus_name == 'spontaneous':
             return self.get_spontaneous_activity_stimulus_table()
         else:
@@ -348,11 +353,19 @@ class BrainObservatoryNwbDataSet(object):
             image_stack = f['stimulus']['templates'][stim_name]['data'].value
         return image_stack
 
-    def get_locally_sparse_noise_stimulus_template(self, mask_off_screen=True):
+    def get_locally_sparse_noise_stimulus_template(self, 
+                                                   stimulus, 
+                                                   mask_off_screen=True):
         ''' Return an array of the stimulus template for the specified stimulus.
 
         Parameters
         ----------
+        stimulus: string
+           Which locally sparse noise stimulus to retrieve.  Must be one of: 
+               stimulus_info.LOCALLY_SPARSE_NOISE
+               stimulus_info.LOCALLY_SPARSE_NOISE_4DEG
+               stimulus_info.LOCALLY_SPARSE_NOISE_8DEG
+
         mask_off_screen: boolean
            Set off-screen regions of the stimulus to LocallySparseNoise.LSN_OFF_SCREEN.
 
@@ -361,10 +374,15 @@ class BrainObservatoryNwbDataSet(object):
         tuple: (template, off-screen mask)
         '''
 
-        template = self.get_stimulus_template("locally_sparse_noise")
+        if stimulus not in si.LOCALLY_SPARSE_NOISE_DIMENSIONS:
+            raise KeyError("%s is not a known locally sparse noise stimulus" % stimulus)
+
+        template = self.get_stimulus_template(stimulus)
 
         # build mapping from template coordinates to display coordinates
-        template_shape = (28, 16)
+        template_shape = si.LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus]
+        template_shape = [ template_shape[1], template_shape[0] ]
+
         template_display_shape = (1260, 720)
         display_shape = (1920, 1200)
 

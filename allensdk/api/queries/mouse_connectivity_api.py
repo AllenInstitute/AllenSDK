@@ -18,6 +18,7 @@ from .grid_data_api import GridDataApi
 import numpy as np
 import os
 import nrrd
+import six
 
 
 class MouseConnectivityApi(RmaApi):
@@ -396,7 +397,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
 
         '''
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_injection_structure', parameters=tuples)
 
     def experiment_spatial_search(self, **kwargs):
@@ -432,7 +433,7 @@ class MouseConnectivityApi(RmaApi):
 
         '''
 
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_target_spatial', parameters=tuples)
 
     def experiment_injection_coordinate_search(self, **kwargs):
@@ -463,7 +464,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_injection_coordinate <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate>`_.
 
         '''
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_injection_coordinate', parameters=tuples)
 
     def experiment_correlation_search(self, **kwargs):
@@ -498,7 +499,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
 
         '''
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_correlation', parameters=tuples)
 
     def get_structure_unionizes(self,
