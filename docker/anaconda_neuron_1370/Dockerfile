@@ -1,7 +1,7 @@
 # DOCKER-VERSION 1.11.1
 #
-# docker build --tag alleninstitute/allensdk:anaconda_nrn_1370 .
-# docker run -it alleninstitute/allensdk:anaconda_nrn_1370 /bin/bash
+# docker build --tag alleninstitute/allensdk:anaconda_neuron_1370 .
+# docker run -it alleninstitute/allensdk:anaconda_neuron_1370 /bin/bash
 #
 FROM continuumio/anaconda:4.1.1
 
