@@ -599,7 +599,7 @@ class MouseConnectivityApi(RmaApi):
         # compute centroid in CCF coordinates
         if sum_density > 0:
             centroid = np.dot(injection_density_computed,
-                              zip(*injection_voxels)) / sum_density * resolution
+                              list(zip(*injection_voxels))) / sum_density * resolution
         else:
             centroid = None
 

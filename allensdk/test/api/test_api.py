@@ -18,6 +18,7 @@ from mock import MagicMock, patch, mock_open
 from allensdk.api.api import Api
 import allensdk.core.json_utilities as ju
 from requests.exceptions import HTTPError
+from six.moves import builtins
 import requests
 
 
@@ -52,7 +53,7 @@ def test_request_timeout(api):
             'requests_toolbelt.downloadutils.stream.stream_response_to_file',
             MagicMock(name='stream_response_to_file',
                       side_effect=raise_read_timeout)) as stream_mock:
-            with patch('__builtin__.open',
+            with patch(builtins.__name__ + '.open',
                        mock_open(),
                        create=True) as open_mock:
                 with patch('os.remove', MagicMock()) as os_remove:
