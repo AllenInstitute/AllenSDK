@@ -1,12 +1,30 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.12.4] - 2016-10-28
+
+### Fixed
+
+- Gitub issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
+- Github issue #26 - better documentation for structure unionize records.
+- Github issue #25 - documentation errors in brain observatory analysis.
+
+### Changed
+
+- New CCF annotation volume with complete cortical areas and layers.
+- Mouse Connectivity structure unionize records have been computed for new CCF.  Previous records are available here: http://download.alleninstitute.org/informatics-archive/june-2016/mouse_projection/
+- Github issue #27 - MouseConnectivityCache.get_structure_unionizes returns only requested structures, not all descendants.  Added a separate argument for descendant inclusion.
+
+### Added
+
+- MouseConnectivityCache has a new constructor argument for specifying CCF version.
+
 ## [0.12.2] - 2016-9-1
 
 ### Fixed
 
 - Github issue #16 (jinja2 requirement)
-- Github pull request #21 (spurious "i" typeo) in r_neuropil.py
+- Github pull request #21 (spurious "i" typo) in r_neuropil.py
 
 ## [0.12.1] - 2016-8-17
 

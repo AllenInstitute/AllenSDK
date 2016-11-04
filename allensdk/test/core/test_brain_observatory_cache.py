@@ -80,7 +80,7 @@ def brain_observatory_cache():
                    mock_open(read_data=manifest_data)):
             # Download a list of all targeted areas
             boc = BrainObservatoryCache(manifest_file='boc/manifest.json',
-                                        base_uri='http://testwarehouse:9000')
+                                        base_uri='http://api.brain-map.org')
 
     boc.api.json_msg_query = MagicMock(name='json_msg_query')
 
@@ -96,7 +96,7 @@ def test_get_all_targeted_structures(brain_observatory_cache):
             brain_observatory_cache.get_all_targeted_structures()
 
         brain_observatory_cache.api.json_msg_query.assert_called_once_with(
-            "http://testwarehouse:9000/api/v2/data/query.json?q="
+            "http://api.brain-map.org/api/v2/data/query.json?q="
             "model::ExperimentContainer,rma::include,"
             "ophys_experiments,isi_experiment,"
             "specimen(donor(age,transgenic_lines)),"
@@ -115,7 +115,7 @@ def test_get_experiment_containers(brain_observatory_cache):
                 targeted_structures=['VISp'])
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
-        "http://testwarehouse:9000/api/v2/data/query.json?q="
+        "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
         "specimen(donor(age,transgenic_lines)),targeted_structure,"
@@ -132,7 +132,7 @@ def test_get_all_cre_lines(brain_observatory_cache):
             tls = brain_observatory_cache.get_all_cre_lines()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
-        "http://testwarehouse:9000/api/v2/data/query.json?q="
+        "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ExperimentContainer,rma::include,"
         "ophys_experiments,isi_experiment,"
         "specimen(donor(age,transgenic_lines)),targeted_structure,"
@@ -149,7 +149,7 @@ def test_get_ophys_experiments(brain_observatory_cache):
             tls = brain_observatory_cache.get_ophys_experiments()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
-        "http://testwarehouse:9000/api/v2/data/query.json?q="
+        "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::OphysExperiment,rma::include,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
@@ -166,7 +166,7 @@ def test_get_all_session_types(brain_observatory_cache):
             tls = brain_observatory_cache.get_all_session_types()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
-        "http://testwarehouse:9000/api/v2/data/query.json?q="
+        "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::OphysExperiment,rma::include,"
         "well_known_files(well_known_file_type),targeted_structure,"
         "specimen(donor(age,transgenic_lines)),"
@@ -183,7 +183,7 @@ def test_get_stimulus_mappings(brain_observatory_cache):
             tls = brain_observatory_cache._get_stimulus_mappings()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
-        "http://testwarehouse:9000/api/v2/data/query.json?q="
+        "http://api.brain-map.org/api/v2/data/query.json?q="
         "model::ApiCamStimulusMapping,"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
 
@@ -199,7 +199,7 @@ def test_get_cell_specimens(brain_observatory_cache):
             tls = brain_observatory_cache.get_cell_specimens()
 
     brain_observatory_cache.api.json_msg_query.assert_called_once_with(
-        "http://testwarehouse:9000/api/v2/data/query.json?q=")
+        "http://api.brain-map.org/api/v2/data/query.json?q=")
 
 
 def test_build_manifest():
@@ -219,7 +219,7 @@ def test_build_manifest():
                            mock_open(read_data=manifest_data)):
                     brain_observatory_cache = BrainObservatoryCache(
                         manifest_file='boc/manifest.json',
-                        base_uri='http://testwarehouse:9000')
+                        base_uri='http://api.brain-map.org')
                     mkdir.assert_called_once_with('boc')
                     mock_write_json.assert_called_once_with(
                         'boc/manifest.json')

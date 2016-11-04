@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import pandas as pd
 from six import string_types
 from .rma_template import RmaTemplate
@@ -292,8 +291,7 @@ class BrainObservatoryApi(RmaTemplate):
         return data
 
     def save_ophys_experiment_data(self, ophys_experiment_id, file_name):
-        dirname = os.path.dirname(file_name)
-        Manifest.safe_mkdir(dirname)
+        Manifest.safe_make_parent_dirs(file_name)
 
         data = self.template_query('brain_observatory_queries',
                                    'ophys_experiment_data',
@@ -367,6 +365,28 @@ class BrainObservatoryApi(RmaTemplate):
                               ids=None,
                               experiment_container_ids=None,
                               filters=None):
+        """
+        Filter a list of cell specimen records returned from the get_cell_metrics method according 
+        some of their properties.
+
+        Parameters
+        ----------
+        cell_specimens: list of dicts
+            List of records returned by the get_cell_metrics method.
+
+        ids: list of integers
+            Return only records for cells with cell specimen ids in this list
+
+        experiment_container_ids: list of integers
+            Return only records for cells that belong to experiment container ids in this list
+
+        filters: list of dicts
+            Custom query used to reproduce filter sets created in the Allen Brain Observatory
+            web application.  The general form is a list of dictionaries each of which
+            describes a filtering operation based on a metric.  For more information, see
+            dataframe_query.  
+        """
+
         if ids is not None:
             cell_specimens = [c for c in cell_specimens if c[
                 'cell_specimen_id'] in ids]
@@ -384,6 +404,11 @@ class BrainObservatoryApi(RmaTemplate):
 
     def dataframe_query_string(self,
                                filters):
+        """
+        Convert a list of cell metric filter dictionaries into a 
+        Pandas query string.
+        """
+
         def _quote_string(v):
             if isinstance(v, string_types):
                 return "'%s'" % (v)
@@ -394,7 +419,7 @@ class BrainObservatoryApi(RmaTemplate):
             if op == 'in':
                 query_args = [field, str(value)]
             elif type(value) is list:
-                query_args = [field] + map(_quote_string, value)
+                query_args = [field] + list(map(_quote_string, value))
             else:
                 query_args = [field, str(value)]
 
@@ -410,15 +435,31 @@ class BrainObservatoryApi(RmaTemplate):
         return query_string
 
     def dataframe_query(self,
-                        datas,
+                        data,
                         filters,
                         primary_key):
+        """
+        Given a list of dictionary records and a list of filter dictionaries,
+        filter the records using Pandas and return the filtered set of records.
+        
+        Parameters
+        ----------
+        data: list of dicts
+           List of dictionaries
+
+        filters: list of dicts
+           Each dictionary describes a filtering operation on a field in the dictionary.
+           The general form is { 'field': <field>, 'op': <operation>, 'value': <filter_value(s)> }.
+           For example, you can apply a threshold on the "osi_dg" column with something like this:
+           { 'field': 'osi_dg', 'op': '>', 'value': 1.0 }.  See _QUERY_TEMPLATES for a full list
+           of operators.
+        """
         queries = self.dataframe_query_string(filters)
-        result_dataframe = pd.DataFrame(datas)
+        result_dataframe = pd.DataFrame(data)
         result_dataframe = result_dataframe.query(queries)
 
         result_keys = set(result_dataframe[primary_key])
-        result = [d for d in datas
+        result = [d for d in data
                   if d[primary_key]
                   in result_keys]
 

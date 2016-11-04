@@ -18,6 +18,7 @@ from .grid_data_api import GridDataApi
 import numpy as np
 import os
 import nrrd
+import six
 
 
 class MouseConnectivityApi(RmaApi):
@@ -396,7 +397,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_injection_structure <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectionstructure>`_.
 
         '''
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_injection_structure', parameters=tuples)
 
     def experiment_spatial_search(self, **kwargs):
@@ -432,7 +433,7 @@ class MouseConnectivityApi(RmaApi):
 
         '''
 
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_target_spatial', parameters=tuples)
 
     def experiment_injection_coordinate_search(self, **kwargs):
@@ -463,7 +464,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_injection_coordinate <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivityinjectioncoordinate>`_.
 
         '''
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_injection_coordinate', parameters=tuples)
 
     def experiment_correlation_search(self, **kwargs):
@@ -498,7 +499,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
 
         '''
-        tuples = [(k, v) for k, v in kwargs.iteritems()]
+        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
         return self.service_query('mouse_connectivity_correlation', parameters=tuples)
 
     def get_structure_unionizes(self,
@@ -556,19 +557,19 @@ class MouseConnectivityApi(RmaApi):
             count=False)
 
     def download_injection_density(self, path, experiment_id, resolution):
-        return GridDataApi().download_projection_grid_data(
+        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
 
     def download_projection_density(self, path, experiment_id, resolution):
-        return GridDataApi().download_projection_grid_data(
+        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
 
     def download_injection_fraction(self, path, experiment_id, resolution):
-        return GridDataApi().download_projection_grid_data(
+        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
 
     def download_data_mask(self, path, experiment_id, resolution):
-        return GridDataApi().download_projection_grid_data(
+        return GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.DATA_MASK], resolution, path)
 
     def calculate_injection_centroid(self,
@@ -598,7 +599,7 @@ class MouseConnectivityApi(RmaApi):
         # compute centroid in CCF coordinates
         if sum_density > 0:
             centroid = np.dot(injection_density_computed,
-                              zip(*injection_voxels)) / sum_density * resolution
+                              list(zip(*injection_voxels))) / sum_density * resolution
         else:
             centroid = None
 

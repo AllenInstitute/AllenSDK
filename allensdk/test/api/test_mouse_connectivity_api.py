@@ -21,6 +21,7 @@ import itertools as it
 import numpy as np
 import nrrd
 
+
 CCF_VERSIONS = [MouseConnectivityApi.CCF_2015,
                 MouseConnectivityApi.CCF_2016]
 DATA_PATHS = [MouseConnectivityApi.AVERAGE_TEMPLATE,
@@ -225,7 +226,7 @@ def test_experiment_source_search(connectivity):
     connectivity.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "service::mouse_connectivity_injection_structure"
-        "[primary_structure_only$eqtrue][injection_structures$eqIsocortex]")
+        "[injection_structures$eqIsocortex][primary_structure_only$eqtrue]")
 
 
 def test_experiment_spatial_search(connectivity):
@@ -255,7 +256,7 @@ def test_experiment_correlation_search(connectivity):
     connectivity.json_msg_query.assert_called_once_with(
         "http://api.brain-map.org/api/v2/data/query.json?q="
         "service::mouse_connectivity_correlation"
-        "[structure$eqTH][row$eq112670853]")
+        "[row$eq112670853][structure$eqTH]")
 
 
 @pytest.mark.parametrize("injection,hemisphere",
@@ -337,16 +338,16 @@ def test_download_injection_fraction(connectivity):
 
 
 def test_calculate_injection_centroid(connectivity):
-    density = np.array(([1,1,1,1],
-                       [1,1,1,1],
-                       [1,1,1,1],
-                       [1,1,1,1]))
-    fraction = np.array(([1,1,1,1],
-                         [1,1,1,1],
-                         [1,1,1,1],
-                         [1,1,1,1]))
+    density = np.array(([1.0,1.0,1.0,1.0],
+                       [1.0,1.0,1.0,1.0],
+                       [1.0,1.0,1.0,1.0],
+                       [1.0,1.0,1.0,1.0]))
+    fraction = np.array(([1.0,1.0,1.0,1.0],
+                         [1.0,1.0,1.0,1.0],
+                         [1.0,1.0,1.0,1.0],
+                         [1.0,1.0,1.0,1.0]))
 
     centroid = connectivity.calculate_injection_centroid(
         density, fraction, resolution=25)
     
-    assert np.array_equal(centroid, [25, 25])
+    assert np.array_equal(centroid, [37.5, 37.5])

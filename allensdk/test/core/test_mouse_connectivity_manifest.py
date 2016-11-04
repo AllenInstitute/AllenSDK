@@ -5,6 +5,7 @@ from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 import os
 
+
 @pytest.fixture
 def mcc():
     mcc = MouseConnectivityCache(
@@ -68,7 +69,7 @@ def test_get_annotation_volume(mcc):
 def test_notebook(unmocked_mcc):
     mcc = unmocked_mcc
     all_experiments = mcc.get_experiments(dataframe=True)
-    #all_experiments.loc[122642490]
+    # all_experiments.loc[122642490]
 
     ontology = mcc.get_ontology()
     isocortex = ontology['Isocortex']
@@ -95,10 +96,10 @@ def test_notebook(unmocked_mcc):
     visp_experiment_ids = [ e['id'] for e in visp_experiments ]
     ctx_children = ontology.get_child_ids( ontology['Isocortex'].id )
     
-    pm = mcc.get_projection_matrix(experiment_ids = visp_experiment_ids, 
-                                   projection_structure_ids = ctx_children,
-                                   hemisphere_ids= [2], # right hemisphere, ipsilateral
-                                   parameter = 'projection_density')
+    pm = mcc.get_projection_matrix(experiment_ids=visp_experiment_ids, 
+                                   projection_structure_ids=ctx_children,
+                                   hemisphere_ids=[2],  # right hemisphere, ipsilateral
+                                   parameter='projection_density')
 
     experiment_id = 181599674
 

@@ -20,6 +20,7 @@ import logging
 from collections import Counter
 
 import ephys_features as ft
+import six
 
 # Constants for stimulus-specific analysis
 RAMPS_START = 1.02
@@ -135,7 +136,7 @@ class EphysSweepFeatureExtractor:
         # Any better way to do it?
         spikes_df = DataFrame(data=thresholds, columns=["threshold_index"])
 
-        for k, vals in vit_data_indexes.iteritems():
+        for k, vals in six.iteritems(vit_data_indexes):
             spikes_df[k + "_index"] = np.nan
             spikes_df[k + "_t"] = np.nan
             spikes_df[k + "_v"] = np.nan
@@ -150,7 +151,7 @@ class EphysSweepFeatureExtractor:
                 if len(vals) > 0:
                     spikes_df.ix[:len(vals) - 1, k + "_i"] = self.i[vals]
 
-        for k, vals in dvdt_data_indexes.iteritems():
+        for k, vals in six.iteritems(dvdt_data_indexes):
             spikes_df[k + "_index"] = np.nan
             spikes_df[k] = np.nan
             if len(vals) > 0:
@@ -161,7 +162,7 @@ class EphysSweepFeatureExtractor:
 
         spikes_df["isi_type"] = isi_types
 
-        for k, vals in trough_detail_indexes.iteritems():
+        for k, vals in six.iteritems(trough_detail_indexes):
             spikes_df[k + "_index"] = np.nan
             if np.any(~np.isnan(vals)):
                 spikes_df.ix[~np.isnan(vals), k + "_index"] = vals[~np.isnan(vals)]
@@ -210,7 +211,7 @@ class EphysSweepFeatureExtractor:
                 "avg_rate": ft.average_rate(t, thresholds, self.start, self.end),
             }
 
-        for k, v in sweep_level_features.iteritems():
+        for k, v in six.iteritems(sweep_level_features):
             self._sweep_features[k] = v
 
     def _process_pauses(self, cost_weight=1.0):
@@ -987,7 +988,7 @@ def extractor_for_nwb_sweeps(dataset, sweep_numbers,
     for sweep_number in sweep_numbers:
         data = dataset.get_sweep(sweep_number)
         v = data['response'] * 1e3 # mV
-        i = data['stimulus'] * 1e12 # nA
+        i = data['stimulus'] * 1e12 # pA
         hz = data['sampling_rate']
         dt = 1. / hz
         t = np.arange(0, len(v)) * dt # sec

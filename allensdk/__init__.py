@@ -1,6 +1,6 @@
 import logging
 
-__version__ = '0.12.2'
+__version__ = '0.12.4'
 
 try:
     from logging import NullHandler

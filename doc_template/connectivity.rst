@@ -8,6 +8,27 @@ please visit the Connectivity Atlas `home page <http://connectivity.brain-map.or
 `API documentation <http://help.brain-map.org/display/mouseconnectivity/ALLEN+Mouse+Brain+Connectivity+Atlas>`_
 
 
+Structure-Level Projection Data
+-------------------------------
+
+All AAV projection signal in the Allen Mouse Connectivity Atlas has been registered to the expert-annotated Common Coordinate Framework (CCF)
+and summarized to structures in the adult mouse structure ontology.  Most commonly used for analysis are measures of the density of projection
+signal in all brain areas for every experiment.  This data is available for download and is described
+in more detail on the :doc:`structure unionizes page </unionizes>`.
+
+
+Voxel-Level Projection Data
+---------------------------
+
+The CCF-registered AAV projection signal is also available for download as a set of 3D volumes for each experiment.  The following data volumes
+are available for download:
+
+    - **projection density**: sum of detected projection pixels / sum of all pixels in voxel
+    - **injection_fraction**: fraction of pixels belonging to manually annotated injection site
+    - **injection_density**: density of detected projection pixels within the manually annotated injection site
+    - **data_mask**: binary mask indicating if a voxel contains valid data. Only valid voxels should be used for analysis.
+
+
 Code Examples
 -------------
 
@@ -17,7 +38,7 @@ started with analysis:
     - `Download experimental metadata by injection structure and transgenic line <_static/examples/nb/mouse_connectivity.html#Mouse-Connectivity>`_
     - `Download projection signal statistics at a structure level <_static/examples/nb/mouse_connectivity.html#Structure-Signal-Unionization>`_
     - `Build a structure-to-structure matrix of projection signal values <_static/examples/nb/mouse_connectivity.html#Generating-a-Projection-Matrix>`_
-    - `Download and visualized gridded projection signal volumes <_static/examples/nb/mouse_connectivity.html#Manipulating-Grid-Data>`_
+    - `Download and visualize gridded projection signal volumes <_static/examples/nb/mouse_connectivity.html#Manipulating-Grid-Data>`_
       
       
 Mouse Connectivity API
@@ -25,7 +46,7 @@ Mouse Connectivity API
 
 The :py:class:`~allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi` class provides a Python interface 
 for downloading data in the Allen Mouse Brain Connectivity Atlas.  The following example demonstrates how to download 
-meta data for all wild-type mice and the projection signal density for one cell:
+meta data for all wild-type injections and the projection signal density for one experiment:
 
 .. literalinclude:: _static/examples/connectivity_ex1.py
 
@@ -45,7 +66,7 @@ all experiments with injections in the isocortex and download the projetion dens
 File Formats
 ------------
 
-This section provides a short description of the file formats used for Allen Cell Types data.
+This section provides a short description of the file formats used for data in the Allen Mouse Connectivity Atlas.
 
 
 NRRD Files
