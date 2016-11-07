@@ -67,8 +67,18 @@ class NwbDataSet(object):
 
             swp = f['epochs']['Sweep_%d' % sweep_number]
 
-            stimulus = swp['stimulus']['timeseries']['data'].value
+            stimulus_dataset = swp['stimulus']['timeseries']['data']
+            stimulus = stimulus_dataset.value
+            unit = stimulus_dataset.attrs["unit"]
             response = swp['response']['timeseries']['data'].value
+
+            unit_str = None
+            if unit.startswith('A'):
+                unit_str = "Amps"
+            elif unit.startswith('V'):
+                unit_str = "Volts"
+            assert unit_str is not None, Exception(
+                "Stimulus time series unit not recognized")
 
             swp_idx_start = swp['stimulus']['idx_start'].value
             swp_length = swp['stimulus']['count'].value
@@ -95,6 +105,7 @@ class NwbDataSet(object):
             return {
                 'stimulus': stimulus,
                 'response': response,
+                'stimulus_unit' : unit_str,
                 'index_range': experiment_index_range,
                 'sampling_rate': 1.0 * swp['stimulus']['timeseries']['starting_time'].attrs['rate']
             }
