@@ -15,6 +15,7 @@
 
 import numpy as np
 import logging
+import six
 from . import ephys_extractor as efex
 from . import ephys_features as ft
 
@@ -181,6 +182,3 @@ def get_square_stim_characteristics(i, t, no_test_pulse=False):
     stim_amp = float(i[start_idx])
 
     return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
-
-
-
