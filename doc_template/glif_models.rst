@@ -20,7 +20,7 @@ during the simulation. The GLIF package contains a built-in set of rules,
 however developers can plug in custom rule implementations provided they
 follow a simple argument specification scheme.
 
-The Allen SDK GLIF simulator was developed and tested with Python 2.7.8, installed
+The Allen SDK GLIF simulator was developed and tested with Python 2.7.9, installed
 as part of `Anaconda Python <https://store.continuum.io/cshop/anaconda/>`_ distribution 
 version `2.1.0 <http://repo.continuum.io/archive/index.html>`_. 
 
@@ -47,7 +47,7 @@ for a cell has a neuronal model download link.  Specifically:
 One such link (for a simple LIF neuronal model, ID 472423251), would look
 like this::
 
-    http://api.brain-map.org/neuronal_model/download/472423251
+   http://api.brain-map.org/neuronal_model/download/472423251
 
 This link returns .zip archive containing the neuron configuration file 
 and sweep metadata required to simulate the model with stimuli applied to 
@@ -191,8 +191,9 @@ afterspike current vector, and current injection value to be passed in by the Gl
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an 
 updated voltage value.
 
-    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_voltage_forward_euler`
-    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_voltage_euler_exact`
+   :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler`
+   
+   :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact`
 
 **Threshold Dynamics Rules**
 
@@ -201,7 +202,12 @@ threshold and voltage values of the simulation to be passed in by the GlifNeuron
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an 
 updated threshold value.
 
-    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components`
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_forward`
+    
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact`
+    
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component`
+    
     :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf`
 
 **Afterspike Current Dynamics Rules**
@@ -212,6 +218,7 @@ parameters must be fixed using the GlifNeuronMethod class.  They all return an u
 afterspike current array.
 
     :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp`
+    
     :py:meth:`allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none`
 
 Built-in Reset Rules
@@ -229,7 +236,8 @@ They all expect a voltageto be passed in by the GlifNeuron. All other function p
 fixed using the GlifNeuronMethod class.  They all return an updated voltage value.
 
     :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_voltage_zero`
-    :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_voltage_bio_rules`
+    
+    :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before`
 
 **Threshold Reset Rules**
 
@@ -238,6 +246,7 @@ They all expect the current threshold and the reset voltage value of the simulat
 class.  They all return an updated threshold value.
 
     :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_threshold_inf`
+    
     :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components`
 
 **Afterspike Reset Reset Rules**
@@ -247,6 +256,7 @@ the GlifNeuron. All other function parameters must be fixed using the GlifNeuron
 class.  They all return an updated afterspike current array.
 
     :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none`
+    
     :py:meth:`allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum`
 
 

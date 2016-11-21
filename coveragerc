@@ -1,0 +1,4 @@
+[report]
+omit =
+    allensdk/test/*
+    allensdk/internal/test/*
