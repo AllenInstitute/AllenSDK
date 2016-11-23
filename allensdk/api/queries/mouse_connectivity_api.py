@@ -499,7 +499,7 @@ class MouseConnectivityApi(RmaApi):
         `service::mouse_connectivity_correlation <http://help.brain-map.org/display/api/Connected+Services+and+Pipes#ConnectedServicesandPipes-service%3A%3Amouseconnectivitycorrelation>`_.
 
         '''
-        tuples = [(k, v) for k, v in six.iteritems(kwargs)]
+        tuples = sorted(six.iteritems(kwargs))
         return self.service_query('mouse_connectivity_correlation', parameters=tuples)
 
     def get_structure_unionizes(self,
@@ -599,7 +599,7 @@ class MouseConnectivityApi(RmaApi):
         # compute centroid in CCF coordinates
         if sum_density > 0:
             centroid = np.dot(injection_density_computed,
-                              zip(*injection_voxels)) / sum_density * resolution
+                              list(zip(*injection_voxels))) / sum_density * resolution
         else:
             centroid = None
 

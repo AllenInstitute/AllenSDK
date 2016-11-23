@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import pandas as pd
 from six import string_types
 from .rma_template import RmaTemplate
@@ -420,7 +419,7 @@ class BrainObservatoryApi(RmaTemplate):
             if op == 'in':
                 query_args = [field, str(value)]
             elif type(value) is list:
-                query_args = [field] + map(_quote_string, value)
+                query_args = [field] + list(map(_quote_string, value))
             else:
                 query_args = [field, str(value)]
 

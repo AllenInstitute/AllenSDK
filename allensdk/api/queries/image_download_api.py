@@ -14,6 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from .rma_api import RmaApi
+from six import string_types
 
 
 class ImageDownloadApi(RmaApi):
@@ -23,6 +24,21 @@ class ImageDownloadApi(RmaApi):
     See `Downloading an Image <http://help.brain-map.org/display/api/Downloading+an+Image>`_
     for more documentation.
     '''
+
+    _FILTER_TYPES = [ 'range', 'rgb', 'contrast' ]
+    COLORMAPS = { "gray": 0,
+                  "hotmetal": 1,
+                  "jet": 2,
+                  "redtemp": 3,
+                  "expression": 4,
+                  "red": 5,
+                  "blue": 6,
+                  "green": 7,
+                  "aba": 8,
+                  "aibsmap_alt": 9,
+                  "colormap": 10,
+                  "projection": 11
+    }
 
     def __init__(self, base_uri=None):
         super(ImageDownloadApi, self).__init__(base_uri)
@@ -86,7 +102,14 @@ class ImageDownloadApi(RmaApi):
         height : int, optional
             Number of rows in the output image.
         range : list of ints, optional
-            Filter to specify the RGB channels.
+            Filter to specify the RGB channels. low,high,low,high,low,high
+        colormap : list of floats, optional
+            Filter to specify the RGB channels. [lower_threshold,colormap]
+            gain 0-1, colormap id is a string from ImageDownloadApi.COLORMAPS
+        rgb : list of floats, optional
+            Filter to specify the RGB channels. [red,green,blue] 0-1
+        contrast : list of floats, optional
+            Filter to specify contrast parameters. [gain,bias] 0-1
         annotation : boolean, optional
             Request the annotated AtlasImage
         atlas : int, optional
@@ -108,7 +131,9 @@ class ImageDownloadApi(RmaApi):
         is returned as a download if no parameters are provided.
 
         'downsample=1' halves the number of pixels of the original image
-        both horizontally and vertically.
+        both horizontally and vertically.        range_list = kwargs.get('range', None)
+
+        
         Specifying 'downsample=2' quarters the height and width values.
 
         Quality must be an integer from 0, for the lowest quality,
@@ -155,8 +180,6 @@ class ImageDownloadApi(RmaApi):
         if quality is not None:
             params.append('quality=%d' % (quality))
 
-        range_list = kwargs.get('range', None)
-
         tumor_feature_annotation = kwargs.get('tumor_feature_annotation', None)
 
         if tumor_feature_annotation is not None:
@@ -202,10 +225,26 @@ class ImageDownloadApi(RmaApi):
             else:
                 params.append('expression=false')
 
+        colormap_filter = kwargs.get('colormap', None)
+        
+        if colormap_filter is not None:
+            if isinstance(colormap_filter, string_types):
+                params.append('colormap=%s' % (colormap_filter))
+            else:
+                lower_threshold = colormap_filter[0]
+                colormap_id = ImageDownloadApi.COLORMAPS[colormap_filter[1]]
+                filter_values_list = '0.5,%s,0,256,%d' % (str(lower_threshold),
+                                                          colormap_id)
+                params.append('colormap=%s' % (filter_values_list))
+
         # see
         # http://api.brain-map.org/api/v2/data/SectionDataSet/100141599.xml?include=equalization,section_images
-        if range_list:
-            params.append('range=%s' % (','.join(str(r) for r in range_list)))
+        for filter_type in ImageDownloadApi._FILTER_TYPES:
+            filter_values = kwargs.get(filter_type, None)
+    
+            if filter_values is not None:
+                filter_values_list = ','.join(str(r) for r in filter_values)
+                params.append('%s=%s' % (filter_type, filter_values_list))
 
         view = kwargs.get('view', None)
 
