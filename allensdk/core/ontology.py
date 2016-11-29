@@ -1,4 +1,4 @@
-# Copyright 2015 Allen Institute for Brain Science
+# Copyright 2015-2016 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -17,16 +17,17 @@ from collections import defaultdict
 
 import numpy as np
 import pandas as pd
-import allensdk.core.json_utilities as json_utilities
 
-class Ontology( object ):      
+
+class Ontology(object):
+
     def __init__(self, df):
         self.df = df
 
         child_ids = defaultdict(set)
         descendant_ids = defaultdict(set)
 
-        for _,s in df.iterrows():
+        for _, s in df.iterrows():
             parent_id = s['parent_structure_id']
             if np.isfinite(parent_id):
                 parent_id = int(parent_id)
@@ -40,9 +41,8 @@ class Ontology( object ):
         self.child_ids = dict(child_ids)
         self.descendant_ids = dict(descendant_ids)
 
-
     def __getitem__(self, structures):
-        """ 
+        """
         Return a subset of structures by id or acronym. Duplicate values are ignored.
 
         Parameters
@@ -55,13 +55,13 @@ class Ontology( object ):
 
         Returns
         -------
-        
+
         pandas.DataFrame
             A subset of rows from the complete ontology that match filtering criteria.
         """
 
-        # __getitem__ always has a single argument.  If called with a single argument 
-        # (e.g. ontology[315]), that item is passed straight through.  If called with 
+        # __getitem__ always has a single argument.  If called with a single argument
+        # (e.g. ontology[315]), that item is passed straight through.  If called with
         # multiple arguments (e.g. ontology[315,997]), that gets passed through as a
         # tuple.  This normalizes the arguments so that everything is iterable.
         if not isinstance(structures, tuple) and not isinstance(structures, list) and not isinstance(structures, set):
@@ -73,13 +73,15 @@ class Ontology( object ):
         string_strs = []
         for s in structures:
             if isinstance(s, pd.Series):
-                # if it's a pandas series, assume it's a series of structure ids
+                # if it's a pandas series, assume it's a series of structure
+                # ids
                 structure_ids.update(s.tolist())
-            elif isinstance(s, str):
+            elif isinstance(s, str) or isinstance(s, unicode):
                 # if it's a string, assume it's an acronym
-                string_strs.append(s)            
+                string_strs.append(s)
             else:
-                # if it's anything else, cast it to an integer and treat it like a structure id
+                # if it's anything else, cast it to an integer and treat it
+                # like a structure id
                 structure_ids.add(int(s))
 
         # convert the string arguments to rows
@@ -91,16 +93,15 @@ class Ontology( object ):
             # if there are no other structure ids, just return this dataframe
             if len(structure_ids) == 0:
                 return string_strs
-                
+
             # otherwise pull out the ids and add them to the set
             structure_ids.update(string_strs.id.tolist())
-        
-        return self.df.loc[structure_ids].dropna(axis=0,how='all')
 
+        return self.df.loc[structure_ids].dropna(axis=0, how='all')
 
     def get_descendant_ids(self, structure_ids):
         """
-        Find the set of the ids of structures that are descendants of one or more structures.  
+        Find the set of the ids of structures that are descendants of one or more structures.
         The returned set will include the input structure ids.
 
         Parameters
@@ -119,14 +120,14 @@ class Ontology( object ):
         else:
             descendants = set()
             for structure_id in structure_ids:
-                descendants.update(self.descendant_ids.get(int(structure_id), set()))
+                descendants.update(self.descendant_ids.get(
+                    int(structure_id), set()))
             return descendants
-
 
     def get_child_ids(self, structure_ids):
         """
         Find the set of ids that are immediate children of one or more structures.
-        
+
         Parameters
         ----------
         structure_ids: iterable
@@ -145,11 +146,10 @@ class Ontology( object ):
             for structure_id in structure_ids:
                 children.update(self.child_ids.get(int(structure_id), set()))
             return children
-                                
 
     def get_descendants(self, structure_ids):
         """
-        Find the set of structures that are descendants of one or more structures.  
+        Find the set of structures that are descendants of one or more structures.
         The returned set will include the input structures.
 
         Parameters
@@ -166,11 +166,10 @@ class Ontology( object ):
         descendant_ids = self.get_descendant_ids(structure_ids)
         return self[descendant_ids]
 
-
     def get_children(self, structure_ids):
         """
         Find the set of structures that are immediate children of one or more structures.
-        
+
         Parameters
         ----------
         structure_ids: iterable
@@ -185,7 +184,6 @@ class Ontology( object ):
         child_ids = self.get_child_ids(structure_ids)
         return self[child_ids]
 
-
     def structure_descends_from(self, child_id, parent_id):
         """
         Return whether one structure id is a descendant of another structure id.
@@ -194,6 +192,6 @@ class Ontology( object ):
 
         if child is not None:
             parent_str = '/%d/' % parent_id
-            return child['structure_id_path'].find(parent_str) >= 0
-        
+            return child['structure_id_path'].values[0].find(parent_str) >= 0
+
         return False
