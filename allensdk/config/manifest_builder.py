@@ -15,17 +15,19 @@
 
 import allensdk.core.json_utilities as ju
 import logging
+from allensdk.config.manifest import Manifest
+import pandas as pd
+import six
 
 
 class ManifestBuilder(object):
+    df_columns = ['key', 'parent_key', 'spec', 'type', 'format']
+
     def __init__(self):
         self._log = logging.getLogger(__name__)
         self.path_info = []
-        self.bps_cfg = {}
-        self.stimulus_conf = {}
-        self.hoc_conf = {}
-    
-    
+        self.sections = {}
+
     def add_path(self, key, spec,
                  typename='dir',
                  parent_key=None,
@@ -33,31 +35,53 @@ class ManifestBuilder(object):
         entry = {
             'key': key,
             'type': typename,
-            'spec': spec }
-        
-        if format != None:
+            'spec': spec}
+
+        if format is not None:
             entry['format'] = format
-        
-        if parent_key != None:
+
+        if parent_key is not None:
             entry['parent_key'] = parent_key
-            
+
         self.path_info.append(entry)
-    
-    
-    def write_json_file(self, path):
-        with open(path, 'wb') as f:
-            f.write(self.write_json_string())
-    
-    
+
+    def add_section(self, name, contents):
+        self.sections[name] = contents
+
+    def write_json_file(self, path, overwrite=False):
+        mode = 'wb'
+
+        if overwrite is True:
+            mode = 'wb+'
+
+        json_string = self.write_json_string()
+
+        with open(path, mode) as f:
+            try:
+                f.write(json_string)   # Python 2.7
+            except TypeError:
+                f.write(bytes(json_string, 'utf-8'))  # Python 3
+
     def get_config(self):
-        wrapper = { "manifest": self.path_info }
-        wrapper.update(self.bps_cfg)
-        wrapper.update(self.stimulus_conf)
-        wrapper.update(self.hoc_conf)
-        
+        wrapper = {"manifest": self.path_info}
+        for section in self.sections.values():
+            wrapper.update(section)
+
         return wrapper
 
-    
+    def get_manifest(self):
+        return Manifest(self.path_info)
+
     def write_json_string(self):
         config = self.get_config()
         return ju.write_string(config)
+
+    def as_dataframe(self):
+        return pd.DataFrame(self.path_info,
+                            columns=ManifestBuilder.df_columns)
+
+    def from_dataframe(self, df):
+        self.path_info = {}
+
+        for _, k, p, s, t, f in six.iteritems(df.loc[:, ManifestBuilder.df_columns]):
+            self.add_path(k, s, typename=t, parent=p, format=f)

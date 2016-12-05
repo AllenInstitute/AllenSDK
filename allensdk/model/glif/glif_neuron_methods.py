@@ -261,103 +261,23 @@ def dynamics_voltage_piecewise_linear_forward_euler(neuron, voltage_t0, AScurren
 
     return voltage_t0 + (inj + np.sum(AScurrents_t0) - G * neuron.coeffs['G'] * (voltage_t0 - El)) * neuron.dt / (neuron.C * neuron.coeffs['C'])
     
-
-def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj, a, b):
-    """ Standard adapting threshold dynamics equation.
-
-    Parameters
-    ----------
-    neuron : class
-    a : float
-        coefficient of voltage
-    b : float
-        coefficient of threshold
-    AScurrents_t0 : not used here 
-    inj : not used here
-    """
-#     print 'HERE: dynamics_threshold_adapt_standard'
-    return threshold_t0 + (a * neuron.coeffs['a'] * (voltage_t0-neuron.El) - 
-                           b * neuron.coeffs['b'] * (threshold_t0 - neuron.coeffs['th_inf'] * neuron.th_inf)) * neuron.dt 
-
-#TODO: depricate when sure that dynamics_threshold_three_sep_components will be the official function
-#def dynamics_threshold_adapt_slow_plus_fast(neuron, threshold_t0, voltage_t0):        
-#    """The threshold will adapt via two mechanisms: 1. a slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard. 
-#    These are the components which are fit via optimization and inditial conditions are supplied via the GLM. 2. A fast component initiated 
-#    by a spike which quickly decays.  These values are estimated via the multi short square stimuli. 
+#TODO: after runs are done deprecate this function because it is not used
+#def dynamics_threshold_adapt_standard(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj, a, b):
+#    """ Standard adapting threshold dynamics equation.
+#
+#    Parameters
+#    ----------
+#    neuron : class
+#    a : float
+#        coefficient of voltage
+#    b : float
+#        coefficient of threshold
+#    AScurrents_t0 : not used here 
+#    inj : not used here
 #    """
-#    
-#    md = neuron.update_method_data
-#
-#    # initial conditions
-#    if 'th_spike' not in md:
-#        md['th_spike'] = [ 0 ]
-#    if 'th_voltage' not in md:
-#        md['th_voltage'] = [ neuron.th_inf * neuron.coeffs['th_inf'] ]
-#
-#    th_spike = md['th_spike'][-1]
-#    th_voltage = md['th_voltage'][-1] 
-#
-##     print 'a_spike', md['a_spike']
-##     print 'b_spike', md['b_spike']
-##     print 'a_voltage', md['a_voltage']
-##     print 'b_voltage', md['b_voltage']
-#
-#    voltage_component = th_voltage + ( md['a_voltage'] * neuron.coeffs['a'] * ( voltage_t0 - neuron.El ) - 
-#                                       md['b_voltage'] * neuron.coeffs['b'] * ( th_voltage - neuron.coeffs['th_inf'] * neuron.th_inf ) ) * neuron.dt
-#    spike_component = th_spike - md['b_spike'] * th_spike * neuron.dt
-#
-#    
-#    #------hack to plot slow and fast component
-##    global fast_threshold
-##    global slow_threshold
-##    fast_threshold.append(spike_component)
-##    slow_threshold.append(voltage_component)
-#    
-#    #------update the voltage and spiking values of the the
-#    md['th_spike'].append(spike_component)
-#    md['th_voltage'].append(voltage_component)
-#    
-#    return voltage_component+spike_component
-
-#TODO: deprecate when confirm the forward and exact equations are doing the right thing.
-# def dynamics_threshold_three_sep_components_hybrid(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj):        
-#     """This is the sequel to the dynamics_threshold_adapt_slow_plus_fast module. Here as in 
-#     dynamics_threshold_adapt_slow_plus_fast. The threshold will adapt via two mechanisms: 1. a 
-#     slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard. and 2. a 
-#     fast component initiated by a spike which quickly decays.  These two component are 
-#     in reference to zero and are recorded in the md parameters.  The third component refers to 
-#     th_inf which is added on in the end as opposed to being encompassed in the voltage component 
-#     of the threshold which caused a problem in optimizing th_inf.
-#     AScurrents_t0 : not used here 
-#     inj : not used here
-#     """
-#     md = neuron.update_method_data
-# 
-#     # initial conditions
-#     if 'th_spike' not in md:
-#         md['th_spike'] = [ 0 ]
-#         logging.warning('delete this function it is a hybrid')
-#     if 'th_voltage' not in md:
-#         md['th_voltage'] = [ 0 ]
-# 
-#     th_spike = md['th_spike'][-1]
-#     th_voltage = md['th_voltage'][-1] 
-# 
-#     #why are this variables being saved in an md variable?
-#     #TODO: HOW CAN NEURON.COEFFS['A'] BE MULTIPLIED AFTERWARD SINCE IT IS ALSO MULTIPLYING THE 
-#     #VOLTAGE COMPONENT.
-#     voltage_component = th_voltage + ( md['a_voltage'] *  ( voltage_t0 - neuron.El ) - 
-#                                        md['b_voltage'] * neuron.coeffs['b'] * ( th_voltage ) ) * neuron.dt
-#     
-#     #spike_component = th_spike - md['b_spike'] * th_spike * neuron.dt
-#     spike_component = th_spike*np.exp(-md['b_spike'] * neuron.dt)
-# 
-#     #------update the voltage and spiking values of the the
-#     md['th_spike'].append(spike_component)
-#     md['th_voltage'].append(voltage_component)
-#     
-#     #TODO: I dont trust the a_coeff being multiplied by the whole function
-#     return neuron.coeffs['a']*voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
+##     print 'HERE: dynamics_threshold_adapt_standard'
+#    return threshold_t0 + (a * neuron.coeffs['a'] * (voltage_t0-neuron.El) - 
+#                           b * neuron.coeffs['b'] * (threshold_t0 - neuron.coeffs['th_inf'] * neuron.th_inf)) * neuron.dt 
 
 def spike_component_of_threshold_forward_euler(th_t0, b_spike, dt):
     '''Spike component of threshold modeled as an exponential decay. Implemented 
@@ -470,25 +390,30 @@ def dynamics_threshold_three_components_forward(neuron, threshold_t0, voltage_t0
     AScurrents_t0 : not used here 
     inj : not used here
     """
-    tcs = neuron.get_threshold_components()
-    
-    th_spike = tcs['spike'][-1]
-    th_voltage = tcs['voltage'][-1] 
+    #TODO: just having the get_threshold_components added an erroneous zero to the beginning of the list 
+    if neuron.threshold_components is None:
+        neuron.threshold_components = { 'spike': [], 'voltage': [] }
+        th_spike = 0
+        th_voltage = 0
+    else:                
+        tcs = neuron.threshold_components
+        th_spike = tcs['spike'][-1]
+        th_voltage = tcs['voltage'][-1] 
 
     a_voltage = a_voltage * neuron.coeffs['a']
     b_voltage = b_voltage * neuron.coeffs['b']
 
-    spike_component = spike_component_of_threshold_forward_euler(th_t0, b_spike, neuron.dt)    
-    voltage_component = voltage_component_of_threshold_forward_euler(th_voltage, voltage_t0, dt, a_voltage, b_voltage, neuron.El)
+    spike_component = spike_component_of_threshold_forward_euler(th_spike, b_spike, neuron.dt)    
+    voltage_component = voltage_component_of_threshold_forward_euler(th_voltage, voltage_t0, neuron.dt, a_voltage, b_voltage, neuron.El)
 
-    neuron.add_threshold_components(spike_component, voltage_component)
+    neuron.append_threshold_components(spike_component, voltage_component)
     
     return voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
 
 
 def dynamics_threshold_three_components_exact(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj,
                                               a_spike, b_spike, a_voltage, b_voltage):
-    """Analitical solution for threshold dynamics. The threshold will adapt via two mechanisms: 
+    """Analytical solution for threshold dynamics. The threshold will adapt via two mechanisms: 
     1. a voltage dependent adaptation.  
     2. a component initiated by a spike which decays as an exponential.  
     These two component are in reference to threshold infinity and are recorded 
@@ -509,10 +434,15 @@ def dynamics_threshold_three_components_exact(neuron, threshold_t0, voltage_t0, 
     inj : float
         current injected into the neuron
     """
-    tcs = neuron.get_threshold_components()
-
-    th_spike = tcs['spike'][-1]
-    th_voltage = tcs['voltage'][-1] 
+    #TODO: just having the get_threshold_components added an erroneous zero to the beginning of the list 
+    if neuron.threshold_components is None:
+        neuron.threshold_components = { 'spike': [], 'voltage': [] }
+        th_spike = 0
+        th_voltage = 0
+    else:                
+        tcs = neuron.threshold_components
+        th_spike = tcs['spike'][-1]
+        th_voltage = tcs['voltage'][-1] 
 
     a_voltage = a_voltage * neuron.coeffs['a']
     b_voltage = b_voltage * neuron.coeffs['b']
@@ -525,7 +455,7 @@ def dynamics_threshold_three_components_exact(neuron, threshold_t0, voltage_t0, 
     spike_component = spike_component_of_threshold_exact(th_spike, b_spike, neuron.dt)
  
     #------update the voltage and spiking values of the the
-    neuron.add_threshold_components(spike_component, voltage_component)
+    neuron.append_threshold_components(spike_component, voltage_component)
      
     return voltage_component+spike_component+neuron.th_inf * neuron.coeffs['th_inf']    
 
@@ -552,15 +482,20 @@ def dynamics_threshold_spike_component(neuron, threshold_t0, voltage_t0, AScurre
         current injected into the neuron
     """
 
-    tcs = neuron.get_threshold_components()
-
-    th_spike = tcs['spike'][-1]
-    th_voltage = tcs['voltage'][-1] 
+    #TODO: just having the get_threshold_components added an erroneous zero to the beginning of the list 
+    if neuron.threshold_components is None:
+        neuron.threshold_components = { 'spike': [], 'voltage': [] }
+        th_spike = 0
+        th_voltage = 0
+    else:                
+        tcs = neuron.threshold_components
+        th_spike = tcs['spike'][-1]
+        th_voltage = tcs['voltage'][-1] 
 
     spike_component = spike_component_of_threshold_exact(th_spike, b_spike, neuron.dt)
  
     #------update the voltage and spiking values of the the
-    neuron.add_threshold_components(spike_component, 0.0)
+    neuron.append_threshold_components(spike_component, 0.0)
      
     return spike_component+neuron.th_inf * neuron.coeffs['th_inf']
 
@@ -671,7 +606,7 @@ def reset_threshold_inf(neuron, threshold_t0, voltage_v1):
 
 
 def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
-    """ Reset the threshold to a fixed value. This method is not sued and will raise an exception if called.
+    """ Reset the threshold to a fixed value. This method is not used and will raise an exception if called.
 
     Parameters
     ----------
@@ -682,13 +617,68 @@ def reset_threshold_fixed(neuron, threshold_t0, voltage_v1, value):
     return  value
 
 
-def reset_threshold_three_components(neuron, threshold_t0, voltage_v1, a_spike):
-    '''This method resets the two components of the threshold: a spike (fast)
-    component and a (voltage) component which are summed. 
+def reset_threshold_three_components(neuron, threshold_t0, voltage_v1, a_spike, b_spike):
+    '''This method calculates the two components of the threshold: a spike (fast)
+    component and a voltage (slow) component.  The threshold_components vectors are then 
+    updated so that the traces match the voltage, current, and total threshold traces.  The
+    spike component of the threshold decays via an exponential fit specified by the amplitude
+    a_spike and the time constant b_spike fit via the multiblip data.  The voltage component 
+    does not change during the duration of the spike.  The 
+    spike component are threshold component are summed along with threshold infinity to 
+    return the total threshold.  Note that in the current implementation a_spike is added to 
+    the last value of the threshold_components which means that a_spike is the amplitude after 
+    spike cutting (if there is any).  
+
+    Inputs:  
+        neuron: class
+            contains attributes of the neuron
+        threshold_t0, voltage_t0: float
+            are not used but are here for consistency with other methods
+        a_spike: float 
+            amplitude of the exponential decay of spike component of threshold after spike
+            cutting has been implemented.
+        b_spike: float
+            amplitude of the exponential decay of spike component of threshold
+            
+    Outputs:
+        Returns: float
+            the total threshold which is the sum of the spike component of threshold, the voltage 
+            component of threshold and threshold infinity (with it's corresponding coefficient)
+        neuron.threshold_components: dictionary containing
+            a spike: list
+                vector of spiking component of threshold that corresponds to the voltage, current, 
+                and total threshold traces
+            b_spike: list
+               vector of voltage component of threshold that corresponds to the voltage, current, 
+                and total threshold traces.
+                
+    Note that this function can be changed to use a_spike at the time of the spike and then have the 
+    the spike component plus the residual decay thought the spike.  There are benefits and drawbacks to
+    this.  This potential change would be beneficial as it perhaps makes more biological sense for the 
+    threshold to go up at the time of spike if the traces are ever used.  Also this would mean that a_spike
+    would not have to be adjusted thought the spike cutting after the multiblip fit.  However the current 
+    implementation makes sense in that it is similar to how afterspike currents are implemented.
     '''
-    tcs = neuron.get_threshold_components()
-    neuron.add_threshold_components( tcs['spike'][-1] + a_spike,  #adding spiking component of threshold ontop of already existent spike component.
-                                     tcs['voltage'][-1] ) #note these are the same value.
+    if neuron.threshold_components is None:
+        raise Exception('reset should never happen at the beginning of a trace')             
+        
+    tcs = neuron.threshold_components #for ease of updating
+    
+    # note that these values are at the indicie of the time of the spike which is the index right after the voltage crosses 
+    # threshold since the neuron.threshold_components are updated by the dynamics method which is called before the reset. 
+    th_spike=tcs['spike'][-1] #this needs to decay through the spike must be very particular about how many indicies to decay
+    th_voltage= tcs['voltage'][-1]
+    
+    # calculate spike component decay though spike from time =1 (not zero because zero is already in neuron.threshold_components
+    # via the dynamics method) though the end of the spike cutting
+    spike_comp_decay=spike_component_of_threshold_exact(th_spike, b_spike, np.arange(1,neuron.spike_cut_length+1)*neuron.dt) #Note that the plus one is that one needs to know the decay and the inital condition for next starting point 
+    
+    #update neuron.threshold_components via pass by reference.
+    [tcs['voltage'].append(value) for value in np.ones(neuron.spike_cut_length)*th_voltage] #note that here I don't need the plus one because I am starting from zero
+    [tcs['spike'].append(value) for value in spike_comp_decay]
+    
+    # add the amplitude of the spike component decay to last value of vector (reseting)
+    tcs['spike'][-1]=tcs['spike'][-1]+a_spike
     
     return tcs['spike'][-1] + tcs['voltage'][-1] + neuron.th_inf * neuron.coeffs['th_inf']
 

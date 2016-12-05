@@ -1,9 +1,8 @@
-*~
+.settings
+cell_types
 dist
-build
-*egg-info
-*.pyc
-doc/
-/.settings/
-.project
-.pydevproject
+doc_template/examples/nb/connectivity/experiment_*
+doc_template/examples/nb/Website_Inquiry_RT_45792 /experiment_*
+*pyc
+*~
+*#*#

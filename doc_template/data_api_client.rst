@@ -8,7 +8,7 @@ pre-made subclasses available that provide pre-made queries specific to certain 
 are several subclasses in Allen SDK:
 
     * :py:class:`~allensdk.api.queries.cell_types_api.CellTypesApi`: data related to the Allen Cell Types Database  
-    * :py:class:`~allensdk.api.queries.biophysical_perisomatic_api.BiophysicalPerisomaticApi`: data related to perisomatic biophysical models
+    * :py:class:`~allensdk.api.queries.biophysical_api.BiophysicalApi`: data related to biophysical models
     * :py:class:`~allensdk.api.queries.glif_api.GlifApi`: data related to GLIF models
     * :py:class:`~allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi`: search for experiments by intensity, density, pattern, and age
     * :py:class:`~allensdk.api.queries.grid_data_api.GridDataApi`: used to download 3-D expression grid data
@@ -49,6 +49,7 @@ that can be accessed via the API.
                            
 Using the criteria, include and other parameter, specific data can be requested.
 ::
+    
     associations = ''.join(['[id$eq1]',
                             'structure_graph(ontology),',
                             'graphic_group_labels'])
@@ -117,7 +118,7 @@ specifically `.loc <http://pandas.pydata.org/pandas-docs/stable/indexing.html#se
 
 ::
 
-    names_and_acromyms = structures.loc[:,['name', 'acronym']]
+    names_and_acronyms = structures.loc[:,['name', 'acronym']]
 
 and `Boolean indexing <http://pandas.pydata.org/pandas-docs/stable/indexing.html#boolean-indexing>`_
 
@@ -155,7 +156,7 @@ Alternatively, it can be accessed using normal python dict and list operations.
 
 ::
 
-    print(summary_structures.loc[:,'ontology'][0].name) 
+    print(summary_structures.ontology[0]['name'])
 
 Pandas Dataframes can be written to a CSV file using to_csv and read using load_csv.
 
