@@ -26,6 +26,7 @@ import os
 import pandas as pd
 import numpy as np
 from allensdk.config.manifest import Manifest
+import warnings
 
 
 class MouseConnectivityCache(Cache):
@@ -330,22 +331,15 @@ class MouseConnectivityCache(Cache):
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
         """
-
         file_name = self.get_cache_path(file_name, self.STRUCTURES_KEY)
 
-        if os.path.exists(file_name):
-            structures = pd.DataFrame.from_csv(file_name)
-        else:
-            structures = OntologiesApi(base_uri=self.api.api_url).get_structures(1)
-            structures = pd.DataFrame(structures)
+        return OntologiesApi(base_uri=self.api.api_url).get_structures(
+            1,
+            do_query='lazy',
+            path=file_name,
+            file_type='csv',
+            dataframe=True)
 
-            if self.cache:
-                Manifest.safe_make_parent_dirs(file_name)
-
-                structures.to_csv(file_name)
-
-        structures.set_index(['id'], inplace=True, drop=False)
-        return structures
 
     def get_experiments(self, dataframe=False, file_name=None, cre=None, injection_structure_ids=None):
         """
@@ -638,6 +632,7 @@ class MouseConnectivityCache(Cache):
             matrix[ridx, cidx] = row[parameter]
 
         if dataframe:
+            warnings.warn("dataframe argument is deprecated.")
             all_experiments = self.get_experiments(dataframe=True)
 
             rows_df = all_experiments.loc[experiment_ids]

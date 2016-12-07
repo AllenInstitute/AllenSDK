@@ -15,6 +15,7 @@
 
 from .rma_api import RmaApi
 from .grid_data_api import GridDataApi
+from ..cache import cacheable
 import numpy as np
 import os
 import nrrd
@@ -105,6 +106,7 @@ class MouseConnectivityApi(RmaApi):
 
         return annotation_data, annotation_image
 
+    @cacheable
     def get_experiments(self,
                         structure_ids,
                         **kwargs):
@@ -132,11 +134,11 @@ class MouseConnectivityApi(RmaApi):
 
         criteria_string = ','.join(criteria_list)
 
-        data = self.model_query('SectionDataSet',
+        return self.model_query('SectionDataSet',
                                 criteria=criteria_string,
                                 **kwargs)
-        return data
 
+    @cacheable
     def get_manual_injection_summary(self, experiment_id):
         ''' Retrieve manual injection summary. '''
 
@@ -182,6 +184,7 @@ class MouseConnectivityApi(RmaApi):
                                 include=include,
                                 only=only)
 
+    @cacheable
     def get_experiment_detail(self, experiment_id):
         '''Retrieve the experiments data.'''
 
@@ -196,6 +199,7 @@ class MouseConnectivityApi(RmaApi):
                                 include=include,
                                 order=order)
 
+    @cacheable
     def get_projection_image_info(self,
                                   experiment_id,
                                   section_number):
@@ -500,8 +504,10 @@ class MouseConnectivityApi(RmaApi):
 
         '''
         tuples = sorted(six.iteritems(kwargs))
-        return self.service_query('mouse_connectivity_correlation', parameters=tuples)
+        return self.service_query('mouse_connectivity_correlation',
+                                  parameters=tuples)
 
+    @cacheable
     def get_structure_unionizes(self,
                                 experiment_ids,
                                 is_injection=None,
