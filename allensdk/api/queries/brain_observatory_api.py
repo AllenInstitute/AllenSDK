@@ -16,6 +16,7 @@
 import pandas as pd
 from six import string_types
 from .rma_template import RmaTemplate
+from ..cache import cacheable
 from allensdk.config.manifest import Manifest
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import logging
@@ -233,6 +234,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         return data
 
+    @cacheable
     def get_cell_metrics(self, cell_specimen_ids=None):
         ''' Get cell metrics by id
 

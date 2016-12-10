@@ -171,10 +171,11 @@ class Cache(object):
             makes the actual query using kwargs.
         path : string
             where to save the data
-        do_query : boolean, string or None, optional
-            True queries server, False loads from disk,
-            'lazy' queries if no file,
-            None queries and bypasses all cacheing behavior
+        query_strategy : string or None, optional
+            'server' always queries server,
+            'file' loads from disk,
+            'lazy' queries the server if no file exists,
+            None queries the server and bypasses all caching behavior
         file_type : string, optional
             'json' (default) or 'csv'
         dataframe : boolean, optional
@@ -196,27 +197,27 @@ class Cache(object):
         Column renaming happens after the file is reloaded for json
         '''
         path = kwargs.pop('path', 'data.csv')
-        cache = kwargs.pop('cache', None)
+        query_strategy = kwargs.pop('query_strategy', None)
         file_type = kwargs.pop('file_type', 'json')
         dataframe = kwargs.pop('dataframe', False)
         index = kwargs.pop('index', None)
         rename = kwargs.pop('rename', None)
 
-        if 'lazy' == cache:
+        if 'lazy' == query_strategy:
             if os.path.exists(path):
-                cache = False
+                query_strategy = 'file'
             else:
-                cache = True
+                query_strategy = 'server'
 
-        if cache is not False:
+        if query_strategy != 'file':
             json_data = fn(*args, **kwargs)
 
-            if cache is None:
+            if query_strategy is None:
                 if dataframe:
                     return pd.DataFrame(json_data)
                 else:
                     return json_data
-            elif cache:
+            elif query_strategy:
                 Manifest.safe_make_parent_dirs(path)
                 
                 if 'json' == file_type:
@@ -240,7 +241,7 @@ class Cache(object):
             else:
                 data = ju.read(path)
         elif 'csv' == file_type:
-            data = pd.DataFrame.read_csv(path)
+            data = pd.DataFrame.from_csv(path)
             
             if dataframe is False:
                 data = data.to_dict('records')
@@ -318,7 +319,10 @@ class Cache(object):
     
         return data
 
+
 def cacheable(func):
+    ''' TODO: docstrings!!!!!
+    '''
     @functools.wraps(func)
     def w(*args,
           **kwargs):

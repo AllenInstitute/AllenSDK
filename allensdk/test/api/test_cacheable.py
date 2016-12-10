@@ -31,7 +31,7 @@ def cache():
 
 _msg = [{'whatever': True}]
 _pd_msg = pd.DataFrame(_msg)
-_csv_msg = pd.read_csv(StringIO.StringIO(""",whatever
+_csv_msg = pd.DataFrame.from_csv(StringIO.StringIO(""",whatever
 0,True
 """))
 
@@ -54,8 +54,8 @@ def rma():
     pd.DataFrame.to_csv = \
         MagicMock(name='to_csv')
 
-    pd.DataFrame.read_csv = \
-        MagicMock(name='read_csv',
+    pd.DataFrame.from_csv = \
+        MagicMock(name='from_csv',
                   return_value=_csv_msg)
 
     return RmaApi()
@@ -67,7 +67,7 @@ def test_cacheable_csv_dataframe(rma, cache):
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/local1/tmp/example.txt',
-                         cache=True,
+                         query_strategy='server',
                          file_type='csv',
                          dataframe=True)
 
@@ -76,7 +76,7 @@ def test_cacheable_csv_dataframe(rma, cache):
     ju.read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     pd.DataFrame.to_csv.assert_called_once_with('/local1/tmp/example.txt')
-    pd.DataFrame.read_csv.assert_called_once_with('/local1/tmp/example.txt')
+    pd.DataFrame.from_csv.assert_called_once_with('/local1/tmp/example.txt')
     assert not ju.write.called, 'write should not have been called'
     assert not ju.read.called, 'read should not have been called'
 
@@ -87,7 +87,7 @@ def test_cacheable_json(rma, cache):
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/local1/tmp/example.json',
-                         cache=True,
+                         query_strategy='server',
                          file_type='json',
                          dataframe=False)
 
@@ -96,7 +96,7 @@ def test_cacheable_json(rma, cache):
     ju.read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     assert not pd.DataFrame.to_csv.called, 'to_csv should not have been called'
-    assert not pd.DataFrame.read_csv.called, 'read_csv should not have been called'
+    assert not pd.DataFrame.from_csv.called, 'from_csv should not have been called'
     ju.write.assert_called_once_with('/local1/tmp/example.json',
                                      _msg)
     ju.read.assert_called_once_with('/local1/tmp/example.json')
@@ -108,7 +108,7 @@ def test_cacheable_no_cache_csv(rma, cache):
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/local1/tmp/example.csv',
-                         cache=False,
+                         query_strategy='file',
                          file_type='csv',
                          dataframe=True)
 
@@ -116,7 +116,7 @@ def test_cacheable_no_cache_csv(rma, cache):
 
     assert not ju.read_url_get.called
     assert not pd.DataFrame.to_csv.called, 'to_csv should not have been called'
-    pd.DataFrame.read_csv.assert_called_once_with('/local1/tmp/example.csv')
+    pd.DataFrame.from_csv.assert_called_once_with('/local1/tmp/example.csv')
     assert not ju.write.called, 'json write should not have been called'
     assert not ju.read.called, 'json read should not have been called'
 
@@ -127,7 +127,7 @@ def test_cacheable_json_dataframe(rma, cache):
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/local1/tmp/example.json',
-                         cache=True,
+                         query_strategy='server',
                          file_type='json',
                          dataframe=True)
 
@@ -136,7 +136,7 @@ def test_cacheable_json_dataframe(rma, cache):
     ju.read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     assert not pd.DataFrame.to_csv.called, 'to_csv should not have been called'
-    assert not pd.DataFrame.read_csv.called, 'read_csv should not have been called'
+    assert not pd.DataFrame.from_csv.called, 'from_csv should not have been called'
     pj.read_json.assert_called_once_with('/local1/tmp/example.json',
                                          orient='records')
     ju.write.assert_called_once_with('/local1/tmp/example.json', _msg)
@@ -149,7 +149,7 @@ def test_cacheable_csv_json(rma, cache):
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/local1/tmp/example.csv',
-                         cache=True,
+                         query_strategy='server',
                          file_type='csv',
                          dataframe=False)
 
@@ -158,7 +158,7 @@ def test_cacheable_csv_json(rma, cache):
     ju.read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     pd.DataFrame.to_csv.assert_called_once_with('/local1/tmp/example.csv')
-    pd.DataFrame.read_csv.assert_called_called_once_with('foo')
+    pd.DataFrame.from_csv.assert_called_called_once_with('foo')
     assert not pj.read_json.called, 'pj.read_json should not have been called'
     assert not ju.write.called, 'ju.write should not have been called'
     assert not ju.read.called, 'json read should not have been called'
@@ -176,7 +176,7 @@ def test_cacheable_no_save(rma, cache):
     ju.read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     assert not pd.DataFrame.to_csv.called, 'to_csv should not have been called'
-    assert not pd.DataFrame.read_csv.called, 'read_csv should not have been called'
+    assert not pd.DataFrame.from_csv.called, 'from_csv should not have been called'
     assert not ju.write.called, 'json write should not have been called'
     assert not ju.read.called, 'json read should not have been called'
 
@@ -193,6 +193,6 @@ def test_cacheable_no_save_dataframe(rma, cache):
     ju.read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     assert not pd.DataFrame.to_csv.called, 'to_csv should not have been called'
-    assert not pd.DataFrame.read_csv.called, 'read_csv should not have been called'
+    assert not pd.DataFrame.from_csv.called, 'from_csv should not have been called'
     assert not ju.write.called, 'json write should not have been called'
     assert not ju.read.called, 'json read should not have been called'
