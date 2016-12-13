@@ -28,7 +28,8 @@ LONG_SQUARES_START = 1.02
 LONG_SQUARES_END = 2.02
 SHORT_SQUARES_WINDOW_START = 1.02
 SHORT_SQUARES_WINDOW_END = 1.021
-
+SHORT_SQUARE_TRIPLE_WINDOW_START = 2.02
+SHORT_SQUARE_TRIPLE_WINDOW_END = 2.021
 
 class EphysSweepFeatureExtractor:
     """Feature calculation for a sweep (voltage and/or current time series)."""
