@@ -18,7 +18,7 @@ import pandas as pd
 from six import string_types
 
 from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.api.cache import Cache
+from allensdk.api.cache import Cache, cacheable
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
 from . import json_utilities as json_utilities
@@ -26,6 +26,7 @@ from .nwb_data_set import NwbDataSet
 from . import  swc
 
 import logging
+import warnings
 
 
 class CellTypesCache(Cache):
@@ -160,6 +161,7 @@ class CellTypesCache(Cache):
                 features_df.to_csv(file_name)
 
         if dataframe:
+            warnings.warn("dataframe argument is deprecated.")
             return features_df
         else:
             return features_df.to_dict('records')
@@ -194,6 +196,7 @@ class CellTypesCache(Cache):
                 features_df.to_csv(file_name)
 
         if dataframe:
+            warnings.warn("dataframe argument is deprecated.")
             return features_df
         else:
             return features_df.to_dict('records')
@@ -225,6 +228,7 @@ class CellTypesCache(Cache):
                                             on='specimen_id')
 
         if dataframe:
+            warnings.warn("dataframe argument is deprecated.")
             return all_features
         else:
             return all_features.to_dict('records')

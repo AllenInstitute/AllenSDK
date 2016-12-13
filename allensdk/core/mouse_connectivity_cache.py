@@ -26,6 +26,7 @@ import os
 import pandas as pd
 import numpy as np
 from allensdk.config.manifest import Manifest
+import warnings
 
 
 class MouseConnectivityCache(Cache):
@@ -120,19 +121,10 @@ class MouseConnectivityCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.ANNOTATION_KEY, self.ccf_version, self.resolution)
 
-        if file_name is None:
-            raise Exception(
-                "No save file name provided for annotation volume.")
-
-        if os.path.exists(file_name):
-            annotation, info = nrrd.read(file_name)
-        else:
-            Manifest.safe_make_parent_dirs(file_name)
-
-            annotation, info = self.api.download_annotation_volume(
-                self.ccf_version,
-                self.resolution,
-                file_name)
+        annotation, info = self.api.download_annotation_volume(
+            self.ccf_version,
+            self.resolution,
+            file_name)
 
         return annotation, info
 
@@ -185,18 +177,12 @@ class MouseConnectivityCache(Cache):
             file_name will be pulled out of the manifest.  Default is None.
 
         """
-
-        file_name = self.get_cache_path(
-            file_name, self.PROJECTION_DENSITY_KEY, experiment_id, self.resolution)
-
-        if file_name is None:
-            raise Exception("No file name to save volume.")
-
-        if not os.path.exists(file_name):
-            Manifest.safe_make_parent_dirs(file_name)
-
-            self.api.download_projection_density(
-                file_name, experiment_id, self.resolution)
+        file_name = self.get_cache_path(file_name,
+                                        self.PROJECTION_DENSITY_KEY,
+                                        experiment_id,
+                                        self.resolution)
+        self.api.download_projection_density(
+            file_name, experiment_id, self.resolution)
 
         return nrrd.read(file_name)
 
@@ -330,22 +316,15 @@ class MouseConnectivityCache(Cache):
             the file_name will be pulled out of the manifest.  If caching
             is disabled, no file will be saved. Default is None.
         """
-
         file_name = self.get_cache_path(file_name, self.STRUCTURES_KEY)
 
-        if os.path.exists(file_name):
-            structures = pd.DataFrame.from_csv(file_name)
-        else:
-            structures = OntologiesApi(base_uri=self.api.api_url).get_structures(1)
-            structures = pd.DataFrame(structures)
+        return OntologiesApi(base_uri=self.api.api_url).get_structures(
+            1,
+            query_strategy='lazy',
+            path=file_name,
+            file_type='csv',
+            dataframe=True)
 
-            if self.cache:
-                Manifest.safe_make_parent_dirs(file_name)
-
-                structures.to_csv(file_name)
-
-        structures.set_index(['id'], inplace=True, drop=False)
-        return structures
 
     def get_experiments(self, dataframe=False, file_name=None, cre=None, injection_structure_ids=None):
         """
@@ -638,6 +617,7 @@ class MouseConnectivityCache(Cache):
             matrix[ridx, cidx] = row[parameter]
 
         if dataframe:
+            warnings.warn("dataframe argument is deprecated.")
             all_experiments = self.get_experiments(dataframe=True)
 
             rows_df = all_experiments.loc[experiment_ids]

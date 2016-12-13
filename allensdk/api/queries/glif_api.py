@@ -17,6 +17,7 @@ import json
 import logging
 
 from .rma_api import RmaApi
+from ..cache import cacheable
 
 
 class GlifApi(RmaApi):
@@ -29,6 +30,7 @@ class GlifApi(RmaApi):
         self.stimulus_url = None
         self.neuron_config_url = None
 
+    @cacheable
     def list_neuronal_models(self):
         ''' Query the API for a list of all GLIF neuronal models.
 
@@ -40,7 +42,9 @@ class GlifApi(RmaApi):
 
         include = "specimen(ephys_result[failed$eqfalse]),neuronal_model_template[name$il'*LIF*']"
 
-        return self.model_query('NeuronalModel', include=include, num_rows='all')
+        return self.model_query('NeuronalModel',
+                                include=include,
+                                num_rows='all')
 
     def get_neuronal_model(self, neuronal_model_id):
         '''Query the current RMA endpoint with a neuronal_model id

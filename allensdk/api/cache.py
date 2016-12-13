@@ -17,7 +17,9 @@ from allensdk.config.manifest import Manifest
 import allensdk.core.json_utilities as ju
 import pandas as pd
 import pandas.io.json as pj
+import functools
 import os
+from allensdk.deprecated import deprecated
 
 
 class Cache(object):
@@ -94,8 +96,8 @@ class Cache(object):
         return pd.DataFrame.from_dict(self.manifest.path_info,
                                       orient='index')
 
-    def rename_columns(self,
-                       data,
+    @staticmethod
+    def rename_columns(data,
                        new_old_name_tuples=None):
         '''Convenience method to rename columns in a pandas dataframe.
 
@@ -127,7 +129,7 @@ class Cache(object):
         '''
         data = pd.DataFrame.from_csv(path)
 
-        self.rename_columns(data, rename)
+        Cache.rename_columns(data, rename)
 
         if index is not None:
             data.set_index([index], inplace=True)
@@ -149,13 +151,107 @@ class Cache(object):
         '''
         data = pj.read_json(path, orient='records')
 
-        self.rename_columns(data, rename)
+        Cache.rename_columns(data, rename)
 
         if index is not None:
             data.set_index([index], inplace=True)
 
         return data
 
+
+    @staticmethod
+    def cacher(fn,
+               *args,
+               **kwargs):
+        '''make an rma query, save it and return the dataframe.
+    
+        Parameters
+        ----------
+        fn : function reference
+            makes the actual query using kwargs.
+        path : string
+            where to save the data
+        query_strategy : string or None, optional
+            'server' always queries server,
+            'file' loads from disk,
+            'lazy' queries the server if no file exists,
+            None queries the server and bypasses all caching behavior
+        file_type : string, optional
+            'json' (default) or 'csv'
+        dataframe : boolean, optional
+            True will cast the return value to a pandas dataframe, False (default) will not
+        index : string, optional
+            column to use as the pandas index
+        rename : list of string tuples, optional
+            (new, old) columns to rename
+        kwargs : objects
+            passed through to the query function
+    
+        Returns
+        -------
+        dict or DataFrame
+            data type depends on dataframe option.
+    
+        Notes
+        -----
+        Column renaming happens after the file is reloaded for json
+        '''
+        path = kwargs.pop('path', 'data.csv')
+        query_strategy = kwargs.pop('query_strategy', None)
+        file_type = kwargs.pop('file_type', 'json')
+        dataframe = kwargs.pop('dataframe', False)
+        index = kwargs.pop('index', None)
+        rename = kwargs.pop('rename', None)
+
+        if 'lazy' == query_strategy:
+            if os.path.exists(path):
+                query_strategy = 'file'
+            else:
+                query_strategy = 'server'
+
+        if query_strategy != 'file':
+            json_data = fn(*args, **kwargs)
+
+            if query_strategy is None:
+                if dataframe:
+                    return pd.DataFrame(json_data)
+                else:
+                    return json_data
+            elif query_strategy:
+                Manifest.safe_make_parent_dirs(path)
+                
+                if 'json' == file_type:
+                    ju.write(path, json_data)
+                elif 'csv' == file_type:
+                    df = pd.DataFrame(json_data)
+                    Cache.rename_columns(df, rename)
+                    df.to_csv(path)
+                else:
+                    raise ValueError('file type not available.')
+
+        # read it back in
+        if 'json' == file_type:
+            if dataframe:
+                data = pj.read_json(path, orient='records')
+                Cache.rename_columns(data, rename)
+                if index is not None:
+                    data.set_index([index],
+                                   inplace=True,
+                                   drop=False)
+            else:
+                data = ju.read(path)
+        elif 'csv' == file_type:
+            data = pd.DataFrame.from_csv(path)
+            
+            if dataframe is False:
+                data = data.to_dict('records')
+        else:
+            raise ValueError('file type not available')
+
+        return data
+
+
+    @deprecated
     def wrap(self, fn, path, cache,
              save_as_json=True,
              return_dataframe=False,
@@ -163,7 +259,7 @@ class Cache(object):
              rename=None,
              **kwargs):
         '''make an rma query, save it and return the dataframe.
-
+    
         Parameters
         ----------
         fn : function reference
@@ -182,35 +278,35 @@ class Cache(object):
             (new, old) columns to rename
         kwargs : objects
             passed through to the query function
-
+    
         Returns
         -------
         dict or DataFrame
             data type depends on return_dataframe option.
-
+    
         Notes
         -----
         Column renaming happens after the file is reloaded for json
         '''
         if cache is True:
             json_data = fn(**kwargs)
-
+    
             if save_as_json is True:
                 ju.write(path, json_data)
             else:
                 df = pd.DataFrame(json_data)
-                self.rename_columns(df, rename)
-
+                Cache.rename_columns(df, rename)
+    
                 if index is not None:
                     df.set_index([index], inplace=True)
-
+    
                 df.to_csv(path)
-
+    
         # read it back in
         if save_as_json is True:
             if return_dataframe is True:
                 data = pj.read_json(path, orient='records')
-                self.rename_columns(data, rename)
+                Cache.rename_columns(data, rename)
                 if index is not None:
                     data.set_index([index], inplace=True)
             else:
@@ -220,5 +316,19 @@ class Cache(object):
         else:
             raise ValueError(
                 'save_as_json=False cannot be used with return_dataframe=False')
-
+    
         return data
+
+
+def cacheable(func):
+    ''' TODO: docstrings!!!!!
+    '''
+    @functools.wraps(func)
+    def w(*args,
+          **kwargs):
+        result = Cache.cacher(func,
+                              *args,
+                              **kwargs)
+        return result
+    
+    return w

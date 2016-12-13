@@ -14,9 +14,10 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from .rma_api import RmaApi
+from ..cache import cacheable
 from allensdk.config.manifest import Manifest
 import pandas as pd
-import os
+import warnings
 
 
 class CellTypesApi(RmaApi):
@@ -27,7 +28,10 @@ class CellTypesApi(RmaApi):
     def __init__(self, base_uri=None):
         super(CellTypesApi, self).__init__(base_uri)
 
-    def list_cells(self, require_morphology=False, require_reconstruction=False, reporter_status=None):
+    def list_cells(self,
+                   require_morphology=False,
+                   require_reconstruction=False,
+                   reporter_status=None):
         """
         Query the API for a list of all cells in the Cell Types Database.
 
@@ -79,6 +83,7 @@ class CellTypesApi(RmaApi):
 
         return self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
 
+    @cacheable
     def get_ephys_sweeps(self, specimen_id):
         """
         Query the API for a list of sweeps for a particular cell in the Cell Types Database.
@@ -131,49 +136,33 @@ class CellTypesApi(RmaApi):
 
         return cells
 
-    def get_ephys_features(self, dataframe=False):
+    @cacheable
+    def get_ephys_features(self):
         """
         Query the API for the full table of EphysFeatures for all cells.
-
-        Parameters
-        ----------
-
-        dataframe: boolean
-            If true, return the results as a Pandas DataFrame.  Otherwise
-            return a list of dictionaries.
         """
 
-        features = self.model_query(
-            'EphysFeature', criteria='specimen(ephys_result[failed$eqfalse])', num_rows='all')
+        return self.model_query(
+            'EphysFeature',
+            criteria='specimen(ephys_result[failed$eqfalse])',
+            num_rows='all')
 
-        if dataframe:
-            return pd.DataFrame(features)
-        else:
-            return features
-
-    def get_morphology_features(self, dataframe=False):
+    @cacheable
+    def get_morphology_features(self):
         """
         Query the API for the full table of morphology features for all cells
-
-        Parameters
-        ----------
-
-        dataframe: boolean
-            If true, return the results as a Pandas DataFrame.  Otherwise
-            return a list of dictionaries.
         """
 
         features = self.model_query(
-            'NeuronReconstruction', criteria="specimen(ephys_result[failed$eqfalse])", num_rows='all')
+            'NeuronReconstruction',
+            criteria="specimen(ephys_result[failed$eqfalse])",
+            num_rows='all')
 
         # the tags column isn't useful
         for f in features:
             del f['tags']
 
-        if dataframe:
-            return pd.DataFrame(features)
-        else:
-            return features
+        return features
 
     def save_ephys_data(self, specimen_id, file_name):
         """
