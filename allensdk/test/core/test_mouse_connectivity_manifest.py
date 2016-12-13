@@ -65,7 +65,7 @@ def test_get_annotation_volume(mcc):
                     '/tmp/n100.nrrd')
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
+@pytest.mark.skipif(True,
                     reason="partial testing")
 def test_notebook(unmocked_mcc):
     mcc = unmocked_mcc

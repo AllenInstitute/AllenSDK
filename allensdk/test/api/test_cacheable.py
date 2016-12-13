@@ -158,7 +158,7 @@ def test_cacheable_csv_json(rma, cache):
     ju.read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     pd.DataFrame.to_csv.assert_called_once_with('/local1/tmp/example.csv')
-    pd.DataFrame.from_csv.assert_called_called_once_with('foo')
+    pd.DataFrame.from_csv.assert_called_called_once_with('/local1/tmp/example.csv')
     assert not pj.read_json.called, 'pj.read_json should not have been called'
     assert not ju.write.called, 'ju.write should not have been called'
     assert not ju.read.called, 'json read should not have been called'
