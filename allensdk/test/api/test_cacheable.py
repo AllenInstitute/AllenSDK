@@ -22,6 +22,7 @@ import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
 import pandas as pd
 import StringIO
+import os
 
 
 @pytest.fixture
@@ -57,6 +58,8 @@ def rma():
     pd.DataFrame.from_csv = \
         MagicMock(name='from_csv',
                   return_value=_csv_msg)
+    
+    os.makedirs = MagicMock(name='makedirs')
 
     return RmaApi()
 
@@ -66,7 +69,7 @@ def test_cacheable_csv_dataframe(rma, cache):
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
-    df = get_hemispheres(path='/local1/tmp/example.txt',
+    df = get_hemispheres(path='/xyz/abc/example.txt',
                          query_strategy='server',
                          file_type='csv',
                          dataframe=True)
@@ -75,8 +78,8 @@ def test_cacheable_csv_dataframe(rma, cache):
 
     ju.read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
-    pd.DataFrame.to_csv.assert_called_once_with('/local1/tmp/example.txt')
-    pd.DataFrame.from_csv.assert_called_once_with('/local1/tmp/example.txt')
+    pd.DataFrame.to_csv.assert_called_once_with('/xyz/abc/example.txt')
+    pd.DataFrame.from_csv.assert_called_once_with('/xyz/abc/example.txt')
     assert not ju.write.called, 'write should not have been called'
     assert not ju.read.called, 'read should not have been called'
 
@@ -86,7 +89,7 @@ def test_cacheable_json(rma, cache):
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
-    df = get_hemispheres(path='/local1/tmp/example.json',
+    df = get_hemispheres(path='/xyz/abc/example.json',
                          query_strategy='server',
                          file_type='json',
                          dataframe=False)
@@ -97,9 +100,9 @@ def test_cacheable_json(rma, cache):
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     assert not pd.DataFrame.to_csv.called, 'to_csv should not have been called'
     assert not pd.DataFrame.from_csv.called, 'from_csv should not have been called'
-    ju.write.assert_called_once_with('/local1/tmp/example.json',
+    ju.write.assert_called_once_with('/xyz/abc/example.json',
                                      _msg)
-    ju.read.assert_called_once_with('/local1/tmp/example.json')
+    ju.read.assert_called_once_with('/xyz/abc/example.json')
 
 
 def test_cacheable_no_cache_csv(rma, cache):
@@ -107,7 +110,7 @@ def test_cacheable_no_cache_csv(rma, cache):
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
-    df = get_hemispheres(path='/local1/tmp/example.csv',
+    df = get_hemispheres(path='/xyz/abc/example.csv',
                          query_strategy='file',
                          file_type='csv',
                          dataframe=True)
@@ -116,7 +119,7 @@ def test_cacheable_no_cache_csv(rma, cache):
 
     assert not ju.read_url_get.called
     assert not pd.DataFrame.to_csv.called, 'to_csv should not have been called'
-    pd.DataFrame.from_csv.assert_called_once_with('/local1/tmp/example.csv')
+    pd.DataFrame.from_csv.assert_called_once_with('/xyz/abc/example.csv')
     assert not ju.write.called, 'json write should not have been called'
     assert not ju.read.called, 'json read should not have been called'
 
@@ -126,7 +129,7 @@ def test_cacheable_json_dataframe(rma, cache):
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
-    df = get_hemispheres(path='/local1/tmp/example.json',
+    df = get_hemispheres(path='/xyz/abc/example.json',
                          query_strategy='server',
                          file_type='json',
                          dataframe=True)
@@ -137,9 +140,9 @@ def test_cacheable_json_dataframe(rma, cache):
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
     assert not pd.DataFrame.to_csv.called, 'to_csv should not have been called'
     assert not pd.DataFrame.from_csv.called, 'from_csv should not have been called'
-    pj.read_json.assert_called_once_with('/local1/tmp/example.json',
+    pj.read_json.assert_called_once_with('/xyz/abc/example.json',
                                          orient='records')
-    ju.write.assert_called_once_with('/local1/tmp/example.json', _msg)
+    ju.write.assert_called_once_with('/xyz/abc/example.json', _msg)
     assert not ju.read.called, 'json read should not have been called'
 
 
@@ -148,7 +151,7 @@ def test_cacheable_csv_json(rma, cache):
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
-    df = get_hemispheres(path='/local1/tmp/example.csv',
+    df = get_hemispheres(path='/xyz/example.csv',
                          query_strategy='server',
                          file_type='csv',
                          dataframe=False)
@@ -157,8 +160,8 @@ def test_cacheable_csv_json(rma, cache):
 
     ju.read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
-    pd.DataFrame.to_csv.assert_called_once_with('/local1/tmp/example.csv')
-    pd.DataFrame.from_csv.assert_called_called_once_with('/local1/tmp/example.csv')
+    pd.DataFrame.to_csv.assert_called_once_with('/xyz/example.csv')
+    pd.DataFrame.from_csv.assert_called_called_once_with('/xyz/example.csv')
     assert not pj.read_json.called, 'pj.read_json should not have been called'
     assert not ju.write.called, 'ju.write should not have been called'
     assert not ju.read.called, 'json read should not have been called'
