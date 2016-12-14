@@ -17,6 +17,8 @@ Michael Buice @mabuice
 
 Nicholas Cain @nicain
 
+Florian Franzen @FlorianFranzen
+
 Werner Van Geit @wvangeit
 
 Richard Gerkin @rgerkin
@@ -34,4 +36,3 @@ Shreejoy Tripathy @stripathy
 Saskia de Vries @saskiad
 
 Derric Williams @derricw
-
