@@ -20,6 +20,7 @@ from mock import patch, MagicMock
 import itertools as it
 import numpy as np
 import nrrd
+import os
 
 
 CCF_VERSIONS = [MouseConnectivityApi.CCF_2015,
@@ -52,6 +53,8 @@ def connectivity():
     conn_api.retrieve_file_over_http = \
         MagicMock(name='retrieve_file_over_http')
 
+    os.makedirs = MagicMock(name='makedirs')
+
     return conn_api
 
 
@@ -80,58 +83,55 @@ def test_download_volumetric_data(connectivity,
 def test_download_annotation_volume(connectivity,
                                     ccf_version,
                                     resolution):
-    with patch('os.makedirs') as mkdir:
-        connectivity.download_annotation_volume(
-            ccf_version,
-            resolution,
-            '/path/to/annotation_%d.nrrd' % (resolution))
+    connectivity.download_annotation_volume(
+        ccf_version,
+        resolution,
+        '/path/to/annotation_%d.nrrd' % (resolution))
 
-        connectivity.retrieve_file_over_http.assert_called_once_with(
-            "http://download.alleninstitute.org/informatics-archive/"
-            "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
-            (ccf_version,
-             resolution),
-            "/path/to/annotation_%d.nrrd" % (resolution))
+    connectivity.retrieve_file_over_http.assert_called_once_with(
+        "http://download.alleninstitute.org/informatics-archive/"
+        "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
+        (ccf_version,
+         resolution),
+        "/path/to/annotation_%d.nrrd" % (resolution))
 
-        mkdir.assert_called_once_with('/path/to')
+    os.makedirs.assert_any_call('/path/to')
 
 
 @pytest.mark.parametrize("resolution",
                          RESOLUTIONS)
 def test_download_annotation_volume_default(connectivity,
                                             resolution):
-    with patch('os.makedirs') as mkdir:
-        connectivity.download_annotation_volume(
-            None,
-            resolution,
-            '/path/to/annotation_%d.nrrd' % (resolution))
+    connectivity.download_annotation_volume(
+        None,
+        resolution,
+        '/path/to/annotation_%d.nrrd' % (resolution))
 
-        connectivity.retrieve_file_over_http.assert_called_once_with(
-            "http://download.alleninstitute.org/informatics-archive/"
-            "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
-            (MouseConnectivityApi.CCF_VERSION_DEFAULT,
-             resolution),
-            "/path/to/annotation_%d.nrrd" % (resolution))
+    connectivity.retrieve_file_over_http.assert_called_once_with(
+        "http://download.alleninstitute.org/informatics-archive/"
+        "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
+        (MouseConnectivityApi.CCF_VERSION_DEFAULT,
+         resolution),
+        "/path/to/annotation_%d.nrrd" % (resolution))
 
-        mkdir.assert_called_once_with('/path/to')
+    os.makedirs.assert_any_call('/path/to')
 
 
 @pytest.mark.parametrize("resolution",
                          RESOLUTIONS)
 def test_download_template_volume(connectivity,
                                   resolution):
-    with patch('os.makedirs') as mkdir:
-        connectivity.download_template_volume(
-            resolution,
-            '/path/to/average_template_%d.nrrd' % (resolution))
+    connectivity.download_template_volume(
+        resolution,
+        '/path/to/average_template_%d.nrrd' % (resolution))
 
-        connectivity.retrieve_file_over_http.assert_called_once_with(
-            "http://download.alleninstitute.org/informatics-archive/"
-            "current-release/mouse_ccf/average_template/average_template_%d.nrrd" % 
-            (resolution),
-            "/path/to/average_template_%d.nrrd" % (resolution))
+    connectivity.retrieve_file_over_http.assert_called_once_with(
+        "http://download.alleninstitute.org/informatics-archive/"
+        "current-release/mouse_ccf/average_template/average_template_%d.nrrd" % 
+        (resolution),
+        "/path/to/average_template_%d.nrrd" % (resolution))
 
-        mkdir.assert_called_once_with('/path/to')
+    os.makedirs.assert_any_call('/path/to')
 
 
 def test_get_experiments_no_ids(connectivity):

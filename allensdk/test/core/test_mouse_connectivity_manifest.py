@@ -3,6 +3,7 @@ from mock import Mock, MagicMock, patch
 import numpy as np
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
+import nrrd
 import os
 
 
@@ -13,6 +14,9 @@ def mcc():
         manifest_file='mcc_manifest.json')
     mcc.api.retrieve_file_over_http = \
         MagicMock(name='retrieve_file_over_http')
+    
+    nrrd.read = MagicMock(name='nrrd.read',
+                          return_value=('a', 'b'))
 
     return mcc
 
@@ -50,21 +54,18 @@ def test_get_annotation_volume_2015(mcc_old):
                         'http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/ccf_2015/annotation_100.nrrd',
                         '/tmp/n100.nrrd')
 
-
 def test_get_annotation_volume(mcc):
     with patch('os.path.exists', Mock(return_value=False)):
         with patch('allensdk.config.manifest.Manifest.safe_mkdir'):
             with patch('os.makedirs'):
-                with patch('nrrd.read',
-                           Mock(return_value=('a', 'b'))):
-                    mcc.get_annotation_volume(file_name="/tmp/n100.nrrd")
-    
-                    mcc.api.retrieve_file_over_http.assert_called_once_with(
-                        'http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/ccf_2016/annotation_100.nrrd',
-                        '/tmp/n100.nrrd')
+                mcc.get_annotation_volume(file_name="/tmp/n100.nrrd")
+
+                mcc.api.retrieve_file_over_http.assert_called_once_with(
+                    'http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/ccf_2016/annotation_100.nrrd',
+                    '/tmp/n100.nrrd')
 
 
-@pytest.mark.skipif(os.getenv('TEST_COMPLETE') != 'true',
+@pytest.mark.skipif(True,
                     reason="partial testing")
 def test_notebook(unmocked_mcc):
     mcc = unmocked_mcc

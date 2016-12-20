@@ -21,6 +21,8 @@ import pandas as pd
 import logging
 import os
 import errno
+import warnings
+from allensdk.deprecated import deprecated
 
 
 class Api(object):
@@ -137,6 +139,7 @@ class Api(object):
                              self.read_data)
 
         if dataframe is True:
+            warnings.warn("dataframe argument is deprecated", DeprecationWarning)
             data = pd.DataFrame(data)
 
         return data
