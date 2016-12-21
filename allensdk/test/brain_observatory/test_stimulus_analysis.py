@@ -42,12 +42,14 @@ def dataset():
     return dataset
 
 
-@pytest.mark.parametrize('speed_tuning,lazy',
+@pytest.mark.parametrize('speed_tuning,lazy,trigger',
                          it.product((False, True),
-                                    (False, True)))
-def test_example(dataset,
+                                    (False, True),
+                                    (1,2,3,4,5)))
+def test_harness(dataset,
                  speed_tuning,
-                 lazy):
+                 lazy,
+                 trigger):
     binned_dx_sp = MagicMock(name='binned_dx_sp')
     binned_cells_sp = MagicMock(name='binned_cells_sp')
     binned_dx_vis = MagicMock(name='binned_dx_vis')
@@ -73,15 +75,35 @@ def test_example(dataset,
             assert sa._dxcm == StimulusAnalysis._LAZY
             assert sa._dxtime == StimulusAnalysis._LAZY
 
-            # trigger the lazy bits
-            print(sa.timestamps)
+            if trigger == 1:
+                print(sa.timestamps)
+                print(sa.dxcm)
+                if speed_tuning:
+                    print(sa.binned_dx_sp)
+            elif trigger == 2:
+                print(sa.celltraces)
+                print(sa.dxtime)
+                if speed_tuning:
+                    print(sa.binned_cells_sp)
+            elif trigger == 3:
+                print(sa.acquisition_rate)
+                print(sa.dxcm)
+                if speed_tuning:
+                    print(sa.binned_dx_vis)
+            elif trigger == 4:
+                print(sa.numbercells)
+                print(sa.dxtime)
+                if speed_tuning:
+                    print(sa.binned_cells_vis)
+            elif trigger == 5:
+                print(sa.timestamps)
+                print(sa.dxcm)
+                if speed_tuning:
+                    print(sa.peak_run)
+
             print(sa.roi_id)
             print(sa.cell_id)
             print(sa.dfftraces)
-            print(sa.dxtime)
-    
-            if speed_tuning:
-                print(sa.binned_dx_sp)
         else:
             assert sa._timestamps is not StimulusAnalysis._LAZY
             assert sa._celltraces is not StimulusAnalysis._LAZY
@@ -106,7 +128,6 @@ def test_example(dataset,
     dataset.get_dff_traces.assert_called_once_with()
     assert sa._dfftraces != StimulusAnalysis._LAZY
 
-    dataset.get_running_speed.assert_called_once_with()
     assert sa._dxcm != StimulusAnalysis._LAZY
     assert sa._dxtime != StimulusAnalysis._LAZY
 
@@ -119,9 +140,9 @@ def test_example(dataset,
         assert sa._peak_run != StimulusAnalysis._LAZY
     else:
         assert not get_speed_tuning.called
-        assert not hasattr(sa, '_binned_dx_sp')
-        assert not hasattr(sa, '_binned_cells_sp')
-        assert not hasattr(sa, '_binned_dx_vis')
-        assert not hasattr(sa, '_binned_cells_vis')
-        assert not hasattr(sa, '_peak_run')
+        assert sa._binned_dx_sp == StimulusAnalysis._LAZY
+        assert sa._binned_cells_sp == StimulusAnalysis._LAZY
+        assert sa._binned_dx_vis == StimulusAnalysis._LAZY
+        assert sa._binned_cells_vis == StimulusAnalysis._LAZY
+        assert sa._peak_run == StimulusAnalysis._LAZY
 

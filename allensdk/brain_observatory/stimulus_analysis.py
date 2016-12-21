@@ -51,14 +51,12 @@ class StimulusAnalysis(object):
         self._dfftraces = StimulusAnalysis._LAZY
         self._dxcm = StimulusAnalysis._LAZY
         self._dxtime = StimulusAnalysis._LAZY
-        
-        if speed_tuning:
-            self._binned_dx_sp = StimulusAnalysis._LAZY
-            self._binned_cells_sp = StimulusAnalysis._LAZY
-            self._binned_dx_vis = StimulusAnalysis._LAZY
-            self._binned_cells_vis = StimulusAnalysis._LAZY
-            self._peak_run = StimulusAnalysis._LAZY
-            self._binsize = 800
+        self._binned_dx_sp = StimulusAnalysis._LAZY
+        self._binned_cells_sp = StimulusAnalysis._LAZY
+        self._binned_dx_vis = StimulusAnalysis._LAZY
+        self._binned_cells_vis = StimulusAnalysis._LAZY
+        self._peak_run = StimulusAnalysis._LAZY
+        self._binsize = 800
 
         if lazy is False:
             self.get_fluorescence()
@@ -157,13 +155,13 @@ class StimulusAnalysis(object):
 
     @property
     def dxcm(self):
+        if self._dxcm == StimulusAnalysis._LAZY:
+            self._dxcm, self._dxtime = self.data_set.get_running_speed()
+
         return self._dxcm
 
     @dxcm.setter
     def dxcm(self, value):
-        if self._dxcm == StimulusAnalysis._LAZY:
-            self._dxcm, self._dxtime = self.data_set.get_running_speed()
-
         self._dxcm = value
 
     @property
