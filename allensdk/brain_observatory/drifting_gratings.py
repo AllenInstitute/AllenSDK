@@ -33,20 +33,143 @@ class DriftingGratings(StimulusAnalysis):
 
     def __init__(self, data_set, **kwargs):
         super(DriftingGratings, self).__init__(data_set, **kwargs)
-        stimulus_table = self.data_set.get_stimulus_table('drifting_gratings')
-        self.stim_table = stimulus_table.fillna(value=0.)
-        # self.sync_table['end'][1] - self.sync_table['start'][1]
+
         self.sweeplength = 60
-        # self.sync_table['start'][2] - self.sync_table['end'][1]
         self.interlength = 30
         self.extralength = 0
-        self.orivals = np.unique(self.stim_table.orientation).astype(int)
-        self.tfvals = np.unique(self.stim_table.temporal_frequency).astype(int)
-        self.number_ori = len(self.orivals)
-        self.number_tf = len(self.tfvals)
-        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
-        self.response = self.get_response()
-        self.peak = self.get_peak()
+
+        self._stim_table = StimulusAnalysis._LAZY
+        self._orivals = StimulusAnalysis._LAZY
+        self._tfvals = StimulusAnalysis._LAZY
+        self._number_ori = StimulusAnalysis._LAZY
+        self._number_tf = StimulusAnalysis._LAZY
+
+        self._sweep_response = StimulusAnalysis._LAZY
+        self._mean_sweep_response = StimulusAnalysis._LAZY
+        self._pval = StimulusAnalysis._LAZY
+        self._response = StimulusAnalysis._LAZY
+        self._peak = StimulusAnalysis._LAZY
+
+    @property
+    def stim_table(self):
+        if self._stim_table == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._stim_table
+
+    @stim_table.setter
+    def stim_table(self, value):
+        self._stim_table = value
+
+    @property
+    def orivals(self):
+        if self._orivals == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._orivals
+
+    @orivals.setter
+    def orivals(self, value):
+        self._orivals = value
+
+    @property
+    def tfvals(self):
+        if self._tfvals == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._tfvals
+
+    @tfvals.setter
+    def tfvals(self, value):
+        self._tfvals = value
+
+    @property
+    def number_ori(self):
+        if self._number_ori == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._number_ori
+
+    @number_ori.setter
+    def number_ori(self, value):
+        self._number_ori = value
+
+    @property
+    def number_tf(self):
+        if self._number_tf == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._number_tf
+
+    @number_tf.setter
+    def number_tf(self, value):
+        self._number_tf = value
+
+    @property
+    def sweep_response(self):
+        if self._sweep_response == StimulusAnalysis._LAZY:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._sweep_response
+
+    @sweep_response.setter
+    def sweep_response(self, value):
+        self._sweep_response = value
+
+    @property
+    def mean_sweep_response(self):
+        if self._mean_sweep_response == StimulusAnalysis._LAZY:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._mean_sweep_response
+
+    @mean_sweep_response.setter
+    def mean_sweep_response(self, value):
+        self._mean_sweep_response = value
+
+    @property
+    def pval(self):
+        if self._pval == StimulusAnalysis._LAZY:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._pval
+
+    @pval.setter
+    def pval(self, value):
+        self._pval = value
+
+    @property
+    def response(self):
+        if self._response == StimulusAnalysis._LAZY:
+            self._response = self.get_response()
+
+        return self._response
+
+    @response.setter
+    def response(self, value):
+        self._response = value
+
+    @property
+    def peak(self):
+        if self._peak == StimulusAnalysis._LAZY:
+            self._peak = self.get_peak()
+
+        return self._peak
+
+    @peak.setter
+    def peak(self, value):
+        self._peak = value
+
+    def populate_stimulus_table(self):
+        stimulus_table = self.data_set.get_stimulus_table('drifting_gratings')
+        self._stim_table = stimulus_table.fillna(value=0.)
+        self._orivals = np.unique(self.stim_table.orientation).astype(int)
+        self._tfvals = np.unique(self.stim_table.temporal_frequency).astype(int)
+        self._number_ori = len(self.orivals)
+        self._number_tf = len(self.tfvals)
 
     def get_response(self):
         ''' Computes the mean response for each cell to each stimulus condition.  Return is

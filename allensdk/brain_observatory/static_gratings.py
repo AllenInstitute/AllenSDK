@@ -36,21 +36,207 @@ class StaticGratings(StimulusAnalysis):
     def __init__(self, data_set, **kwargs):
         super(StaticGratings, self).__init__(data_set, **kwargs)
 
+        self._stim_table = StimulusAnalysis._LAZY
+        self._sweeplength = StimulusAnalysis._LAZY
+        self._interlength = StimulusAnalysis._LAZY
+        self._extralength = StimulusAnalysis._LAZY
+        self._orivals = StimulusAnalysis._LAZY
+        self._sfvals = StimulusAnalysis._LAZY
+        self._phasevals = StimulusAnalysis._LAZY
+        self._number_ori = StimulusAnalysis._LAZY
+        self._number_sf = StimulusAnalysis._LAZY
+        self._number_phase = StimulusAnalysis._LAZY
+
+        self._sweep_response = StimulusAnalysis._LAZY
+        self._mean_sweep_response = StimulusAnalysis._LAZY
+        self._pval = StimulusAnalysis._LAZY
+
+        self._response = StimulusAnalysis._LAZY
+        self._peak = StimulusAnalysis._LAZY
+
+    @property
+    def stim_table(self):
+        if self._stim_table == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._stim_table
+
+    @stim_table.setter
+    def stim_table(self, value):
+        self._stim_table = value
+
+    @property
+    def sweeplength(self):
+        if self._sweeplength == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._sweeplength
+
+    @sweeplength.setter
+    def sweeplength(self, value):
+        self._sweeplength = value
+
+    @property
+    def interlength(self):
+        if self._interlength == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._interlength
+
+    @interlength.setter
+    def interlength(self, value):
+        self._interlength = value
+
+    @property
+    def extralength(self):
+        if self._extralength == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._extralength
+
+    @extralength.setter
+    def extralength(self, value):
+        self._extralength = value
+
+    @property
+    def orivals(self):
+        if self._orivals == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._orivals
+
+    @orivals.setter
+    def orivals(self, value):
+        self._orivals = value
+
+    @property
+    def sfvals(self):
+        if self._sfvals == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._sfvals
+
+    @sfvals.setter
+    def sfvals(self, value):
+        self._sfvals = value
+
+    @property
+    def phasevals(self):
+        if self._phasevals == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._phasevals
+
+    @phasevals.setter
+    def phasevals(self, value):
+        self._phasevals = value
+
+    @property
+    def number_ori(self):
+        if self._number_ori == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._number_ori
+
+    @number_ori.setter
+    def number_ori(self, value):
+        self._number_ori = value
+
+    @property
+    def number_sf(self):
+        if self._number_sf == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._number_sf
+
+    @number_ori.setter
+    def number_ori(self, value):
+        self._number_sf = value
+
+    @property
+    def number_phase(self):
+        if self._number_phase == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._number_phase
+
+    @number_phase.setter
+    def number_phase(self, value):
+        self._number_phase = value
+
+        self._number_phase
+
+    @property
+    def sweep_response(self):
+        if self._sweep_response == StimulusAnalysis._LAZY:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._sweep_response
+
+    @sweep_response.setter
+    def sweep_response(self, value):
+        self._sweep_response = value
+
+    @property
+    def mean_sweep_response(self):
+        if self._mean_sweep_response == StimulusAnalysis._LAZY:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._mean_sweep_response
+
+    @mean_sweep_response.setter
+    def mean_sweep_response(self, value):
+        self._mean_sweep_response = value
+
+    @property
+    def pval(self):
+        if self._pval == StimulusAnalysis._LAZY:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._pval
+
+    @pval.setter
+    def pval(self, value):
+        self._pval = value
+
+    @property
+    def response(self):
+        if self._response == StimulusAnalysis._LAZY:
+            self._response = self.get_response()
+
+        return self._response
+
+    @response.setter
+    def response(self, value):
+        self._response = value
+
+    @property
+    def peak(self):
+        if self._peak == StimulusAnalysis._LAZY:
+            self._peak = self.get_peak()
+
+        return self._peak
+
+    @peak.setter
+    def peak(self, value):
+        self._peak = value
+
+    def populate_stimulus_table(self):
         stimulus_table = self.data_set.get_stimulus_table('static_gratings')
-        self.stim_table = stimulus_table.fillna(value=0.)
-        self.sweeplength = self.stim_table['end'].iloc[
+        self._stim_table = stimulus_table.fillna(value=0.)
+        self._sweeplength = self.stim_table['end'].iloc[
             1] - self.stim_table['start'].iloc[1]
-        self.interlength = 4 * self.sweeplength
-        self.extralength = self.sweeplength
-        self.orivals = np.unique(self.stim_table.orientation.dropna())
-        self.sfvals = np.unique(self.stim_table.spatial_frequency.dropna())
-        self.phasevals = np.unique(self.stim_table.phase.dropna())
-        self.number_ori = len(self.orivals)
-        self.number_sf = len(self.sfvals)
-        self.number_phase = len(self.phasevals)
-        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
-        self.response = self.get_response()
-        self.peak = self.get_peak()
+        self._interlength = 4 * self._sweeplength
+        self._extralength = self._sweeplength
+        self._orivals = np.unique(self._stim_table.orientation.dropna())
+        self._sfvals = np.unique(self._stim_table.spatial_frequency.dropna())
+        self._phasevals = np.unique(self._stim_table.phase.dropna())
+        self._number_ori = len(self._orivals)
+        self._number_sf = len(self._sfvals)
+        self._number_phase = len(self._phasevals)
 
     def get_response(self):
         ''' Computes the mean response for each cell to each stimulus condition.  Return is
