@@ -24,7 +24,7 @@ import itertools as it
 @pytest.fixture
 def dataset():
     dataset = MagicMock(name='dataset')
-    
+
     timestamps = MagicMock(name='timestamps')
     celltraces = MagicMock(name='celltraces')
     dataset.get_corrected_fluorescence_traces = \
@@ -41,6 +41,20 @@ def dataset():
                                         return_value=(dxcm, dxtime))
     return dataset
 
+def mock_speed_tuning():
+    binned_dx_sp = MagicMock(name='binned_dx_sp')
+    binned_cells_sp = MagicMock(name='binned_cells_sp')
+    binned_dx_vis = MagicMock(name='binned_dx_vis')
+    binned_cells_vis = MagicMock(name='binned_cells_vis')
+    peak_run = MagicMock(name='peak_run')
+    
+    return MagicMock(name='get_speed_tuning',
+                     return_value=(binned_dx_sp,
+                                   binned_cells_sp,
+                                   binned_dx_vis,
+                                   binned_cells_vis,
+                                   peak_run))
+
 
 @pytest.mark.parametrize('speed_tuning,lazy,trigger',
                          it.product((False, True),
@@ -50,19 +64,8 @@ def test_harness(dataset,
                  speed_tuning,
                  lazy,
                  trigger):
-    binned_dx_sp = MagicMock(name='binned_dx_sp')
-    binned_cells_sp = MagicMock(name='binned_cells_sp')
-    binned_dx_vis = MagicMock(name='binned_dx_vis')
-    binned_cells_vis = MagicMock(name='binned_cells_vis')
-    peak_run = MagicMock(name='peak_run')
-    
     with patch('allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning',
-               MagicMock(name='get_speed_tuning',
-                         return_value=(binned_dx_sp,
-                                       binned_cells_sp,
-                                       binned_dx_vis,
-                                       binned_cells_vis,
-                                       peak_run))) as get_speed_tuning:
+               mock_speed_tuning()) as get_speed_tuning:
         sa = StimulusAnalysis(dataset, speed_tuning, lazy)
 
         if lazy:
@@ -74,7 +77,7 @@ def test_harness(dataset,
             assert sa._dfftraces == StimulusAnalysis._LAZY
             assert sa._dxcm == StimulusAnalysis._LAZY
             assert sa._dxtime == StimulusAnalysis._LAZY
-
+    
             if trigger == 1:
                 print(sa.timestamps)
                 print(sa.dxcm)
@@ -100,7 +103,7 @@ def test_harness(dataset,
                 print(sa.dxcm)
                 if speed_tuning:
                     print(sa.peak_run)
-
+    
             print(sa.roi_id)
             print(sa.cell_id)
             print(sa.dfftraces)
@@ -113,36 +116,36 @@ def test_harness(dataset,
             assert sa._dfftraces is not StimulusAnalysis._LAZY
             assert sa._dxcm is not StimulusAnalysis._LAZY
             assert sa._dxtime is not StimulusAnalysis._LAZY
-
-    dataset.get_corrected_fluorescence_traces.assert_called_once_with()
-    assert sa._timestamps != StimulusAnalysis._LAZY
-    assert sa._celltraces != StimulusAnalysis._LAZY
-    assert sa._numbercells != StimulusAnalysis._LAZY
-
-    dataset.get_roi_ids.assert_called_once_with()
-    assert sa._roi_id != StimulusAnalysis._LAZY
-
-    dataset.get_cell_specimen_ids.assert_called_once_with()
-    assert sa._cell_id != StimulusAnalysis._LAZY
-
-    dataset.get_dff_traces.assert_called_once_with()
-    assert sa._dfftraces != StimulusAnalysis._LAZY
-
-    assert sa._dxcm != StimulusAnalysis._LAZY
-    assert sa._dxtime != StimulusAnalysis._LAZY
-
-    if speed_tuning:
-        get_speed_tuning.assert_called_once_with(binsize=800)
-        assert sa._binned_dx_sp != StimulusAnalysis._LAZY
-        assert sa._binned_cells_sp != StimulusAnalysis._LAZY
-        assert sa._binned_dx_vis != StimulusAnalysis._LAZY
-        assert sa._binned_cells_vis != StimulusAnalysis._LAZY
-        assert sa._peak_run != StimulusAnalysis._LAZY
-    else:
-        assert not get_speed_tuning.called
-        assert sa._binned_dx_sp == StimulusAnalysis._LAZY
-        assert sa._binned_cells_sp == StimulusAnalysis._LAZY
-        assert sa._binned_dx_vis == StimulusAnalysis._LAZY
-        assert sa._binned_cells_vis == StimulusAnalysis._LAZY
-        assert sa._peak_run == StimulusAnalysis._LAZY
+    
+        dataset.get_corrected_fluorescence_traces.assert_called_once_with()
+        assert sa._timestamps != StimulusAnalysis._LAZY
+        assert sa._celltraces != StimulusAnalysis._LAZY
+        assert sa._numbercells != StimulusAnalysis._LAZY
+    
+        dataset.get_roi_ids.assert_called_once_with()
+        assert sa._roi_id != StimulusAnalysis._LAZY
+    
+        dataset.get_cell_specimen_ids.assert_called_once_with()
+        assert sa._cell_id != StimulusAnalysis._LAZY
+    
+        dataset.get_dff_traces.assert_called_once_with()
+        assert sa._dfftraces != StimulusAnalysis._LAZY
+    
+        assert sa._dxcm != StimulusAnalysis._LAZY
+        assert sa._dxtime != StimulusAnalysis._LAZY
+    
+        if speed_tuning:
+            get_speed_tuning.assert_called_once_with(binsize=800)
+            assert sa._binned_dx_sp != StimulusAnalysis._LAZY
+            assert sa._binned_cells_sp != StimulusAnalysis._LAZY
+            assert sa._binned_dx_vis != StimulusAnalysis._LAZY
+            assert sa._binned_cells_vis != StimulusAnalysis._LAZY
+            assert sa._peak_run != StimulusAnalysis._LAZY
+        else:
+            assert not get_speed_tuning.called
+            assert sa._binned_dx_sp == StimulusAnalysis._LAZY
+            assert sa._binned_cells_sp == StimulusAnalysis._LAZY
+            assert sa._binned_dx_vis == StimulusAnalysis._LAZY
+            assert sa._binned_cells_vis == StimulusAnalysis._LAZY
+            assert sa._peak_run == StimulusAnalysis._LAZY
 
