@@ -42,25 +42,156 @@ class LocallySparseNoise(StimulusAnalysis):
 
     def __init__(self, data_set, stimulus, **kwargs):
         super(LocallySparseNoise, self).__init__(data_set, **kwargs)
+        self.stimulus = stimulus
         
         try:
-            lsn_dims = stimulus_info.LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus]
+            lsn_dims = stimulus_info.LOCALLY_SPARSE_NOISE_DIMENSIONS[self.stimulus]
         except KeyError as e:
-            raise KeyError("Unknown stimulus name: %s" % stimulus)
+            raise KeyError("Unknown stimulus name: %s" % self.stimulus)
         
         self.nrows = lsn_dims[0]
         self.ncols = lsn_dims[1]
+        
+        self._stim_table = StimulusAnalysis._LAZY
+        self._LSN = StimulusAnalysis._LAZY
+        self._LSN_mask = StimulusAnalysis._LAZY
+        self._sweeplength = StimulusAnalysis._LAZY
+        self._interlength = StimulusAnalysis._LAZY
+        self._extralength = StimulusAnalysis._LAZY
 
-        self.stim_table = self.data_set.get_stimulus_table(
-            stimulus)
-        self.LSN, self.LSN_mask = self.data_set.get_locally_sparse_noise_stimulus_template(
-            stimulus, mask_off_screen=False)
-        self.sweeplength = self.stim_table['end'][
-            1] - self.stim_table['start'][1]
-        self.interlength = 4 * self.sweeplength
-        self.extralength = self.sweeplength
-        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
-        self.receptive_field = self.get_receptive_field()
+        self._sweep_response = StimulusAnalysis._LAZY
+        self._mean_sweep_response = StimulusAnalysis._LAZY
+        self._pval = StimulusAnalysis._LAZY\
+
+        self._receptive_field = StimulusAnalysis._LAZY
+
+        # get stimulus table
+
+    @property
+    def stim_table(self):
+        if self._stim_table == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._stim_table
+
+    @stim_table.setter
+    def stim_table(self, value):
+        self._stim_table = value
+
+    @property
+    def LSN(self):
+        if self._LSN == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._LSN
+
+    @LSN.setter
+    def LSN(self, value):
+        self._LSN = value
+
+    @property
+    def LSN_mask(self):
+        if self._LSN_mask == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._LSN_mask
+
+    @LSN_mask.setter
+    def LSN_mask(self, value):
+        self._LSN_mask = value
+
+    @property
+    def sweeplength(self):
+        if self._sweeplength == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._sweeplength
+
+    @sweeplength.setter
+    def sweeplength(self, value):
+        self._sweeplength = value
+
+    @LSN_mask.setter
+    def LSN_mask(self, value):
+        self._LSN_mask = value
+
+    @property
+    def interlength(self):
+        if self._interlength == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._interlength
+
+    @interlength.setter
+    def interlength(self, value):
+        self._interlength = value
+
+    @property
+    def extralength(self):
+        if self._extralength == StimulusAnalysis._LAZY:
+            self.populate_stimulus_table()
+
+        return self._extralength
+
+    @extralength.setter
+    def extralength(self, value):
+        self._extralength = value
+
+    @property
+    def sweep_response(self):
+        if self._sweep_response == StimulusAnalysis._LAZY:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._sweep_response
+
+    @sweep_response.setter
+    def sweep_response(self, value):
+        self._sweep_response = value
+
+    @property
+    def mean_sweep_response(self):
+        if self._mean_sweep_response == StimulusAnalysis._LAZY:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._mean_sweep_response
+
+    @mean_sweep_response.setter
+    def mean_sweep_response(self, value):
+        self._mean_sweep_response = value
+
+    @property
+    def pval(self):
+        if self._pval == StimulusAnalysis._LAZY:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._pval
+
+    @pval.setter
+    def pval(self, value):
+        self._pval = value
+
+    @property
+    def receptive_field(self):
+        if self._receptive_field == StimulusAnalysis._LAZY:
+            self._receptive_field = self.get_receptive_field()
+
+        return self._receptive_field
+
+    @receptive_field.setter
+    def receptive_field(self, value):
+        self._receptive_field = value
+
+    def populate_stimulus_table(self):
+        self._stim_table = self.data_set.get_stimulus_table(self.stimulus)
+        self._LSN, self._LSN_mask = self.data_set.get_locally_sparse_noise_stimulus_template(
+            self.stimulus, mask_off_screen=False)
+        self._sweeplength = self._stim_table['end'][
+            1] - self._stim_table['start'][1]
+        self._interlength = 4 * self._sweeplength
+        self._extralength = self._sweeplength
 
     def get_receptive_field(self):
         ''' Calculates receptive fields for each cell
