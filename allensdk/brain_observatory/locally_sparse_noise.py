@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -69,120 +69,76 @@ class LocallySparseNoise(StimulusAnalysis):
 
     @property
     def stim_table(self):
-        if self._stim_table == StimulusAnalysis._LAZY:
+        if self._stim_table is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._stim_table
 
-    @stim_table.setter
-    def stim_table(self, value):
-        self._stim_table = value
-
     @property
     def LSN(self):
-        if self._LSN == StimulusAnalysis._LAZY:
+        if self._LSN is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._LSN
 
-    @LSN.setter
-    def LSN(self, value):
-        self._LSN = value
-
     @property
     def LSN_mask(self):
-        if self._LSN_mask == StimulusAnalysis._LAZY:
+        if self._LSN_mask is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._LSN_mask
 
-    @LSN_mask.setter
-    def LSN_mask(self, value):
-        self._LSN_mask = value
-
     @property
     def sweeplength(self):
-        if self._sweeplength == StimulusAnalysis._LAZY:
+        if self._sweeplength is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._sweeplength
 
-    @sweeplength.setter
-    def sweeplength(self, value):
-        self._sweeplength = value
-
-    @LSN_mask.setter
-    def LSN_mask(self, value):
-        self._LSN_mask = value
-
     @property
     def interlength(self):
-        if self._interlength == StimulusAnalysis._LAZY:
+        if self._interlength is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._interlength
 
-    @interlength.setter
-    def interlength(self, value):
-        self._interlength = value
-
     @property
     def extralength(self):
-        if self._extralength == StimulusAnalysis._LAZY:
+        if self._extralength is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._extralength
 
-    @extralength.setter
-    def extralength(self, value):
-        self._extralength = value
-
     @property
     def sweep_response(self):
-        if self._sweep_response == StimulusAnalysis._LAZY:
+        if self._sweep_response is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._sweep_response
 
-    @sweep_response.setter
-    def sweep_response(self, value):
-        self._sweep_response = value
-
     @property
     def mean_sweep_response(self):
-        if self._mean_sweep_response == StimulusAnalysis._LAZY:
+        if self._mean_sweep_response is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._mean_sweep_response
 
-    @mean_sweep_response.setter
-    def mean_sweep_response(self, value):
-        self._mean_sweep_response = value
-
     @property
     def pval(self):
-        if self._pval == StimulusAnalysis._LAZY:
+        if self._pval is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._pval
 
-    @pval.setter
-    def pval(self, value):
-        self._pval = value
-
     @property
     def receptive_field(self):
-        if self._receptive_field == StimulusAnalysis._LAZY:
+        if self._receptive_field is StimulusAnalysis._LAZY:
             self._receptive_field = self.get_receptive_field()
 
         return self._receptive_field
-
-    @receptive_field.setter
-    def receptive_field(self, value):
-        self._receptive_field = value
 
     def populate_stimulus_table(self):
         self._stim_table = self.data_set.get_stimulus_table(self.stimulus)

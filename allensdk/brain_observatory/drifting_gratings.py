@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -52,116 +52,76 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def stim_table(self):
-        if self._stim_table == StimulusAnalysis._LAZY:
+        if self._stim_table is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._stim_table
 
-    @stim_table.setter
-    def stim_table(self, value):
-        self._stim_table = value
-
     @property
     def orivals(self):
-        if self._orivals == StimulusAnalysis._LAZY:
+        if self._orivals is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._orivals
 
-    @orivals.setter
-    def orivals(self, value):
-        self._orivals = value
-
     @property
     def tfvals(self):
-        if self._tfvals == StimulusAnalysis._LAZY:
+        if self._tfvals is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._tfvals
 
-    @tfvals.setter
-    def tfvals(self, value):
-        self._tfvals = value
-
     @property
     def number_ori(self):
-        if self._number_ori == StimulusAnalysis._LAZY:
+        if self._number_ori is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._number_ori
 
-    @number_ori.setter
-    def number_ori(self, value):
-        self._number_ori = value
-
     @property
     def number_tf(self):
-        if self._number_tf == StimulusAnalysis._LAZY:
+        if self._number_tf is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._number_tf
 
-    @number_tf.setter
-    def number_tf(self, value):
-        self._number_tf = value
-
     @property
     def sweep_response(self):
-        if self._sweep_response == StimulusAnalysis._LAZY:
+        if self._sweep_response is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._sweep_response
 
-    @sweep_response.setter
-    def sweep_response(self, value):
-        self._sweep_response = value
-
     @property
     def mean_sweep_response(self):
-        if self._mean_sweep_response == StimulusAnalysis._LAZY:
+        if self._mean_sweep_response is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._mean_sweep_response
 
-    @mean_sweep_response.setter
-    def mean_sweep_response(self, value):
-        self._mean_sweep_response = value
-
     @property
     def pval(self):
-        if self._pval == StimulusAnalysis._LAZY:
+        if self._pval is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._pval
 
-    @pval.setter
-    def pval(self, value):
-        self._pval = value
-
     @property
     def response(self):
-        if self._response == StimulusAnalysis._LAZY:
+        if self._response is StimulusAnalysis._LAZY:
             self._response = self.get_response()
 
         return self._response
 
-    @response.setter
-    def response(self, value):
-        self._response = value
-
     @property
     def peak(self):
-        if self._peak == StimulusAnalysis._LAZY:
+        if self._peak is StimulusAnalysis._LAZY:
             self._peak = self.get_peak()
 
         return self._peak
-
-    @peak.setter
-    def peak(self, value):
-        self._peak = value
 
     def populate_stimulus_table(self):
         stimulus_table = self.data_set.get_stimulus_table('drifting_gratings')
@@ -263,7 +223,7 @@ class DriftingGratings(StimulusAnalysis):
                         self.stim_table.orientation == ori)][str(nc)])
             groups.append(self.mean_sweep_response[
                           self.stim_table.temporal_frequency == 0][str(nc)])
-            f, p = st.f_oneway(*groups)
+            _, p = st.f_oneway(*groups)
             peak.ptest_dg.iloc[nc] = p
 
             subset = self.mean_sweep_response[(self.stim_table.temporal_frequency == self.tfvals[
@@ -271,7 +231,7 @@ class DriftingGratings(StimulusAnalysis):
             subset_stat = subset[subset.dx < 1]
             subset_run = subset[subset.dx >= 1]
             if (len(subset_run) > 2) & (len(subset_stat) > 2):
-                (f, peak.p_run_dg.iloc[nc]) = st.ks_2samp(
+                (_, peak.p_run_dg.iloc[nc]) = st.ks_2samp(
                     subset_run[str(nc)], subset_stat[str(nc)])
                 peak.run_modulation_dg.iloc[nc] = subset_run[
                     str(nc)].mean() / subset_stat[str(nc)].mean()

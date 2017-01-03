@@ -56,173 +56,111 @@ class StaticGratings(StimulusAnalysis):
 
     @property
     def stim_table(self):
-        if self._stim_table == StimulusAnalysis._LAZY:
+        if self._stim_table is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._stim_table
 
-    @stim_table.setter
-    def stim_table(self, value):
-        self._stim_table = value
-
     @property
     def sweeplength(self):
-        if self._sweeplength == StimulusAnalysis._LAZY:
+        if self._sweeplength is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._sweeplength
 
-    @sweeplength.setter
-    def sweeplength(self, value):
-        self._sweeplength = value
-
     @property
     def interlength(self):
-        if self._interlength == StimulusAnalysis._LAZY:
+        if self._interlength is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._interlength
 
-    @interlength.setter
-    def interlength(self, value):
-        self._interlength = value
-
     @property
     def extralength(self):
-        if self._extralength == StimulusAnalysis._LAZY:
+        if self._extralength is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._extralength
 
-    @extralength.setter
-    def extralength(self, value):
-        self._extralength = value
-
     @property
     def orivals(self):
-        if self._orivals == StimulusAnalysis._LAZY:
+        if self._orivals is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._orivals
 
-    @orivals.setter
-    def orivals(self, value):
-        self._orivals = value
-
     @property
     def sfvals(self):
-        if self._sfvals == StimulusAnalysis._LAZY:
+        if self._sfvals is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._sfvals
 
-    @sfvals.setter
-    def sfvals(self, value):
-        self._sfvals = value
-
     @property
     def phasevals(self):
-        if self._phasevals == StimulusAnalysis._LAZY:
+        if self._phasevals is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._phasevals
 
-    @phasevals.setter
-    def phasevals(self, value):
-        self._phasevals = value
-
     @property
     def number_ori(self):
-        if self._number_ori == StimulusAnalysis._LAZY:
+        if self._number_ori is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._number_ori
 
-    @number_ori.setter
-    def number_ori(self, value):
-        self._number_ori = value
-
     @property
     def number_sf(self):
-        if self._number_sf == StimulusAnalysis._LAZY:
+        if self._number_sf is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._number_sf
 
-    @number_ori.setter
-    def number_ori(self, value):
-        self._number_sf = value
-
     @property
     def number_phase(self):
-        if self._number_phase == StimulusAnalysis._LAZY:
+        if self._number_phase is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._number_phase
 
-    @number_phase.setter
-    def number_phase(self, value):
-        self._number_phase = value
-
-        self._number_phase
-
     @property
     def sweep_response(self):
-        if self._sweep_response == StimulusAnalysis._LAZY:
+        if self._sweep_response is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._sweep_response
 
-    @sweep_response.setter
-    def sweep_response(self, value):
-        self._sweep_response = value
-
     @property
     def mean_sweep_response(self):
-        if self._mean_sweep_response == StimulusAnalysis._LAZY:
+        if self._mean_sweep_response is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._mean_sweep_response
 
-    @mean_sweep_response.setter
-    def mean_sweep_response(self, value):
-        self._mean_sweep_response = value
-
     @property
     def pval(self):
-        if self._pval == StimulusAnalysis._LAZY:
+        if self._pval is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._pval
 
-    @pval.setter
-    def pval(self, value):
-        self._pval = value
-
     @property
     def response(self):
-        if self._response == StimulusAnalysis._LAZY:
+        if self._response is StimulusAnalysis._LAZY:
             self._response = self.get_response()
 
         return self._response
 
-    @response.setter
-    def response(self, value):
-        self._response = value
-
     @property
     def peak(self):
-        if self._peak == StimulusAnalysis._LAZY:
+        if self._peak is StimulusAnalysis._LAZY:
             self._peak = self.get_peak()
 
         return self._peak
-
-    @peak.setter
-    def peak(self, value):
-        self._peak = value
 
     def populate_stimulus_table(self):
         stimulus_table = self.data_set.get_stimulus_table('static_gratings')

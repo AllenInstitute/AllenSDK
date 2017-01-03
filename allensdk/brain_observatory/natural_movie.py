@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -33,12 +33,46 @@ class NaturalMovie(StimulusAnalysis):
 
     def __init__(self, data_set, movie_name, **kwargs):
         super(NaturalMovie, self).__init__(data_set, **kwargs)
+        
+        self.movie_name = movie_name
+        self._stim_table = StimulusAnalysis._LAZY
+        self._sweeplength = StimulusAnalysis._LAZY
+        self._sweep_response = StimulusAnalysis._LAZY
+        self._peak = StimulusAnalysis._LAZY
+
+    @property
+    def stim_table(self):
+        if self._stim_table is StimulusAnalysis._LAZY:
+            self.populate_stimulus_table(self.movie_name)
+
+        return self._stim_table
+
+    @property
+    def sweeplength(self):
+        if self._sweeplength is StimulusAnalysis._LAZY:
+            self.populate_stimulus_table(self.movie_name)
+
+        return self._sweeplength
+
+    @property
+    def sweep_response(self):
+        if self._sweep_response is StimulusAnalysis._LAZY:
+            self._sweep_response = self.get_sweep_response()
+
+        return self._sweep_response
+
+    @property
+    def peak(self):
+        if self._peak is StimulusAnalysis._LAZY:
+            self._peak = self.get_peak(movie_name=self.movie_name)
+
+        return self._peak
+
+    def populate_stimulus_table(self, movie_name):
         stimulus_table = self.data_set.get_stimulus_table(movie_name)
-        self.stim_table = stimulus_table[stimulus_table.frame == 0]
-        self.sweeplength = self.stim_table.start.iloc[
-            1] - self.stim_table.start.iloc[0]
-        self.sweep_response = self.get_sweep_response()
-        self.peak = self.get_peak(movie_name=movie_name)
+        self._stim_table = stimulus_table[stimulus_table.frame == 0]
+        self._sweeplength = \
+            self.stim_table.start.iloc[1] - self.stim_table.start.iloc[0]
 
     def get_sweep_response(self):
         ''' Returns the dF/F response for each cell

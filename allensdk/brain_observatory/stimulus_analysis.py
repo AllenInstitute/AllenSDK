@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@ import pandas as pd
 import logging
 from .findlevel import findlevel
 from .brain_observatory_exceptions import BrainObservatoryAnalysisException
+import warnings
 
 
 class StimulusAnalysis(object):
@@ -33,7 +34,7 @@ class StimulusAnalysis(object):
     ----------
     data_set: BrainObservatoryNwbDataSet instance
 
-    speed_tuning: boolean
+    speed_tuning: boolean, deprecated
        Whether or not to compute speed tuning histograms
 
     """
@@ -62,183 +63,130 @@ class StimulusAnalysis(object):
             self.get_fluorescence()
             self._roi_id = self.data_set.get_roi_ids()
             self._cell_id = self.data_set.get_cell_specimen_ids()
-            _, self.dfftraces = self.data_set.get_dff_traces()
+            _, self._dfftraces = self.data_set.get_dff_traces()
             self._dxcm, self._dxtime = self.data_set.get_running_speed()
 
             if speed_tuning:
+                warnings.warn("speed tuning flag is deprecated",
+                              DeprecationWarning)
                 (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
                  self._binned_cells_vis, self._peak_run) = \
                     self.get_speed_tuning(binsize=self._binsize)
 
     def get_fluorescence(self):
         # get fluorescence
-        self.timestamps, self.celltraces = self.data_set.get_corrected_fluorescence_traces()
-        self.acquisition_rate = 1 / (self.timestamps[1] - self.timestamps[0])
-        self.numbercells = len(self.celltraces)  # number of cells in dataset
+        self._timestamps, self._celltraces = \
+            self.data_set.get_corrected_fluorescence_traces()
+        self._acquisition_rate = 1 / (self.timestamps[1] - self.timestamps[0])
+        self._numbercells = len(self.celltraces)  # number of cells in dataset
 
     @property
     def timestamps(self):
-        if self._timestamps == StimulusAnalysis._LAZY:
+        if self._timestamps is StimulusAnalysis._LAZY:
             self.get_fluorescence()
 
         return self._timestamps
 
-    @timestamps.setter
-    def timestamps(self, value):
-        self._timestamps = value
-
     @property
     def celltraces(self):
-        if self._celltraces == StimulusAnalysis._LAZY:
+        if self._celltraces is StimulusAnalysis._LAZY:
             self.get_fluorescence()
 
         return self._celltraces
 
-    @celltraces.setter
-    def celltraces(self, value):
-        self._celltraces = value
-
     @property
     def acquisition_rate(self):
-        if self._acquisition_rate == StimulusAnalysis._LAZY:
+        if self._acquisition_rate is StimulusAnalysis._LAZY:
             self.get_fluorescence()
 
         return self._acquisition_rate
 
-    @acquisition_rate.setter
-    def acquisition_rate(self, value):
-        self._acquisition_rate = value
-
     @property
     def numbercells(self):
-        if self._numbercells == StimulusAnalysis._LAZY:
+        if self._numbercells is StimulusAnalysis._LAZY:
             self.get_fluorescence()
 
         return self._numbercells
 
-    @numbercells.setter
-    def numbercells(self, value):
-        self._numbercells = value
-
     @property
     def roi_id(self):
-        if self._roi_id == StimulusAnalysis._LAZY:
+        if self._roi_id is StimulusAnalysis._LAZY:
             self._roi_id = self.data_set.get_roi_ids()
 
         return self._roi_id
 
-    @roi_id.setter
-    def roi_id(self, value):
-        self._roi_id = value
-
     @property
     def cell_id(self):
-        if self._cell_id == StimulusAnalysis._LAZY:
+        if self._cell_id is StimulusAnalysis._LAZY:
             self._cell_id = self.data_set.get_cell_specimen_ids()
 
         return self._cell_id
 
-    @cell_id.setter
-    def cell_id(self, value):
-        self._cell_id = value
-
     @property
     def dfftraces(self):
-        if self._dfftraces == StimulusAnalysis._LAZY:
-            _, self.dfftraces = self.data_set.get_dff_traces()
+        if self._dfftraces is StimulusAnalysis._LAZY:
+            _, self._dfftraces = self.data_set.get_dff_traces()
 
         return self._dfftraces
 
-    @dfftraces.setter
-    def dfftraces(self, value):
-        self._dfftraces = value
-
     @property
     def dxcm(self):
-        if self._dxcm == StimulusAnalysis._LAZY:
+        if self._dxcm is StimulusAnalysis._LAZY:
             self._dxcm, self._dxtime = self.data_set.get_running_speed()
 
         return self._dxcm
 
-    @dxcm.setter
-    def dxcm(self, value):
-        self._dxcm = value
-
     @property
     def dxtime(self):
-        if self._dxtime == StimulusAnalysis._LAZY:
+        if self._dxtime is StimulusAnalysis._LAZY:
             self._dxcm, self._dxtime = self.data_set.get_running_speed()
             
         return self._dxtime
 
-    @dxtime.setter
-    def dxtime(self, value):
-        self._dxtime = value
-
     @property
     def binned_dx_sp(self):
-        if self._binned_dx_sp == StimulusAnalysis._LAZY:
+        if self._binned_dx_sp is StimulusAnalysis._LAZY:
             (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
              self._binned_cells_vis, self._peak_run) = \
                 self.get_speed_tuning(binsize=self._binsize)
 
         return self._binned_dx_sp
 
-    @binned_dx_sp.setter
-    def binned_dx_sp(self, value):
-        self._binned_dx_sp = value
-
     @property
     def binned_cells_sp(self):
-        if self._binned_cells_sp == StimulusAnalysis._LAZY:
+        if self._binned_cells_sp is StimulusAnalysis._LAZY:
             (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
              self._binned_cells_vis, self._peak_run) = \
                 self.get_speed_tuning(binsize=self._binsize)
 
         return self._binned_cells_sp
 
-    @binned_cells_sp.setter
-    def binned_cells_sp(self, value):
-        self._binned_cells_sp = value
-
     @property
     def binned_dx_vis(self):
-        if self._binned_dx_vis == StimulusAnalysis._LAZY:
+        if self._binned_dx_vis is StimulusAnalysis._LAZY:
             (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
              self._binned_cells_vis, self._peak_run) = \
                 self.get_speed_tuning(binsize=self._binsize)
 
         return self._binned_dx_vis
 
-    @binned_dx_vis.setter
-    def binned_dx_vis(self, value):
-        self._binned_dx_vis = value
-
     @property
     def binned_cells_vis(self):
-        if self._binned_cells_vis == StimulusAnalysis._LAZY:
-            (self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis,
-             self.binned_cells_vis, self.peak_run) = \
+        if self._binned_cells_vis is StimulusAnalysis._LAZY:
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
+             self._binned_cells_vis, self._peak_run) = \
                 self.get_speed_tuning(binsize=self._binsize)
 
         return self._binned_cells_vis
 
-    @binned_cells_vis.setter
-    def binned_cells_vis(self, value):
-        self._binned_cells_vis = value
-
     @property
     def peak_run(self):
-        if self._peak_run == StimulusAnalysis._LAZY:
-            (self.binned_dx_sp, self.binned_cells_sp, self.binned_dx_vis,
-             self.binned_cells_vis, self.peak_run) = \
+        if self._peak_run is StimulusAnalysis._LAZY:
+            (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
+             self._binned_cells_vis, self._peak_run) = \
                 self.get_speed_tuning(binsize=self._binsize)
 
         return self._peak_run
-
-    @peak_run.setter
-    def peak_run(self, value):
-        self._peak_run = value
 
     def get_response(self):
         """ Implemented by subclasses. """
@@ -319,7 +267,7 @@ class StimulusAnalysis(object):
             offset = findlevel(dx_sorted, 1, 'up')
 
             if offset is None:
-                logging.info(
+                StimulusAnalysis._log.info(
                     "dx never crosses 1, all speed data going into single bin")
                 offset = len(dx_sorted)
 
@@ -351,7 +299,7 @@ class StimulusAnalysis(object):
                 offset = findlevel(dx_sorted, 1, 'up')
 
                 if offset is None:
-                    logging.info(
+                    StimulusAnalysis._log.info(
                         "dx never crosses 1, all speed data going into single bin")
                     offset = celltraces_shuffled_sorted.shape[1]
 
@@ -376,7 +324,7 @@ class StimulusAnalysis(object):
             offset = findlevel(dx_sorted, 1, 'up')
 
             if offset is None:
-                logging.info(
+                StimulusAnalysis._log.info(
                     "dx never crosses 1, all speed data going into single bin")
                 offset = len(dx_sorted)
 
@@ -408,7 +356,7 @@ class StimulusAnalysis(object):
                 offset = findlevel(dx_sorted, 1, 'up')
 
                 if offset is None:
-                    logging.info(
+                    StimulusAnalysis._log.info(
                         "dx never crosses 1, all speed data going into single bin")
                     offset = len(dx_sorted)
 

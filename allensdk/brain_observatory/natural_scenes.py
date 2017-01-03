@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -47,116 +47,76 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def stim_table(self):
-        if self._stim_table == StimulusAnalysis._LAZY:
+        if self._stim_table is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._stim_table
 
-    @stim_table.setter
-    def stim_table(self, value):
-        self._stim_table = value
-
     @property
     def number_scenes(self):
-        if self._number_scenes == StimulusAnalysis._LAZY:
+        if self._number_scenes is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._number_scenes
 
-    @number_scenes.setter
-    def number_scenes(self, value):
-        self._number_scenes = value
-
     @property
     def sweeplength(self):
-        if self._sweeplength == StimulusAnalysis._LAZY:
+        if self._sweeplength is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._sweeplength
 
-    @sweeplength.setter
-    def sweeplength(self, value):
-        self._sweeplength = value
-
     @property
     def interlength(self):
-        if self._interlength == StimulusAnalysis._LAZY:
+        if self._interlength is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._interlength
 
-    @interlength.setter
-    def interlength(self, value):
-        self._interlength = value
-
     @property
     def extralength(self):
-        if self._extralength == StimulusAnalysis._LAZY:
+        if self._extralength is StimulusAnalysis._LAZY:
             self.populate_stimulus_table()
 
         return self._extralength
 
-    @extralength.setter
-    def extralength(self, value):
-        self._extralength = value
-
     @property
     def sweep_response(self):
-        if self._sweep_response == StimulusAnalysis._LAZY:
+        if self._sweep_response is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._sweep_response
 
-    @sweep_response.setter
-    def sweep_response(self, value):
-        self._sweep_response = value
-
     @property
     def mean_sweep_response(self):
-        if self._mean_sweep_response == StimulusAnalysis._LAZY:
+        if self._mean_sweep_response is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._mean_sweep_response
 
-    @mean_sweep_response.setter
-    def mean_sweep_response(self, value):
-        self._mean_sweep_response = value
-
     @property
     def pval(self):
-        if self._pval == StimulusAnalysis._LAZY:
+        if self._pval is StimulusAnalysis._LAZY:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
         return self._pval
 
-    @pval.setter
-    def pval(self, value):
-        self._pval = value
-
     @property
     def response(self):
-        if self._response == StimulusAnalysis._LAZY:
+        if self._response is StimulusAnalysis._LAZY:
             self._response = self.get_response()
 
         return self._response
 
-    @response.setter
-    def response(self, value):
-        self._response = value
-
     @property
     def peak(self):
-        if self._peak == StimulusAnalysis._LAZY:
+        if self._peak is StimulusAnalysis._LAZY:
             self._peak = self.get_peak()
 
         return self._peak
-
-    @peak.setter
-    def peak(self, value):
-        self._peak = value
 
     def populate_stimulus_table(self):
         self._stim_table = self.data_set.get_stimulus_table('natural_scenes')
