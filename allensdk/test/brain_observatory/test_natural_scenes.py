@@ -78,16 +78,16 @@ def mock_sweep_response():
 def test_harness(dataset, trigger):
     ns = NaturalScenes(dataset)
 
-    assert ns._stim_table is StimulusAnalysis._LAZY
-    assert ns._number_scenes is StimulusAnalysis._LAZY
-    assert ns._sweeplength is StimulusAnalysis._LAZY
-    assert ns._interlength is StimulusAnalysis._LAZY
-    assert ns._extralength is StimulusAnalysis._LAZY
-    assert ns._sweep_response is StimulusAnalysis._LAZY
-    assert ns._mean_sweep_response is StimulusAnalysis._LAZY
-    assert ns._pval is StimulusAnalysis._LAZY
-    assert ns._response is StimulusAnalysis._LAZY
-    assert ns._peak is StimulusAnalysis._LAZY
+    assert ns._stim_table is StimulusAnalysis._PRELOAD
+    assert ns._number_scenes is StimulusAnalysis._PRELOAD
+    assert ns._sweeplength is StimulusAnalysis._PRELOAD
+    assert ns._interlength is StimulusAnalysis._PRELOAD
+    assert ns._extralength is StimulusAnalysis._PRELOAD
+    assert ns._sweep_response is StimulusAnalysis._PRELOAD
+    assert ns._mean_sweep_response is StimulusAnalysis._PRELOAD
+    assert ns._pval is StimulusAnalysis._PRELOAD
+    assert ns._response is StimulusAnalysis._PRELOAD
+    assert ns._peak is StimulusAnalysis._PRELOAD
 
     if trigger == 1:
         print(ns._stim_table)
@@ -115,30 +115,30 @@ def test_harness(dataset, trigger):
         print(ns.response)
         print(ns.peak)
 
-    assert ns._stim_table is not StimulusAnalysis._LAZY
-    assert ns._number_scenes is not StimulusAnalysis._LAZY
-    assert ns._sweeplength is not StimulusAnalysis._LAZY
-    assert ns._interlength is not StimulusAnalysis._LAZY
-    assert ns._extralength is not StimulusAnalysis._LAZY
-    assert ns._sweep_response is not StimulusAnalysis._LAZY
-    assert ns._mean_sweep_response is not StimulusAnalysis._LAZY
-    assert ns._pval is not StimulusAnalysis._LAZY
-    assert ns._response is not StimulusAnalysis._LAZY
-    assert ns._peak is not StimulusAnalysis._LAZY
+    assert ns._stim_table is not StimulusAnalysis._PRELOAD
+    assert ns._number_scenes is not StimulusAnalysis._PRELOAD
+    assert ns._sweeplength is not StimulusAnalysis._PRELOAD
+    assert ns._interlength is not StimulusAnalysis._PRELOAD
+    assert ns._extralength is not StimulusAnalysis._PRELOAD
+    assert ns._sweep_response is not StimulusAnalysis._PRELOAD
+    assert ns._mean_sweep_response is not StimulusAnalysis._PRELOAD
+    assert ns._pval is not StimulusAnalysis._PRELOAD
+    assert ns._response is not StimulusAnalysis._PRELOAD
+    assert ns._peak is not StimulusAnalysis._PRELOAD
     # check super properties
     dataset.get_corrected_fluorescence_traces.assert_called_once_with()
-    assert ns._timestamps != NaturalScenes._LAZY
-    assert ns._celltraces != NaturalScenes._LAZY
-    assert ns._numbercells != NaturalScenes._LAZY
+    assert ns._timestamps != NaturalScenes._PRELOAD
+    assert ns._celltraces != NaturalScenes._PRELOAD
+    assert ns._numbercells != NaturalScenes._PRELOAD
     
     dataset.get_roi_ids.assert_called_once_with()
-    assert ns._roi_id != NaturalScenes._LAZY
+    assert ns._roi_id != NaturalScenes._PRELOAD
     
     assert dataset.get_cell_specimen_ids.called
-    assert ns._cell_id != NaturalScenes._LAZY
+    assert ns._cell_id != NaturalScenes._PRELOAD
     
     dataset.get_dff_traces.assert_called_once_with()
-    assert ns._dfftraces != NaturalScenes._LAZY
+    assert ns._dfftraces != NaturalScenes._PRELOAD
     
-    assert ns._dxcm != NaturalScenes._LAZY
-    assert ns._dxtime != NaturalScenes._LAZY
+    assert ns._dxcm != NaturalScenes._PRELOAD
+    assert ns._dxtime != NaturalScenes._PRELOAD

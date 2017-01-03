@@ -91,16 +91,16 @@ def test_harness(dataset,
                mock_speed_tuning()) as get_speed_tuning:
         lsn = LocallySparseNoise(dataset, stimulus)
 
-        assert lsn._stim_table is StimulusAnalysis._LAZY
-        assert lsn._LSN is StimulusAnalysis._LAZY
-        assert lsn._LSN_mask is StimulusAnalysis._LAZY
-        assert lsn._sweeplength is StimulusAnalysis._LAZY
-        assert lsn._interlength is StimulusAnalysis._LAZY
-        assert lsn._extralength is StimulusAnalysis._LAZY
-        assert lsn._sweep_response is StimulusAnalysis._LAZY
-        assert lsn._mean_sweep_response is StimulusAnalysis._LAZY
-        assert lsn._pval is StimulusAnalysis._LAZY
-        assert lsn._receptive_field is StimulusAnalysis._LAZY
+        assert lsn._stim_table is StimulusAnalysis._PRELOAD
+        assert lsn._LSN is StimulusAnalysis._PRELOAD
+        assert lsn._LSN_mask is StimulusAnalysis._PRELOAD
+        assert lsn._sweeplength is StimulusAnalysis._PRELOAD
+        assert lsn._interlength is StimulusAnalysis._PRELOAD
+        assert lsn._extralength is StimulusAnalysis._PRELOAD
+        assert lsn._sweep_response is StimulusAnalysis._PRELOAD
+        assert lsn._mean_sweep_response is StimulusAnalysis._PRELOAD
+        assert lsn._pval is StimulusAnalysis._PRELOAD
+        assert lsn._receptive_field is StimulusAnalysis._PRELOAD
     
         if trigger == 1:
             print(lsn.stim_table)
@@ -127,30 +127,30 @@ def test_harness(dataset,
             print(lsn.pval)
             print(lsn.receptive_field)
 
-        assert lsn._stim_table is not StimulusAnalysis._LAZY
-        assert lsn._LSN is not StimulusAnalysis._LAZY
-        assert lsn._LSN_mask is not StimulusAnalysis._LAZY
-        assert lsn._sweeplength is not StimulusAnalysis._LAZY
-        assert lsn._interlength is not StimulusAnalysis._LAZY
-        assert lsn._extralength is not StimulusAnalysis._LAZY
-        assert lsn._sweep_response is not StimulusAnalysis._LAZY
-        assert lsn._mean_sweep_response is not StimulusAnalysis._LAZY
-        assert lsn._pval is not StimulusAnalysis._LAZY
-        assert lsn._receptive_field is not StimulusAnalysis._LAZY
+        assert lsn._stim_table is not StimulusAnalysis._PRELOAD
+        assert lsn._LSN is not StimulusAnalysis._PRELOAD
+        assert lsn._LSN_mask is not StimulusAnalysis._PRELOAD
+        assert lsn._sweeplength is not StimulusAnalysis._PRELOAD
+        assert lsn._interlength is not StimulusAnalysis._PRELOAD
+        assert lsn._extralength is not StimulusAnalysis._PRELOAD
+        assert lsn._sweep_response is not StimulusAnalysis._PRELOAD
+        assert lsn._mean_sweep_response is not StimulusAnalysis._PRELOAD
+        assert lsn._pval is not StimulusAnalysis._PRELOAD
+        assert lsn._receptive_field is not StimulusAnalysis._PRELOAD
         
         dataset.get_corrected_fluorescence_traces.assert_called_once_with()
-        assert lsn._timestamps != StimulusAnalysis._LAZY
-        assert lsn._celltraces != StimulusAnalysis._LAZY
-        assert lsn._numbercells != StimulusAnalysis._LAZY
+        assert lsn._timestamps != StimulusAnalysis._PRELOAD
+        assert lsn._celltraces != StimulusAnalysis._PRELOAD
+        assert lsn._numbercells != StimulusAnalysis._PRELOAD
     
         dataset.get_roi_ids.assert_called_once_with()
-        assert lsn._roi_id != StimulusAnalysis._LAZY
+        assert lsn._roi_id != StimulusAnalysis._PRELOAD
     
         dataset.get_cell_specimen_ids.assert_called_once_with()
-        assert lsn._cell_id != StimulusAnalysis._LAZY
+        assert lsn._cell_id != StimulusAnalysis._PRELOAD
     
         dataset.get_dff_traces.assert_called_once_with()
-        assert lsn._dfftraces != StimulusAnalysis._LAZY
+        assert lsn._dfftraces != StimulusAnalysis._PRELOAD
     
-        assert lsn._dxcm != StimulusAnalysis._LAZY
-        assert lsn._dxtime != StimulusAnalysis._LAZY
+        assert lsn._dxcm != StimulusAnalysis._PRELOAD
+        assert lsn._dxtime != StimulusAnalysis._PRELOAD

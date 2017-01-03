@@ -69,14 +69,14 @@ def test_harness(dataset,
         sa = StimulusAnalysis(dataset, speed_tuning, lazy)
 
         if lazy:
-            assert sa._timestamps == StimulusAnalysis._LAZY
-            assert sa._celltraces == StimulusAnalysis._LAZY
-            assert sa._numbercells == StimulusAnalysis._LAZY
-            assert sa._roi_id == StimulusAnalysis._LAZY
-            assert sa._cell_id == StimulusAnalysis._LAZY
-            assert sa._dfftraces == StimulusAnalysis._LAZY
-            assert sa._dxcm == StimulusAnalysis._LAZY
-            assert sa._dxtime == StimulusAnalysis._LAZY
+            assert sa._timestamps == StimulusAnalysis._PRELOAD
+            assert sa._celltraces == StimulusAnalysis._PRELOAD
+            assert sa._numbercells == StimulusAnalysis._PRELOAD
+            assert sa._roi_id == StimulusAnalysis._PRELOAD
+            assert sa._cell_id == StimulusAnalysis._PRELOAD
+            assert sa._dfftraces == StimulusAnalysis._PRELOAD
+            assert sa._dxcm == StimulusAnalysis._PRELOAD
+            assert sa._dxtime == StimulusAnalysis._PRELOAD
     
             if trigger == 1:
                 print(sa.timestamps)
@@ -108,44 +108,44 @@ def test_harness(dataset,
             print(sa.cell_id)
             print(sa.dfftraces)
         else:
-            assert sa._timestamps is not StimulusAnalysis._LAZY
-            assert sa._celltraces is not StimulusAnalysis._LAZY
-            assert sa._numbercells is not StimulusAnalysis._LAZY
-            assert sa._roi_id is not StimulusAnalysis._LAZY
-            assert sa._cell_id is not StimulusAnalysis._LAZY
-            assert sa._dfftraces is not StimulusAnalysis._LAZY
-            assert sa._dxcm is not StimulusAnalysis._LAZY
-            assert sa._dxtime is not StimulusAnalysis._LAZY
+            assert sa._timestamps is not StimulusAnalysis._PRELOAD
+            assert sa._celltraces is not StimulusAnalysis._PRELOAD
+            assert sa._numbercells is not StimulusAnalysis._PRELOAD
+            assert sa._roi_id is not StimulusAnalysis._PRELOAD
+            assert sa._cell_id is not StimulusAnalysis._PRELOAD
+            assert sa._dfftraces is not StimulusAnalysis._PRELOAD
+            assert sa._dxcm is not StimulusAnalysis._PRELOAD
+            assert sa._dxtime is not StimulusAnalysis._PRELOAD
     
         dataset.get_corrected_fluorescence_traces.assert_called_once_with()
-        assert sa._timestamps != StimulusAnalysis._LAZY
-        assert sa._celltraces != StimulusAnalysis._LAZY
-        assert sa._numbercells != StimulusAnalysis._LAZY
+        assert sa._timestamps != StimulusAnalysis._PRELOAD
+        assert sa._celltraces != StimulusAnalysis._PRELOAD
+        assert sa._numbercells != StimulusAnalysis._PRELOAD
     
         dataset.get_roi_ids.assert_called_once_with()
-        assert sa._roi_id != StimulusAnalysis._LAZY
+        assert sa._roi_id != StimulusAnalysis._PRELOAD
     
         dataset.get_cell_specimen_ids.assert_called_once_with()
-        assert sa._cell_id != StimulusAnalysis._LAZY
+        assert sa._cell_id != StimulusAnalysis._PRELOAD
     
         dataset.get_dff_traces.assert_called_once_with()
-        assert sa._dfftraces != StimulusAnalysis._LAZY
+        assert sa._dfftraces != StimulusAnalysis._PRELOAD
     
-        assert sa._dxcm != StimulusAnalysis._LAZY
-        assert sa._dxtime != StimulusAnalysis._LAZY
+        assert sa._dxcm != StimulusAnalysis._PRELOAD
+        assert sa._dxtime != StimulusAnalysis._PRELOAD
     
         if speed_tuning:
             get_speed_tuning.assert_called_once_with(binsize=800)
-            assert sa._binned_dx_sp != StimulusAnalysis._LAZY
-            assert sa._binned_cells_sp != StimulusAnalysis._LAZY
-            assert sa._binned_dx_vis != StimulusAnalysis._LAZY
-            assert sa._binned_cells_vis != StimulusAnalysis._LAZY
-            assert sa._peak_run != StimulusAnalysis._LAZY
+            assert sa._binned_dx_sp != StimulusAnalysis._PRELOAD
+            assert sa._binned_cells_sp != StimulusAnalysis._PRELOAD
+            assert sa._binned_dx_vis != StimulusAnalysis._PRELOAD
+            assert sa._binned_cells_vis != StimulusAnalysis._PRELOAD
+            assert sa._peak_run != StimulusAnalysis._PRELOAD
         else:
             assert not get_speed_tuning.called
-            assert sa._binned_dx_sp == StimulusAnalysis._LAZY
-            assert sa._binned_cells_sp == StimulusAnalysis._LAZY
-            assert sa._binned_dx_vis == StimulusAnalysis._LAZY
-            assert sa._binned_cells_vis == StimulusAnalysis._LAZY
-            assert sa._peak_run == StimulusAnalysis._LAZY
+            assert sa._binned_dx_sp == StimulusAnalysis._PRELOAD
+            assert sa._binned_cells_sp == StimulusAnalysis._PRELOAD
+            assert sa._binned_dx_vis == StimulusAnalysis._PRELOAD
+            assert sa._binned_cells_vis == StimulusAnalysis._PRELOAD
+            assert sa._peak_run == StimulusAnalysis._PRELOAD
 

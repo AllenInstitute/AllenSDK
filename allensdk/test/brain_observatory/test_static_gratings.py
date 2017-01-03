@@ -78,21 +78,21 @@ def mock_sweep_response():
 def test_harness(dataset, trigger):
     sg = StaticGratings(dataset)
 
-    assert sg._stim_table is StimulusAnalysis._LAZY
-    assert sg._sweeplength is StimulusAnalysis._LAZY
-    assert sg._interlength is StimulusAnalysis._LAZY
-    assert sg._extralength is StimulusAnalysis._LAZY
-    assert sg._orivals is StimulusAnalysis._LAZY
-    assert sg._sfvals is StimulusAnalysis._LAZY
-    assert sg._phasevals is StimulusAnalysis._LAZY
-    assert sg._number_ori is StimulusAnalysis._LAZY
-    assert sg._number_sf is StimulusAnalysis._LAZY
-    assert sg._number_phase is StimulusAnalysis._LAZY
-    assert sg._sweep_response is StimulusAnalysis._LAZY
-    assert sg._mean_sweep_response is StimulusAnalysis._LAZY
-    assert sg._pval is StimulusAnalysis._LAZY
-    assert sg._response is StimulusAnalysis._LAZY
-    assert sg._peak is StimulusAnalysis._LAZY
+    assert sg._stim_table is StimulusAnalysis._PRELOAD
+    assert sg._sweeplength is StimulusAnalysis._PRELOAD
+    assert sg._interlength is StimulusAnalysis._PRELOAD
+    assert sg._extralength is StimulusAnalysis._PRELOAD
+    assert sg._orivals is StimulusAnalysis._PRELOAD
+    assert sg._sfvals is StimulusAnalysis._PRELOAD
+    assert sg._phasevals is StimulusAnalysis._PRELOAD
+    assert sg._number_ori is StimulusAnalysis._PRELOAD
+    assert sg._number_sf is StimulusAnalysis._PRELOAD
+    assert sg._number_phase is StimulusAnalysis._PRELOAD
+    assert sg._sweep_response is StimulusAnalysis._PRELOAD
+    assert sg._mean_sweep_response is StimulusAnalysis._PRELOAD
+    assert sg._pval is StimulusAnalysis._PRELOAD
+    assert sg._response is StimulusAnalysis._PRELOAD
+    assert sg._peak is StimulusAnalysis._PRELOAD
 
     if trigger == 1:
         print(sg._stim_table)
@@ -145,35 +145,35 @@ def test_harness(dataset, trigger):
         print(sg.response)
         print(sg.peak)
 
-    assert sg._stim_table is not StimulusAnalysis._LAZY
-    assert sg._sweeplength is not StimulusAnalysis._LAZY
-    assert sg._interlength is not StimulusAnalysis._LAZY
-    assert sg._extralength is not StimulusAnalysis._LAZY
-    assert sg._orivals is not StimulusAnalysis._LAZY
-    assert sg._sfvals is not StimulusAnalysis._LAZY
-    assert sg._phasevals is not StimulusAnalysis._LAZY
-    assert sg._number_ori is not StimulusAnalysis._LAZY
-    assert sg._number_sf is not StimulusAnalysis._LAZY
-    assert sg._number_phase is not StimulusAnalysis._LAZY
-    assert sg._sweep_response is not StimulusAnalysis._LAZY
-    assert sg._mean_sweep_response is not StimulusAnalysis._LAZY
-    assert sg._pval is not StimulusAnalysis._LAZY
-    assert sg._response is not StimulusAnalysis._LAZY
-    assert sg._peak is not StimulusAnalysis._LAZY
+    assert sg._stim_table is not StimulusAnalysis._PRELOAD
+    assert sg._sweeplength is not StimulusAnalysis._PRELOAD
+    assert sg._interlength is not StimulusAnalysis._PRELOAD
+    assert sg._extralength is not StimulusAnalysis._PRELOAD
+    assert sg._orivals is not StimulusAnalysis._PRELOAD
+    assert sg._sfvals is not StimulusAnalysis._PRELOAD
+    assert sg._phasevals is not StimulusAnalysis._PRELOAD
+    assert sg._number_ori is not StimulusAnalysis._PRELOAD
+    assert sg._number_sf is not StimulusAnalysis._PRELOAD
+    assert sg._number_phase is not StimulusAnalysis._PRELOAD
+    assert sg._sweep_response is not StimulusAnalysis._PRELOAD
+    assert sg._mean_sweep_response is not StimulusAnalysis._PRELOAD
+    assert sg._pval is not StimulusAnalysis._PRELOAD
+    assert sg._response is not StimulusAnalysis._PRELOAD
+    assert sg._peak is not StimulusAnalysis._PRELOAD
     # check super properties
     dataset.get_corrected_fluorescence_traces.assert_called_once_with()
-    assert sg._timestamps != StaticGratings._LAZY
-    assert sg._celltraces != StaticGratings._LAZY
-    assert sg._numbercells != StaticGratings._LAZY
+    assert sg._timestamps != StaticGratings._PRELOAD
+    assert sg._celltraces != StaticGratings._PRELOAD
+    assert sg._numbercells != StaticGratings._PRELOAD
     
     dataset.get_roi_ids.assert_called_once_with()
-    assert sg._roi_id != StaticGratings._LAZY
+    assert sg._roi_id != StaticGratings._PRELOAD
     
     assert dataset.get_cell_specimen_ids.called
-    assert sg._cell_id != StaticGratings._LAZY
+    assert sg._cell_id != StaticGratings._PRELOAD
     
     dataset.get_dff_traces.assert_called_once_with()
-    assert sg._dfftraces != StaticGratings._LAZY
+    assert sg._dfftraces != StaticGratings._PRELOAD
     
-    assert sg._dxcm != StaticGratings._LAZY
-    assert sg._dxtime != StaticGratings._LAZY
+    assert sg._dxcm != StaticGratings._PRELOAD
+    assert sg._dxtime != StaticGratings._PRELOAD

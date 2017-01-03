@@ -78,16 +78,16 @@ def mock_sweep_response():
 def test_harness(dataset, trigger):
     dg = DriftingGratings(dataset)
 
-    assert dg._stim_table is StimulusAnalysis._LAZY
-    assert dg._orivals is StimulusAnalysis._LAZY
-    assert dg._tfvals is StimulusAnalysis._LAZY
-    assert dg._number_ori is StimulusAnalysis._LAZY
-    assert dg._number_tf is StimulusAnalysis._LAZY
-    assert dg._sweep_response is StimulusAnalysis._LAZY
-    assert dg._mean_sweep_response is StimulusAnalysis._LAZY
-    assert dg._pval is StimulusAnalysis._LAZY
-    assert dg._response is StimulusAnalysis._LAZY
-    assert dg._peak is StimulusAnalysis._LAZY
+    assert dg._stim_table is StimulusAnalysis._PRELOAD
+    assert dg._orivals is StimulusAnalysis._PRELOAD
+    assert dg._tfvals is StimulusAnalysis._PRELOAD
+    assert dg._number_ori is StimulusAnalysis._PRELOAD
+    assert dg._number_tf is StimulusAnalysis._PRELOAD
+    assert dg._sweep_response is StimulusAnalysis._PRELOAD
+    assert dg._mean_sweep_response is StimulusAnalysis._PRELOAD
+    assert dg._pval is StimulusAnalysis._PRELOAD
+    assert dg._response is StimulusAnalysis._PRELOAD
+    assert dg._peak is StimulusAnalysis._PRELOAD
 
     if trigger == 1:
         print(dg.stim_table)
@@ -115,31 +115,31 @@ def test_harness(dataset, trigger):
         print(dg.response)
         print(dg.peak)
 
-    assert dg._stim_table is not StimulusAnalysis._LAZY
-    assert dg._orivals is not StimulusAnalysis._LAZY
-    assert dg._tfvals is not StimulusAnalysis._LAZY
-    assert dg._number_ori is not StimulusAnalysis._LAZY
-    assert dg._number_tf is not StimulusAnalysis._LAZY
-    assert dg._sweep_response is not StimulusAnalysis._LAZY
-    assert dg._mean_sweep_response is not StimulusAnalysis._LAZY
-    assert dg._pval is not StimulusAnalysis._LAZY
-    assert dg._response is not StimulusAnalysis._LAZY
-    assert dg._peak is not StimulusAnalysis._LAZY
+    assert dg._stim_table is not StimulusAnalysis._PRELOAD
+    assert dg._orivals is not StimulusAnalysis._PRELOAD
+    assert dg._tfvals is not StimulusAnalysis._PRELOAD
+    assert dg._number_ori is not StimulusAnalysis._PRELOAD
+    assert dg._number_tf is not StimulusAnalysis._PRELOAD
+    assert dg._sweep_response is not StimulusAnalysis._PRELOAD
+    assert dg._mean_sweep_response is not StimulusAnalysis._PRELOAD
+    assert dg._pval is not StimulusAnalysis._PRELOAD
+    assert dg._response is not StimulusAnalysis._PRELOAD
+    assert dg._peak is not StimulusAnalysis._PRELOAD
     
     # check super properties
     dataset.get_corrected_fluorescence_traces.assert_called_once_with()
-    assert dg._timestamps != DriftingGratings._LAZY
-    assert dg._celltraces != DriftingGratings._LAZY
-    assert dg._numbercells != DriftingGratings._LAZY
+    assert dg._timestamps != DriftingGratings._PRELOAD
+    assert dg._celltraces != DriftingGratings._PRELOAD
+    assert dg._numbercells != DriftingGratings._PRELOAD
     
     dataset.get_roi_ids.assert_called_once_with()
-    assert dg._roi_id != DriftingGratings._LAZY
+    assert dg._roi_id != DriftingGratings._PRELOAD
     
     assert dataset.get_cell_specimen_ids.called
-    assert dg._cell_id != DriftingGratings._LAZY
+    assert dg._cell_id != DriftingGratings._PRELOAD
     
     dataset.get_dff_traces.assert_called_once_with()
-    assert dg._dfftraces != DriftingGratings._LAZY
+    assert dg._dfftraces != DriftingGratings._PRELOAD
     
-    assert dg._dxcm != DriftingGratings._LAZY
-    assert dg._dxtime != DriftingGratings._LAZY
+    assert dg._dxcm != DriftingGratings._PRELOAD
+    assert dg._dxtime != DriftingGratings._PRELOAD

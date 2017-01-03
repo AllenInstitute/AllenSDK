@@ -35,35 +35,35 @@ class NaturalMovie(StimulusAnalysis):
         super(NaturalMovie, self).__init__(data_set, **kwargs)
         
         self.movie_name = movie_name
-        self._stim_table = StimulusAnalysis._LAZY
-        self._sweeplength = StimulusAnalysis._LAZY
-        self._sweep_response = StimulusAnalysis._LAZY
-        self._peak = StimulusAnalysis._LAZY
+        self._stim_table = StimulusAnalysis._PRELOAD
+        self._sweeplength = StimulusAnalysis._PRELOAD
+        self._sweep_response = StimulusAnalysis._PRELOAD
+        self._peak = StimulusAnalysis._PRELOAD
 
     @property
     def stim_table(self):
-        if self._stim_table is StimulusAnalysis._LAZY:
+        if self._stim_table is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table(self.movie_name)
 
         return self._stim_table
 
     @property
     def sweeplength(self):
-        if self._sweeplength is StimulusAnalysis._LAZY:
+        if self._sweeplength is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table(self.movie_name)
 
         return self._sweeplength
 
     @property
     def sweep_response(self):
-        if self._sweep_response is StimulusAnalysis._LAZY:
+        if self._sweep_response is StimulusAnalysis._PRELOAD:
             self._sweep_response = self.get_sweep_response()
 
         return self._sweep_response
 
     @property
     def peak(self):
-        if self._peak is StimulusAnalysis._LAZY:
+        if self._peak is StimulusAnalysis._PRELOAD:
             self._peak = self.get_peak(movie_name=self.movie_name)
 
         return self._peak

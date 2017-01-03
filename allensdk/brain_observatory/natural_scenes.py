@@ -34,55 +34,55 @@ class NaturalScenes(StimulusAnalysis):
     def __init__(self, data_set, **kwargs):
         super(NaturalScenes, self).__init__(data_set, **kwargs)
 
-        self._stim_table = StimulusAnalysis._LAZY
-        self._number_scenes = StimulusAnalysis._LAZY
-        self._sweeplength = StimulusAnalysis._LAZY
-        self._interlength = StimulusAnalysis._LAZY
-        self._extralength = StimulusAnalysis._LAZY
-        self._sweep_response = StimulusAnalysis._LAZY
-        self._mean_sweep_response = StimulusAnalysis._LAZY
-        self._pval = StimulusAnalysis._LAZY
-        self._response = StimulusAnalysis._LAZY
-        self._peak = StimulusAnalysis._LAZY
+        self._stim_table = StimulusAnalysis._PRELOAD
+        self._number_scenes = StimulusAnalysis._PRELOAD
+        self._sweeplength = StimulusAnalysis._PRELOAD
+        self._interlength = StimulusAnalysis._PRELOAD
+        self._extralength = StimulusAnalysis._PRELOAD
+        self._sweep_response = StimulusAnalysis._PRELOAD
+        self._mean_sweep_response = StimulusAnalysis._PRELOAD
+        self._pval = StimulusAnalysis._PRELOAD
+        self._response = StimulusAnalysis._PRELOAD
+        self._peak = StimulusAnalysis._PRELOAD
 
     @property
     def stim_table(self):
-        if self._stim_table is StimulusAnalysis._LAZY:
+        if self._stim_table is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table()
 
         return self._stim_table
 
     @property
     def number_scenes(self):
-        if self._number_scenes is StimulusAnalysis._LAZY:
+        if self._number_scenes is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table()
 
         return self._number_scenes
 
     @property
     def sweeplength(self):
-        if self._sweeplength is StimulusAnalysis._LAZY:
+        if self._sweeplength is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table()
 
         return self._sweeplength
 
     @property
     def interlength(self):
-        if self._interlength is StimulusAnalysis._LAZY:
+        if self._interlength is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table()
 
         return self._interlength
 
     @property
     def extralength(self):
-        if self._extralength is StimulusAnalysis._LAZY:
+        if self._extralength is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table()
 
         return self._extralength
 
     @property
     def sweep_response(self):
-        if self._sweep_response is StimulusAnalysis._LAZY:
+        if self._sweep_response is StimulusAnalysis._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -90,7 +90,7 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def mean_sweep_response(self):
-        if self._mean_sweep_response is StimulusAnalysis._LAZY:
+        if self._mean_sweep_response is StimulusAnalysis._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -98,7 +98,7 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def pval(self):
-        if self._pval is StimulusAnalysis._LAZY:
+        if self._pval is StimulusAnalysis._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -106,14 +106,14 @@ class NaturalScenes(StimulusAnalysis):
 
     @property
     def response(self):
-        if self._response is StimulusAnalysis._LAZY:
+        if self._response is StimulusAnalysis._PRELOAD:
             self._response = self.get_response()
 
         return self._response
 
     @property
     def peak(self):
-        if self._peak is StimulusAnalysis._LAZY:
+        if self._peak is StimulusAnalysis._PRELOAD:
             self._peak = self.get_peak()
 
         return self._peak

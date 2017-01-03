@@ -79,10 +79,10 @@ def test_harness(dataset, trigger):
     movie_name = "Mock Movie Name"
     nm = NaturalMovie(dataset, movie_name)
 
-    assert nm._stim_table is StimulusAnalysis._LAZY
-    assert nm._sweeplength is StimulusAnalysis._LAZY
-    assert nm._sweep_response is StimulusAnalysis._LAZY
-    assert nm._peak is StimulusAnalysis._LAZY
+    assert nm._stim_table is StimulusAnalysis._PRELOAD
+    assert nm._sweeplength is StimulusAnalysis._PRELOAD
+    assert nm._sweep_response is StimulusAnalysis._PRELOAD
+    assert nm._peak is StimulusAnalysis._PRELOAD
 
     if trigger == 1:
         print(nm.stim_table)
@@ -93,25 +93,25 @@ def test_harness(dataset, trigger):
         print(nm.sweep_response)
         print(nm.peak)
 
-    assert nm._stim_table is not StimulusAnalysis._LAZY
-    assert nm._sweeplength is not StimulusAnalysis._LAZY
-    assert nm._sweep_response is not StimulusAnalysis._LAZY
-    assert nm._peak is not StimulusAnalysis._LAZY
+    assert nm._stim_table is not StimulusAnalysis._PRELOAD
+    assert nm._sweeplength is not StimulusAnalysis._PRELOAD
+    assert nm._sweep_response is not StimulusAnalysis._PRELOAD
+    assert nm._peak is not StimulusAnalysis._PRELOAD
 
     # check super properties
     dataset.get_corrected_fluorescence_traces.assert_called_once_with()
-    assert nm._timestamps != NaturalMovie._LAZY
-    assert nm._celltraces != NaturalMovie._LAZY
-    assert nm._numbercells != NaturalMovie._LAZY
+    assert nm._timestamps != NaturalMovie._PRELOAD
+    assert nm._celltraces != NaturalMovie._PRELOAD
+    assert nm._numbercells != NaturalMovie._PRELOAD
     
     dataset.get_roi_ids.assert_called_once_with()
-    assert nm._roi_id != NaturalMovie._LAZY
+    assert nm._roi_id != NaturalMovie._PRELOAD
     
     assert dataset.get_cell_specimen_ids.called
-    assert nm._cell_id != NaturalMovie._LAZY
+    assert nm._cell_id != NaturalMovie._PRELOAD
     
     dataset.get_dff_traces.assert_called_once_with()
-    assert nm._dfftraces != NaturalMovie._LAZY
+    assert nm._dfftraces != NaturalMovie._PRELOAD
     
-    assert nm._dxcm != NaturalMovie._LAZY
-    assert nm._dxtime != NaturalMovie._LAZY
+    assert nm._dxcm != NaturalMovie._PRELOAD
+    assert nm._dxtime != NaturalMovie._PRELOAD

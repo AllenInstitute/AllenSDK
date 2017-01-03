@@ -39,24 +39,24 @@ class StimulusAnalysis(object):
 
     """
     _log = logging.getLogger('allensdk.brain_observatory.stimulus_analysis')
-    _LAZY = "LAZY"
+    _PRELOAD = "LAZY"
 
     def __init__(self, data_set, speed_tuning=False, lazy=False):
         self.data_set = data_set
-        self._timestamps = StimulusAnalysis._LAZY
-        self._celltraces = StimulusAnalysis._LAZY
-        self._acquisition_rate = StimulusAnalysis._LAZY
-        self._numbercells = StimulusAnalysis._LAZY
-        self._roi_id = StimulusAnalysis._LAZY
-        self._cell_id = StimulusAnalysis._LAZY
-        self._dfftraces = StimulusAnalysis._LAZY
-        self._dxcm = StimulusAnalysis._LAZY
-        self._dxtime = StimulusAnalysis._LAZY
-        self._binned_dx_sp = StimulusAnalysis._LAZY
-        self._binned_cells_sp = StimulusAnalysis._LAZY
-        self._binned_dx_vis = StimulusAnalysis._LAZY
-        self._binned_cells_vis = StimulusAnalysis._LAZY
-        self._peak_run = StimulusAnalysis._LAZY
+        self._timestamps = StimulusAnalysis._PRELOAD
+        self._celltraces = StimulusAnalysis._PRELOAD
+        self._acquisition_rate = StimulusAnalysis._PRELOAD
+        self._numbercells = StimulusAnalysis._PRELOAD
+        self._roi_id = StimulusAnalysis._PRELOAD
+        self._cell_id = StimulusAnalysis._PRELOAD
+        self._dfftraces = StimulusAnalysis._PRELOAD
+        self._dxcm = StimulusAnalysis._PRELOAD
+        self._dxtime = StimulusAnalysis._PRELOAD
+        self._binned_dx_sp = StimulusAnalysis._PRELOAD
+        self._binned_cells_sp = StimulusAnalysis._PRELOAD
+        self._binned_dx_vis = StimulusAnalysis._PRELOAD
+        self._binned_cells_vis = StimulusAnalysis._PRELOAD
+        self._peak_run = StimulusAnalysis._PRELOAD
         self._binsize = 800
 
         if lazy is False:
@@ -82,70 +82,70 @@ class StimulusAnalysis(object):
 
     @property
     def timestamps(self):
-        if self._timestamps is StimulusAnalysis._LAZY:
+        if self._timestamps is StimulusAnalysis._PRELOAD:
             self.get_fluorescence()
 
         return self._timestamps
 
     @property
     def celltraces(self):
-        if self._celltraces is StimulusAnalysis._LAZY:
+        if self._celltraces is StimulusAnalysis._PRELOAD:
             self.get_fluorescence()
 
         return self._celltraces
 
     @property
     def acquisition_rate(self):
-        if self._acquisition_rate is StimulusAnalysis._LAZY:
+        if self._acquisition_rate is StimulusAnalysis._PRELOAD:
             self.get_fluorescence()
 
         return self._acquisition_rate
 
     @property
     def numbercells(self):
-        if self._numbercells is StimulusAnalysis._LAZY:
+        if self._numbercells is StimulusAnalysis._PRELOAD:
             self.get_fluorescence()
 
         return self._numbercells
 
     @property
     def roi_id(self):
-        if self._roi_id is StimulusAnalysis._LAZY:
+        if self._roi_id is StimulusAnalysis._PRELOAD:
             self._roi_id = self.data_set.get_roi_ids()
 
         return self._roi_id
 
     @property
     def cell_id(self):
-        if self._cell_id is StimulusAnalysis._LAZY:
+        if self._cell_id is StimulusAnalysis._PRELOAD:
             self._cell_id = self.data_set.get_cell_specimen_ids()
 
         return self._cell_id
 
     @property
     def dfftraces(self):
-        if self._dfftraces is StimulusAnalysis._LAZY:
+        if self._dfftraces is StimulusAnalysis._PRELOAD:
             _, self._dfftraces = self.data_set.get_dff_traces()
 
         return self._dfftraces
 
     @property
     def dxcm(self):
-        if self._dxcm is StimulusAnalysis._LAZY:
+        if self._dxcm is StimulusAnalysis._PRELOAD:
             self._dxcm, self._dxtime = self.data_set.get_running_speed()
 
         return self._dxcm
 
     @property
     def dxtime(self):
-        if self._dxtime is StimulusAnalysis._LAZY:
+        if self._dxtime is StimulusAnalysis._PRELOAD:
             self._dxcm, self._dxtime = self.data_set.get_running_speed()
             
         return self._dxtime
 
     @property
     def binned_dx_sp(self):
-        if self._binned_dx_sp is StimulusAnalysis._LAZY:
+        if self._binned_dx_sp is StimulusAnalysis._PRELOAD:
             (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
              self._binned_cells_vis, self._peak_run) = \
                 self.get_speed_tuning(binsize=self._binsize)
@@ -154,7 +154,7 @@ class StimulusAnalysis(object):
 
     @property
     def binned_cells_sp(self):
-        if self._binned_cells_sp is StimulusAnalysis._LAZY:
+        if self._binned_cells_sp is StimulusAnalysis._PRELOAD:
             (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
              self._binned_cells_vis, self._peak_run) = \
                 self.get_speed_tuning(binsize=self._binsize)
@@ -163,7 +163,7 @@ class StimulusAnalysis(object):
 
     @property
     def binned_dx_vis(self):
-        if self._binned_dx_vis is StimulusAnalysis._LAZY:
+        if self._binned_dx_vis is StimulusAnalysis._PRELOAD:
             (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
              self._binned_cells_vis, self._peak_run) = \
                 self.get_speed_tuning(binsize=self._binsize)
@@ -172,7 +172,7 @@ class StimulusAnalysis(object):
 
     @property
     def binned_cells_vis(self):
-        if self._binned_cells_vis is StimulusAnalysis._LAZY:
+        if self._binned_cells_vis is StimulusAnalysis._PRELOAD:
             (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
              self._binned_cells_vis, self._peak_run) = \
                 self.get_speed_tuning(binsize=self._binsize)
@@ -181,7 +181,7 @@ class StimulusAnalysis(object):
 
     @property
     def peak_run(self):
-        if self._peak_run is StimulusAnalysis._LAZY:
+        if self._peak_run is StimulusAnalysis._PRELOAD:
             (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
              self._binned_cells_vis, self._peak_run) = \
                 self.get_speed_tuning(binsize=self._binsize)

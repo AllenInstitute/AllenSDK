@@ -38,56 +38,56 @@ class DriftingGratings(StimulusAnalysis):
         self.interlength = 30
         self.extralength = 0
 
-        self._stim_table = StimulusAnalysis._LAZY
-        self._orivals = StimulusAnalysis._LAZY
-        self._tfvals = StimulusAnalysis._LAZY
-        self._number_ori = StimulusAnalysis._LAZY
-        self._number_tf = StimulusAnalysis._LAZY
+        self._stim_table = StimulusAnalysis._PRELOAD
+        self._orivals = StimulusAnalysis._PRELOAD
+        self._tfvals = StimulusAnalysis._PRELOAD
+        self._number_ori = StimulusAnalysis._PRELOAD
+        self._number_tf = StimulusAnalysis._PRELOAD
 
-        self._sweep_response = StimulusAnalysis._LAZY
-        self._mean_sweep_response = StimulusAnalysis._LAZY
-        self._pval = StimulusAnalysis._LAZY
-        self._response = StimulusAnalysis._LAZY
-        self._peak = StimulusAnalysis._LAZY
+        self._sweep_response = StimulusAnalysis._PRELOAD
+        self._mean_sweep_response = StimulusAnalysis._PRELOAD
+        self._pval = StimulusAnalysis._PRELOAD
+        self._response = StimulusAnalysis._PRELOAD
+        self._peak = StimulusAnalysis._PRELOAD
 
     @property
     def stim_table(self):
-        if self._stim_table is StimulusAnalysis._LAZY:
+        if self._stim_table is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table()
 
         return self._stim_table
 
     @property
     def orivals(self):
-        if self._orivals is StimulusAnalysis._LAZY:
+        if self._orivals is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table()
 
         return self._orivals
 
     @property
     def tfvals(self):
-        if self._tfvals is StimulusAnalysis._LAZY:
+        if self._tfvals is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table()
 
         return self._tfvals
 
     @property
     def number_ori(self):
-        if self._number_ori is StimulusAnalysis._LAZY:
+        if self._number_ori is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table()
 
         return self._number_ori
 
     @property
     def number_tf(self):
-        if self._number_tf is StimulusAnalysis._LAZY:
+        if self._number_tf is StimulusAnalysis._PRELOAD:
             self.populate_stimulus_table()
 
         return self._number_tf
 
     @property
     def sweep_response(self):
-        if self._sweep_response is StimulusAnalysis._LAZY:
+        if self._sweep_response is StimulusAnalysis._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -95,7 +95,7 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def mean_sweep_response(self):
-        if self._mean_sweep_response is StimulusAnalysis._LAZY:
+        if self._mean_sweep_response is StimulusAnalysis._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -103,7 +103,7 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def pval(self):
-        if self._pval is StimulusAnalysis._LAZY:
+        if self._pval is StimulusAnalysis._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -111,14 +111,14 @@ class DriftingGratings(StimulusAnalysis):
 
     @property
     def response(self):
-        if self._response is StimulusAnalysis._LAZY:
+        if self._response is StimulusAnalysis._PRELOAD:
             self._response = self.get_response()
 
         return self._response
 
     @property
     def peak(self):
-        if self._peak is StimulusAnalysis._LAZY:
+        if self._peak is StimulusAnalysis._PRELOAD:
             self._peak = self.get_peak()
 
         return self._peak
