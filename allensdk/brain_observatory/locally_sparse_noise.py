@@ -15,7 +15,7 @@
 
 import numpy as np
 from .stimulus_analysis import StimulusAnalysis
-import stimulus_info
+import allensdk.brain_observatory.stimulus_info as stimulus_info
 import scipy.ndimage 
 
 class LocallySparseNoise(StimulusAnalysis):
@@ -52,66 +52,66 @@ class LocallySparseNoise(StimulusAnalysis):
         self.nrows = lsn_dims[0]
         self.ncols = lsn_dims[1]
         
-        self._stim_table = StimulusAnalysis._PRELOAD
-        self._LSN = StimulusAnalysis._PRELOAD
-        self._LSN_mask = StimulusAnalysis._PRELOAD
-        self._sweeplength = StimulusAnalysis._PRELOAD
-        self._interlength = StimulusAnalysis._PRELOAD
-        self._extralength = StimulusAnalysis._PRELOAD
+        self._stim_table = LocallySparseNoise._PRELOAD
+        self._LSN = LocallySparseNoise._PRELOAD
+        self._LSN_mask = LocallySparseNoise._PRELOAD
+        self._sweeplength = LocallySparseNoise._PRELOAD
+        self._interlength = LocallySparseNoise._PRELOAD
+        self._extralength = LocallySparseNoise._PRELOAD
 
-        self._sweep_response = StimulusAnalysis._PRELOAD
-        self._mean_sweep_response = StimulusAnalysis._PRELOAD
-        self._pval = StimulusAnalysis._PRELOAD\
+        self._sweep_response = LocallySparseNoise._PRELOAD
+        self._mean_sweep_response = LocallySparseNoise._PRELOAD
+        self._pval = LocallySparseNoise._PRELOAD\
 
-        self._receptive_field = StimulusAnalysis._PRELOAD
+        self._receptive_field = LocallySparseNoise._PRELOAD
 
         # get stimulus table
 
     @property
     def stim_table(self):
-        if self._stim_table is StimulusAnalysis._PRELOAD:
+        if self._stim_table is LocallySparseNoise._PRELOAD:
             self.populate_stimulus_table()
 
         return self._stim_table
 
     @property
     def LSN(self):
-        if self._LSN is StimulusAnalysis._PRELOAD:
+        if self._LSN is LocallySparseNoise._PRELOAD:
             self.populate_stimulus_table()
 
         return self._LSN
 
     @property
     def LSN_mask(self):
-        if self._LSN_mask is StimulusAnalysis._PRELOAD:
+        if self._LSN_mask is LocallySparseNoise._PRELOAD:
             self.populate_stimulus_table()
 
         return self._LSN_mask
 
     @property
     def sweeplength(self):
-        if self._sweeplength is StimulusAnalysis._PRELOAD:
+        if self._sweeplength is LocallySparseNoise._PRELOAD:
             self.populate_stimulus_table()
 
         return self._sweeplength
 
     @property
     def interlength(self):
-        if self._interlength is StimulusAnalysis._PRELOAD:
+        if self._interlength is LocallySparseNoise._PRELOAD:
             self.populate_stimulus_table()
 
         return self._interlength
 
     @property
     def extralength(self):
-        if self._extralength is StimulusAnalysis._PRELOAD:
+        if self._extralength is LocallySparseNoise._PRELOAD:
             self.populate_stimulus_table()
 
         return self._extralength
 
     @property
     def sweep_response(self):
-        if self._sweep_response is StimulusAnalysis._PRELOAD:
+        if self._sweep_response is LocallySparseNoise._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -119,7 +119,7 @@ class LocallySparseNoise(StimulusAnalysis):
 
     @property
     def mean_sweep_response(self):
-        if self._mean_sweep_response is StimulusAnalysis._PRELOAD:
+        if self._mean_sweep_response is LocallySparseNoise._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -127,7 +127,7 @@ class LocallySparseNoise(StimulusAnalysis):
 
     @property
     def pval(self):
-        if self._pval is StimulusAnalysis._PRELOAD:
+        if self._pval is LocallySparseNoise._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -135,7 +135,7 @@ class LocallySparseNoise(StimulusAnalysis):
 
     @property
     def receptive_field(self):
-        if self._receptive_field is StimulusAnalysis._PRELOAD:
+        if self._receptive_field is LocallySparseNoise._PRELOAD:
             self._receptive_field = self.get_receptive_field()
 
         return self._receptive_field

@@ -36,97 +36,97 @@ class StaticGratings(StimulusAnalysis):
     def __init__(self, data_set, **kwargs):
         super(StaticGratings, self).__init__(data_set, **kwargs)
 
-        self._stim_table = StimulusAnalysis._PRELOAD
-        self._sweeplength = StimulusAnalysis._PRELOAD
-        self._interlength = StimulusAnalysis._PRELOAD
-        self._extralength = StimulusAnalysis._PRELOAD
-        self._orivals = StimulusAnalysis._PRELOAD
-        self._sfvals = StimulusAnalysis._PRELOAD
-        self._phasevals = StimulusAnalysis._PRELOAD
-        self._number_ori = StimulusAnalysis._PRELOAD
-        self._number_sf = StimulusAnalysis._PRELOAD
-        self._number_phase = StimulusAnalysis._PRELOAD
+        self._stim_table = StaticGratings._PRELOAD
+        self._sweeplength = StaticGratings._PRELOAD
+        self._interlength = StaticGratings._PRELOAD
+        self._extralength = StaticGratings._PRELOAD
+        self._orivals = StaticGratings._PRELOAD
+        self._sfvals = StaticGratings._PRELOAD
+        self._phasevals = StaticGratings._PRELOAD
+        self._number_ori = StaticGratings._PRELOAD
+        self._number_sf = StaticGratings._PRELOAD
+        self._number_phase = StaticGratings._PRELOAD
 
-        self._sweep_response = StimulusAnalysis._PRELOAD
-        self._mean_sweep_response = StimulusAnalysis._PRELOAD
-        self._pval = StimulusAnalysis._PRELOAD
+        self._sweep_response = StaticGratings._PRELOAD
+        self._mean_sweep_response = StaticGratings._PRELOAD
+        self._pval = StaticGratings._PRELOAD
 
-        self._response = StimulusAnalysis._PRELOAD
-        self._peak = StimulusAnalysis._PRELOAD
+        self._response = StaticGratings._PRELOAD
+        self._peak = StaticGratings._PRELOAD
 
     @property
     def stim_table(self):
-        if self._stim_table is StimulusAnalysis._PRELOAD:
+        if self._stim_table is StaticGratings._PRELOAD:
             self.populate_stimulus_table()
 
         return self._stim_table
 
     @property
     def sweeplength(self):
-        if self._sweeplength is StimulusAnalysis._PRELOAD:
+        if self._sweeplength is StaticGratings._PRELOAD:
             self.populate_stimulus_table()
 
         return self._sweeplength
 
     @property
     def interlength(self):
-        if self._interlength is StimulusAnalysis._PRELOAD:
+        if self._interlength is StaticGratings._PRELOAD:
             self.populate_stimulus_table()
 
         return self._interlength
 
     @property
     def extralength(self):
-        if self._extralength is StimulusAnalysis._PRELOAD:
+        if self._extralength is StaticGratings._PRELOAD:
             self.populate_stimulus_table()
 
         return self._extralength
 
     @property
     def orivals(self):
-        if self._orivals is StimulusAnalysis._PRELOAD:
+        if self._orivals is StaticGratings._PRELOAD:
             self.populate_stimulus_table()
 
         return self._orivals
 
     @property
     def sfvals(self):
-        if self._sfvals is StimulusAnalysis._PRELOAD:
+        if self._sfvals is StaticGratings._PRELOAD:
             self.populate_stimulus_table()
 
         return self._sfvals
 
     @property
     def phasevals(self):
-        if self._phasevals is StimulusAnalysis._PRELOAD:
+        if self._phasevals is StaticGratings._PRELOAD:
             self.populate_stimulus_table()
 
         return self._phasevals
 
     @property
     def number_ori(self):
-        if self._number_ori is StimulusAnalysis._PRELOAD:
+        if self._number_ori is StaticGratings._PRELOAD:
             self.populate_stimulus_table()
 
         return self._number_ori
 
     @property
     def number_sf(self):
-        if self._number_sf is StimulusAnalysis._PRELOAD:
+        if self._number_sf is StaticGratings._PRELOAD:
             self.populate_stimulus_table()
 
         return self._number_sf
 
     @property
     def number_phase(self):
-        if self._number_phase is StimulusAnalysis._PRELOAD:
+        if self._number_phase is StaticGratings._PRELOAD:
             self.populate_stimulus_table()
 
         return self._number_phase
 
     @property
     def sweep_response(self):
-        if self._sweep_response is StimulusAnalysis._PRELOAD:
+        if self._sweep_response is StaticGratings._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -134,7 +134,7 @@ class StaticGratings(StimulusAnalysis):
 
     @property
     def mean_sweep_response(self):
-        if self._mean_sweep_response is StimulusAnalysis._PRELOAD:
+        if self._mean_sweep_response is StaticGratings._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -142,7 +142,7 @@ class StaticGratings(StimulusAnalysis):
 
     @property
     def pval(self):
-        if self._pval is StimulusAnalysis._PRELOAD:
+        if self._pval is StaticGratings._PRELOAD:
             self._sweep_response, self._mean_sweep_response, self._pval = \
                 self.get_sweep_response()
 
@@ -150,14 +150,14 @@ class StaticGratings(StimulusAnalysis):
 
     @property
     def response(self):
-        if self._response is StimulusAnalysis._PRELOAD:
+        if self._response is StaticGratings._PRELOAD:
             self._response = self.get_response()
 
         return self._response
 
     @property
     def peak(self):
-        if self._peak is StimulusAnalysis._PRELOAD:
+        if self._peak is StaticGratings._PRELOAD:
             self._peak = self.get_peak()
 
         return self._peak
