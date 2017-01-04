@@ -50,6 +50,18 @@ def test_get_roi_ids(data_set):
     ids = data_set.get_roi_ids()
     assert len(ids) == len(data_set.get_cell_specimen_ids())
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_get_metadata(data_set):
+    md = data_set.get_metadata()
+
+    fields = [ 'genotype', 'cre_line', 'imaging_depth_um', 'ophys_experiment_id', 'experiment_container_id',
+               'session_start_time', 'age_days', 'device', 'device_name', 'pipeline_version', 'sex',
+               'targeted_structure', 'excitation_lambda', 'indicator', 'fov', 'session_type', 'specimen_name' ]
+
+    for field in fields:
+        assert field in md
+
 
 @pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
                     reason="test NWB file not available")

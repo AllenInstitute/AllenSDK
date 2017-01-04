@@ -508,7 +508,7 @@ class BrainObservatoryNwbDataSet(object):
                 except KeyError as e:
                     logging.warning("could not find key %s", disk_key)
 
-        if 'genotye' in meta:
+        if 'genotype' in meta:
             meta['cre_line'] = meta['genotype'].split(';')[0]
 
         if 'imaging_depth' in meta:
