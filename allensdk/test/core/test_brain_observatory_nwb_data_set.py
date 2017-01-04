@@ -55,12 +55,18 @@ def test_get_roi_ids(data_set):
 def test_get_metadata(data_set):
     md = data_set.get_metadata()
 
-    fields = [ 'genotype', 'cre_line', 'imaging_depth_um', 'ophys_experiment_id', 'experiment_container_id',
-               'session_start_time', 'age_days', 'device', 'device_name', 'pipeline_version', 'sex',
-               'targeted_structure', 'excitation_lambda', 'indicator', 'fov', 'session_type', 'specimen_name' ]
+    valid_fields = [ 'genotype', 'cre_line', 'imaging_depth_um', 'ophys_experiment_id', 'experiment_container_id',
+                     'session_start_time', 'age_days', 'device', 'device_name', 'pipeline_version', 'sex',
+                     'targeted_structure', 'excitation_lambda', 'indicator', 'fov', 'session_type', 'specimen_name' ]
 
-    for field in fields:
-        assert field in md
+    invalid_fields = [ 'imaging_depth', 'age', 'device_string', 'generated_by' ]
+
+    for field in valid_fields:
+        assert md[field] is not None
+
+    for field in invalid_fields:
+        assert field not in md
+    
 
 
 @pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
