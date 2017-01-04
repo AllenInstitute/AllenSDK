@@ -52,27 +52,12 @@ class LocallySparseNoise(StimulusAnalysis):
         self.nrows = lsn_dims[0]
         self.ncols = lsn_dims[1]
         
-        self._stim_table = LocallySparseNoise._PRELOAD
         self._LSN = LocallySparseNoise._PRELOAD
         self._LSN_mask = LocallySparseNoise._PRELOAD
         self._sweeplength = LocallySparseNoise._PRELOAD
         self._interlength = LocallySparseNoise._PRELOAD
         self._extralength = LocallySparseNoise._PRELOAD
-
-        self._sweep_response = LocallySparseNoise._PRELOAD
-        self._mean_sweep_response = LocallySparseNoise._PRELOAD
-        self._pval = LocallySparseNoise._PRELOAD\
-
         self._receptive_field = LocallySparseNoise._PRELOAD
-
-        # get stimulus table
-
-    @property
-    def stim_table(self):
-        if self._stim_table is LocallySparseNoise._PRELOAD:
-            self.populate_stimulus_table()
-
-        return self._stim_table
 
     @property
     def LSN(self):
@@ -108,30 +93,6 @@ class LocallySparseNoise(StimulusAnalysis):
             self.populate_stimulus_table()
 
         return self._extralength
-
-    @property
-    def sweep_response(self):
-        if self._sweep_response is LocallySparseNoise._PRELOAD:
-            self._sweep_response, self._mean_sweep_response, self._pval = \
-                self.get_sweep_response()
-
-        return self._sweep_response
-
-    @property
-    def mean_sweep_response(self):
-        if self._mean_sweep_response is LocallySparseNoise._PRELOAD:
-            self._sweep_response, self._mean_sweep_response, self._pval = \
-                self.get_sweep_response()
-
-        return self._mean_sweep_response
-
-    @property
-    def pval(self):
-        if self._pval is LocallySparseNoise._PRELOAD:
-            self._sweep_response, self._mean_sweep_response, self._pval = \
-                self.get_sweep_response()
-
-        return self._pval
 
     @property
     def receptive_field(self):

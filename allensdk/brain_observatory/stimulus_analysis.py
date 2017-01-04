@@ -58,6 +58,58 @@ class StimulusAnalysis(object):
         self._peak_run = StimulusAnalysis._PRELOAD
         self._binsize = 800
 
+        self._stim_table = StimulusAnalysis._PRELOAD
+        self._response = StimulusAnalysis._PRELOAD
+        self._sweep_response = StimulusAnalysis._PRELOAD
+        self._mean_sweep_response = StimulusAnalysis._PRELOAD
+        self._pval = StimulusAnalysis._PRELOAD
+        self._peak = StimulusAnalysis._PRELOAD
+
+    @property
+    def stim_table(self):
+        if self._stim_table is StimulusAnalysis._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._stim_table
+
+    @property
+    def sweep_response(self):
+        if self._sweep_response is StimulusAnalysis._PRELOAD:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._sweep_response
+
+    @property
+    def mean_sweep_response(self):
+        if self._mean_sweep_response is StimulusAnalysis._PRELOAD:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._mean_sweep_response
+
+    @property
+    def pval(self):
+        if self._pval is StimulusAnalysis._PRELOAD:
+            self._sweep_response, self._mean_sweep_response, self._pval = \
+                self.get_sweep_response()
+
+        return self._pval
+
+    @property
+    def response(self):
+        if self._response is StimulusAnalysis._PRELOAD:
+            self._response = self.get_response()
+
+        return self._response
+
+    @property
+    def peak(self):
+        if self._peak is StimulusAnalysis._PRELOAD:
+            self._peak = self.get_peak()
+
+        return self._peak
+
     def get_fluorescence(self):
         # get fluorescence
         self._timestamps, self._celltraces = \
@@ -172,6 +224,10 @@ class StimulusAnalysis(object):
                 self.get_speed_tuning(binsize=self._binsize)
 
         return self._peak_run
+
+    def populate_stimulus_table(self):
+        """ Implemented by subclasses. """
+        raise BrainObservatoryAnalysisException("populate_stimulus_table not implemented")
 
     def get_response(self):
         """ Implemented by subclasses. """

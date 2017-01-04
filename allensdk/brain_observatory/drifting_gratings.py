@@ -38,24 +38,10 @@ class DriftingGratings(StimulusAnalysis):
         self.interlength = 30
         self.extralength = 0
 
-        self._stim_table = DriftingGratings._PRELOAD
         self._orivals = DriftingGratings._PRELOAD
         self._tfvals = DriftingGratings._PRELOAD
         self._number_ori = DriftingGratings._PRELOAD
         self._number_tf = DriftingGratings._PRELOAD
-
-        self._sweep_response = DriftingGratings._PRELOAD
-        self._mean_sweep_response = DriftingGratings._PRELOAD
-        self._pval = DriftingGratings._PRELOAD
-        self._response = DriftingGratings._PRELOAD
-        self._peak = DriftingGratings._PRELOAD
-
-    @property
-    def stim_table(self):
-        if self._stim_table is DriftingGratings._PRELOAD:
-            self.populate_stimulus_table()
-
-        return self._stim_table
 
     @property
     def orivals(self):
@@ -84,44 +70,6 @@ class DriftingGratings(StimulusAnalysis):
             self.populate_stimulus_table()
 
         return self._number_tf
-
-    @property
-    def sweep_response(self):
-        if self._sweep_response is DriftingGratings._PRELOAD:
-            self._sweep_response, self._mean_sweep_response, self._pval = \
-                self.get_sweep_response()
-
-        return self._sweep_response
-
-    @property
-    def mean_sweep_response(self):
-        if self._mean_sweep_response is DriftingGratings._PRELOAD:
-            self._sweep_response, self._mean_sweep_response, self._pval = \
-                self.get_sweep_response()
-
-        return self._mean_sweep_response
-
-    @property
-    def pval(self):
-        if self._pval is DriftingGratings._PRELOAD:
-            self._sweep_response, self._mean_sweep_response, self._pval = \
-                self.get_sweep_response()
-
-        return self._pval
-
-    @property
-    def response(self):
-        if self._response is DriftingGratings._PRELOAD:
-            self._response = self.get_response()
-
-        return self._response
-
-    @property
-    def peak(self):
-        if self._peak is DriftingGratings._PRELOAD:
-            self._peak = self.get_peak()
-
-        return self._peak
 
     def populate_stimulus_table(self):
         stimulus_table = self.data_set.get_stimulus_table('drifting_gratings')

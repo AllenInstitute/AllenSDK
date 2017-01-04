@@ -35,22 +35,13 @@ class NaturalMovie(StimulusAnalysis):
         super(NaturalMovie, self).__init__(data_set, **kwargs)
         
         self.movie_name = movie_name
-        self._stim_table = NaturalMovie._PRELOAD
         self._sweeplength = NaturalMovie._PRELOAD
         self._sweep_response = NaturalMovie._PRELOAD
-        self._peak = NaturalMovie._PRELOAD
-
-    @property
-    def stim_table(self):
-        if self._stim_table is NaturalMovie._PRELOAD:
-            self.populate_stimulus_table(self.movie_name)
-
-        return self._stim_table
 
     @property
     def sweeplength(self):
         if self._sweeplength is NaturalMovie._PRELOAD:
-            self.populate_stimulus_table(self.movie_name)
+            self.populate_stimulus_table()
 
         return self._sweeplength
 
@@ -61,14 +52,10 @@ class NaturalMovie(StimulusAnalysis):
 
         return self._sweep_response
 
-    @property
-    def peak(self):
-        if self._peak is NaturalMovie._PRELOAD:
-            self._peak = self.get_peak(movie_name=self.movie_name)
+    def populate_stimulus_table(self, movie_name=None):
+        if movie_name == None:
+            movie_name = self.movie_name
 
-        return self._peak
-
-    def populate_stimulus_table(self, movie_name):
         stimulus_table = self.data_set.get_stimulus_table(movie_name)
         self._stim_table = stimulus_table[stimulus_table.frame == 0]
         self._sweeplength = \
@@ -90,7 +77,7 @@ class NaturalMovie(StimulusAnalysis):
                 sweep_response[str(nc)][index] = self.dfftraces[nc, start:end]
         return sweep_response
 
-    def get_peak(self, movie_name):
+    def get_peak(self, movie_name=None):
         ''' Computes properties of the peak response condition for each cell.
 
         Parameters
@@ -105,6 +92,9 @@ class NaturalMovie(StimulusAnalysis):
             * peak_nm1 (frame with peak response)
             * response_variability_nm1
         '''
+        if movie_name == None:
+            movie_name = self.movie_name
+        
         peak_movie = pd.DataFrame(index=range(self.numbercells), columns=(
             'peak', 'response_reliability', 'cell_specimen_id'))
         cids = self.data_set.get_cell_specimen_ids()
