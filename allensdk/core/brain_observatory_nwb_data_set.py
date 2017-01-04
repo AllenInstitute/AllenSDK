@@ -508,38 +508,36 @@ class BrainObservatoryNwbDataSet(object):
                 except KeyError as e:
                     logging.warning("could not find key %s", disk_key)
 
-        if 'genotye' in meta:
-            meta['cre_line'] = meta['genotype'].split(';')[0]
+        # extract cre line from genotype string
+        genotype = meta.get('genotype')
+        meta['cre_line'] = meta['genotype'].split(';')[0] if genotype else None
 
-        if 'imaging_depth' in meta:
-            meta['imaging_depth_um'] = int(meta['imaging_depth'].split()[0])
-            del meta['imaging_depth']
-            
-        if 'ophys_experiment_id' in meta:
-            meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
+        imaging_depth = meta.pop('imaging_depth', None)
+        meta['imaging_depth_um'] = int(imaging_depth.split()[0]) if imaging_depth else None
+        
+        ophys_experiment_id = meta.get('ophys_experiment_id')
+        meta['ophys_experiment_id'] = int(ophys_experiment_id) if ophys_experiment_id else None
 
-        if 'experiment_container_id' in meta:
-            meta['experiment_container_id'] = \
-                int(meta['experiment_container_id'])
+        experiment_container_id = meta.get('experiment_container_id')
+        meta['experiment_container_id'] = int(experiment_container_id) if experiment_container_id else None
 
-        if 'session_start_time' in meta:
-            meta['session_start_time'] = \
-                dateutil.parser.parse(meta['session_start_time'])
+        # convert start time to a date object
+        session_start_time = meta.get('session_start_time')
+        meta['session_start_time'] = dateutil.parser.parse(session_start_time) if session_start_time else None
 
-        if 'age' in meta:
+        age = meta.pop('age', None)
+        if age:
             # parse the age in days
-            m = re.match("(.*?) days", meta['age'])
+            m = re.match("(.*?) days", age)
             if m:
                 meta['age_days'] = int(m.groups()[0])
-                del meta['age']
             else:
                 raise IOError("Could not parse age.")
+            
 
         # parse the device string (ugly, sorry)
-        if 'device_string' in meta:
-            device_string = meta['device_string']
-            del meta['device_string']
-
+        device_string = meta.pop('device_string', None)
+        if device_string:
             m = re.match("(.*?)\.\s(.*?)\sPlease*", device_string)
             if m:
                 device, device_name = m.groups()
@@ -549,14 +547,9 @@ class BrainObservatoryNwbDataSet(object):
                 raise IOError("Could not parse device string.")
 
         # file version
-        if 'generated_by' in meta:
-            generated_by = meta.get("generated_by", None)
-            if generated_by is not None:
-                del meta["generated_by"]
-                version = generated_by[-1]
-            else:
-                version = "0.9"
-            meta["pipeline_version"] = version
+        generated_by = meta.pop('generated_by', None)
+        version = generated_by[-1] if generated_by else "0.9"
+        meta["pipeline_version"] = version
 
         return meta
 
@@ -850,3 +843,4 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
 
     return stimulus_table
+
