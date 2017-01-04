@@ -52,11 +52,8 @@ class NaturalMovie(StimulusAnalysis):
 
         return self._sweep_response
 
-    def populate_stimulus_table(self, movie_name=None):
-        if movie_name == None:
-            movie_name = self.movie_name
-
-        stimulus_table = self.data_set.get_stimulus_table(movie_name)
+    def populate_stimulus_table(self):
+        stimulus_table = self.data_set.get_stimulus_table(self.movie_name)
         self._stim_table = stimulus_table[stimulus_table.frame == 0]
         self._sweeplength = \
             self.stim_table.start.iloc[1] - self.stim_table.start.iloc[0]
@@ -77,13 +74,8 @@ class NaturalMovie(StimulusAnalysis):
                 sweep_response[str(nc)][index] = self.dfftraces[nc, start:end]
         return sweep_response
 
-    def get_peak(self, movie_name=None):
+    def get_peak(self):
         ''' Computes properties of the peak response condition for each cell.
-
-        Parameters
-        ----------
-        movie_name: string
-            one of [ stimulus_info.NATURAL_MOVIE_ONE, stimulus_info.NATURAL_MOVIE_TWO, stimulus_info.NATURAL_MOVIE_THREE ]
 
         Returns
         -------
@@ -92,9 +84,6 @@ class NaturalMovie(StimulusAnalysis):
             * peak_nm1 (frame with peak response)
             * response_variability_nm1
         '''
-        if movie_name == None:
-            movie_name = self.movie_name
-        
         peak_movie = pd.DataFrame(index=range(self.numbercells), columns=(
             'peak', 'response_reliability', 'cell_specimen_id'))
         cids = self.data_set.get_cell_specimen_ids()
@@ -120,13 +109,13 @@ class NaturalMovie(StimulusAnalysis):
             else:
                 peak_movie.response_reliability.iloc[nc] = ptime[0]
             peak_movie.peak.iloc[nc] = peak
-        if movie_name == 'natural_movie_one':
+        if self.movie_name == 'natural_movie_one':
             peak_movie.rename(columns={
                               'peak': 'peak_nm1', 'response_reliability': 'response_reliability_nm1'}, inplace=True)
-        elif movie_name == 'natural_movie_two':
+        elif self.movie_name == 'natural_movie_two':
             peak_movie.rename(columns={
                               'peak': 'peak_nm2', 'response_reliability': 'response_reliability_nm2'}, inplace=True)
-        elif movie_name == 'natural_movie_three':
+        elif self.movie_name == 'natural_movie_three':
             peak_movie.rename(columns={
                               'peak': 'peak_nm3', 'response_reliability': 'response_reliability_nm3'}, inplace=True)
 
