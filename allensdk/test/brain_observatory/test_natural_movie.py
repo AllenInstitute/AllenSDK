@@ -98,20 +98,20 @@ def test_harness(dataset, trigger):
     assert nm._sweep_response is not StimulusAnalysis._PRELOAD
     assert nm._peak is not StimulusAnalysis._PRELOAD
 
-    # check super properties
+    # check super properties weren't preloaded
     dataset.get_corrected_fluorescence_traces.assert_called_once_with()
-    assert nm._timestamps != NaturalMovie._PRELOAD
-    assert nm._celltraces != NaturalMovie._PRELOAD
-    assert nm._numbercells != NaturalMovie._PRELOAD
-    
-    dataset.get_roi_ids.assert_called_once_with()
-    assert nm._roi_id != NaturalMovie._PRELOAD
-    
+    assert nm._timestamps is not NaturalMovie._PRELOAD
+    assert nm._celltraces is not NaturalMovie._PRELOAD
+    assert nm._numbercells is not NaturalMovie._PRELOAD
+
+    assert not dataset.get_roi_ids.called
+    assert nm._roi_id is NaturalMovie._PRELOAD
+
     assert dataset.get_cell_specimen_ids.called
-    assert nm._cell_id != NaturalMovie._PRELOAD
-    
-    dataset.get_dff_traces.assert_called_once_with()
-    assert nm._dfftraces != NaturalMovie._PRELOAD
-    
-    assert nm._dxcm != NaturalMovie._PRELOAD
-    assert nm._dxtime != NaturalMovie._PRELOAD
+    assert nm._cell_id is NaturalMovie._PRELOAD
+
+    assert not dataset.get_dff_traces.called
+    assert nm._dfftraces is NaturalMovie._PRELOAD
+
+    assert nm._dxcm is NaturalMovie._PRELOAD
+    assert nm._dxtime is NaturalMovie._PRELOAD

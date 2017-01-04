@@ -166,14 +166,14 @@ def test_harness(dataset, trigger):
     assert sg._celltraces != StaticGratings._PRELOAD
     assert sg._numbercells != StaticGratings._PRELOAD
     
-    dataset.get_roi_ids.assert_called_once_with()
-    assert sg._roi_id != StaticGratings._PRELOAD
+    #dataset.get_roi_ids.assert_called_once_with()
+    #assert sg._roi_id != StaticGratings._PRELOAD
     
-    assert dataset.get_cell_specimen_ids.called
-    assert sg._cell_id != StaticGratings._PRELOAD
+    #assert dataset.get_cell_specimen_ids.called
+    #assert sg._cell_id != StaticGratings._PRELOAD
     
-    dataset.get_dff_traces.assert_called_once_with()
-    assert sg._dfftraces != StaticGratings._PRELOAD
+    #dataset.get_dff_traces.assert_called_once_with()
+    #assert sg._dfftraces != StaticGratings._PRELOAD
     
-    assert sg._dxcm != StaticGratings._PRELOAD
-    assert sg._dxtime != StaticGratings._PRELOAD
+    #assert sg._dxcm != StaticGratings._PRELOAD
+    #assert sg._dxtime != StaticGratings._PRELOAD

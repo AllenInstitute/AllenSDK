@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -125,20 +125,21 @@ def test_harness(dataset, trigger):
     assert ns._pval is not StimulusAnalysis._PRELOAD
     assert ns._response is not StimulusAnalysis._PRELOAD
     assert ns._peak is not StimulusAnalysis._PRELOAD
+
     # check super properties
     dataset.get_corrected_fluorescence_traces.assert_called_once_with()
     assert ns._timestamps != NaturalScenes._PRELOAD
     assert ns._celltraces != NaturalScenes._PRELOAD
     assert ns._numbercells != NaturalScenes._PRELOAD
-    
-    dataset.get_roi_ids.assert_called_once_with()
-    assert ns._roi_id != NaturalScenes._PRELOAD
-    
+
+    assert not dataset.get_roi_ids.called
+    assert ns._roi_id is NaturalScenes._PRELOAD
+
     assert dataset.get_cell_specimen_ids.called
-    assert ns._cell_id != NaturalScenes._PRELOAD
-    
-    dataset.get_dff_traces.assert_called_once_with()
-    assert ns._dfftraces != NaturalScenes._PRELOAD
-    
-    assert ns._dxcm != NaturalScenes._PRELOAD
-    assert ns._dxtime != NaturalScenes._PRELOAD
+    assert ns._cell_id is NaturalScenes._PRELOAD
+
+    assert not dataset.get_dff_traces.called
+    assert ns._dfftraces is NaturalScenes._PRELOAD
+
+    assert ns._dxcm is NaturalScenes._PRELOAD
+    assert ns._dxtime is NaturalScenes._PRELOAD

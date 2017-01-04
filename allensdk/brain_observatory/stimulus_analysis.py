@@ -19,7 +19,6 @@ import pandas as pd
 import logging
 from .findlevel import findlevel
 from .brain_observatory_exceptions import BrainObservatoryAnalysisException
-import warnings
 
 
 class StimulusAnalysis(object):
@@ -39,9 +38,9 @@ class StimulusAnalysis(object):
 
     """
     _log = logging.getLogger('allensdk.brain_observatory.stimulus_analysis')
-    _PRELOAD = "LAZY"
+    _PRELOAD = "PRELOAD"
 
-    def __init__(self, data_set, speed_tuning=False, lazy=False):
+    def __init__(self, data_set):
         self.data_set = data_set
         self._timestamps = StimulusAnalysis._PRELOAD
         self._celltraces = StimulusAnalysis._PRELOAD
@@ -58,20 +57,6 @@ class StimulusAnalysis(object):
         self._binned_cells_vis = StimulusAnalysis._PRELOAD
         self._peak_run = StimulusAnalysis._PRELOAD
         self._binsize = 800
-
-        if lazy is False:
-            self.get_fluorescence()
-            self._roi_id = self.data_set.get_roi_ids()
-            self._cell_id = self.data_set.get_cell_specimen_ids()
-            _, self._dfftraces = self.data_set.get_dff_traces()
-            self._dxcm, self._dxtime = self.data_set.get_running_speed()
-
-            if speed_tuning:
-                warnings.warn("speed tuning flag is deprecated",
-                              DeprecationWarning)
-                (self._binned_dx_sp, self._binned_cells_sp, self._binned_dx_vis,
-                 self._binned_cells_vis, self._peak_run) = \
-                    self.get_speed_tuning(binsize=self._binsize)
 
     def get_fluorescence(self):
         # get fluorescence

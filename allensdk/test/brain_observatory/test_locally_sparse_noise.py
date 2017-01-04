@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -137,20 +137,21 @@ def test_harness(dataset,
         assert lsn._mean_sweep_response is not StimulusAnalysis._PRELOAD
         assert lsn._pval is not StimulusAnalysis._PRELOAD
         assert lsn._receptive_field is not StimulusAnalysis._PRELOAD
-        
-        dataset.get_corrected_fluorescence_traces.assert_called_once_with()
-        assert lsn._timestamps != StimulusAnalysis._PRELOAD
-        assert lsn._celltraces != StimulusAnalysis._PRELOAD
-        assert lsn._numbercells != StimulusAnalysis._PRELOAD
-    
-        dataset.get_roi_ids.assert_called_once_with()
-        assert lsn._roi_id != StimulusAnalysis._PRELOAD
-    
-        dataset.get_cell_specimen_ids.assert_called_once_with()
-        assert lsn._cell_id != StimulusAnalysis._PRELOAD
-    
-        dataset.get_dff_traces.assert_called_once_with()
-        assert lsn._dfftraces != StimulusAnalysis._PRELOAD
-    
-        assert lsn._dxcm != StimulusAnalysis._PRELOAD
-        assert lsn._dxtime != StimulusAnalysis._PRELOAD
+
+        # verify super class members weren't preloaded
+        assert not dataset.get_corrected_fluorescence_traces.called
+        assert lsn._timestamps is StimulusAnalysis._PRELOAD
+        assert lsn._celltraces is StimulusAnalysis._PRELOAD
+        assert lsn._numbercells is StimulusAnalysis._PRELOAD
+
+        assert not dataset.get_roi_ids.called
+        assert lsn._roi_id is StimulusAnalysis._PRELOAD
+
+        assert not dataset.get_cell_specimen_ids.called
+        assert lsn._cell_id is StimulusAnalysis._PRELOAD
+
+        assert not dataset.get_dff_traces.called
+        assert lsn._dfftraces is StimulusAnalysis._PRELOAD
+
+        assert lsn._dxcm is StimulusAnalysis._PRELOAD
+        assert lsn._dxtime is StimulusAnalysis._PRELOAD

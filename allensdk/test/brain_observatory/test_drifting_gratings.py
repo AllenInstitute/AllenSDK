@@ -125,21 +125,21 @@ def test_harness(dataset, trigger):
     assert dg._pval is not StimulusAnalysis._PRELOAD
     assert dg._response is not StimulusAnalysis._PRELOAD
     assert dg._peak is not StimulusAnalysis._PRELOAD
-    
+
     # check super properties
     dataset.get_corrected_fluorescence_traces.assert_called_once_with()
     assert dg._timestamps != DriftingGratings._PRELOAD
     assert dg._celltraces != DriftingGratings._PRELOAD
     assert dg._numbercells != DriftingGratings._PRELOAD
-    
-    dataset.get_roi_ids.assert_called_once_with()
-    assert dg._roi_id != DriftingGratings._PRELOAD
-    
+
+    assert not dataset.get_roi_ids.called
+    assert dg._roi_id is DriftingGratings._PRELOAD
+
     assert dataset.get_cell_specimen_ids.called
-    assert dg._cell_id != DriftingGratings._PRELOAD
-    
-    dataset.get_dff_traces.assert_called_once_with()
-    assert dg._dfftraces != DriftingGratings._PRELOAD
-    
-    assert dg._dxcm != DriftingGratings._PRELOAD
-    assert dg._dxtime != DriftingGratings._PRELOAD
+    assert dg._cell_id is DriftingGratings._PRELOAD
+
+    assert not dataset.get_dff_traces.called
+    assert dg._dfftraces is DriftingGratings._PRELOAD
+
+    assert dg._dxcm is DriftingGratings._PRELOAD
+    assert dg._dxtime is DriftingGratings._PRELOAD
