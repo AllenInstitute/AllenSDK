@@ -1,6 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.12.x] - TBD
+
+### Fixed
+
+- MouseConnectivityCache's manifest now uses CCF-version- and resolution-specific file names for masks.  The masks now live inside the CCF version directory.
+
 ## [0.12.4] - 2016-10-28
 
 ### Fixed
