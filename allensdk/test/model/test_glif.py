@@ -91,6 +91,7 @@ def test_2():
     spike_times = output['interpolated_spike_times']
 
 
+@pytest.mark.skipif(True, reason="needs nwb file")
 def test_3():
     neuron_config = json_utilities.read('neuron_config.json')
     ephys_sweeps = json_utilities.read('ephys_sweeps.json')
@@ -120,12 +121,14 @@ def stimulus():
     return stimulus
 
 
+@pytest.mark.skipif(True, reason="needs nwb file")
 def test_4(output):
     voltage = output['voltage']
     threshold = output['threshold']
     spike_times = output['interpolated_spike_times']
 
 
+@pytest.mark.skipif(True, reason="needs nwb file")
 def test_5(output):
     voltage = output['voltage']
     threshold = output['threshold']
@@ -178,6 +181,7 @@ def test_5(output):
 #     plt.show()
 
 
+@pytest.mark.skipif(True, reason="needs nwb file")
 def test_6(stimulus):
     # define your own custom voltage reset rule
     # this one linearly scales the input voltage
