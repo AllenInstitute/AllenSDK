@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -15,7 +15,7 @@
 
 import numpy as np
 from .stimulus_analysis import StimulusAnalysis
-import stimulus_info
+import allensdk.brain_observatory.stimulus_info as stimulus_info
 import scipy.ndimage 
 
 class LocallySparseNoise(StimulusAnalysis):
@@ -40,27 +40,78 @@ class LocallySparseNoise(StimulusAnalysis):
     LSN_GREY = 127
     LSN_OFF_SCREEN = 64
 
-    def __init__(self, data_set, stimulus, **kwargs):
+    def __init__(self, data_set, stimulus=None, **kwargs):
         super(LocallySparseNoise, self).__init__(data_set, **kwargs)
-        
+        if stimulus is None:
+            self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE
+        else:
+            self.stimulus = stimulus
+
         try:
-            lsn_dims = stimulus_info.LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus]
+            lsn_dims = stimulus_info.LOCALLY_SPARSE_NOISE_DIMENSIONS[self.stimulus]
         except KeyError as e:
-            raise KeyError("Unknown stimulus name: %s" % stimulus)
+            raise KeyError("Unknown stimulus name: %s" % self.stimulus)
         
         self.nrows = lsn_dims[0]
         self.ncols = lsn_dims[1]
+        
+        self._LSN = LocallySparseNoise._PRELOAD
+        self._LSN_mask = LocallySparseNoise._PRELOAD
+        self._sweeplength = LocallySparseNoise._PRELOAD
+        self._interlength = LocallySparseNoise._PRELOAD
+        self._extralength = LocallySparseNoise._PRELOAD
+        self._receptive_field = LocallySparseNoise._PRELOAD
 
-        self.stim_table = self.data_set.get_stimulus_table(
-            stimulus)
-        self.LSN, self.LSN_mask = self.data_set.get_locally_sparse_noise_stimulus_template(
-            stimulus, mask_off_screen=False)
-        self.sweeplength = self.stim_table['end'][
-            1] - self.stim_table['start'][1]
-        self.interlength = 4 * self.sweeplength
-        self.extralength = self.sweeplength
-        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
-        self.receptive_field = self.get_receptive_field()
+    @property
+    def LSN(self):
+        if self._LSN is LocallySparseNoise._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._LSN
+
+    @property
+    def LSN_mask(self):
+        if self._LSN_mask is LocallySparseNoise._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._LSN_mask
+
+    @property
+    def sweeplength(self):
+        if self._sweeplength is LocallySparseNoise._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._sweeplength
+
+    @property
+    def interlength(self):
+        if self._interlength is LocallySparseNoise._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._interlength
+
+    @property
+    def extralength(self):
+        if self._extralength is LocallySparseNoise._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._extralength
+
+    @property
+    def receptive_field(self):
+        if self._receptive_field is LocallySparseNoise._PRELOAD:
+            self._receptive_field = self.get_receptive_field()
+
+        return self._receptive_field
+
+    def populate_stimulus_table(self):
+        self._stim_table = self.data_set.get_stimulus_table(self.stimulus)
+        self._LSN, self._LSN_mask = self.data_set.get_locally_sparse_noise_stimulus_template(
+            self.stimulus, mask_off_screen=False)
+        self._sweeplength = self._stim_table['end'][
+            1] - self._stim_table['start'][1]
+        self._interlength = 4 * self._sweeplength
+        self._extralength = self._sweeplength
 
     def get_receptive_field(self):
         ''' Calculates receptive fields for each cell

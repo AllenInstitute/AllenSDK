@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -33,15 +33,47 @@ class NaturalScenes(StimulusAnalysis):
 
     def __init__(self, data_set, **kwargs):
         super(NaturalScenes, self).__init__(data_set, **kwargs)
-        self.stim_table = self.data_set.get_stimulus_table('natural_scenes')
-        self.number_scenes = len(np.unique(self.stim_table.frame))
-        self.sweeplength = self.stim_table.end.iloc[
-            1] - self.stim_table.start.iloc[1]
-        self.interlength = 4 * self.sweeplength
-        self.extralength = self.sweeplength
-        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
-        self.response = self.get_response()
-        self.peak = self.get_peak()
+
+        self._number_scenes = StimulusAnalysis._PRELOAD
+        self._sweeplength = StimulusAnalysis._PRELOAD
+        self._interlength = StimulusAnalysis._PRELOAD
+        self._extralength = StimulusAnalysis._PRELOAD
+
+    @property
+    def number_scenes(self):
+        if self._number_scenes is StimulusAnalysis._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._number_scenes
+
+    @property
+    def sweeplength(self):
+        if self._sweeplength is StimulusAnalysis._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._sweeplength
+
+    @property
+    def interlength(self):
+        if self._interlength is StimulusAnalysis._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._interlength
+
+    @property
+    def extralength(self):
+        if self._extralength is StimulusAnalysis._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._extralength
+
+    def populate_stimulus_table(self):
+        self._stim_table = self.data_set.get_stimulus_table('natural_scenes')
+        self._number_scenes = len(np.unique(self._stim_table.frame))
+        self._sweeplength = self._stim_table.end.iloc[
+            1] - self._stim_table.start.iloc[1]
+        self._interlength = 4 * self._sweeplength
+        self._extralength = self._sweeplength
 
     def get_response(self):
         ''' Computes the mean response for each cell to each stimulus condition.  Return is

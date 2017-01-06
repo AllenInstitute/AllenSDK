@@ -36,21 +36,92 @@ class StaticGratings(StimulusAnalysis):
     def __init__(self, data_set, **kwargs):
         super(StaticGratings, self).__init__(data_set, **kwargs)
 
+        self._sweeplength = StaticGratings._PRELOAD
+        self._interlength = StaticGratings._PRELOAD
+        self._extralength = StaticGratings._PRELOAD
+        self._orivals = StaticGratings._PRELOAD
+        self._sfvals = StaticGratings._PRELOAD
+        self._phasevals = StaticGratings._PRELOAD
+        self._number_ori = StaticGratings._PRELOAD
+        self._number_sf = StaticGratings._PRELOAD
+        self._number_phase = StaticGratings._PRELOAD
+
+    @property
+    def sweeplength(self):
+        if self._sweeplength is StaticGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._sweeplength
+
+    @property
+    def interlength(self):
+        if self._interlength is StaticGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._interlength
+
+    @property
+    def extralength(self):
+        if self._extralength is StaticGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._extralength
+
+    @property
+    def orivals(self):
+        if self._orivals is StaticGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._orivals
+
+    @property
+    def sfvals(self):
+        if self._sfvals is StaticGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._sfvals
+
+    @property
+    def phasevals(self):
+        if self._phasevals is StaticGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._phasevals
+
+    @property
+    def number_ori(self):
+        if self._number_ori is StaticGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._number_ori
+
+    @property
+    def number_sf(self):
+        if self._number_sf is StaticGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._number_sf
+
+    @property
+    def number_phase(self):
+        if self._number_phase is StaticGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._number_phase
+
+    def populate_stimulus_table(self):
         stimulus_table = self.data_set.get_stimulus_table('static_gratings')
-        self.stim_table = stimulus_table.fillna(value=0.)
-        self.sweeplength = self.stim_table['end'].iloc[
+        self._stim_table = stimulus_table.fillna(value=0.)
+        self._sweeplength = self.stim_table['end'].iloc[
             1] - self.stim_table['start'].iloc[1]
-        self.interlength = 4 * self.sweeplength
-        self.extralength = self.sweeplength
-        self.orivals = np.unique(self.stim_table.orientation.dropna())
-        self.sfvals = np.unique(self.stim_table.spatial_frequency.dropna())
-        self.phasevals = np.unique(self.stim_table.phase.dropna())
-        self.number_ori = len(self.orivals)
-        self.number_sf = len(self.sfvals)
-        self.number_phase = len(self.phasevals)
-        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
-        self.response = self.get_response()
-        self.peak = self.get_peak()
+        self._interlength = 4 * self._sweeplength
+        self._extralength = self._sweeplength
+        self._orivals = np.unique(self._stim_table.orientation.dropna())
+        self._sfvals = np.unique(self._stim_table.spatial_frequency.dropna())
+        self._phasevals = np.unique(self._stim_table.phase.dropna())
+        self._number_ori = len(self._orivals)
+        self._number_sf = len(self._sfvals)
+        self._number_phase = len(self._phasevals)
 
     def get_response(self):
         ''' Computes the mean response for each cell to each stimulus condition.  Return is

@@ -182,7 +182,7 @@ class SessionAnalysis(object):
                     "Error -- ROI lists have different entries")
 
     def session_a(self, plot_flag=False, save_flag=True):
-        nm1 = NaturalMovie(self.nwb, 'natural_movie_one', speed_tuning=True)
+        nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         nm3 = NaturalMovie(self.nwb, 'natural_movie_three')
         dg = DriftingGratings(self.nwb)
 
@@ -205,7 +205,7 @@ class SessionAnalysis(object):
     def session_b(self, plot_flag=False, save_flag=True):
         ns = NaturalScenes(self.nwb)
         sg = StaticGratings(self.nwb)
-        nm1 = NaturalMovie(self.nwb, 'natural_movie_one', speed_tuning=True)
+        nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session B analyzed")
         peak = multi_dataframe_merge(
             [nm1.peak_run, sg.peak, ns.peak, nm1.peak])
@@ -227,7 +227,7 @@ class SessionAnalysis(object):
     def session_c(self, plot_flag=False, save_flag=True):
         lsn = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE)
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
-        nm1 = NaturalMovie(self.nwb, 'natural_movie_one', speed_tuning=True)
+        nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session C analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_metadata(peak)
@@ -245,7 +245,7 @@ class SessionAnalysis(object):
         lsn4 = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE_4DEG)
         lsn8 = LocallySparseNoise(self.nwb, stimulus_info.LOCALLY_SPARSE_NOISE_8DEG)
         nm2 = NaturalMovie(self.nwb, 'natural_movie_two')
-        nm1 = NaturalMovie(self.nwb, 'natural_movie_one', speed_tuning=True)
+        nm1 = NaturalMovie(self.nwb, 'natural_movie_one')
         SessionAnalysis._log.info("Session C2 analyzed")
         peak = multi_dataframe_merge([nm1.peak_run, nm1.peak, nm2.peak])
         self.append_metadata(peak)

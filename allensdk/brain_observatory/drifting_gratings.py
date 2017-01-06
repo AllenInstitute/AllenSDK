@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -33,20 +33,51 @@ class DriftingGratings(StimulusAnalysis):
 
     def __init__(self, data_set, **kwargs):
         super(DriftingGratings, self).__init__(data_set, **kwargs)
-        stimulus_table = self.data_set.get_stimulus_table('drifting_gratings')
-        self.stim_table = stimulus_table.fillna(value=0.)
-        # self.sync_table['end'][1] - self.sync_table['start'][1]
+
         self.sweeplength = 60
-        # self.sync_table['start'][2] - self.sync_table['end'][1]
         self.interlength = 30
         self.extralength = 0
-        self.orivals = np.unique(self.stim_table.orientation).astype(int)
-        self.tfvals = np.unique(self.stim_table.temporal_frequency).astype(int)
-        self.number_ori = len(self.orivals)
-        self.number_tf = len(self.tfvals)
-        self.sweep_response, self.mean_sweep_response, self.pval = self.get_sweep_response()
-        self.response = self.get_response()
-        self.peak = self.get_peak()
+
+        self._orivals = DriftingGratings._PRELOAD
+        self._tfvals = DriftingGratings._PRELOAD
+        self._number_ori = DriftingGratings._PRELOAD
+        self._number_tf = DriftingGratings._PRELOAD
+
+    @property
+    def orivals(self):
+        if self._orivals is DriftingGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._orivals
+
+    @property
+    def tfvals(self):
+        if self._tfvals is DriftingGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._tfvals
+
+    @property
+    def number_ori(self):
+        if self._number_ori is DriftingGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._number_ori
+
+    @property
+    def number_tf(self):
+        if self._number_tf is DriftingGratings._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._number_tf
+
+    def populate_stimulus_table(self):
+        stimulus_table = self.data_set.get_stimulus_table('drifting_gratings')
+        self._stim_table = stimulus_table.fillna(value=0.)
+        self._orivals = np.unique(self.stim_table.orientation).astype(int)
+        self._tfvals = np.unique(self.stim_table.temporal_frequency).astype(int)
+        self._number_ori = len(self.orivals)
+        self._number_tf = len(self.tfvals)
 
     def get_response(self):
         ''' Computes the mean response for each cell to each stimulus condition.  Return is
@@ -140,7 +171,7 @@ class DriftingGratings(StimulusAnalysis):
                         self.stim_table.orientation == ori)][str(nc)])
             groups.append(self.mean_sweep_response[
                           self.stim_table.temporal_frequency == 0][str(nc)])
-            f, p = st.f_oneway(*groups)
+            _, p = st.f_oneway(*groups)
             peak.ptest_dg.iloc[nc] = p
 
             subset = self.mean_sweep_response[(self.stim_table.temporal_frequency == self.tfvals[
@@ -148,7 +179,7 @@ class DriftingGratings(StimulusAnalysis):
             subset_stat = subset[subset.dx < 1]
             subset_run = subset[subset.dx >= 1]
             if (len(subset_run) > 2) & (len(subset_stat) > 2):
-                (f, peak.p_run_dg.iloc[nc]) = st.ks_2samp(
+                (_, peak.p_run_dg.iloc[nc]) = st.ks_2samp(
                     subset_run[str(nc)], subset_stat[str(nc)])
                 peak.run_modulation_dg.iloc[nc] = subset_run[
                     str(nc)].mean() / subset_stat[str(nc)].mean()

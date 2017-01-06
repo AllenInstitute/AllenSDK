@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -33,12 +33,30 @@ class NaturalMovie(StimulusAnalysis):
 
     def __init__(self, data_set, movie_name, **kwargs):
         super(NaturalMovie, self).__init__(data_set, **kwargs)
-        stimulus_table = self.data_set.get_stimulus_table(movie_name)
-        self.stim_table = stimulus_table[stimulus_table.frame == 0]
-        self.sweeplength = self.stim_table.start.iloc[
-            1] - self.stim_table.start.iloc[0]
-        self.sweep_response = self.get_sweep_response()
-        self.peak = self.get_peak(movie_name=movie_name)
+        
+        self.movie_name = movie_name
+        self._sweeplength = NaturalMovie._PRELOAD
+        self._sweep_response = NaturalMovie._PRELOAD
+
+    @property
+    def sweeplength(self):
+        if self._sweeplength is NaturalMovie._PRELOAD:
+            self.populate_stimulus_table()
+
+        return self._sweeplength
+
+    @property
+    def sweep_response(self):
+        if self._sweep_response is NaturalMovie._PRELOAD:
+            self._sweep_response = self.get_sweep_response()
+
+        return self._sweep_response
+
+    def populate_stimulus_table(self):
+        stimulus_table = self.data_set.get_stimulus_table(self.movie_name)
+        self._stim_table = stimulus_table[stimulus_table.frame == 0]
+        self._sweeplength = \
+            self.stim_table.start.iloc[1] - self.stim_table.start.iloc[0]
 
     def get_sweep_response(self):
         ''' Returns the dF/F response for each cell
@@ -56,13 +74,8 @@ class NaturalMovie(StimulusAnalysis):
                 sweep_response[str(nc)][index] = self.dfftraces[nc, start:end]
         return sweep_response
 
-    def get_peak(self, movie_name):
+    def get_peak(self):
         ''' Computes properties of the peak response condition for each cell.
-
-        Parameters
-        ----------
-        movie_name: string
-            one of [ stimulus_info.NATURAL_MOVIE_ONE, stimulus_info.NATURAL_MOVIE_TWO, stimulus_info.NATURAL_MOVIE_THREE ]
 
         Returns
         -------
@@ -96,13 +109,13 @@ class NaturalMovie(StimulusAnalysis):
             else:
                 peak_movie.response_reliability.iloc[nc] = ptime[0]
             peak_movie.peak.iloc[nc] = peak
-        if movie_name == 'natural_movie_one':
+        if self.movie_name == 'natural_movie_one':
             peak_movie.rename(columns={
                               'peak': 'peak_nm1', 'response_reliability': 'response_reliability_nm1'}, inplace=True)
-        elif movie_name == 'natural_movie_two':
+        elif self.movie_name == 'natural_movie_two':
             peak_movie.rename(columns={
                               'peak': 'peak_nm2', 'response_reliability': 'response_reliability_nm2'}, inplace=True)
-        elif movie_name == 'natural_movie_three':
+        elif self.movie_name == 'natural_movie_three':
             peak_movie.rename(columns={
                               'peak': 'peak_nm3', 'response_reliability': 'response_reliability_nm3'}, inplace=True)
 
