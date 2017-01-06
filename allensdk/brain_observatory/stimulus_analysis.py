@@ -502,11 +502,11 @@ class StimulusAnalysis(object):
         sweep_response.rename(
             columns={str(self.numbercells): 'dx'}, inplace=True)
         for index, row in self.stim_table.iterrows():
-            start = row['start'] - self.interlength
-            end = row['start'] + self.sweeplength + self.interlength
+            start = int(row['start'] - self.interlength)
+            end = int(row['start'] + self.sweeplength + self.interlength)
 
             for nc in range(self.numbercells):
-                temp = self.celltraces[nc, start:end]
+                temp = self.celltraces[int(nc), start:end]
                 sweep_response[str(nc)][index] = 100 * \
                     ((temp / np.mean(temp[:self.interlength])) - 1)
             sweep_response['dx'][index] = self.dxcm[start:end]
