@@ -40,10 +40,13 @@ class LocallySparseNoise(StimulusAnalysis):
     LSN_GREY = 127
     LSN_OFF_SCREEN = 64
 
-    def __init__(self, data_set, stimulus, **kwargs):
+    def __init__(self, data_set, stimulus=None, **kwargs):
         super(LocallySparseNoise, self).__init__(data_set, **kwargs)
-        self.stimulus = stimulus
-        
+        if stimulus == None:
+            self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE
+        else:
+            self.stimulus = stimulus
+
         try:
             lsn_dims = stimulus_info.LOCALLY_SPARSE_NOISE_DIMENSIONS[self.stimulus]
         except KeyError as e:
