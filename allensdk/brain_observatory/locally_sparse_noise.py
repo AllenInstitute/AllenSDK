@@ -42,7 +42,7 @@ class LocallySparseNoise(StimulusAnalysis):
 
     def __init__(self, data_set, stimulus=None, **kwargs):
         super(LocallySparseNoise, self).__init__(data_set, **kwargs)
-        if stimulus == None:
+        if stimulus is None:
             self.stimulus = stimulus_info.LOCALLY_SPARSE_NOISE
         else:
             self.stimulus = stimulus
