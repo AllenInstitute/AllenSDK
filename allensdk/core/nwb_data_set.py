@@ -67,6 +67,15 @@ class NwbDataSet(object):
 
             swp = f['epochs']['Sweep_%d' % sweep_number]
 
+            ## fetch data from file and convert to correct SI unit
+            ## stimulus
+            #stimulus_dataset = swp['stimulus']['timeseries']['data']
+            #conversion = float(stimulus_dataset.attrs["conversion"])
+            #stimulus = stimulus_dataset.value * conversion
+            ## acquisition
+            #response_dataset = swp['response']['timeseries']['data']
+            #conversion = float(response_dataset.attrs["conversion"])
+            #response = response_dataset.value * conversion
             stimulus_dataset = swp['stimulus']['timeseries']['data']
             stimulus = stimulus_dataset.value
             response = swp['response']['timeseries']['data'].value
