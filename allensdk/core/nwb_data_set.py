@@ -67,9 +67,26 @@ class NwbDataSet(object):
 
             swp = f['epochs']['Sweep_%d' % sweep_number]
 
-            stimulus_dataset = swp['stimulus']['timeseries']['data']
-            stimulus = stimulus_dataset.value
-            response = swp['response']['timeseries']['data'].value
+            # fetch data from file and convert to correct SI unit
+            # this operation depends on file version. early versions of
+            #   the file have incorrect conversion information embedded
+            #   in the nwb file and data was stored in the appropriate
+            #   SI unit. For those files, return uncorrected data.
+            #   For newer files (1.1 and later), apply conversion value.
+            major, minor = self.get_pipeline_version()
+            if (major == 1 and minor > 0) or major > 1:
+                # stimulus
+                stimulus_dataset = swp['stimulus']['timeseries']['data']
+                conversion = float(stimulus_dataset.attrs["conversion"])
+                stimulus = stimulus_dataset.value * conversion
+                # acquisition
+                response_dataset = swp['response']['timeseries']['data']
+                conversion = float(response_dataset.attrs["conversion"])
+                response = response_dataset.value * conversion
+            else:   # old file version
+                stimulus_dataset = swp['stimulus']['timeseries']['data']
+                stimulus = stimulus_dataset.value
+                response = swp['response']['timeseries']['data'].value
 
             if 'unit' in stimulus_dataset.attrs:
                 unit = stimulus_dataset.attrs["unit"]
@@ -157,6 +174,36 @@ class NwbDataSet(object):
                     response = np.append(response, np.zeros(missing_data))
 
                 swp['response']['timeseries']['data'][...] = response
+
+    def get_pipeline_version(self):
+        """ Returns the AI pipeline version number, stored in the 
+            metadata field 'generated_by'. If that field is
+            missing, version 0.0 is returned.
+
+            Returns
+            -------
+            int tuple: (major, minor)
+        """
+        try:
+            with h5py.File(self.file_name, 'r') as f:
+                if 'generated_by' in f["general"]:
+                    info = f["general/generated_by"]
+                    # generated_by stores array of keys and values
+                    # keys are even numbered, corresponding values are in
+                    #   odd indices
+                    for i in range(len(info)):
+                        val = info[i]
+                        if info[i] == 'version':
+                            version = info[i+1]
+                            break
+            toks = version.split('.')
+            if len(toks) >= 2:
+                major = int(toks[0])
+                minor = int(toks[1])
+        except:
+            minor = 0
+            major = 0
+        return major, minor
 
     def get_spike_times(self, sweep_number, key=None):
         """ Return any spike times stored in the NWB file for a sweep.
