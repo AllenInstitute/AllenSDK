@@ -11,6 +11,8 @@ def enable_console_log(level=None):
         level : int
             logging level 0-50 (logging.INFO, logging.DEBUG, etc.) 
 
+        Notes
+        -----
         See: `Logging Cookbook <https://docs.python.org/2/howto/logging-cookbook.html>`_
     '''
     

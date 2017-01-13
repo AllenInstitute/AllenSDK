@@ -131,6 +131,20 @@ def test_get_dff_traces(data_set):
     timestamps, traces = data_set.get_dff_traces([ids[0]])
     assert traces.shape[0] == 1
 
+@pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
+                    reason="test NWB file not available")
+def test_get_neuropil_r(data_set):
+
+    ids = data_set.get_cell_specimen_ids()
+    r = data_set.get_neuropil_r()
+    assert len(ids) == len(r)
+
+    r = data_set.get_neuropil_r(ids)
+    assert len(ids) == len(r)
+
+    short_list = [ids[0]]
+    r = data_set.get_neuropil_r(short_list)
+    assert len(short_list) == len(r)
 
 @pytest.mark.skipif(not os.path.exists('/projects/neuralcoding'),
                     reason="test NWB file not available")
