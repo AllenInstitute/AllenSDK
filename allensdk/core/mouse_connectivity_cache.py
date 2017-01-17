@@ -649,9 +649,10 @@ class MouseConnectivityCache(Cache):
             it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
         """
-
+        
         file_name = self.get_cache_path(
-            file_name, self.STRUCTURE_MASK_KEY, structure_id)
+            file_name, self.STRUCTURE_MASK_KEY, self.ccf_version, 
+            self.resolution, structure_id)
 
         if os.path.exists(file_name):
             return nrrd.read(file_name)
@@ -756,8 +757,8 @@ class MouseConnectivityCache(Cache):
                                   typename='file')
 
         manifest_builder.add_path(self.STRUCTURE_MASK_KEY,
-                                  'structure_masks/structure_%d.nrrd',
-                                  parent_key='BASEDIR',
+                                  'structure_masks/resolution_%d/structure_%d.nrrd',
+                                  parent_key=self.CCF_VERSION_KEY,
                                   typename='file')
 
         manifest_builder.write_json_file(file_name)
