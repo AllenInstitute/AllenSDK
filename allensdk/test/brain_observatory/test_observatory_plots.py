@@ -62,7 +62,8 @@ def assert_images_match(new_file, test_file, shape):
     test_img = mpimg.imread(test_file)
     assert np.allclose(new_img.shape, test_img.shape)
     assert np.allclose(test_img.shape[:2], shape)
-    assert np.allclose(new_img, test_img)
+
+    assert (new_img - test_img).mean() < 0.1
     
     os.remove(new_file)
 
