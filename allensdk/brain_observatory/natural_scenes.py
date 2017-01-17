@@ -19,7 +19,10 @@ import numpy as np
 import pandas as pd
 from .stimulus_analysis import StimulusAnalysis
 import logging
-
+import h5py
+import observatory_plots as oplots
+import circle_plots as cplots
+from .brain_observatory_exceptions import MissingStimulusException
 
 class NaturalScenes(StimulusAnalysis):
     """ Perform tuning analysis specific to natural scenes stimulus.
@@ -161,3 +164,70 @@ class NaturalScenes(StimulusAnalysis):
                 pass
 
         return peak
+
+    def plot_time_to_peak(self, 
+                          p_value_max=oplots.P_VALUE_MAX, 
+                          color_map=oplots.STIMULUS_COLOR_MAP):
+        stimulus_table = self.data_set.get_stimulus_table('natural_scenes')
+
+        resps = []
+
+        for index, row in self.peak.iterrows():    
+            mean_response = self.sweep_response.ix[stimulus_table.frame==row.scene_ns][str(index)].mean()
+            resps.append((mean_response - mean_response.mean() / mean_response.std()))
+
+        mean_responses = np.array(resps)
+
+        sorted_table = self.peak[self.peak.ptest_ns < p_value_max].sort(columns='time_to_peak_ns')
+        cell_order = sorted_table.index
+
+        # time to peak is relative to stimulus start in seconds
+        ttps = sorted_table.time_to_peak_ns.values + self.interlength / self.acquisition_rate
+        msrs_sorted = mean_responses[cell_order,:]
+
+        oplots.plot_time_to_peak(msrs_sorted, ttps,
+                                 0, (2*self.interlength + self.sweeplength) / self.acquisition_rate,
+                                 (self.interlength) / self.acquisition_rate, 
+                                 (self.interlength + self.sweeplength) / self.acquisition_rate, 
+                                 color_map)
+
+    def open_corona_plot(self, cell_specimen_id):
+        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+
+        df = self.mean_sweep_response[str(cell_id)]
+        data = df.values
+
+        st = self.data_set.get_stimulus_table('natural_scenes')
+        mask = st[st.frame >= 0].index
+
+        cmin = self.response[0,cell_id,0]
+        cmax = data.mean() + data.std()*3
+
+        cp = cplots.CoronaPlotter()
+        cp.plot(st.frame.ix[mask].values, 
+                data=df.ix[mask].values,
+                clim=[cmin, cmax])
+        cp.show_arrow()
+
+    
+    @staticmethod
+    def from_analysis_file(data_set, analysis_file):
+        ns = NaturalScenes(data_set)
+        ns.populate_stimulus_table()
+
+        try:
+            ns._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_ns")
+            ns._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_ns")
+            ns._peak = pd.read_hdf(analysis_file, "analysis/peak")
+
+            with h5py.File(analysis_file, "r") as f:
+                ns._response = f["analysis/response_ns"].value
+                ns._binned_dx_sp = f["analysis/binned_dx_sp"].value
+                ns._binned_cells_sp = f["analysis/binned_cells_sp"].value
+                ns._binned_dx_vis = f["analysis/binned_dx_vis"].value
+                ns._binned_cells_vis = f["analysis/binned_cells_vis"].value
+        except Exception as e:
+            raise MissingStimulusException(e.message)
+
+        return ns
+

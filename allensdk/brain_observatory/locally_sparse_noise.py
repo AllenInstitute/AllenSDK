@@ -14,9 +14,14 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
+import h5py
+import pandas as pd
 from .stimulus_analysis import StimulusAnalysis
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import scipy.ndimage 
+import observatory_plots as oplots
+import circle_plots as cplots
+from .brain_observatory_exceptions import MissingStimulusException
 
 class LocallySparseNoise(StimulusAnalysis):
     """ Perform tuning analysis specific to the locally sparse noise stimulus.
@@ -146,6 +151,70 @@ class LocallySparseNoise(StimulusAnalysis):
         rc2_zoom = scipy.ndimage.zoom(rc2, shape_mult, order=0)
 
         return rc1 + rc2_zoom
+
+    def plot_receptive_field(self, cell_specimen_id, on, color_map=None, zlim=[-3,3], mask=None):
+        csids = self.data_set.get_cell_specimen_ids()
+        cell_idx = np.where(csids == cell_specimen_id)[0][0]
         
+        if color_map is None:
+            color_map = oplots.LSN_RF_ON_COLOR_MAP if on else oplots.LSN_RF_OFF_COLOR_MAP
+
+        rf_idx = 0 if on else 1
+        cell_rf = self.receptive_field[:,:,cell_idx,rf_idx]
+        
+        plot_receptive_field(cell_rf, color_map, zlim, mask)
+
+    def sort_trials(self):
+        ds = self.data_set
+
+        lsn_movie, lsn_mask = ds.get_locally_sparse_noise_stimulus_template(self.stimulus, 
+                                                                            mask_off_screen=False)
+
+        baseline_trials = np.unique(np.where(lsn_movie[:,-5:,-1] != LocallySparseNoise.LSN_GREY)[0])
+        baseline_df = self.mean_sweep_response.ix[baseline_trials]
+        cell_baselines = np.nanmean(baseline_df.values, axis=0)
+
+        lsn_movie[:,~lsn_mask] = LocallySparseNoise.LSN_OFF_SCREEN
+
+        trials = {}
+        for row in range(self.nrows):
+            for col in range(self.ncols):
+                on_trials = np.where(lsn_movie[:,row,col] == LocallySparseNoise.LSN_ON)
+                off_trials = np.where(lsn_movie[:,row,col] == LocallySparseNoise.LSN_OFF)
+
+                trials[(col,row,True)] = on_trials
+                trials[(col,row,False)] = off_trials
+
+        return trials, cell_baselines
+
+
+    def open_pincushion_plot(self, cell_specimen_id, on, color_map=None):
+        csids = self.data_set.get_cell_specimen_ids()
+        cell_id = np.where(csids == cell_specimen_id)[0][0]
+
+        trials, baselines = self.sort_trials()
+        data = self.mean_sweep_response[str(cell_id)].values
+        
+        cplots.make_pincushion_plot(data, trials, on, 
+                                    self.nrows, self.ncols,
+                                    clim=[ baselines[cell_id], data.mean() + data.std() * 3 ],
+                                    color_map=color_map,
+                                    radius=1.0/16.0)
+
+    @staticmethod
+    def from_analysis_file(data_set, analysis_file, stimulus):
+        lsn = LocallySparseNoise(data_set, stimulus)
+        lsn.populate_stimulus_table()
+
+        try:
+            lsn._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_lsn")
+            lsn._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_lsn")
+
+            with h5py.File(analysis_file, "r") as f:
+                lsn._receptive_field = f["analysis/receptive_field_lsn"].value
+        except Exception as e:
+            raise MissingStimulusException(e.message)
+
+        return lsn
 
         

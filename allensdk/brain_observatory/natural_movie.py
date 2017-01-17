@@ -16,8 +16,11 @@
 import scipy.stats as st
 import pandas as pd
 import numpy as np
+import h5py
 from .stimulus_analysis import StimulusAnalysis
-
+from .brain_observatory_exceptions import MissingStimulusException
+import stimulus_info as stiminfo
+import circle_plots as cplots
 
 class NaturalMovie(StimulusAnalysis):
     """ Perform tuning analysis specific to natural movie stimulus.
@@ -120,3 +123,47 @@ class NaturalMovie(StimulusAnalysis):
                               'peak': 'peak_nm3', 'response_reliability': 'response_reliability_nm3'}, inplace=True)
 
         return peak_movie
+
+    def open_track_plot(self, cell_specimen_id):
+        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+
+        cell_rows = self.sweep_response[str(cell_id)]
+        data = []
+        for i in range(len(cell_rows)):
+            data.append(cell_rows.iloc[i])
+
+        data = np.vstack(data)
+
+        tp = cplots.TrackPlotter(ring_length=360)
+        tp.plot(data,
+                clim=[0, data.mean() + data.std()*3])
+        tp.show_arrow()
+
+    @staticmethod 
+    def from_analysis_file(data_set, analysis_file, movie_name):
+        nm = NaturalMovie(data_set, movie_name)
+        nm.populate_stimulus_table()
+
+        # TODO: deal with this properly
+        suffix_map = {
+            stiminfo.NATURAL_MOVIE_ONE: '_nm1',
+            stiminfo.NATURAL_MOVIE_TWO: '_nm2',
+            stiminfo.NATURAL_MOVIE_THREE: '_nm3',
+            }
+
+        try:
+            suffix = suffix_map[movie_name]
+
+
+            nm._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response"+suffix)
+            nm._peak = pd.read_hdf(analysis_file, "analysis/peak")
+
+            with h5py.File(analysis_file, "r") as f:
+                nm._binned_dx_sp = f["analysis/binned_dx_sp"].value
+                nm._binned_cells_sp = f["analysis/binned_cells_sp"].value
+                nm._binned_dx_vis = f["analysis/binned_dx_vis"].value
+                nm._binned_cells_vis = f["analysis/binned_cells_vis"].value
+        except Exception as e:
+            raise MissingStimulusException(e.message)
+
+        return nm

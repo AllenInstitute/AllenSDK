@@ -25,9 +25,7 @@ import dateutil
 import re
 import os
 from pkg_resources import parse_version
-
-class MissingStimulusException(Exception):
-    pass
+from allensdk.brain_observatory.brain_observatory_exceptions import MissingStimulusException
 
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
