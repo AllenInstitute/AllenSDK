@@ -17,9 +17,13 @@ from stimulus_analysis import StimulusAnalysis
 import scipy.stats as st
 import pandas as pd
 import numpy as np
+import h5py
 from math import sqrt
 import logging
-
+import observatory_plots as oplots
+import circle_plots as cplots
+from .brain_observatory_exceptions import MissingStimulusException
+import matplotlib.pyplot as plt
 
 class DriftingGratings(StimulusAnalysis):
     """ Perform tuning analysis specific to drifting gratings stimulus.
@@ -188,3 +192,129 @@ class DriftingGratings(StimulusAnalysis):
                 peak.run_modulation_dg.iloc[nc] = np.NaN
 
         return peak
+
+    def open_star_plot(self, cell_specimen_id, include_labels=False):
+        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+
+        df = self.mean_sweep_response[str(cell_id)]
+        st = self.data_set.get_stimulus_table('drifting_gratings')
+        mask = st.dropna(subset=['orientation']).index
+        
+        data = df.values
+    
+        cmin = self.response[0,0,cell_id,0]
+        cmax = data.mean() + data.std()*3
+
+        fp = cplots.FanPlotter.for_drifting_gratings()
+        fp.plot(r_data=st.temporal_frequency.ix[mask].values,
+                angle_data=st.orientation.ix[mask].values,
+                data=df.ix[mask].values,
+                clim=[cmin, cmax])
+        fp.show_axes(closed=True)
+    
+        if include_labels:
+            fp.show_r_labels()
+            fp.show_angle_labels()
+
+    def plot_orientation_selectivity(self,
+                                     si_range=oplots.SI_RANGE,
+                                     n_hist_bins=oplots.N_HIST_BINS,
+                                     color=oplots.STIM_COLOR,
+                                     p_value_max=oplots.P_VALUE_MAX,
+                                     peak_dff_min=oplots.PEAK_DFF_MIN):
+        # responsive cells 
+        vis_cells = (self.peak.ptest_dg < p_value_max) & (self.peak.peak_dff_dg > peak_dff_min)
+
+        # orientation selective cells
+        osi_cells = vis_cells & (self.peak.osi_dg > si_range[0]) & (self.peak.osi_dg < si_range[1])
+
+        peak_osi = self.peak.ix[osi_cells]
+        osis = peak_osi.osi_dg.values
+
+        oplots.plot_selectivity_cumulative_histogram(osis, 
+                                                     "orientation selectivity index",
+                                                     si_range=si_range,
+                                                     n_hist_bins=n_hist_bins,
+                                                     color=color)
+
+    def plot_direction_selectivity(self,
+                                   si_range=oplots.SI_RANGE,
+                                   n_hist_bins=oplots.N_HIST_BINS,
+                                   color=oplots.STIM_COLOR,
+                                   p_value_max=oplots.P_VALUE_MAX,
+                                   peak_dff_min=oplots.PEAK_DFF_MIN):
+
+        # responsive cells 
+        vis_cells = (self.peak.ptest_dg < p_value_max) & (self.peak.peak_dff_dg > peak_dff_min)
+
+        # direction selective cells
+        dsi_cells = vis_cells & (self.peak.dsi_dg > si_range[0]) & (self.peak.dsi_dg < si_range[1])
+
+        peak_dsi = self.peak.ix[dsi_cells]
+        dsis = peak_dsi.dsi_dg.values
+
+        oplots.plot_selectivity_cumulative_histogram(dsis, 
+                                                     "direction selectivity index",
+                                                     si_range=si_range,
+                                                     n_hist_bins=n_hist_bins,
+                                                     color=color)
+
+    def plot_preferred_direction(self,
+                                 include_labels=False,
+                                 si_range=oplots.SI_RANGE,
+                                 color=oplots.STIM_COLOR,
+                                 p_value_max=oplots.P_VALUE_MAX,
+                                 peak_dff_min=oplots.PEAK_DFF_MIN):
+        vis_cells = (self.peak.ptest_dg < p_value_max) & (self.peak.peak_dff_dg > peak_dff_min)    
+        pref_dirs = self.peak.ix[vis_cells].ori_dg.values
+        pref_dirs = [ self.orivals[pref_dir] for pref_dir in pref_dirs ]
+
+        angles, counts = np.unique(pref_dirs, return_counts=True)
+        oplots.plot_radial_histogram(angles, 
+                                     counts,
+                                     include_labels=include_labels,
+                                     all_angles=self.orivals,
+                                     direction=-1,
+                                     offset=0.0,
+                                     closed=True,
+                                     color=color)
+
+    def plot_preferred_temporal_frequency(self, 
+                                          si_range=oplots.SI_RANGE,
+                                          color=oplots.STIM_COLOR,
+                                          p_value_max=oplots.P_VALUE_MAX,
+                                          peak_dff_min=oplots.PEAK_DFF_MIN):
+
+        vis_cells = (self.peak.ptest_dg < p_value_max) & (self.peak.peak_dff_dg > peak_dff_min)    
+        pref_tfs = self.peak.ix[vis_cells].tf_dg.values
+
+        oplots.plot_condition_histogram(pref_tfs, 
+                                        self.tfvals[1:],
+                                        color=color)
+
+        plt.xlabel("temporal frequency (Hz)")
+        plt.ylabel("number of cells")
+
+
+    @staticmethod
+    def from_analysis_file(data_set, analysis_file):
+        dg = DriftingGratings(data_set)
+
+        try:
+            dg.populate_stimulus_table()
+
+            dg._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_dg")
+            dg._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_dg")
+            dg._peak = pd.read_hdf(analysis_file, "analysis/peak")
+
+            with h5py.File(analysis_file, "r") as f:
+                dg._response = f["analysis/response_dg"].value
+                dg._binned_dx_sp = f["analysis/binned_dx_sp"].value
+                dg._binned_cells_sp = f["analysis/binned_cells_sp"].value
+                dg._binned_dx_vis = f["analysis/binned_dx_vis"].value
+                dg._binned_cells_vis = f["analysis/binned_cells_vis"].value
+        except Exception as e:
+            raise MissingStimulusException(e.message)
+
+        return dg
+

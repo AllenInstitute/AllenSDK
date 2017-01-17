@@ -19,7 +19,8 @@ import pandas as pd
 import logging
 from .findlevel import findlevel
 from .brain_observatory_exceptions import BrainObservatoryAnalysisException
-
+import observatory_plots as oplots
+import matplotlib.pyplot as plt
 
 class StimulusAnalysis(object):
     """ Base class for all response analysis code. Subclasses are responsible
@@ -515,3 +516,20 @@ class StimulusAnalysis(object):
 
         pval = sweep_response.applymap(do_p_value)
         return sweep_response, mean_sweep_response, pval
+
+    def plot_speed_tuning(self, cell_specimen_id, 
+                          evoked_color=oplots.EVOKED_COLOR, 
+                          spontaneous_color=oplots.SPONTANEOUS_COLOR):
+        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+
+        oplots.plot_combined_speed(self.binned_cells_vis[cell_id,:,:]*100, self.binned_dx_vis[:,:], 
+                                   self.binned_cells_sp[cell_id,:,:]*100, self.binned_dx_sp[:,:],
+                                   evoked_color, spontaneous_color)
+
+        ax = plt.gca()
+        plt.xlabel("running speed (cm/s)")
+        plt.ylabel("percent dF/F")
+
+    @staticmethod
+    def peak_row_from_csid(peak, csid):
+        return peak[peak.cell_specimen_id == csid].index[0]

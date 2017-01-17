@@ -20,8 +20,11 @@ import pandas as pd
 from math import sqrt
 import logging
 from .stimulus_analysis import StimulusAnalysis
-from .brain_observatory_exceptions import BrainObservatoryAnalysisException
-
+from .brain_observatory_exceptions import BrainObservatoryAnalysisException, MissingStimulusException
+import observatory_plots as oplots
+import circle_plots as cplots
+import h5py
+import matplotlib.pyplot as plt
 
 class StaticGratings(StimulusAnalysis):
     """ Perform tuning analysis specific to static gratings stimulus.
@@ -239,3 +242,150 @@ class StaticGratings(StimulusAnalysis):
                 pass
 
         return peak
+
+    def plot_time_to_peak(self, 
+                          p_value_max=oplots.P_VALUE_MAX, 
+                          color_map=oplots.STIMULUS_COLOR_MAP):
+        stimulus_table = self.data_set.get_stimulus_table('static_gratings')
+
+        resps = []
+
+        for index, row in self.peak.iterrows():
+            pref_rows = (stimulus_table.orientation==self.orivals[row.ori_sg]) & \
+                (stimulus_table.spatial_frequency==self.sfvals[row.sf_sg]) & \
+                (stimulus_table.phase==self.phasevals[row.phase_sg])
+
+            mean_response = self.sweep_response[pref_rows][str(index)].mean()
+            resps.append((mean_response - mean_response.mean() / mean_response.std()))
+
+        mean_responses = np.array(resps)
+
+        sorted_table = self.peak[self.peak.ptest_sg < p_value_max].sort(columns='time_to_peak_sg')
+        cell_order = sorted_table.index
+
+        # time to peak is relative to stimulus start in seconds
+        ttps = sorted_table.time_to_peak_sg.values + self.interlength / self.acquisition_rate
+        msrs_sorted = mean_responses[cell_order,:]
+
+        oplots.plot_time_to_peak(msrs_sorted, ttps,
+                                 0, (2*self.interlength + self.sweeplength) / self.acquisition_rate,
+                                 (self.interlength) / self.acquisition_rate, 
+                                 (self.interlength + self.sweeplength) / self.acquisition_rate, 
+                                 color_map)
+
+
+    def plot_orientation_selectivity(self, 
+                                     si_range=oplots.SI_RANGE,
+                                     n_hist_bins=oplots.N_HIST_BINS,
+                                     color=oplots.STIM_COLOR,
+                                     p_value_max=oplots.P_VALUE_MAX,
+                                     peak_dff_min=oplots.PEAK_DFF_MIN):
+
+        # responsive cells 
+        vis_cells = (self.peak.ptest_sg < p_value_max) & (self.peak.peak_dff_sg > peak_dff_min)
+
+        # orientation selective cells
+        osi_cells = vis_cells & (self.peak.osi_sg > si_range[0]) & (self.peak.osi_sg < si_range[1])
+
+        peak_osi = self.peak.ix[osi_cells]
+        osis = peak_osi.osi_sg.values
+
+        oplots.plot_selectivity_cumulative_histogram(osis, 
+                                                     "orientation selectivity index",
+                                                     si_range=si_range,
+                                                     n_hist_bins=n_hist_bins,
+                                                     color=color)
+
+    def plot_preferred_orientation(self,
+                                   include_labels=False,
+                                   si_range=oplots.SI_RANGE,
+                                   color=oplots.STIM_COLOR,
+                                   p_value_max=oplots.P_VALUE_MAX,
+                                   peak_dff_min=oplots.PEAK_DFF_MIN):
+
+        vis_cells = (self.peak.ptest_sg < p_value_max) & (self.peak.peak_dff_sg > peak_dff_min)    
+        pref_oris = self.peak.ix[vis_cells].ori_sg.values
+        pref_oris = [ self.orivals[pref_ori] for pref_ori in pref_oris ]
+
+        angles, counts = np.unique(pref_oris, return_counts=True)
+
+        oplots.plot_radial_histogram(angles, 
+                                     counts,
+                                     include_labels=include_labels,
+                                     all_angles=self.orivals,
+                                     direction=-1,
+                                     offset=180.0,
+                                     color=color)
+
+        max_count = max(counts)
+
+        center_x = 0.0
+        center_y = 0.5 * max_count
+        w = 2.4 * max_count
+        h = 1.4 * max_count
+
+        plt.gca().set(xlim=(center_x - w*0.5, center_x + w*0.5),
+                      ylim = (center_y - h*0.5, center_y + h*0.5),
+                      aspect=1.0)
+
+    def plot_preferred_spatial_frequency(self, 
+                                         si_range=oplots.SI_RANGE,
+                                         color=oplots.STIM_COLOR,
+                                         p_value_max=oplots.P_VALUE_MAX,
+                                         peak_dff_min=oplots.PEAK_DFF_MIN):
+
+        vis_cells = (self.peak.ptest_sg < p_value_max) & (self.peak.peak_dff_sg > peak_dff_min)    
+        pref_sfs = self.peak.ix[vis_cells].sf_sg.values
+
+        oplots.plot_condition_histogram(pref_sfs, 
+                                        self.sfvals[1:],
+                                        color=color)
+
+        plt.xlabel("spatial frequency (cycles/deg)")
+        plt.ylabel("number of cells")
+
+    def open_fan_plot(self, cell_specimen_id, include_labels=False):
+        cell_id = self.peak_row_from_csid(self.peak, cell_specimen_id)
+
+        df = self.mean_sweep_response[str(cell_id)]
+        st = self.data_set.get_stimulus_table('static_gratings')
+        mask = st.dropna(subset=['orientation']).index
+
+        data = df.values
+
+        cmin = self.response[0,0,0,cell_id,0]
+        cmax = data.mean() + data.std()*3
+
+        fp = cplots.FanPlotter.for_static_gratings()
+        fp.plot(r_data=st.spatial_frequency.ix[mask].values,
+                angle_data=st.orientation.ix[mask].values,
+                group_data=st.phase.ix[mask].values,
+                data=df.ix[mask].values,
+                clim=[cmin, cmax])
+        fp.show_axes(closed=False)
+
+        if include_labels:
+            fp.show_r_labels()
+            fp.show_angle_labels()
+
+    @staticmethod
+    def from_analysis_file(data_set, analysis_file):
+        sg = StaticGratings(data_set)
+
+        try:
+            sg.populate_stimulus_table()
+
+            sg._sweep_response = pd.read_hdf(analysis_file, "analysis/sweep_response_sg")
+            sg._mean_sweep_response = pd.read_hdf(analysis_file, "analysis/mean_sweep_response_sg")
+            sg._peak = pd.read_hdf(analysis_file, "analysis/peak")
+
+            with h5py.File(analysis_file, "r") as f:
+                sg._response = f["analysis/response_sg"].value
+                sg._binned_dx_sp = f["analysis/binned_dx_sp"].value
+                sg._binned_cells_sp = f["analysis/binned_cells_sp"].value
+                sg._binned_dx_vis = f["analysis/binned_dx_vis"].value
+                sg._binned_cells_vis = f["analysis/binned_cells_vis"].value
+        except Exception as e:
+            raise MissingStimulusException(e.message)
+
+        return sg
