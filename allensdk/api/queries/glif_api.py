@@ -183,7 +183,7 @@ class GlifApi(RmaTemplate):
         return self.ephys_sweeps
 
     @deprecated
-    def get_neuron_config_old(self, output_file_name=None):
+    def get_neuron_config(self, output_file_name=None):
         ''' DEPRECATED Retrieve a model configuration file from the API, optionally save it to disk, and
         return the contents of that file as a dictionary.
 

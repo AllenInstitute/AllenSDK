@@ -64,9 +64,9 @@ def test_get_neuron_configs(glif_api):
     np.testing.assert_almost_equal(glif_api.get_neuron_configs([neuronal_model_id])[neuronal_model_id]['th_inf'], 0.0236421993869)
 
 
-def test_depricated():
+def test_deprecated():
 
-    # Exercising depricated functionality
+    # Exercising deprecated functionality
     tmp = GlifApi()
     len(tmp.list_neuronal_models())
 
@@ -79,7 +79,7 @@ def test_depricated():
 
     tmp = GlifApi()
     tmp.get_neuronal_model(473465606)
-    x = tmp.get_neuron_config_old()
+    x = tmp.get_neuron_config()
 
     tmp = GlifApi()
     tmp.get_neuronal_model(473465606)
@@ -91,4 +91,4 @@ if __name__ == "__main__":
     test_get_neuronal_model_templates(glif_api)
     test_get_neuronal_models(glif_api)
     test_get_neuron_configs(glif_api)
-    test_depricated(glif_api)
+    test_deprecated(glif_api)
