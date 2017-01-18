@@ -978,7 +978,7 @@ def fit_prespike_time_constant(v, t, start, spike_time, dv_limit=-0.001, tau_lim
     return tau
 
 
-def estimate_adjusted_detection_parameters(v_set, t_set, interval_start, interval_end):
+def estimate_adjusted_detection_parameters(v_set, t_set, interval_start, interval_end, filter=10):
     """
     Estimate adjusted values for spike detection by analyzing a period when the voltage
     changes quickly but passively (due to strong current stimulation), which can result
@@ -996,7 +996,7 @@ def estimate_adjusted_detection_parameters(v_set, t_set, interval_start, interva
     new_dv_cutoff : adjusted dv/dt cutoff (V/s)
     new_thresh_frac : adjusted fraction of avg upstroke to find threshold
     """
-
+    
     if type(v_set) is not list:
         v_set = list(v_set)
 
@@ -1016,7 +1016,7 @@ def estimate_adjusted_detection_parameters(v_set, t_set, interval_start, interva
     ends = []
     dv_set = []
     for v, t in zip(v_set, t_set):
-        dv = calculate_dvdt(v, t, 10.)
+        dv = calculate_dvdt(v, t, filter)
         dv_set.append(dv)
         maxes.append(dv[start_index:end_index].max())
         ends.append(dv[end_index])
@@ -1032,7 +1032,7 @@ def estimate_adjusted_detection_parameters(v_set, t_set, interval_start, interva
 
     all_upstrokes = np.array([])
     for v, t, dv in zip(v_set, t_set, dv_set):
-        putative_spikes = detect_putative_spikes(v, t, dv_cutoff=new_dv_cutoff)
+        putative_spikes = detect_putative_spikes(v, t, dv_cutoff=new_dv_cutoff, filter=filter)
         peaks = find_peak_indexes(v, t, putative_spikes)
         putative_spikes, peaks = filter_putative_spikes(v, t, putative_spikes, peaks)
         upstrokes = find_upstroke_indexes(v, t, putative_spikes, peaks, dvdt=dv)

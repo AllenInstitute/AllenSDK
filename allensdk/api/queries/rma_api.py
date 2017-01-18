@@ -461,7 +461,7 @@ class RmaApi(Api):
         '''
         filters_builder = []
 
-        for filt in filters:
+        for filt in sorted(filters):
             if filt[-1] is None:
                 continue
             if len(filt) == 2:

@@ -14,6 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from .rma_api import RmaApi
+from ..cache import cacheable
 
 
 class AnnotatedSectionDataSetsApi(RmaApi):
@@ -81,6 +82,7 @@ class AnnotatedSectionDataSetsApi(RmaApi):
 
         return self.json_msg_query(url)
 
+    @cacheable
     def get_annotated_section_data_sets_via_rma(self,
                                                 structures,
                                                 intensity_values=None,

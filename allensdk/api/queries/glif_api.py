@@ -16,8 +16,10 @@
 import json
 import logging
 
+# <<<<<<< HEAD
 from ...deprecated import deprecated
 from .rma_template import RmaTemplate
+from ..cache import cacheable
 
 class GlifApi(RmaTemplate):
 
@@ -53,6 +55,10 @@ class GlifApi(RmaTemplate):
             }
         ]
         }
+# =======
+# from .rma_api import RmaApi
+
+# >>>>>>> 8a03e88c9e084a99db25991832854b2ea2b8623e
 
     def __init__(self, base_uri=None):
         super(GlifApi, self).__init__(base_uri, query_manifest=GlifApi.rma_templates)
@@ -69,6 +75,7 @@ class GlifApi(RmaTemplate):
 
     def get_neuron_configs(self, neuronal_model_ids=None):
 
+# <<<<<<< HEAD
         data = self.template_query('glif_queries',
                                    'neuron_config', neuronal_model_ids=neuronal_model_ids)
 
@@ -81,7 +88,10 @@ class GlifApi(RmaTemplate):
 
         return return_dict
 
-    @deprecated
+#     @deprecated
+# =======
+    @cacheable
+# >>>>>>> 8a03e88c9e084a99db25991832854b2ea2b8623e
     def list_neuronal_models(self):
         ''' DEPRECATED Query the API for a list of all GLIF neuronal models.
 
@@ -93,7 +103,9 @@ class GlifApi(RmaTemplate):
 
         include = "specimen(ephys_result[failed$eqfalse]),neuronal_model_template[name$il'*LIF*']"
 
-        return self.model_query('NeuronalModel', include=include, num_rows='all')
+        return self.model_query('NeuronalModel',
+                                include=include,
+                                num_rows='all')
 
     @deprecated
     def get_neuronal_model(self, neuronal_model_id):

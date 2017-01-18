@@ -15,6 +15,7 @@
 
 import numpy as np
 import logging
+import six
 from . import ephys_extractor as efex
 from . import ephys_features as ft
 
@@ -38,7 +39,7 @@ def extract_sweep_features(data_set, sweeps_by_type):
     # extract sweep-level features
     sweep_features = {}
 
-    for stimulus_type, sweep_numbers in sweeps_by_type.iteritems():
+    for stimulus_type, sweep_numbers in six.iteritems(sweeps_by_type):
         logging.debug("%s:%s" % (stimulus_type, ','.join(map(str, sweep_numbers))))
 
         if stimulus_type in SHORT_SQUARE_TYPES:
@@ -181,6 +182,3 @@ def get_square_stim_characteristics(i, t, no_test_pulse=False):
     stim_amp = float(i[start_idx])
 
     return (stim_start, stim_dur, stim_amp, start_idx, end_idx)
-
-
-

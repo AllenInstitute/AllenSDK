@@ -14,7 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-
+from six import string_types
 import numpy as np
 import pandas as pd
 
@@ -76,7 +76,7 @@ class Ontology(object):
                 # if it's a pandas series, assume it's a series of structure
                 # ids
                 structure_ids.update(s.tolist())
-            elif isinstance(s, str) or isinstance(s, unicode):
+            elif isinstance(s, string_types):
                 # if it's a string, assume it's an acronym
                 string_strs.append(s)
             else:
