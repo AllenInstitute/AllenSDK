@@ -7,7 +7,7 @@ import matplotlib.patches as mpatches
 import scipy.interpolate as si
 from scipy.stats.mstats import zscore
 
-import allensdk.internal.brain_observatory.circle_plots as cplots
+import allensdk.brain_observatory.circle_plots as cplots
 from contextlib import contextmanager
 
 import h5py
