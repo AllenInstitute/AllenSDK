@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('agg')
+
 import pytest
 import os
 import matplotlib.pyplot as plt
