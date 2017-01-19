@@ -1,7 +1,5 @@
-import matplotlib
-matplotlib.use('agg')
-
 import pytest
+import matplotlib
 import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
