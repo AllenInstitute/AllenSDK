@@ -321,7 +321,38 @@ class Cache(object):
 
 
 def cacheable(func):
-    ''' TODO: docstrings!!!!!
+    '''decorator for rma queries, save it and return the dataframe.
+
+    Parameters
+    ----------
+    fn : function reference
+        makes the actual query using kwargs.
+    path : string
+        where to save the data
+    query_strategy : string or None, optional
+        'server' always queries server,
+        'file' loads from disk,
+        'lazy' queries the server if no file exists,
+        None queries the server and bypasses all caching behavior
+    file_type : string, optional
+        'json' (default) or 'csv'
+    dataframe : boolean, optional
+        True will cast the return value to a pandas dataframe, False (default) will not
+    index : string, optional
+        column to use as the pandas index
+    rename : list of string tuples, optional
+        (new, old) columns to rename
+    kwargs : objects
+        passed through to the query function
+
+    Returns
+    -------
+    dict or DataFrame
+        data type depends on dataframe option.
+
+    Notes
+    -----
+    Column renaming happens after the file is reloaded for json
     '''
     @functools.wraps(func)
     def w(*args,
