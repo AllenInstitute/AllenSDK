@@ -8,6 +8,21 @@ from simple_tree import SimpleTree
 
 
 class StructureTree( SimpleTree ):
+
+    # These structure sets may be of interest
+    # check descriptions at:
+    # http://api.brain-map.org/api/v2/data/StructureSet/query.json?
+    STRUCTURE_SETS = {114512892: 'Mouse Connectivity - BDA/AAV Primary Injection Structures',  
+                      112905813: 'Mouse Connectivity - BDA/AAV All Injection Structures', 
+                      167587189: 'Mouse Connectivity - Summary',  
+                      112905828: 'Mouse Connectivity - Projection All Injection Structures',  
+                      184527634: 'Mouse Connectivity - Target Search', 
+                      3: 'Mouse - Areas', 
+                      396673091: 'Mouse Cell Types - Structures', 
+                      514166994: 'CAM targeted structure set', 
+                      2: 'Mouse - Coarse', 
+                      114512891: 'Mouse Connectivity - Projection Primary Injection Structures'}
+
     def __init__(self, nodes):
         super(StructureTree, self).__init__(nodes,
                                             lambda s: int(s['id']),
@@ -40,26 +55,15 @@ class StructureTree( SimpleTree ):
                               lambda y: self.get_ancestor_ids(y))
         
         
-    def get_cortical_layers(self, layer=None):
-    
-        if layer is not None:
-            pattern_string = 'layer(.*){0}'.format(layer)
-        else:
-            pattern_string = 'layer'
-        pattern = re.compile(pattern_string, re.IGNORECASE)
-            
-        cortical_ids = self.descendant_ids(315)[0]
-        return self.filter_nodes(lambda x: re.search(pattern, x['safe_name']) \
-                                           and x['id'] in cortical_ids)
-        
-        
     def structure_descends_from(self, child_id, parent_id):
         return parent_id in self.ancestor_ids(child_id)
         
         
     @classmethod
-    def from_ontologies_api(cls, oapi, structure_graph_id, 
-                            insert_structure_sets=True):
+    def from_ontologies_api(cls, oapi, insert_structure_sets=True):
                             
-        structures = oapi.get_structures(structure_graph_id)
+        structures = oapi.get_structures(1)
+        if insert_structure_sets:
+            
+        
         

@@ -97,6 +97,16 @@ class OntologiesApi(RmaTemplate):
              'count': False,
              'criteria_params': ['atlas_ids']
              }, 
+             {'name': 'structure_ids_by_set_ids', 
+             'description': 'see name',
+             'model': 'StructureSet',
+             'include': 'structures', 
+             'criteria': '[id$in{{ set_ids }}]',
+             'only': ['id', 'structures.id'], 
+             'num_rows': 'all', 
+             'count': False, 
+             'criteria_params': ['set_ids']
+             }, 
         ]}
 
     def __init__(self, base_uri=None):
@@ -168,6 +178,38 @@ class OntologiesApi(RmaTemplate):
                                        count=count)
 
         return data 
+        
+    def get_structure_set_map(self, structure_set_ids, 
+                              num_rows='all',
+                              count=False):
+        '''Get a dictionary listing structure ids by structure set id
+        
+        Parameters
+        ----------
+        structure_set_ids : list of int
+            obtain structure ids for these sets.
+        num_rows : int
+            How many records (maximum) to retrieve
+        count : bool, optional
+            If True also return a count of the records.
+            
+        Returns
+        -------
+        dict : 
+            Keys are structure set ids, values are lists of structure ids.
+            
+        '''
+        
+        data = self.template_query('ontology_queries',
+                                   'structure_ids_by_set_ids',
+                                   set_ids=structure_set_ids, 
+                                   num_rows=num_rows,
+                                   count=count)
+                  
+        return map(lambda stset: {
+                   stset['id']: [st['id'] for st 
+                   in stset['structures']]}, data)
+                
 
     def unpack_structure_set_ancestors(self, structure_dataframe):
         '''Convert a slash-separated structure_id_path field to a list.
