@@ -321,8 +321,10 @@ class StaticGratings(StimulusAnalysis):
 
         center_x = 0.0
         center_y = 0.5 * max_count
+
+        # dimensions to get plot to fit 
+        h = 1.6 * max_count
         w = 2.4 * max_count
-        h = 1.4 * max_count
 
         plt.gca().set(xlim=(center_x - w*0.5, center_x + w*0.5),
                       ylim = (center_y - h*0.5, center_y + h*0.5),

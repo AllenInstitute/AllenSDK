@@ -162,7 +162,7 @@ class LocallySparseNoise(StimulusAnalysis):
         rf_idx = 0 if on else 1
         cell_rf = self.receptive_field[:,:,cell_idx,rf_idx]
         
-        plot_receptive_field(cell_rf, color_map, zlim, mask)
+        oplots.plot_receptive_field(cell_rf, color_map, zlim, mask)
 
     def sort_trials(self):
         ds = self.data_set
