@@ -96,7 +96,7 @@ class OntologiesApi(RmaTemplate):
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['atlas_ids']
-             }
+             }, 
         ]}
 
     def __init__(self, base_uri=None):
@@ -167,7 +167,7 @@ class OntologiesApi(RmaTemplate):
                                        num_rows=num_rows,
                                        count=count)
 
-        return data
+        return data 
 
     def unpack_structure_set_ancestors(self, structure_dataframe):
         '''Convert a slash-separated structure_id_path field to a list.

@@ -52,21 +52,21 @@ def test_node_ids(tree):
 def test_parent_id(tree):
 
     nodes = [5, 4, 2]
-    obtained = tree.parent_id(*nodes)
+    obtained = tree.parent_id(nodes)
     
     assert( allclose([2, 1, 0], obtained) )
     
     
 def test_child_ids(tree):
 
-    obtained = tree.child_ids(1)
+    obtained = tree.child_ids([1])
     assert( set(obtained[0]) == set([4, 3]) )
     assert( len(obtained) == 1 )
     
     
 def test_ancestor_ids(tree):
 
-    obtained = tree.ancestor_ids(*[5, 1])
+    obtained = tree.ancestor_ids([5, 1])
     
     assert( len(obtained) == 2 )
     assert( set(obtained[0]) == set([5, 2, 0]) )
@@ -75,7 +75,7 @@ def test_ancestor_ids(tree):
     
 def test_descendant_ids(tree):
 
-    obtained = tree.descendant_ids(*[0, 3])
+    obtained = tree.descendant_ids([0, 3])
 
     assert( len(obtained) == 2 )
     assert( set(obtained[0]) == set(range(6)) )
@@ -84,7 +84,7 @@ def test_descendant_ids(tree):
     
 def test_node(tree):
     
-    obtained = tree.node(0, 1)
+    obtained = tree.node([0, 1])
     
     assert( len(obtained) == 2 )
     assert( obtained[0]['parent'] is None )
@@ -93,14 +93,13 @@ def test_node(tree):
 
 def test_parent(tree):
 
-    obtained = tree.parent(0, 1)
+    obtained = tree.parent([0, 1])
     assert( len(obtained) == 2 )
-    assert( set(obtained[0]) == set([None]) )
-    assert( isinstance(obtained[1][0], dict))
+    assert( obtained[0] is None )
 
 def test_children(tree):
     
-    obtained = tree.children(0, 5)
+    obtained = tree.children([0, 5])
 
     assert( len(obtained) == 2 )
     assert( set(obtained[1]) == set([]) )
@@ -109,7 +108,7 @@ def test_children(tree):
     
 def test_descendants(tree):
 
-    obtained = tree.descendants(*[0, 3])
+    obtained = tree.descendants([0, 3])
 
     assert( len(obtained) == 2 )
     assert( len(obtained[0]) == 6 )
@@ -119,7 +118,7 @@ def test_descendants(tree):
 
 def test_ancestors(tree):
 
-    obtained = tree.ancestors(*[5, 1])
+    obtained = tree.ancestors([5, 1])
     
     assert( len(obtained) == 2 )
     assert( len(obtained[0]) == 3 )
