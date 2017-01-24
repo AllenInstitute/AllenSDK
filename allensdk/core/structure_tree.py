@@ -1,10 +1,10 @@
 from __future__ import division, print_function, absolute_import
 import re
+import operator as op
 
 import numpy as np
 
-from simple_tree import SimpleTree
-
+from .simple_tree import SimpleTree
 
 
 class StructureTree( SimpleTree ):
@@ -42,9 +42,8 @@ class StructureTree( SimpleTree ):
         
         
     def get_structures_by_set_id(self, structure_set_ids):
-        nonoverlap = lambda x: not (set(structure_set_ids) \
-                                    ^ set(x['structure_set_ids']))
-        return self.filter_nodes(nonoverlap)
+        overlap = lambda x: set(ss_ids) & set(x['structure_set_ids'])
+        return self.filter_nodes(overlap)
         
         
     def get_structures_by_acronym(self, acronyms):
@@ -58,25 +57,46 @@ class StructureTree( SimpleTree ):
         
     def get_ancestor_id_map(self):
         return self.value_map(lambda x: x['id'], 
-                              lambda y: self.get_ancestor_ids(y))
+                              lambda y: self.ancestor_ids([y['id']])[0])
         
         
     def structure_descends_from(self, child_id, parent_id):
-        return parent_id in self.ancestor_ids(child_id)
+        return parent_id in self.ancestor_ids([child_id])[0]
+        
+        
+    def has_overlaps(self, structure_ids):
+        '''Determine if a list of structures contains spatial overlaps
+        
+        Parameters
+        ----------
+        structure_ids : list of int
+            Check this set of structures for overlaps
+            
+        Returns
+        -------
+        set : 
+            Ids of structures that are the ancestors of other structures in 
+            the supplied set.
+        
+        '''
+    
+        ancestor_ids = reduce(op.add, 
+                              map(lambda x: x[1:], 
+                                  self.ancestor_ids(structure_ids)))
+        return (set(ancestor_ids) & set(structure_ids))
         
         
     @staticmethod
-    def from_ontologies_api(oapi, structure_sets=None):
+    def from_ontologies_api(oapi, structure_set_ids=None):
                             
         structures = oapi.get_structures(1)
         
-        if structure_sets is None:
-            structure_sets = StructureTree.structure_sets
+        if structure_set_ids is None:
+            structure_set_ids = StructureTree.STRUCTURE_SETS.keys()
             
-        structure_set_map = oapi.get_structure_set_map(
-            structure_sets=structure_sets)
-            
-        for st in structures:
-            if st['id']
+        ss_map = oapi.get_structure_set_map(structure_sets=structure_set_ids)
+        structures = map(lambda x: dict(x, structure_sets=ss_map[x['id']]), 
+                         structures)
         
+        return StructureTree(structures)
         
