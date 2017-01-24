@@ -33,15 +33,21 @@ class StructureTree( SimpleTree ):
                                                 
                            
     # or just use _nodes keys                     
-    def get_structures_by_id(self, *sids):
+    def get_structures_by_id(self, sids):
         return self.filter_nodes(lambda x: x['id'] in sids)
         
     
-    def get_structures_by_name(self, *names):
+    def get_structures_by_name(self, names):
         return self.filter_nodes(lambda x: x['safe_name'] in names)
         
         
-    def get_structures_by_acronym(self, *acronyms):
+    def get_structures_by_set_id(self, structure_set_ids):
+        nonoverlap = lambda x: not (set(structure_set_ids) \
+                                    ^ set(x['structure_set_ids']))
+        return self.filter_nodes(nonoverlap)
+        
+        
+    def get_structures_by_acronym(self, acronyms):
         return self.filter_nodes(lambda x: x['acronym'] in acronyms)
         
         
@@ -59,11 +65,18 @@ class StructureTree( SimpleTree ):
         return parent_id in self.ancestor_ids(child_id)
         
         
-    @classmethod
-    def from_ontologies_api(cls, oapi, insert_structure_sets=True):
+    @staticmethod
+    def from_ontologies_api(oapi, structure_sets=None):
                             
         structures = oapi.get_structures(1)
-        if insert_structure_sets:
+        
+        if structure_sets is None:
+            structure_sets = StructureTree.structure_sets
             
+        structure_set_map = oapi.get_structure_set_map(
+            structure_sets=structure_sets)
+            
+        for st in structures:
+            if st['id']
         
         

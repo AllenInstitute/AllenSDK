@@ -99,10 +99,10 @@ class OntologiesApi(RmaTemplate):
              }, 
              {'name': 'structure_ids_by_set_ids', 
              'description': 'see name',
-             'model': 'StructureSet',
-             'include': 'structures', 
-             'criteria': '[id$in{{ set_ids }}]',
-             'only': ['id', 'structures.id'], 
+             'model': 'Structure',
+             'include': 'structure_sets', 
+             'criteria': '[structure_sets.id$in{{ set_ids }}]',
+             'only': ['id', 'structure_sets.id'], 
              'num_rows': 'all', 
              'count': False, 
              'criteria_params': ['set_ids']
@@ -182,7 +182,7 @@ class OntologiesApi(RmaTemplate):
     def get_structure_set_map(self, structure_set_ids, 
                               num_rows='all',
                               count=False):
-        '''Get a dictionary listing structure ids by structure set id
+        '''Get a dictionary listing structure set ids by structure id
         
         Parameters
         ----------
@@ -196,7 +196,7 @@ class OntologiesApi(RmaTemplate):
         Returns
         -------
         dict : 
-            Keys are structure set ids, values are lists of structure ids.
+            Keys are structure ids, values are lists of structure set ids.
             
         '''
         
@@ -206,9 +206,8 @@ class OntologiesApi(RmaTemplate):
                                    num_rows=num_rows,
                                    count=count)
                   
-        return map(lambda stset: {
-                   stset['id']: [st['id'] for st 
-                   in stset['structures']]}, data)
+        return {item['id']: [sset['id'] for sset in item['structure_sets']]
+                for item in data}
                 
 
     def unpack_structure_set_ancestors(self, structure_dataframe):
