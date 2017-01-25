@@ -30,7 +30,9 @@ class StructureTree( SimpleTree ):
     DELETE_FIELDS = ['atlas_id', 'ontology_id', 'sphinx_id', 'weight', 
                      'depth', 'parent_structure_id', 
                      'neuro_name_structure_id', 
-                     'neuro_name_structure_id_path', 'st_level']
+                     'neuro_name_structure_id_path', 'st_level', 
+                     'hemisphere_id', 'failed', 'failed_facet', 
+                     'structure_name_facet', 'safe_name']
 
     def __init__(self, nodes):
         '''A tree whose nodes are brain structures and whose edges indicate 
@@ -43,8 +45,23 @@ class StructureTree( SimpleTree ):
             
             'acronym' : str
                 Abbreviated name for the structure.
-            'atlas_id' : 
-            
+            'color_hex_triplet' : str
+                RGB hexidecimal color assigned to this structure
+            'graph_id' : int
+                Specifies the structure graph containing this structure.
+            'graph_order' : int
+                0-indexed position in the canonical flattened structure graph.
+            'id': int
+                Unique structure specifier.
+            'name' : str
+                Full name of structure.
+            'structure_id_path' : list of int
+                The structures ancestors (inclusive) from the root of the tree.
+                
+        Notes
+        -----
+        If you want a newly downloaded StructureTree, it is best to use the 
+        from_ontologies_api method defined below. 
         
         '''
         
@@ -206,7 +223,8 @@ class StructureTree( SimpleTree ):
         
         
     @staticmethod
-    def from_ontologies_api(oapi, graph_id=1, structure_set_ids=None):
+    def from_ontologies_api(oapi, graph_id=1, structure_set_ids=None, 
+                            delete_fields=None):
         '''Construct a StructureTree from an OntologiesApi instance.
         
         Parameters
@@ -222,6 +240,9 @@ class StructureTree( SimpleTree ):
             containing that structure. Available sets are specified by this 
             parameter. If none are supplied, a general default list will be 
             used.
+        delete_fields : list of str, optional
+            These key-value pairs will be removed from each sructure record. 
+            If not supplied, a general list will be used.
         
         Returns
         -------
@@ -231,6 +252,8 @@ class StructureTree( SimpleTree ):
                             
         structures = oapi.get_structures(graph_id)
         
+        if delete_fields is None:
+            delete_fields = StructureTree.DELETE_FIELDS
         if structure_set_ids is None:
             structure_set_ids = StructureTree.STRUCTURE_SETS.keys()
             
@@ -238,7 +261,7 @@ class StructureTree( SimpleTree ):
         
         for ii, val in enumerate(structures):
         
-            val = delete_fields(val, *StructureTree.DELETE_FIELDS)
+            val = delete_fields(val, *delete_fields)
                                 
             val['structure_sets'] = sts_map[val['id']]
             
