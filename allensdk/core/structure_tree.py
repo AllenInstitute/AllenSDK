@@ -22,45 +22,164 @@ class StructureTree( SimpleTree ):
                       514166994: 'CAM targeted structure set', 
                       2: 'Mouse - Coarse', 
                       114512891: 'Mouse Connectivity - Projection Primary Injection Structures'}
+   
+    # These fields will be removed from each structure when building from 
+    # the api. 
+    # unsure about: hemisphere_id, failed, failed_facet, structure_name_facet, safe_name
+    # st_level might be needed for devmouse
+    DELETE_FIELDS = ['atlas_id', 'ontology_id', 'sphinx_id', 'weight', 
+                     'depth', 'parent_structure_id', 
+                     'neuro_name_structure_id', 
+                     'neuro_name_structure_id_path', 'st_level']
 
     def __init__(self, nodes):
+        '''A tree whose nodes are brain structures and whose edges indicate 
+        physical containment.
+        
+        Parameters
+        ----------
+        nodes : list of dict
+            Each specifies a structure. Fields are:
+            
+            'acronym' : str
+                Abbreviated name for the structure.
+            'atlas_id' : 
+            
+        
+        '''
+        
         super(StructureTree, self).__init__(nodes,
                                             lambda s: int(s['id']),
-                                            lambda s: int(s['parent_structure_id']) \
-                                                if s['parent_structure_id'] is not None \
-                                                and np.isfinite(s['parent_structure_id']) \
+                                            lambda s: s['structure_id_path'][-2] \
+                                                if s['structure_id_path'] is not None \
+                                                and len(s['structure_id_path']) > 1 \
+                                                and np.isfinite(s['structure_id_path'][-2]) \
                                                 else None)
                                                 
-                           
-    # or just use _nodes keys                     
-    def get_structures_by_id(self, sids):
-        return self.filter_nodes(lambda x: x['id'] in sids)
+                                             
+    def get_structures_by_id(self, structure_ids):
+        '''Obtain a list of brain structures from their structure ids
+        
+        Parameters
+        ----------
+        structure_ids : list of int
+            Get structures corresponding to these ids.
+            
+        Returns
+        -------
+        list of dict : 
+            Each item describes a structure.
+        
+        '''
+    
+        return self.filter_nodes(lambda x: x['id'] in structure_ids)
         
     
     def get_structures_by_name(self, names):
-        return self.filter_nodes(lambda x: x['safe_name'] in names)
+        '''Obtain a list of brain structures from their names,
         
+        Parameters
+        ----------
+        names : list of str
+            Get structures corresponding to these names.
+            
+        Returns
+        -------
+        list of dict : 
+            Each item describes a structure.
+            
+        '''
         
-    def get_structures_by_set_id(self, structure_set_ids):
-        overlap = lambda x: set(ss_ids) & set(x['structure_set_ids'])
-        return self.filter_nodes(overlap)
+        return self.filter_nodes(lambda x: x['name'] in names)
         
         
     def get_structures_by_acronym(self, acronyms):
+        '''Obtain a list of brain structures from their acronyms
+        
+        Parameters
+        ----------
+        names : list of str
+            Get structures corresponding to these acronyms.
+            
+        Returns
+        -------
+        list of dict : 
+            Each item describes a structure.
+            
+        '''
+        
         return self.filter_nodes(lambda x: x['acronym'] in acronyms)
         
         
+    def get_structures_by_set_id(self, structure_set_ids):
+        '''Obtain a list of brain structures from by the sets that contain 
+        them.
+        
+        Parameters
+        ----------
+        structure_set_ids : list of int
+            Get structures belonging to these structure sets.
+            
+        Returns
+        -------
+        list of dict : 
+            Each item describes a structure.
+            
+        '''
+        
+        overlap = lambda x: (set(structure_set_ids) & set(x['structure_sets']))
+        return self.filter_nodes(overlap)
+        
+        
     def get_colormap(self):
+        '''Get a dictionary mapping structure ids to colors across all nodes.
+        
+        Returns
+        -------
+        dict : 
+            Keys are structure ids. Values are strings containing RGB-order 
+            hexidecimal color.
+        
+        '''
+    
         return self.value_map(lambda x: x['id'], 
                               lambda y: y['color_hex_triplet'])
         
         
     def get_ancestor_id_map(self):
+        '''Get a dictionary mapping structure ids to ancestor ids across all 
+        nodes. 
+        
+        Returns
+        -------
+        dict : 
+            Keys are structure ids. Values are lists of ancestor ids.
+        
+        '''
+
         return self.value_map(lambda x: x['id'], 
                               lambda y: self.ancestor_ids([y['id']])[0])
         
         
     def structure_descends_from(self, child_id, parent_id):
+        '''Tests whether one structure descends from another. 
+        
+        Parameters
+        ----------
+        child_id : int
+            Id of the putative child structure.
+        parent_id : int
+            Id of the putative parent structure.
+            
+        Returns
+        -------
+        bool :
+            True if the structure specified by child_id is a descendant of 
+            the one specified by parent_id. Otherwise False.
+        
+        '''
+    
+
         return parent_id in self.ancestor_ids([child_id])[0]
         
         
@@ -87,16 +206,51 @@ class StructureTree( SimpleTree ):
         
         
     @staticmethod
-    def from_ontologies_api(oapi, structure_set_ids=None):
+    def from_ontologies_api(oapi, graph_id=1, structure_set_ids=None):
+        '''Construct a StructureTree from an OntologiesApi instance.
+        
+        Parameters
+        ----------
+        oapi : OntologiesApi
+            Used to download structures and find structure sets.
+        graph_id : int, optional
+            Specifies the structure graph from which to draw structures. 
+            Default is the mouse brain atlas.
+        structure_set_ids : list of int, optional
+            Each structure in the tree will be given an additional key 
+            ("structure_sets") that maps to a list of structure sets 
+            containing that structure. Available sets are specified by this 
+            parameter. If none are supplied, a general default list will be 
+            used.
+        
+        Returns
+        -------
+        StructureTree
+        
+        '''
                             
-        structures = oapi.get_structures(1)
+        structures = oapi.get_structures(graph_id)
         
         if structure_set_ids is None:
             structure_set_ids = StructureTree.STRUCTURE_SETS.keys()
             
-        ss_map = oapi.get_structure_set_map(structure_sets=structure_set_ids)
-        structures = map(lambda x: dict(x, structure_sets=ss_map[x['id']]), 
-                         structures)
+        sts_map = oapi.get_structure_set_map(structure_sets=structure_set_ids)
+        
+        for ii, val in enumerate(structures):
+        
+            val = delete_fields(val, *StructureTree.DELETE_FIELDS)
+                                
+            val['structure_sets'] = sts_map[val['id']]
+            
+            val['structure_id_path'] = [int(stid) for stid 
+                                        in val['structure_id_path'].split('/')
+                                        if stid != ''] 
+        
+            structures[ii] = val
         
         return StructureTree(structures)
         
+        
+def delete_fields(dictionary, *field_names):
+    return {k:v for k, v in dictionary.iteritems() if not k in field_names}
+    

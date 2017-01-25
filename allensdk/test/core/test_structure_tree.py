@@ -10,9 +10,9 @@ from allensdk.core.structure_tree import StructureTree
 @pytest.fixture
 def tree():
 
-    nodes = [{'id': 0, 'parent_structure_id': None, 'color_hex_triplet': '000000', 'acronym': 'rt', 'safe_name': 'root'}, 
-            {'id': 1, 'parent_structure_id': 0, 'color_hex_triplet': '000fff', 'acronym': 'a', 'safe_name': 'alpha'}, 
-            {'id': 2, 'parent_structure_id': 0, 'color_hex_triplet': 'ffffff', 'acronym': 'b', 'safe_name': 'beta'}, ]
+    nodes = [{'id': 0, 'structure_id_path': [0], 'color_hex_triplet': '000000', 'acronym': 'rt', 'name': 'root', 'structure_sets':[1, 4]}, 
+            {'id': 1, 'structure_id_path': [0, 1], 'color_hex_triplet': '000fff', 'acronym': 'a', 'name': 'alpha', 'structure_sets': [1, 3]}, 
+            {'id': 2, 'structure_id_path': [0, 2], 'color_hex_triplet': 'ffffff', 'acronym': 'b', 'name': 'beta', 'structure_sets': [1, 2]}]
             
     return StructureTree(nodes)
     
@@ -21,7 +21,7 @@ def tree():
 def oapi():
     oa = OntologiesApi()
     
-    oa.get_structures = mock.MagicMock(return_value=[{'id': 1, 'parent_structure_id': None}])
+    oa.get_structures = mock.MagicMock(return_value=[{'id': 1, 'structure_id_path': '1'}])
     oa.get_structure_set_map = mock.MagicMock(return_value={1: [2, 3]})
     
     return oa
@@ -43,6 +43,13 @@ def test_get_structures_by_acronym(tree):
 
     obtained = tree.get_structures_by_acronym(['rt', 'a', 'b'])
     assert( len(obtained) == 3)
+    
+
+def test_get_structures_by_set_id(tree):
+
+    obtained = tree.get_structures_by_set_id([2, 3])
+
+    assert( len(obtained) == 2 )
     
     
 def test_get_colormap(tree):
