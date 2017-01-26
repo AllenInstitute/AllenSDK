@@ -17,6 +17,7 @@ from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.cache import Cache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.api.queries.ontologies_api import OntologiesApi
+from allensdk.deprecated import deprecated
 
 from . import json_utilities
 from .ontology import Ontology
@@ -103,7 +104,23 @@ class MouseConnectivityCache(Cache):
         if ccf_version is None:
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
         self.ccf_version = ccf_version
+        
+    def get_structure_tree(self, file_name=None):
+        """
+        Read the list of adult mouse structures and return an StructureTree 
+        instance.
 
+        Parameters
+        ----------
+
+        file_name: string
+            File name to save/read the structures table.  If file_name is None,
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+        """
+
+        return StructureTree(self.get_structures(file_name).to_dict('record'))
+        
     def get_annotation_volume(self, file_name=None):
         """
         Read the annotation volume.  Download it first if it doesn't exist.
@@ -289,6 +306,7 @@ class MouseConnectivityCache(Cache):
 
         return nrrd.read(file_name)
 
+    @deprecated
     def get_ontology(self, file_name=None):
         """
         Read the list of adult mouse structures and return an Ontology instance.
@@ -411,7 +429,7 @@ class MouseConnectivityCache(Cache):
                 'transgenic-line'] in cre]
 
         if injection_structure_ids is not None:
-            descendant_ids = self.get_ontology().get_descendant_ids(injection_structure_ids)
+            descendant_ids = self.get_structure_tree().descendant_ids(injection_structure_ids)
             experiments = [e for e in experiments if e[
                 'structure-id'] in descendant_ids]
 
@@ -515,7 +533,7 @@ class MouseConnectivityCache(Cache):
 
         if structure_ids is not None:
             if include_descendants:
-                structure_ids = self.get_ontology().get_descendant_ids(structure_ids)
+                structure_ids = self.get_structure_tree().descendant_ids(structure_ids)
             else:
                 structure_ids = set(structure_ids)
 
@@ -657,8 +675,8 @@ class MouseConnectivityCache(Cache):
         if os.path.exists(file_name):
             return nrrd.read(file_name)
         else:
-            ont = self.get_ontology()
-            structure_ids = ont.get_descendant_ids([structure_id])
+            st = self.get_structure_tree()
+            structure_ids = st.get_descendant_ids([structure_id])
             annotation, _ = self.get_annotation_volume(annotation_file_name)
             mask = self.make_structure_mask(structure_ids, annotation)
 
