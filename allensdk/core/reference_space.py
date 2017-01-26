@@ -13,22 +13,17 @@ class ReferenceSpace(object):
 
     @property
     def direct_voxel_map(self):
-        structure_ids = self.structure_tree.node_ids()
-        return self.direct_voxel_counts(structure_ids)
+        if not hasattr(self, '_direct_voxel_map'):
+            self.direct_voxel_counts()
+        return self._direct_voxel_map 
         
-    @direct_voxel_map.setter
-    def direct_voxel_map(self, data):
-        self._direct_voxel_map = data
-    
+        
     @property
     def total_voxel_map(self):
-        structure_ids = self.structure_tree.node_ids()
-        return self.total_voxel_counts(structure_ids)
+        if not hasattr(self, '_total_voxel_map'):
+            self.total_voxel_counts()
+        return self._total_voxel_map
         
-    @total_voxel_map.setter
-    def total_voxel_map(self, data):
-        self._total_voxel_map = data
-
 
     def __init__(self, structure_tree, annotation, resolution):
         '''Handles brain structures in a 3d reference space
@@ -49,70 +44,42 @@ class ReferenceSpace(object):
         
         self.annotation = np.ascontiguousarray(annotation)
         
-        self._direct_voxel_map = defaultdict(lambda *x: None, {})
-        self._total_voxel_map = defaultdict(lambda *x: None, {})
-
-        
-    def direct_voxel_counts(self, structure_ids):
+    def direct_voxel_counts(self):
         '''Determines the number of voxels directly assigned to one or more 
         structures.
-        
-        Parameters
-        ----------
-        structure_ids : list of int
-        
         
         Returns
         -------
         dict : 
             Keys are structure ids, values are the number of voxels directly 
-            assigned to input structures.
+            assigned to those structures.
         
         '''
-    
-        counts = {}
-        for stid in structure_ids:
-        
-            counts[stid] = self._direct_voxel_map[stid]
-        
-            if counts[stid] is None:
-                counts[stid] = (self.annotation.size \
-                                - np.count_nonzero(self.annotation - stid))
-                                
-        self._direct_voxel_map.update(counts)
-        return counts
-        
-        
-    def total_voxel_counts(self, structure_ids):
+
+        uniques = np.unique(self.annotation, return_counts=True)
+        found = {k: v for k, v in zip(*uniques) if k != 0}
+
+        self._direct_voxel_map = {k: (found[k] if k in found else 0) for k 
+                                  in self.structure_tree.node_ids()}
+          
+    def total_voxel_counts(self):
         '''Determines the number of voxels assigned to a structure or its 
         descendants
-        
-        Parameters
-        ----------
-        structure_ids : list of int
-            Get counts for these structures.
             
         Returns
         -------
         dict : 
             Keys are structure ids, values are the number of voxels assigned 
-            to input structures' descendants.
+            to structures' descendants.
         
         ''' 
-        
 
-        counts = {}
-        for stid in structure_ids:
-        
-            counts[stid] = self._total_voxel_map[stid]
-        
-            if counts[stid] is None:
-                desc_ids = self.structure_tree.descendant_ids([stid])[0]
-                counts[stid] = sum(self.direct_voxel_counts(desc_ids).values())
-                                
-        self._total_voxel_map.update(counts)
-        return counts
-    
+        self._total_voxel_map = {}
+        for stid in self.structure_tree.node_ids():
+
+            desc_ids = self.structure_tree.descendant_ids([stid])[0]
+            self._total_voxel_map[stid] = sum([self.direct_voxel_map[dscid] 
+                                               for dscid in desc_ids])
     
     def remove_unassigned(self, update_self=True):
         '''Obtains a structure tree consisting only of structures that have 
@@ -138,7 +105,6 @@ class ReferenceSpace(object):
             
         return structures
     
-    
     def make_structure_mask(self, structure_ids, direct_only=False):
         '''Return an indicator array for one or more structures
         
@@ -162,7 +128,7 @@ class ReferenceSpace(object):
             for stid in structure_ids:
                 
                 print(stid)
-                if self.direct_voxel_counts([stid]) == 0:
+                if self.direct_voxel_map[stid] == 0:
                     continue
                     
                 mask[self.annotation == stid] = True
@@ -174,7 +140,6 @@ class ReferenceSpace(object):
             structure_ids = set(reduce(op.add, structure_ids))
             return self.make_structure_mask(structure_ids, direct_only=True)
                         
-        
     def many_structure_masks(self, structure_ids, output_cb=None, 
                              direct_only=False):
         '''Build one or more structure masks and do something with them
@@ -211,7 +176,6 @@ class ReferenceSpace(object):
             yield output_cb(stid, self.make_structure_mask([stid], 
                             direct_only))
 
-        
     def check_coverage(self, structure_ids, domain_mask):
         '''Determines whether a spatial domain is completely covered by 
         structures in a set.
@@ -233,7 +197,6 @@ class ReferenceSpace(object):
     
         candidate_mask = self.make_structure_mask(structure_ids)
         return np.logical_and(domain_mask, np.logical_not(candidate_mask))
-        
         
     def validate_structures(self, structure_ids, domain_mask):
         '''Determines whether a set of structures produces an exact and 
@@ -259,7 +222,6 @@ class ReferenceSpace(object):
         
         return [self.structure_tree.has_overlaps(structure_ids), 
                 self.check_coverage(structure_ids, domain_mask)]
-        
         
     def downsample(self, target_resolution):
         '''Obtain a smaller reference space by downsampling

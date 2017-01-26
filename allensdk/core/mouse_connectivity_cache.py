@@ -646,6 +646,25 @@ class MouseConnectivityCache(Cache):
         else:
             return {'matrix': matrix, 'rows': experiment_ids, 'columns': columns}
 
+    def get_voxel_counts(self, structure_ids=None, file_name=None, structure_file_name=None, annotation_file_name=None):
+        
+        if structure_ids is None:
+            structure_ids = self.get_structure_tree(structure_file_name).node_ids()
+            
+        # check if file
+        file_name = self.get_cache_path(file_name, self.VOXEL_COUNT_KEY, 
+                                        self.resolution)
+        try:
+            with open(file_name, 'rb') as vcf:
+                voxel_counts = json.load(vcf)
+        except (OSError, IOError) as _:
+            voxel_counts = {'total': {}, 'direct': {}}
+            
+        # check if requested sts in voxel_counts
+        
+                    
+
+
     def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
         """
         Read a 3D numpy array shaped like the annotation volume that has non-zero values where

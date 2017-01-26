@@ -33,8 +33,8 @@ def rsp():
     
 def test_direct_voxel_counts(rsp):
 
-    obt_one = rsp.direct_voxel_counts([3, 2])
-    obt_two = rsp.direct_voxel_counts([1, 2])
+    obt_one = rsp.direct_voxel_map
+    obt_two = rsp.direct_voxel_map
     
     assert( obt_one[3] == 8 )
     assert( obt_one[2] == 4**3 - 2**3 - 1 )
@@ -44,7 +44,7 @@ def test_direct_voxel_counts(rsp):
     
 def test_total_voxel_counts(rsp):
 
-    obt = rsp.total_voxel_counts([2, 6])
+    obt = rsp.total_voxel_map
     
     assert( obt[2] == 4**3 )
     assert( obt[6] == 4 )   
