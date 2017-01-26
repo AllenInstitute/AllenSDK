@@ -3,6 +3,7 @@ from collections import defaultdict
 import operator as op
 
 from scipy.misc import imresize
+from scipy.ndimage.interpolation import zoom
 import numpy as np
 
 from allensdk.core.structure_tree import StructureTree
@@ -10,6 +11,8 @@ from allensdk.core.structure_tree import StructureTree
 
 class ReferenceSpace(object):
 
+    RESOLUTIONS = {''
+                    }
 
     @property
     def direct_voxel_map(self):
@@ -270,13 +273,12 @@ class ReferenceSpace(object):
         
         '''
         
-        # divide to go from source -> target
-        factors = [ float(ii / jj) for ii, jj in zip(self.resolution, 
+        factors = [ float(jj / ii) for ii, jj in zip(self.resolution, 
                                                      target_resolution)]
-        target = ndimage.interpolation.zoom(self.annotation, factors, order=0)
+        target = zoom(self.annotation, factors, order=0)
         
-        return ReferenceSpace(self.structure_tree, target)
-
+        return ReferenceSpace(self.structure_tree, target, target_resolution)
+        
     
 # An example for many_structure_masks. Use by currying  a la:
 # from functools import partial

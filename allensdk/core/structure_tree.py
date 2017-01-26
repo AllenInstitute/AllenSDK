@@ -28,7 +28,7 @@ class StructureTree( SimpleTree ):
     # unsure about: hemisphere_id, failed, failed_facet, structure_name_facet, safe_name
     # st_level might be needed for devmouse
     KEEP_FIELDS = ['acronym', 'color_hex_triplet', 'graph_id', 'graph_order', 
-                   'id', 'name']
+                   'id', 'name', 'structure_id_path']
 
     def __init__(self, nodes):
         '''A tree whose nodes are brain structures and whose edges indicate 
@@ -272,5 +272,5 @@ class StructureTree( SimpleTree ):
         
         
 def filter_dict(dictionary, *pass_keys):
-    return {k:v for k, v in dictionary.iteritems() if k in field_names}
+    return {k:v for k, v in dictionary.iteritems() if k in pass_keys}
     

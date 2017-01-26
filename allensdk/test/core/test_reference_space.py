@@ -107,4 +107,8 @@ def test_validate_structures(rsp):
     rsp.check_coverage.assert_called_with(1, 2)
     
 
-
+def test_downsample(rsp):
+    
+    target = rsp.downsample((10, 5, 5))
+    
+    assert( np.allclose(target.annotation.shape, [10, 5, 5]) )
