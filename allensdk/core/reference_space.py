@@ -271,17 +271,11 @@ class ReferenceSpace(object):
         '''
         
         # divide to go from source -> target
-        factors = [ ii / jj for ii, jj in zip(self.resolution, 
-                                              target_resolution)]
-        target_size = [int(np.around(sc * shp)) for sc, shp 
-                       in zip(scale, self.annotation.shape)]
-    
-        target_annotation = imresize(self.annotation, target_size, 
-                                     interp='nearest')
-                                                
-        return ReferenceSpace(self.structure_tree, target_annotation, 
-                              target_resolution)
+        factors = [ float(ii / jj) for ii, jj in zip(self.resolution, 
+                                                     target_resolution)]
+        target = ndimage.interpolation.zoom(self.annotation, factors, order=0)
         
+        return ReferenceSpace(self.structure_tree, target)
 
     
 # An example for many_structure_masks. Use by currying  a la:
