@@ -1,8 +1,11 @@
 from __future__ import division, print_function, absolute_import
 from collections import defaultdict
+import operator as op
+
+from scipy.misc import imresize
+import numpy as np
 
 from allensdk.core.structure_tree import StructureTree
-
 
 
 class ReferenceSpace(object):
@@ -39,8 +42,8 @@ class ReferenceSpace(object):
         
         self.annotation = np.ascontiguousarray(annotation)
         
-        self._direct_voxel_map = defaultdict(lambda x: None)
-        self._total_voxel_map = defaultdict(lambda x: None)
+        self._direct_voxel_map = defaultdict(lambda *x: None, {})
+        self._total_voxel_map = defaultdict(lambda *x: None, {})
 
         
     def direct_voxel_counts(self, structure_ids):
@@ -66,7 +69,7 @@ class ReferenceSpace(object):
             counts[stid] = self._direct_voxel_map[stid]
         
             if counts[stid] is None:
-                counts[stid = ](self.annotation.size \
+                counts[stid] = (self.annotation.size \
                                 - np.count_nonzero(self.annotation - stid))
                                 
         self._direct_voxel_map.update(counts)
@@ -97,14 +100,14 @@ class ReferenceSpace(object):
             counts[stid] = self._total_voxel_map[stid]
         
             if counts[stid] is None:
-                desc_ids = self.structure_tree.descendant_ids([stid])
+                desc_ids = self.structure_tree.descendant_ids([stid])[0]
                 counts[stid] = sum(self.direct_voxel_counts(desc_ids).values())
                                 
         self._total_voxel_map.update(counts)
         return counts
     
     
-    def remove_unannnotated(self, update_self=True):
+    def remove_unassigned(self, update_self=True):
         '''Obtains a structure tree consisting only of structures that have 
         at least one voxel in the annotation.
         
@@ -148,20 +151,21 @@ class ReferenceSpace(object):
         '''
     
         if direct_only:
-            mask = np.zeros(self.annotation.shape, dtype=np.bool_)
+            mask = np.zeros(self.annotation.shape, dtype=np.bool_, order='C')
             for stid in structure_ids:
                 
-                if self.direct_voxel_count([stid]) == 0:
+                print(stid)
+                if self.direct_voxel_counts([stid]) == 0:
                     continue
                     
-                mask[np.where(annotation == stid)] = True
+                mask[np.where(self.annotation == stid)] = True
                 
             return mask
             
         else:
             structure_ids = self.structure_tree.descendant_ids(structure_ids)
-            return self.make_structure_mask(list(set(structure_ids)), 
-                                            direct_only=True)
+            structure_ids = set(reduce(op.add, structure_ids))
+            return self.make_structure_mask(structure_ids, direct_only=True)
                         
         
     def many_structure_masks(self, structure_ids, output_cb=None, 
@@ -173,27 +177,32 @@ class ReferenceSpace(object):
         structure_ids : list of int
             Specify structures to be masked
         output_cb : function | structure_id, structure_mask => ?
-            Will be applied to each mask. The default treats this method as 
-            a generator.
+            Will be applied to each id and mask. The default just gives you 
+            structure mask ndarrays.
         direct_only : bool, optional
             If True, only include voxels directly assigned to a structure in 
             the mask. Otherwise include voxels assigned to descendants.
             
-        Returns
+        Yields
         -------
-        Nothing, generally. However the default output callback turns this 
-        method into a generator so that you will want to pretend that it 
-        returns an iterator whose elements are (structure_id, structure_mask) 
-        tuples.
+        Return values of output_cb called on each structure_id, structure_mask 
+        pair.
+        
+        Notes
+        -----
+        output_cb is called on every yield, so any side-effects (such as 
+        writing to a file) will be carried out regardless of what you do with 
+        the return values. You do actually have to iterate through the output, 
+        though.
         
         '''
         
         if output_cb is None:
-            output_cb = lambda structure_id, structure_mask: \
-                               yield (structure_id, structure_mask)
+            output_cb = lambda structure_id, structure_mask: structure_mask
         
         for stid in structure_ids:
-            output_cb(stid, self.make_structure_mask([stid], direct_only))
+            yield output_cb(stid, self.make_structure_mask([stid], 
+                            direct_only))
 
         
     def check_coverage(self, structure_ids, domain_mask):
@@ -267,8 +276,8 @@ class ReferenceSpace(object):
         target_size = [int(np.around(sc * shp)) for sc, shp 
                        in zip(scale, self.annotation.shape)]
     
-        target_annotation = scipy.misc.imresize(self.annotation, target_size, 
-                                                interp='nearest')
+        target_annotation = imresize(self.annotation, target_size, 
+                                     interp='nearest')
                                                 
         return ReferenceSpace(self.structure_tree, target_annotation, 
                               target_resolution)

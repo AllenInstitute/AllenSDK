@@ -27,12 +27,8 @@ class StructureTree( SimpleTree ):
     # the api. 
     # unsure about: hemisphere_id, failed, failed_facet, structure_name_facet, safe_name
     # st_level might be needed for devmouse
-    DELETE_FIELDS = ['atlas_id', 'ontology_id', 'sphinx_id', 'weight', 
-                     'depth', 'parent_structure_id', 
-                     'neuro_name_structure_id', 
-                     'neuro_name_structure_id_path', 'st_level', 
-                     'hemisphere_id', 'failed', 'failed_facet', 
-                     'structure_name_facet', 'safe_name']
+    KEEP_FIELDS = ['acronym', 'color_hex_triplet', 'graph_id', 'graph_order', 
+                   'id', 'name']
 
     def __init__(self, nodes):
         '''A tree whose nodes are brain structures and whose edges indicate 
@@ -201,7 +197,8 @@ class StructureTree( SimpleTree ):
         
         
     def has_overlaps(self, structure_ids):
-        '''Determine if a list of structures contains spatial overlaps
+        '''Determine if a list of structures contains structures along with 
+        their ancestors
         
         Parameters
         ----------
@@ -224,7 +221,7 @@ class StructureTree( SimpleTree ):
         
     @staticmethod
     def from_ontologies_api(oapi, graph_id=1, structure_set_ids=None, 
-                            delete_fields=None):
+                            keep_fields=None):
         '''Construct a StructureTree from an OntologiesApi instance.
         
         Parameters
@@ -240,9 +237,9 @@ class StructureTree( SimpleTree ):
             containing that structure. Available sets are specified by this 
             parameter. If none are supplied, a general default list will be 
             used.
-        delete_fields : list of str, optional
-            These key-value pairs will be removed from each sructure record. 
-            If not supplied, a general list will be used.
+        keep_fields : list of str, optional
+            Key-value pairs not in this list will be removed from each 
+            sructure record. If not supplied, a general list will be used.
         
         Returns
         -------
@@ -252,8 +249,8 @@ class StructureTree( SimpleTree ):
                             
         structures = oapi.get_structures(graph_id)
         
-        if delete_fields is None:
-            delete_fields = StructureTree.DELETE_FIELDS
+        if keep_fields is None:
+            keep_fields = StructureTree.KEEP_FIELDS
         if structure_set_ids is None:
             structure_set_ids = StructureTree.STRUCTURE_SETS.keys()
             
@@ -261,7 +258,7 @@ class StructureTree( SimpleTree ):
         
         for ii, val in enumerate(structures):
         
-            val = delete_fields(val, *delete_fields)
+            val = filter_dict(val, *keep_fields)
                                 
             val['structure_sets'] = sts_map[val['id']]
             
@@ -274,6 +271,6 @@ class StructureTree( SimpleTree ):
         return StructureTree(structures)
         
         
-def delete_fields(dictionary, *field_names):
-    return {k:v for k, v in dictionary.iteritems() if not k in field_names}
+def filter_dict(dictionary, *pass_keys):
+    return {k:v for k, v in dictionary.iteritems() if k in field_names}
     

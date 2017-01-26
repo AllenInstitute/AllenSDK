@@ -1,0 +1,110 @@
+
+import pytest
+import mock
+import numpy as np
+
+from allensdk.api.queries.ontologies_api import OntologiesApi
+from allensdk.core.reference_space import ReferenceSpace
+from allensdk.core.structure_tree import StructureTree
+
+
+@pytest.fixture
+def rsp():
+
+    tree = [{'id': 1, 'structure_id_path': [1]}, 
+            {'id': 2, 'structure_id_path': [1, 2]}, 
+            {'id': 3, 'structure_id_path': [1, 3]}, 
+            {'id': 4, 'structure_id_path': [1, 2, 4]}, 
+            {'id': 5, 'structure_id_path': [1, 2, 5]}, 
+            {'id': 6, 'structure_id_path': [1, 2, 5, 6]}, 
+            {'id': 7, 'structure_id_path': [1, 7]}]
+            
+    # leaves are 6, 4, 3
+    # additionally annotate 2, 5 for realism :)
+    annotation = np.zeros((10, 10, 10))
+    annotation[4:8, 4:8, 4:8] = 2
+    annotation[5:7, 5:7, 5:7] = 5
+    annotation[5:7, 5:7, 5] = 6
+    annotation[7, 7, 7] = 4
+    annotation[8:10, 8:10, 8:10] = 3
+
+    return ReferenceSpace(StructureTree(tree), annotation, [10, 10, 10])
+    
+    
+def test_direct_voxel_counts(rsp):
+
+    obt_one = rsp.direct_voxel_counts([3, 2])
+    obt_two = rsp.direct_voxel_counts([1, 2])
+    
+    assert( obt_one[3] == 8 )
+    assert( obt_one[2] == 4**3 - 2**3 - 1 )
+    assert( obt_two[1] == 0 )
+    assert( obt_two[2] == 4**3 - 2**3 - 1 )    
+
+    
+def test_total_voxel_counts(rsp):
+
+    obt = rsp.total_voxel_counts([2, 6])
+    
+    assert( obt[2] == 4**3 )
+    assert( obt[6] == 4 )   
+    
+    
+def test_remove_unassigned(rsp):
+
+    rsp.remove_unassigned()
+    node_ids = rsp.structure_tree.node_ids()
+    
+    assert( 1 in node_ids )
+    assert( 7 not in node_ids )
+    
+    
+def test_make_structure_mask(rsp):
+
+    exp = np.zeros((10, 10, 10))
+    exp[4:8, 4:8, 4:8] = 1
+    exp[8:10, 8:10, 8:10] = 1
+    obt = rsp.make_structure_mask([2, 3])
+
+    assert( np.allclose(obt, exp) )
+    
+    
+def test_make_structure_mask_direct(rsp):
+
+    exp = np.zeros((10, 10, 10))
+    exp[5:7, 5:7, 6:7] = 1
+    obt = rsp.make_structure_mask([5], True)
+
+    assert( np.allclose(obt, exp) )
+    
+    
+def test_many_structure_masks(rsp):
+
+    cb = mock.MagicMock()
+    
+    [ii for ii in rsp.many_structure_masks([2, 3], output_cb=cb)]
+    
+    assert( cb.call_count == 2 )
+    
+    
+def test_check_coverage(rsp):
+    
+    mask = np.zeros((10, 10, 10))
+    mask[7:10, 7:10, 7:10] = 1
+    
+    obt = rsp.check_coverage([3], mask)
+    assert( np.count_nonzero(obt) == 27 - 8 )
+    
+    
+def test_validate_structures(rsp):
+
+    rsp.structure_tree.has_overlaps = mock.MagicMock()
+    rsp.check_coverage = mock.MagicMock()
+    
+    rsp.validate_structures(1, 2)
+    
+    rsp.structure_tree.has_overlaps.assert_called_with(1)
+    rsp.check_coverage.assert_called_with(1, 2)
+    
+
+
