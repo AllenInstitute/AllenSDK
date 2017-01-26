@@ -254,13 +254,16 @@ class StructureTree( SimpleTree ):
         if structure_set_ids is None:
             structure_set_ids = StructureTree.STRUCTURE_SETS.keys()
             
-        sts_map = oapi.get_structure_set_map(structure_sets=structure_set_ids)
+        sts_map = oapi.get_structure_set_map(structure_set_ids=structure_set_ids)
         
         for ii, val in enumerate(structures):
         
             val = filter_dict(val, *keep_fields)
                                 
-            val['structure_sets'] = sts_map[val['id']]
+            try:
+                val['structure_sets'] = sts_map[val['id']]
+            except KeyError:
+                val['structure_sets'] = []
             
             val['structure_id_path'] = [int(stid) for stid 
                                         in val['structure_id_path'].split('/')

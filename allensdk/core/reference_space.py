@@ -11,19 +11,23 @@ from allensdk.core.structure_tree import StructureTree
 
 class ReferenceSpace(object):
 
-    RESOLUTIONS = {''
-                    }
-
     @property
     def direct_voxel_map(self):
         structure_ids = self.structure_tree.node_ids()
         return self.direct_voxel_counts(structure_ids)
-    
+        
+    @direct_voxel_map.setter
+    def direct_voxel_map(self, data):
+        self._direct_voxel_map = data
     
     @property
     def total_voxel_map(self):
         structure_ids = self.structure_tree.node_ids()
         return self.total_voxel_counts(structure_ids)
+        
+    @total_voxel_map.setter
+    def total_voxel_map(self, data):
+        self._total_voxel_map = data
 
 
     def __init__(self, structure_tree, annotation, resolution):
