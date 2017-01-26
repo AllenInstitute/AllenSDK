@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -15,14 +15,21 @@
 from allensdk.api.queries.glif_api import GlifApi
 import numpy as np
 import pytest
+import os
 
 
 @pytest.fixture
 def glif_api():
+    endpoint = None
 
-    return GlifApi('http://testwarehouse:9000')
+    if 'TEST_API_ENDPOINT' in os.environ:
+        endpoint = os.environ['TEST_API_ENDPOINT']
+        return GlifApi(endpoint)
+    else:
+        return None
 
 
+@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
 def test_get_neuronal_model_templates(glif_api):
 
     assert len(glif_api.get_neuronal_model_templates()) == 7
@@ -47,6 +54,7 @@ def test_get_neuronal_model_templates(glif_api):
             raise Exception('Unrecognized template: %s (%s)' % (template['id'], template['name']))
 
 
+@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
 def test_get_neuronal_models(glif_api):
 
     model = glif_api.get_neuronal_models([325464516])
@@ -55,6 +63,7 @@ def test_get_neuronal_models(glif_api):
     assert len(model[0]['neuronal_models']) == 2
 
 
+@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
 def test_get_neuron_configs(glif_api):
     model = glif_api.get_neuronal_models([325464516])
 
@@ -84,11 +93,3 @@ def test_deprecated():
     tmp = GlifApi()
     tmp.get_neuronal_model(473465606)
     tmp.cache_stimulus_file('tmp.nwb')
-
-
-if __name__ == "__main__":
-
-    test_get_neuronal_model_templates(glif_api)
-    test_get_neuronal_models(glif_api)
-    test_get_neuron_configs(glif_api)
-    test_deprecated(glif_api)
