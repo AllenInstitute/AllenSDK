@@ -18,9 +18,11 @@ from six import string_types
 import numpy as np
 import pandas as pd
 
+from allensdk.deprecated import deprecated
 
 class Ontology(object):
 
+    @deprecated
     def __init__(self, df):
         self.df = df
 
