@@ -161,7 +161,7 @@ class ReferenceSpace(object):
                 if self.direct_voxel_counts([stid]) == 0:
                     continue
                     
-                mask[np.where(self.annotation == stid)] = True
+                mask[self.annotation == stid] = True
                 
             return mask
             
