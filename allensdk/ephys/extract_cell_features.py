@@ -39,12 +39,10 @@ def extract_sweep_features(data_set, sweeps_by_type):
     # extract sweep-level features
     sweep_features = {}
 
-    original = False # DEBUG
-
     for stimulus_type, sweep_numbers in six.iteritems(sweeps_by_type):
         logging.debug("%s:%s" % (stimulus_type, ','.join(map(str, sweep_numbers))))
 
-        if stimulus_type == "Short Square - Triple" and not original:
+        if stimulus_type == "Short Square - Triple":
             tmp_ext = efex.extractor_for_nwb_sweeps(data_set, sweep_numbers)
             t_set = [s.t for s in tmp_ext.sweeps()]
             v_set = [s.v for s in tmp_ext.sweeps()]
