@@ -28,7 +28,7 @@ SHORT_SQUARE_TYPES = ["Short Square",
                       "Short Square - Hold -70mv",
                       "Short Square - Hold -80mv"]
 
-SHORT_SQUARE_MAX_THRESH_FRAC = 0.1
+SHORT_SQUARE_THRESH_FRAC_FLOOR = 0.1
 
 MEAN_FEATURES = [ "upstroke_downstroke_ratio", "peak_v", "peak_t", "trough_v", "trough_t",
                   "fast_trough_v", "fast_trough_t", "slow_trough_v", "slow_trough_t",
@@ -39,18 +39,36 @@ def extract_sweep_features(data_set, sweeps_by_type):
     # extract sweep-level features
     sweep_features = {}
 
+    original = False # DEBUG
+
     for stimulus_type, sweep_numbers in six.iteritems(sweeps_by_type):
         logging.debug("%s:%s" % (stimulus_type, ','.join(map(str, sweep_numbers))))
 
-        if stimulus_type in SHORT_SQUARE_TYPES:
+        if stimulus_type == "Short Square - Triple" and not original:
             tmp_ext = efex.extractor_for_nwb_sweeps(data_set, sweep_numbers)
             t_set = [s.t for s in tmp_ext.sweeps()]
             v_set = [s.v for s in tmp_ext.sweeps()]
 
-            cutoff, thresh_frac = ft.estimate_adjusted_detection_parameters(v_set, t_set,
-                                                                            efex.SHORT_SQUARES_WINDOW_START,
-                                                                            efex.SHORT_SQUARES_WINDOW_END)
-            thresh_frac = max(SHORT_SQUARE_MAX_THRESH_FRAC, thresh_frac)
+            # IT-14530
+            # triple-sweeps to use different window
+            win_start = efex.SHORT_SQUARE_TRIPLE_WINDOW_START
+            win_end = efex.SHORT_SQUARE_TRIPLE_WINDOW_END
+            cutoff, thresh_frac = ft.estimate_adjusted_detection_parameters(
+                                    v_set, t_set, win_start, win_end)
+            thresh_frac = max(SHORT_SQUARE_THRESH_FRAC_FLOOR, thresh_frac)
+
+            fex = efex.extractor_for_nwb_sweeps(data_set, sweep_numbers,
+                                    dv_cutoff=cutoff, thresh_frac=thresh_frac)
+        elif stimulus_type in SHORT_SQUARE_TYPES:
+            tmp_ext = efex.extractor_for_nwb_sweeps(data_set, sweep_numbers)
+            t_set = [s.t for s in tmp_ext.sweeps()]
+            v_set = [s.v for s in tmp_ext.sweeps()]
+
+            win_start = efex.SHORT_SQUARES_WINDOW_START
+            win_end = efex.SHORT_SQUARES_WINDOW_END
+            cutoff, thresh_frac = ft.estimate_adjusted_detection_parameters(
+                                     v_set, t_set, win_start, win_end)
+            thresh_frac = max(SHORT_SQUARE_THRESH_FRAC_FLOOR, thresh_frac)
 
             fex = efex.extractor_for_nwb_sweeps(data_set, sweep_numbers,
                                                 dv_cutoff=cutoff, thresh_frac=thresh_frac)
