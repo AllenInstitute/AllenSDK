@@ -17,14 +17,20 @@ class ReferenceSpace(object):
             self.direct_voxel_counts()
         return self._direct_voxel_map 
         
-        
+    @direct_voxel_map.setter
+    def direct_voxel_map(self, data):
+        self._direct_voxel_map = data
+    
     @property
     def total_voxel_map(self):
         if not hasattr(self, '_total_voxel_map'):
             self.total_voxel_counts()
         return self._total_voxel_map
         
-
+    @total_voxel_map.setter
+    def total_voxel_map(self, data):
+        self._total_voxel_map = data
+        
     def __init__(self, structure_tree, annotation, resolution):
         '''Handles brain structures in a 3d reference space
         
@@ -170,7 +176,8 @@ class ReferenceSpace(object):
         '''
         
         if output_cb is None:
-            output_cb = lambda structure_id, structure_mask: structure_mask
+            output_cb = lambda structure_id, structure_mask: \
+                               structure_id, structure_mask
         
         for stid in structure_ids:
             yield output_cb(stid, self.make_structure_mask([stid], 
@@ -249,10 +256,5 @@ class ReferenceSpace(object):
 # An example for many_structure_masks. Use by currying  a la:
 # from functools import partial
 # output_cb = functools.partial(write_nrrd_cb, my_out_dir, my_iso_res)
-def write_nrrd_cb(output_directory, isometric_resolution, structure_id, 
-                  structure_mask):
-    path = os.path.join(output_directory, 
-                        'structure_mask_{0}_{1}'.format(structure_id, 
-                                                        isometric_resolution))
-    nrrd.write(path, structure_mask)
+
 

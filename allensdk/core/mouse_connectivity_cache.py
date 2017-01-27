@@ -646,25 +646,96 @@ class MouseConnectivityCache(Cache):
         else:
             return {'matrix': matrix, 'rows': experiment_ids, 'columns': columns}
 
-    def get_voxel_counts(self, structure_ids=None, file_name=None, structure_file_name=None, annotation_file_name=None):
+    def get_reference_space(self, structure_file_name=None, 
+                            annotation_file_name=None):
+        """
+        Build a ReferenceSpace from this cache's annotation volume and 
+        structure tree. The ReferenceSpace does operations that relate brain 
+        structures to spatial domains.
         
-        if structure_ids is None:
-            structure_ids = self.get_structure_tree(structure_file_name).node_ids()
-            
-        # check if file
-        file_name = self.get_cache_path(file_name, self.VOXEL_COUNT_KEY, 
-                                        self.resolution)
-        try:
-            with open(file_name, 'rb') as vcf:
-                voxel_counts = json.load(vcf)
-        except (OSError, IOError) as _:
-            voxel_counts = {'total': {}, 'direct': {}}
-            
-        # check if requested sts in voxel_counts
+        Parameters
+        ----------
         
-                    
+        structure_file_name: string
+            File name to save/read the structures table.  If file_name is None,
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+            
+        annotation_file_name: string
+            File name to store the annotation volume.  If it already exists,
+            it will be read from this file.  If file_name is None, the
+            file_name will be pulled out of the manifest.  Default is None.
+        
+        """
+        
+        return ReferenceSpace(self.get_structure_tree(structure_file_name), 
+                              self.get_annotation_volume(annotation_file_name), 
+                              [self.resolution] * 3)
+        
+    def get_structure_masks(self, structure_ids, file_names=None, 
+                             structure_file_name=None, 
+                             annotation_file_name=None):
+        """
+        Read 3d numpy arrays shaped like the annotation volume that have 
+        non-zero values where voxels belong to a particular structure.  This 
+        will take care of identifying substructures.
 
 
+        Parameters
+        ----------
+
+        structure_id: list of int
+            IDs of one or more structures.
+
+        file_names: list of string
+            Each item corresponds to a structure id and determines where to 
+            look for the file. If a file name is None, a name will be chosen 
+            from the manifest. If file_names is None, all names will be chosen 
+            from the manifest. Default is None
+
+        structure_file_name: string
+            File name to save/read the structures table.  If file_name is None,
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+
+        annotation_file_name: string
+            File name to store the annotation volume.  If it already exists,
+            it will be read from this file.  If file_name is None, the
+            file_name will be pulled out of the manifest.  Default is None.
+            
+        Yields
+        ------
+        
+        tuple: 
+            The first element is a structure mask. The second is the header of 
+            that mask's nrrd file.
+            
+        """
+                             
+        if file_names is None:
+            file_names = [None for stid in structure_ids]
+            
+        # clean the names and get a map
+        pather = lambda structure_id: self.get_cache_path(file_map[structure_id], 
+                                                          self.STRUCTURE_MASK_KEY, 
+                                                          self.ccf_version, 
+                                                          self.resolution, 
+                                                          structure_id)
+        file_names = map(pather, file_names)
+        file_map = {stid: fn for stid, fn in zip(structure_id, file_names)}
+
+        reference_space = self.get_reference_space(structure_file_name, 
+                                                   annotation_file_name)
+                     
+        # make masks if needed                              
+        no_file = [k for k, v in file_map.iteritems() if not os.path.exists(v)]
+        for item in reference_space.many_structure_masks(no_file.keys()):
+            nrrd.write(file_map[item[0]], item[1])
+            
+        for fn in file_map.values():
+            yield nrrd.read(fn)        
+
+    @deprecated
     def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
         """
         Read a 3D numpy array shaped like the annotation volume that has non-zero values where
@@ -705,6 +776,7 @@ class MouseConnectivityCache(Cache):
 
             return mask, None
 
+    @deprecated
     def make_structure_mask(self, structure_ids, annotation):
         """
         Look at an annotation volume and identify voxels that have values
@@ -799,3 +871,11 @@ class MouseConnectivityCache(Cache):
                                   typename='file')
 
         manifest_builder.write_json_file(file_name)
+        
+        
+def write_nrrd_return_cb(pather, structure_id, structure_mask):
+    nrrd.write(pather(structure_id), structure_mask)
+    return structure_mask
+    
+def write_nrrd_cb(pather, structure_id, structure_mask):
+    nrrd.write(pather(structure_id), structure_mask)
