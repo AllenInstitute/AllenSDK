@@ -22,6 +22,7 @@ from allensdk.deprecated import deprecated
 from . import json_utilities
 from .ontology import Ontology
 from .structure_tree import StructureTree
+from .reference_space import ReferenceSpace
 
 import nrrd
 import os
