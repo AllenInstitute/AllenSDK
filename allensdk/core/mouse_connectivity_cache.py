@@ -84,6 +84,7 @@ class MouseConnectivityCache(Cache):
     STRUCTURE_UNIONIZES_KEY = 'STRUCTURE_UNIONIZES'
     EXPERIMENTS_KEY = 'EXPERIMENTS'
     STRUCTURES_KEY = 'STRUCTURES'
+    STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
 
 
@@ -305,10 +306,11 @@ class MouseConnectivityCache(Cache):
             is disabled, no file will be saved. Default is None.
         """
         
-        file_name = self.get_cache_path(file_name, self.STRUCTURES_KEY)
+        file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
 
         structures = OntologiesApi(base_uri=self.api.api_url).get_structure_tree(
             structure_graph_ids=1,
+            return_tree=False, 
             query_strategy='lazy',
             path=file_name,
             file_type='json',
@@ -832,6 +834,11 @@ class MouseConnectivityCache(Cache):
 
         manifest_builder.add_path(self.STRUCTURES_KEY,
                                   'structures.csv',
+                                  parent_key='BASEDIR',
+                                  typename='file')
+                                  
+        manifest_builder.add_path(self.STRUCTURE_TREE_KEY,
+                                  'structures.json',
                                   parent_key='BASEDIR',
                                   typename='file')
 

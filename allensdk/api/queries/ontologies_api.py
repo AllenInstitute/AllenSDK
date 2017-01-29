@@ -183,8 +183,8 @@ class OntologiesApi(RmaTemplate):
         
         
     @cacheable
-    def get_structure_tree(self, append_structure_sets=None, keep_fields=None, 
-                           **kwargs):
+    def get_structure_tree(self, return_tree=True, append_structure_sets=None, 
+                           keep_fields=None, **kwargs):
         
         if append_structure_sets is None:
             append_structure_sets = StructureTree.STRUCTURE_SETS.keys()
@@ -194,8 +194,13 @@ class OntologiesApi(RmaTemplate):
         structure_set_map = self.get_structure_set_map(
             structure_set_ids=append_structure_sets)
         
-        return StructureTree.from_structures(structures, structure_set_map, 
-                                             keep_fields).node()
+        tree = StructureTree.from_structures(structures, structure_set_map, 
+                                             keep_fields)
+                                             
+        if return_tree:
+            return tree
+        else:
+            return tree.node()
         
         
         
