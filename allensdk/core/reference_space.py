@@ -130,7 +130,7 @@ class ReferenceSpace(object):
         '''
     
         if direct_only:
-            mask = np.zeros(self.annotation.shape, dtype=np.bool_, order='C')
+            mask = np.zeros(self.annotation.shape, dtype=np.uint8, order='C')
             for stid in structure_ids:
                 
                 print(stid)
@@ -177,7 +177,7 @@ class ReferenceSpace(object):
         
         if output_cb is None:
             output_cb = lambda structure_id, structure_mask: \
-                               structure_id, structure_mask
+                               (structure_id, structure_mask)
         
         for stid in structure_ids:
             yield output_cb(stid, self.make_structure_mask([stid], 

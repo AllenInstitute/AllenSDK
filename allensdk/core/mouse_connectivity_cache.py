@@ -682,10 +682,10 @@ class MouseConnectivityCache(Cache):
         """
         
         return ReferenceSpace(self.get_structure_tree(structure_file_name), 
-                              self.get_annotation_volume(annotation_file_name), 
+                              self.get_annotation_volume(annotation_file_name)[0], 
                               [self.resolution] * 3)
         
-    def get_structure_masks(self, structure_ids, file_names=None, 
+    def get_structure_masks(self, structure_ids, file_map=None, 
                              structure_file_name=None, 
                              annotation_file_name=None):
         """
@@ -700,11 +700,9 @@ class MouseConnectivityCache(Cache):
         structure_id: list of int
             IDs of one or more structures.
 
-        file_names: list of string
-            Each item corresponds to a structure id and determines where to 
-            look for the file. If a file name is None, a name will be chosen 
-            from the manifest. If file_names is None, all names will be chosen 
-            from the manifest. Default is None
+        file_map: dict
+            Keys are structure ids. Values are strings describing the locations 
+            of .nrrd files containing associated structure masks.
 
         structure_file_name: string
             File name to save/read the structures table.  If file_name is None,
@@ -725,28 +723,32 @@ class MouseConnectivityCache(Cache):
             
         """
                              
-        if file_names is None:
-            file_names = [None for stid in structure_ids]
+        if file_map is None:
+            file_map = {}
+        file_map.update({stid: None for stid in structure_ids 
+                         if stid not in file_map})
             
         # clean the names and get a map
-        pather = lambda structure_id: self.get_cache_path(file_map[structure_id], 
-                                                          self.STRUCTURE_MASK_KEY, 
-                                                          self.ccf_version, 
-                                                          self.resolution, 
-                                                          structure_id)
-        file_names = map(pather, file_names)
-        file_map = {stid: fn for stid, fn in zip(structure_id, file_names)}
+        for stid in file_map.iterkeys():
+            file_map[stid] = self.get_cache_path(file_map[stid], 
+                                                 self.STRUCTURE_MASK_KEY, 
+                                                 self.ccf_version, 
+                                                 self.resolution, 
+                                                 stid)
 
         reference_space = self.get_reference_space(structure_file_name, 
                                                    annotation_file_name)
                      
         # make masks if needed                              
         no_file = [k for k, v in file_map.iteritems() if not os.path.exists(v)]
-        for item in reference_space.many_structure_masks(no_file.keys()):
-            nrrd.write(file_map[item[0]], item[1])
+        
+        for item in reference_space.many_structure_masks(no_file):
+            file_name = file_map[item[0]]
+            Manifest.safe_make_parent_dirs(file_name)
+            nrrd.write(file_name, item[1])
             
         for fn in file_map.values():
-            yield nrrd.read(fn)        
+            yield nrrd.read(fn)
 
     @deprecated
     def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
