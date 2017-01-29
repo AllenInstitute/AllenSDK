@@ -64,8 +64,8 @@ class StructureTree( SimpleTree ):
         super(StructureTree, self).__init__(nodes,
                                             lambda s: int(s['id']),
                                             lambda s: s['structure_id_path'][-2] \
-                                                if s['structure_id_path'] is not None \
-                                                and len(s['structure_id_path']) > 1 \
+                                                if len(s['structure_id_path']) > 1 \
+                                                and s['structure_id_path'] is not None \
                                                 and np.isfinite(s['structure_id_path'][-2]) \
                                                 else None)
                                                 
@@ -220,7 +220,7 @@ class StructureTree( SimpleTree ):
         
         
     @staticmethod
-    def from_ontologies_api(oapi, graph_id=1, structure_set_ids=None, 
+    def from_ontologies_api(oapi, graph_id=1, append_structure_sets=None, 
                             keep_fields=None):
         '''Construct a StructureTree from an OntologiesApi instance.
         
@@ -231,7 +231,7 @@ class StructureTree( SimpleTree ):
         graph_id : int, optional
             Specifies the structure graph from which to draw structures. 
             Default is the mouse brain atlas.
-        structure_set_ids : list of int, optional
+        append_structure_sets : list of int, optional
             Each structure in the tree will be given an additional key 
             ("structure_sets") that maps to a list of structure sets 
             containing that structure. Available sets are specified by this 
@@ -249,19 +249,30 @@ class StructureTree( SimpleTree ):
                             
         structures = oapi.get_structures(graph_id)
         
+        if append_structure_sets is None:
+            append_structure_sets = StructureTree.STRUCTURE_SETS.keys()
+        sts_map = oapi.get_structure_set_map(
+            structure_set_ids=append_structure_sets)
+        
+        
+        return StructureTree.from_structures(structures, sts_map, 
+                                             append_structure_sets, 
+                                             keep_fields)
+        
+        
+        
+    @staticmethod
+    def from_structures(structures, structure_set_map, keep_fields=None):
+    
         if keep_fields is None:
             keep_fields = StructureTree.KEEP_FIELDS
-        if structure_set_ids is None:
-            structure_set_ids = StructureTree.STRUCTURE_SETS.keys()
-            
-        sts_map = oapi.get_structure_set_map(structure_set_ids=structure_set_ids)
-        
+
         for ii, val in enumerate(structures):
         
             val = filter_dict(val, *keep_fields)
                                 
             try:
-                val['structure_sets'] = sts_map[val['id']]
+                val['structure_sets'] = structure_set_map[val['id']]
             except KeyError:
                 val['structure_sets'] = []
             

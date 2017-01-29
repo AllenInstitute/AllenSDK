@@ -21,6 +21,7 @@ from allensdk.deprecated import deprecated
 
 from . import json_utilities
 from .ontology import Ontology
+from .structure_tree import StructureTree
 
 import nrrd
 import os
@@ -104,22 +105,6 @@ class MouseConnectivityCache(Cache):
         if ccf_version is None:
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
         self.ccf_version = ccf_version
-        
-    def get_structure_tree(self, file_name=None):
-        """
-        Read the list of adult mouse structures and return an StructureTree 
-        instance.
-
-        Parameters
-        ----------
-
-        file_name: string
-            File name to save/read the structures table.  If file_name is None,
-            the file_name will be pulled out of the manifest.  If caching
-            is disabled, no file will be saved. Default is None.
-        """
-
-        return StructureTree(self.get_structures(file_name).to_dict('record'))
         
     def get_annotation_volume(self, file_name=None):
         """
@@ -305,6 +290,31 @@ class MouseConnectivityCache(Cache):
                 file_name, experiment_id, self.resolution)
 
         return nrrd.read(file_name)
+
+    def get_structure_tree(self, file_name=None):
+        """
+        Read the list of adult mouse structures and return an StructureTree 
+        instance.
+
+        Parameters
+        ----------
+
+        file_name: string
+            File name to save/read the structures table.  If file_name is None,
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+        """
+        
+        file_name = self.get_cache_path(file_name, self.STRUCTURES_KEY)
+
+        structures = OntologiesApi(base_uri=self.api.api_url).get_structure_tree(
+            structure_graph_ids=1,
+            query_strategy='lazy',
+            path=file_name,
+            file_type='json',
+            dataframe=False)
+
+        return StructureTree(structures)
 
     @deprecated
     def get_ontology(self, file_name=None):

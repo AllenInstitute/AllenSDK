@@ -210,19 +210,22 @@ class SimpleTree( object ):
         return out
             
 
-    def node(self, node_ids):
+    def node(self, node_ids=None):
         '''Get one or more nodes' full dictionaries from their ids.
         
         Parameters
         ----------
         node_ids : list of hashable
-            Items are ids of nodes to be returned
+            Items are ids of nodes to be returned. Default is all.
             
         Returns
         -------
         list of dict : 
             Items are nodes corresponding to argued ids.
         '''
+    
+        if node_ids is None:
+            node_ids = self.node_ids()
     
         return [ self._nodes[nid] for nid in node_ids ]
 

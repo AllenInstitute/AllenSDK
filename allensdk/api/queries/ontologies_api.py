@@ -16,6 +16,8 @@
 from .rma_template import RmaTemplate
 from ..cache import cacheable
 
+from allensdk.core.structure_tree import StructureTree
+
 
 class OntologiesApi(RmaTemplate):
     '''
@@ -178,6 +180,24 @@ class OntologiesApi(RmaTemplate):
                                        count=count)
 
         return data 
+        
+        
+    @cacheable
+    def get_structure_tree(self, append_structure_sets=None, keep_fields=None, 
+                           **kwargs):
+        
+        if append_structure_sets is None:
+            append_structure_sets = StructureTree.STRUCTURE_SETS.keys()
+        
+        structures = self.get_structures(**kwargs)
+        
+        structure_set_map = self.get_structure_set_map(
+            structure_set_ids=append_structure_sets)
+        
+        return StructureTree.from_structures(structures, structure_set_map, 
+                                             keep_fields).node()
+        
+        
         
     def get_structure_set_map(self, structure_set_ids, 
                               num_rows='all',
