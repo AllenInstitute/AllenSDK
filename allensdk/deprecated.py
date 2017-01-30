@@ -16,18 +16,27 @@
 
 import warnings
 import functools
+from numpy import VisibleDeprecationWarning
+# Python suppresses DeprecationWarning, so numpy made a UserWarning with a 
+# different name.
 
+    
+def deprecated(message=None):
 
-def deprecated(func):
-    """This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used."""
-
-    @functools.wraps(func)
-    def new_func(*args, **kwargs):
-        warnings.warn("Function {} is deprecated.".format(func.__name__),
-                      category=DeprecationWarning,
-                      stacklevel=2)
-        return func(*args, **kwargs)
-
-    return new_func
+    if message is None:
+        message = '' 
+    
+    def output_decorator(fn):
+        
+        @functools.wraps(fn)
+        def wrapper(*args, **kwargs):
+        
+            warnings.warn("Function {0} is deprecated. {1}".format(
+                          fn.__name__, message), 
+                          category=VisibleDeprecationWarning, stacklevel=2)
+            
+            return fn(*args, **kwargs)
+            
+        return wrapper
+        
+    return output_decorator
