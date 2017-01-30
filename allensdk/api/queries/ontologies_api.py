@@ -114,7 +114,7 @@ class OntologiesApi(RmaTemplate):
                       'structure_sets'], 
              'num_rows': 'all', 
              'count': False, 
-             'criteria_params': ['set_ids']
+             'criteria_params': ['graph_ids']
              }, 
         ]}
 
@@ -196,7 +196,9 @@ class OntologiesApi(RmaTemplate):
         '''
     
         return self.template_query('ontology_queries', 'structure_tree', 
-                                   graph_ids=structure_graph_ids)
+                                   graph_ids=structure_graph_ids, 
+                                   order=order, num_rows=num_rows, 
+                                   count=count)
     
 
     def unpack_structure_set_ancestors(self, structure_dataframe):

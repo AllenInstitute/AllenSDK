@@ -239,7 +239,7 @@ class StructureTree( SimpleTree ):
         
         
     @staticmethod
-    def from_structures(structures, structure_set_map=None, keep_fields=None):
+    def from_structures(structures):
         '''Construct a StructureTree from raw dowloaded structures.
         
         Parameters
@@ -258,26 +258,14 @@ class StructureTree( SimpleTree ):
         StructureTree
         
         '''
-    
-        if keep_fields is None:
-            keep_fields = StructureTree.KEEP_FIELDS
-
-        if structure_set_map is None:
-            structure_set_map = {}
 
         for ii, val in enumerate(structures):
-        
-            val = filter_dict(val, *keep_fields)
-                                
-            try:
-                val['structure_sets'] = structure_set_map[val['id']]
-            except KeyError:
-                val['structure_sets'] = []
-            
             val['structure_id_path'] = [int(stid) for stid 
                                         in val['structure_id_path'].split('/')
                                         if stid != ''] 
         
+            val['structure_sets'] = [sts['id'] for sts in val['structure_sets']]
+
             structures[ii] = val
         
         return StructureTree(structures)
