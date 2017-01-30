@@ -184,6 +184,8 @@ class Cache(object):
             column to use as the pandas index
         rename : list of string tuples, optional
             (new, old) columns to rename
+        pre_filter : function
+            takes one data argument and returns filtered version, None for pass-through
         kwargs : objects
             passed through to the query function
     
@@ -202,6 +204,7 @@ class Cache(object):
         dataframe = kwargs.pop('dataframe', False)
         index = kwargs.pop('index', None)
         rename = kwargs.pop('rename', None)
+        pre_filter = kwargs.pop('pre_filter', lambda d: d)
 
         if 'lazy' == query_strategy:
             if os.path.exists(path):
@@ -214,16 +217,16 @@ class Cache(object):
 
             if query_strategy is None:
                 if dataframe:
-                    return pd.DataFrame(json_data)
+                    return pre_filter(pd.DataFrame(json_data))
                 else:
-                    return json_data
+                    return pre_filter(json_data)
             elif query_strategy:
                 Manifest.safe_make_parent_dirs(path)
                 
                 if 'json' == file_type:
-                    ju.write(path, json_data)
+                    ju.write(path, pre_filter(json_data))
                 elif 'csv' == file_type:
-                    df = pd.DataFrame(json_data)
+                    df = pre_filter(pd.DataFrame(json_data))
                     Cache.rename_columns(df, rename)
                     df.to_csv(path)
                 else:
