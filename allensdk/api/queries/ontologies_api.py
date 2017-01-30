@@ -99,19 +99,12 @@ class OntologiesApi(RmaTemplate):
              'count': False,
              'criteria_params': ['atlas_ids']
              }, 
-             {'name': 'structure_tree', 
+             {'name': 'structures_with_sets', 
              'description': 'see name',
              'model': 'Structure',
              'include': 'structure_sets', 
              'criteria': '[graph_id$in{{ graph_ids }}]',
-             'order': ['structures.graph_order'],
-             'only': ['id', 
-                      'acronym', 
-                      'color_hex_triplet', 
-                      'graph_id', 
-                      'name', 
-                      'structure_id_path', 
-                      'structure_sets'], 
+             'order': ['structures.graph_order'], 
              'num_rows': 'all', 
              'count': False, 
              'criteria_params': ['graph_ids']
@@ -190,12 +183,27 @@ class OntologiesApi(RmaTemplate):
         
         
     @cacheable
-    def get_structure_tree(self, structure_graph_ids, order=['structures.graph_order'], 
-                           num_rows='all', count=False, **kwargs):
-        ''' Docstring docstring docstring
+    def get_structures_with_sets(self, structure_graph_ids, order=['structures.graph_order'], 
+                                 num_rows='all', count=False, **kwargs):
+        '''Download structures along with the sets to which they belong.
+
+        Parameters
+        ----------
+        structure_graph_ids : int or list of int
+            Only fetch structure records from these graphs.
+        order : list of strings
+            list of RMA order clauses for sorting
+        num_rows : int
+            how many records to retrieve
+ 
+        Returns
+        -------
+        dict
+            the parsed json response containing data from the API
+
         '''
     
-        return self.template_query('ontology_queries', 'structure_tree', 
+        return self.template_query('ontology_queries', 'structures_with_sets', 
                                    graph_ids=structure_graph_ids, 
                                    order=order, num_rows=num_rows, 
                                    count=count)

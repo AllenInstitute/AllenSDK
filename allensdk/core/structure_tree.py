@@ -27,8 +27,8 @@ class StructureTree( SimpleTree ):
     # the api. 
     # unsure about: hemisphere_id, failed, failed_facet, structure_name_facet, safe_name
     # st_level might be needed for devmouse
-    KEEP_FIELDS = ['acronym', 'color_hex_triplet', 'graph_id', 'graph_order', 
-                   'id', 'name', 'structure_id_path']
+    FIELDS = ['acronym', 'color_hex_triplet', 'graph_id', 'graph_order', 
+              'id', 'name', 'structure_id_path', 'structure_sets']
 
     def __init__(self, nodes):
         '''A tree whose nodes are brain structures and whose edges indicate 
@@ -53,7 +53,7 @@ class StructureTree( SimpleTree ):
                 Full name of structure.
             'structure_id_path' : list of int
                 The structures ancestors (inclusive) from the root of the tree.
-                
+
         Notes
         -----
         If you want a newly downloaded StructureTree, it is best to use the 
@@ -218,59 +218,43 @@ class StructureTree( SimpleTree ):
                                   self.ancestor_ids(structure_ids)))
         return (set(ancestor_ids) & set(structure_ids))
         
-        
-    @staticmethod
-    def from_ontologies_api(oapi, graph_id=1, append_structure_sets=None, 
-                            keep_fields=None):
 
-                            
-        structures = oapi.get_structures(graph_id)
-        
-        if append_structure_sets is None:
-            append_structure_sets = StructureTree.STRUCTURE_SETS.keys()
-        sts_map = oapi.get_structure_set_map(
-            structure_set_ids=append_structure_sets)
-        
-        
-        return StructureTree.from_structures(structures, sts_map, 
-                                             append_structure_sets, 
-                                             keep_fields)
-        
-        
-        
     @staticmethod
-    def from_structures(structures):
-        '''Construct a StructureTree from raw dowloaded structures.
+    def clean_structures(structures, field_whitelist=None):
+        '''Convert structures_with_sets query results into a form that can be 
+        used to construct a StructureTree
         
         Parameters
         ----------
         structures : list of dict
-            Each item describes a structure.
-        structure_set_map : dict | int => list of int, optional
-            Each key is a structure id. Each value is a list of associated 
-            structure set ids.
-        keep_fields : list of str, optional
-            Key-value pairs not in this list will be removed from each 
-            sructure record. If not supplied, a general list will be used.
-        
+            Each element describes a structure. Should have a structure id path 
+            field (str values) and a structure_sets field (list of dict).
+        field_whitelist : list of str, optional
+           Each record should keep only fields in this list
+           
         Returns
         -------
-        StructureTree
+        list of dict : 
+            structures, after conversion of structure_id_path and structure_sets 
         
         '''
 
+        if field_whitelist is None:
+            field_whitelist = StructureTree.FIELDS
+
         for ii, val in enumerate(structures):
+
             val['structure_id_path'] = [int(stid) for stid 
                                         in val['structure_id_path'].split('/')
                                         if stid != ''] 
-        
+   
             val['structure_sets'] = [sts['id'] for sts in val['structure_sets']]
 
-            structures[ii] = val
-        
-        return StructureTree(structures)
-        
-        
+            structures[ii] = filter_dict(val, *field_whitelist)
+
+        return structures
+
+
 def filter_dict(dictionary, *pass_keys):
     return {k:v for k, v in dictionary.iteritems() if k in pass_keys}
     

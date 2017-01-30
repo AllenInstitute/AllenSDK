@@ -309,14 +309,14 @@ class MouseConnectivityCache(Cache):
         
         file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
 
-        structures = OntologiesApi(self.api.api_url).get_structure_tree(
+        return OntologiesApi(self.api.api_url).get_structures_with_sets(
             structure_graph_ids=1,
             query_strategy='lazy',
             path=file_name,
             file_type='json',
-            dataframe=False)
-
-        return StructureTree.from_structures(structures)
+            dataframe=False, 
+            pre=StructureTree.clean_structures, 
+            post=StructureTree)
 
     @deprecated
     def get_ontology(self, file_name=None):
