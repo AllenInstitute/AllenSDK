@@ -222,30 +222,7 @@ class StructureTree( SimpleTree ):
     @staticmethod
     def from_ontologies_api(oapi, graph_id=1, append_structure_sets=None, 
                             keep_fields=None):
-        '''Construct a StructureTree from an OntologiesApi instance.
-        
-        Parameters
-        ----------
-        oapi : OntologiesApi
-            Used to download structures and find structure sets.
-        graph_id : int, optional
-            Specifies the structure graph from which to draw structures. 
-            Default is the mouse brain atlas.
-        append_structure_sets : list of int, optional
-            Each structure in the tree will be given an additional key 
-            ("structure_sets") that maps to a list of structure sets 
-            containing that structure. Available sets are specified by this 
-            parameter. If none are supplied, a general default list will be 
-            used.
-        keep_fields : list of str, optional
-            Key-value pairs not in this list will be removed from each 
-            sructure record. If not supplied, a general list will be used.
-        
-        Returns
-        -------
-        StructureTree
-        
-        '''
+
                             
         structures = oapi.get_structures(graph_id)
         
@@ -262,10 +239,31 @@ class StructureTree( SimpleTree ):
         
         
     @staticmethod
-    def from_structures(structures, structure_set_map, keep_fields=None):
+    def from_structures(structures, structure_set_map=None, keep_fields=None):
+        '''Construct a StructureTree from raw dowloaded structures.
+        
+        Parameters
+        ----------
+        structures : list of dict
+            Each item describes a structure.
+        structure_set_map : dict | int => list of int, optional
+            Each key is a structure id. Each value is a list of associated 
+            structure set ids.
+        keep_fields : list of str, optional
+            Key-value pairs not in this list will be removed from each 
+            sructure record. If not supplied, a general list will be used.
+        
+        Returns
+        -------
+        StructureTree
+        
+        '''
     
         if keep_fields is None:
             keep_fields = StructureTree.KEEP_FIELDS
+
+        if structure_set_map is None:
+            structure_set_map = {}
 
         for ii, val in enumerate(structures):
         
