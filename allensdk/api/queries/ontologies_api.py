@@ -99,12 +99,19 @@ class OntologiesApi(RmaTemplate):
              'count': False,
              'criteria_params': ['atlas_ids']
              }, 
-             {'name': 'structure_ids_by_set_ids', 
+             {'name': 'structure_tree', 
              'description': 'see name',
              'model': 'Structure',
              'include': 'structure_sets', 
-             'criteria': '[structure_sets.id$in{{ set_ids }}]',
-             'only': ['id', 'structure_sets.id'], 
+             'criteria': '[graph_id$in{{ graph_ids }}]',
+             'order': ['structures.graph_order'],
+             'only': ['id', 
+                      'acronym', 
+                      'color_hex_triplet', 
+                      'graph_id', 
+                      'name', 
+                      'structure_id_path', 
+                      'structure_sets'], 
              'num_rows': 'all', 
              'count': False, 
              'criteria_params': ['set_ids']
@@ -183,57 +190,14 @@ class OntologiesApi(RmaTemplate):
         
         
     @cacheable
-    def get_structure_tree(self, return_tree=True, append_structure_sets=None, 
-                           keep_fields=None, **kwargs):
-        
-        if append_structure_sets is None:
-            append_structure_sets = StructureTree.STRUCTURE_SETS.keys()
-        
-        structures = self.get_structures(**kwargs)
-        
-        structure_set_map = self.get_structure_set_map(
-            structure_set_ids=append_structure_sets)
-        
-        tree = StructureTree.from_structures(structures, structure_set_map, 
-                                             keep_fields)
-                                             
-        if return_tree:
-            return tree
-        else:
-            return tree.node()
-        
-        
-        
-    def get_structure_set_map(self, structure_set_ids, 
-                              num_rows='all',
-                              count=False):
-        '''Get a dictionary listing structure set ids by structure id
-        
-        Parameters
-        ----------
-        structure_set_ids : list of int
-            obtain structure ids for these sets.
-        num_rows : int
-            How many records (maximum) to retrieve
-        count : bool, optional
-            If True also return a count of the records.
-            
-        Returns
-        -------
-        dict : 
-            Keys are structure ids, values are lists of structure set ids.
-            
+    def get_structure_tree(self, structure_graph_ids, order=['structures.graph_order'], 
+                           num_rows='all', count=False, **kwargs):
+        ''' Docstring docstring docstring
         '''
-        
-        data = self.template_query('ontology_queries',
-                                   'structure_ids_by_set_ids',
-                                   set_ids=structure_set_ids, 
-                                   num_rows=num_rows,
-                                   count=count)
-                  
-        return {item['id']: [sset['id'] for sset in item['structure_sets']]
-                for item in data}
-                
+    
+        return self.template_query('ontology_queries', 'structure_tree', 
+                                   graph_ids=structure_graph_ids)
+    
 
     def unpack_structure_set_ancestors(self, structure_dataframe):
         '''Convert a slash-separated structure_id_path field to a list.
