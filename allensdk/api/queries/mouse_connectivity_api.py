@@ -78,6 +78,9 @@ class MouseConnectivityApi(RmaApi):
                                       None,
                                       file_name)
 
+    @file_download(reader='nrrd', 
+                   file_name_position=2, 
+                   read_by_default=True)
     def download_template_volume(self, resolution, file_name):
         '''
         Download the registration template volume at a particular resolution.
@@ -91,19 +94,12 @@ class MouseConnectivityApi(RmaApi):
         file_name: string
             Where to save the registration template volume.
         '''
-        try:
-            os.makedirs(os.path.dirname(file_name))
-        except:
-            pass
 
         self.download_volumetric_data(MouseConnectivityApi.AVERAGE_TEMPLATE,
                                       'average_template_%d.nrrd' % resolution,
-                                      save_file_path=file_name)
-
-        annotation_data, annotation_image = nrrd.read(file_name)
-
-        return annotation_data, annotation_image
-
+                                      None, 
+                                      file_name)
+                                      
     @cacheable
     def get_experiments(self,
                         structure_ids,

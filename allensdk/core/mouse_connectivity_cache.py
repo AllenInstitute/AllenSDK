@@ -30,6 +30,7 @@ import pandas as pd
 import numpy as np
 from allensdk.config.manifest import Manifest
 import warnings
+import operator as op
 
 
 class MouseConnectivityCache(Cache):
@@ -149,16 +150,8 @@ class MouseConnectivityCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.TEMPLATE_KEY, self.resolution)
 
-        if file_name is None:
-            raise Exception("No save file provided for annotation volume.")
-
-        if os.path.exists(file_name):
-            annotation, info = nrrd.read(file_name)
-        else:
-            Manifest.safe_make_parent_dirs(file_name)
-
-            annotation, info = self.api.download_template_volume(
-                self.resolution, file_name)
+        annotation, info = self.api.download_template_volume(self.resolution, 
+                                                             file_name)
 
         return annotation, info
 
@@ -441,7 +434,7 @@ class MouseConnectivityCache(Cache):
                 'transgenic-line'] in cre]
 
         if injection_structure_ids is not None:
-            descendant_ids = self.get_structure_tree().descendant_ids(injection_structure_ids)
+            descendant_ids = reduce(op.and_, self.get_structure_tree().descendant_ids(injection_structure_ids))
             experiments = [e for e in experiments if e[
                 'structure-id'] in descendant_ids]
 
@@ -545,7 +538,7 @@ class MouseConnectivityCache(Cache):
 
         if structure_ids is not None:
             if include_descendants:
-                structure_ids = self.get_structure_tree().descendant_ids(structure_ids)
+                structure_ids = reduce(op.and_, self.get_structure_tree().descendant_ids(structure_ids))
             else:
                 structure_ids = set(structure_ids)
 
@@ -630,12 +623,13 @@ class MouseConnectivityCache(Cache):
         cidx = 0
         hlabel = {1: '-L', 2: '-R', 3: ''}
 
-        o = self.get_ontology()
+        acronym_map = self.get_structure_tree().value_map(lambda x: x['id'], 
+                                                          lambda x: x['acronym'])
 
         for hid in hemisphere_ids:
             for sid in projection_structure_ids:
                 column_lookup[(hid, sid)] = cidx
-                label = o[sid].iloc[0]['acronym'] + hlabel[hid]
+                label = acronym_map[sid] + hlabel[hid]
                 columns.append(
                     {'hemisphere_id': hid, 'structure_id': sid, 'label': label})
                 cidx += 1
@@ -684,7 +678,6 @@ class MouseConnectivityCache(Cache):
                               self.get_annotation_volume(annotation_file_name)[0], 
                               [self.resolution] * 3)
 
-    @deprecated
     def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
         """
         Read a 3D numpy array shaped like the annotation volume that has non-zero values where
@@ -715,7 +708,7 @@ class MouseConnectivityCache(Cache):
             return nrrd.read(file_name)
         else:
             st = self.get_structure_tree()
-            structure_ids = st.get_descendant_ids([structure_id])
+            structure_ids = st.descendant_ids([structure_id])[0]
             annotation, _ = self.get_annotation_volume(annotation_file_name)
             mask = self.make_structure_mask(structure_ids, annotation)
 
@@ -725,7 +718,6 @@ class MouseConnectivityCache(Cache):
 
             return mask, None
 
-    @deprecated
     def make_structure_mask(self, structure_ids, annotation):
         """
         Look at an annotation volume and identify voxels that have values

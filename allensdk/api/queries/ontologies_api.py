@@ -108,7 +108,15 @@ class OntologiesApi(RmaTemplate):
              'num_rows': 'all', 
              'count': False, 
              'criteria_params': ['graph_ids']
-             }, 
+             },
+             {'name': 'structure_sets_by_id', 
+              'description': 'see name', 
+              'model': 'StructureSet',
+              'criteria': '[id$in{{ set_ids }}]', 
+              'num_rows': 'all',
+              'count': False, 
+              'criteria_params': ['set_ids']
+             }
         ]}
 
     def __init__(self, base_uri=None):
@@ -274,6 +282,12 @@ class OntologiesApi(RmaTemplate):
                                    'structure_graphs_list')
 
     @cacheable
-    def get_structure_sets(self):
-        return self.template_query('ontology_queries',
-                                   'structure_sets_list')
+    def get_structure_sets(self, structure_set_ids=None):
+
+        if structure_set_ids is None:
+            return self.template_query('ontology_queries',
+                                       'structure_sets_list')
+        else:
+            return self.template_query('ontology_queries', 
+                                       'structure_sets_by_id', 
+                                       set_ids=structure_set_ids)

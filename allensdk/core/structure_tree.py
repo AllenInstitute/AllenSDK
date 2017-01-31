@@ -23,12 +23,12 @@ class StructureTree( SimpleTree ):
                       2: 'Mouse - Coarse', 
                       114512891: 'Mouse Connectivity - Projection Primary Injection Structures'}
    
-    # These fields will be removed from each structure when building from 
+    # These fields will be retained in each structure when building from 
     # the api. 
     # unsure about: hemisphere_id, failed, failed_facet, structure_name_facet, safe_name
     # st_level might be needed for devmouse
     FIELDS = ['acronym', 'color_hex_triplet', 'graph_id', 'graph_order', 
-              'id', 'name', 'structure_id_path', 'structure_sets']
+              'id', 'name', 'structure_id_path', 'structure_set_ids']
 
     def __init__(self, nodes):
         '''A tree whose nodes are brain structures and whose edges indicate 
@@ -140,7 +140,7 @@ class StructureTree( SimpleTree ):
             
         '''
         
-        overlap = lambda x: (set(structure_set_ids) & set(x['structure_sets']))
+        overlap = lambda x: (set(structure_set_ids) & set(x['structure_set_ids']))
         return self.filter_nodes(overlap)
         
         
@@ -248,7 +248,7 @@ class StructureTree( SimpleTree ):
                                         in val['structure_id_path'].split('/')
                                         if stid != ''] 
    
-            val['structure_sets'] = [sts['id'] for sts in val['structure_sets']]
+            val['structure_set_ids'] = [sts['id'] for sts in val['structure_sets']]
 
             structures[ii] = filter_dict(val, *field_whitelist)
 
