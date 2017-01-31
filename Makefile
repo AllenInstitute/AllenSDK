@@ -45,7 +45,7 @@ pytest_lite:
 
 pylint:
 	pylint --disable=C allensdk > htmlcov/pylint.txt || exit 0
-	grep import-error htmlcov/pylint.txt > htmlcov/pylint_imports.txt
+	egrep '(import-error)|(Unable to import)|(Undefined variable)' htmlcov/pylint.txt > htmlcov/pylint_imports.txt
 
 flake8:
 	flake8 --ignore=E201,E202,E226 --max-line-length=200 allensdk | grep -v "local variable '_' is assigned to but never used" > htmlcov/flake8.txt
