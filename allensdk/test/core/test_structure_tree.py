@@ -78,13 +78,4 @@ def test_has_overlaps(tree):
     
     obag = tree.has_overlaps([1, 2])
     assert( not obag )
-    
-    
-def test_from_ontologies_api(oapi):
-    
-    st = StructureTree.from_ontologies_api(oapi)
-    
-    oapi.get_structures.assert_called_with(1)
-    oapi.get_structure_set_map.assert_called_with(structure_set_ids=StructureTree.STRUCTURE_SETS.keys())
-    
-    assert(len(st._nodes) == 1)
+

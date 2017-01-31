@@ -339,6 +339,7 @@ def file_download(reader=None,
     def decor(func):
         def w(*args,
               **kwargs):
+              
             query_strategy = kwargs.pop('query_strategy',
                                         default_query_strategy)
             file_name = None

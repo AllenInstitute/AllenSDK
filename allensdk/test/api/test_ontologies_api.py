@@ -156,12 +156,4 @@ def test_atlas_verbose(ontologies):
         "rma::include,structure_graph(ontology),graphic_group_labels,"
         "rma::options[num_rows$eq'all'][count$eqfalse]")
         
-def test_get_structure_set_map(ontologies):
-    ontologies.get_structure_set_map([7, 8])
-    ontologies.json_msg_query.assert_called_once_with(
-        "http://api.brain-map.org/api/v2/data/query.json?"
-        "q=model::Structure,"
-        "rma::criteria,[structure_sets.id$in7,8],"
-        "rma::include,structure_sets,"
-        "rma::options[only$eq'id,structure_sets.id']"
-        "[num_rows$eq'all'][count$eqfalse]")
+
