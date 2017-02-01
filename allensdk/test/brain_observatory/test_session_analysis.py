@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -14,7 +14,6 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import matplotlib
-matplotlib.use('agg')
 import pytest
 from mock import patch
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
@@ -35,7 +34,7 @@ def mock_stimulus_table(dset, name):
 
 @pytest.fixture
 def session_a():
-    filename = '/data/informatics/CAM/test_nwb/out_510390912.nwb'
+    filename = '/data/informatics/module_test_data/observatory/test_nwb/out_510390912.nwb'
     save_path = 'xyza'
 
     sa = SessionAnalysis(filename, save_path)
@@ -45,7 +44,7 @@ def session_a():
 
 @pytest.fixture
 def session_b():
-    filename = '/data/informatics/CAM/test_nwb/506278598.nwb'
+    filename = '/data/informatics/module_test_data/observatory/test_nwb/506278598.nwb'
     save_path = 'xyzb'
 
     sa = SessionAnalysis(filename, save_path)
@@ -55,7 +54,7 @@ def session_b():
 
 @pytest.fixture
 def session_c():
-    filename = '/data/informatics/CAM/test_nwb/out_510221121.nwb'
+    filename = '/data/informatics/module_test_data/observatory/test_nwb/out_510221121.nwb'
     save_path = 'xyzc'
 
     sa = SessionAnalysis(filename, save_path)

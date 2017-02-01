@@ -16,23 +16,75 @@
 import json
 import logging
 
-from .rma_api import RmaApi
+from ...deprecated import deprecated
+from .rma_template import RmaTemplate
 from ..cache import cacheable
 
+class GlifApi(RmaTemplate):
 
-class GlifApi(RmaApi):
+    _log = logging.getLogger('allensdk.api.queries.glif_api')
+
+    NWB_FILE_TYPE = None
+
+    rma_templates = \
+        {"glif_queries": [
+            {'name': 'neuronal_model_templates',
+             'description': 'see name',
+             'model': 'NeuronalModelTemplate',
+             'num_rows': 'all',
+             'count': False,
+             },
+            {'name': 'neuronal_models',
+             'description': 'see name',
+             'model': 'Specimen',
+             'include': 'neuronal_models(well_known_files)',
+             'criteria':'[id$in{{ ephys_experiment_ids }}]',
+             'num_rows': 'all',
+             'criteria_params':['ephys_experiment_ids'],
+             'count': False,
+             },
+            {'name': 'neuron_config',
+             'description': 'see name',
+             'model': 'NeuronalModel',
+             'include': 'well_known_files(well_known_file_type)',
+             'criteria':'[id$in{{ neuronal_model_ids }}]',
+             'num_rows': 'all',
+             'criteria_params':['neuronal_model_ids'],
+             'count': False,
+            }
+        ]
+        }
 
     def __init__(self, base_uri=None):
-        super(RmaApi, self).__init__(base_uri)
+        super(GlifApi, self).__init__(base_uri, query_manifest=GlifApi.rma_templates)
 
-        self.neuronal_model = None
-        self.ephys_sweeps = None
-        self.stimulus_url = None
-        self.neuron_config_url = None
+    def get_neuronal_model_templates(self):
 
-    @cacheable
+        return self.template_query('glif_queries',
+                                   'neuronal_model_templates')
+
+    def get_neuronal_models(self, ephys_experiment_ids=None):
+
+        return self.template_query('glif_queries',
+                                   'neuronal_models', ephys_experiment_ids=ephys_experiment_ids)
+
+    def get_neuron_configs(self, neuronal_model_ids=None):
+
+        data = self.template_query('glif_queries',
+                                   'neuron_config', neuronal_model_ids=neuronal_model_ids)
+
+        return_dict = {}
+        for curr_config in data:
+            # print curr_config
+            neuron_config_url = curr_config['well_known_files'][0]['download_link']
+            return_dict[curr_config['id']] = self.retrieve_parsed_json_over_http(self.api_url +
+                                                                                 neuron_config_url)
+
+        return return_dict
+
+    @deprecated
     def list_neuronal_models(self):
-        ''' Query the API for a list of all GLIF neuronal models.
+        ''' DEPRECATED Query the API for a list of all GLIF neuronal models.
 
         Returns
         -------
@@ -46,8 +98,9 @@ class GlifApi(RmaApi):
                                 include=include,
                                 num_rows='all')
 
+    @deprecated
     def get_neuronal_model(self, neuronal_model_id):
-        '''Query the current RMA endpoint with a neuronal_model id
+        '''DEPRECATED Query the current RMA endpoint with a neuronal_model id
         to get the corresponding well known files and meta data.
 
         Returns
@@ -55,6 +108,8 @@ class GlifApi(RmaApi):
         dict
             A dictionary containing
         '''
+
+
         include = ('neuronal_model_template(well_known_files(well_known_file_type)),' +
                    'specimen(ephys_sweeps,ephys_result(well_known_files(well_known_file_type))),' +
                    'well_known_files(well_known_file_type)')
@@ -118,18 +173,21 @@ class GlifApi(RmaApi):
 
         return self.metadata
 
+    @deprecated
     def get_ephys_sweeps(self):
-        ''' Retrieve ephys sweep information out of downloaded metadata for a neuronal model
+        ''' DEPRECATED Retrieve ephys sweep information out of downloaded metadata for a neuronal model
 
         Returns
         -------
         list
             A list of sweeps metadata dictionaries
         '''
+
         return self.ephys_sweeps
 
+    @deprecated
     def get_neuron_config(self, output_file_name=None):
-        ''' Retrieve a model configuration file from the API, optionally save it to disk, and
+        ''' DEPRECATED Retrieve a model configuration file from the API, optionally save it to disk, and
         return the contents of that file as a dictionary.
 
         Parameters
@@ -137,6 +195,7 @@ class GlifApi(RmaApi):
         output_file_name: string
             File name to store the neuron configuration (optional).
         '''
+
         if self.neuron_config_url is None:
             raise Exception("URL for neuron config file is empty.")
 
@@ -151,14 +210,16 @@ class GlifApi(RmaApi):
 
         return neuron_config
 
+    @deprecated
     def cache_stimulus_file(self, output_file_name):
-        ''' Download the NWB file for the current neuronal model and save it to a file.
+        ''' DEPRECATED Download the NWB file for the current neuronal model and save it to a file.
 
         Parameters
         ----------
         output_file_name: string
             File name to store the NWB file.
         '''
+
         if self.stimulus_url is None:
             raise Exception("URL for stimulus file is empty.")
 

@@ -16,7 +16,6 @@
 import matplotlib
 from allensdk.brain_observatory.static_gratings import StaticGratings
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
-matplotlib.use('agg')
 import pytest
 from mock import patch, MagicMock
 

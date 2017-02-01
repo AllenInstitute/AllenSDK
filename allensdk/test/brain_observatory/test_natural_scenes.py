@@ -16,7 +16,6 @@
 import matplotlib
 from allensdk.brain_observatory.natural_scenes import NaturalScenes
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
-matplotlib.use('agg')
 import pytest
 from mock import patch, MagicMock
 
