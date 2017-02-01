@@ -133,7 +133,6 @@ class ReferenceSpace(object):
             mask = np.zeros(self.annotation.shape, dtype=np.uint8, order='C')
             for stid in structure_ids:
                 
-                print(stid)
                 if self.direct_voxel_map[stid] == 0:
                     continue
                     

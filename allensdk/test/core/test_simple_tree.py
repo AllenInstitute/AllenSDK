@@ -90,6 +90,12 @@ def test_node(tree):
     assert( obtained[0]['parent'] is None )
     assert( obtained[1]['id'] == 1 )
     
+    
+def test_node_default(tree):
+
+    obtained = tree.node()
+    assert( len(obtained) == 6 )
+    
 
 def test_parent(tree):
 

@@ -64,7 +64,7 @@ def test_make_structure_mask(rsp):
     exp = np.zeros((10, 10, 10))
     exp[4:8, 4:8, 4:8] = 1
     exp[8:10, 8:10, 8:10] = 1
-    obt = rsp.make_structure_mask([2, 3])
+    obt = rsp.make_structure_mask([2, 3, 7])
 
     assert( np.allclose(obt, exp) )
     
@@ -85,6 +85,14 @@ def test_many_structure_masks(rsp):
     [ii for ii in rsp.many_structure_masks([2, 3], output_cb=cb)]
     
     assert( cb.call_count == 2 )
+    
+    
+def test_many_structure_masks_default_cb(rsp):
+    
+    rsp.make_structure_mask = mock.MagicMock(return_value=2)
+    for item in rsp.many_structure_masks([1]):
+        print(item)
+        assert( np.allclose(item, [1, 2]) )
     
     
 def test_check_coverage(rsp):
@@ -112,3 +120,15 @@ def test_downsample(rsp):
     target = rsp.downsample((10, 5, 5))
     
     assert( np.allclose(target.annotation.shape, [10, 5, 5]) )
+    
+    
+def test_direct_voxel_map_setter(rsp):
+    
+    rsp.direct_voxel_map = 4
+    assert( rsp.direct_voxel_map == 4 )
+    
+    
+def test_total_voxel_map_setter(rsp):
+    
+    rsp.total_voxel_map = 3
+    assert( rsp.total_voxel_map == 3 )  

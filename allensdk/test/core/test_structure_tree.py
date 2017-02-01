@@ -8,12 +8,15 @@ from allensdk.core.structure_tree import StructureTree
 
 
 @pytest.fixture
-def tree():
+def nodes():
 
-    nodes = [{'id': 0, 'structure_id_path': [0], 'color_hex_triplet': '000000', 'acronym': 'rt', 'name': 'root', 'structure_sets':[1, 4]}, 
-            {'id': 1, 'structure_id_path': [0, 1], 'color_hex_triplet': '000fff', 'acronym': 'a', 'name': 'alpha', 'structure_sets': [1, 3]}, 
-            {'id': 2, 'structure_id_path': [0, 2], 'color_hex_triplet': 'ffffff', 'acronym': 'b', 'name': 'beta', 'structure_sets': [1, 2]}]
-            
+    return [{'id': 0, 'structure_id_path': [0], 'color_hex_triplet': '000000', 'acronym': 'rt', 'name': 'root', 'structure_set_ids':[1, 4]}, 
+            {'id': 1, 'structure_id_path': [0, 1], 'color_hex_triplet': '000fff', 'acronym': 'a', 'name': 'alpha', 'structure_set_ids': [1, 3]}, 
+            {'id': 2, 'structure_id_path': [0, 2], 'color_hex_triplet': 'ffffff', 'acronym': 'b', 'name': 'beta', 'structure_set_ids': [1, 2]}]
+
+
+@pytest.fixture
+def tree(nodes):
     return StructureTree(nodes)
     
 
@@ -79,3 +82,19 @@ def test_has_overlaps(tree):
     obag = tree.has_overlaps([1, 2])
     assert( not obag )
 
+
+def test_clean_structures(nodes):
+
+    dirty_node = {'id': 0, 'structure_id_path': '/0/', 
+                  'color_hex_triplet': '000000', 'acronym': 'rt', 
+                  'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}
+                  
+    clean_node = StructureTree.clean_structures([dirty_node])
+    assert( repr(clean_node[0]) == repr(nodes[0]) )
+    
+    
+def test_get_structure_sets(tree):
+
+    expected = set([1, 2, 3, 4])
+    obtained = tree.get_structure_sets()
+    assert( expected == obtained )
