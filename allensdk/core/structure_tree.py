@@ -9,24 +9,6 @@ from .simple_tree import SimpleTree
 
 class StructureTree( SimpleTree ):
 
-    # These structure sets may be of interest
-    # check descriptions at:
-    # http://api.brain-map.org/api/v2/data/StructureSet/query.json?
-    STRUCTURE_SETS = {114512892: 'Mouse Connectivity - BDA/AAV Primary Injection Structures',  
-                      112905813: 'Mouse Connectivity - BDA/AAV All Injection Structures', 
-                      167587189: 'Mouse Connectivity - Summary',  
-                      112905828: 'Mouse Connectivity - Projection All Injection Structures',  
-                      184527634: 'Mouse Connectivity - Target Search', 
-                      3: 'Mouse - Areas', 
-                      396673091: 'Mouse Cell Types - Structures', 
-                      514166994: 'CAM targeted structure set', 
-                      2: 'Mouse - Coarse', 
-                      114512891: 'Mouse Connectivity - Projection Primary Injection Structures'}
-   
-    # These fields will be retained in each structure when building from 
-    # the api. 
-    # unsure about: hemisphere_id, failed, failed_facet, structure_name_facet, safe_name
-    # st_level might be needed for devmouse
     FIELDS = ['acronym', 'color_hex_triplet', 'graph_id', 'graph_order', 
               'id', 'name', 'structure_id_path', 'structure_set_ids']
 
@@ -42,22 +24,21 @@ class StructureTree( SimpleTree ):
             'acronym' : str
                 Abbreviated name for the structure.
             'color_hex_triplet' : str
-                RGB hexidecimal color assigned to this structure
+                Canonical RGB hexidecimal color assigned to this structure
             'graph_id' : int
                 Specifies the structure graph containing this structure.
             'graph_order' : int
-                0-indexed position in the canonical flattened structure graph.
+                Canonical position in the flattened structure graph.
             'id': int
                 Unique structure specifier.
             'name' : str
                 Full name of structure.
             'structure_id_path' : list of int
-                The structures ancestors (inclusive) from the root of the tree.
-
-        Notes
-        -----
-        If you want a newly downloaded StructureTree, it is best to use the 
-        from_ontologies_api method defined below. 
+                This structure's ancestors (inclusive) from the root of the 
+                tree.
+            'structure_set_ids' : list of int
+                Unique identifiers of structure sets to which this structure 
+                belongs.
         
         '''
         
@@ -192,8 +173,22 @@ class StructureTree( SimpleTree ):
         
         '''
     
-
         return parent_id in self.ancestor_ids([child_id])[0]
+    
+    
+    def get_structure_sets(self):
+        '''Lists all unique structure sets that are assigned to at least one 
+        structure in the tree.
+        
+        Returns
+        -------
+        list of int : 
+            Elements are ids of structure sets.
+        
+        '''
+        
+        return set(reduce(op.add, map(lambda x: x['structure_set_ids'], 
+                                      self.node())))
         
         
     def has_overlaps(self, structure_ids):

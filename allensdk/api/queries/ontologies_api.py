@@ -290,4 +290,4 @@ class OntologiesApi(RmaTemplate):
         else:
             return self.template_query('ontology_queries', 
                                        'structure_sets_by_id', 
-                                       set_ids=structure_set_ids)
+                                       set_ids=list(structure_set_ids))
