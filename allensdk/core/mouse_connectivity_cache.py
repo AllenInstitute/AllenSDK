@@ -31,6 +31,7 @@ import numpy as np
 from allensdk.config.manifest import Manifest
 import warnings
 import operator as op
+import functools
 
 
 class MouseConnectivityCache(Cache):
@@ -150,10 +151,10 @@ class MouseConnectivityCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.TEMPLATE_KEY, self.resolution)
 
-        annotation, info = self.api.download_template_volume(self.resolution, 
+        template, info = self.api.download_template_volume(self.resolution, 
                                                              file_name)
 
-        return annotation, info
+        return template, info
 
     def get_projection_density(self, experiment_id, file_name=None):
         """
@@ -174,6 +175,7 @@ class MouseConnectivityCache(Cache):
             file_name will be pulled out of the manifest.  Default is None.
 
         """
+        
         file_name = self.get_cache_path(file_name,
                                         self.PROJECTION_DENSITY_KEY,
                                         experiment_id,
@@ -203,18 +205,13 @@ class MouseConnectivityCache(Cache):
             file_name will be pulled out of the manifest.  Default is None.
 
         """
-
-        file_name = self.get_cache_path(
-            file_name, self.INJECTION_DENSITY_KEY, experiment_id, self.resolution)
-
-        if file_name is None:
-            raise Exception("No file name to save volume.")
-
-        if not os.path.exists(file_name):
-            Manifest.safe_make_parent_dirs(file_name)
-
-            self.api.download_injection_density(
-                file_name, experiment_id, self.resolution)
+        
+        file_name = self.get_cache_path(file_name,
+                                        self.INJECTION_DENSITY_KEY,
+                                        experiment_id,
+                                        self.resolution)
+        self.api.download_injection_density(
+            file_name, experiment_id, self.resolution)
 
         return nrrd.read(file_name)
 
@@ -238,17 +235,12 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.INJECTION_FRACTION_KEY, experiment_id, self.resolution)
-
-        if file_name is None:
-            raise Exception("No file name to save volume.")
-
-        if not os.path.exists(file_name):
-            Manifest.safe_make_parent_dirs(file_name)
-
-            self.api.download_injection_fraction(
-                file_name, experiment_id, self.resolution)
+        file_name = self.get_cache_path(file_name,
+                                        self.INJECTION_FRACTION_KEY,
+                                        experiment_id,
+                                        self.resolution)
+        self.api.download_injection_fraction(
+            file_name, experiment_id, self.resolution)
 
         return nrrd.read(file_name)
 
@@ -272,17 +264,12 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.DATA_MASK_KEY, experiment_id, self.resolution)
-
-        if file_name is None:
-            raise Exception("No file name to save volume.")
-
-        if not os.path.exists(file_name):
-            Manifest.safe_make_parent_dirs(file_name)
-
-            self.api.download_data_mask(
-                file_name, experiment_id, self.resolution)
+        file_name = self.get_cache_path(file_name,
+                                        self.DATA_MASK_KEY,
+                                        experiment_id,
+                                        self.resolution)
+        self.api.download_data_mask(
+            file_name, experiment_id, self.resolution)
 
         return nrrd.read(file_name)
 
@@ -311,7 +298,7 @@ class MouseConnectivityCache(Cache):
             pre=StructureTree.clean_structures, 
             post=StructureTree)
 
-    @deprecated
+    @deprecated('Use get_structure_tree instead.')
     def get_ontology(self, file_name=None):
         """
         Read the list of adult mouse structures and return an Ontology instance.
@@ -327,6 +314,7 @@ class MouseConnectivityCache(Cache):
 
         return Ontology(self.get_structures(file_name))
 
+    @deprecated('Use get_structure_tree instead.')
     def get_structures(self, file_name=None):
         """
         Read the list of adult mouse structures and return a Pandas DataFrame.
@@ -434,7 +422,7 @@ class MouseConnectivityCache(Cache):
                 'transgenic-line'] in cre]
 
         if injection_structure_ids is not None:
-            descendant_ids = reduce(op.and_, self.get_structure_tree().descendant_ids(injection_structure_ids))
+            descendant_ids = reduce(op.add, self.get_structure_tree().descendant_ids(injection_structure_ids))
             experiments = [e for e in experiments if e[
                 'structure-id'] in descendant_ids]
 
@@ -480,30 +468,26 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.STRUCTURE_UNIONIZES_KEY, experiment_id)
-
-        if os.path.exists(file_name):
-            unionizes = pd.DataFrame.from_csv(file_name)
-        else:
-            unionizes = self.api.get_structure_unionizes([experiment_id])
-            unionizes = pd.DataFrame(unionizes)
-
-            # rename section_data_set_id column to experiment_id
-            unionizes.columns = ['experiment_id'
-                                 if c == 'section_data_set_id' else c
-                                 for c in unionizes.columns]
-
-            if self.cache:
-                Manifest.safe_make_parent_dirs(file_name)
-
-                unionizes.to_csv(file_name)
-
-        return self.filter_structure_unionizes(unionizes, 
-                                               is_injection, 
-                                               structure_ids,
-                                               include_descendants,
-                                               hemisphere_ids)
+        file_name = self.get_cache_path(file_name, 
+                                        self.STRUCTURE_UNIONIZES_KEY, 
+                                        experiment_id)
+                   
+        filter_fn = functools.partial(self.filter_structure_unionizes, 
+                                      is_injection=is_injection, 
+                                      structure_ids=structure_ids, 
+                                      include_descendants=include_descendants, 
+                                      hemisphere_ids=hemisphere_ids)
+                                      
+        col_rn = lambda x: x.rename(columns={'section_data_set_id': 
+                                             'experiment_id'})
+                                      
+        return self.api.get_structure_unionizes([experiment_id], 
+                                                path=file_name,
+                                                query_strategy='lazy',  
+                                                file_type='csv', 
+                                                dataframe=True, 
+                                                pre=col_rn, 
+                                                post=filter_fn)
 
     def filter_structure_unionizes(self, unionizes, 
                                    is_injection=None, 
@@ -538,7 +522,7 @@ class MouseConnectivityCache(Cache):
 
         if structure_ids is not None:
             if include_descendants:
-                structure_ids = reduce(op.and_, self.get_structure_tree().descendant_ids(structure_ids))
+                structure_ids = reduce(op.add, self.get_structure_tree().descendant_ids(structure_ids))
             else:
                 structure_ids = set(structure_ids)
 

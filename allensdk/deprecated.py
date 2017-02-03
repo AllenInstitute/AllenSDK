@@ -14,11 +14,10 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import copy
 import warnings
 import functools
 from numpy import VisibleDeprecationWarning
-# Python suppresses DeprecationWarning, so numpy made a UserWarning with a 
-# different name.
 
     
 def deprecated(message=None):
@@ -40,3 +39,25 @@ def deprecated(message=None):
         return wrapper
         
     return output_decorator
+    
+    
+def class_deprecated(message=None):
+
+    if message is None:
+        message = ''
+        
+    def output_class_decorator(cls):
+        
+        fn_copy = copy.deepcopy(cls.__init__)
+        
+        @functools.wraps(cls.__init__)
+        def wrapper(*args, **kwargs):
+            warnings.warn("Class {0} is deprecated. {1}".format(
+                          cls.__name__, message), 
+                          category=VisibleDeprecationWarning, stacklevel=2)
+            fn_copy(*args, **kwargs)
+                          
+        cls.__init__ = wrapper
+        return cls
+        
+    return output_class_decorator
