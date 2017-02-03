@@ -1,4 +1,4 @@
-# Copyright 2015-2016 Allen Institute for Brain Science
+# Copyright 2015-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -158,7 +158,6 @@ class Cache(object):
 
         return data
 
-
     @staticmethod
     def cacher(fn,
                *args,
@@ -172,91 +171,69 @@ class Cache(object):
         path : string
             where to save the data
         query_strategy : string or None, optional
-            'server' always queries server,
+            'create' always generates the data,
             'file' loads from disk,
             'lazy' queries the server if no file exists,
-            None queries the server and bypasses all caching behavior
-        file_type : string, optional
-            'json' (default) or 'csv'
-        dataframe : boolean, optional
-            True will cast the return value to a pandas dataframe, False (default) will not
-        index : string, optional
-            column to use as the pandas index
-        rename : list of string tuples, optional
-            (new, old) columns to rename
+            None generates the data and bypasses all caching behavior
         pre : function
             df|json->df|json, takes one data argument and returns filtered version, None for pass-through
         post : function
             df|json->?, takes one data argument and returns Object
+        reader : function, optional
+            path -> data, default NOP
+        writer : function, optional
+            path, data -> None, default NOP
         kwargs : objects
             passed through to the query function
 
         Returns
         -------
-        dict or DataFrame
-            data type depends on dataframe option.
-    
-        Notes
-        -----
-        Column renaming happens after the file is reloaded for json
+        Object or None
+            data type depends on fn, reader and/or post methods.
         '''
         path = kwargs.pop('path', 'data.csv')
         query_strategy = kwargs.pop('query_strategy', None)
-        file_type = kwargs.pop('file_type', 'json')
-        dataframe = kwargs.pop('dataframe', False)
-        index = kwargs.pop('index', None)
-        rename = kwargs.pop('rename', None)
         pre = kwargs.pop('pre', lambda d: d)
         post = kwargs.pop('post', lambda d: d)
+        reader = kwargs.pop('reader', None)
+        writer = kwargs.pop('writer', None)
 
         if 'lazy' == query_strategy:
             if os.path.exists(path):
                 query_strategy = 'file'
             else:
-                query_strategy = 'server'
+                query_strategy = 'create'
 
-        if query_strategy != 'file':
-            json_data = fn(*args, **kwargs)
+        if query_strategy is None:
+            query_strategy = 'pass_through'
 
-            if query_strategy is None:
-                if dataframe:
-                    data = pre(pd.DataFrame(json_data))
-                else:
-                    data = pre(json_data)
-                
-                return post(data)
-            elif query_strategy:
+        if query_strategy == 'pass_through':
+                data = fn(*args, **kwargs)
+                # TODO: handle pre / post?
+        elif query_strategy != 'file':
+            if writer:
                 Manifest.safe_make_parent_dirs(path)
-                
-                if 'json' == file_type:
-                    ju.write(path, pre(json_data))
-                elif 'csv' == file_type:
-                    df = pre(pd.DataFrame(json_data))
-                    Cache.rename_columns(df, rename)
-                    df.to_csv(path)
-                else:
-                    raise ValueError('file type not available.')
 
-        # read it back in
-        if 'json' == file_type:
-            if dataframe:
-                data = pj.read_json(path, orient='records')
-                Cache.rename_columns(data, rename)
-                if index is not None:
-                    data.set_index([index],
-                                   inplace=True,
-                                   drop=False)
+                data = fn(*args, **kwargs)
+                data = pre(data)
+                writer(path, data)
             else:
-                data = ju.read(path)
-        elif 'csv' == file_type:
-            data = pd.DataFrame.from_csv(path)
-            
-            if dataframe is False:
-                data = data.to_dict('records')
-        else:
-            raise ValueError('file type not available')
+                fn(*args, **kwargs)
 
-        return post(data)
+        if reader:
+            data = reader(path)
+            
+        if post:
+            data = post(data)
+            return data
+        
+        try:
+            data
+            return data
+        except:
+            pass
+
+        return
 
 
     @deprecated
@@ -298,18 +275,18 @@ class Cache(object):
         '''
         if cache is True:
             json_data = fn(**kwargs)
-    
+
             if save_as_json is True:
                 ju.write(path, json_data)
             else:
                 df = pd.DataFrame(json_data)
                 Cache.rename_columns(df, rename)
-    
+
                 if index is not None:
                     df.set_index([index], inplace=True)
-    
+
                 df.to_csv(path)
-    
+
         # read it back in
         if save_as_json is True:
             if return_dataframe is True:
@@ -338,18 +315,18 @@ def cacheable(func):
     path : string
         where to save the data
     query_strategy : string or None, optional
-        'server' always queries server,
+        'create' always gets the data from the source (server or generated),
         'file' loads from disk,
-        'lazy' queries the server if no file exists,
+        'lazy' creates the data and saves to file if no file exists,
         None queries the server and bypasses all caching behavior
-    file_type : string, optional
-        'json' (default) or 'csv'
-    dataframe : boolean, optional
-        True will cast the return value to a pandas dataframe, False (default) will not
-    index : string, optional
-        column to use as the pandas index
-    rename : list of string tuples, optional
-        (new, old) columns to rename
+    pre : function
+        df|json->df|json, takes one data argument and returns filtered version, None for pass-through
+    post : function
+        df|json->?, takes one data argument and returns Object
+    reader : function, optional
+        path -> data, default NOP
+    writer : function, optional
+        path, data -> None, default NOP
     kwargs : objects
         passed through to the query function
 

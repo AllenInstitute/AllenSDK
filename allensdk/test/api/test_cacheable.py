@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -46,7 +46,7 @@ def rma():
 
     ju.read = \
         MagicMock(name='read',
-                  return_value=_pd_msg)
+                  return_value=_msg)
 
     pj.read_json = \
         MagicMock(name='read_json',
@@ -64,15 +64,16 @@ def rma():
     return RmaApi()
 
 
-def xtest_cacheable_csv_dataframe(rma, cache):
+def test_cacheable_csv_dataframe(rma, cache):
     @cacheable
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/xyz/abc/example.txt',
-                         query_strategy='server',
-                         file_type='csv',
-                         dataframe=True)
+                         query_strategy='create',
+                         pre=pd.DataFrame,
+                         writer=lambda p, x : x.to_csv(p),
+                         reader=pd.DataFrame.from_csv)
 
     assert df.loc[:, 'whatever'][0]
 
@@ -84,17 +85,17 @@ def xtest_cacheable_csv_dataframe(rma, cache):
     assert not ju.read.called, 'read should not have been called'
 
 
-def xtest_cacheable_json(rma, cache):
+def test_cacheable_json(rma, cache):
     @cacheable
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/xyz/abc/example.json',
-                         query_strategy='server',
-                         file_type='json',
-                         dataframe=False)
+                         query_strategy='create',
+                         writer=ju.write,
+                         reader=ju.read)
 
-    assert df.loc[:, 'whatever'][0]
+    assert 'whatever' in df[0]
 
     ju.read_url_get.assert_called_once_with(
         'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
@@ -105,37 +106,19 @@ def xtest_cacheable_json(rma, cache):
     ju.read.assert_called_once_with('/xyz/abc/example.json')
 
 
-def test_cacheable_json_index(rma, cache):
-    @cacheable
-    def get_hemispheres():
-        return rma.model_query(model='Hemisphere')
-
-    df = get_hemispheres(path='/xyz/abc/example.json',
-                         query_strategy='server',
-                         file_type='json',
-                         index='whatever',
-                         dataframe=False)
-
-    assert df.loc[:, 'whatever'][0]
-
-    ju.read_url_get.assert_called_once_with(
-        'http://api.brain-map.org/api/v2/data/query.json?q=model::Hemisphere')
-    assert not pd.DataFrame.to_csv.called, 'to_csv should not have been called'
-    assert not pd.DataFrame.from_csv.called, 'from_csv should not have been called'
-    ju.write.assert_called_once_with('/xyz/abc/example.json',
-                                     _msg)
-    ju.read.assert_called_once_with('/xyz/abc/example.json')
+# oops, index doesn't apply to pure json caching
 
 
-def xtest_cacheable_no_cache_csv(rma, cache):
+def test_cacheable_no_cache_csv(rma, cache):
     @cacheable
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/xyz/abc/example.csv',
                          query_strategy='file',
-                         file_type='csv',
-                         dataframe=True)
+                         pre=pd.DataFrame,
+                         writer=lambda p, x : x.to_csv(p),
+                         reader=pd.DataFrame.from_csv)
 
     assert df.loc[:, 'whatever'][0]
 
@@ -146,15 +129,15 @@ def xtest_cacheable_no_cache_csv(rma, cache):
     assert not ju.read.called, 'json read should not have been called'
 
 
-def xtest_cacheable_json_dataframe(rma, cache):
+def test_cacheable_json_dataframe(rma, cache):
     @cacheable
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/xyz/abc/example.json',
-                         query_strategy='server',
-                         file_type='json',
-                         dataframe=True)
+                         query_strategy='create',
+                         writer=ju.write,
+                         reader=lambda p: pj.read_json(p, orient='records'))
 
     assert df.loc[:, 'whatever'][0]
 
@@ -168,15 +151,17 @@ def xtest_cacheable_json_dataframe(rma, cache):
     assert not ju.read.called, 'json read should not have been called'
 
 
-def xtest_cacheable_csv_json(rma, cache):
+def test_cacheable_csv_json(rma, cache):
     @cacheable
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/xyz/example.csv',
-                         query_strategy='server',
-                         file_type='csv',
-                         dataframe=False)
+                         query_strategy='create',
+                         pre=pd.DataFrame,
+                         writer=lambda p, x : x.to_csv(p),
+                         reader=pd.DataFrame.from_csv,
+                         post=lambda x: x.to_dict('records'))
 
     assert 'whatever' in df[0]
 
@@ -188,22 +173,9 @@ def xtest_cacheable_csv_json(rma, cache):
     assert not ju.write.called, 'ju.write should not have been called'
     assert not ju.read.called, 'json read should not have been called'
 
+# Not applicable any more because the parameter went away
 
-def xtest_cacheable_unknown_data_type(rma, cache):
-    @cacheable
-    def get_hemispheres():
-        return rma.model_query(model='Hemisphere')
-
-    with pytest.raises(ValueError) as exc:
-        get_hemispheres(path='/xyz/example.csv',
-                        query_strategy='server',
-                        file_type='hologram',
-                        dataframe=False)
-
-    assert exc.value.message == 'file type not available.'
-
-
-def xtest_cacheable_no_save(rma, cache):
+def test_cacheable_no_save(rma, cache):
     @cacheable
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
@@ -220,12 +192,12 @@ def xtest_cacheable_no_save(rma, cache):
     assert not ju.read.called, 'json read should not have been called'
 
 
-def xtest_cacheable_no_save_dataframe(rma, cache):
+def test_cacheable_no_save_dataframe(rma, cache):
     @cacheable
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
-    df = get_hemispheres(dataframe=True)
+    df = get_hemispheres(post=pd.DataFrame)
 
     assert df.loc[:, 'whatever'][0]
 
@@ -237,7 +209,7 @@ def xtest_cacheable_no_save_dataframe(rma, cache):
     assert not ju.read.called, 'json read should not have been called'
 
 
-def xtest_cacheable_lazy_csv_no_file(rma, cache):
+def test_cacheable_lazy_csv_no_file(rma, cache):
     @cacheable
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
@@ -245,8 +217,9 @@ def xtest_cacheable_lazy_csv_no_file(rma, cache):
     with patch('os.path.exists', MagicMock(return_value=False)) as ope:
         df = get_hemispheres(path='/xyz/abc/example.csv',
                              query_strategy='lazy',
-                             file_type='csv',
-                             dataframe=True)
+                             pre=pd.DataFrame,
+                             writer=lambda p, x : x.to_csv(p),
+                             reader=pd.DataFrame.from_csv)
 
     assert df.loc[:, 'whatever'][0]
 
@@ -258,7 +231,7 @@ def xtest_cacheable_lazy_csv_no_file(rma, cache):
     assert not ju.read.called, 'json read should not have been called'
 
 
-def xtest_cacheable_lazy_csv_file_exists(rma, cache):
+def test_cacheable_lazy_csv_file_exists(rma, cache):
     @cacheable
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
@@ -266,8 +239,9 @@ def xtest_cacheable_lazy_csv_file_exists(rma, cache):
     with patch('os.path.exists', MagicMock(return_value=True)) as ope:
         df = get_hemispheres(path='/xyz/abc/example.csv',
                              query_strategy='lazy',
-                             file_type='csv',
-                             dataframe=True)
+                             pre=pd.DataFrame,
+                             writer=lambda p, x : x.to_csv(p),
+                             reader=pd.DataFrame.from_csv)
 
     assert df.loc[:, 'whatever'][0]
 
