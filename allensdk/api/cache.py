@@ -23,7 +23,6 @@ from allensdk.deprecated import deprecated
 
 
 class Cache(object):
-
     def __init__(self,
                  manifest=None,
                  cache=True):
@@ -235,6 +234,54 @@ class Cache(object):
 
         return
 
+    @staticmethod
+    def cache_csv_json():
+        return {
+             'writer': lambda p, x : x.to_csv(p),
+             'reader': pd.DataFrame.from_csv,
+             'post': lambda x: x.to_dict('records')
+        }
+
+    @staticmethod
+    def cache_csv_dataframe():
+        return {
+             'pre': pd.DataFrame,
+             'writer': lambda p, x : x.to_csv(p),
+             'reader' : pd.DataFrame.from_csv
+        }
+
+    @staticmethod
+    def nocache_dataframe():
+        return {
+             'post': pd.DataFrame
+        }
+
+    @staticmethod
+    def nocache_json():
+        return {
+        }
+
+    @staticmethod
+    def cache_json_dataframe():
+        return {
+             'writer': ju.write,
+             'reader': lambda p: pj.read_json(p, orient='records')
+        }
+
+    @staticmethod
+    def cache_json():
+        return {
+            'writer': ju.write,
+            'reader' : ju.read
+        }
+
+    @staticmethod
+    def cache_csv():
+        return {
+             'pre': pd.DataFrame,
+             'writer': lambda p, x : x.to_csv(p),
+             'reader': pd.DataFrame.from_csv
+        }
 
     @deprecated
     def wrap(self, fn, path, cache,

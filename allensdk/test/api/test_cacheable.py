@@ -71,9 +71,7 @@ def test_cacheable_csv_dataframe(rma, cache):
 
     df = get_hemispheres(path='/xyz/abc/example.txt',
                          query_strategy='create',
-                         pre=pd.DataFrame,
-                         writer=lambda p, x : x.to_csv(p),
-                         reader=pd.DataFrame.from_csv)
+                         **Cache.cache_csv_dataframe())
 
     assert df.loc[:, 'whatever'][0]
 
@@ -92,8 +90,7 @@ def test_cacheable_json(rma, cache):
 
     df = get_hemispheres(path='/xyz/abc/example.json',
                          query_strategy='create',
-                         writer=ju.write,
-                         reader=ju.read)
+                         **Cache.cache_json())
 
     assert 'whatever' in df[0]
 
@@ -116,9 +113,7 @@ def test_cacheable_no_cache_csv(rma, cache):
 
     df = get_hemispheres(path='/xyz/abc/example.csv',
                          query_strategy='file',
-                         pre=pd.DataFrame,
-                         writer=lambda p, x : x.to_csv(p),
-                         reader=pd.DataFrame.from_csv)
+                         **Cache.cache_csv())
 
     assert df.loc[:, 'whatever'][0]
 
@@ -136,8 +131,7 @@ def test_cacheable_json_dataframe(rma, cache):
 
     df = get_hemispheres(path='/xyz/abc/example.json',
                          query_strategy='create',
-                         writer=ju.write,
-                         reader=lambda p: pj.read_json(p, orient='records'))
+                         **Cache.cache_json_dataframe())
 
     assert df.loc[:, 'whatever'][0]
 
@@ -159,9 +153,7 @@ def test_cacheable_csv_json(rma, cache):
     df = get_hemispheres(path='/xyz/example.csv',
                          query_strategy='create',
                          pre=pd.DataFrame,
-                         writer=lambda p, x : x.to_csv(p),
-                         reader=pd.DataFrame.from_csv,
-                         post=lambda x: x.to_dict('records'))
+                         **Cache.cache_csv_json())
 
     assert 'whatever' in df[0]
 
@@ -197,7 +189,7 @@ def test_cacheable_no_save_dataframe(rma, cache):
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
-    df = get_hemispheres(post=pd.DataFrame)
+    df = get_hemispheres(**Cache.nocache_dataframe())
 
     assert df.loc[:, 'whatever'][0]
 
@@ -217,9 +209,7 @@ def test_cacheable_lazy_csv_no_file(rma, cache):
     with patch('os.path.exists', MagicMock(return_value=False)) as ope:
         df = get_hemispheres(path='/xyz/abc/example.csv',
                              query_strategy='lazy',
-                             pre=pd.DataFrame,
-                             writer=lambda p, x : x.to_csv(p),
-                             reader=pd.DataFrame.from_csv)
+                             **Cache.cache_csv())
 
     assert df.loc[:, 'whatever'][0]
 
@@ -239,9 +229,7 @@ def test_cacheable_lazy_csv_file_exists(rma, cache):
     with patch('os.path.exists', MagicMock(return_value=True)) as ope:
         df = get_hemispheres(path='/xyz/abc/example.csv',
                              query_strategy='lazy',
-                             pre=pd.DataFrame,
-                             writer=lambda p, x : x.to_csv(p),
-                             reader=pd.DataFrame.from_csv)
+                             **Cache.cache_csv())
 
     assert df.loc[:, 'whatever'][0]
 
