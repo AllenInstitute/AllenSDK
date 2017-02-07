@@ -123,7 +123,7 @@ class OntologiesApi(RmaTemplate):
         super(OntologiesApi, self).__init__(base_uri,
                                             query_manifest=OntologiesApi.rma_templates)
 
-    @cacheable
+    @cacheable()
     def get_structures(self,
                        structure_graph_ids=None,
                        structure_graph_names=None,
@@ -237,7 +237,7 @@ class OntologiesApi(RmaTemplate):
         ]
         structure_dataframe['structure_set_ancestor'] = structure_ancestors
 
-    @cacheable
+    @cacheable()
     def get_atlases_table(self, atlas_ids=None, brief=True):
         '''List Atlases available through the API
         with associated ontologies and structure graphs.
@@ -271,12 +271,12 @@ class OntologiesApi(RmaTemplate):
 
         return data
 
-    @cacheable
+    @cacheable()
     def get_atlases(self):
         return self.template_query('ontology_queries',
                                    'atlases_list')
 
-    @cacheable
+    @cacheable()
     def get_structure_graphs(self):
         return self.template_query('ontology_queries',
                                    'structure_graphs_list')
