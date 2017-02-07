@@ -1,10 +1,9 @@
 import pytest
 from mock import Mock, MagicMock, patch
 import numpy as np
+import nrrd
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
-import nrrd
-import os
 
 
 @pytest.fixture
@@ -14,9 +13,6 @@ def mcc():
         manifest_file='mcc_manifest.json')
     mcc.api.retrieve_file_over_http = \
         MagicMock(name='retrieve_file_over_http')
-    
-    nrrd.read = MagicMock(name='nrrd.read',
-                          return_value=('a', 'b'))
 
     return mcc
 
@@ -47,7 +43,7 @@ def test_get_annotation_volume_2015(mcc_old):
         with patch('allensdk.config.manifest.Manifest.safe_mkdir'):
             with patch('os.makedirs'):
                 with patch('nrrd.read',
-                           Mock(return_value=('a', 'b'))):
+                           Mock(return_value=('a', 'b'))) as nread:
                     mcc_old.get_annotation_volume(file_name="/tmp/n100.nrrd")
     
                     mcc_old.api.retrieve_file_over_http.assert_called_once_with(

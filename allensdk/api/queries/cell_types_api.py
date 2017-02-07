@@ -83,7 +83,7 @@ class CellTypesApi(RmaApi):
 
         return self.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
 
-    @cacheable
+    @cacheable()
     def get_ephys_sweeps(self, specimen_id):
         """
         Query the API for a list of sweeps for a particular cell in the Cell Types Database.
@@ -136,7 +136,7 @@ class CellTypesApi(RmaApi):
 
         return cells
 
-    @cacheable
+    @cacheable()
     def get_ephys_features(self):
         """
         Query the API for the full table of EphysFeatures for all cells.
@@ -147,7 +147,7 @@ class CellTypesApi(RmaApi):
             criteria='specimen(ephys_result[failed$eqfalse])',
             num_rows='all')
 
-    @cacheable
+    @cacheable()
     def get_morphology_features(self):
         """
         Query the API for the full table of morphology features for all cells

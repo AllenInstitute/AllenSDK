@@ -193,7 +193,7 @@ class Cache(object):
         path = kwargs.pop('path', 'data.csv')
         query_strategy = kwargs.pop('query_strategy', None)
         pre = kwargs.pop('pre', lambda d: d)
-        post = kwargs.pop('post', lambda d: d)
+        post = kwargs.pop('post', None)
         reader = kwargs.pop('reader', None)
         writer = kwargs.pop('writer', None)
 
@@ -209,6 +209,9 @@ class Cache(object):
         if query_strategy == 'pass_through':
                 data = fn(*args, **kwargs)
                 # TODO: handle pre / post?
+        elif query_strategy == 'download':
+            Manifest.safe_make_parent_dirs(path)
+            fn(*args, **kwargs)
         elif query_strategy != 'file':
             if writer:
                 Manifest.safe_make_parent_dirs(path)
@@ -221,11 +224,11 @@ class Cache(object):
 
         if reader:
             data = reader(path)
-            
+
         if post:
             data = post(data)
             return data
-        
+
         try:
             data
             return data
@@ -283,6 +286,22 @@ class Cache(object):
              'reader': pd.DataFrame.from_csv
         }
 
+    @staticmethod
+    def pathfinder(file_name_position,
+                   secondary_file_name_position=None):
+        def pf(*args):
+            file_name = None
+
+            if file_name_position < len(args):
+                file_name = args[file_name_position]
+        
+            if (file_name is None and
+                secondary_file_name_position and 
+                secondary_file_name_position < len(args)):
+                file_name = args[secondary_file_name_position]
+        
+            return file_name
+        return pf
     @deprecated
     def wrap(self, fn, path, cache,
              save_as_json=True,
@@ -352,7 +371,12 @@ class Cache(object):
         return data
 
 
-def cacheable(func):
+def cacheable(query_strategy=None,
+              pre=None,
+              writer=None,
+              reader=None,
+              post=None,
+              pathfinder=None):
     '''decorator for rma queries, save it and return the dataframe.
 
     Parameters
@@ -386,12 +410,35 @@ def cacheable(func):
     -----
     Column renaming happens after the file is reloaded for json
     '''
-    @functools.wraps(func)
-    def w(*args,
-          **kwargs):
-        result = Cache.cacher(func,
-                              *args,
-                              **kwargs)
-        return result
-    
-    return w
+    def decor(func):
+        decor.query_strategy=query_strategy
+        decor.pre = pre
+        decor.writer = writer
+        decor.reader = reader
+        decor.post = post
+        decor.pathfinder = pathfinder
+
+        @functools.wraps(func)
+        def w(*args,
+              **kwargs):
+
+            if pathfinder and not 'path' in kwargs:
+                kwargs['path'] = pathfinder(*args)
+            if decor.query_strategy and not 'query_strategy' in kwargs:
+                kwargs['query_strategy'] = decor.query_strategy
+            if decor.pre and not 'pre' in kwargs:
+                kwargs['pre'] = decor.pre
+            if decor.writer and not 'writer' in kwargs:
+                kwargs['writer'] = decor.writer
+            if decor.reader and not 'reader' in kwargs:
+                kwargs['reader'] = decor.reader
+            if decor.post and not 'post in kwargs':
+                kwargs['post'] = decor.post
+
+            result = Cache.cacher(func,
+                                  *args,
+                                  **kwargs)
+            return result
+        
+        return w
+    return decor

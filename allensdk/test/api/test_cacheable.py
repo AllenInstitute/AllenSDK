@@ -65,7 +65,7 @@ def rma():
 
 
 def test_cacheable_csv_dataframe(rma, cache):
-    @cacheable
+    @cacheable()
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
@@ -84,7 +84,7 @@ def test_cacheable_csv_dataframe(rma, cache):
 
 
 def test_cacheable_json(rma, cache):
-    @cacheable
+    @cacheable()
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
@@ -107,7 +107,7 @@ def test_cacheable_json(rma, cache):
 
 
 def test_cacheable_no_cache_csv(rma, cache):
-    @cacheable
+    @cacheable()
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
@@ -125,7 +125,7 @@ def test_cacheable_no_cache_csv(rma, cache):
 
 
 def test_cacheable_json_dataframe(rma, cache):
-    @cacheable
+    @cacheable()
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
@@ -146,7 +146,7 @@ def test_cacheable_json_dataframe(rma, cache):
 
 
 def test_cacheable_csv_json(rma, cache):
-    @cacheable
+    @cacheable()
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
@@ -168,7 +168,7 @@ def test_cacheable_csv_json(rma, cache):
 # Not applicable any more because the parameter went away
 
 def test_cacheable_no_save(rma, cache):
-    @cacheable
+    @cacheable()
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
@@ -185,7 +185,7 @@ def test_cacheable_no_save(rma, cache):
 
 
 def test_cacheable_no_save_dataframe(rma, cache):
-    @cacheable
+    @cacheable()
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
@@ -202,7 +202,7 @@ def test_cacheable_no_save_dataframe(rma, cache):
 
 
 def test_cacheable_lazy_csv_no_file(rma, cache):
-    @cacheable
+    @cacheable()
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
@@ -222,7 +222,7 @@ def test_cacheable_lazy_csv_no_file(rma, cache):
 
 
 def test_cacheable_lazy_csv_file_exists(rma, cache):
-    @cacheable
+    @cacheable()
     def get_hemispheres():
         return rma.model_query(model='Hemisphere')
 
