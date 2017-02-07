@@ -56,7 +56,7 @@ example Dockerfiles are available.
 
  #. Ensure you have Docker installed.
 
- #. Use Docker to build the image one of the images.
+ #. Use Docker to build one of the images.
  
      Anaconda::
      

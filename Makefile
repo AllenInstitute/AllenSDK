@@ -35,17 +35,17 @@ pypi_deploy:
 	python setup.py sdist upload --repository https://testpypi.python.org/pypi
 
 pytest:
-	find -L . -name "test_*.py" -exec py.test --boxed --pep8 --cov-config coveragerc --cov=allensdk --cov-report html --assert=rewrite --junitxml=test-reports/test.xml {} \+
+	find -L . -name "test_*.py" -exec py.test --boxed --pep8 --cov-config coveragerc --cov=allensdk --cov-report html --junitxml=test-reports/test.xml {} \+
 
 pytest_lax:
-	find -L . -name "test_*.py" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --assert=rewrite --junitxml=test-reports/test.xml {} \+
+	find -L . -name "test_*.py" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --junitxml=test-reports/test.xml {} \+
 
 pytest_lite:
 	find -L . -name "test_*.py" -exec py.test --boxed --assert=rewrite --junitxml=test-reports/test.xml {} \+
 
 pylint:
 	pylint --disable=C allensdk > htmlcov/pylint.txt || exit 0
-	grep import-error htmlcov/pylint.txt > htmlcov/pylint_imports.txt
+	egrep '(import-error)|(Unable to import)|(Undefined variable)' htmlcov/pylint.txt > htmlcov/pylint_imports.txt
 
 flake8:
 	flake8 --ignore=E201,E202,E226 --max-line-length=200 allensdk | grep -v "local variable '_' is assigned to but never used" > htmlcov/flake8.txt
