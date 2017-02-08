@@ -190,7 +190,7 @@ class OntologiesApi(RmaTemplate):
         return data 
         
         
-    @cacheable
+    @cacheable()
     def get_structures_with_sets(self, structure_graph_ids, order=['structures.graph_order'], 
                                  num_rows='all', count=False, **kwargs):
         '''Download structures along with the sets to which they belong.
