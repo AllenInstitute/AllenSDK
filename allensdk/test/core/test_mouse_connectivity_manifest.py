@@ -1,15 +1,26 @@
 import pytest
 from mock import Mock, MagicMock, patch
 import numpy as np
-import nrrd
-from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
-from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
+
+
+def mock_imports():
+    import nrrd
+    nrrd.read = MagicMock(name='nrrd_read_file',
+                          return_value=('mock_annotation_data',
+                                        'mock_annotation_image'))
+
+    from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache as MCC
+    from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA
+
+    return nrrd, MCA, MCC
+
+nrrd, MCA, MCC = mock_imports()
 
 
 @pytest.fixture
 def mcc():
-    mcc = MouseConnectivityCache(
-        resolution=MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS,
+    mcc = MCC(
+        resolution=MCA.VOXEL_RESOLUTION_100_MICRONS,
         manifest_file='mcc_manifest.json')
     mcc.api.retrieve_file_over_http = \
         MagicMock(name='retrieve_file_over_http')
@@ -19,18 +30,18 @@ def mcc():
 
 @pytest.fixture
 def unmocked_mcc():
-    mcc = MouseConnectivityCache(
-        resolution=MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS,
-        ccf_version=MouseConnectivityApi.CCF_2015)
+    mcc = MCC(
+        resolution=MCA.VOXEL_RESOLUTION_100_MICRONS,
+        ccf_version=MCA.CCF_2015)
 
     return mcc
 
 
 @pytest.fixture
 def mcc_old():
-    mcc_old = MouseConnectivityCache(
-        resolution=MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS,
-        ccf_version=MouseConnectivityApi.CCF_2015,
+    mcc_old = MCC(
+        resolution=MCA.VOXEL_RESOLUTION_100_MICRONS,
+        ccf_version=MCA.CCF_2015,
         manifest_file='mcc_manifest.json')
     mcc_old.api.retrieve_file_over_http = \
         MagicMock(name='retrieve_file_over_http')

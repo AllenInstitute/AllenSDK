@@ -16,37 +16,42 @@
 
 import pytest
 from mock import patch, MagicMock
-import nrrd
-with patch('nrrd.read',
-           MagicMock(name='nrrd_read_file',
-                      return_value=('mock_annotation_data',
-                                    'mock_annotation_image')):
-    from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 import itertools as it
 import numpy as np
 import os
 
 
-CCF_VERSIONS = [MouseConnectivityApi.CCF_2015,
-                MouseConnectivityApi.CCF_2016]
-DATA_PATHS = [MouseConnectivityApi.AVERAGE_TEMPLATE,
-              MouseConnectivityApi.ARA_NISSL,
-              MouseConnectivityApi.MOUSE_2011,
-              MouseConnectivityApi.DEVMOUSE_2012,
-              MouseConnectivityApi.CCF_2015,
-              MouseConnectivityApi.CCF_2016]
-RESOLUTIONS = [MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS,
-               MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS,
-               MouseConnectivityApi.VOXEL_RESOLUTION_50_MICRONS,
-               MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS]
-
 MOCK_ANNOTATION_DATA = 'mock_annotation_data'
 MOCK_ANNOTATION_IMAGE = 'mock_annotation_image'
 
+def mock_imports():
+    import nrrd
+    nrrd.read = MagicMock(name='nrrd_read_file',
+                          return_value=('mock_annotation_data',
+                                        'mock_annotation_image'))
+
+    from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as mca
+
+    ccf_versions = [mca.CCF_2015,
+                    mca.CCF_2016]
+    data_paths = [mca.AVERAGE_TEMPLATE,
+                  mca.ARA_NISSL,
+                  mca.MOUSE_2011,
+                  mca.DEVMOUSE_2012,
+                  mca.CCF_2015,
+                  mca.CCF_2016]
+    resolutions = [mca.VOXEL_RESOLUTION_10_MICRONS,
+                   mca.VOXEL_RESOLUTION_25_MICRONS,
+                   mca.VOXEL_RESOLUTION_50_MICRONS,
+                   mca.VOXEL_RESOLUTION_100_MICRONS]
+
+    return nrrd, mca, ccf_versions, data_paths, resolutions
+
+nrrd, mca, CCF_VERSIONS, DATA_PATHS, RESOLUTIONS = mock_imports()
 
 @pytest.fixture
 def connectivity():
-    conn_api = MouseConnectivityApi()
+    conn_api = mca()
     download_link = '/path/to/link'
     conn_api.do_query = MagicMock(return_value=download_link)
 
@@ -129,7 +134,7 @@ def test_download_annotation_volume_default(connectivity,
     connectivity.retrieve_file_over_http.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
         "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
-        (MouseConnectivityApi.CCF_VERSION_DEFAULT,
+        (mca.CCF_VERSION_DEFAULT,
          resolution),
         "/path/to/annotation_%d.nrrd" % (resolution))
 
