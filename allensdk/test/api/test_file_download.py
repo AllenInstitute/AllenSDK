@@ -16,15 +16,24 @@
 
 import pytest
 from mock import MagicMock, patch
-from allensdk.api.cache import Cache
-from allensdk.config.manifest import file_download, Manifest
+from allensdk.api.cache import cacheable, Cache
+from allensdk.config.manifest import Manifest
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
 import pandas as pd
 import StringIO
-import nrrd
 
+
+@pytest.fixture
+def nrrd():
+    import nrrd
+
+    nrrd.read = MagicMock(name='nrrd.read',
+                          return_value=('nrrd_file_a',
+                                        'nrrd_file_b'))
+
+    return nrrd
 
 @pytest.fixture
 def cache():
@@ -39,6 +48,8 @@ _csv_msg = pd.read_csv(StringIO.StringIO(""",whatever
 
 @pytest.fixture
 def mca():
+    import nrrd
+
     ju.read_url_get = \
         MagicMock(name='read_url_get',
                   return_value={'msg': _msg})
@@ -61,10 +72,6 @@ def mca():
                   return_value=_csv_msg)
 
     Manifest.safe_mkdir = MagicMock(name='safe_mkdir')
-    
-    nrrd.read = MagicMock(name='nrrd.read',
-                          return_value=('nrrd_file_a',
-                                        'nrrd_file_b'))
 
     mca = MouseConnectivityApi()
     mca.retrieve_file_over_http = MagicMock(name='retrieve_file_over_http')
@@ -73,11 +80,12 @@ def mca():
 
 @pytest.mark.parametrize("file_exists",
                          (True, False))
-def test_file_download_lazy(mca, cache,
+def test_file_download_lazy(nrrd, mca, cache,
                             file_exists):
-    @file_download(reader='nrrd',
-                   file_name_position=3,
-                   secondary_file_name_position=1)
+    @cacheable(query_strategy='lazy',
+               reader=nrrd.read,
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           secondary_file_name_position=1))
     def download_volumetric_data(data_path,
                                  file_name,
                                  voxel_resolution=None,
@@ -113,11 +121,11 @@ def test_file_download_lazy(mca, cache,
 
 @pytest.mark.parametrize("file_exists",
                          (True, False))
-def test_file_download_server(mca, cache,
+def test_file_download_server(nrrd, mca, cache,
                              file_exists):
-    @file_download(reader='nrrd',
-                   file_name_position=3,
-                   secondary_file_name_position=1)
+    @cacheable(reader=nrrd.read,
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           secondary_file_name_position=1))
     def download_volumetric_data(data_path,
                                  file_name,
                                  voxel_resolution=None,
@@ -150,11 +158,11 @@ def test_file_download_server(mca, cache,
 
 @pytest.mark.parametrize("file_exists",
                          (True, False))
-def test_file_download_cached_file(mca, cache,
+def test_file_download_cached_file(nrrd, mca, cache,
                                    file_exists):
-    @file_download(reader='nrrd',
-                   file_name_position=3,
-                   secondary_file_name_position=1)
+    @cacheable(reader=nrrd.read,
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           secondary_file_name_position=1))
     def download_volumetric_data(data_path,
                                  file_name,
                                  voxel_resolution=None,

@@ -1,4 +1,4 @@
-# Copyright 2016 Allen Institute for Brain Science
+# Copyright 2016-2017 Allen Institute for Brain Science
 # This file is part of Allen SDK.
 #
 # Allen SDK is free software: you can redistribute it and/or modify
@@ -14,38 +14,44 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 import pytest
 from mock import patch, MagicMock
 import itertools as it
 import numpy as np
-import nrrd
 import os
 
-
-CCF_VERSIONS = [MouseConnectivityApi.CCF_2015,
-                MouseConnectivityApi.CCF_2016]
-DATA_PATHS = [MouseConnectivityApi.AVERAGE_TEMPLATE,
-              MouseConnectivityApi.ARA_NISSL,
-              MouseConnectivityApi.MOUSE_2011,
-              MouseConnectivityApi.DEVMOUSE_2012,
-              MouseConnectivityApi.CCF_2015,
-              MouseConnectivityApi.CCF_2016]
-RESOLUTIONS = [MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS,
-               MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS,
-               MouseConnectivityApi.VOXEL_RESOLUTION_50_MICRONS,
-               MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS]
 
 MOCK_ANNOTATION_DATA = 'mock_annotation_data'
 MOCK_ANNOTATION_IMAGE = 'mock_annotation_image'
 
-
-@pytest.fixture
-def connectivity():
+def mock_imports():
+    import nrrd
     nrrd.read = MagicMock(name='nrrd_read_file',
                           return_value=('mock_annotation_data',
                                         'mock_annotation_image'))
-    conn_api = MouseConnectivityApi()
+
+    from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as mca
+
+    ccf_versions = [mca.CCF_2015,
+                    mca.CCF_2016]
+    data_paths = [mca.AVERAGE_TEMPLATE,
+                  mca.ARA_NISSL,
+                  mca.MOUSE_2011,
+                  mca.DEVMOUSE_2012,
+                  mca.CCF_2015,
+                  mca.CCF_2016]
+    resolutions = [mca.VOXEL_RESOLUTION_10_MICRONS,
+                   mca.VOXEL_RESOLUTION_25_MICRONS,
+                   mca.VOXEL_RESOLUTION_50_MICRONS,
+                   mca.VOXEL_RESOLUTION_100_MICRONS]
+
+    return nrrd, mca, ccf_versions, data_paths, resolutions
+
+nrrd, mca, CCF_VERSIONS, DATA_PATHS, RESOLUTIONS = mock_imports()
+
+@pytest.fixture
+def connectivity():
+    conn_api = mca()
     download_link = '/path/to/link'
     conn_api.do_query = MagicMock(return_value=download_link)
 
@@ -64,29 +70,43 @@ def connectivity():
 def test_download_volumetric_data(connectivity,
                                   data_path,
                                   resolution):
-    connectivity.download_volumetric_data(
+    cache_filename = "annotation_%d.nrrd" % (resolution)
+
+    nrrd.read.reset_mock()
+
+    a, b = connectivity.download_volumetric_data(
         data_path,
-        'annotation_%d.nrrd' % (resolution),
+        cache_filename,
         resolution)
+
+    assert a
+    assert b
+    
+    nrrd.read.assert_called_once_with(cache_filename)
 
     connectivity.retrieve_file_over_http.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
         "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
         (data_path,
          resolution),
-        "annotation_%d.nrrd" % (resolution))
+        cache_filename)
+
 
 
 @pytest.mark.parametrize("ccf_version,resolution",
-                         it.product(CCF_VERSIONS,
-                                    RESOLUTIONS))
+                         it.product([CCF_VERSIONS[0]],
+                                    [RESOLUTIONS[0]]))
 def test_download_annotation_volume(connectivity,
                                     ccf_version,
                                     resolution):
+    nrrd.read.reset_mock()
+
     connectivity.download_annotation_volume(
         ccf_version,
         resolution,
         '/path/to/annotation_%d.nrrd' % (resolution))
+    
+    nrrd.read.assert_called_once_with('/path/to/annotation_10.nrrd')
 
     connectivity.retrieve_file_over_http.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
@@ -102,15 +122,19 @@ def test_download_annotation_volume(connectivity,
                          RESOLUTIONS)
 def test_download_annotation_volume_default(connectivity,
                                             resolution):
-    connectivity.download_annotation_volume(
+    a, b = connectivity.download_annotation_volume(
         None,
         resolution,
-        '/path/to/annotation_%d.nrrd' % (resolution))
+        '/path/to/annotation_%d.nrrd' % (resolution),
+        reader=nrrd.read)
+    
+    assert a
+    assert b
 
     connectivity.retrieve_file_over_http.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
         "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
-        (MouseConnectivityApi.CCF_VERSION_DEFAULT,
+        (mca.CCF_VERSION_DEFAULT,
          resolution),
         "/path/to/annotation_%d.nrrd" % (resolution))
 
