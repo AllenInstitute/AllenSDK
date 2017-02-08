@@ -18,7 +18,6 @@ import re
 import logging
 import errno
 import pandas as pd
-import nrrd
 
 
 class Manifest(object):

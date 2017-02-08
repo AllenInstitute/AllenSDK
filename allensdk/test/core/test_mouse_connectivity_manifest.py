@@ -1,26 +1,28 @@
 import pytest
 from mock import Mock, MagicMock, patch
 import numpy as np
+import nrrd
+from allensdk.core import mouse_connectivity_cache
+from allensdk.api.queries import mouse_connectivity_api
 
 
+@pytest.fixture(scope='module', autouse=True)
 def mock_imports():
     import nrrd
-    nrrd.read = MagicMock(name='nrrd_read_file',
+    nrrd.read = MagicMock(name='nrrd_read_file_mcm',
                           return_value=('mock_annotation_data',
                                         'mock_annotation_image'))
 
-    from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache as MCC
-    from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA
-
-    return nrrd, MCA, MCC
-
-nrrd, MCA, MCC = mock_imports()
+    import allensdk.core.mouse_connectivity_cache
+    import allensdk.api.queries.mouse_connectivity_api
+    reload(allensdk.api.queries.mouse_connectivity_api)
+    reload(allensdk.core.mouse_connectivity_cache)
 
 
 @pytest.fixture
 def mcc():
-    mcc = MCC(
-        resolution=MCA.VOXEL_RESOLUTION_100_MICRONS,
+    mcc = mouse_connectivity_cache.MouseConnectivityCache(
+        resolution=mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS,
         manifest_file='mcc_manifest.json')
     mcc.api.retrieve_file_over_http = \
         MagicMock(name='retrieve_file_over_http')
@@ -30,18 +32,18 @@ def mcc():
 
 @pytest.fixture
 def unmocked_mcc():
-    mcc = MCC(
-        resolution=MCA.VOXEL_RESOLUTION_100_MICRONS,
-        ccf_version=MCA.CCF_2015)
+    mcc = mouse_connectivity_cache.MouseConnectivityCache(
+        resolution=mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS,
+        ccf_version=mouse_connectivity_api.MouseConnectivityApi.CCF_2015)
 
     return mcc
 
 
 @pytest.fixture
 def mcc_old():
-    mcc_old = MCC(
-        resolution=MCA.VOXEL_RESOLUTION_100_MICRONS,
-        ccf_version=MCA.CCF_2015,
+    mcc_old = mouse_connectivity_cache.MouseConnectivityCache(
+        resolution=mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS,
+        ccf_version=mouse_connectivity_api.MouseConnectivityApi.CCF_2015,
         manifest_file='mcc_manifest.json')
     mcc_old.api.retrieve_file_over_http = \
         MagicMock(name='retrieve_file_over_http')
@@ -53,13 +55,11 @@ def test_get_annotation_volume_2015(mcc_old):
     with patch('os.path.exists', Mock(return_value=False)):
         with patch('allensdk.config.manifest.Manifest.safe_mkdir'):
             with patch('os.makedirs'):
-                with patch('nrrd.read',
-                           Mock(return_value=('a', 'b'))) as nread:
-                    mcc_old.get_annotation_volume(file_name="/tmp/n100.nrrd")
-    
-                    mcc_old.api.retrieve_file_over_http.assert_called_once_with(
-                        'http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/ccf_2015/annotation_100.nrrd',
-                        '/tmp/n100.nrrd')
+                mcc_old.get_annotation_volume(file_name="/tmp/n100.nrrd")
+
+                mcc_old.api.retrieve_file_over_http.assert_called_once_with(
+                    'http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/annotation/ccf_2015/annotation_100.nrrd',
+                    '/tmp/n100.nrrd')
 
 def test_get_annotation_volume(mcc):
     with patch('os.path.exists', Mock(return_value=False)):

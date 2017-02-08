@@ -208,23 +208,20 @@ class Cache(object):
 
         if query_strategy == 'pass_through':
                 data = fn(*args, **kwargs)
-                # TODO: handle pre / post?
-        elif query_strategy == 'download':
+        elif query_strategy in ['create']:
             Manifest.safe_make_parent_dirs(path)
-            fn(*args, **kwargs)
-        elif query_strategy != 'file':
-            if writer:
-                Manifest.safe_make_parent_dirs(path)
 
+            if writer:
                 data = fn(*args, **kwargs)
                 data = pre(data)
                 writer(path, data)
             else:
-                fn(*args, **kwargs)
+                data = fn(*args, **kwargs)
 
         if reader:
             data = reader(path)
 
+        # Note: don't provide post if fn or reader doesn't return data
         if post:
             data = post(data)
             return data

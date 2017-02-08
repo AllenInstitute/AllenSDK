@@ -19,39 +19,41 @@ from mock import patch, MagicMock
 import itertools as it
 import numpy as np
 import os
+import nrrd
+from allensdk.api.queries import mouse_connectivity_api
 
+CCF_VERSIONS = [mouse_connectivity_api.MouseConnectivityApi.CCF_2015,
+                mouse_connectivity_api.MouseConnectivityApi.CCF_2016]
+DATA_PATHS = [mouse_connectivity_api.MouseConnectivityApi.AVERAGE_TEMPLATE,
+              mouse_connectivity_api.MouseConnectivityApi.ARA_NISSL,
+              mouse_connectivity_api.MouseConnectivityApi.MOUSE_2011,
+              mouse_connectivity_api.MouseConnectivityApi.DEVMOUSE_2012,
+              mouse_connectivity_api.MouseConnectivityApi.CCF_2015,
+              mouse_connectivity_api.MouseConnectivityApi.CCF_2016]
+RESOLUTIONS = [mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS,
+               mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS,
+               mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_50_MICRONS,
+               mouse_connectivity_api.MouseConnectivityApi.VOXEL_RESOLUTION_100_MICRONS]
 
 MOCK_ANNOTATION_DATA = 'mock_annotation_data'
 MOCK_ANNOTATION_IMAGE = 'mock_annotation_image'
 
+@pytest.fixture(scope='module', autouse=True)
 def mock_imports():
     import nrrd
-    nrrd.read = MagicMock(name='nrrd_read_file',
+    nrrd.read = MagicMock(name='nrrd_read_file_mcm',
                           return_value=('mock_annotation_data',
                                         'mock_annotation_image'))
 
-    from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as mca
+    import allensdk.core.mouse_connectivity_cache
+    import allensdk.api.queries.mouse_connectivity_api
+    reload(allensdk.api.queries.mouse_connectivity_api)
+    reload(allensdk.core.mouse_connectivity_cache)
 
-    ccf_versions = [mca.CCF_2015,
-                    mca.CCF_2016]
-    data_paths = [mca.AVERAGE_TEMPLATE,
-                  mca.ARA_NISSL,
-                  mca.MOUSE_2011,
-                  mca.DEVMOUSE_2012,
-                  mca.CCF_2015,
-                  mca.CCF_2016]
-    resolutions = [mca.VOXEL_RESOLUTION_10_MICRONS,
-                   mca.VOXEL_RESOLUTION_25_MICRONS,
-                   mca.VOXEL_RESOLUTION_50_MICRONS,
-                   mca.VOXEL_RESOLUTION_100_MICRONS]
-
-    return nrrd, mca, ccf_versions, data_paths, resolutions
-
-nrrd, mca, CCF_VERSIONS, DATA_PATHS, RESOLUTIONS = mock_imports()
 
 @pytest.fixture
 def connectivity():
-    conn_api = mca()
+    conn_api = mouse_connectivity_api.MouseConnectivityApi()
     download_link = '/path/to/link'
     conn_api.do_query = MagicMock(return_value=download_link)
 
@@ -92,21 +94,22 @@ def test_download_volumetric_data(connectivity,
         cache_filename)
 
 
-
 @pytest.mark.parametrize("ccf_version,resolution",
-                         it.product([CCF_VERSIONS[0]],
-                                    [RESOLUTIONS[0]]))
+                         it.product(CCF_VERSIONS,
+                                    RESOLUTIONS))
 def test_download_annotation_volume(connectivity,
                                     ccf_version,
                                     resolution):
     nrrd.read.reset_mock()
 
+    cache_file = '/path/to/annotation_%d.nrrd' % (resolution)
+
     connectivity.download_annotation_volume(
         ccf_version,
         resolution,
-        '/path/to/annotation_%d.nrrd' % (resolution))
-    
-    nrrd.read.assert_called_once_with('/path/to/annotation_10.nrrd')
+        cache_file)
+
+    nrrd.read.assert_called_once_with(cache_file)
 
     connectivity.retrieve_file_over_http.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
@@ -134,7 +137,7 @@ def test_download_annotation_volume_default(connectivity,
     connectivity.retrieve_file_over_http.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
         "current-release/mouse_ccf/%s/annotation_%d.nrrd" % 
-        (mca.CCF_VERSION_DEFAULT,
+        (mouse_connectivity_api.MouseConnectivityApi.CCF_VERSION_DEFAULT,
          resolution),
         "/path/to/annotation_%d.nrrd" % (resolution))
 
