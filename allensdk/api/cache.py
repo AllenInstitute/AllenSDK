@@ -419,8 +419,6 @@ def cacheable(query_strategy=None,
         def w(*args,
               **kwargs):
 
-            if pathfinder and not 'path' in kwargs:
-                kwargs['path'] = pathfinder(*args)
             if decor.query_strategy and not 'query_strategy' in kwargs:
                 kwargs['query_strategy'] = decor.query_strategy
             if decor.pre and not 'pre' in kwargs:
@@ -431,6 +429,12 @@ def cacheable(query_strategy=None,
                 kwargs['reader'] = decor.reader
             if decor.post and not 'post in kwargs':
                 kwargs['post'] = decor.post
+
+            if decor.pathfinder and not 'pathfinder' in kwargs:
+                pathfinder = decor.pathfinder
+
+            if pathfinder and not 'path' in kwargs:
+                kwargs['path'] = pathfinder(*args)
 
             result = Cache.cacher(func,
                                   *args,
