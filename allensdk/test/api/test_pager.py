@@ -64,6 +64,37 @@ def rma():
 
     return RmaApi()
 
+@pytest.fixture
+def rma5():
+    ju.read_url_get = \
+        MagicMock(name='read_url_get',
+                  side_effect = [{'msg': _msg},
+                                 {'msg': _msg},
+                                 {'msg': _msg},
+                                 {'msg': _msg},
+                                 {'msg': _msg}])
+    ju.write = \
+        MagicMock(name='write')
+
+    ju.read = \
+        MagicMock(name='read',
+                  return_value=_msg)
+
+    pj.read_json = \
+        MagicMock(name='read_json',
+                  return_value=_pd_msg)
+
+    pd.DataFrame.to_csv = \
+        MagicMock(name='to_csv')
+
+    pd.DataFrame.from_csv = \
+        MagicMock(name='from_csv',
+                  return_value=_csv_msg)
+    
+    os.makedirs = MagicMock(name='makedirs')
+
+    return RmaApi()
+
 
 def test_pageable_json(rma, cache):
     @pageable()
@@ -71,21 +102,51 @@ def test_pageable_json(rma, cache):
         return rma.model_query(model='Gene',
                                **kwargs)
 
-    nr = 50
-    pp = 2
+    nr = 5
+    pp = 1
     tr = nr*pp
 
-    df = get_genes(num_rows=nr,
-                   total_rows=tr)
+    df = list(get_genes(num_rows=nr, total_rows=tr))
 
-    assert df ==  [{'whatever': True}, {'whatever': True}]
+    assert df ==  [{'whatever': True},
+                   {'whatever': True},
+                   {'whatever': True},
+                   {'whatever': True},
+                   {'whatever': True}]
 
     base_query = \
         ('http://api.brain-map.org/api/v2/data/query.json?q=model::Gene'
-         ',rma::options%5Bnum_rows$eq50%5D%5Bstart_row$eq{}%5D'
+         ',rma::options%5Bnum_rows$eq5%5D%5Bstart_row$eq{}%5D'
          '%5Bcount$eqfalse%5D')
-    
+
     expected_calls = map(lambda c: call(base_query.format(c)),
-                         [0, 50])
+                         [0, 1, 2, 3, 4])
+                     
+    assert ju.read_url_get.call_args_list == expected_calls
+
+
+def test_all(rma5, cache):
+    @pageable()
+    def get_genes(**kwargs):
+        return rma5.model_query(model='Gene', **kwargs)
+
+    nr = 1
+
+    df = list(get_genes(num_rows=nr, total_rows='all'))
+
+    assert df ==  [{'whatever': True},
+                   {'whatever': True},
+                   {'whatever': True},
+                   {'whatever': True},
+                   {'whatever': True}]
+
+    base_query = \
+        ('http://api.brain-map.org/api/v2/data/query.json?q=model::Gene'
+         ',rma::options%5Bnum_rows$eq1%5D%5Bstart_row$eq{}%5D'
+         '%5Bcount$eqfalse%5D')
+
+    # we get one extra call if total_rows % num_rows == 0 with current implementation
+    expected_calls = map(lambda c: call(base_query.format(c)),
+                         [0, 1, 2, 3, 4, 5])
                      
     assert ju.read_url_get.call_args_list == expected_calls

@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 import functools
+import itertools as it
 
 
 class RmaPager(object):
@@ -27,17 +28,32 @@ class RmaPager(object):
         total_rows = kwargs.pop('total_rows', None)
         num_rows = kwargs.get('num_rows', None)
 
-        def single_call(s):
-            kwargs['start_row'] = s
+        if total_rows == 'all':
+            start_row = 0
+            result_count = num_rows
+            kwargs = kwargs
             kwargs['count'] = False
 
-            data = fn(*args, **kwargs)
-            return data
+            while result_count == num_rows:
+                kwargs['start_row'] = start_row
+                data = fn(*args, **kwargs)
+                start_row = start_row + num_rows
+                result_count = len(data)
+                for r in data:
+                    yield r
+        else:
+            start_row = 0
+            kwargs = kwargs
+            kwargs['count'] = False
 
-        return functools.reduce( (lambda d, s: d.extend(single_call(s)) or d),
-                                 range(0, total_rows, num_rows),
-                                 [])
+            while start_row < total_rows:
+                kwargs['start_row'] = start_row
 
+                data = fn(*args, **kwargs)
+                result_count = len(data)
+                start_row = start_row + result_count
+                for r in data:
+                    yield r
 
 def pageable(pages=None,
              total_rows=None,
