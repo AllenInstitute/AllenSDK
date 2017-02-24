@@ -11,7 +11,8 @@ MAINTAINER Tim Fliss <timf@alleninstitute.org>
 USER root
 
 # http://micro.stanford.edu/wiki/Install_HDF5
-RUN apt-get install -yq \
+RUN apt-get update; \
+    apt-get install -yq \
     pkg-config \
     libhdf5-dev \
     hdf5-tools \

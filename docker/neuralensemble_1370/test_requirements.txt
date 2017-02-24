@@ -7,3 +7,4 @@ pytest-pep8==1.0.6
 pytest-xdist==1.14
 flake8>=3.0.4
 pylint>=1.5.4
+jupyter==4.2.1
