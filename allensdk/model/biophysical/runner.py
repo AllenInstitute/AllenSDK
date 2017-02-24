@@ -126,7 +126,7 @@ def save_nwb(output_path, v, sweep, sweeps_by_type):
         spike_times = [s['threshold_t'] for s in spikes]
         output.set_spike_times(sweep, spike_times)
     except Exception as e:
-        logging.info("sweep %d has no sweep features. %s" % (sweep, e.message))
+        logging.info("sweep %d has no sweep features. %s" % (sweep, e.args))
 
 
 def load_description(manifest_json_path):

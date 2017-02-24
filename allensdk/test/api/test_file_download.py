@@ -21,8 +21,19 @@ from allensdk.config.manifest import Manifest
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
 import pandas as pd
-import StringIO
 
+try:
+    import StringIO
+except:
+    import io as StringIO
+
+try:
+    reload
+except NameError:
+    try:
+        from importlib import reload
+    except ImportError:
+        from imp import reload
 
 def mock_imports():
     import nrrd

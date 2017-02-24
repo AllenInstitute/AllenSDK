@@ -6,6 +6,15 @@ from allensdk.core import mouse_connectivity_cache
 from allensdk.api.queries import mouse_connectivity_api
 
 
+try:
+    reload
+except NameError:
+    try:
+        from importlib import reload
+    except ImportError:
+        from imp import reload
+
+
 @pytest.fixture(scope='module', autouse=True)
 def mock_imports():
     import nrrd
