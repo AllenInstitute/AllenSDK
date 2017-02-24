@@ -11,9 +11,8 @@ MAINTAINER Tim Fliss <timf@alleninstitute.org>
 COPY env.sh git_clone.sh ./
 
 RUN /bin/bash -c "\
-  chmod +x git_clone.sh && \
   source env.sh && \
-  ./git_clone.sh && \
+  /bin/bash ./git_clone.sh && \
   cd allensdk && \
   pip install . && \
   pip install -r test_requirements.txt"
