@@ -42,7 +42,7 @@ WORKDIR /home/docker
 
 COPY requirements.txt test_requirements.txt ./
 
-RUN $VENV/bin/pip install --update pip; \
+RUN $VENV/bin/pip install --upgrade pip; \
     $VENV/bin/pip install -r requirements.txt; \
     $VENV/bin/pip install -r test_requirements.txt
 
