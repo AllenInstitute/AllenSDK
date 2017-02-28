@@ -1,7 +1,5 @@
 import pytest
-import matplotlib
 import os
-import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet

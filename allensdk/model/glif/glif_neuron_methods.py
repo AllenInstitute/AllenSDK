@@ -1,13 +1,13 @@
 """ The methods in this module are used for configuring dynamics and reset rules for the GlifNeuron.  
 For more details on how to use these methods, see :doc:`glif_models`.
 """
-import logging
 import functools
 import numpy as np
-from numpy.distutils.npy_pkg_config import VariableSet
+
 
 #fast_threshold=[]
 #slow_threshold=[]
+
 
 class GlifNeuronMethod( object ):
     """ A simple class to keep track of the name and parameters associated with a neuron method.

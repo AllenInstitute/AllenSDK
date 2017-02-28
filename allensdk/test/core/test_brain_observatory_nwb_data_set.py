@@ -13,13 +13,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import numpy as np
 from pkg_resources import resource_filename  # @UnresolvedImport
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import pytest
 import os
 
+
 NWB_FLAVORS = []
+
 
 if 'TEST_NWB_FILES' in os.environ:
     nwb_list_file = os.environ['TEST_NWB_FILES']

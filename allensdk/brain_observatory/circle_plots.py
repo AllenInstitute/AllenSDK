@@ -2,12 +2,10 @@ import numpy as np
 
 import pandas as pd
 import math
-import h5py
 
-from matplotlib.colors import LinearSegmentedColormap, rgb2hex
+from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from matplotlib.path import Path
 from matplotlib.collections import PatchCollection, LineCollection
 import matplotlib.transforms as mxfms
 import matplotlib.colors as mcolors
@@ -125,7 +123,7 @@ def build_hex_pack(n):
     while len(pos) < n:
         layer_pos = [  ] 
         
-        for i,v in enumerate(vs):            
+        for i,v in enumerate(vs):
             x = - N * v[1] * sq32
             y = N * v[0] * sq32
         
@@ -134,7 +132,7 @@ def build_hex_pack(n):
                 y -= 0.5 * v[1]
                 
             layer_pos.append([])
-            layer_pos[i].append([x,y])                                    
+            layer_pos[i].append([x,y])
             mag = 1
             sign = 1
                       
@@ -143,7 +141,7 @@ def build_hex_pack(n):
                 y += v[1] * mag * sign
                 mag += 1
                 sign = -sign
-                layer_pos[i].append([x,y])            
+                layer_pos[i].append([x,y])
         
         for j in range(N):
             for i in range(len(vs)):
