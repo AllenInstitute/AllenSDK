@@ -84,7 +84,7 @@ def test_deprecated():
 
     tmp = GlifApi()
     tmp.get_neuronal_model(473465606)
-    print tmp.get_ephys_sweeps()
+    print(tmp.get_ephys_sweeps())
 
     tmp = GlifApi()
     tmp.get_neuronal_model(473465606)

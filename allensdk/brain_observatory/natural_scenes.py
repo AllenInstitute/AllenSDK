@@ -20,8 +20,8 @@ import pandas as pd
 from .stimulus_analysis import StimulusAnalysis
 import logging
 import h5py
-import observatory_plots as oplots
-import circle_plots as cplots
+from . import observatory_plots as oplots
+from . import circle_plots as cplots
 from .brain_observatory_exceptions import MissingStimulusException
 
 class NaturalScenes(StimulusAnalysis):
@@ -227,7 +227,7 @@ class NaturalScenes(StimulusAnalysis):
                 ns._binned_dx_vis = f["analysis/binned_dx_vis"].value
                 ns._binned_cells_vis = f["analysis/binned_cells_vis"].value
         except Exception as e:
-            raise MissingStimulusException(e.message)
+            raise MissingStimulusException(e.args)
 
         return ns
 

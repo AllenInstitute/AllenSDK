@@ -19,7 +19,7 @@ import pandas as pd
 import logging
 from .findlevel import findlevel
 from .brain_observatory_exceptions import BrainObservatoryAnalysisException
-import observatory_plots as oplots
+from . import observatory_plots as oplots
 import matplotlib.pyplot as plt
 
 class StimulusAnalysis(object):

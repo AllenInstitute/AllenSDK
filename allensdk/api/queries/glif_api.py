@@ -129,7 +129,7 @@ class GlifApi(RmaTemplate):
             specimen = self.neuronal_model['specimen']
             self.ephys_sweeps = specimen['ephys_sweeps']
         except Exception as e:
-            logging.info(e.message)
+            logging.info(e.args)
             self.ephys_sweeps = None
 
         if self.ephys_sweeps is None:

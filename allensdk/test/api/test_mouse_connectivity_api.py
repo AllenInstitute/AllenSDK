@@ -22,6 +22,16 @@ import os
 import nrrd
 from allensdk.api.queries import mouse_connectivity_api
 
+
+try:
+    reload
+except NameError:
+    try:
+        from importlib import reload
+    except ImportError:
+        from imp import reload
+
+
 CCF_VERSIONS = [mouse_connectivity_api.MouseConnectivityApi.CCF_2015,
                 mouse_connectivity_api.MouseConnectivityApi.CCF_2016]
 DATA_PATHS = [mouse_connectivity_api.MouseConnectivityApi.AVERAGE_TEMPLATE,

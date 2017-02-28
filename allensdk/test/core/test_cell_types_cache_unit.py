@@ -24,6 +24,16 @@ import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
 import os
 
+
+try:
+    reload
+except NameError:
+    try:
+        from importlib import reload
+    except ImportError:
+        from imp import reload
+
+
 @pytest.fixture(scope='module', autouse=True)
 @patch('allensdk.core.nwb_data_set.NwbDataSet')
 def mock_nwb(nwb):

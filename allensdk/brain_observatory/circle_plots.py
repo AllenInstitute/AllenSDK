@@ -2,7 +2,8 @@ import numpy as np
 
 import pandas as pd
 import math
-
+import h5py
+from past.builtins import xrange
 from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -76,7 +77,7 @@ def angle_lines(angles, inner_radius, outer_radius):
     inner_pos = polar_to_xy(angles, inner_radius)
     outer_pos = polar_to_xy(angles, outer_radius)
 
-    segments = np.array(zip(inner_pos, outer_pos))
+    segments = np.array(list(zip(inner_pos, outer_pos)))
 
     return LineCollection(segments)
 
