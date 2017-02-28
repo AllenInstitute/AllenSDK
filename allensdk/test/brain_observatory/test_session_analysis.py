@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import matplotlib
+
 import pytest
 from mock import patch
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet

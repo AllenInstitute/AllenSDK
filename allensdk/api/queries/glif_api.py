@@ -15,10 +15,9 @@
 
 import json
 import logging
-
 from ...deprecated import deprecated
 from .rma_template import RmaTemplate
-from ..cache import cacheable
+
 
 class GlifApi(RmaTemplate):
 
