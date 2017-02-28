@@ -5,7 +5,7 @@
 # docker run -it alleninstitute/allensdk:neuralensemble /bin/bash
 # source ~/env/neurosci/bin/activate
 #
-FROM alleninstitute/allensdk:neuralensemble_py3_1370
+FROM alleninstitute/neuralensemble_py3_1370
 MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
 COPY env.sh git_clone.sh ./
@@ -15,4 +15,5 @@ RUN /bin/bash -c "\
   /bin/bash ./git_clone.sh && \
   cd allensdk && \
   pip install . && \
+  pip install -r requirements.txt && \
   pip install -r test_requirements.txt"
