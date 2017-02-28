@@ -1,7 +1,7 @@
 import pytest
 from mock import Mock, MagicMock, patch
 import numpy as np
-import nrrd
+import nrrd  # noqa: F401
 from allensdk.core import mouse_connectivity_cache
 from allensdk.api.queries import mouse_connectivity_api
 
@@ -17,7 +17,7 @@ except NameError:
 
 @pytest.fixture(scope='module', autouse=True)
 def mock_imports():
-    import nrrd
+    import nrrd  # noqa: F401
     nrrd.read = MagicMock(name='nrrd_read_file_mcm',
                           return_value=('mock_annotation_data',
                                         'mock_annotation_image'))

@@ -457,8 +457,8 @@ class BrainObservatoryNwbDataSet(object):
         roi_arr = np.zeros((len(roi_list), roi_list[0].shape[
                            0], roi_list[0].shape[1]), dtype=np.uint8)
 
-        for i, roi in enumerate(roi_list):
-            roi_arr[i, :, :] = roi
+        for i, an_roi in enumerate(roi_list):
+            roi_arr[i, :, :] = an_roi
 
         return roi_arr
 
