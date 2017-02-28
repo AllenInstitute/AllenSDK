@@ -17,6 +17,7 @@ RUN apt-get update; \
     libhdf5-dev \
     hdf5-tools \
     libfreetype6-dev \
+    python-skimage \
     cython
 
 ENV NRN=nrn-$NRN_VER NRN_RELEASE=7.4.rel-1370
@@ -40,7 +41,9 @@ USER docker
 WORKDIR /home/docker
 
 COPY requirements.txt test_requirements.txt ./
-RUN $VENV/bin/pip install -r requirements.txt; \
+
+RUN $VENV/bin/pip install --update pip; \
+    $VENV/bin/pip install -r requirements.txt; \
     $VENV/bin/pip install -r test_requirements.txt
 
 RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv
