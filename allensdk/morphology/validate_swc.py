@@ -15,7 +15,10 @@
 
 import argparse
 import allensdk.core.swc as swc
-from past.builtins import xrange
+try:
+    xrange
+except:
+    from past.builtins import xrange
 
 
 def validate_swc(swc_file):

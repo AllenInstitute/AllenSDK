@@ -33,6 +33,7 @@ setup(
                         'numpy>=1.8.2',
                         'six>=1.5.2',
                         'pynrrd >= 0.2.1',
+                        'future >= 0.14.3',
                         'requests',
                         'requests-toolbelt'],
     tests_require=['pytest>=2.6.3',

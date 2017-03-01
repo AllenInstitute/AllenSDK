@@ -2,8 +2,10 @@ import numpy as np
 
 import pandas as pd
 import math
-import h5py
-from past.builtins import xrange
+try:
+    xrange
+except:
+    from past.builtins import xrange
 from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
