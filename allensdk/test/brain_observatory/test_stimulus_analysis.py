@@ -13,11 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import matplotlib
+
 from allensdk.brain_observatory.stimulus_analysis import StimulusAnalysis
 import pytest
 from mock import patch, MagicMock
-import itertools as it
 
 
 @pytest.fixture

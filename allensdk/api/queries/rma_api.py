@@ -14,6 +14,7 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from ..api import Api
+import warnings
 
 
 class RmaApi(Api):
@@ -33,6 +34,7 @@ class RmaApi(Api):
     COUNT = 'count'
     ONLY = 'only'
     EXCEPT = 'except'
+    EXCPT = 'excpt'
     TABULAR = 'tabular'
     DEBUG = 'debug'
     PREVIEW = 'preview'
@@ -209,6 +211,8 @@ class RmaApi(Api):
             to be joined into an rma::options only filter to limit what data is returned
         except : list of strings, optional
             to be joined into an rma::options except filter to limit what data is returned
+        excpt : list of strings, optional
+            synonym for except parameter to avoid a reserved word conflict.
         tabular : list of string, optional
             return columns as a tabular data structure rather than a nested tree.
         count : boolean, optional
@@ -279,7 +283,15 @@ class RmaApi(Api):
                 self.only_except_tabular_clause(RmaApi.ONLY,
                                                 only))
 
+        # handle alternate 'except' spelling to avoid reserved word conflict
         excpt = kwargs.get(RmaApi.EXCEPT, None)
+        excpt2 = kwargs.get(RmaApi.EXCPT, None)
+        
+        if excpt is not None and excpt2 is not None:
+            warnings.warn('excpt and except options should not be used together',
+                          Warning)
+        elif excpt2 is not None:
+            excpt = excpt2 
 
         if excpt is not None:
             options_params.append(

@@ -96,6 +96,43 @@ class Cache(object):
                                       orient='index')
 
     @staticmethod
+    def json_remove_keys(data, keys):
+        for r in data:
+            for key in keys:
+                del r[key]
+
+        return data
+
+    @staticmethod
+    def remove_keys(data, keys=None):
+        ''' DataFrame version
+        '''
+        if keys is None:
+            keys = []
+        
+        for key in keys:
+            del data[key]
+
+    @staticmethod
+    def json_rename_columns(data,
+                            new_old_name_tuples=None):
+        '''Convenience method to rename columns in a pandas dataframe.
+
+        Parameters
+        ----------
+        data : dataframe
+            edited in place.
+        new_old_name_tuples : list of string tuples (new, old)
+        '''
+        if new_old_name_tuples is None:
+            new_old_name_tuples = []
+
+        for new_name, old_name in new_old_name_tuples:
+            for r in data:
+                r[new_name] = r[old_name]
+                del r[old_name]
+
+    @staticmethod
     def rename_columns(data,
                        new_old_name_tuples=None):
         '''Convenience method to rename columns in a pandas dataframe.
@@ -208,23 +245,20 @@ class Cache(object):
 
         if query_strategy == 'pass_through':
                 data = fn(*args, **kwargs)
-                # TODO: handle pre / post?
-        elif query_strategy == 'download':
+        elif query_strategy in ['create']:
             Manifest.safe_make_parent_dirs(path)
-            fn(*args, **kwargs)
-        elif query_strategy != 'file':
-            if writer:
-                Manifest.safe_make_parent_dirs(path)
 
+            if writer:
                 data = fn(*args, **kwargs)
                 data = pre(data)
                 writer(path, data)
             else:
-                fn(*args, **kwargs)
+                data = fn(*args, **kwargs)
 
         if reader:
             data = reader(path)
 
+        # Note: don't provide post if fn or reader doesn't return data
         if post:
             data = post(data)
             return data
@@ -240,16 +274,14 @@ class Cache(object):
     @staticmethod
     def cache_csv_json():
         return {
-             'writer': lambda p, x : x.to_csv(p),
-             'reader': pd.DataFrame.from_csv,
-             'post': lambda x: x.to_dict('records')
+             'writer': lambda p, x : pd.DataFrame(x).to_csv(p),
+             'reader': lambda f: pd.DataFrame.from_csv(f).to_dict('records')
         }
 
     @staticmethod
     def cache_csv_dataframe():
         return {
-             'pre': pd.DataFrame,
-             'writer': lambda p, x : x.to_csv(p),
+             'writer': lambda p, x : pd.DataFrame(x).to_csv(p),
              'reader' : pd.DataFrame.from_csv
         }
 
@@ -302,6 +334,7 @@ class Cache(object):
         
             return file_name
         return pf
+
     @deprecated
     def wrap(self, fn, path, cache,
              save_as_json=True,
@@ -423,7 +456,10 @@ def cacheable(query_strategy=None,
               **kwargs):
 
             if pathfinder and not 'path' in kwargs:
-                kwargs['path'] = pathfinder(*args)
+                found_path = pathfinder(*args)
+                
+                if found_path:
+                    kwargs['path'] = found_path
             if decor.query_strategy and not 'query_strategy' in kwargs:
                 kwargs['query_strategy'] = decor.query_strategy
             if decor.pre and not 'pre' in kwargs:

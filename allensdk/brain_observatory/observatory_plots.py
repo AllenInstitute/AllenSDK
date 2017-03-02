@@ -1,8 +1,6 @@
-import matplotlib
-
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.collections import PatchCollection, LineCollection
+from matplotlib.collections import PatchCollection
 import matplotlib.patches as mpatches
 import scipy.interpolate as si
 from scipy.stats.mstats import zscore
@@ -10,9 +8,6 @@ from scipy.stats.mstats import zscore
 import allensdk.brain_observatory.circle_plots as cplots
 from contextlib import contextmanager
 
-import h5py
-import pandas as pd
-import logging
 import numpy as np
 
 SI_RANGE = [ 0, 1.5 ]

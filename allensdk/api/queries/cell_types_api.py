@@ -16,8 +16,7 @@
 from .rma_api import RmaApi
 from ..cache import cacheable
 from allensdk.config.manifest import Manifest
-import pandas as pd
-import warnings
+from allensdk.api.cache import Cache
 
 
 class CellTypesApi(RmaApi):
@@ -151,19 +150,19 @@ class CellTypesApi(RmaApi):
     def get_morphology_features(self):
         """
         Query the API for the full table of morphology features for all cells
+        
+        Notes
+        -----
+        by default the tags column is removed because it isn't useful
         """
-
-        features = self.model_query(
+        return self.model_query(
             'NeuronReconstruction',
             criteria="specimen(ephys_result[failed$eqfalse])",
+            excpt='tags',
             num_rows='all')
 
-        # the tags column isn't useful
-        for f in features:
-            del f['tags']
-
-        return features
-
+    @cacheable(query_strategy='create',
+               pathfinder=Cache.pathfinder(file_name_position=2))
     def save_ephys_data(self, specimen_id, file_name):
         """
         Save the electrophysology recordings for a cell as an NWB file.
@@ -176,9 +175,6 @@ class CellTypesApi(RmaApi):
         file_name: str
             Path to save the NWB file.
         """
-
-        Manifest.safe_make_parent_dirs(file_name)
-
         criteria = '[id$eq%d],ephys_result(well_known_files(well_known_file_type[name$eq%s]))' % (
             specimen_id, self.NWB_FILE_TYPE)
         includes = 'ephys_result(well_known_files(well_known_file_type))'
