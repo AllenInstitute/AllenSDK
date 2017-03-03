@@ -237,16 +237,14 @@ class Cache(object):
     @staticmethod
     def cache_csv_json():
         return {
-             'writer': lambda p, x : x.to_csv(p),
-             'reader': pd.DataFrame.from_csv,
-             'post': lambda x: x.to_dict('records')
+             'writer': lambda p, x : pd.DataFrame(x).to_csv(p),
+             'reader': lambda f: pd.DataFrame.from_csv(f).to_dict('records')
         }
 
     @staticmethod
     def cache_csv_dataframe():
         return {
-             'pre': pd.DataFrame,
-             'writer': lambda p, x : x.to_csv(p),
+             'writer': lambda p, x : pd.DataFrame(x).to_csv(p),
              'reader' : pd.DataFrame.from_csv
         }
 
@@ -418,7 +416,13 @@ def cacheable(query_strategy=None,
         @functools.wraps(func)
         def w(*args,
               **kwargs):
+            if decor.pathfinder and not 'pathfinder' in kwargs:
+                pathfinder = decor.pathfinder
+            else:
+                pathfinder = kwargs.pop('pathfinder', None)
 
+            if pathfinder and not 'path' in kwargs:
+                kwargs['path'] = pathfinder(*args)
             if decor.query_strategy and not 'query_strategy' in kwargs:
                 kwargs['query_strategy'] = decor.query_strategy
             if decor.pre and not 'pre' in kwargs:
@@ -429,12 +433,6 @@ def cacheable(query_strategy=None,
                 kwargs['reader'] = decor.reader
             if decor.post and not 'post in kwargs':
                 kwargs['post'] = decor.post
-
-            if decor.pathfinder and not 'pathfinder' in kwargs:
-                pathfinder = decor.pathfinder
-
-            if pathfinder and not 'path' in kwargs:
-                kwargs['path'] = pathfinder(*args)
 
             result = Cache.cacher(func,
                                   *args,
