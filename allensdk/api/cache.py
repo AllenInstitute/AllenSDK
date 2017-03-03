@@ -454,6 +454,10 @@ def cacheable(query_strategy=None,
         @functools.wraps(func)
         def w(*args,
               **kwargs):
+            if decor.pathfinder and not 'pathfinder' in kwargs:
+                pathfinder = decor.pathfinder
+            else:
+                pathfinder = kwargs.pop('pathfinder', None)
 
             if pathfinder and not 'path' in kwargs:
                 found_path = pathfinder(*args)
