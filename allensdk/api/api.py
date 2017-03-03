@@ -22,7 +22,6 @@ import logging
 import os
 import errno
 import warnings
-from allensdk.deprecated import deprecated
 
 
 class Api(object):

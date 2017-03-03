@@ -21,7 +21,10 @@ from allensdk.api.queries.rma_api import RmaApi
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
 import pandas as pd
-import StringIO
+try:
+    import StringIO
+except:
+    import io as StringIO
 import os
 
 

@@ -1,7 +1,7 @@
 #
 # A Docker image for running allensdk with neuronal network simulations
 #
-# docker build --tag alleninstitute/allensdk:neuralensemble_1370 .
+# docker build --tag alleninstitute/neuralensemble_py3_1370 .
 # docker run -it alleninstitute/allensdk:neuralensemble_1370 /bin/bash
 # source ~/env/neurosci/bin/activate
 #
@@ -11,12 +11,14 @@ MAINTAINER Tim Fliss <timf@alleninstitute.org>
 USER root
 
 # http://micro.stanford.edu/wiki/Install_HDF5
-RUN apt-get install -yq \
+RUN apt-get update; \
+    apt-get install -yq \
     pkg-config \
     libhdf5-dev \
     hdf5-tools \
     libfreetype6-dev \
-    unzip
+    python-skimage \
+    cython
 
 ENV NRN=nrn-$NRN_VER NRN_RELEASE=7.4.rel-1370
 
@@ -39,7 +41,9 @@ USER docker
 WORKDIR /home/docker
 
 COPY requirements.txt test_requirements.txt ./
-RUN $VENV/bin/pip install -r requirements.txt; \
+
+RUN $VENV/bin/pip install --upgrade pip; \
+    $VENV/bin/pip install -r requirements.txt; \
     $VENV/bin/pip install -r test_requirements.txt
 
 RUN cd $VENV/bin; ln -s ../x86_64/bin/nrniv

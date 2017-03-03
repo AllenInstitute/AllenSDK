@@ -19,8 +19,8 @@ import numpy as np
 import h5py
 from .stimulus_analysis import StimulusAnalysis
 from .brain_observatory_exceptions import MissingStimulusException
-import stimulus_info as stiminfo
-import circle_plots as cplots
+from . import stimulus_info as stiminfo
+from . import circle_plots as cplots
 
 class NaturalMovie(StimulusAnalysis):
     """ Perform tuning analysis specific to natural movie stimulus.
@@ -164,6 +164,6 @@ class NaturalMovie(StimulusAnalysis):
                 nm._binned_dx_vis = f["analysis/binned_dx_vis"].value
                 nm._binned_cells_vis = f["analysis/binned_cells_vis"].value
         except Exception as e:
-            raise MissingStimulusException(e.message)
+            raise MissingStimulusException(e.args)
 
         return nm
