@@ -180,6 +180,8 @@ class MouseConnectivityCache(Cache):
                                         self.PROJECTION_DENSITY_KEY,
                                         experiment_id,
                                         self.resolution)
+                                        
+        print(file_name)
         self.api.download_projection_density(
             file_name, experiment_id, self.resolution)
 
