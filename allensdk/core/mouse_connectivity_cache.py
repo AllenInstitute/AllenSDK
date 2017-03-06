@@ -292,13 +292,12 @@ class MouseConnectivityCache(Cache):
         file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
 
         return OntologiesApi(self.api.api_url).get_structures_with_sets(
-            structure_graph_ids=1,
             query_strategy='lazy',
             path=file_name,
-            file_type='json',
-            dataframe=False, 
             pre=StructureTree.clean_structures, 
-            post=StructureTree)
+            post=StructureTree, 
+            structure_graph_ids=1,
+            **Cache.cache_json())
 
     @deprecated('Use get_structure_tree instead.')
     def get_ontology(self, file_name=None):
@@ -335,8 +334,7 @@ class MouseConnectivityCache(Cache):
             1,
             query_strategy='lazy',
             path=file_name,
-            file_type='csv',
-            dataframe=True)
+            **Cache.cache_csv_dataframe())
 
 
     def get_experiments(self, dataframe=False, file_name=None, cre=None, injection_structure_ids=None):
@@ -424,9 +422,10 @@ class MouseConnectivityCache(Cache):
                 'transgenic-line'] in cre]
 
         if injection_structure_ids is not None:
-            descendant_ids = reduce(op.add, self.get_structure_tree().descendant_ids(injection_structure_ids))
-            experiments = [e for e in experiments if e[
-                'structure-id'] in descendant_ids]
+            descendant_ids = reduce(op.add, self.get_structure_tree()\
+                                    .descendant_ids(injection_structure_ids))
+            experiments = [e for e in experiments 
+                           if e['structure-id'] in descendant_ids]
 
         return experiments
 
@@ -480,16 +479,15 @@ class MouseConnectivityCache(Cache):
                                       include_descendants=include_descendants, 
                                       hemisphere_ids=hemisphere_ids)
                                       
-        col_rn = lambda x: x.rename(columns={'section_data_set_id': 
-                                             'experiment_id'})
+        col_rn = lambda x: pd.DataFrame(x).rename(columns={
+            'section_data_set_id': 'experiment_id'})
                                       
         return self.api.get_structure_unionizes([experiment_id], 
                                                 path=file_name,
                                                 query_strategy='lazy',  
-                                                file_type='csv', 
-                                                dataframe=True, 
                                                 pre=col_rn, 
-                                                post=filter_fn)
+                                                post=filter_fn, 
+                                                **Cache.cache_csv_dataframe())
 
     def filter_structure_unionizes(self, unionizes, 
                                    is_injection=None, 
@@ -620,6 +618,8 @@ class MouseConnectivityCache(Cache):
                     {'hemisphere_id': hid, 'structure_id': sid, 'label': label})
                 cidx += 1
 
+        print(column_lookup)
+
         for _, row in unionizes.iterrows():
             ridx = row_lookup[row['experiment_id']]
             k = (row['hemisphere_id'], row['structure_id'])
@@ -664,6 +664,8 @@ class MouseConnectivityCache(Cache):
                               self.get_annotation_volume(annotation_file_name)[0], 
                               [self.resolution] * 3)
 
+    @deprecated('In the future, this functionality '
+                'will be moved over to a ReferenceSpaceCache.')
     def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
         """
         Read a 3D numpy array shaped like the annotation volume that has non-zero values where
@@ -704,6 +706,8 @@ class MouseConnectivityCache(Cache):
 
             return mask, None
 
+    @deprecated('In the future, this functionality '
+                'will be moved over to ReferenceSpace.')
     def make_structure_mask(self, structure_ids, annotation):
         """
         Look at an annotation volume and identify voxels that have values
@@ -804,10 +808,3 @@ class MouseConnectivityCache(Cache):
 
         manifest_builder.write_json_file(file_name)
         
-        
-def write_nrrd_return_cb(pather, structure_id, structure_mask):
-    nrrd.write(pather(structure_id), structure_mask)
-    return structure_mask
-    
-def write_nrrd_cb(pather, structure_id, structure_mask):
-    nrrd.write(pather(structure_id), structure_mask)

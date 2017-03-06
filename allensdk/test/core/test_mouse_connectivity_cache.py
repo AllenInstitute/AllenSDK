@@ -8,8 +8,10 @@ import pytest
 
 import numpy as np
 import nrrd
+import pandas as pd
 
 from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
+from allensdk.core.structure_tree import StructureTree
 
 
 @pytest.fixture(scope='function')
@@ -52,6 +54,58 @@ def mcc(test_dir):
     return MouseConnectivityCache(manifest_file=manifest_path)
     
     
+@pytest.fixture(scope='function')
+def new_nodes():
+
+    return [{'id': 0, 'structure_id_path': '/0/', 
+             'color_hex_triplet': '000000', 'acronym': 'rt', 
+             'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}]
+             
+
+@pytest.fixture(scope='function')
+def old_nodes():
+
+    return [{'id': 0, 'structure_id_path': '/0/', 
+             'color_hex_triplet': '000000', 'acronym': 'rt', 
+             'name': 'root', 'parent_structure_id': 12}]
+             
+             
+@pytest.fixture(scope='function')
+def experiments():
+
+    return [{'num-voxels': 100, 'injection-volume': 99, 'sum': 98, 
+             'name': 'foo', 'transgenic-line': 'most_creish', 
+             'structure-id': 97,}]
+             
+             
+@pytest.fixture(scope='function')
+def unionizes():
+
+    # note that I've mucked around with these values a bit
+    return [{"hemisphere_id": 1, "id": 169991412, "is_injection": False,
+             "max_voxel_density": 0.284863, "max_voxel_x": 7700, 
+             "max_voxel_y": 6500, "max_voxel_z": 5000, 
+             "normalized_projection_volume": 0.0, 
+             "projection_density": 0.116754, "projection_energy": 30.7332,
+             "projection_intensity": 263.231, "projection_volume": 0.0018718,
+             "section_data_set_id": 166218353, "structure_id": 1,
+             "sum_pixel_intensity": 99234900.0, "sum_pixels": 1308740.0,
+             "sum_projection_pixel_intensity": 40221700.0,
+             "sum_projection_pixels": 152800.0,
+             "volume": 0.016032},
+            {"hemisphere_id": 2, "id": 169991601, "is_injection": False,
+             "max_voxel_density": 0.0614783, "max_voxel_x": 7500,
+             "max_voxel_y": 4900, "max_voxel_z": 1700,
+             "normalized_projection_volume": 0.0, 
+             "projection_density": 0.0168009,
+             "projection_energy": 1.96084, "projection_intensity": 116.71,
+             "projection_volume": 0.00148144, 
+             "section_data_set_id": 166218353, "structure_id": 60,
+             "sum_pixel_intensity": 261941000.0, "sum_pixels": 7198050.0,
+             "sum_projection_pixel_intensity": 14114200.0,
+             "sum_projection_pixels": 120934.0, "volume": 0.0881761}]
+    
+    
 def test_init(mcc, test_dir):
 
     manifest_path = os.path.join(test_dir, 'manifest.json')
@@ -90,7 +144,6 @@ def test_get_projection_density(mcc, test_dir):
     path = os.path.join(test_dir, 'experiment_{0}'.format(eid), 
                         'projection_density_25.nrrd')
                         
-#    mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
     with mock.patch('allensdk.api.queries.grid_data_api.GridDataApi.'
                     'retrieve_file_over_http', 
                     new=lambda a, b, c: nrrd.write(c, eye)):
@@ -148,66 +201,175 @@ def test_get_data_mask(mcc, test_dir):
     assert( os.path.exists(path) )
     
     
-def test_get_structure_tree(mcc, test_dir):
-
-    dirty_node = {'id': 0, 'structure_id_path': '/0/', 
-                  'color_hex_triplet': '000000', 'acronym': 'rt', 
-                  'name': 'root', 'structure_sets':[{'id': 1}, {'id': 4}]}
+def test_get_structure_tree(mcc, test_dir, new_nodes):
             
     path = os.path.join(test_dir, 'structures.json')
     
     with mock.patch('allensdk.api.queries.ontologies_api.'
                     'OntologiesApi.model_query', 
-                    return_value=dirty_node):
+                    return_value=new_nodes):
                     
         obtained = mcc.get_structure_tree()
         
-    assert(len(obtained.nodes()) == 1)
+    assert(obtained.node_ids()[0] == 0)
     assert( os.path.exists(path) )
     
     
-#def test_get_ontology(mcc, test_dir):
+def test_get_ontology(mcc, test_dir, old_nodes):
 
-#    with warnings.catch_warnings(record=True) as c:
-#        warnings.simplefilter('always')
+    with warnings.catch_warnings(record=True) as c:
+        warnings.simplefilter('always')
 
-#        with mock.patch('allensdk.api.queries.ontologies_api.'
-#                        'OntologiesApi.model_query', 
-#                        return_value=[1, 2]):
-#                
-#            mcc.get_ontology()
-#    
-#            assert(len(c) == 3)
-#            
-#            
-#def test_get_structures(mcc, test_dir):
+        with mock.patch('allensdk.api.queries.ontologies_api.'
+                        'OntologiesApi.model_query', 
+                        return_value=old_nodes):
+                
+            mcc.get_ontology()
+    
+            assert(len(c) == 3)
+            
+            
+def test_get_structures(mcc, test_dir, old_nodes):
 
-#    with warnings.catch_warnings(record=True) as c:
-#        warnings.simplefilter('always')
 
-#        with mock.patch('allensdk.api.queries.ontologies_api.'
-#                        'OntologiesApi.model_query', 
-#                        return_value=[1, 2]):
-#                
-#            mcc.get_structures()
-#    
-#            assert(len(c) == 1)
-#            
-#            
-#def test_get_experiments(mcc, test_dir):
+    with warnings.catch_warnings(record=True) as c:
+        warnings.simplefilter('always')
 
-#    experiments = [{'num-voxels': 100, 'injection-volume': 99, 'sum': 98, 
-#                    'name': 'foo', 'transgenic-line': 'most_creish', 
-#                    'structure-id': 97,}]
-#    file_path = os.path.join(test_dir, 'experiments.json')
-#    
-#    mcc.api.service_query = lambda a, b: experiments    
-#    obtained = mcc.get_experiments()
-#    
-#    assert( os.path.exists(file_path) )
-#    assert( 'num_voxels' not in obtained[0] )
+        with mock.patch('allensdk.api.queries.ontologies_api.'
+                        'OntologiesApi.model_query', 
+                        return_value=old_nodes):
+                
+            obtained = mcc.get_structures()
+    
+            assert( obtained.loc[0, 'acronym'] == old_nodes[0]['acronym'] )
+            assert(len(c) == 1)
+            
+            
+def test_get_experiments(mcc, test_dir, experiments):
+
+    file_path = os.path.join(test_dir, 'experiments.json')
+    
+    mcc.api.service_query = lambda a, parameters: experiments    
+    obtained = mcc.get_experiments()
+    
+    assert( os.path.exists(file_path) )
+    assert( 'num_voxels' not in obtained[0] )
+    assert( obtained[0]['transgenic-line'] == 'most_creish' ) 
     
     
-#def test_filter_experiments(mcc, test_dir):
+def test_filter_experiments(mcc, test_dir, experiments):
+
+    pass_line = mcc.filter_experiments(experiments, cre=True)
+    fail_line = mcc.filter_experiments(experiments, cre=False)
+    
+    assert( len(pass_line) == 1 )
+    assert( len(fail_line) == 0 )
 
 
+def test_get_experiment_structure_unionizes(mcc, test_dir, unionizes):
+
+    eid = 166218353
+    path = os.path.join(test_dir, 'experiment_{0}'.format(eid), 
+                        'structure_unionizes.csv')
+
+    mcc.api.model_query = lambda *args, **kwargs: unionizes
+    obtained = mcc.get_experiment_structure_unionizes(eid)
+        
+    assert( obtained.loc[0, 'projection_intensity'] == 263.231 )
+    assert( os.path.exists(path) )
+
+
+def test_filter_structure_unionizes(mcc, unionizes):
+
+    obtained = mcc.filter_structure_unionizes(pd.DataFrame(unionizes), 
+                                              hemisphere_ids=[1])
+
+    assert( obtained.loc[0, 'volume'] == 0.016032 )
+    
+
+def test_get_structure_unionizes(mcc, unionizes):
+
+    mcc.get_experiment_structure_unionizes = \
+        lambda *a, **k: pd.DataFrame(unionizes)
+    obtained = mcc.get_structure_unionizes([1, 2, 3])
+    
+    assert( obtained.shape[0] == 6 )
+    
+    
+def test_get_projection_matrix(mcc):
+    # yup
+    
+    unionizes = [{'experiment_id': 1, 
+                  'structure_id': 2, 
+                  'hemisphere_id': 1, 
+                  'value': 30},
+                 {'experiment_id': 1, 
+                  'structure_id': 2, 
+                  'hemisphere_id': 2, 
+                  'value': 40},]
+    
+    mcc.get_structure_unionizes = lambda *a, **k: pd.DataFrame(unionizes)
+    
+    class FakeTree(object):
+        def value_map(*a, **k):
+            return {1: 'one', 2: 'two'}
+    mcc.get_structure_tree = lambda *a, **k: FakeTree()
+    
+    obtained = mcc.get_projection_matrix([1], [2], [1, 2], ['value'])
+    
+    assert( np.allclose(obtained['matrix'], np.array([[30, 40]])) )
+    assert( np.array_equal([ii['label'] for ii in obtained['columns']], 
+                           ['two-L', 'two-R']) )
+                           
+                           
+def test_get_reference_space(mcc, new_nodes):
+
+    tree = StructureTree(StructureTree.clean_structures(new_nodes))
+    mcc.get_structure_tree = lambda *a, **k: tree
+    
+    annot = np.arange(125).reshape((5, 5, 5))
+    mcc.get_annotation_volume = lambda *a, **k: (annot, 'foo')
+    
+    rsp_obt = mcc.get_reference_space()
+    
+    assert( np.allclose(rsp_obt.resolution, [25, 25, 25]) )
+    assert( np.allclose( rsp_obt.annotation, annot ) ) 
+
+
+def test_get_structure_mask(mcc, test_dir):
+
+    class FakeTree(object):
+        def descendant_ids(self, list_of_things):
+            return [list_of_things]
+    mcc.get_structure_tree = lambda *a, **k: FakeTree()
+
+    annot = np.arange(125).reshape((5, 5, 5))
+    mcc.get_annotation_volume = lambda *a, **k: (annot, 'foo')
+    
+    path = os.path.join(test_dir, 'annotation', 'ccf_2016', 'structure_masks', 
+                        'resolution_25', 'structure_{0}.nrrd'.format(12))
+
+    with warnings.catch_warnings(record=True) as c:
+        warnings.simplefilter('always')
+    
+        mask, _ = mcc.get_structure_mask(12)
+        
+        
+    assert( mask.sum() == 1 )
+    assert( len(c) == 2 )
+    assert( os.path.exists(path) )
+    
+    
+def test_make_structure_mask(mcc):
+
+    annot = np.arange(125).reshape((5, 5, 5))
+    sids = [0, 1, 2, 3, 4]
+    
+    with warnings.catch_warnings(record=True) as c:
+        warnings.simplefilter('always')
+    
+        mask = mcc.make_structure_mask(sids, annot)
+        
+    assert(len(c) == 1)
+    assert( mask.sum() == 5 )
+    

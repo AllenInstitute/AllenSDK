@@ -131,7 +131,8 @@ class OntologiesApi(RmaTemplate):
                        structure_set_names=None,
                        order=['structures.graph_order'],
                        num_rows='all',
-                       count=False):
+                       count=False,
+                       **kwargs):
         '''Retrieve data about anatomical structures.
 
         Parameters
