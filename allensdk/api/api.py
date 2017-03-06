@@ -335,12 +335,11 @@ class Api(object):
         self._log.info("Downloading URL: %s", url)
         
         if post is False:
-            data = json_utilities.read_url(
+            data = json_utilities.read_url_get(
                 requests.utils.quote(url,
-                                     ';/?:@&=+$,'),
-                'GET')
+                                     ';/?:@&=+$,'))
         else:
-            data = json_utilities.read_url(url, 'POST')
+            data = json_utilities.read_url_post(url)
 
         return data
 

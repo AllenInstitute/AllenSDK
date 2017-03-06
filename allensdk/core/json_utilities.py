@@ -50,7 +50,10 @@ def write(file_name, obj):
 
 def write_string(obj):
     """ Shortcut for writing JSON to a string.  This also takes care of serializing numpy and data types. """
-    return json.dumps(obj, indent=2, default=json_handler)
+    return json.dumps(obj,
+                      indent=2,
+                      allow_nan=False,
+                      default=json_handler)
 
 
 def read_url(url, method='POST'):

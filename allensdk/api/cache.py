@@ -234,14 +234,20 @@ class Cache(object):
         reader = kwargs.pop('reader', None)
         writer = kwargs.pop('writer', None)
 
+        if query_strategy is None:
+            if writer or path:
+                query_strategy = 'lazy'
+            else:
+                query_strategy = 'pass_through'
+
+        if not query_strategy in ['lazy', 'pass_through', 'file', 'create']:
+            raise ValueError("Unknown query strategy: {}.".format(query_strategy))
+
         if 'lazy' == query_strategy:
             if os.path.exists(path):
                 query_strategy = 'file'
             else:
                 query_strategy = 'create'
-
-        if query_strategy is None:
-            query_strategy = 'pass_through'
 
         if query_strategy == 'pass_through':
                 data = fn(*args, **kwargs)
@@ -454,6 +460,10 @@ def cacheable(query_strategy=None,
         @functools.wraps(func)
         def w(*args,
               **kwargs):
+            if decor.pathfinder and not 'pathfinder' in kwargs:
+                pathfinder = decor.pathfinder
+            else:
+                pathfinder = kwargs.pop('pathfinder', None)
 
             if pathfinder and not 'path' in kwargs:
                 found_path = pathfinder(*args)
