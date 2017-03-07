@@ -181,7 +181,6 @@ class MouseConnectivityCache(Cache):
                                         experiment_id,
                                         self.resolution)
                                         
-        print(file_name)
         self.api.download_projection_density(
             file_name, experiment_id, self.resolution)
 
@@ -617,8 +616,6 @@ class MouseConnectivityCache(Cache):
                 columns.append(
                     {'hemisphere_id': hid, 'structure_id': sid, 'label': label})
                 cidx += 1
-
-        print(column_lookup)
 
         for _, row in unionizes.iterrows():
             ridx = row_lookup[row['experiment_id']]

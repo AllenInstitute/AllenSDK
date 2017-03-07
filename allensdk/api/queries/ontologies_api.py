@@ -282,7 +282,7 @@ class OntologiesApi(RmaTemplate):
         return self.template_query('ontology_queries',
                                    'structure_graphs_list')
 
-    @cacheable
+    @cacheable()
     def get_structure_sets(self, structure_set_ids=None):
 
         if structure_set_ids is None:
