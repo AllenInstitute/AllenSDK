@@ -3,7 +3,6 @@ import pytest
 import mock
 import numpy as np
 
-from allensdk.api.queries.ontologies_api import OntologiesApi
 from allensdk.core.reference_space import ReferenceSpace
 from allensdk.core.structure_tree import StructureTree
 

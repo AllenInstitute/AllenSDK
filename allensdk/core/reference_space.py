@@ -251,9 +251,5 @@ class ReferenceSpace(object):
         
         return ReferenceSpace(self.structure_tree, target, target_resolution)
         
-    
-# An example for many_structure_masks. Use by currying  a la:
-# from functools import partial
-# output_cb = functools.partial(write_nrrd_cb, my_out_dir, my_iso_res)
 
 
