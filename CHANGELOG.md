@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [0.12.x] - TBD
 
+
+### Added
+
+- ReferenceSpace is a new class for relating structure graphs and annotation volumes.
+
+### Changed
+
+- Ontology has been deprecated in favor of StructureTree. 
+
 ### Fixed
 
 - MouseConnectivityCache's manifest now uses CCF-version- and resolution-specific file names for masks.  The masks now live inside the CCF version directory.

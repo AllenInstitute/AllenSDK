@@ -61,6 +61,13 @@ def test_get_colormap(tree):
     assert( obtained[0] == '000000' )
     assert( obtained[2] == 'ffffff' )   
     
+    
+def test_get_name_map(tree):
+    
+    obtained = tree.get_name_map()
+    assert( obtained[0] == 'root' )
+    assert( obtained[2] == 'beta' )  
+    
 
 def test_get_ancestor_id_map(tree):
 

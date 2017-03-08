@@ -138,6 +138,20 @@ class StructureTree( SimpleTree ):
     
         return self.value_map(lambda x: x['id'], 
                               lambda y: y['color_hex_triplet'])
+                              
+                              
+    def get_name_map(self):
+        '''Get a dictionary mapping structure ids to names across all nodes.
+        
+        Returns
+        -------
+        dict : 
+            Keys are structure ids. Values are structure name strings.
+        
+        '''
+    
+        return self.value_map(lambda x: x['id'], 
+                              lambda y: y['name'])
         
         
     def get_ancestor_id_map(self):

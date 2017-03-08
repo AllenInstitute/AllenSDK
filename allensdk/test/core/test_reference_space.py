@@ -116,7 +116,7 @@ def test_validate_structures(rsp):
 
 def test_downsample(rsp):
     
-    target = rsp.downsample((10, 5, 5))
+    target = rsp.downsample((10, 20, 20))
     
     assert( np.allclose(target.annotation.shape, [10, 5, 5]) )
     

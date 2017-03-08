@@ -1,10 +1,13 @@
 from __future__ import division, print_function, absolute_import
 from collections import defaultdict
 import operator as op
+import functools
+import os
 
 from scipy.misc import imresize
 from scipy.ndimage.interpolation import zoom
 import numpy as np
+import nrrd
 
 from allensdk.core.structure_tree import StructureTree
 
@@ -153,9 +156,10 @@ class ReferenceSpace(object):
         ----------
         structure_ids : list of int
             Specify structures to be masked
-        output_cb : function | structure_id, structure_mask => ?
-            Will be applied to each id and mask. The default just gives you 
-            structure mask ndarrays.
+        output_cb : function, optional
+            Must have the following signature: output_cb(structure_id, fn). 
+            On each requested id, fn will be curried to make a mask for that 
+            id. Defaults to returning the structure id and mask.
         direct_only : bool, optional
             If True, only include voxels directly assigned to a structure in 
             the mask. Otherwise include voxels assigned to descendants.
@@ -175,12 +179,12 @@ class ReferenceSpace(object):
         '''
         
         if output_cb is None:
-            output_cb = lambda structure_id, structure_mask: \
-                               (structure_id, structure_mask)
-        
+            output_cb = ReferenceSpace.return_mask_cb
+                                              
         for stid in structure_ids:
-            yield output_cb(stid, self.make_structure_mask([stid], 
-                            direct_only))
+            yield output_cb(stid, functools.partial(self.make_structure_mask, 
+                                                    [stid], direct_only))
+
 
     def check_coverage(self, structure_ids, domain_mask):
         '''Determines whether a spatial domain is completely covered by 
@@ -197,12 +201,13 @@ class ReferenceSpace(object):
         Returns
         -------
         numpy ndarray : 
-            Indicator for missing voxels.
+            1 where voxels are missing from the candidate, 0 where the 
+            candidate exceeds the domain
         
         '''
     
         candidate_mask = self.make_structure_mask(structure_ids)
-        return np.logical_and(domain_mask, np.logical_not(candidate_mask))
+        return domain_mask - candidate_mask
         
     def validate_structures(self, structure_ids, domain_mask):
         '''Determines whether a set of structures produces an exact and 
@@ -245,11 +250,30 @@ class ReferenceSpace(object):
         
         '''
         
-        factors = [ float(jj / ii) for ii, jj in zip(self.resolution, 
+        factors = [ float(ii / jj) for ii, jj in zip(self.resolution, 
                                                      target_resolution)]
         target = zoom(self.annotation, factors, order=0)
         
         return ReferenceSpace(self.structure_tree, target, target_resolution)
         
 
+    @staticmethod
+    def return_mask_cb(structure_id, fn):
+        '''A basic callback for many_structure_masks
+        '''
+    
+        return structure_id, fn()
+        
+        
+    @staticmethod
+    def check_and_write(base_dir, structure_id, fn):
+        '''A many_structure_masks callback that writes the mask to a nrrd file 
+        if the file does not already exist.
+        '''
+    
+        mask_path = os.path.join(base_dir, 
+                                 'structure_{0}.nrrd'.format(structure_id))
+        
+        if not os.path.exists(mask_path):
+            nrrd.write(mask_path, fn())
 
