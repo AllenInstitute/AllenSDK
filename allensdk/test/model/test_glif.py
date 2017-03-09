@@ -32,7 +32,7 @@ def glif_api():
 
 @pytest.fixture
 def neuronal_model_id():
-    neuronal_model_id = 472423251
+    neuronal_model_id = 566302806
 
     return neuronal_model_id
 
