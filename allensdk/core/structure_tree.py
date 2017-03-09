@@ -125,7 +125,7 @@ class StructureTree( SimpleTree ):
         return self.filter_nodes(overlap)
         
         
-    def get_colormap(self,):
+    def get_colormap(self):
         '''Get a dictionary mapping structure ids to colors across all nodes.
         
         Returns
