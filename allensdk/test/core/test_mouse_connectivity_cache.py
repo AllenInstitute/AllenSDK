@@ -1,3 +1,11 @@
+import sys
+
+if not 'reload' in globals():
+    from importlib import reload
+
+for k, v in sys.modules.items():
+    v = reload(v)
+
 import os
 import shutil
 import itertools as it
@@ -14,7 +22,6 @@ from allensdk.core.mouse_connectivity_cache import MouseConnectivityCache
 from allensdk.core.structure_tree import StructureTree
 
 from allensdk.test_utilities.temp_dir import fn_temp_dir
-
 
 
 @pytest.fixture(scope='function')    
