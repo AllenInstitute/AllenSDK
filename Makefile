@@ -17,11 +17,10 @@ build:
 	mkdir -p $(DISTDIR)/$(PROJECTNAME) 
 	cp -r allensdk setup.py README.md $(DISTDIR)/$(PROJECTNAME)/
 	cd $(DISTDIR); tar czvf $(PROJECTNAME).tgz --exclude .git $(PROJECTNAME)
-	
 
 distutils_build: clean
 	python setup.py build
-	
+
 setversion:
 	sed -i --expression 's/'\''[0-9]\+.[0-9]\+.[0-9]\+'\''/'\''${VERSION}.${RELEASE}'\''/g' allensdk/__init__.py
 
@@ -63,7 +62,7 @@ doc: FORCE
 ifdef STATIC
 	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html
 	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
-	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_static/external_assets/javascript/portal.js
+	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalFooter.html
 endif
 	cd $(EXAMPLES)/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
 	cd $(EXAMPLES)/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
