@@ -81,7 +81,7 @@ class GlifApi(RmaTemplate):
 
         return return_dict
 
-    @deprecated
+    @deprecated()
     def list_neuronal_models(self):
         ''' DEPRECATED Query the API for a list of all GLIF neuronal models.
 
@@ -97,7 +97,7 @@ class GlifApi(RmaTemplate):
                                 include=include,
                                 num_rows='all')
 
-    @deprecated
+    @deprecated()
     def get_neuronal_model(self, neuronal_model_id):
         '''DEPRECATED Query the current RMA endpoint with a neuronal_model id
         to get the corresponding well known files and meta data.
@@ -172,7 +172,7 @@ class GlifApi(RmaTemplate):
 
         return self.metadata
 
-    @deprecated
+    @deprecated()
     def get_ephys_sweeps(self):
         ''' DEPRECATED Retrieve ephys sweep information out of downloaded metadata for a neuronal model
 
@@ -184,7 +184,7 @@ class GlifApi(RmaTemplate):
 
         return self.ephys_sweeps
 
-    @deprecated
+    @deprecated()
     def get_neuron_config(self, output_file_name=None):
         ''' DEPRECATED Retrieve a model configuration file from the API, optionally save it to disk, and
         return the contents of that file as a dictionary.
@@ -209,7 +209,7 @@ class GlifApi(RmaTemplate):
 
         return neuron_config
 
-    @deprecated
+    @deprecated()
     def cache_stimulus_file(self, output_file_name):
         ''' DEPRECATED Download the NWB file for the current neuronal model and save it to a file.
 

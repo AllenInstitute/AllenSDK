@@ -341,7 +341,7 @@ class Cache(object):
             return file_name
         return pf
 
-    @deprecated
+    @deprecated()
     def wrap(self, fn, path, cache,
              save_as_json=True,
              return_dataframe=False,
