@@ -1,11 +1,3 @@
-import sys
-
-if not 'reload' in globals():
-    from importlib import reload
-
-for k, v in sys.modules.items():
-    v = reload(v)
-
 import os
 import shutil
 import itertools as it

@@ -58,8 +58,8 @@ def test_get_structures_by_set_id(tree):
 def test_get_colormap(tree):
     
     obtained = tree.get_colormap()
-    assert( obtained[0] == '000000' )
-    assert( obtained[2] == 'ffffff' )   
+    assert( allclose(obtained[0], [0, 0, 0]) )
+    assert( allclose(obtained[2], [255, 255, 255]) )   
     
     
 def test_get_name_map(tree):
@@ -67,6 +67,12 @@ def test_get_name_map(tree):
     obtained = tree.get_name_map()
     assert( obtained[0] == 'root' )
     assert( obtained[2] == 'beta' )  
+    
+    
+def test_get_id_acronym_map(tree):
+    
+    obtained = tree.get_id_acronym_map()
+    assert( obtained['rt'] == 0 )
     
 
 def test_get_ancestor_id_map(tree):
