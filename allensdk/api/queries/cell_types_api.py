@@ -161,7 +161,7 @@ class CellTypesApi(RmaApi):
             excpt='tags',
             num_rows='all')
 
-    @cacheable(query_strategy='create',
+    @cacheable(query_strategy='lazy',
                pathfinder=Cache.pathfinder(file_name_position=2))
     def save_ephys_data(self, specimen_id, file_name):
         """
