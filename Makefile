@@ -64,9 +64,11 @@ doc: FORCE
 	sed -i --expression "s/|version|/${VERSION}/g" doc/conf.py
 	cp -R doc_template/aibs_sphinx/static/* doc/_static
 	cp -R doc_template/aibs_sphinx/templates/* doc/_templates
-	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html
-	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
-	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_static/external_assets/javascript/portal.js
+ifdef STATIC
+	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html
+	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
+	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalFooter.html
+endif
 	cd $(EXAMPLES)/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
 	cd $(EXAMPLES)/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
 	cd doc && make html || true
