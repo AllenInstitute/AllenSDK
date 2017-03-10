@@ -10,6 +10,7 @@ come in future updates.
    brain_observatory
    cell_types
    connectivity
+   reference_space
    data_api_client 
 
 

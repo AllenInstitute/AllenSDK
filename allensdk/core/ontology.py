@@ -18,7 +18,10 @@ from six import string_types
 import numpy as np
 import pandas as pd
 
+from allensdk.deprecated import class_deprecated
 
+
+@class_deprecated('Use StructureTree instead.')
 class Ontology(object):
 
     def __init__(self, df):
