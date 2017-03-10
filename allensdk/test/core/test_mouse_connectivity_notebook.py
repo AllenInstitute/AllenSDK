@@ -1,3 +1,4 @@
+import pytest
 
 import os
 from allensdk.test_utilities.temp_dir import fn_temp_dir
