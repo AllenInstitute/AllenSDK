@@ -17,6 +17,12 @@ def prepend_find_packages(*roots):
         
     return packages
 
+with open('requirements.txt', 'r') as f:
+    required = f.read().splitlines()
+
+with open('test_requirements.txt', 'r') as f:
+    test_required = f.read().splitlines()
+
 setup(
     version = allensdk.__version__,
     name = 'allensdk',
@@ -25,25 +31,9 @@ setup(
     packages = prepend_find_packages('allensdk'),
     package_data={'': ['*.conf', '*.cfg', '*.md', '*.json', '*.dat', '*.env', '*.sh', '*.txt', 'bps', 'Makefile', 'COPYING'] },
     description = 'core libraries for the allensdk.',
-    install_requires = ['h5py>=2.2.1',
-                        'matplotlib>=1.4.0',
-                        'scipy>=0.14.0',
-                        'pandas>=0.14.1',
-                        'jinja2>=2.7.3',
-                        'numpy>=1.8.2',
-                        'six>=1.5.2',
-                        'pynrrd >= 0.2.1',
-                        'future >= 0.14.3',
-                        'requests',
-                        'requests-toolbelt'],
-    tests_require=['pytest>=2.6.3',
-                   'pytest-cov>=2.2.1',
-                   'pytest-cover>=3.0.0',
-                   'pytest-mock>=0.11.0',
-                   'pytest-pep8>=1.0.6',
-                   'coverage>=3.7.1',
-                   'mock>=1.0.1'],
-    setup_requires=['setuptools', 'sphinx', 'numpydoc'],
+    install_requires = required,
+    tests_require=test_required,
+    setup_requires=['setuptools', 'sphinx', 'numpydoc', 'pytest-runner'],
     url='https://github.com/AllenInstitute/AllenSDK/tree/v%s' % (allensdk.__version__),
     download_url = 'https://github.com/AllenInstitute/AllenSDK/tarball/v%s' % (allensdk.__version__),
     keywords = ['neuroscience', 'bioinformatics', 'scientific'  ],

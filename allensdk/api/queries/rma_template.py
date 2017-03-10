@@ -107,6 +107,8 @@ class RmaTemplate(RmaApi):
         elif 'order' in template:
             query_args['order'] = template['order']
 
+        query_args.update(kwargs)
+
         data = self.model_query(**query_args)
 
         return data

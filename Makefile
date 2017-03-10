@@ -17,10 +17,11 @@ build:
 	mkdir -p $(DISTDIR)/$(PROJECTNAME) 
 	cp -r allensdk setup.py README.md $(DISTDIR)/$(PROJECTNAME)/
 	cd $(DISTDIR); tar czvf $(PROJECTNAME).tgz --exclude .git $(PROJECTNAME)
+	
 
 distutils_build: clean
 	python setup.py build
-
+	
 setversion:
 	sed -i --expression 's/'\''[0-9]\+.[0-9]\+.[0-9]\+'\''/'\''${VERSION}.${RELEASE}'\''/g' allensdk/__init__.py
 
@@ -33,11 +34,15 @@ pypi_register:
 pypi_deploy:
 	python setup.py sdist upload --repository https://testpypi.python.org/pypi
 
-pytest:
-	find -L . -name "test_*.py" -exec py.test --boxed --pep8 --cov-config coveragerc --cov=allensdk --cov-report html --junitxml=test-reports/test.xml {} \+
-
 pytest_lax:
-	find -L . -name "test_*.py" -exec py.test --boxed --cov-config coveragerc --cov=allensdk --cov-report html --junitxml=test-reports/test.xml {} \+
+	python setup.py test
+
+pytest: pytest_lax
+
+test: pytest
+
+pytest_pep8:
+	find -L . -name "test_*.py" -exec py.test --boxed --pep8 --cov-config coveragerc --cov=allensdk --cov-report html --junitxml=test-reports/test.xml {} \+
 
 pytest_lite:
 	find -L . -name "test_*.py" -exec py.test --boxed --assert=reinterp --junitxml=test-reports/test.xml {} \+
@@ -59,11 +64,9 @@ doc: FORCE
 	sed -i --expression "s/|version|/${VERSION}/g" doc/conf.py
 	cp -R doc_template/aibs_sphinx/static/* doc/_static
 	cp -R doc_template/aibs_sphinx/templates/* doc/_templates
-ifdef STATIC
-	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html
-	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
-	sed -i --expression "s/\/_static\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalFooter.html
-endif
+	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/layout.html
+	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_templates/portalHeader.html
+	sed -i --expression "s/\/external_assets/${STATIC}\/external_assets/g" doc/_static/external_assets/javascript/portal.js
 	cd $(EXAMPLES)/nb && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
 	cd $(EXAMPLES)/nb/summer_workshop_2015 && find . -maxdepth 1 -name '*.ipynb' -exec jupyter-nbconvert --to html {} \;
 	cd doc && make html || true

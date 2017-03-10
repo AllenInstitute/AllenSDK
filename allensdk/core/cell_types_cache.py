@@ -26,7 +26,6 @@ from . import  swc
 
 import logging
 import warnings
-import pandas as pd
 
 
 class CellTypesCache(Cache):
@@ -227,8 +226,8 @@ class CellTypesCache(Cache):
             reconstructions. Default True.
         """
 
-        ephys_features = pd.DataFrame(self.get_ephys_features())
-        morphology_features = pd.DataFrame(self.get_morphology_features())
+        ephys_features = self.get_ephys_features(dataframe=True)
+        morphology_features = self.get_morphology_features(dataframe=True)
 
         how = 'inner' if require_reconstruction else 'outer'
 
@@ -242,6 +241,9 @@ class CellTypesCache(Cache):
         else:
             return all_features.to_dict('records')
 
+    @cacheable(query_strategy='lazy',
+               reader=NwbDataSet,
+               pathfinder=Cache.pathfinder(file_name_position=2))
     def get_ephys_data(self, specimen_id, file_name=None):
         """
         Download electrophysiology traces for a single cell in the database.
