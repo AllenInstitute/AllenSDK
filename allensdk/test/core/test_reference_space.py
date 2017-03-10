@@ -90,7 +90,6 @@ def test_many_structure_masks_default_cb(rsp):
     
     rsp.make_structure_mask = mock.MagicMock(return_value=2)
     for item in rsp.many_structure_masks([1]):
-        print(item)
         assert( np.allclose(item, [1, 2]) )
     
     
@@ -119,6 +118,16 @@ def test_downsample(rsp):
     target = rsp.downsample((10, 20, 20))
     
     assert( np.allclose(target.annotation.shape, [10, 5, 5]) )
+    
+    
+def test_get_slice_image(rsp):
+
+    cmap = {0: [0, 0, 0], 1: [0, 0, 0], 2: [0, 0, 0], 3: [1, 2, 3], 
+            4: [0, 0, 0], 5: [0, 0, 0], 6: [0, 0, 0], 7: [0, 0, 0], }
+            
+    image = rsp.get_slice_image(0, 90, cmap=cmap)
+    
+    assert( image[:, :, 0].sum() == 4 ) 
     
     
 def test_direct_voxel_map_setter(rsp):

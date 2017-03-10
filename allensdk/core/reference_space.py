@@ -234,6 +234,7 @@ class ReferenceSpace(object):
         return [self.structure_tree.has_overlaps(structure_ids), 
                 self.check_coverage(structure_ids, domain_mask)]
         
+        
     def downsample(self, target_resolution):
         '''Obtain a smaller reference space by downsampling
         
@@ -241,6 +242,9 @@ class ReferenceSpace(object):
         ----------
         target_resolution : tuple of numeric
             Resolution in microns of the output space.
+        interpolator : string
+            Method used to interpolate the volume. Currently only 'nearest' 
+            is supported
             
         Returns
         -------
@@ -252,11 +256,49 @@ class ReferenceSpace(object):
         
         factors = [ float(ii / jj) for ii, jj in zip(self.resolution, 
                                                      target_resolution)]
+                                                     
         target = zoom(self.annotation, factors, order=0)
         
         return ReferenceSpace(self.structure_tree, target, target_resolution)
         
-
+        
+    def get_slice_image(self, axis, position, cmap=None):
+        '''Produce a AxBx3 RGB image from a slice in the annotation
+        
+        Parameters
+        ----------
+        axis : int
+            Along which to slice the annotation volume. 0 is coronal, 1 is 
+            horizontal, and 2 is sagittal.
+        position : int 
+            In microns. Take the slice from this far along the specified axis.
+        cmap : dict, optional
+            Keys are structure ids, values are rgb triplets. Defaults to 
+            structure color_hex_triplets. 
+            
+        Returns
+        -------
+        np.ndarray : 
+            RGB image array. 
+            
+        Notes
+        -----
+        If you assign a custom colormap, make sure that you take care of the 
+        background in addition to the structures.
+        
+        '''
+        
+        if cmap is None:
+            cmap = self.structure_tree.get_colormap()
+            cmap[0] = [0, 0, 0]
+        
+        position = int(np.around(position / self.resolution[axis]))
+        image = np.squeeze(self.annotation.take([position], axis=axis))
+            
+        return np.reshape([cmap[point] for point in image.flat], 
+                      list(image.shape) + [3]).astype(np.uint8)
+            
+            
     @staticmethod
     def return_mask_cb(structure_id, fn):
         '''A basic callback for many_structure_masks
@@ -276,4 +318,6 @@ class ReferenceSpace(object):
         
         if not os.path.exists(mask_path):
             nrrd.write(mask_path, fn())
+            
+        return structure_id
 

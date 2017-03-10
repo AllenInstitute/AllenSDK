@@ -131,13 +131,13 @@ class StructureTree( SimpleTree ):
         Returns
         -------
         dict : 
-            Keys are structure ids. Values are strings containing RGB-order 
-            hexidecimal color.
+            Keys are structure ids. Values are RGB lists of integers.
         
         '''
     
         return self.value_map(lambda x: x['id'], 
-                              lambda y: y['color_hex_triplet'])
+                              lambda y: StructureTree.hex_to_rgb(y['color_hex_triplet']))
+
                               
                               
     def get_name_map(self):
@@ -152,6 +152,20 @@ class StructureTree( SimpleTree ):
     
         return self.value_map(lambda x: x['id'], 
                               lambda y: y['name'])
+        
+        
+    def get_id_acronym_map(self):
+        '''Get a dictionary mapping structure acronyms to ids across all nodes.
+        
+        Returns
+        -------
+        dict : 
+            Keys are structure acronyms. Values are structure ids.
+        
+        '''
+        
+        return self.value_map(lambda x: x['acronym'], 
+                              lambda y: y['id'])
         
         
     def get_ancestor_id_map(self):
@@ -259,11 +273,35 @@ class StructureTree( SimpleTree ):
    
             val['structure_set_ids'] = [sts['id'] for sts in val['structure_sets']]
 
-            structures[ii] = filter_dict(val, *field_whitelist)
+            structures[ii] = StructureTree.filter_dict(val, *field_whitelist)
 
         return structures
+        
+        
+    @staticmethod
+    def hex_to_rgb(hex_color):
+        '''Convert a hexadecimal color string to a uint8 triplet
+        
+        Parameters
+        ----------
+        hex_color : string 
+            Must be 6 characters long, unless it is 7 long and the first 
+            character is #.
+            
+        Returns
+        -------
+        list of int : 
+            3 characters long - 1 per two characters in the input string.
+        
+        '''
+        
+        if hex_color[0] == '#':
+            hex_color = hex_color[1:]
+        
+        return [int(hex_color[a * 2: a*2 + 2], 16) for a in xrange(3)]
 
 
-def filter_dict(dictionary, *pass_keys):
-    return {k:v for k, v in dictionary.iteritems() if k in pass_keys}
+    @staticmethod
+    def filter_dict(dictionary, *pass_keys):
+        return {k:v for k, v in dictionary.iteritems() if k in pass_keys}
     
