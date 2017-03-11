@@ -1,5 +1,4 @@
 coverage==4.1
-mock==2.0.0
 pep8==1.7.0
 pytest==2.9.2
 pytest-cov==2.2.1
