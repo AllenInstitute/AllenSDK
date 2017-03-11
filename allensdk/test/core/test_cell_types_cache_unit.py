@@ -18,7 +18,7 @@ from allensdk.core.cell_types_cache import ReporterStatus as RS
 import pytest
 from pandas.core.frame import DataFrame
 from allensdk.config import enable_console_log
-from mock import MagicMock, patch, call
+from mock import Mock, MagicMock, patch, call
 import itertools as it
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
@@ -157,7 +157,7 @@ def test_sweep_data_with_api(cache_fixture,
         assert not mkd.called
     else:
         # both levels of cacheable methods check if the directory exists.
-        assert mkd.call_args_list == [call(_MOCK_PATH), call(_MOCK_PATH)]
+        assert mkd.call_args_list == [call(_MOCK_PATH)]
         assert query_mock.called
         mock_http.assert_called_once_with('http://api.brain-map.org/path/to/data.nwb',
                                           _MOCK_PATH)
@@ -557,55 +557,15 @@ def test_get_ephys_sweeps_with_api(cache_fixture,
         assert query_mock.called
 
 
-@pytest.mark.parametrize('path_exists,require_reconstruction,df',
+@pytest.mark.parametrize('path_exists,require_reconstruction',
                          it.product((False, True),
-                                    (False, True),
                                     (False, True)))
-def test_get_all_features(cache_fixture,
-                             path_exists,
-                             require_reconstruction,
-                             df):
-    ctc = cache_fixture
-
-    ephys_df = MagicMock(name='ephys')
-    morph_df = MagicMock(name='morph')
-    
-    ephys_fn = \
-        'allensdk.core.cell_types_cache.CellTypesCache.get_ephys_features'
-    morph_fn = \
-        'allensdk.core.cell_types_cache.CellTypesCache.get_morphology_features'
-
-    with patch(ephys_fn,
-               return_value=ephys_df) as ephys_mock:
-        with patch(morph_fn,
-                   return_value=morph_df) as morph_mock:
-            _ = ctc.get_all_features(
-                dataframe=df,
-                require_reconstruction=require_reconstruction)
-    
-    # TODO: convert these to new decorator-style args
-    ephys_mock.assert_called_once_with(dataframe=True)
-    morph_mock.assert_called_once_with(dataframe=True)
-    
-    if require_reconstruction:
-        ephys_df.merge.assert_called_once_with(morph_df,
-                                               how='inner',
-                                               on='specimen_id')
-    else:
-        ephys_df.merge.assert_called_once_with(morph_df,
-                                               how='outer',
-                                               on='specimen_id')
-
-
-@pytest.mark.parametrize('path_exists,require_reconstruction,df',
-                         it.product((False, True),
-                                    (False, True),
-                                    (False, True)))
-def test_get_all_features_with_api(cache_fixture,
-                                   mock_csv,
-                                   path_exists,
-                                   require_reconstruction,
-                                   df):
+@patch('pandas.DataFrame.merge')
+def test_get_all_features(mock_merge,
+                           cache_fixture,
+                           mock_csv_stuff,
+                           path_exists,
+                           require_reconstruction):
     ctc = cache_fixture
 
     sweeps = [1, 2, 3]
@@ -618,16 +578,17 @@ def test_get_all_features_with_api(cache_fixture,
             with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
                 with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
                     with patch('allensdk.core.json_utilities.read',
-                               return_value=['mock_data']) as ju_read:
+                               return_value=return_dicts) as ju_read:
                         with patch('allensdk.core.json_utilities.write') as ju_write:
                             _ = ctc.get_all_features(
-                                dataframe=df,
                                 require_reconstruction=require_reconstruction)
 
     if path_exists:
         assert DataFrame.from_csv.called
     else:
         assert query_mock.called
+    
+    assert mock_merge.called
 
 
 def test_build_manifest(cache_fixture):
