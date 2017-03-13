@@ -90,7 +90,7 @@ See the `mouse connectivity section <connectivity.html>`_ for more details.
 What's New - Release 0.12.5 (March 16th, 2017)
 ------------------------------------------------
 
-The 0.12.5 release features a new set of classes for manipulating structure ontologies (:py:class:`~allensdk.core.structure_tree.StructureTree`) annotated reference spaces like the CCF (:py:class:`~allensdk.core.reference_space.ReferenceSpace`).  These were designed based on feedback from the community that more regular, specifically named functions would be valuable.  The :py:class:`~allensdk.core.ontology.Ontology` class is now deprecated in favor of :py:class:`~allensdk.core.structure_tree.StructureTree`.  Take a look at the `Reference Space documentation page <reference_space.html>`.  
+The 0.12.5 release features a new set of classes for manipulating structure ontologies (:py:class:`~allensdk.core.structure_tree.StructureTree`) annotated reference spaces like the CCF (:py:class:`~allensdk.core.reference_space.ReferenceSpace`).  These were designed based on feedback from the community that more regular, specifically named functions would be valuable.  The :py:class:`~allensdk.core.ontology.Ontology` class is now deprecated in favor of :py:class:`~allensdk.core.structure_tree.StructureTree`.  Take a look at the `Reference Space documentation page <reference_space.html>`_.  
 
 This release also addresses issues from the Github issue tracker:
 
