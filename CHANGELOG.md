@@ -6,11 +6,13 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - ReferenceSpace is a new class for relating structure graphs and annotation volumes.
+- Standardized caching and paging decorators
 
 ### Changed
 
 - Ontology has been deprecated in favor of StructureTree. 
 - MouseConnectivityCache uses StructureTree internally (ontology-based methods are deprecated)
+- CellTypesCache and MouseConnectivityCache use cacher decorator
 
 ### Fixed
 
