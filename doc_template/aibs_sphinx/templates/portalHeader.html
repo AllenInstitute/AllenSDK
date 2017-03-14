@@ -18,11 +18,25 @@
   }
 
   img#portal_logo{
-  content:url("/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;;
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
   }
 
-  #header_content{
-  height:75px !important;;
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent;
   }
 
   #portal_tabs {
