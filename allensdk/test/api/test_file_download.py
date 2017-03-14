@@ -101,7 +101,7 @@ def test_file_download_lazy(mock_imports,
                             file_exists):
     nrrd_read, MCA = mock_imports
 
-    @cacheable(query_strategy='lazy',
+    @cacheable(strategy='lazy',
                reader=nrrd_read,
                pathfinder=Cache.pathfinder(file_name_position=3,
                                            secondary_file_name_position=1))
@@ -128,7 +128,7 @@ def test_file_download_lazy(mock_imports,
                                  MCA.VOXEL_RESOLUTION_10_MICRONS,
                                  'volumetric.nrrd',
                                  MCA.CCF_2016,
-                                 query_strategy='lazy')
+                                 strategy='lazy')
 
     if file_exists:
         assert not mca.retrieve_file_over_http.called, 'server call not needed when file exists'
@@ -175,7 +175,7 @@ def test_file_download_server(mock_imports,
                                  MCA.VOXEL_RESOLUTION_10_MICRONS,
                                  'volumetric.nrrd',
                                  MCA.CCF_2016,
-                                 query_strategy='create')
+                                 strategy='create')
 
     mca.retrieve_file_over_http.assert_called_once_with(
         'http://download.alleninstitute.org/informatics-archive/annotation/ccf_2016/mouse_ccf/average_template/annotation_10.nrrd',
@@ -219,7 +219,7 @@ def test_file_download_cached_file(mock_imports,
                                  MCA.VOXEL_RESOLUTION_10_MICRONS,
                                  'volumetric.nrrd',
                                  MCA.CCF_2016,
-                                 query_strategy='file')
+                                 strategy='file')
 
     assert not mca.retrieve_file_over_http.called, 'server should not have been called'
     assert not Manifest.safe_mkdir.called, 'safe_mkdir should not have been called.'

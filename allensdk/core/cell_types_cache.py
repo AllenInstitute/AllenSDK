@@ -164,7 +164,7 @@ class CellTypesCache(Cache):
                 args = Cache.cache_csv_dataframe()
             else:
                 args = Cache.cache_csv_json()
-            args['query_strategy'] = 'lazy'
+            args['strategy'] = 'lazy'
         else:
             args = Cache.nocache_json()
 
@@ -204,7 +204,7 @@ class CellTypesCache(Cache):
         else:
             args = Cache.nocache_json()
 
-        args['query_strategy'] = 'lazy'
+        args['strategy'] = 'lazy'
         args['path'] = file_name
 
         return self.api.get_morphology_features(**args)

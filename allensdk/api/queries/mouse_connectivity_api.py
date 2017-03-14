@@ -45,7 +45,7 @@ class MouseConnectivityApi(RmaApi):
     VOXEL_RESOLUTION_50_MICRONS = 50
     VOXEL_RESOLUTION_100_MICRONS = 100
 
-    @cacheable(query_strategy='create',
+    @cacheable(strategy='create',
                reader=nrrd.read,
                pathfinder=Cache.pathfinder(file_name_position=3))
     def download_annotation_volume(self,
@@ -77,7 +77,7 @@ class MouseConnectivityApi(RmaApi):
                                       file_name,
                                       reader=None)
 
-    @cacheable(query_strategy='create',
+    @cacheable(strategy='create',
                reader=nrrd.read,
                pathfinder=Cache.pathfinder(file_name_position=2))
     def download_template_volume(self, resolution, file_name):
@@ -261,7 +261,7 @@ class MouseConnectivityApi(RmaApi):
         return url
 
     # TODO: check if this was 'read_by_default'
-    @cacheable(query_strategy='create',
+    @cacheable(strategy='create',
                reader=nrrd.read,
                pathfinder=Cache.pathfinder(file_name_position=4,
                                            secondary_file_name_position=2))
@@ -561,25 +561,25 @@ class MouseConnectivityApi(RmaApi):
             debug=debug,
             count=False)
 
-    @cacheable(query_strategy='lazy', 
+    @cacheable(strategy='lazy', 
                pathfinder=Cache.pathfinder(file_name_position=1))
     def download_injection_density(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
 
-    @cacheable(query_strategy='lazy', 
+    @cacheable(strategy='lazy', 
                pathfinder=Cache.pathfinder(file_name_position=1))
     def download_projection_density(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
 
-    @cacheable(query_strategy='lazy', 
+    @cacheable(strategy='lazy', 
                pathfinder=Cache.pathfinder(file_name_position=1))
     def download_injection_fraction(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
 
-    @cacheable(query_strategy='lazy', 
+    @cacheable(strategy='lazy', 
                pathfinder=Cache.pathfinder(file_name_position=1))
     def download_data_mask(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(

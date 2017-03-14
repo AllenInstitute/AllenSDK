@@ -291,7 +291,7 @@ class MouseConnectivityCache(Cache):
         file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
 
         return OntologiesApi(self.api.api_url).get_structures_with_sets(
-            query_strategy='lazy',
+            strategy='lazy',
             path=file_name,
             pre=StructureTree.clean_structures, 
             post=StructureTree, 
@@ -331,7 +331,7 @@ class MouseConnectivityCache(Cache):
 
         return OntologiesApi(base_uri=self.api.api_url).get_structures(
             1,
-            query_strategy='lazy',
+            strategy='lazy',
             path=file_name,
             **Cache.cache_csv_dataframe())
 
@@ -483,7 +483,7 @@ class MouseConnectivityCache(Cache):
                                       
         return self.api.get_structure_unionizes([experiment_id], 
                                                 path=file_name,
-                                                query_strategy='lazy',  
+                                                strategy='lazy',  
                                                 pre=col_rn, 
                                                 post=filter_fn, 
                                                 **Cache.cache_csv_dataframe())

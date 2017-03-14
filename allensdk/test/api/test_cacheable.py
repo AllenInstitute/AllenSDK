@@ -68,7 +68,7 @@ def test_cacheable_csv_dataframe(rma):
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/xyz/abc/example.txt',
-                         query_strategy='create',
+                         strategy='create',
                          **Cache.cache_csv_dataframe())
 
     assert df.loc[:, 'whatever'][0]
@@ -87,7 +87,7 @@ def test_cacheable_json(rma):
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/xyz/abc/example.json',
-                         query_strategy='create',
+                         strategy='create',
                          **Cache.cache_json())
 
     assert 'whatever' in df[0]
@@ -108,7 +108,7 @@ def test_excpt(rma):
                                excpt=['symbol'])
 
     df = get_hemispheres_excpt(path='/xyz/abc/example.json',
-                         query_strategy='create',
+                         strategy='create',
                          **Cache.cache_json())
 
     assert 'whatever' in df[0]
@@ -128,7 +128,7 @@ def test_cacheable_no_cache_csv(rma):
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/xyz/abc/example.csv',
-                         query_strategy='file',
+                         strategy='file',
                          **Cache.cache_csv())
 
     assert df.loc[:, 'whatever'][0]
@@ -146,7 +146,7 @@ def test_cacheable_json_dataframe(rma):
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/xyz/abc/example.json',
-                         query_strategy='create',
+                         strategy='create',
                          **Cache.cache_json_dataframe())
 
     assert df.loc[:, 'whatever'][0]
@@ -167,7 +167,7 @@ def test_cacheable_csv_json(rma):
         return rma.model_query(model='Hemisphere')
 
     df = get_hemispheres(path='/xyz/example.csv',
-                         query_strategy='create',
+                         strategy='create',
                          **Cache.cache_csv_json())
 
     assert 'whatever' in df[0]
@@ -223,7 +223,7 @@ def test_cacheable_lazy_csv_no_file(rma, cache):
 
     with patch('os.path.exists', MagicMock(return_value=False)) as ope:
         df = get_hemispheres(path='/xyz/abc/example.csv',
-                             query_strategy='lazy',
+                             strategy='lazy',
                              **Cache.cache_csv())
 
     assert df.loc[:, 'whatever'][0]
@@ -243,7 +243,7 @@ def test_cacheable_lazy_csv_file_exists(rma, cache):
 
     with patch('os.path.exists', MagicMock(return_value=True)) as ope:
         df = get_hemispheres(path='/xyz/abc/example.csv',
-                             query_strategy='lazy',
+                             strategy='lazy',
                              **Cache.cache_csv())
 
     assert df.loc[:, 'whatever'][0]

@@ -206,7 +206,7 @@ class Cache(object):
             makes the actual query using kwargs.
         path : string
             where to save the data
-        query_strategy : string or None, optional
+        strategy : string or None, optional
             'create' always generates the data,
             'file' loads from disk,
             'lazy' queries the server if no file exists,
@@ -228,30 +228,30 @@ class Cache(object):
             data type depends on fn, reader and/or post methods.
         '''
         path = kwargs.pop('path', 'data.csv')
-        query_strategy = kwargs.pop('query_strategy', None)
+        strategy = kwargs.pop('strategy', None)
         pre = kwargs.pop('pre', lambda d: d)
         post = kwargs.pop('post', None)
         reader = kwargs.pop('reader', None)
         writer = kwargs.pop('writer', None)
 
-        if query_strategy is None:
+        if strategy is None:
             if writer or path:
-                query_strategy = 'lazy'
+                strategy = 'lazy'
             else:
-                query_strategy = 'pass_through'
+                strategy = 'pass_through'
 
-        if not query_strategy in ['lazy', 'pass_through', 'file', 'create']:
-            raise ValueError("Unknown query strategy: {}.".format(query_strategy))
+        if not strategy in ['lazy', 'pass_through', 'file', 'create']:
+            raise ValueError("Unknown query strategy: {}.".format(strategy))
 
-        if 'lazy' == query_strategy:
+        if 'lazy' == strategy:
             if os.path.exists(path):
-                query_strategy = 'file'
+                strategy = 'file'
             else:
-                query_strategy = 'create'
+                strategy = 'create'
 
-        if query_strategy == 'pass_through':
+        if strategy == 'pass_through':
                 data = fn(*args, **kwargs)
-        elif query_strategy in ['create']:
+        elif strategy in ['create']:
             Manifest.safe_make_parent_dirs(path)
 
             if writer:
@@ -410,7 +410,7 @@ class Cache(object):
         return data
 
 
-def cacheable(query_strategy=None,
+def cacheable(strategy=None,
               pre=None,
               writer=None,
               reader=None,
@@ -424,7 +424,7 @@ def cacheable(query_strategy=None,
         makes the actual query using kwargs.
     path : string
         where to save the data
-    query_strategy : string or None, optional
+    strategy : string or None, optional
         'create' always gets the data from the source (server or generated),
         'file' loads from disk,
         'lazy' creates the data and saves to file if no file exists,
@@ -450,7 +450,7 @@ def cacheable(query_strategy=None,
     Column renaming happens after the file is reloaded for json
     '''
     def decor(func):
-        decor.query_strategy=query_strategy
+        decor.strategy=strategy
         decor.pre = pre
         decor.writer = writer
         decor.reader = reader
@@ -470,8 +470,8 @@ def cacheable(query_strategy=None,
                 
                 if found_path:
                     kwargs['path'] = found_path
-            if decor.query_strategy and not 'query_strategy' in kwargs:
-                kwargs['query_strategy'] = decor.query_strategy
+            if decor.strategy and not 'strategy' in kwargs:
+                kwargs['strategy'] = decor.strategy
             if decor.pre and not 'pre' in kwargs:
                 kwargs['pre'] = decor.pre
             if decor.writer and not 'writer' in kwargs:
