@@ -30,7 +30,7 @@ def glif_api():
         endpoint = os.environ['TEST_API_ENDPOINT']
         return GlifApi(endpoint)
     else:
-        return None
+        return GlifApi()
 
 @pytest.fixture
 def neuronal_model_id():
