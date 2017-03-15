@@ -87,16 +87,22 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.12.5 (March 16th, 2017)
+What's New - Release 0.13.0 (March 16th, 2017)
 ------------------------------------------------
 
-The 0.12.5 release features a new set of classes for manipulating structure ontologies (:py:class:`~allensdk.core.structure_tree.StructureTree`) and annotated reference spaces like the CCF (:py:class:`~allensdk.core.reference_space.ReferenceSpace`).  These were designed based on feedback from the community that more regular, specifically named functions would be valuable.  The :py:class:`~allensdk.core.ontology.Ontology` class is now deprecated in favor of :py:class:`~allensdk.core.structure_tree.StructureTree`.  Take a look at the `Reference Space documentation page <reference_space.html>`_.  
+The 0.13.0 release features a new set of classes for manipulating structure ontologies (:py:class:`~allensdk.core.structure_tree.StructureTree`) and annotated reference spaces like the CCF (:py:class:`~allensdk.core.reference_space.ReferenceSpace`).  These were designed based on feedback from the community that more regular, specifically named functions would be valuable.  The :py:class:`~allensdk.core.ontology.Ontology` class is now deprecated in favor of :py:class:`~allensdk.core.structure_tree.StructureTree`.  Take a look at the `Reference Space documentation page <reference_space.html>`_.  
 
 This release also addresses issues from the Github issue tracker:
 
     * issue #35: structure masks at different resolutions were overwriting each other
     * issue #37: updating cell types notebook to use new feature extractor
 
-Note that because of the change to the structure masks, users will need to regenerate their MouseConnectivityCache manifests.
+Note that because of the change to the structure mask paths, users will need to regenerate their MouseConnectivityCache manifests.  Also, if you don't want to regenerate all of your masks, please move them from here: 
+
+    * `manifest_dir/structure_masks/`
+
+To here (with the appropriate CCF/resolution strings):
+
+    * `manifest_dir/annotation/ccf_2016/resolution_25/structure_masks/`
 
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

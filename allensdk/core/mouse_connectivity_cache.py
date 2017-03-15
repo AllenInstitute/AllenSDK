@@ -661,13 +661,16 @@ class MouseConnectivityCache(Cache):
                               self.get_annotation_volume(annotation_file_name)[0], 
                               [self.resolution] * 3)
 
-    @deprecated('In the future, this functionality '
-                'will be moved over to a ReferenceSpaceCache.')
     def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
         """
         Read a 3D numpy array shaped like the annotation volume that has non-zero values where
         voxels belong to a particular structure.  This will take care of identifying substructures.
 
+        Notes
+        -----
+        If you are making large numbers of masks, there is a faster structure mask generator in 
+        ReferenceSpace.many_structure_masks.  We will be migrating this function in a future release.
+        
         Parameters
         ----------
 
@@ -703,8 +706,6 @@ class MouseConnectivityCache(Cache):
 
             return mask, None
 
-    @deprecated('In the future, this functionality '
-                'will be moved over to ReferenceSpace.')
     def make_structure_mask(self, structure_ids, annotation):
         """
         Look at an annotation volume and identify voxels that have values
