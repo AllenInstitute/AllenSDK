@@ -1,19 +1,17 @@
 {% extends '!layout.html' %}
 
 {% block header %}
-<script type="text/javascript" src="/external_assets/javascript/portal.js"></script>
 {% include "portalHeader.html" %}
-<link rel="stylesheet" type="text/css" href="/external_assets/stylesheets/common_layout.css" />
 {{ super() }}
-{% endblock %}
-
-{% block relbar1 %}
 {% endblock %}
 
 {% block relbar2 %}
 {% endblock %}
 
+{% block relbar1 %}
+{% endblock %}
+
 {% block footer %}
 {{ super() }}
-<script type="text/javascript" src="/external_assets/javascript/portalFooter.js"></script>
+{% include "portalFooter.html" %}
 {% endblock %}

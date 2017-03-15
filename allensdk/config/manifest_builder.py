@@ -17,6 +17,7 @@ import allensdk.core.json_utilities as ju
 import logging
 from allensdk.config.manifest import Manifest
 import pandas as pd
+import six
 
 
 class ManifestBuilder(object):
@@ -82,5 +83,5 @@ class ManifestBuilder(object):
     def from_dataframe(self, df):
         self.path_info = {}
 
-        for _, k, p, s, t, f in df.loc[:, ManifestBuilder.df_columns].iteritems():
+        for _, k, p, s, t, f in six.iteritems(df.loc[:, ManifestBuilder.df_columns]):
             self.add_path(k, s, typename=t, parent=p, format=f)

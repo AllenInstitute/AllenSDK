@@ -14,12 +14,21 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-
+from six import string_types
 import numpy as np
 import pandas as pd
 
+from allensdk.deprecated import class_deprecated
 
+
+@class_deprecated('Use StructureTree instead.')
 class Ontology(object):
+    '''
+
+    .. note:: Deprecated from 0.12.5
+        `Ontology` has been replaced by `StructureTree`.
+
+    '''
 
     def __init__(self, df):
         self.df = df
@@ -76,7 +85,7 @@ class Ontology(object):
                 # if it's a pandas series, assume it's a series of structure
                 # ids
                 structure_ids.update(s.tolist())
-            elif isinstance(s, str) or isinstance(s, unicode):
+            elif isinstance(s, string_types):
                 # if it's a string, assume it's an acronym
                 string_strs.append(s)
             else:

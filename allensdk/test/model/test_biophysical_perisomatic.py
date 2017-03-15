@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import pytest, os, numpy
+import pytest
+import os
+import numpy
 from allensdk.model.biophys_sim.config import Config
 from allensdk.model.biophysical.utils import Utils
 from allensdk.core.dat_utilities import DatUtilities

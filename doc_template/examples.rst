@@ -13,4 +13,5 @@ Brain Observatory Stimulus Manipulation               `Jupyter notebook <_static
 Brain Observatory Tuning Analysis                     `Jupyter notebook <_static/examples/nb/brain_observatory_analysis.html>`_ `(download .ipynb) <_static/examples/nb/brain_observatory_analysis.ipynb>`_
 Dynamic Brain Workshop 2015 experiment detail         `Jupyter notebook <_static/examples/nb/summer_workshop_2015/experiment_detail_example.html>`_ `(download .ipynb) <_static/examples/nb/summer_workshop_2015/experiment_detail_example.ipynb>`_
 Stimulating a biophysical model with a square pulse   `Jupyter notebook <_static/examples/nb/pulse_stimulus.html>`_ `(download .ipynb) <_static/examples/nb/pulse_stimulus.ipynb>`_
+Using a Reference Space                               `Jupyter notebook <_static/examples/nb/reference_space.html>`_ `(download .ipynb) <_static/examples/nb/reference_space.ipynb>`_  
 ===================================================== ====
