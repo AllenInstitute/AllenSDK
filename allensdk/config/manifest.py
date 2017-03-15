@@ -19,6 +19,12 @@ import logging
 import errno
 import pandas as pd
 
+class ManifestVersionError(Exception): 
+    def __init__(self, message, version, found_version):
+        super(ManifestVersionError, self).__init__(message)
+        self.found_version = found_version
+        self.version = version
+        
 
 class Manifest(object):
     """Manages the location of external files
@@ -27,16 +33,18 @@ class Manifest(object):
     DIR = 'dir'
     FILE = 'file'
     DIRNAME = 'dir_name'
+    VERSION = 'manifest_version'
+
     log = logging.getLogger(__name__)
 
-    def __init__(self, config=None, relative_base_dir='.'):
+    def __init__(self, config=None, relative_base_dir='.', version=None):
         self.path_info = {}
         self.relative_base_dir = relative_base_dir
 
         if config is not None:
-            self.load_config(config)
+            self.load_config(config, version=version)
 
-    def load_config(self, config):
+    def load_config(self, config, version=None):
         ''' Load paths into the manifest from an Allen SDK config section.
 
         Parameters
@@ -44,6 +52,7 @@ class Manifest(object):
         config : Config
             Manifest section of an Allen SDK config.
         '''
+        found_version = None
         for path_info in config:
             path_type = path_info['type']
             path_format = None
@@ -76,9 +85,17 @@ class Manifest(object):
                               absolute,
                               path_format,
                               parent_key)
+
+            elif path_type == self.VERSION:
+                found_version = path_info['value']
             else:
                 Manifest.log.warning("Unknown path type in manifest: %s" %
                                      (path_type))
+
+
+        if found_version != version:
+            raise ManifestVersionError("", version, found_version)
+        self.version = version
 
     def add_path(self, key, path, path_type=DIR,
                  absolute=True, path_format=None, parent_key=None):
