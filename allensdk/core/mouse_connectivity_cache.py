@@ -89,7 +89,7 @@ class MouseConnectivityCache(Cache):
     STRUCTURES_KEY = 'STRUCTURES'
     STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
-
+    MANIFEST_VERSION = 1.0
 
     def __init__(self,
                  resolution=None,
@@ -98,7 +98,7 @@ class MouseConnectivityCache(Cache):
                  ccf_version=None,
                  base_uri=None):
         super(MouseConnectivityCache, self).__init__(
-            manifest=manifest_file, cache=cache)
+            manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
 
         if resolution is None:
             self.resolution = MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS
@@ -741,6 +741,7 @@ class MouseConnectivityCache(Cache):
         """
 
         manifest_builder = ManifestBuilder()
+        manifest_builder.set_version(self.MANIFEST_VERSION)
         manifest_builder.add_path('BASEDIR', '.')
 
         manifest_builder.add_path(self.EXPERIMENTS_KEY,
