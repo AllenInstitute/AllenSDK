@@ -97,4 +97,6 @@ This release also addresses issues from the Github issue tracker:
     * issue #35: structure masks at different resolutions were overwriting each other
     * issue #37: updating cell types notebook to use new feature extractor
 
+Note that because of the change to the structure masks, users will need to regenerate their MouseConnectivityCache manifests.
+
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 
