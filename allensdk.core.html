@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core package &mdash; Allen SDK 0.12.5 documentation</title>
+    <title>allensdk.core package &mdash; Allen SDK 0.13.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.5',
+        VERSION:     '0.13.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.5 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.13.0 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.ephys package" href="allensdk.ephys.html" />
     <link rel="prev" title="allensdk.config.model.formats package" href="allensdk.config.model.formats.html" /> 
@@ -36,6 +36,9 @@
     var _pTabId = "pHome";
     var _pMoreProjectsId = "pMoreProjects";
     var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
 </script>
 <script type="text/javascript">
     function initialize() {
@@ -60,14 +63,14 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
   }
 
   #header_content > a:hover {
-  background-color: transparent;
+  background-color: transparent !important;
   }
 
   #portal_tabs {
@@ -80,7 +83,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -154,6 +157,11 @@ in the function call (e.g. get_ophys_experiment_data(file_name=&#8217;file.nwb&#
 <dl class="attribute">
 <dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENT_DATA_KEY">
 <code class="descname">EXPERIMENT_DATA_KEY</code><em class="property"> = 'EXPERIMENT_DATA'</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.EXPERIMENT_DATA_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.core.brain_observatory_cache.BrainObservatoryCache.MANIFEST_VERSION">
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = None</em><a class="headerlink" href="#allensdk.core.brain_observatory_cache.BrainObservatoryCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -998,6 +1006,11 @@ in the function call (e.g. get_ephys_data(file_name=&#8217;file.nwb&#8217;)).</p
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="allensdk.core.cell_types_cache.CellTypesCache.MANIFEST_VERSION">
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = None</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="allensdk.core.cell_types_cache.CellTypesCache.MARKER_KEY">
 <code class="descname">MARKER_KEY</code><em class="property"> = 'MARKER'</em><a class="headerlink" href="#allensdk.core.cell_types_cache.CellTypesCache.MARKER_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1556,6 +1569,11 @@ in the function call (e.g. get_projection_density(file_name=&#8217;file.nrrd&#82
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION">
+<code class="descname">MANIFEST_VERSION</code><em class="property"> = 1.0</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.PROJECTION_DENSITY_KEY">
 <code class="descname">PROJECTION_DENSITY_KEY</code><em class="property"> = 'PROJECTION_DENSITY'</em><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.PROJECTION_DENSITY_KEY" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1931,7 +1949,7 @@ file_name will be pulled out of the manifest.  Default is None.</p>
 
 <dl class="method">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_mask">
-<code class="descname">get_structure_mask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_structure_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_mask" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_structure_mask</code><span class="sig-paren">(</span><em>structure_id</em>, <em>file_name=None</em>, <em>annotation_file_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.get_structure_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a 3D numpy array shaped like the annotation volume that has non-zero values where
 voxels belong to a particular structure.  This will take care of identifying substructures.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1958,6 +1976,9 @@ file_name will be pulled out of the manifest.  Default is None.</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Notes</p>
+<p>If you are making large numbers of masks, there is a faster structure mask generator in 
+ReferenceSpace.many_structure_masks.  We will be migrating this function in a future release.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2063,7 +2084,7 @@ file_name will be pulled out of the manifest.  Default is None.</p>
 
 <dl class="method">
 <dt id="allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.make_structure_mask">
-<code class="descname">make_structure_mask</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.make_structure_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.make_structure_mask" title="Permalink to this definition">¶</a></dt>
+<code class="descname">make_structure_mask</code><span class="sig-paren">(</span><em>structure_ids</em>, <em>annotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/core/mouse_connectivity_cache.html#MouseConnectivityCache.make_structure_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.make_structure_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Look at an annotation volume and identify voxels that have values
 in a list of structure ids.</p>
 <table class="docutils field-list" frame="void" rules="none">

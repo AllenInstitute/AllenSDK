@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.config.manifest &mdash; Allen SDK 0.12.5 documentation</title>
+    <title>allensdk.config.manifest &mdash; Allen SDK 0.13.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.12.5',
+        VERSION:     '0.13.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.5 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.13.0 documentation" href="../../../index.html" />
     <link rel="up" title="allensdk.config" href="../config.html" /> 
   </head>
   <body role="document">
@@ -34,6 +34,9 @@
     var _pTabId = "pHome";
     var _pMoreProjectsId = "pMoreProjects";
     var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
 </script>
 <script type="text/javascript">
     function initialize() {
@@ -58,14 +61,14 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
   }
 
   #header_content > a:hover {
-  background-color: transparent;
+  background-color: transparent !important;
   }
 
   #portal_tabs {
@@ -78,7 +81,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -110,6 +113,12 @@
 <span class="kn">import</span> <span class="nn">errno</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 
+<div class="viewcode-block" id="ManifestVersionError"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.ManifestVersionError">[docs]</a><span class="k">class</span> <span class="nc">ManifestVersionError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> 
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">found_version</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ManifestVersionError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">found_version</span> <span class="o">=</span> <span class="n">found_version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span></div>
+        
 
 <div class="viewcode-block" id="Manifest"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest">[docs]</a><span class="k">class</span> <span class="nc">Manifest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Manages the location of external files</span>
@@ -118,16 +127,18 @@
     <span class="n">DIR</span> <span class="o">=</span> <span class="s1">&#39;dir&#39;</span>
     <span class="n">FILE</span> <span class="o">=</span> <span class="s1">&#39;file&#39;</span>
     <span class="n">DIRNAME</span> <span class="o">=</span> <span class="s1">&#39;dir_name&#39;</span>
+    <span class="n">VERSION</span> <span class="o">=</span> <span class="s1">&#39;manifest_version&#39;</span>
+
     <span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">relative_base_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">relative_base_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">relative_base_dir</span> <span class="o">=</span> <span class="n">relative_base_dir</span>
 
         <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">version</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Manifest.load_config"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<div class="viewcode-block" id="Manifest.load_config"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.load_config">[docs]</a>    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Load paths into the manifest from an Allen SDK config section.</span>
 
 <span class="sd">        Parameters</span>
@@ -135,6 +146,7 @@
 <span class="sd">        config : Config</span>
 <span class="sd">            Manifest section of an Allen SDK config.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">found_version</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="k">for</span> <span class="n">path_info</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
             <span class="n">path_type</span> <span class="o">=</span> <span class="n">path_info</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
             <span class="n">path_format</span> <span class="o">=</span> <span class="bp">None</span>
@@ -167,9 +179,17 @@
                               <span class="n">absolute</span><span class="p">,</span>
                               <span class="n">path_format</span><span class="p">,</span>
                               <span class="n">parent_key</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">path_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">VERSION</span><span class="p">:</span>
+                <span class="n">found_version</span> <span class="o">=</span> <span class="n">path_info</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">Manifest</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unknown path type in manifest: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
-                                     <span class="p">(</span><span class="n">path_type</span><span class="p">))</span></div>
+                                     <span class="p">(</span><span class="n">path_type</span><span class="p">))</span>
+
+
+        <span class="k">if</span> <span class="n">found_version</span> <span class="o">!=</span> <span class="n">version</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ManifestVersionError</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">found_version</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span></div>
 
 <div class="viewcode-block" id="Manifest.add_path"><a class="viewcode-back" href="../../../allensdk.config.html#allensdk.config.manifest.Manifest.add_path">[docs]</a>    <span class="k">def</span> <span class="nf">add_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">path_type</span><span class="o">=</span><span class="n">DIR</span><span class="p">,</span>
                  <span class="n">absolute</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">path_format</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>

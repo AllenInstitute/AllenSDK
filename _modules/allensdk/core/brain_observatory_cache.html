@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.brain_observatory_cache &mdash; Allen SDK 0.12.5 documentation</title>
+    <title>allensdk.core.brain_observatory_cache &mdash; Allen SDK 0.13.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.12.5',
+        VERSION:     '0.13.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.5 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.13.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -34,6 +34,9 @@
     var _pTabId = "pHome";
     var _pMoreProjectsId = "pMoreProjects";
     var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
 </script>
 <script type="text/javascript">
     function initialize() {
@@ -58,14 +61,14 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
   }
 
   #header_content > a:hover {
-  background-color: transparent;
+  background-color: transparent !important;
   }
 
   #portal_tabs {
@@ -78,7 +81,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -146,10 +149,11 @@
     <span class="n">CELL_SPECIMENS_KEY</span> <span class="o">=</span> <span class="s1">&#39;CELL_SPECIMENS&#39;</span>
     <span class="n">EXPERIMENT_DATA_KEY</span> <span class="o">=</span> <span class="s1">&#39;EXPERIMENT_DATA&#39;</span>
     <span class="n">STIMULUS_MAPPINGS_KEY</span> <span class="o">=</span> <span class="s1">&#39;STIMULUS_MAPPINGS&#39;</span>
+    <span class="n">MANIFEST_VERSION</span><span class="o">=</span><span class="bp">None</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">manifest_file</span><span class="o">=</span><span class="s1">&#39;brain_observatory_manifest.json&#39;</span><span class="p">,</span> <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">BrainObservatoryCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
-            <span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+            <span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_VERSION</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="n">BrainObservatoryApi</span><span class="p">(</span><span class="n">base_uri</span><span class="o">=</span><span class="n">base_uri</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BrainObservatoryCache.get_all_targeted_structures"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.get_all_targeted_structures">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_targeted_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -491,7 +495,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">mb</span> <span class="o">=</span> <span class="n">ManifestBuilder</span><span class="p">()</span>
-
+        <span class="n">mb</span><span class="o">.</span><span class="n">set_version</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_VERSION</span><span class="p">)</span>
         <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
         <span class="n">mb</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENT_CONTAINERS_KEY</span><span class="p">,</span>
                     <span class="s1">&#39;experiment_containers.json&#39;</span><span class="p">,</span> <span class="n">typename</span><span class="o">=</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">)</span>

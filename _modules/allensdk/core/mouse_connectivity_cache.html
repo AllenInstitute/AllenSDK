@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.mouse_connectivity_cache &mdash; Allen SDK 0.12.5 documentation</title>
+    <title>allensdk.core.mouse_connectivity_cache &mdash; Allen SDK 0.13.0 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.12.5',
+        VERSION:     '0.13.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.5 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.13.0 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -34,6 +34,9 @@
     var _pTabId = "pHome";
     var _pMoreProjectsId = "pMoreProjects";
     var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
 </script>
 <script type="text/javascript">
     function initialize() {
@@ -58,14 +61,14 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
   }
 
   #header_content > a:hover {
-  background-color: transparent;
+  background-color: transparent !important;
   }
 
   #portal_tabs {
@@ -78,7 +81,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -180,7 +183,7 @@
     <span class="n">STRUCTURES_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURES&#39;</span>
     <span class="n">STRUCTURE_TREE_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURE_TREE&#39;</span>
     <span class="n">STRUCTURE_MASK_KEY</span> <span class="o">=</span> <span class="s1">&#39;STRUCTURE_MASK&#39;</span>
-
+    <span class="n">MANIFEST_VERSION</span> <span class="o">=</span> <span class="mf">1.0</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">resolution</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
@@ -189,7 +192,7 @@
                  <span class="n">ccf_version</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                  <span class="n">base_uri</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MouseConnectivityCache</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span>
-            <span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+            <span class="n">manifest</span><span class="o">=</span><span class="n">manifest_file</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_VERSION</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">resolution</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">MouseConnectivityApi</span><span class="o">.</span><span class="n">VOXEL_RESOLUTION_25_MICRONS</span>
@@ -752,13 +755,16 @@
                               <span class="bp">self</span><span class="o">.</span><span class="n">get_annotation_volume</span><span class="p">(</span><span class="n">annotation_file_name</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> 
                               <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span></div>
 
-    <span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;In the future, this functionality &#39;</span>
-                <span class="s1">&#39;will be moved over to a ReferenceSpaceCache.&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="MouseConnectivityCache.get_structure_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">annotation_file_name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read a 3D numpy array shaped like the annotation volume that has non-zero values where</span>
 <span class="sd">        voxels belong to a particular structure.  This will take care of identifying substructures.</span>
 
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If you are making large numbers of masks, there is a faster structure mask generator in </span>
+<span class="sd">        ReferenceSpace.many_structure_masks.  We will be migrating this function in a future release.</span>
+<span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 
@@ -794,8 +800,6 @@
 
             <span class="k">return</span> <span class="n">mask</span><span class="p">,</span> <span class="bp">None</span></div>
 
-    <span class="nd">@deprecated</span><span class="p">(</span><span class="s1">&#39;In the future, this functionality &#39;</span>
-                <span class="s1">&#39;will be moved over to ReferenceSpace.&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="MouseConnectivityCache.make_structure_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.make_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">make_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">annotation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Look at an annotation volume and identify voxels that have values</span>
@@ -832,6 +836,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">manifest_builder</span> <span class="o">=</span> <span class="n">ManifestBuilder</span><span class="p">()</span>
+        <span class="n">manifest_builder</span><span class="o">.</span><span class="n">set_version</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_VERSION</span><span class="p">)</span>
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="s1">&#39;BASEDIR&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
 
         <span class="n">manifest_builder</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">EXPERIMENTS_KEY</span><span class="p">,</span>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.config package &mdash; Allen SDK 0.12.5 documentation</title>
+    <title>allensdk.config package &mdash; Allen SDK 0.13.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.5',
+        VERSION:     '0.13.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.5 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.13.0 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.config.app package" href="allensdk.config.app.html" />
     <link rel="prev" title="allensdk.brain_observatory package" href="allensdk.brain_observatory.html" /> 
@@ -36,6 +36,9 @@
     var _pTabId = "pHome";
     var _pMoreProjectsId = "pMoreProjects";
     var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
 </script>
 <script type="text/javascript">
     function initialize() {
@@ -60,14 +63,14 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
   }
 
   #header_content > a:hover {
-  background-color: transparent;
+  background-color: transparent !important;
   }
 
   #portal_tabs {
@@ -80,7 +83,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -130,7 +133,7 @@
 <span id="allensdk-config-manifest-module"></span><h2>allensdk.config.manifest module<a class="headerlink" href="#module-allensdk.config.manifest" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="allensdk.config.manifest.Manifest">
-<em class="property">class </em><code class="descclassname">allensdk.config.manifest.</code><code class="descname">Manifest</code><span class="sig-paren">(</span><em>config=None</em>, <em>relative_base_dir='.'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">allensdk.config.manifest.</code><code class="descname">Manifest</code><span class="sig-paren">(</span><em>config=None</em>, <em>relative_base_dir='.'</em>, <em>version=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Manages the location of external files
 referenced in an Allen SDK configuration</p>
@@ -147,6 +150,11 @@ referenced in an Allen SDK configuration</p>
 <dl class="attribute">
 <dt id="allensdk.config.manifest.Manifest.FILE">
 <code class="descname">FILE</code><em class="property"> = 'file'</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="allensdk.config.manifest.Manifest.VERSION">
+<code class="descname">VERSION</code><em class="property"> = 'manifest_version'</em><a class="headerlink" href="#allensdk.config.manifest.Manifest.VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -330,7 +338,7 @@ referenced in an Allen SDK configuration</p>
 
 <dl class="method">
 <dt id="allensdk.config.manifest.Manifest.load_config">
-<code class="descname">load_config</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.load_config" title="Permalink to this definition">¶</a></dt>
+<code class="descname">load_config</code><span class="sig-paren">(</span><em>config</em>, <em>version=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#Manifest.load_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.Manifest.load_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load paths into the manifest from an Allen SDK config section.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -407,6 +415,12 @@ referenced in an Allen SDK configuration</p>
 
 </dd></dl>
 
+<dl class="exception">
+<dt id="allensdk.config.manifest.ManifestVersionError">
+<em class="property">exception </em><code class="descclassname">allensdk.config.manifest.</code><code class="descname">ManifestVersionError</code><span class="sig-paren">(</span><em>message</em>, <em>version</em>, <em>found_version</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest.html#ManifestVersionError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest.ManifestVersionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></code></p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-allensdk.config.manifest_builder">
 <span id="allensdk-config-manifest-builder-module"></span><h2>allensdk.config.manifest_builder module<a class="headerlink" href="#module-allensdk.config.manifest_builder" title="Permalink to this headline">¶</a></h2>
@@ -447,6 +461,11 @@ referenced in an Allen SDK configuration</p>
 <dl class="method">
 <dt id="allensdk.config.manifest_builder.ManifestBuilder.get_manifest">
 <code class="descname">get_manifest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest_builder.html#ManifestBuilder.get_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest_builder.ManifestBuilder.get_manifest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="allensdk.config.manifest_builder.ManifestBuilder.set_version">
+<code class="descname">set_version</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/config/manifest_builder.html#ManifestBuilder.set_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.config.manifest_builder.ManifestBuilder.set_version" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

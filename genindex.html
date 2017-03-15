@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &mdash; Allen SDK 0.12.5 documentation</title>
+    <title>Index &mdash; Allen SDK 0.13.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.5',
+        VERSION:     '0.13.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.5 documentation" href="index.html" /> 
+    <link rel="top" title="Allen SDK 0.13.0 documentation" href="index.html" /> 
   </head>
   <body role="document">
 <link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
@@ -34,6 +34,9 @@
     var _pTabId = "pHome";
     var _pMoreProjectsId = "pMoreProjects";
     var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
 </script>
 <script type="text/javascript">
     function initialize() {
@@ -58,14 +61,14 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
   }
 
   #header_content > a:hover {
-  background-color: transparent;
+  background-color: transparent !important;
   }
 
   #portal_tabs {
@@ -78,7 +81,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -2644,7 +2647,25 @@
   </dt>
 
       
+  <dt><a href="allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.MANIFEST_VERSION">MANIFEST_VERSION (allensdk.core.brain_observatory_cache.BrainObservatoryCache attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.MANIFEST_VERSION">(allensdk.core.cell_types_cache.CellTypesCache attribute)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.MANIFEST_VERSION">(allensdk.core.mouse_connectivity_cache.MouseConnectivityCache attribute)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder">ManifestBuilder (class in allensdk.config.manifest_builder)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.html#allensdk.config.manifest.ManifestVersionError">ManifestVersionError</a>
   </dt>
 
       
@@ -2687,12 +2708,12 @@
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.mean_sweep_response">mean_sweep_response (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_extractor.membrane_time_constant">membrane_time_constant() (in module allensdk.ephys.ephys_extractor)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.merge_receptive_fields">merge_receptive_fields() (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise static method)</a>
   </dt>
@@ -3708,6 +3729,10 @@
   </dt>
 
       
+  <dt><a href="allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.set_version">set_version() (allensdk.config.manifest_builder.ManifestBuilder method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.setup_iclamp">setup_iclamp() (allensdk.model.biophysical.utils.Utils method)</a>
   </dt>
 
@@ -3761,12 +3786,12 @@
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.simulate_sweep">simulate_sweep() (in module allensdk.model.glif.simulate_neuron)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.simulate_sweep_from_file">simulate_sweep_from_file() (in module allensdk.model.glif.simulate_neuron)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.SOMA">SOMA (allensdk.core.swc.Morphology attribute)</a>
   </dt>
@@ -4115,6 +4140,10 @@
 
       
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.verify_roi_lists_equal">verify_roi_lists_equal() (allensdk.brain_observatory.session_analysis.SessionAnalysis method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.html#allensdk.config.manifest.Manifest.VERSION">VERSION (allensdk.config.manifest.Manifest attribute)</a>
   </dt>
 
       

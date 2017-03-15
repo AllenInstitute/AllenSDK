@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.api package &mdash; Allen SDK 0.12.5 documentation</title>
+    <title>allensdk.api package &mdash; Allen SDK 0.13.0 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.5',
+        VERSION:     '0.13.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.5 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.13.0 documentation" href="index.html" />
     <link rel="up" title="allensdk package" href="allensdk.html" />
     <link rel="next" title="allensdk.api.queries package" href="allensdk.api.queries.html" />
     <link rel="prev" title="allensdk package" href="allensdk.html" /> 
@@ -36,6 +36,9 @@
     var _pTabId = "pHome";
     var _pMoreProjectsId = "pMoreProjects";
     var _pImagePath = "http://www.brain-map.org/assets/images/";
+    var _pSiteWarnings = function() {
+        this.show_warning() = {};
+    }
 </script>
 <script type="text/javascript">
     function initialize() {
@@ -60,14 +63,14 @@
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
   }
 
   #header_content > a:hover {
-  background-color: transparent;
+  background-color: transparent !important;
   }
 
   #portal_tabs {
@@ -80,7 +83,7 @@
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -483,7 +486,7 @@ based on a api server endpoint.</p>
 <span id="allensdk-api-cache-module"></span><h2>allensdk.api.cache module<a class="headerlink" href="#module-allensdk.api.cache" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="allensdk.api.cache.Cache">
-<em class="property">class </em><code class="descclassname">allensdk.api.cache.</code><code class="descname">Cache</code><span class="sig-paren">(</span><em>manifest=None</em>, <em>cache=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">allensdk.api.cache.</code><code class="descname">Cache</code><span class="sig-paren">(</span><em>manifest=None</em>, <em>cache=True</em>, <em>version=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="allensdk.api.cache.Cache.build_manifest">
@@ -676,7 +679,7 @@ None generates the data and bypasses all caching behavior</p>
 
 <dl class="method">
 <dt id="allensdk.api.cache.Cache.load_manifest">
-<code class="descname">load_manifest</code><span class="sig-paren">(</span><em>file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.load_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.load_manifest" title="Permalink to this definition">¶</a></dt>
+<code class="descname">load_manifest</code><span class="sig-paren">(</span><em>file_name</em>, <em>version=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/allensdk/api/cache.html#Cache.load_manifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#allensdk.api.cache.Cache.load_manifest" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read a keyed collection of path specifications.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
