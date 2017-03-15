@@ -13,6 +13,7 @@ Subpackages
     allensdk.ephys
     allensdk.model
     allensdk.morphology
+    allensdk.test_utilities
 
 Submodules
 ----------

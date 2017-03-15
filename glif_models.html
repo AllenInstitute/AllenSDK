@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Generalized LIF Models &mdash; Allen SDK 0.12.3 documentation</title>
+    <title>Generalized LIF Models &mdash; Allen SDK 0.12.5 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.3',
+        VERSION:     '0.12.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,606 +23,64 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.3 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.12.5 documentation" href="index.html" />
     <link rel="up" title="Models" href="models.html" />
     <link rel="next" title="Biophysical Models" href="biophysical_models.html" />
     <link rel="prev" title="Models" href="models.html" /> 
   </head>
-  <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
-<style>
-
-	/* the icon font-family definition and helper classes */
-	@font-face {
-	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
-	  font-weight: normal;
-	  font-style: normal;
-	}
-	 
-	 [class^="icon-"]:before, [class*=" icon-"]:before {
-	  font-family: "portal_icon_font";
-	  font-style: normal;
-	  font-weight: normal;
-	  speak: none;
-	 
-	  display: inline-block;
-	  text-decoration: inherit;
-	  width: 1em;
-	  margin-right: .2em;
-	  text-align: center;
-	  /* opacity: .8; */
-	 
-	  /* For safety - reset parent styles, that can break glyph codes*/
-	  font-variant: normal;
-	  text-transform: none;
-	     
-	  /* fix buttons height, for twitter bootstrap */
-	  line-height: 1em;
-	 
-	  /* Animation center compensation - margins should be symmetric */
-	  /* remove if not needed */
-	  margin-left: .2em;
-	
-	}
-	 
-	.icon-spin5:before { content: '\e806'; } /* '' */
-	.icon-left-open-1:before { content: '\e81e'; } /* '' */
-	.icon-plus-1:before { content: '\e801'; } /* '' */
-	.icon-facebook:before { content: '\e816'; } /* '' */
-	.icon-gplus:before { content: '\e818'; } /* '' */
-	.icon-linkedin-3:before { content: '\e815'; } /* '' */
-	.icon-twitter:before { content: '\e817'; } /* '' */
-	.icon-youtube-play:before { content: '\e805'; } /* '' */
-	.icon-plus-2:before { content: '\e809'; } /* '' */
-	.icon-record-1:before { content: '\e81c'; } /* '' */
-	.icon-cancel:before { content: '\e80b'; } /* '' */
-	.icon-search:before { content: '\e804'; } /* '' */
-	.icon-cancel-2:before { content: '\e80c'; } /* '' */
-	.icon-plus-4:before { content: '\e80d'; } /* '' */
-	.icon-cancel-3:before { content: '\e80e'; } /* '' */
-	.icon-plus:before { content: '\e808'; } /* '' */
-	.icon-down-open:before { content: '\e800'; } /* '' */
-	.icon-right-open:before { content: '\e802'; } /* '' */
-	.icon-up-open:before { content: '\e803'; } /* '' */
-	.icon-stop:before { content: '\e813'; } /* '' */
-	.icon-cancel-1:before { content: '\e820'; } /* '' */
-	.icon-plus-3:before { content: '\e80a'; } /* '' */
-	/* end icon font helpers */
-
-	/* icon font spin animation */
-	.animate-spin {
-	  -moz-animation: spin 2s infinite linear;
-	  -o-animation: spin 2s infinite linear;
-	  -webkit-animation: spin 2s infinite linear;
-	  animation: spin 2s infinite linear;
-	  display: inline-block;
-	}
-	@-moz-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-webkit-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-o-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-ms-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	/*  end spin animation */	
-
-	@font-face {
-	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
-	    font-weight: normal;
-	    font-style: normal;
-	}
-
-	/* top chrome styles */
-	#top_chrome {
-
-		width:100%;
-		height:28px;
-		background-color:#163E65;
-	}
-
-	.chrome_link_block {
-
-		color:#fff !important;	
-		display:inline-block;
-		height:100%;
-		max-height:28px;
-	}
-
-	.chrome_link_block:hover {
-
-		background-color:#eee;
-		color:#0779BE !important;	
-		cursor:pointer;
-	}
-
-	#top_chrome a {
-
-		color:inherit !important;	
-		text-decoration:none;
-	}
-
-	#top_chrome a:hover {
-
-		color:inherit !important;	
-	}
-
-	#top_chrome_buttons {
-
-		float:right;
-		margin-right:50px;
-	}
-
-	.chrome_button {
-
-		font-family:arial,sans-serif;
-		font-weight:bold;
-		display:inline-block;
-		font-size:9px;
-		text-align:left;
-		text-decoration:none;
-		margin:9px 20px 10px 20px;
-	}
-
-	.chrome_active {
-
-		background-color:#1b7abd;
-		color:#fff;
-	}
-
-
-	/* header element styles*/
-	#header_content {
-
-		font-family: bebas_neueregular, arial, sans-serif;
-		font-size:22px;
-		color:#0779be;		
-		letter-spacing:0.03em;
-
-		position:relative;
-		width:calc(100% - 112px);
-		min-width:800px;
-		height:76px;
-		border-bottom:2px solid #A5A8AB;
-		margin-left:50px;
-		margin-right:50px;
-        z-index:9999; /* IT-9508 */
-	}
-
-	#portal_logo {
-
-		position:absolute;
-		top:20px;
-		left:0px;
-		width:236px;
-	}
-
-	#portal_tabs {
-
-		position: absolute;
-		bottom: 12px;
-		left: 0px;
-		margin-bottom: -12px;
-		display: block;
-	}
-
-	.horizontal_list
-	{
-		margin: 0;
-		padding: 0;
-		list-style-type: none;
-		display: inline; 		
-	}
-
-	.horizontal_list li { 
-
-		display: inline; 	
-	}	
-
-	#portal_tab_menu_container {
-
-		display:none;
-	}
-
-	#portal_search_input_group {
-
-		position:absolute;
-		margin: 0;
-		padding: 0;
-		bottom:12px;
-		right:0px;
-		border:1px solid #DAD9D3;
-		color:#DAD9D3;
-	}
-
-	#portal_search_input_group input {
-
-		margin: 0;
-		padding: 0;
-		border:none;
-		width:110px;
-		color:#DAD9D3;
-		font-family:Helvetica,sans-serif;
-		font-size:12px;
-		height:28px;
-		margin-left:10px;
-
-		outline:none;
-	}
-
-	input::-ms-clear {
-		display: none;
-	}
-
-	#portal_search_input_group i {
-
-		font-size:0.8em;
-		cursor:pointer;
-	}
-
-	#pSiteSearchTextInput:focus {
-
-		color:#000;
-	}
-
-	.icon_menu_down {
-
-		font-size: 12px;
-		margin-left: 4px;
-		vertical-align: text-top;
-		padding-top: 4px;
-		display: inline-block;
-	}
-
-	.portal_tab_item {
-
-		background-color: #fff;
-		padding: 12px;
-		padding-left:20px;
-		padding-right:20px;
-		display: inline-block !important;		
-	}
-
-	.portal_tab_item a:hover {
-
-		color:#fbe300;	
-	}
-
-	.portal_tab_item:hover {
-
-		background-color: #0779be;	
-		color:#fbe300 !important;	
-	}	
-
-
-	.portal_menu_active {
-
-		background-color: #EEEEEE;
-	}	
-
-	.portal_menu_item_active {
-
-		color:#fbe300 !important;	
-	}
-
-	.portal_tab_active {
-
-		color:#a5a8ab !important;
-	}
-
-	#header_content a {		
-
-		color:inherit !important;
-	}
-
-	#header_content a:hover {
-
-		background-color: #0779be;	
-		color:#fbe300 !important;	
-	}
-
-	#header_content ul {
-
-		list-style: none;
-		position: relative;
-		top: 58px;
-		display: inline-table;
-	}
-
-	#header_content ul ul {
-		
-		display:none;
-		opacity:0;
-	}
-
-	/* the fly out menus */
-	#header_content ul li:hover > ul,
-	#header_content ul li.hover > ul {
-
-		position: absolute;
-		top: 48px;
-		z-index:999;
-
-		display: block;
-		width: 152px;
-		padding:0px;
-		padding-top:20px;
-		padding-bottom:10px;
-		font-size: 12px;
-		font-family: Arial,Sans-Serif;
-		font-weight: bold;
-		text-transform: uppercase;
-
-		background-color: rgba(8,122,191,0.98);
-		color: #fff !important;
-		opacity: 1;
-
-		-webkit-animation: fade 0.25s;
-		animation: fade 0.25s;
-	}
-
-	@-webkit-keyframes fade {
-	    from {opacity: 0}
-	    to {opacity: 1}
-	}
-	@keyframes fade {
-	    from {opacity: 0}
-	    to {opacity: 1}
-	}	
-
-	#header_content ul li:hover > ul li {
-
-		padding: 10px;
-		padding-top: 0px;
-		padding-left: 20px;
-		display: block;
-		opacity:1;
-	}
-
-	#header_content ul li:hover > ul a {
-
-		display: block;
-		opacity:1;
-		white-space:nowrap;
-	}
-
-	#portal_menu_start_list {
-
-		left: 81px;
-
-		/* IE sauce */
-		left:85px\9;
-
-		/* Safari sauce */
-		(;left:79px;);
-	}
-
-	#portal_menu_atlases_list {
-
-		left: 290px;
-		width: 210px !important;
-        height: 236px;
-
-		padding-bottom:5px !important;
-
-		/* IE sauce */
-		left: 303px\9;
-        height: 225px\9;
-
-		/* Safari sauce */
-		(;left:279px;);
-	}
-
-	#portal_menu_tools_list {
-
-		left: 500px;
-		width: 172px !important;
-		height: 236px;
-
-		padding-bottom:5px !important;
-
-		/* IE sauce */
-		left: 513px\9;
-		height:225px\9;
-
-		/* Safari sauce */
-		(;left:489px;);
-		(;height:227px;);
-	}
-
-	/* mozilla sauce */
-	@-moz-document url-prefix() {
-
-		#header_content {
-
-			height:107px;
-		}
-
-		#portal_menu_start_list {
-
-			left:85px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 302px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 512px;
-			height:236px;
-		}
-	}
-
-
-	/* make it look OK on iPad also */
-	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
-
-		#portal_menu_start_list {
-
-			left:81px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 291px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 501px;
-			height:236px;
-		}  
-	}
-	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
-
-		#portal_menu_start_list {
-
-			left:81px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 291px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 501px;
-			height:236px;
-		}	  
-	}
-
-	.portal_menu_list_heading {
-
-		color:#9ccae5;
-		border-bottom:1px solid #9ccae5;
-		padding-bottom:5px !important;
-	}
-
-	.portal_menu_list_heading + li {
-
-		padding-top:10px !important;
-	}
-
-	.portal_menu_list_heading li {
-
-		padding-bottom:0px;
-	}	
-
-	#portal_menu_atlases_list li:last-of-type {
-
-		padding-bottom:15px !important;
-	}
-
-	.icon-spin5 {
-
-		color:#000;
-	}
-</style>
-<div id="pHeader">
-<div id="top_chrome">
-	<div id="top_chrome_buttons">
-		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
-		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
-	</div>
-</div>
-
-<div id="header_content">
-
-	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
-	</a>
-</div>
-</div>
-
-<script>
-
-jQuery('#portal_tab_menu').bind('touchstart', function() {
-
-	if(window.console)
-		console.log("touchstart");
-});
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  div.document {
+  position:relative !important;;
+  }
+
+  img#portal_logo{
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
+  }
+
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent;
+  }
+
+  #portal_tabs {
+  display:none !important;;
+  }
+
+  #portal_search_input_group {
+  display:none !important;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -630,7 +88,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="generalized-lif-models">
 <h1>Generalized LIF Models<a class="headerlink" href="#generalized-lif-models" title="Permalink to this headline">¶</a></h1>
@@ -674,9 +132,9 @@ for a cell has a neuronal model download link.  Specifically:</p>
 <li>Scroll down to the model response click &#8216;Download model&#8217;.</li>
 </ol>
 </div></blockquote>
-<p>One such link (for a simple LIF neuronal model, ID 472423251), would look
+<p>One such link (for a simple LIF neuronal model, ID 566302806), would look
 like this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>http://api.brain-map.org/neuronal_model/download/472423251
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">api</span><span class="o">.</span><span class="n">brain</span><span class="o">-</span><span class="nb">map</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">neuronal_model</span><span class="o">/</span><span class="n">download</span><span class="o">/</span><span class="mi">566302806</span>
 </pre></div>
 </div>
 <p>This link returns .zip archive containing the neuron configuration file
@@ -695,12 +153,12 @@ you can download an NWB file containing both the stimulus and cell response trac
 <a class="reference external" href="cell_types.html#neurodata-without-borders">NWB</a> description section
 for more details on the NWB file format.</p>
 <p>You can also download all of these files, including the cell&#8217;s NWB file,
-using the <a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi" title="allensdk.api.queries.glif_api.GlifApi"><tt class="xref py py-class docutils literal"><span class="pre">GlifApi</span></tt></a>
+using the <a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi" title="allensdk.api.queries.glif_api.GlifApi"><code class="xref py py-class docutils literal"><span class="pre">GlifApi</span></code></a>
 class:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.glif_api</span> <span class="kn">import</span> <span class="n">GlifApi</span>
-<span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">json_utilities</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.glif_api</span> <span class="k">import</span> <span class="n">GlifApi</span>
+<span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="k">as</span> <span class="nn">json_utilities</span>
 
-<span class="n">neuronal_model_id</span> <span class="o">=</span> <span class="mi">472423251</span>
+<span class="n">neuronal_model_id</span> <span class="o">=</span> <span class="mi">566302806</span>
 
 <span class="n">glif_api</span> <span class="o">=</span> <span class="n">GlifApi</span><span class="p">()</span>
 <span class="n">glif_api</span><span class="o">.</span><span class="n">get_neuronal_model</span><span class="p">(</span><span class="n">neuronal_model_id</span><span class="p">)</span>
@@ -716,20 +174,20 @@ class:</p>
 </div>
 <div class="section" id="running-a-glif-simulation">
 <h2>Running a GLIF Simulation<a class="headerlink" href="#running-a-glif-simulation" title="Permalink to this headline">¶</a></h2>
-<p>To run a GLIF simulation, the most important file you you need is the <tt class="docutils literal"><span class="pre">neuron_config</span></tt>
+<p>To run a GLIF simulation, the most important file you you need is the <code class="docutils literal"><span class="pre">neuron_config</span></code>
 JSON file.  You can use this file to instantiate a simulator and feed in your own stimulus:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">json_utilities</span>
-<span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="kn">import</span> <span class="n">GlifNeuron</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="k">as</span> <span class="nn">json_utilities</span>
+<span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="k">import</span> <span class="n">GlifNeuron</span>
 
 <span class="c1"># initialize the neuron</span>
 <span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)</span>
 <span class="n">neuron</span> <span class="o">=</span> <span class="n">GlifNeuron</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">neuron_config</span><span class="p">)</span>
 
 <span class="c1"># make a short square pulse. stimulus units should be in Amps.</span>
-<span class="n">stimulus</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">0.0</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">+</span> <span class="p">[</span> <span class="mf">10e-9</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">+</span> <span class="p">[</span> <span class="mf">0.0</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">stimulus</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">0.0</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">+</span> <span class="p">[</span> <span class="mi">10</span><span class="n">e</span><span class="o">-</span><span class="mi">9</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">+</span> <span class="p">[</span> <span class="mf">0.0</span> <span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
 
 <span class="c1"># important! set the neuron&#39;s dt value for your stimulus in seconds</span>
-<span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">5e-6</span>
+<span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mi">5</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span>
 
 <span class="c1"># simulate the neuron</span>
 <span class="n">output</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
@@ -742,17 +200,17 @@ JSON file.  You can use this file to instantiate a simulator and feed in your ow
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The GLIF simulator does not simulate during action potentials.
-Instead it inserts <tt class="docutils literal"><span class="pre">NaN</span></tt> values for a fixed number of time steps when voltage
-surpasses threshold.  The simulator skips <tt class="docutils literal"><span class="pre">neuron.spike_cut_length</span></tt> time steps
+Instead it inserts <code class="docutils literal"><span class="pre">NaN</span></code> values for a fixed number of time steps when voltage
+surpasses threshold.  The simulator skips <code class="docutils literal"><span class="pre">neuron.spike_cut_length</span></code> time steps
 after voltage surpasses threshold.</p>
 </div>
 <p>To reproduce the model&#8217;s traces displayed on the Allen Cell Types Database web page,
-the Allen SDK provides the <tt class="xref py py-mod docutils literal"><span class="pre">allensdk.core.model.glif.simulate_neuron</span></tt>
+the Allen SDK provides the <code class="xref py py-mod docutils literal"><span class="pre">allensdk.core.model.glif.simulate_neuron</span></code>
 module for simulating all sweeps presented to a cell and storing them in the NWB format:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">json_utilities</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="k">as</span> <span class="nn">json_utilities</span>
 
-<span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="kn">import</span> <span class="n">GlifNeuron</span>
-<span class="kn">from</span> <span class="nn">allensdk.model.glif.simulate_neuron</span> <span class="kn">import</span> <span class="n">simulate_neuron</span>
+<span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="k">import</span> <span class="n">GlifNeuron</span>
+<span class="kn">from</span> <span class="nn">allensdk.model.glif.simulate_neuron</span> <span class="k">import</span> <span class="n">simulate_neuron</span>
 
 <span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)</span>
 <span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;ephys_sweeps.json&#39;</span><span class="p">)</span>
@@ -770,15 +228,15 @@ module for simulating all sweeps presented to a cell and storing them in the NWB
 <p class="last">These stimuli are sampled at a very high resolution (200kHz),
 and a given cell can have many sweeps.  This process can take over an hour.</p>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">simulate_neuron</span></tt> function call simulates all sweeps in the NWB file.
+<p>The <code class="docutils literal"><span class="pre">simulate_neuron</span></code> function call simulates all sweeps in the NWB file.
 Because the same NWB file is being used for both input and output,
 the cell&#8217;s response traces will be overwritten as stimuli are simulated.
-<tt class="docutils literal"><span class="pre">simulate_neuron</span></tt> optionally accepts a value which will be used to overwrite
-these <tt class="docutils literal"><span class="pre">NaN</span></tt> values generated during action potentials (in this case 0.05 Volts).</p>
+<code class="docutils literal"><span class="pre">simulate_neuron</span></code> optionally accepts a value which will be used to overwrite
+these <code class="docutils literal"><span class="pre">NaN</span></code> values generated during action potentials (in this case 0.05 Volts).</p>
 <p>If you would like to run a single sweep instead of all sweeps, try the following:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="kn">as</span> <span class="nn">json_utilities</span>
-<span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="kn">import</span> <span class="n">GlifNeuron</span>
-<span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="kn">import</span> <span class="n">NwbDataSet</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">allensdk.core.json_utilities</span> <span class="k">as</span> <span class="nn">json_utilities</span>
+<span class="kn">from</span> <span class="nn">allensdk.model.glif.glif_neuron</span> <span class="k">import</span> <span class="n">GlifNeuron</span>
+<span class="kn">from</span> <span class="nn">allensdk.core.nwb_data_set</span> <span class="k">import</span> <span class="n">NwbDataSet</span>
 
 <span class="n">neuron_config</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;neuron_config.json&#39;</span><span class="p">)</span>
 <span class="n">ephys_sweeps</span> <span class="o">=</span> <span class="n">json_utilities</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;ephys_sweeps.json&#39;</span><span class="p">)</span>
@@ -805,14 +263,14 @@ these <tt class="docutils literal"><span class="pre">NaN</span></tt> values gene
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The <tt class="docutils literal"><span class="pre">dt</span></tt> value provided in the downloadable GLIF neuron configuration
+<p class="last">The <code class="docutils literal"><span class="pre">dt</span></code> value provided in the downloadable GLIF neuron configuration
 files does not correspond to the sampling rate of the original stimulus.  Stimuli were
 subsampled and filtered for parameter optimization.  Be sure to overwrite the neuron&#8217;s
-<tt class="docutils literal"><span class="pre">dt</span></tt> with the correct sampling rate.</p>
+<code class="docutils literal"><span class="pre">dt</span></code> with the correct sampling rate.</p>
 </div>
 <p>If you would like to plot the outputs of this simulation using numpy and matplotlib, try:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="n">voltage</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">]</span>
 <span class="n">threshold</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="s1">&#39;threshold&#39;</span><span class="p">]</span>
@@ -869,13 +327,13 @@ subsampled and filtered for parameter optimization.  Be sure to overwrite the ne
 <p class="first admonition-title">Note</p>
 <p class="last">There both interpolated spike times and grid spike times.  The grid spike is the first time step
 where the voltage is higher than the threshold.  Note that if you try to plot the voltage at the grid
-spike indices the output will be <tt class="docutils literal"><span class="pre">NaN</span></tt>. The interpolated spike is the calculated intersection of the
+spike indices the output will be <code class="docutils literal"><span class="pre">NaN</span></code>. The interpolated spike is the calculated intersection of the
 threshold and voltage between the time steps.</p>
 </div>
 </div>
 <div class="section" id="glif-configuration">
 <h2>GLIF Configuration<a class="headerlink" href="#glif-configuration" title="Permalink to this headline">¶</a></h2>
-<p>Instances of the <a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron" title="allensdk.model.glif.glif_neuron.GlifNeuron"><tt class="xref py py-class docutils literal"><span class="pre">GlifNeuron</span></tt></a>
+<p>Instances of the <a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron" title="allensdk.model.glif.glif_neuron.GlifNeuron"><code class="xref py py-class docutils literal"><span class="pre">GlifNeuron</span></code></a>
 class require many parameters for initialization.
 Fixed neuron parameters are stored directly as properties on the class instance:</p>
 <table border="1" class="docutils">
@@ -937,10 +395,10 @@ Fixed neuron parameters are stored directly as properties on the class instance:
 </table>
 <p>Some of these fixed parameters were optimized to fit Allen Cell Types Database
 electrophysiology data.  Optimized coefficients for these
-parameters are stored by name in the <tt class="docutils literal"><span class="pre">neuron.coeffs</span></tt> dictionary. For more details
+parameters are stored by name in the <code class="docutils literal"><span class="pre">neuron.coeffs</span></code> dictionary. For more details
 on which parameters were optimized, please see the technical
 <a class="reference external" href="http://help.brain-map.org/display/celltypes/Documentation">white paper</a>.</p>
-<p>The <a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron" title="allensdk.model.glif.glif_neuron.GlifNeuron"><tt class="xref py py-class docutils literal"><span class="pre">GlifNeuron</span></tt></a> class has six
+<p>The <a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron" title="allensdk.model.glif.glif_neuron.GlifNeuron"><code class="xref py py-class docutils literal"><span class="pre">GlifNeuron</span></code></a> class has six
 methods that can be customized: three rules
 for updating voltage, threshold, and afterspike currents during the
 simulation; and three rules for updating those values when a spike is detected
@@ -978,7 +436,7 @@ simulation; and three rules for updating those values when a spike is detected
 </table>
 <p>The GLIF neuron configuration files available from the Allen Brain Atlas API use built-in
 methods, however you can supply your own custom method if you like:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="c1"># define your own custom voltage reset rule </span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># define your own custom voltage reset rule </span>
 <span class="c1"># this one linearly scales the input voltage</span>
 <span class="k">def</span> <span class="nf">custom_voltage_reset_rule</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">custom_param_a</span><span class="p">,</span> <span class="n">custom_param_b</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">custom_param_a</span> <span class="o">*</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="n">custom_param_b</span>
@@ -995,10 +453,10 @@ methods, however you can supply your own custom method if you like:</p>
 <span class="n">output</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Notice that the function is allowed to take custom parameters (here <tt class="docutils literal"><span class="pre">custom_param_a</span></tt> and
-<tt class="docutils literal"><span class="pre">custom_param_b</span></tt>), which are configured on method initialization from a dictionary. For more details,
-see the documentation for the <a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron" title="allensdk.model.glif.glif_neuron.GlifNeuron"><tt class="xref py py-class docutils literal"><span class="pre">GlifNeuron</span></tt></a> and
-<a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod" title="allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod"><tt class="xref py py-class docutils literal"><span class="pre">GlifNeuronMethod</span></tt></a> classes.</p>
+<p>Notice that the function is allowed to take custom parameters (here <code class="docutils literal"><span class="pre">custom_param_a</span></code> and
+<code class="docutils literal"><span class="pre">custom_param_b</span></code>), which are configured on method initialization from a dictionary. For more details,
+see the documentation for the <a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron" title="allensdk.model.glif.glif_neuron.GlifNeuron"><code class="xref py py-class docutils literal"><span class="pre">GlifNeuron</span></code></a> and
+<a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod" title="allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod"><code class="xref py py-class docutils literal"><span class="pre">GlifNeuronMethod</span></code></a> classes.</p>
 </div>
 <div class="section" id="built-in-dynamics-rules">
 <h2>Built-in Dynamics Rules<a class="headerlink" href="#built-in-dynamics-rules" title="Permalink to this headline">¶</a></h2>
@@ -1011,19 +469,16 @@ afterspike current vector, and current injection value to be passed in by the Gl
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an
 updated voltage value.</p>
 <blockquote>
-<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler" title="allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler()</span></tt></a></p>
-<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact" title="allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact()</span></tt></a></p>
-</div></blockquote>
+<div><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler" title="allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler()</span></code></a></div></blockquote>
 <p><strong>Threshold Dynamics Rules</strong></p>
 <p>These methods update the spike threshold of the simulation.  They all expect the current
 threshold and voltage values of the simulation to be passed in by the GlifNeuron. All
 other function parameters must be fixed using the GlifNeuronMethod class.  They all return an
 updated threshold value.</p>
 <blockquote>
-<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_forward" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_forward"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_forward()</span></tt></a></p>
-<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact()</span></tt></a></p>
-<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component()</span></tt></a></p>
-<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf()</span></tt></a></p>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact()</span></code></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component()</span></code></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf" title="allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf()</span></code></a></p>
 </div></blockquote>
 <p><strong>Afterspike Current Dynamics Rules</strong></p>
 <p>These methods expect current afterspike current coefficients, current time step,
@@ -1031,8 +486,8 @@ and time steps of all previous spikes to be passed in by the GlifNeuron. All oth
 parameters must be fixed using the GlifNeuronMethod class.  They all return an updated
 afterspike current array.</p>
 <blockquote>
-<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp" title="allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp()</span></tt></a></p>
-<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none" title="allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none()</span></tt></a></p>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp" title="allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp()</span></code></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none" title="allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none()</span></code></a></p>
 </div></blockquote>
 </div>
 <div class="section" id="built-in-reset-rules">
@@ -1046,24 +501,24 @@ threshold.</p>
 They all expect a voltageto be passed in by the GlifNeuron. All other function parameters must be
 fixed using the GlifNeuronMethod class.  They all return an updated voltage value.</p>
 <blockquote>
-<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_zero" title="allensdk.model.glif.glif_neuron_methods.reset_voltage_zero"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_voltage_zero()</span></tt></a></p>
-<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before" title="allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before()</span></tt></a></p>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_zero" title="allensdk.model.glif.glif_neuron_methods.reset_voltage_zero"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_voltage_zero()</span></code></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before" title="allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before()</span></code></a></p>
 </div></blockquote>
 <p><strong>Threshold Reset Rules</strong></p>
 <p>These methods update the spike threshold of the simulation after a spike has been detected.
 They all expect the current threshold and the reset voltage value of the simulation to be passed in by the GlifNeuron. All other function parameters must be fixed using the GlifNeuronMethod
 class.  They all return an updated threshold value.</p>
 <blockquote>
-<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_inf" title="allensdk.model.glif.glif_neuron_methods.reset_threshold_inf"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_threshold_inf()</span></tt></a></p>
-<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components" title="allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components()</span></tt></a></p>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_inf" title="allensdk.model.glif.glif_neuron_methods.reset_threshold_inf"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_threshold_inf()</span></code></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components" title="allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components()</span></code></a></p>
 </div></blockquote>
 <p><strong>Afterspike Reset Reset Rules</strong></p>
 <p>These methods expect current afterspike current coefficients to be passed in by
 the GlifNeuron. All other function parameters must be fixed using the GlifNeuronMethod
 class.  They all return an updated afterspike current array.</p>
 <blockquote>
-<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none" title="allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none()</span></tt></a></p>
-<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum" title="allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum"><tt class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum()</span></tt></a></p>
+<div><p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none" title="allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none()</span></code></a></p>
+<p><a class="reference internal" href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum" title="allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum"><code class="xref py py-meth docutils literal"><span class="pre">allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum()</span></code></a></p>
 </div></blockquote>
 </div>
 </div>
@@ -1072,7 +527,7 @@ class.  They all return an updated afterspike current array.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h3><a href="index.html">Contents</a></h3>
 <ul class="current">
@@ -1083,11 +538,12 @@ class.  They all return an updated afterspike current array.</p>
 <li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="models.html">Models</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="">Generalized LIF</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Generalized LIF</a></li>
 <li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
 </ul>
 </li>
@@ -1101,6 +557,7 @@ class.  They all return an updated afterspike current array.</p>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -1116,7 +573,7 @@ class.  They all return an updated afterspike current array.</p>
   If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
 </p>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -1124,9 +581,6 @@ class.  They all return an updated afterspike current array.</p>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1135,9 +589,10 @@ class.  They all return an updated afterspike current array.</p>
     </div>
 
 
-    <div class="footer">
+    <div class="footer" role="contentinfo">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
 
   </body>
 </html>

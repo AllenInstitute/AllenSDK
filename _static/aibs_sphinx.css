@@ -17,6 +17,10 @@ body {
 
 /* :::: LAYOUT :::: */
 
+div.document {
+    position: absolute;
+}
+
 div.documentwrapper {
     float: left;
     width: 100%;
@@ -39,8 +43,10 @@ div.sphinxsidebarwrapper {
 }
 
 div.sphinxsidebar {
-    float: left;
-    margin-left: -100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-left: 0;
     width: 300px;
     font-family: Verdana, sans-serif;
 }

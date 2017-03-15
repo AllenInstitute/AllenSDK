@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.brain_observatory_nwb_data_set &mdash; Allen SDK 0.12.3 documentation</title>
+    <title>allensdk.core.brain_observatory_nwb_data_set &mdash; Allen SDK 0.12.5 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.12.3',
+        VERSION:     '0.12.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,604 +23,62 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.3 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.5 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
-<style>
-
-	/* the icon font-family definition and helper classes */
-	@font-face {
-	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
-	  font-weight: normal;
-	  font-style: normal;
-	}
-	 
-	 [class^="icon-"]:before, [class*=" icon-"]:before {
-	  font-family: "portal_icon_font";
-	  font-style: normal;
-	  font-weight: normal;
-	  speak: none;
-	 
-	  display: inline-block;
-	  text-decoration: inherit;
-	  width: 1em;
-	  margin-right: .2em;
-	  text-align: center;
-	  /* opacity: .8; */
-	 
-	  /* For safety - reset parent styles, that can break glyph codes*/
-	  font-variant: normal;
-	  text-transform: none;
-	     
-	  /* fix buttons height, for twitter bootstrap */
-	  line-height: 1em;
-	 
-	  /* Animation center compensation - margins should be symmetric */
-	  /* remove if not needed */
-	  margin-left: .2em;
-	
-	}
-	 
-	.icon-spin5:before { content: '\e806'; } /* '' */
-	.icon-left-open-1:before { content: '\e81e'; } /* '' */
-	.icon-plus-1:before { content: '\e801'; } /* '' */
-	.icon-facebook:before { content: '\e816'; } /* '' */
-	.icon-gplus:before { content: '\e818'; } /* '' */
-	.icon-linkedin-3:before { content: '\e815'; } /* '' */
-	.icon-twitter:before { content: '\e817'; } /* '' */
-	.icon-youtube-play:before { content: '\e805'; } /* '' */
-	.icon-plus-2:before { content: '\e809'; } /* '' */
-	.icon-record-1:before { content: '\e81c'; } /* '' */
-	.icon-cancel:before { content: '\e80b'; } /* '' */
-	.icon-search:before { content: '\e804'; } /* '' */
-	.icon-cancel-2:before { content: '\e80c'; } /* '' */
-	.icon-plus-4:before { content: '\e80d'; } /* '' */
-	.icon-cancel-3:before { content: '\e80e'; } /* '' */
-	.icon-plus:before { content: '\e808'; } /* '' */
-	.icon-down-open:before { content: '\e800'; } /* '' */
-	.icon-right-open:before { content: '\e802'; } /* '' */
-	.icon-up-open:before { content: '\e803'; } /* '' */
-	.icon-stop:before { content: '\e813'; } /* '' */
-	.icon-cancel-1:before { content: '\e820'; } /* '' */
-	.icon-plus-3:before { content: '\e80a'; } /* '' */
-	/* end icon font helpers */
-
-	/* icon font spin animation */
-	.animate-spin {
-	  -moz-animation: spin 2s infinite linear;
-	  -o-animation: spin 2s infinite linear;
-	  -webkit-animation: spin 2s infinite linear;
-	  animation: spin 2s infinite linear;
-	  display: inline-block;
-	}
-	@-moz-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-webkit-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-o-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-ms-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	/*  end spin animation */	
-
-	@font-face {
-	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
-	    font-weight: normal;
-	    font-style: normal;
-	}
-
-	/* top chrome styles */
-	#top_chrome {
-
-		width:100%;
-		height:28px;
-		background-color:#163E65;
-	}
-
-	.chrome_link_block {
-
-		color:#fff !important;	
-		display:inline-block;
-		height:100%;
-		max-height:28px;
-	}
-
-	.chrome_link_block:hover {
-
-		background-color:#eee;
-		color:#0779BE !important;	
-		cursor:pointer;
-	}
-
-	#top_chrome a {
-
-		color:inherit !important;	
-		text-decoration:none;
-	}
-
-	#top_chrome a:hover {
-
-		color:inherit !important;	
-	}
-
-	#top_chrome_buttons {
-
-		float:right;
-		margin-right:50px;
-	}
-
-	.chrome_button {
-
-		font-family:arial,sans-serif;
-		font-weight:bold;
-		display:inline-block;
-		font-size:9px;
-		text-align:left;
-		text-decoration:none;
-		margin:9px 20px 10px 20px;
-	}
-
-	.chrome_active {
-
-		background-color:#1b7abd;
-		color:#fff;
-	}
-
-
-	/* header element styles*/
-	#header_content {
-
-		font-family: bebas_neueregular, arial, sans-serif;
-		font-size:22px;
-		color:#0779be;		
-		letter-spacing:0.03em;
-
-		position:relative;
-		width:calc(100% - 112px);
-		min-width:800px;
-		height:76px;
-		border-bottom:2px solid #A5A8AB;
-		margin-left:50px;
-		margin-right:50px;
-        z-index:9999; /* IT-9508 */
-	}
-
-	#portal_logo {
-
-		position:absolute;
-		top:20px;
-		left:0px;
-		width:236px;
-	}
-
-	#portal_tabs {
-
-		position: absolute;
-		bottom: 12px;
-		left: 0px;
-		margin-bottom: -12px;
-		display: block;
-	}
-
-	.horizontal_list
-	{
-		margin: 0;
-		padding: 0;
-		list-style-type: none;
-		display: inline; 		
-	}
-
-	.horizontal_list li { 
-
-		display: inline; 	
-	}	
-
-	#portal_tab_menu_container {
-
-		display:none;
-	}
-
-	#portal_search_input_group {
-
-		position:absolute;
-		margin: 0;
-		padding: 0;
-		bottom:12px;
-		right:0px;
-		border:1px solid #DAD9D3;
-		color:#DAD9D3;
-	}
-
-	#portal_search_input_group input {
-
-		margin: 0;
-		padding: 0;
-		border:none;
-		width:110px;
-		color:#DAD9D3;
-		font-family:Helvetica,sans-serif;
-		font-size:12px;
-		height:28px;
-		margin-left:10px;
-
-		outline:none;
-	}
-
-	input::-ms-clear {
-		display: none;
-	}
-
-	#portal_search_input_group i {
-
-		font-size:0.8em;
-		cursor:pointer;
-	}
-
-	#pSiteSearchTextInput:focus {
-
-		color:#000;
-	}
-
-	.icon_menu_down {
-
-		font-size: 12px;
-		margin-left: 4px;
-		vertical-align: text-top;
-		padding-top: 4px;
-		display: inline-block;
-	}
-
-	.portal_tab_item {
-
-		background-color: #fff;
-		padding: 12px;
-		padding-left:20px;
-		padding-right:20px;
-		display: inline-block !important;		
-	}
-
-	.portal_tab_item a:hover {
-
-		color:#fbe300;	
-	}
-
-	.portal_tab_item:hover {
-
-		background-color: #0779be;	
-		color:#fbe300 !important;	
-	}	
-
-
-	.portal_menu_active {
-
-		background-color: #EEEEEE;
-	}	
-
-	.portal_menu_item_active {
-
-		color:#fbe300 !important;	
-	}
-
-	.portal_tab_active {
-
-		color:#a5a8ab !important;
-	}
-
-	#header_content a {		
-
-		color:inherit !important;
-	}
-
-	#header_content a:hover {
-
-		background-color: #0779be;	
-		color:#fbe300 !important;	
-	}
-
-	#header_content ul {
-
-		list-style: none;
-		position: relative;
-		top: 58px;
-		display: inline-table;
-	}
-
-	#header_content ul ul {
-		
-		display:none;
-		opacity:0;
-	}
-
-	/* the fly out menus */
-	#header_content ul li:hover > ul,
-	#header_content ul li.hover > ul {
-
-		position: absolute;
-		top: 48px;
-		z-index:999;
-
-		display: block;
-		width: 152px;
-		padding:0px;
-		padding-top:20px;
-		padding-bottom:10px;
-		font-size: 12px;
-		font-family: Arial,Sans-Serif;
-		font-weight: bold;
-		text-transform: uppercase;
-
-		background-color: rgba(8,122,191,0.98);
-		color: #fff !important;
-		opacity: 1;
-
-		-webkit-animation: fade 0.25s;
-		animation: fade 0.25s;
-	}
-
-	@-webkit-keyframes fade {
-	    from {opacity: 0}
-	    to {opacity: 1}
-	}
-	@keyframes fade {
-	    from {opacity: 0}
-	    to {opacity: 1}
-	}	
-
-	#header_content ul li:hover > ul li {
-
-		padding: 10px;
-		padding-top: 0px;
-		padding-left: 20px;
-		display: block;
-		opacity:1;
-	}
-
-	#header_content ul li:hover > ul a {
-
-		display: block;
-		opacity:1;
-		white-space:nowrap;
-	}
-
-	#portal_menu_start_list {
-
-		left: 81px;
-
-		/* IE sauce */
-		left:85px\9;
-
-		/* Safari sauce */
-		(;left:79px;);
-	}
-
-	#portal_menu_atlases_list {
-
-		left: 290px;
-		width: 210px !important;
-        height: 236px;
-
-		padding-bottom:5px !important;
-
-		/* IE sauce */
-		left: 303px\9;
-        height: 225px\9;
-
-		/* Safari sauce */
-		(;left:279px;);
-	}
-
-	#portal_menu_tools_list {
-
-		left: 500px;
-		width: 172px !important;
-		height: 236px;
-
-		padding-bottom:5px !important;
-
-		/* IE sauce */
-		left: 513px\9;
-		height:225px\9;
-
-		/* Safari sauce */
-		(;left:489px;);
-		(;height:227px;);
-	}
-
-	/* mozilla sauce */
-	@-moz-document url-prefix() {
-
-		#header_content {
-
-			height:107px;
-		}
-
-		#portal_menu_start_list {
-
-			left:85px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 302px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 512px;
-			height:236px;
-		}
-	}
-
-
-	/* make it look OK on iPad also */
-	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
-
-		#portal_menu_start_list {
-
-			left:81px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 291px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 501px;
-			height:236px;
-		}  
-	}
-	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
-
-		#portal_menu_start_list {
-
-			left:81px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 291px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 501px;
-			height:236px;
-		}	  
-	}
-
-	.portal_menu_list_heading {
-
-		color:#9ccae5;
-		border-bottom:1px solid #9ccae5;
-		padding-bottom:5px !important;
-	}
-
-	.portal_menu_list_heading + li {
-
-		padding-top:10px !important;
-	}
-
-	.portal_menu_list_heading li {
-
-		padding-bottom:0px;
-	}	
-
-	#portal_menu_atlases_list li:last-of-type {
-
-		padding-bottom:15px !important;
-	}
-
-	.icon-spin5 {
-
-		color:#000;
-	}
-</style>
-<div id="pHeader">
-<div id="top_chrome">
-	<div id="top_chrome_buttons">
-		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
-		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
-	</div>
-</div>
-
-<div id="header_content">
-
-	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
-	</a>
-</div>
-</div>
-
-<script>
-
-jQuery('#portal_tab_menu').bind('touchstart', function() {
-
-	if(window.console)
-		console.log("touchstart");
-});
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  div.document {
+  position:relative !important;;
+  }
+
+  img#portal_logo{
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
+  }
+
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent;
+  }
+
+  #portal_tabs {
+  display:none !important;;
+  }
+
+  #portal_search_input_group {
+  display:none !important;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -628,7 +86,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for allensdk.core.brain_observatory_nwb_data_set</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2016 Allen Institute for Brain Science</span>
@@ -658,10 +116,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="kn">import</span> <span class="n">parse_version</span>
+<span class="kn">from</span> <span class="nn">allensdk.brain_observatory.brain_observatory_exceptions</span> <span class="kn">import</span> <span class="n">MissingStimulusException</span>
 
-<div class="viewcode-block" id="MissingStimulusException"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.MissingStimulusException">[docs]</a><span class="k">class</span> <span class="nc">MissingStimulusException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">pass</span>
-</div>
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet">[docs]</a><span class="k">class</span> <span class="nc">BrainObservatoryNwbDataSet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">PIPELINE_DATASET</span> <span class="o">=</span> <span class="s1">&#39;brain_observatory_pipeline&#39;</span>
     <span class="n">SUPPORTED_PIPELINE_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
@@ -687,7 +143,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">STIMULUS_TABLE_TYPES</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;abstract_feature_series&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">si</span><span class="o">.</span><span class="n">DRIFTING_GRATINGS</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">STATIC_GRATINGS</span><span class="p">],</span>
         <span class="s1">&#39;indexed_time_series&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">si</span><span class="o">.</span><span class="n">NATURAL_MOVIE_ONE</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">NATURAL_MOVIE_TWO</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">NATURAL_MOVIE_THREE</span><span class="p">,</span>
-                                <span class="n">si</span><span class="o">.</span><span class="n">NATURAL_SCENES</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">]</span>
+                                <span class="n">si</span><span class="o">.</span><span class="n">NATURAL_SCENES</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE</span><span class="p">,</span> 
+                                <span class="n">si</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE_4DEG</span><span class="p">,</span> <span class="n">si</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE_8DEG</span><span class="p">]</span>
+
     <span class="p">}</span>
 
     <span class="n">MOTION_CORRECTION_DATASETS</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;MotionCorrection/2p_image_series/xy_translations&quot;</span><span class="p">,</span> 
@@ -735,16 +193,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
                 <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
 
-        <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span>
-</div>
+        <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_fluorescence_timestamps"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_timestamps">[docs]</a>    <span class="k">def</span> <span class="nf">get_fluorescence_timestamps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of timestamps in seconds for the fluorescence traces &#39;&#39;&#39;</span>
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">timestamps</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                 <span class="s1">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s1">&#39;timestamps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">return</span> <span class="n">timestamps</span>
-</div>
+        <span class="k">return</span> <span class="n">timestamps</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_neuropil_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuropil_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of fluorescence traces for all ROIs</span>
 <span class="sd">        and the timestamps for each datapoint</span>
@@ -775,8 +233,36 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
                 <span class="n">np_traces</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
 
-        <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">np_traces</span>
-</div>
+        <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">np_traces</span></div>
+
+
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_neuropil_r"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_r">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuropil_r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Returns a scalar value of r for neuropil correction of flourescence traces</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cell_specimen_ids: list or array (optional)</span>
+<span class="sd">            List of cell IDs to return traces for. If this is None (default)</span>
+<span class="sd">            then results for all are returned</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        r: 1D numpy array, len(r)=len(cell_specimen_ids)</span>
+<span class="sd">            Scalar for neuropil subtraction for each cell</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">r_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
+                <span class="s1">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s1">&#39;r&#39;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">r_ds</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">r_ds</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">r</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_corrected_fluorescence_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_corrected_fluorescence_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of neuropil-corrected fluorescence traces</span>
 <span class="sd">        for all ROIs and the timestamps for each datapoint</span>
@@ -798,23 +284,17 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         
         <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fluorescence_traces</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
 
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_neuropil_r</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
+
         <span class="n">_</span><span class="p">,</span> <span class="n">neuropil_traces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_neuropil_traces</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">r_ds</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
-                <span class="s1">&#39;Fluorescence&#39;</span><span class="p">][</span><span class="s1">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s1">&#39;r&#39;</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="n">cell_specimen_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="n">r</span> <span class="o">=</span> <span class="n">r_ds</span><span class="o">.</span><span class="n">value</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
-                <span class="n">r</span> <span class="o">=</span> <span class="n">r_ds</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
 
         <span class="n">fc</span> <span class="o">=</span> <span class="n">cell_traces</span> <span class="o">-</span> <span class="n">neuropil_traces</span> <span class="o">*</span> <span class="n">r</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">fc</span>
-</div>
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_cell_specimen_indices"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">fc</span></div>
+
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_cell_specimen_indices"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_indices">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Given a list of cell specimen ids, return their index based on their order in this file.</span>
 
 <span class="sd">        Parameters</span>
@@ -831,8 +311,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cell specimen not found (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">inds</span>
-</div>
+        <span class="k">return</span> <span class="n">inds</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_dff_traces"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_dff_traces">[docs]</a>    <span class="k">def</span> <span class="nf">get_dff_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of dF/F traces for all ROIs and</span>
 <span class="sd">        the timestamps for each datapoint</span>
@@ -863,8 +343,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="n">inds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cell_specimen_indices</span><span class="p">(</span><span class="n">cell_specimen_ids</span><span class="p">)</span>
                 <span class="n">cell_traces</span> <span class="o">=</span> <span class="n">dff_ds</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="n">inds</span><span class="p">,</span> <span class="p">:]</span>
 
-        <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span>
-</div>
+        <span class="k">return</span> <span class="n">timestamps</span><span class="p">,</span> <span class="n">cell_traces</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of IDs for all ROIs in the file</span>
 
@@ -875,8 +355,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">roi_id</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                 <span class="s1">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s1">&#39;roi_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">return</span> <span class="n">roi_id</span>
-</div>
+        <span class="k">return</span> <span class="n">roi_id</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_cell_specimen_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_cell_specimen_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_specimen_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of cell IDs for all cells in the file</span>
 
@@ -887,8 +367,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">cell_id</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span>
                 <span class="s1">&#39;ImageSegmentation&#39;</span><span class="p">][</span><span class="s1">&#39;cell_specimen_ids&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">return</span> <span class="n">cell_id</span>
-</div>
+        <span class="k">return</span> <span class="n">cell_id</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_session_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_session_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_session_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns the type of experimental session, presently one of the</span>
 <span class="sd">        following: three_session_A, three_session_B, three_session_C</span>
@@ -899,8 +379,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">session_type</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;general/session_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">return</span> <span class="n">session_type</span>
-</div>
+        <span class="k">return</span> <span class="n">session_type</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_max_projection"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_max_projection">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_projection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Returns the maximum projection image for the 2P movie.</span>
 
@@ -912,8 +392,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">max_projection</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">PIPELINE_DATASET</span><span class="p">][</span><span class="s1">&#39;ImageSegmentation&#39;</span><span class="p">][</span>
                 <span class="s1">&#39;imaging_plane_1&#39;</span><span class="p">][</span><span class="s1">&#39;reference_images&#39;</span><span class="p">][</span><span class="s1">&#39;maximum_intensity_projection_image&#39;</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">return</span> <span class="n">max_projection</span>
-</div>
+        <span class="k">return</span> <span class="n">max_projection</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.list_stimuli"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.list_stimuli">[docs]</a>    <span class="k">def</span> <span class="nf">list_stimuli</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return a list of the stimuli presented in the experiment.</span>
 
@@ -924,20 +404,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">keys</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s2">&quot;stimulus/presentation/&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_stimulus&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
-</div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_stimulus&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus_table"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return a stimulus table given a stimulus name &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="n">stimulus_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_TABLE_TYPES</span><span class="p">[</span><span class="s1">&#39;abstract_feature_series&#39;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">_get_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span> <span class="o">+</span> <span class="s2">&quot;_stimulus&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">stimulus_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">STIMULUS_TABLE_TYPES</span><span class="p">[</span><span class="s1">&#39;indexed_time_series&#39;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="n">_get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span> <span class="o">+</span> <span class="s2">&quot;_stimulus&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span> <span class="o">+</span> <span class="s2">&quot;_stimulus&quot;</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_get_indexed_time_series_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">stimulus_name</span> <span class="o">==</span> <span class="s1">&#39;spontaneous&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_spontaneous_activity_stimulus_table</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
-                <span class="s2">&quot;Could not find a stimulus table named &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span>
-</div>
+                <span class="s2">&quot;Could not find a stimulus table named &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">stimulus_name</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_spontaneous_activity_stimulus_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_spontaneous_activity_stimulus_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return the spontaneous activity stimulus table, if it exists.</span>
 
@@ -962,8 +445,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">stimulus_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">stim_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">])</span>
 
-        <span class="k">return</span> <span class="n">stimulus_table</span>
-</div>
+        <span class="k">return</span> <span class="n">stimulus_table</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_stimulus_template">[docs]</a>    <span class="k">def</span> <span class="nf">get_stimulus_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return an array of the stimulus template for the specified stimulus.</span>
 
@@ -979,13 +462,21 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">stim_name</span> <span class="o">=</span> <span class="n">stimulus_name</span> <span class="o">+</span> <span class="s2">&quot;_image_stack&quot;</span>
         <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nwb_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">image_stack</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;stimulus&#39;</span><span class="p">][</span><span class="s1">&#39;templates&#39;</span><span class="p">][</span><span class="n">stim_name</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">return</span> <span class="n">image_stack</span>
-</div>
-<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template">[docs]</a>    <span class="k">def</span> <span class="nf">get_locally_sparse_noise_stimulus_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_off_screen</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">image_stack</span></div>
+
+<div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_locally_sparse_noise_stimulus_template">[docs]</a>    <span class="k">def</span> <span class="nf">get_locally_sparse_noise_stimulus_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                                                   <span class="n">stimulus</span><span class="p">,</span> 
+                                                   <span class="n">mask_off_screen</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return an array of the stimulus template for the specified stimulus.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        stimulus: string</span>
+<span class="sd">           Which locally sparse noise stimulus to retrieve.  Must be one of: </span>
+<span class="sd">               stimulus_info.LOCALLY_SPARSE_NOISE</span>
+<span class="sd">               stimulus_info.LOCALLY_SPARSE_NOISE_4DEG</span>
+<span class="sd">               stimulus_info.LOCALLY_SPARSE_NOISE_8DEG</span>
+
 <span class="sd">        mask_off_screen: boolean</span>
 <span class="sd">           Set off-screen regions of the stimulus to LocallySparseNoise.LSN_OFF_SCREEN.</span>
 
@@ -994,10 +485,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        tuple: (template, off-screen mask)</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stimulus_template</span><span class="p">(</span><span class="s2">&quot;locally_sparse_noise&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stimulus</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">si</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE_DIMENSIONS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a known locally sparse noise stimulus&quot;</span> <span class="o">%</span> <span class="n">stimulus</span><span class="p">)</span>
+
+        <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_stimulus_template</span><span class="p">(</span><span class="n">stimulus</span><span class="p">)</span>
 
         <span class="c1"># build mapping from template coordinates to display coordinates</span>
-        <span class="n">template_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+        <span class="n">template_shape</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">LOCALLY_SPARSE_NOISE_DIMENSIONS</span><span class="p">[</span><span class="n">stimulus</span><span class="p">]</span>
+        <span class="n">template_shape</span> <span class="o">=</span> <span class="p">[</span> <span class="n">template_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">template_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">]</span>
+
         <span class="n">template_display_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1260</span><span class="p">,</span> <span class="mi">720</span><span class="p">)</span>
         <span class="n">display_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1200</span><span class="p">)</span>
 
@@ -1024,8 +520,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">mask_off_screen</span><span class="p">:</span>
             <span class="n">template</span><span class="p">[:,</span> <span class="o">~</span><span class="n">template_mask</span><span class="o">.</span><span class="n">T</span><span class="p">]</span> <span class="o">=</span> <span class="n">LocallySparseNoise</span><span class="o">.</span><span class="n">LSN_OFF_SCREEN</span>
 
-        <span class="k">return</span> <span class="n">template</span><span class="p">,</span> <span class="n">template_mask</span><span class="o">.</span><span class="n">T</span>
-</div>
+        <span class="k">return</span> <span class="n">template</span><span class="p">,</span> <span class="n">template_mask</span><span class="o">.</span><span class="n">T</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_mask_array"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_mask_array">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_mask_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Return a numpy array containing all of the ROI masks for requested cells.</span>
 <span class="sd">        If cell_specimen_ids is omitted, return all masks.</span>
@@ -1052,11 +548,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">roi_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">roi_list</span><span class="p">),</span> <span class="n">roi_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span>
                            <span class="mi">0</span><span class="p">],</span> <span class="n">roi_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">roi_list</span><span class="p">):</span>
-            <span class="n">roi_arr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">roi</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">an_roi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">roi_list</span><span class="p">):</span>
+            <span class="n">roi_arr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">an_roi</span>
 
-        <span class="k">return</span> <span class="n">roi_arr</span>
-</div>
+        <span class="k">return</span> <span class="n">roi_arr</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_roi_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_roi_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_roi_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_specimen_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns an array of all the ROI masks</span>
 
@@ -1091,8 +587,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                                         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">roi_mask</span><span class="o">=</span><span class="n">roi_mask</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
                 <span class="n">roi_array</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">roi_array</span>
-</div>
+        <span class="k">return</span> <span class="n">roi_array</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_metadata"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">get_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns a dictionary of meta data associated with each</span>
 <span class="sd">        experiment, including Cre line, specimen number,</span>
@@ -1123,38 +619,36 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;could not find key </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">disk_key</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s1">&#39;genotye&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
-            <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;cre_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;genotype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># extract cre line from genotype string</span>
+        <span class="n">genotype</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;genotype&#39;</span><span class="p">)</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;cre_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;genotype&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">genotype</span> <span class="k">else</span> <span class="bp">None</span>
 
-        <span class="k">if</span> <span class="s1">&#39;imaging_depth&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
-            <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;imaging_depth_um&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;imaging_depth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;imaging_depth&#39;</span><span class="p">]</span>
-            
-        <span class="k">if</span> <span class="s1">&#39;ophys_experiment_id&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
-            <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;ophys_experiment_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;ophys_experiment_id&#39;</span><span class="p">])</span>
+        <span class="n">imaging_depth</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;imaging_depth&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;imaging_depth_um&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">imaging_depth</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="n">imaging_depth</span> <span class="k">else</span> <span class="bp">None</span>
+        
+        <span class="n">ophys_experiment_id</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ophys_experiment_id&#39;</span><span class="p">)</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;ophys_experiment_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ophys_experiment_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">ophys_experiment_id</span> <span class="k">else</span> <span class="bp">None</span>
 
-        <span class="k">if</span> <span class="s1">&#39;experiment_container_id&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
-            <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="o">=</span> \
-                <span class="nb">int</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;experiment_container_id&#39;</span><span class="p">])</span>
+        <span class="n">experiment_container_id</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;experiment_container_id&#39;</span><span class="p">)</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;experiment_container_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">experiment_container_id</span><span class="p">)</span> <span class="k">if</span> <span class="n">experiment_container_id</span> <span class="k">else</span> <span class="bp">None</span>
 
-        <span class="k">if</span> <span class="s1">&#39;session_start_time&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
-            <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;session_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> \
-                <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;session_start_time&#39;</span><span class="p">])</span>
+        <span class="c1"># convert start time to a date object</span>
+        <span class="n">session_start_time</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;session_start_time&#39;</span><span class="p">)</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;session_start_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">session_start_time</span><span class="p">)</span> <span class="k">if</span> <span class="n">session_start_time</span> <span class="k">else</span> <span class="bp">None</span>
 
-        <span class="k">if</span> <span class="s1">&#39;age&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+        <span class="n">age</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">age</span><span class="p">:</span>
             <span class="c1"># parse the age in days</span>
-            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;(.*?) days&quot;</span><span class="p">,</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">])</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;(.*?) days&quot;</span><span class="p">,</span> <span class="n">age</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
                 <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;age_days&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Could not parse age.&quot;</span><span class="p">)</span>
+            
 
         <span class="c1"># parse the device string (ugly, sorry)</span>
-        <span class="k">if</span> <span class="s1">&#39;device_string&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
-            <span class="n">device_string</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;device_string&#39;</span><span class="p">]</span>
-            <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;device_string&#39;</span><span class="p">]</span>
-
+        <span class="n">device_string</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;device_string&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device_string</span><span class="p">:</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;(.*?)\.\s(.*?)\sPlease*&quot;</span><span class="p">,</span> <span class="n">device_string</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
                 <span class="n">device</span><span class="p">,</span> <span class="n">device_name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
@@ -1164,17 +658,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
                 <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Could not parse device string.&quot;</span><span class="p">)</span>
 
         <span class="c1"># file version</span>
-        <span class="k">if</span> <span class="s1">&#39;generated_by&#39;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
-            <span class="n">generated_by</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;generated_by&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">generated_by</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;generated_by&quot;</span><span class="p">]</span>
-                <span class="n">version</span> <span class="o">=</span> <span class="n">generated_by</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;0.9&quot;</span>
-            <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;pipeline_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span>
+        <span class="n">generated_by</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;generated_by&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">version</span> <span class="o">=</span> <span class="n">generated_by</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">generated_by</span> <span class="k">else</span> <span class="s2">&quot;0.9&quot;</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;pipeline_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span>
 
-        <span class="k">return</span> <span class="n">meta</span>
-</div>
+        <span class="k">return</span> <span class="n">meta</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_running_speed"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_running_speed">[docs]</a>    <span class="k">def</span> <span class="nf">get_running_speed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns the mouse running speed in cm/s</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -1192,8 +681,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span> <span class="o">=</span> <span class="n">align_running_speed</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span>
-</div>
+        <span class="k">return</span> <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.get_motion_correction"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_motion_correction">[docs]</a>    <span class="k">def</span> <span class="nf">get_motion_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Returns a Panda DataFrame containing the x- and y- translation of each image used for image alignment</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -1223,8 +712,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">if</span> <span class="n">motion_correction</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Could not find motion correction data.&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">motion_correction</span>
-</div>
+        <span class="k">return</span> <span class="n">motion_correction</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.save_analysis_dataframes"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_dataframes">[docs]</a>    <span class="k">def</span> <span class="nf">save_analysis_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">tables</span><span class="p">):</span>
         <span class="c1"># NOTE: should use NWB library to write data to NWB file. It is</span>
         <span class="c1">#   designed to avoid possible corruption of the file in event</span>
@@ -1234,8 +723,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
             <span class="n">store</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s1">&#39;analysis/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>
 
-        <span class="n">store</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</div>
+        <span class="n">store</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="BrainObservatoryNwbDataSet.save_analysis_arrays"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.save_analysis_arrays">[docs]</a>    <span class="k">def</span> <span class="nf">save_analysis_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">datasets</span><span class="p">):</span>
         <span class="c1"># NOTE: should use NWB library to write data to NWB file. It is</span>
         <span class="c1">#   designed to avoid possible corruption of the file in event</span>
@@ -1244,9 +733,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;analysis&#39;</span><span class="p">]:</span>
                     <span class="k">del</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;analysis&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;analysis/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;analysis/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">v</span><span class="p">)</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="align_running_speed"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.align_running_speed">[docs]</a><span class="k">def</span> <span class="nf">align_running_speed</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; If running speed timestamps differ from fluorescence</span>
 <span class="sd">    timestamps, adjust by inserting NaNs to running speed.</span>
@@ -1264,8 +753,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">dxtime</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dxtime</span><span class="p">,</span> <span class="n">timestamps</span><span class="p">[(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">adjust</span><span class="p">):])</span>
         <span class="n">dxcm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dxcm</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">NaN</span><span class="p">,</span> <span class="n">adjust</span><span class="p">))</span>
         
-    <span class="k">return</span> <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span>
-</div>
+    <span class="k">return</span> <span class="n">dxcm</span><span class="p">,</span> <span class="n">dxtime</span></div>
+
 <div class="viewcode-block" id="warp_stimulus_coords"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords">[docs]</a><span class="k">def</span> <span class="nf">warp_stimulus_coords</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span>
                          <span class="n">distance</span><span class="o">=</span><span class="mf">15.0</span><span class="p">,</span>
                          <span class="n">mon_height_cm</span><span class="o">=</span><span class="mf">32.5</span><span class="p">,</span>
@@ -1351,9 +840,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">retCoords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">retCoords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">mon_res_x</span>
     <span class="n">retCoords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">retCoords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">mon_res_y</span>
 
-    <span class="k">return</span> <span class="n">retCoords</span>
+    <span class="k">return</span> <span class="n">retCoords</span></div>
 
-</div>
+
 <div class="viewcode-block" id="make_display_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.make_display_mask">[docs]</a><span class="k">def</span> <span class="nf">make_display_mask</span><span class="p">(</span><span class="n">display_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1200</span><span class="p">)):</span>
     <span class="sd">&#39;&#39;&#39; Build a display-shaped mask that indicates which pixels are on screen after warping the stimulus. &#39;&#39;&#39;</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">-</span> <span class="n">display_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
@@ -1375,9 +864,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">display_shape</span><span class="p">)</span>
     <span class="n">mask</span><span class="p">[</span><span class="n">used_coords</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
-    <span class="k">return</span> <span class="n">mask</span>
+    <span class="k">return</span> <span class="n">mask</span></div>
 
-</div>
+
 <div class="viewcode-block" id="mask_stimulus_template"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.mask_stimulus_template">[docs]</a><span class="k">def</span> <span class="nf">mask_stimulus_template</span><span class="p">(</span><span class="n">template_display_coords</span><span class="p">,</span> <span class="n">template_shape</span><span class="p">,</span> <span class="n">display_mask</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Build a mask for a stimulus template of a given shape and display coordinates that indicates</span>
 <span class="sd">    which part of the template is on screen after warping.</span>
@@ -1415,9 +904,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">frac</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span>
             <span class="n">mask</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span> <span class="o">&gt;=</span> <span class="n">threshold</span>
 
-    <span class="k">return</span> <span class="n">mask</span><span class="p">,</span> <span class="n">frac</span>
+    <span class="k">return</span> <span class="n">mask</span><span class="p">,</span> <span class="n">frac</span></div>
 
-</div>
+
 <span class="k">def</span> <span class="nf">_get_abstract_feature_series_stimulus_table</span><span class="p">(</span><span class="n">nwb_file</span><span class="p">,</span> <span class="n">stimulus_name</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Return the a stimulus table for an abstract feature series.</span>
 
@@ -1465,12 +954,13 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">stimulus_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_dur</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">stimulus_table</span>
+
 </pre></div>
 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
@@ -1481,6 +971,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_space.html">Reference Space</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -1499,6 +990,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -1514,7 +1006,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
 </p>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -1522,9 +1014,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1533,9 +1022,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     </div>
 
 
-    <div class="footer">
+    <div class="footer" role="contentinfo">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
 
   </body>
 </html>

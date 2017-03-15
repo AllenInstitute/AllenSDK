@@ -1,0 +1,22 @@
+allensdk.test_utilities package
+===============================
+
+Submodules
+----------
+
+allensdk.test_utilities.temp_dir module
+---------------------------------------
+
+.. automodule:: allensdk.test_utilities.temp_dir
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: allensdk.test_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,484 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.core.simple_tree &mdash; Allen SDK 0.12.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.12.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.12.5 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  div.document {
+  position:relative !important;;
+  }
+
+  img#portal_logo{
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
+  }
+
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent;
+  }
+
+  #portal_tabs {
+  display:none !important;;
+  }
+
+  #portal_search_input_group {
+  display:none !important;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for allensdk.core.simple_tree</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2017 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">operator</span> <span class="kn">as</span> <span class="nn">op</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<div class="viewcode-block" id="SimpleTree"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree">[docs]</a><span class="k">class</span> <span class="nc">SimpleTree</span><span class="p">(</span> <span class="nb">object</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> 
+                 <span class="n">node_id_cb</span><span class="p">,</span> 
+                 <span class="n">parent_id_cb</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;A tree structure</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nodes : list of dict</span>
+<span class="sd">            Each dict is a node in the tree. The keys of the dict name the </span>
+<span class="sd">            properties of the node and should be consistent across nodes.</span>
+<span class="sd">        node_id_cb : function | node dict -&gt; node id</span>
+<span class="sd">            Calling node_id_cb on a node dictionary ought to produce a unique </span>
+<span class="sd">            identifier for that node (we call this the node&#39;s id). The type </span>
+<span class="sd">            of the node id is up to you, but ought to be consistent across </span>
+<span class="sd">            nodes and must be hashable.</span>
+<span class="sd">        parent_id_cb : function | node_dict =&gt; parent node&#39;s id</span>
+<span class="sd">            As node_id_cb, but returns the id of the node&#39;s parent.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        It is easy to pass a pandas DataFrame as the nodes. Just use the </span>
+<span class="sd">        to_dict method of the dataframe like so:</span>
+<span class="sd">            list_of_dict = your_dataframe.to_dict(&#39;record&#39;)</span>
+<span class="sd">            your_tree = SimpleTree(list_of_dict, ...)</span>
+<span class="sd">        Converting a list of dictionaries to a pandas DataFrame is also very </span>
+<span class="sd">        easy. The DataFrame constructor does it for you:</span>
+<span class="sd">            your_dataframe = pandas.DataFrame(list_of_dict)</span>
+<span class="sd">             </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span> <span class="p">{</span> <span class="n">node_id_cb</span><span class="p">(</span><span class="n">n</span><span class="p">):</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nodes</span> <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parent_ids</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span> <span class="p">{</span> <span class="n">nid</span><span class="p">:</span><span class="n">parent_id_cb</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">nid</span><span class="p">,</span><span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_child_ids</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span> <span class="p">{</span> <span class="n">nid</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">nid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span> <span class="p">})</span>
+
+        <span class="k">for</span> <span class="n">nid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_ids</span><span class="p">:</span>
+            <span class="n">pid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_ids</span><span class="p">[</span><span class="n">nid</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">pid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_child_ids</span><span class="p">[</span><span class="n">pid</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nid</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SimpleTree.filter_nodes"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.filter_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">filter_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">criterion</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Obtain a list of nodes filtered by some criterion</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        criterion : function | node dict =&gt; bool</span>
+<span class="sd">            Only nodes for which criterion returns true will be returned.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of dict :</span>
+<span class="sd">            Items are node dictionaries that passed the filter.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">return</span> <span class="nb">filter</span><span class="p">(</span><span class="n">criterion</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+        
+        
+<div class="viewcode-block" id="SimpleTree.value_map"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.value_map">[docs]</a>    <span class="k">def</span> <span class="nf">value_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_fn</span><span class="p">,</span> <span class="n">to_fn</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Obtain a look-up table relating a pair of node properties across </span>
+<span class="sd">        nodes</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        from_fn : function | node dict =&gt; hashable value</span>
+<span class="sd">            The keys of the output dictionary will be obtained by calling </span>
+<span class="sd">            from_fn on each node.</span>
+<span class="sd">        to_fn : function | node_dict =&gt; value</span>
+<span class="sd">            The values of the output function will be obtained by calling </span>
+<span class="sd">            to_fn on each node.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict :</span>
+<span class="sd">            Maps the node property defined by from_fn to the node property </span>
+<span class="sd">            defined by to_fn across nodes.</span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The resulting map is not necessarily 1-to-1! </span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">return</span> <span class="p">{</span><span class="n">from_fn</span><span class="p">(</span><span class="n">v</span><span class="p">):</span> <span class="n">to_fn</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span></div>
+
+
+<div class="viewcode-block" id="SimpleTree.node_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.node_ids">[docs]</a>    <span class="k">def</span> <span class="nf">node_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Obtain the node ids of each node in the tree</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list :</span>
+<span class="sd">            elements are node ids </span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SimpleTree.parent_id"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.parent_id">[docs]</a>    <span class="k">def</span> <span class="nf">parent_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Obtain the ids of one or more nodes&#39; parents</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node_ids : list of hashable</span>
+<span class="sd">            Items are ids of nodes whose parents you wish to find.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of hashable : </span>
+<span class="sd">            Items are ids of input nodes&#39; parents in order.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">return</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_ids</span><span class="p">[</span><span class="n">nid</span><span class="p">]</span> <span class="k">for</span> <span class="n">nid</span> <span class="ow">in</span> <span class="n">node_ids</span> <span class="p">]</span></div>
+
+   
+<div class="viewcode-block" id="SimpleTree.child_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.child_ids">[docs]</a>    <span class="k">def</span> <span class="nf">child_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Obtain the ids of one or more nodes&#39; children</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node_ids : list of hashable</span>
+<span class="sd">            Items are ids of nodes whose children you wish to find.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of list of hashable : </span>
+<span class="sd">            Items are lists of input nodes&#39; children&#39;s ids.</span>
+<span class="sd">            </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">return</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">_child_ids</span><span class="p">[</span><span class="n">nid</span><span class="p">]</span> <span class="k">for</span> <span class="n">nid</span> <span class="ow">in</span> <span class="n">node_ids</span> <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="SimpleTree.ancestor_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.ancestor_ids">[docs]</a>    <span class="k">def</span> <span class="nf">ancestor_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Obtain the ids of one or more nodes&#39; ancestors</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node_ids : list of hashable</span>
+<span class="sd">            Items are ids of nodes whose ancestors you wish to find.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of list of hashable : </span>
+<span class="sd">            Items are lists of input nodes&#39; ancestors&#39; ids.</span>
+<span class="sd">        </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Given the tree:</span>
+<span class="sd">        A -&gt; B -&gt; C</span>
+<span class="sd">         `-&gt; D</span>
+<span class="sd">          </span>
+<span class="sd">        The ancestors of C are [C, B, A]. The ancestors of A are [A]. The </span>
+<span class="sd">        ancestors of D are [D, A]</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">nid</span> <span class="ow">in</span> <span class="n">node_ids</span><span class="p">:</span>
+        
+            <span class="n">current</span> <span class="o">=</span> <span class="p">[</span><span class="n">nid</span><span class="p">]</span>
+            <span class="k">while</span> <span class="n">current</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">current</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_id</span><span class="p">([</span><span class="n">current</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]))</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                
+        <span class="k">return</span> <span class="n">out</span></div>
+            
+    
+<div class="viewcode-block" id="SimpleTree.descendant_ids"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.descendant_ids">[docs]</a>    <span class="k">def</span> <span class="nf">descendant_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Obtain the ids of one or more nodes&#39; descendants</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node_ids : list of hashable</span>
+<span class="sd">            Items are ids of nodes whose descendants you wish to find.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of list of hashable : </span>
+<span class="sd">            Items are lists of input nodes&#39; descendants&#39; ids.</span>
+<span class="sd">        </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Given the tree:</span>
+<span class="sd">        A -&gt; B -&gt; C</span>
+<span class="sd">         `-&gt; D</span>
+<span class="sd">          </span>
+<span class="sd">        The descendants of A are [B, C, D]. The descendants of C are [].</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">nid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">node_ids</span><span class="p">):</span>
+        
+            <span class="n">current</span> <span class="o">=</span> <span class="p">[</span><span class="n">nid</span><span class="p">]</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_ids</span><span class="p">([</span><span class="n">nid</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            
+            <span class="k">if</span> <span class="n">children</span><span class="p">:</span>
+                <span class="n">current</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> 
+                               <span class="bp">self</span><span class="o">.</span><span class="n">descendant_ids</span><span class="p">(</span><span class="n">children</span><span class="p">))))</span>
+                               
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+            
+
+<div class="viewcode-block" id="SimpleTree.node"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.node">[docs]</a>    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ids</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Get one or more nodes&#39; full dictionaries from their ids.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node_ids : list of hashable</span>
+<span class="sd">            Items are ids of nodes to be returned. Default is all.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of dict : </span>
+<span class="sd">            Items are nodes corresponding to argued ids.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">if</span> <span class="n">node_ids</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">node_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_ids</span><span class="p">()</span>
+    
+        <span class="k">return</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="p">[</span><span class="n">nid</span><span class="p">]</span> <span class="k">for</span> <span class="n">nid</span> <span class="ow">in</span> <span class="n">node_ids</span> <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="SimpleTree.parent"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.parent">[docs]</a>    <span class="k">def</span> <span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Get one or mode nodes&#39; parent nodes</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node_ids : list of hashable</span>
+<span class="sd">            Items are ids of nodes whose parents will be found.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of dict : </span>
+<span class="sd">            Items are parents of nodes corresponding to argued ids.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent_ids</span><span class="p">[</span><span class="n">nid</span><span class="p">]</span> <span class="k">for</span> <span class="n">nid</span> <span class="ow">in</span> <span class="n">node_ids</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="SimpleTree.children"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.children">[docs]</a>    <span class="k">def</span> <span class="nf">children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Get one or mode nodes&#39; child nodes</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node_ids : list of hashable</span>
+<span class="sd">            Items are ids of nodes whose children will be found.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of list of dict : </span>
+<span class="sd">            Items are lists of child nodes corresponding to argued ids.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_ids</span><span class="p">(</span><span class="n">node_ids</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SimpleTree.descendants"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.descendants">[docs]</a>    <span class="k">def</span> <span class="nf">descendants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Get one or mode nodes&#39; descendant nodes</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node_ids : list of hashable</span>
+<span class="sd">            Items are ids of nodes whose descendants will be found.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of list of dict : </span>
+<span class="sd">            Items are lists of descendant nodes corresponding to argued ids.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">descendant_ids</span><span class="p">(</span><span class="n">node_ids</span><span class="p">))</span></div>
+
+    
+<div class="viewcode-block" id="SimpleTree.ancestors"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.simple_tree.SimpleTree.ancestors">[docs]</a>    <span class="k">def</span> <span class="nf">ancestors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_ids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Get one or mode nodes&#39; ancestor nodes</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node_ids : list of hashable</span>
+<span class="sd">            Items are ids of nodes whose ancestors will be found.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of list of dict : </span>
+<span class="sd">            Items are lists of ancestor nodes corresponding to argued ids.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor_ids</span><span class="p">(</span><span class="n">node_ids</span><span class="p">))</span></div></div>
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

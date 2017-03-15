@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.model.glif.glif_neuron_methods &mdash; Allen SDK 0.12.3 documentation</title>
+    <title>allensdk.model.glif.glif_neuron_methods &mdash; Allen SDK 0.12.5 documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../../',
-        VERSION:     '0.12.3',
+        VERSION:     '0.12.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,604 +23,62 @@
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.3 documentation" href="../../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.5 documentation" href="../../../../index.html" />
     <link rel="up" title="Module code" href="../../../index.html" /> 
   </head>
-  <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
-<style>
-
-	/* the icon font-family definition and helper classes */
-	@font-face {
-	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
-	  font-weight: normal;
-	  font-style: normal;
-	}
-	 
-	 [class^="icon-"]:before, [class*=" icon-"]:before {
-	  font-family: "portal_icon_font";
-	  font-style: normal;
-	  font-weight: normal;
-	  speak: none;
-	 
-	  display: inline-block;
-	  text-decoration: inherit;
-	  width: 1em;
-	  margin-right: .2em;
-	  text-align: center;
-	  /* opacity: .8; */
-	 
-	  /* For safety - reset parent styles, that can break glyph codes*/
-	  font-variant: normal;
-	  text-transform: none;
-	     
-	  /* fix buttons height, for twitter bootstrap */
-	  line-height: 1em;
-	 
-	  /* Animation center compensation - margins should be symmetric */
-	  /* remove if not needed */
-	  margin-left: .2em;
-	
-	}
-	 
-	.icon-spin5:before { content: '\e806'; } /* '' */
-	.icon-left-open-1:before { content: '\e81e'; } /* '' */
-	.icon-plus-1:before { content: '\e801'; } /* '' */
-	.icon-facebook:before { content: '\e816'; } /* '' */
-	.icon-gplus:before { content: '\e818'; } /* '' */
-	.icon-linkedin-3:before { content: '\e815'; } /* '' */
-	.icon-twitter:before { content: '\e817'; } /* '' */
-	.icon-youtube-play:before { content: '\e805'; } /* '' */
-	.icon-plus-2:before { content: '\e809'; } /* '' */
-	.icon-record-1:before { content: '\e81c'; } /* '' */
-	.icon-cancel:before { content: '\e80b'; } /* '' */
-	.icon-search:before { content: '\e804'; } /* '' */
-	.icon-cancel-2:before { content: '\e80c'; } /* '' */
-	.icon-plus-4:before { content: '\e80d'; } /* '' */
-	.icon-cancel-3:before { content: '\e80e'; } /* '' */
-	.icon-plus:before { content: '\e808'; } /* '' */
-	.icon-down-open:before { content: '\e800'; } /* '' */
-	.icon-right-open:before { content: '\e802'; } /* '' */
-	.icon-up-open:before { content: '\e803'; } /* '' */
-	.icon-stop:before { content: '\e813'; } /* '' */
-	.icon-cancel-1:before { content: '\e820'; } /* '' */
-	.icon-plus-3:before { content: '\e80a'; } /* '' */
-	/* end icon font helpers */
-
-	/* icon font spin animation */
-	.animate-spin {
-	  -moz-animation: spin 2s infinite linear;
-	  -o-animation: spin 2s infinite linear;
-	  -webkit-animation: spin 2s infinite linear;
-	  animation: spin 2s infinite linear;
-	  display: inline-block;
-	}
-	@-moz-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-webkit-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-o-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-ms-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	/*  end spin animation */	
-
-	@font-face {
-	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
-	    font-weight: normal;
-	    font-style: normal;
-	}
-
-	/* top chrome styles */
-	#top_chrome {
-
-		width:100%;
-		height:28px;
-		background-color:#163E65;
-	}
-
-	.chrome_link_block {
-
-		color:#fff !important;	
-		display:inline-block;
-		height:100%;
-		max-height:28px;
-	}
-
-	.chrome_link_block:hover {
-
-		background-color:#eee;
-		color:#0779BE !important;	
-		cursor:pointer;
-	}
-
-	#top_chrome a {
-
-		color:inherit !important;	
-		text-decoration:none;
-	}
-
-	#top_chrome a:hover {
-
-		color:inherit !important;	
-	}
-
-	#top_chrome_buttons {
-
-		float:right;
-		margin-right:50px;
-	}
-
-	.chrome_button {
-
-		font-family:arial,sans-serif;
-		font-weight:bold;
-		display:inline-block;
-		font-size:9px;
-		text-align:left;
-		text-decoration:none;
-		margin:9px 20px 10px 20px;
-	}
-
-	.chrome_active {
-
-		background-color:#1b7abd;
-		color:#fff;
-	}
-
-
-	/* header element styles*/
-	#header_content {
-
-		font-family: bebas_neueregular, arial, sans-serif;
-		font-size:22px;
-		color:#0779be;		
-		letter-spacing:0.03em;
-
-		position:relative;
-		width:calc(100% - 112px);
-		min-width:800px;
-		height:76px;
-		border-bottom:2px solid #A5A8AB;
-		margin-left:50px;
-		margin-right:50px;
-        z-index:9999; /* IT-9508 */
-	}
-
-	#portal_logo {
-
-		position:absolute;
-		top:20px;
-		left:0px;
-		width:236px;
-	}
-
-	#portal_tabs {
-
-		position: absolute;
-		bottom: 12px;
-		left: 0px;
-		margin-bottom: -12px;
-		display: block;
-	}
-
-	.horizontal_list
-	{
-		margin: 0;
-		padding: 0;
-		list-style-type: none;
-		display: inline; 		
-	}
-
-	.horizontal_list li { 
-
-		display: inline; 	
-	}	
-
-	#portal_tab_menu_container {
-
-		display:none;
-	}
-
-	#portal_search_input_group {
-
-		position:absolute;
-		margin: 0;
-		padding: 0;
-		bottom:12px;
-		right:0px;
-		border:1px solid #DAD9D3;
-		color:#DAD9D3;
-	}
-
-	#portal_search_input_group input {
-
-		margin: 0;
-		padding: 0;
-		border:none;
-		width:110px;
-		color:#DAD9D3;
-		font-family:Helvetica,sans-serif;
-		font-size:12px;
-		height:28px;
-		margin-left:10px;
-
-		outline:none;
-	}
-
-	input::-ms-clear {
-		display: none;
-	}
-
-	#portal_search_input_group i {
-
-		font-size:0.8em;
-		cursor:pointer;
-	}
-
-	#pSiteSearchTextInput:focus {
-
-		color:#000;
-	}
-
-	.icon_menu_down {
-
-		font-size: 12px;
-		margin-left: 4px;
-		vertical-align: text-top;
-		padding-top: 4px;
-		display: inline-block;
-	}
-
-	.portal_tab_item {
-
-		background-color: #fff;
-		padding: 12px;
-		padding-left:20px;
-		padding-right:20px;
-		display: inline-block !important;		
-	}
-
-	.portal_tab_item a:hover {
-
-		color:#fbe300;	
-	}
-
-	.portal_tab_item:hover {
-
-		background-color: #0779be;	
-		color:#fbe300 !important;	
-	}	
-
-
-	.portal_menu_active {
-
-		background-color: #EEEEEE;
-	}	
-
-	.portal_menu_item_active {
-
-		color:#fbe300 !important;	
-	}
-
-	.portal_tab_active {
-
-		color:#a5a8ab !important;
-	}
-
-	#header_content a {		
-
-		color:inherit !important;
-	}
-
-	#header_content a:hover {
-
-		background-color: #0779be;	
-		color:#fbe300 !important;	
-	}
-
-	#header_content ul {
-
-		list-style: none;
-		position: relative;
-		top: 58px;
-		display: inline-table;
-	}
-
-	#header_content ul ul {
-		
-		display:none;
-		opacity:0;
-	}
-
-	/* the fly out menus */
-	#header_content ul li:hover > ul,
-	#header_content ul li.hover > ul {
-
-		position: absolute;
-		top: 48px;
-		z-index:999;
-
-		display: block;
-		width: 152px;
-		padding:0px;
-		padding-top:20px;
-		padding-bottom:10px;
-		font-size: 12px;
-		font-family: Arial,Sans-Serif;
-		font-weight: bold;
-		text-transform: uppercase;
-
-		background-color: rgba(8,122,191,0.98);
-		color: #fff !important;
-		opacity: 1;
-
-		-webkit-animation: fade 0.25s;
-		animation: fade 0.25s;
-	}
-
-	@-webkit-keyframes fade {
-	    from {opacity: 0}
-	    to {opacity: 1}
-	}
-	@keyframes fade {
-	    from {opacity: 0}
-	    to {opacity: 1}
-	}	
-
-	#header_content ul li:hover > ul li {
-
-		padding: 10px;
-		padding-top: 0px;
-		padding-left: 20px;
-		display: block;
-		opacity:1;
-	}
-
-	#header_content ul li:hover > ul a {
-
-		display: block;
-		opacity:1;
-		white-space:nowrap;
-	}
-
-	#portal_menu_start_list {
-
-		left: 81px;
-
-		/* IE sauce */
-		left:85px\9;
-
-		/* Safari sauce */
-		(;left:79px;);
-	}
-
-	#portal_menu_atlases_list {
-
-		left: 290px;
-		width: 210px !important;
-        height: 236px;
-
-		padding-bottom:5px !important;
-
-		/* IE sauce */
-		left: 303px\9;
-        height: 225px\9;
-
-		/* Safari sauce */
-		(;left:279px;);
-	}
-
-	#portal_menu_tools_list {
-
-		left: 500px;
-		width: 172px !important;
-		height: 236px;
-
-		padding-bottom:5px !important;
-
-		/* IE sauce */
-		left: 513px\9;
-		height:225px\9;
-
-		/* Safari sauce */
-		(;left:489px;);
-		(;height:227px;);
-	}
-
-	/* mozilla sauce */
-	@-moz-document url-prefix() {
-
-		#header_content {
-
-			height:107px;
-		}
-
-		#portal_menu_start_list {
-
-			left:85px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 302px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 512px;
-			height:236px;
-		}
-	}
-
-
-	/* make it look OK on iPad also */
-	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
-
-		#portal_menu_start_list {
-
-			left:81px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 291px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 501px;
-			height:236px;
-		}  
-	}
-	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
-
-		#portal_menu_start_list {
-
-			left:81px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 291px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 501px;
-			height:236px;
-		}	  
-	}
-
-	.portal_menu_list_heading {
-
-		color:#9ccae5;
-		border-bottom:1px solid #9ccae5;
-		padding-bottom:5px !important;
-	}
-
-	.portal_menu_list_heading + li {
-
-		padding-top:10px !important;
-	}
-
-	.portal_menu_list_heading li {
-
-		padding-bottom:0px;
-	}	
-
-	#portal_menu_atlases_list li:last-of-type {
-
-		padding-bottom:15px !important;
-	}
-
-	.icon-spin5 {
-
-		color:#000;
-	}
-</style>
-<div id="pHeader">
-<div id="top_chrome">
-	<div id="top_chrome_buttons">
-		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
-		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
-	</div>
-</div>
-
-<div id="header_content">
-
-	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
-	</a>
-</div>
-</div>
-
-<script>
-
-jQuery('#portal_tab_menu').bind('touchstart', function() {
-
-	if(window.console)
-		console.log("touchstart");
-});
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  div.document {
+  position:relative !important;;
+  }
+
+  img#portal_logo{
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
+  }
+
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent;
+  }
+
+  #portal_tabs {
+  display:none !important;;
+  }
+
+  #portal_search_input_group {
+  display:none !important;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -628,26 +86,24 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for allensdk.model.glif.glif_neuron_methods</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot; The methods in this module are used for configuring dynamics and reset rules for the GlifNeuron.</span>
+<span></span><span class="sd">&quot;&quot;&quot; The methods in this module are used for configuring dynamics and reset rules for the GlifNeuron.  </span>
 <span class="sd">For more details on how to use these methods, see :doc:`glif_models`.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
-<span class="c1">#fast_threshold=[]</span>
-<span class="c1">#slow_threshold=[]</span>
 
 <div class="viewcode-block" id="GlifNeuronMethod"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod">[docs]</a><span class="k">class</span> <span class="nc">GlifNeuronMethod</span><span class="p">(</span> <span class="nb">object</span> <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A simple class to keep track of the name and parameters associated with a neuron method.</span>
 <span class="sd">    This class is initialized with a name, function, and parameters to pass to the function.  The</span>
-<span class="sd">    function then has those passed parameters fixed to a partial function using functools.partial.</span>
-<span class="sd">    This class then mimics a function itself using the __call__ convention. Parameters that are not</span>
+<span class="sd">    function then has those passed parameters fixed to a partial function using functools.partial.  </span>
+<span class="sd">    This class then mimics a function itself using the __call__ convention. Parameters that are not </span>
 <span class="sd">    fixed in this way are assumed to be passed into the method when it is called.  If the passed</span>
 <span class="sd">    parameters contain an argument that is not part of the function signature, an exception will</span>
-<span class="sd">    be raised.</span>
+<span class="sd">    be raised.    </span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -672,10 +128,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">return</span> <span class="p">{</span>
             <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span>
-        <span class="p">}</span>
-</div>
+        <span class="p">}</span></div>
+
 <div class="viewcode-block" id="GlifNeuronMethod.modify_parameter"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.GlifNeuronMethod.modify_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">modify_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Modify a function parameter needs to be modified after initialization.</span>
+        <span class="sd">&quot;&quot;&quot; Modify a function parameter needs to be modified after initialization. </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -691,12 +147,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">operator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="n">param</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">keywords</span><span class="p">[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">value</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="max_of_line_and_const"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.max_of_line_and_const">[docs]</a><span class="k">def</span> <span class="nf">max_of_line_and_const</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">):</span>
     <span class="c1">#TODO: move to other library</span>
-    <span class="sd">&quot;&quot;&quot; Find the maximum of a value and a position on a line</span>
+    <span class="sd">&quot;&quot;&quot; Find the maximum of a value and a position on a line </span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -717,37 +173,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">one</span> <span class="o">=</span> <span class="n">b</span>
     <span class="n">two</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="n">d</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">one</span><span class="p">,</span><span class="n">two</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">one</span><span class="p">,</span><span class="n">two</span><span class="p">)</span></div>
 
-<span class="c1">#commenting this out to make sure it doest get called and I forgot to switch is somewhere</span>
-<span class="c1">#def min_of_line_and_const(x,b,c,d):</span>
-<span class="c1">#    #TODO: move to other library</span>
-<span class="c1">#    &quot;&quot;&quot; Find the minimum of a value and a position on a line</span>
-<span class="c1">#</span>
-<span class="c1">#    Parameters</span>
-<span class="c1">#    ----------</span>
-<span class="c1">#    x: float</span>
-<span class="c1">#        x position on line 1</span>
-<span class="c1">#    c: float</span>
-<span class="c1">#        slope of line 1</span>
-<span class="c1">#    d: float</span>
-<span class="c1">#        y-intercept of line 1</span>
-<span class="c1">#    b: float</span>
-<span class="c1">#        y-intercept of line 2</span>
-<span class="c1">#</span>
-<span class="c1">#    Returns</span>
-<span class="c1">#    -------</span>
-<span class="c1">#    float</span>
-<span class="c1">#        the max of a line value and a constant</span>
-<span class="c1">#    &quot;&quot;&quot;</span>
-<span class="c1">#</span>
-<span class="c1">#    one = b</span>
-<span class="c1">#    two = c*x+d</span>
-<span class="c1">#    return np.minimum(one,two)</span>
-</div>
+
 <div class="viewcode-block" id="min_of_line_and_zero"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.min_of_line_and_zero">[docs]</a><span class="k">def</span> <span class="nf">min_of_line_and_zero</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">):</span>
     <span class="c1">#TODO: move to other library</span>
-    <span class="sd">&quot;&quot;&quot; Find the minimum of a value and a position on a line</span>
+    <span class="sd">&quot;&quot;&quot; Find the minimum of a value and a position on a line </span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -768,54 +199,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">one</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">two</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="n">d</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">one</span><span class="p">,</span><span class="n">two</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">one</span><span class="p">,</span><span class="n">two</span><span class="p">)</span></div>
 
-</div>
+
 <div class="viewcode-block" id="dynamics_AScurrent_exp"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_exp">[docs]</a><span class="k">def</span> <span class="nf">dynamics_AScurrent_exp</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">spike_time_steps</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Exponential afterspike current dynamics method takes a current at t0 and returns the current at</span>
 <span class="sd">    a time step later.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="c1">#     print(&#39;HERE: dynamics_threshold_inf&#39;)</span>
-<span class="c1">#    return AScurrents_t0*(1.0 - neuron.k*neuron.dt)</span>
-    <span class="k">return</span> <span class="n">AScurrents_t0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">k</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">AScurrents_t0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">k</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span></div>
+        
 
-</div>
-<div class="viewcode-block" id="dynamics_AScurrent_vector"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_vector">[docs]</a><span class="k">def</span> <span class="nf">dynamics_AScurrent_vector</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">spike_time_steps</span><span class="p">,</span> <span class="n">vector</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; The vector afterspike current dynamics method keeps track of all of the afterspike</span>
-<span class="sd">    currents for every previous spike and updates them based on the current time step.</span>
-<span class="sd">    This method is very slow.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    vector : np.ndarray</span>
-<span class="sd">        an array of all running afterspike current values.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># a hack to convert lists into numpy arrays</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vector</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="n">vector</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">AScurrent_dynamics_method</span><span class="o">.</span><span class="n">modify_parameter</span><span class="p">(</span><span class="s1">&#39;vector&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span>
-
-    <span class="n">total</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vector</span><span class="p">))</span>
-
-    <span class="c1"># run through all of the spikes, adding ascurrents based on how long its been since the spike occurred</span>
-    <span class="k">for</span> <span class="n">spike_time_step</span> <span class="ow">in</span> <span class="n">spike_time_steps</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">total</span> <span class="o">+=</span> <span class="n">vector</span><span class="p">[:,</span> <span class="n">time_step</span> <span class="o">-</span> <span class="n">spike_time_step</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">pass</span>
-
-    <span class="k">return</span> <span class="n">total</span>
-
-</div>
 <div class="viewcode-block" id="dynamics_AScurrent_none"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_none">[docs]</a><span class="k">def</span> <span class="nf">dynamics_AScurrent_none</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">time_step</span><span class="p">,</span> <span class="n">spike_time_steps</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; This method always returns zeros for the afterspike currents, regardless of input. &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">))</span></div>
 
-</div>
+
 <div class="viewcode-block" id="dynamics_voltage_linear_forward_euler"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler">[docs]</a><span class="k">def</span> <span class="nf">dynamics_voltage_linear_forward_euler</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; (TODO) Linear voltage dynamics. &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span>
-</div>
+    <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span></div>
+
 <div class="viewcode-block" id="dynamics_voltage_linear_exact"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact">[docs]</a><span class="k">def</span> <span class="nf">dynamics_voltage_linear_exact</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; (TODO) Linear voltage dynamics. &quot;&quot;&quot;</span>
 
@@ -825,175 +228,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <span class="n">tau</span> <span class="o">=</span> <span class="n">g</span><span class="o">/</span><span class="n">C</span>
     <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">I</span><span class="o">+</span> <span class="n">g</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">)</span><span class="o">/</span><span class="n">C</span>
 
-    <span class="k">return</span> <span class="n">voltage_t0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="o">*</span><span class="n">tau</span><span class="p">)</span> <span class="o">+</span> <span class="n">N</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">tau</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">))</span><span class="o">/</span><span class="n">tau</span>
-</div>
-<div class="viewcode-block" id="dynamics_voltage_piecewise_linear_exact"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_piecewise_linear_exact">[docs]</a><span class="k">def</span> <span class="nf">dynamics_voltage_piecewise_linear_exact</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">,</span> <span class="n">El_slope_param</span><span class="p">,</span> <span class="n">El_intercept_param</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; (TODO) Linear voltage dynamics. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">voltage_t0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="o">*</span><span class="n">tau</span><span class="p">)</span> <span class="o">+</span> <span class="n">N</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">tau</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">))</span><span class="o">/</span><span class="n">tau</span></div>
 
-    <span class="n">C</span> <span class="o">=</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span>
-    <span class="n">I</span> <span class="o">=</span> <span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">max_of_line_and_const</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">)</span>
-    <span class="n">tau</span> <span class="o">=</span> <span class="n">g</span><span class="o">/</span><span class="n">C</span>
-    <span class="n">El</span> <span class="o">=</span> <span class="n">min_of_line_and_zero</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">El_slope_param</span><span class="p">,</span> <span class="n">El_intercept_param</span><span class="p">)</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">I</span><span class="o">+</span> <span class="n">g</span><span class="o">*</span><span class="n">El</span><span class="p">)</span><span class="o">/</span><span class="n">C</span>
-
-    <span class="n">G</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_of_line_and_const</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">))</span>
-    <span class="n">El</span> <span class="o">=</span> <span class="n">min_of_line_and_zero</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">El_slope_param</span><span class="p">,</span> <span class="n">El_intercept_param</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">voltage_t0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="o">*</span><span class="n">tau</span><span class="p">)</span> <span class="o">+</span> <span class="n">N</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">tau</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">))</span><span class="o">/</span><span class="n">tau</span>
-
-</div>
-<div class="viewcode-block" id="dynamics_voltage_quadratic_forward_euler"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_quadratic_forward_euler">[docs]</a><span class="k">def</span> <span class="nf">dynamics_voltage_quadratic_forward_euler</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; (TODO) Quadratic voltage dynamics equation.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    a : float</span>
-<span class="sd">        constant coefficient of voltage equation</span>
-<span class="sd">    b : float</span>
-<span class="sd">        linear coefficient of voltage equation</span>
-<span class="sd">    c : float</span>
-<span class="sd">        quadratic coefficient of voltage equation</span>
-<span class="sd">    d : float</span>
-<span class="sd">        voltage threshold</span>
-<span class="sd">    e : float</span>
-<span class="sd">        voltage used if voltage surpasses threshold (d)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">I_of_v</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">*</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="n">c</span> <span class="o">*</span> <span class="n">voltage_t0</span><span class="o">**</span><span class="mi">2</span>
-
-    <span class="k">if</span> <span class="n">voltage_t0</span> <span class="o">&gt;</span> <span class="n">d</span><span class="p">:</span>
-        <span class="n">I_of_v</span><span class="o">=</span><span class="n">e</span>
-
-    <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">I_of_v</span><span class="p">)</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span>
-
-</div>
-<div class="viewcode-block" id="dynamics_voltage_piecewise_linear_forward_euler"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_piecewise_linear_forward_euler">[docs]</a><span class="k">def</span> <span class="nf">dynamics_voltage_piecewise_linear_forward_euler</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">,</span> <span class="n">El_slope_param</span><span class="p">,</span> <span class="n">El_intercept_param</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Piecewise linear voltage dynamics methods. This method requires 3 parameters for equations of both resistance and resting potential.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    R_tlparam1 : float</span>
-<span class="sd">        TODO</span>
-<span class="sd">    R_tlparam2 : float</span>
-<span class="sd">        TODO</span>
-<span class="sd">    R_tlparam3 : float</span>
-<span class="sd">        TODO</span>
-<span class="sd">    El_tlparam1 : float</span>
-<span class="sd">        TODO</span>
-<span class="sd">    El_tlparam2 : float</span>
-<span class="sd">        TODO</span>
-<span class="sd">    El_tlparam3 : float</span>
-<span class="sd">        TOOD</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1">#confirm this is being implimented correctly.</span>
-    <span class="n">G</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_of_line_and_const</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">R_tlparam1</span><span class="p">,</span> <span class="n">R_tlparam2</span><span class="p">,</span> <span class="n">R_t1param3</span><span class="p">))</span>
-<span class="c1">#    El = min_of_line_and_const(voltage_t0, El_tlparam1, El_tlparam2, El_t1param3) #this is for when El wasnt forced to zero</span>
-    <span class="n">El</span> <span class="o">=</span> <span class="n">min_of_line_and_zero</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">,</span> <span class="n">El_slope_param</span><span class="p">,</span> <span class="n">El_intercept_param</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">voltage_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">inj</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span> <span class="o">-</span> <span class="n">G</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span> <span class="o">-</span> <span class="n">El</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">C</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">])</span>
-
-</div>
-<div class="viewcode-block" id="dynamics_threshold_adapt_standard"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_adapt_standard">[docs]</a><span class="k">def</span> <span class="nf">dynamics_threshold_adapt_standard</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Standard adapting threshold dynamics equation.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    neuron : class</span>
-<span class="sd">    a : float</span>
-<span class="sd">        coefficient of voltage</span>
-<span class="sd">    b : float</span>
-<span class="sd">        coefficient of threshold</span>
-<span class="sd">    AScurrents_t0 : not used here</span>
-<span class="sd">    inj : not used here</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-<span class="c1">#     print(&#39;HERE: dynamics_threshold_adapt_standard&#39;)</span>
-    <span class="k">return</span> <span class="n">threshold_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">voltage_t0</span><span class="o">-</span><span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">)</span> <span class="o">-</span>
-                           <span class="n">b</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">threshold_t0</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span><span class="p">))</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span>
-
-<span class="c1">#TODO: depricate when sure that dynamics_threshold_three_sep_components will be the official function</span>
-<span class="c1">#def dynamics_threshold_adapt_slow_plus_fast(neuron, threshold_t0, voltage_t0):</span>
-<span class="c1">#    &quot;&quot;&quot;The threshold will adapt via two mechanisms: 1. a slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard.</span>
-<span class="c1">#    These are the components which are fit via optimization and inditial conditions are supplied via the GLM. 2. A fast component initiated</span>
-<span class="c1">#    by a spike which quickly decays.  These values are estimated via the multi short square stimuli.</span>
-<span class="c1">#    &quot;&quot;&quot;</span>
-<span class="c1">#</span>
-<span class="c1">#    md = neuron.update_method_data</span>
-<span class="c1">#</span>
-<span class="c1">#    # initial conditions</span>
-<span class="c1">#    if &#39;th_spike&#39; not in md:</span>
-<span class="c1">#        md[&#39;th_spike&#39;] = [ 0 ]</span>
-<span class="c1">#    if &#39;th_voltage&#39; not in md:</span>
-<span class="c1">#        md[&#39;th_voltage&#39;] = [ neuron.th_inf * neuron.coeffs[&#39;th_inf&#39;] ]</span>
-<span class="c1">#</span>
-<span class="c1">#    th_spike = md[&#39;th_spike&#39;][-1]</span>
-<span class="c1">#    th_voltage = md[&#39;th_voltage&#39;][-1]</span>
-<span class="c1">#</span>
-<span class="c1">##     print(&#39;a_spike&#39;, md[&#39;a_spike&#39;])</span>
-<span class="c1">##     print(&#39;b_spike&#39;, md[&#39;b_spike&#39;])</span>
-<span class="c1">##     print(&#39;a_voltage&#39;, md[&#39;a_voltage&#39;])</span>
-<span class="c1">##     print(&#39;b_voltage&#39;, md[&#39;b_voltage&#39;])</span>
-<span class="c1">#</span>
-<span class="c1">#    voltage_component = th_voltage + ( md[&#39;a_voltage&#39;] * neuron.coeffs[&#39;a&#39;] * ( voltage_t0 - neuron.El ) -</span>
-<span class="c1">#                                       md[&#39;b_voltage&#39;] * neuron.coeffs[&#39;b&#39;] * ( th_voltage - neuron.coeffs[&#39;th_inf&#39;] * neuron.th_inf ) ) * neuron.dt</span>
-<span class="c1">#    spike_component = th_spike - md[&#39;b_spike&#39;] * th_spike * neuron.dt</span>
-<span class="c1">#</span>
-<span class="c1">#</span>
-<span class="c1">#    #------hack to plot slow and fast component</span>
-<span class="c1">##    global fast_threshold</span>
-<span class="c1">##    global slow_threshold</span>
-<span class="c1">##    fast_threshold.append(spike_component)</span>
-<span class="c1">##    slow_threshold.append(voltage_component)</span>
-<span class="c1">#</span>
-<span class="c1">#    #------update the voltage and spiking values of the the</span>
-<span class="c1">#    md[&#39;th_spike&#39;].append(spike_component)</span>
-<span class="c1">#    md[&#39;th_voltage&#39;].append(voltage_component)</span>
-<span class="c1">#</span>
-<span class="c1">#    return voltage_component+spike_component</span>
-
-<span class="c1">#TODO: deprecate when confirm the forward and exact equations are doing the right thing.</span>
-<span class="c1"># def dynamics_threshold_three_sep_components_hybrid(neuron, threshold_t0, voltage_t0, AScurrents_t0, inj):</span>
-<span class="c1">#     &quot;&quot;&quot;This is the sequel to the dynamics_threshold_adapt_slow_plus_fast module. Here as in</span>
-<span class="c1">#     dynamics_threshold_adapt_slow_plus_fast. The threshold will adapt via two mechanisms: 1. a</span>
-<span class="c1">#     slower voltage dependent adaptation as in the dynamics_threshold_adapt_standard. and 2. a</span>
-<span class="c1">#     fast component initiated by a spike which quickly decays.  These two component are</span>
-<span class="c1">#     in reference to zero and are recorded in the md parameters.  The third component refers to</span>
-<span class="c1">#     th_inf which is added on in the end as opposed to being encompassed in the voltage component</span>
-<span class="c1">#     of the threshold which caused a problem in optimizing th_inf.</span>
-<span class="c1">#     AScurrents_t0 : not used here</span>
-<span class="c1">#     inj : not used here</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     md = neuron.update_method_data</span>
-<span class="c1">#</span>
-<span class="c1">#     # initial conditions</span>
-<span class="c1">#     if &#39;th_spike&#39; not in md:</span>
-<span class="c1">#         md[&#39;th_spike&#39;] = [ 0 ]</span>
-<span class="c1">#         logging.warning(&#39;delete this function it is a hybrid&#39;)</span>
-<span class="c1">#     if &#39;th_voltage&#39; not in md:</span>
-<span class="c1">#         md[&#39;th_voltage&#39;] = [ 0 ]</span>
-<span class="c1">#</span>
-<span class="c1">#     th_spike = md[&#39;th_spike&#39;][-1]</span>
-<span class="c1">#     th_voltage = md[&#39;th_voltage&#39;][-1]</span>
-<span class="c1">#</span>
-<span class="c1">#     #why are this variables being saved in an md variable?</span>
-<span class="c1">#     #TODO: HOW CAN NEURON.COEFFS[&#39;A&#39;] BE MULTIPLIED AFTERWARD SINCE IT IS ALSO MULTIPLYING THE</span>
-<span class="c1">#     #VOLTAGE COMPONENT.</span>
-<span class="c1">#     voltage_component = th_voltage + ( md[&#39;a_voltage&#39;] *  ( voltage_t0 - neuron.El ) -</span>
-<span class="c1">#                                        md[&#39;b_voltage&#39;] * neuron.coeffs[&#39;b&#39;] * ( th_voltage ) ) * neuron.dt</span>
-<span class="c1">#</span>
-<span class="c1">#     #spike_component = th_spike - md[&#39;b_spike&#39;] * th_spike * neuron.dt</span>
-<span class="c1">#     spike_component = th_spike*np.exp(-md[&#39;b_spike&#39;] * neuron.dt)</span>
-<span class="c1">#</span>
-<span class="c1">#     #------update the voltage and spiking values of the the</span>
-<span class="c1">#     md[&#39;th_spike&#39;].append(spike_component)</span>
-<span class="c1">#     md[&#39;th_voltage&#39;].append(voltage_component)</span>
-<span class="c1">#</span>
-<span class="c1">#     #TODO: I dont trust the a_coeff being multiplied by the whole function</span>
-<span class="c1">#     return neuron.coeffs[&#39;a&#39;]*voltage_component+spike_component+neuron.th_inf * neuron.coeffs[&#39;th_inf&#39;]</span>
-</div>
 <div class="viewcode-block" id="spike_component_of_threshold_forward_euler"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.spike_component_of_threshold_forward_euler">[docs]</a><span class="k">def</span> <span class="nf">spike_component_of_threshold_forward_euler</span><span class="p">(</span><span class="n">th_t0</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Spike component of threshold modeled as an exponential decay. Implemented</span>
-<span class="sd">    here for forward Euler</span>
-
+    <span class="sd">&#39;&#39;&#39;Spike component of threshold modeled as an exponential decay. Implemented </span>
+<span class="sd">    here for forward Euler </span>
+<span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    th_t0 : float</span>
@@ -1004,12 +244,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        time step</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">b_spike</span><span class="o">=-</span><span class="n">b_spike</span> <span class="c1">#TODO: this is here because b_spike is always input as positive although it is negative</span>
-    <span class="k">return</span> <span class="n">th_t0</span> <span class="o">+</span> <span class="n">th_t0</span><span class="o">*</span><span class="n">b_spike</span> <span class="o">*</span> <span class="n">dt</span>
-</div>
+    <span class="k">return</span> <span class="n">th_t0</span> <span class="o">+</span> <span class="n">th_t0</span><span class="o">*</span><span class="n">b_spike</span> <span class="o">*</span> <span class="n">dt</span>                                                                         </div>
+    
 <div class="viewcode-block" id="spike_component_of_threshold_exact"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.spike_component_of_threshold_exact">[docs]</a><span class="k">def</span> <span class="nf">spike_component_of_threshold_exact</span><span class="p">(</span><span class="n">th0</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Spike component of threshold modeled as an exponential decay. Implemented</span>
-<span class="sd">    here as exact analytical solution.</span>
-
+    <span class="sd">&#39;&#39;&#39;Spike component of threshold modeled as an exponential decay. Implemented </span>
+<span class="sd">    here as exact analytical solution. </span>
+<span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    th0 : float</span>
@@ -1021,14 +261,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        time if used analytically</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">b_spike</span><span class="o">=-</span><span class="n">b_spike</span>
-    <span class="k">return</span> <span class="n">th0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b_spike</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
-</div>
-<div class="viewcode-block" id="voltage_component_of_threshold_forward_euler"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.voltage_component_of_threshold_forward_euler">[docs]</a><span class="k">def</span> <span class="nf">voltage_component_of_threshold_forward_euler</span><span class="p">(</span><span class="n">th_t0</span><span class="p">,</span> <span class="n">v_t0</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">,</span> <span class="n">El</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Equation 2.1 of Mihalas and Nieber, 2009 implemented for use in forward Euler. Note</span>
-<span class="sd">    here all variables are in reference to threshold infinity.  Therefore thr_inf is zero</span>
-<span class="sd">    here (replaced threshold_inf with 0 in the equation to be verbose). This is done so that</span>
-<span class="sd">    th_inf can be optimized without affecting this function.</span>
+    <span class="k">return</span> <span class="n">th0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b_spike</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="voltage_component_of_threshold_forward_euler"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.voltage_component_of_threshold_forward_euler">[docs]</a><span class="k">def</span> <span class="nf">voltage_component_of_threshold_forward_euler</span><span class="p">(</span><span class="n">th_t0</span><span class="p">,</span> <span class="n">v_t0</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">,</span> <span class="n">El</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Equation 2.1 of Mihalas and Nieber, 2009 implemented for use in forward Euler. Note </span>
+<span class="sd">    here all variables are in reference to threshold infinity.  Therefore thr_inf is zero </span>
+<span class="sd">    here (replaced threshold_inf with 0 in the equation to be verbose). This is done so that </span>
+<span class="sd">    th_inf can be optimized without affecting this function. </span>
+<span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    th_t0 : float</span>
@@ -1044,14 +284,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    El : float</span>
 <span class="sd">        reversal potential</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">return</span> <span class="n">th_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">a_voltage</span><span class="o">*</span><span class="p">(</span><span class="n">v_t0</span><span class="o">-</span><span class="n">El</span><span class="p">)</span><span class="o">-</span><span class="n">b_voltage</span><span class="o">*</span><span class="p">(</span><span class="n">th_t0</span><span class="o">-</span><span class="mi">0</span><span class="p">))</span><span class="o">*</span><span class="n">dt</span>
-</div>
+    <span class="k">return</span> <span class="n">th_t0</span> <span class="o">+</span> <span class="p">(</span><span class="n">a_voltage</span><span class="o">*</span><span class="p">(</span><span class="n">v_t0</span><span class="o">-</span><span class="n">El</span><span class="p">)</span><span class="o">-</span><span class="n">b_voltage</span><span class="o">*</span><span class="p">(</span><span class="n">th_t0</span><span class="o">-</span><span class="mi">0</span><span class="p">))</span><span class="o">*</span><span class="n">dt</span></div>
+
 <div class="viewcode-block" id="voltage_component_of_threshold_exact"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.voltage_component_of_threshold_exact">[docs]</a><span class="k">def</span> <span class="nf">voltage_component_of_threshold_exact</span><span class="p">(</span><span class="n">th0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">El</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Note this function is the exact formulation; however, dt is used because t0 is the initial time and dt</span>
 <span class="sd">    is the time the function is exactly evaluated at. Note: that here, this equation is in reference to th_inf.</span>
-<span class="sd">    Therefore th0 is the total threshold-thr_inf (threshold_inf replaced with 0 in the equation to be verbose).</span>
+<span class="sd">    Therefore th0 is the total threshold-thr_inf (threshold_inf replaced with 0 in the equation to be verbose).  </span>
 <span class="sd">    This is done so that th_inf can be optimized without affecting this function.</span>
-
+<span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    th0 : float</span>
@@ -1071,63 +311,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        capacitance</span>
 <span class="sd">    g : float</span>
 <span class="sd">        conductance (1/resistance)</span>
-<span class="sd">    El : float</span>
+<span class="sd">    El : float </span>
 <span class="sd">        reversal potential</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">beta</span><span class="o">=</span><span class="p">(</span><span class="n">I</span><span class="o">+</span><span class="n">g</span><span class="o">*</span><span class="n">El</span><span class="p">)</span><span class="o">/</span><span class="n">g</span>
     <span class="n">phi</span><span class="o">=</span><span class="n">a_voltage</span><span class="o">/</span><span class="p">(</span><span class="n">b_voltage</span><span class="o">-</span><span class="n">g</span><span class="o">/</span><span class="n">C</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">phi</span><span class="o">*</span><span class="p">(</span><span class="n">v0</span><span class="o">-</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">g</span><span class="o">*</span><span class="n">t</span><span class="o">/</span><span class="n">C</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">b_voltage</span><span class="o">*</span><span class="n">t</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">th0</span><span class="o">-</span><span class="n">phi</span><span class="o">*</span><span class="p">(</span><span class="n">v0</span><span class="o">-</span><span class="n">beta</span><span class="p">)</span><span class="o">-</span>
-                        <span class="p">(</span><span class="n">a_voltage</span><span class="o">/</span><span class="n">b_voltage</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">beta</span><span class="o">-</span><span class="n">El</span><span class="p">)</span><span class="o">-</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span><span class="p">(</span><span class="n">a_voltage</span><span class="o">/</span><span class="n">b_voltage</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">beta</span><span class="o">-</span><span class="n">El</span><span class="p">)</span> <span class="o">+</span><span class="mi">0</span>
+                        <span class="p">(</span><span class="n">a_voltage</span><span class="o">/</span><span class="n">b_voltage</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">beta</span><span class="o">-</span><span class="n">El</span><span class="p">)</span><span class="o">-</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span><span class="p">(</span><span class="n">a_voltage</span><span class="o">/</span><span class="n">b_voltage</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">beta</span><span class="o">-</span><span class="n">El</span><span class="p">)</span> <span class="o">+</span><span class="mi">0</span></div>
 
-</div>
-<div class="viewcode-block" id="dynamics_threshold_three_components_forward"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_forward">[docs]</a><span class="k">def</span> <span class="nf">dynamics_threshold_three_components_forward</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span>
-                                                <span class="n">a_spike</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Threshold dynamics implemented for forward Euler. The threshold will adapt via two mechanisms:</span>
-<span class="sd">    1. a voltage dependent adaptation.</span>
-<span class="sd">    2. a component initiated by a spike which decays as an exponential.</span>
-<span class="sd">    These two component are in reference to threshold infinity and are recorded</span>
-<span class="sd">    in the neuron&#39;s threshold components.</span>
-<span class="sd">    The third component refers to th_inf which is added separately as opposed to being</span>
-<span class="sd">    included in the voltage component of the threshold as is done in equation 2.1 of</span>
-<span class="sd">    Mihalas and Nieber 2009.  Threshold infinity is removed for simple optimization.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    neuron : class</span>
-<span class="sd">    threshold_t0 : float</span>
-<span class="sd">        threshold input to function</span>
-<span class="sd">    voltage_t0 : float</span>
-<span class="sd">        voltage input to function</span>
-<span class="sd">    AScurrents_t0 : not used here</span>
-<span class="sd">    inj : not used here</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">get_threshold_components</span><span class="p">()</span>
-
-    <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="n">a_voltage</span> <span class="o">=</span> <span class="n">a_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
-    <span class="n">b_voltage</span> <span class="o">=</span> <span class="n">b_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
-
-    <span class="n">spike_component</span> <span class="o">=</span> <span class="n">spike_component_of_threshold_forward_euler</span><span class="p">(</span><span class="n">th_t0</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
-    <span class="n">voltage_component</span> <span class="o">=</span> <span class="n">voltage_component_of_threshold_forward_euler</span><span class="p">(</span><span class="n">th_voltage</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">)</span>
-
-    <span class="n">neuron</span><span class="o">.</span><span class="n">add_threshold_components</span><span class="p">(</span><span class="n">spike_component</span><span class="p">,</span> <span class="n">voltage_component</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">voltage_component</span><span class="o">+</span><span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span>
-
-</div>
 <div class="viewcode-block" id="dynamics_threshold_three_components_exact"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_exact">[docs]</a><span class="k">def</span> <span class="nf">dynamics_threshold_three_components_exact</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span>
                                               <span class="n">a_spike</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Analitical solution for threshold dynamics. The threshold will adapt via two mechanisms:</span>
-<span class="sd">    1. a voltage dependent adaptation.</span>
-<span class="sd">    2. a component initiated by a spike which decays as an exponential.</span>
-<span class="sd">    These two component are in reference to threshold infinity and are recorded</span>
+    <span class="sd">&quot;&quot;&quot;Analytical solution for threshold dynamics. The threshold will adapt via two mechanisms: </span>
+<span class="sd">    1. a voltage dependent adaptation.  </span>
+<span class="sd">    2. a component initiated by a spike which decays as an exponential.  </span>
+<span class="sd">    These two component are in reference to threshold infinity and are recorded </span>
 <span class="sd">    in the neuron&#39;s threshold components.</span>
-<span class="sd">    The third component refers to th_inf which is added separately as opposed to being</span>
+<span class="sd">    The third component refers to th_inf which is added separately as opposed to being </span>
 <span class="sd">    included in the voltage component of the threshold as is done in equation 2.1 of</span>
 <span class="sd">    Mihalas and Nieber 2009.  Threshold infinity is removed for simple optimization.</span>
-
+<span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    neuron : class</span>
@@ -1136,14 +339,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    voltage_t0 : float</span>
 <span class="sd">        voltage input to function</span>
 <span class="sd">    AScurrents_t0 : vector</span>
-<span class="sd">        values of after spike currents</span>
+<span class="sd">        values of after spike currents </span>
 <span class="sd">    inj : float</span>
 <span class="sd">        current injected into the neuron</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">get_threshold_components</span><span class="p">()</span>
-
-    <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1">#TODO: just having the get_threshold_components added an erroneous zero to the beginning of the list </span>
+    <span class="k">if</span> <span class="n">neuron</span><span class="o">.</span><span class="n">threshold_components</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">neuron</span><span class="o">.</span><span class="n">threshold_components</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;spike&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;voltage&#39;</span><span class="p">:</span> <span class="p">[]</span> <span class="p">}</span>
+        <span class="n">th_spike</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">th_voltage</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>                
+        <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">threshold_components</span>
+        <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> 
 
     <span class="n">a_voltage</span> <span class="o">=</span> <span class="n">a_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
     <span class="n">b_voltage</span> <span class="o">=</span> <span class="n">b_voltage</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
@@ -1154,22 +362,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
     <span class="n">voltage_component</span><span class="o">=</span><span class="n">voltage_component_of_threshold_exact</span><span class="p">(</span><span class="n">th_voltage</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">El</span><span class="p">)</span>
     <span class="n">spike_component</span> <span class="o">=</span> <span class="n">spike_component_of_threshold_exact</span><span class="p">(</span><span class="n">th_spike</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
-
+ 
     <span class="c1">#------update the voltage and spiking values of the the</span>
-    <span class="n">neuron</span><span class="o">.</span><span class="n">add_threshold_components</span><span class="p">(</span><span class="n">spike_component</span><span class="p">,</span> <span class="n">voltage_component</span><span class="p">)</span>
+    <span class="n">neuron</span><span class="o">.</span><span class="n">append_threshold_components</span><span class="p">(</span><span class="n">spike_component</span><span class="p">,</span> <span class="n">voltage_component</span><span class="p">)</span>
+     
+    <span class="k">return</span> <span class="n">voltage_component</span><span class="o">+</span><span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span>    </div>
 
-    <span class="k">return</span> <span class="n">voltage_component</span><span class="o">+</span><span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span>
-</div>
 <div class="viewcode-block" id="dynamics_threshold_spike_component"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_spike_component">[docs]</a><span class="k">def</span> <span class="nf">dynamics_threshold_spike_component</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">,</span>
                                        <span class="n">a_spike</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">a_voltage</span><span class="p">,</span> <span class="n">b_voltage</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Analytical solution for spike component of threshold. The threshold will adapt via</span>
-<span class="sd">    a component initiated by a spike which decays as an exponential.  The component is in</span>
-<span class="sd">    reference to threshold infinity and are recorded in the neuron&#39;s threshold components.  The voltage</span>
-<span class="sd">    component of the threshold is set to zero in the threshold components  because it is zero here</span>
-<span class="sd">    The third component refers to th_inf which is added separately as opposed to being</span>
+    <span class="sd">&quot;&quot;&quot;Analytical solution for spike component of threshold. The threshold will adapt via </span>
+<span class="sd">    a component initiated by a spike which decays as an exponential.  The component is in </span>
+<span class="sd">    reference to threshold infinity and are recorded in the neuron&#39;s threshold components.  The voltage </span>
+<span class="sd">    component of the threshold is set to zero in the threshold components  because it is zero here  </span>
+<span class="sd">    The third component refers to th_inf which is added separately as opposed to being </span>
 <span class="sd">    included in the voltage component of the threshold as is done in equation 2.1 of</span>
 <span class="sd">    Mihalas and Nieber 2009.  Threshold infinity is removed for simple optimization.</span>
-
+<span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    neuron : class</span>
@@ -1178,66 +386,71 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">    voltage_t0 : float</span>
 <span class="sd">        voltage input to function</span>
 <span class="sd">    AScurrents_t0 : vector</span>
-<span class="sd">        values of after spike currents</span>
+<span class="sd">        values of after spike currents </span>
 <span class="sd">    inj : float</span>
 <span class="sd">        current injected into the neuron</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">get_threshold_components</span><span class="p">()</span>
-
-    <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="c1">#TODO: just having the get_threshold_components added an erroneous zero to the beginning of the list </span>
+    <span class="k">if</span> <span class="n">neuron</span><span class="o">.</span><span class="n">threshold_components</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">neuron</span><span class="o">.</span><span class="n">threshold_components</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;spike&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;voltage&#39;</span><span class="p">:</span> <span class="p">[]</span> <span class="p">}</span>
+        <span class="n">th_spike</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">th_voltage</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>                
+        <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">threshold_components</span>
+        <span class="n">th_spike</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">th_voltage</span> <span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> 
 
     <span class="n">spike_component</span> <span class="o">=</span> <span class="n">spike_component_of_threshold_exact</span><span class="p">(</span><span class="n">th_spike</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
-
+ 
     <span class="c1">#------update the voltage and spiking values of the the</span>
-    <span class="n">neuron</span><span class="o">.</span><span class="n">add_threshold_components</span><span class="p">(</span><span class="n">spike_component</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">neuron</span><span class="o">.</span><span class="n">append_threshold_components</span><span class="p">(</span><span class="n">spike_component</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+     
+    <span class="k">return</span> <span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span></div>
 
-    <span class="k">return</span> <span class="n">spike_component</span><span class="o">+</span><span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span>
 
-</div>
 <div class="viewcode-block" id="dynamics_threshold_inf"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf">[docs]</a><span class="k">def</span> <span class="nf">dynamics_threshold_inf</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">inj</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Set threshold to the neuron&#39;s instantaneous threshold.</span>
+    <span class="sd">&quot;&quot;&quot; Set threshold to the neuron&#39;s instantaneous threshold. </span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    neuron : class</span>
 <span class="sd">    threshold_t0 : not used here</span>
 <span class="sd">    voltage_t0 : not used here</span>
-<span class="sd">    AScurrents_t0 : not used here</span>
+<span class="sd">    AScurrents_t0 : not used here </span>
 <span class="sd">    inj : not used here</span>
-<span class="sd">    AScurrents_t0 : not used here</span>
+<span class="sd">    AScurrents_t0 : not used here </span>
 <span class="sd">    inj : not used here</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span>
+<span class="sd">    &quot;&quot;&quot;</span>   
+    <span class="k">return</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span></div>
 
-</div>
+
 <div class="viewcode-block" id="reset_AScurrent_sum"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum">[docs]</a><span class="k">def</span> <span class="nf">reset_AScurrent_sum</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Reset afterspike currents by adding summed exponentials. Left over currents from last spikes as</span>
+    <span class="sd">&quot;&quot;&quot; Reset afterspike currents by adding summed exponentials. Left over currents from last spikes as </span>
 <span class="sd">    well as newly initiated currents from current spike.  Currents amplitudes in neuron.asc_amp_array need</span>
-<span class="sd">    to be the amplitudes advanced though the spike cutting.  I.e. In the preprocessor if the after spike currents</span>
-<span class="sd">    are calculated via the GLM from spike initiation the amplitude at the time after the spike cutting needs to</span>
+<span class="sd">    to be the amplitudes advanced though the spike cutting.  I.e. In the preprocessor if the after spike currents </span>
+<span class="sd">    are calculated via the GLM from spike initiation the amplitude at the time after the spike cutting needs to </span>
 <span class="sd">    be calculated and neuron.asc_amp_array needs to be set to this value.</span>
-
+<span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    r : np.ndarray</span>
 <span class="sd">        a coefficient vector applied to the afterspike currents</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">new_currents</span><span class="o">=</span><span class="n">neuron</span><span class="o">.</span><span class="n">asc_amp_array</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;asc_amp_array&#39;</span><span class="p">]</span> <span class="c1">#neuron.asc_amp_array are amplitudes initiating after the spike is cut</span>
-    <span class="n">left_over_currents</span><span class="o">=</span><span class="n">AScurrents_t0</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">spike_cut_length</span><span class="p">))</span> <span class="c1">#advancing cut currents though the spike</span>
+    <span class="n">left_over_currents</span><span class="o">=</span><span class="n">AScurrents_t0</span> <span class="o">*</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">k</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">dt</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">spike_cut_length</span><span class="p">))</span> <span class="c1">#advancing cut currents though the spike    </span>
 
-    <span class="k">return</span> <span class="n">new_currents</span><span class="o">+</span><span class="n">left_over_currents</span>
+    <span class="k">return</span> <span class="n">new_currents</span><span class="o">+</span><span class="n">left_over_currents</span></div>
 
-</div>
+
 <div class="viewcode-block" id="reset_AScurrent_none"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_none">[docs]</a><span class="k">def</span> <span class="nf">reset_AScurrent_none</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">AScurrents_t0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Reset afterspike currents to zero. &quot;&quot;&quot;</span>
-
+    
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;You are running a LIF but the AScurrents are not zero!&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">AScurrents_t0</span><span class="p">))</span></div>
 
-</div>
+
 <div class="viewcode-block" id="reset_voltage_v_before"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_v_before">[docs]</a><span class="k">def</span> <span class="nf">reset_voltage_v_before</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Reset voltage to the previous value with a scale and offset applied.</span>
 
@@ -1249,118 +462,108 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        voltage offset constant</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">)</span><span class="o">+</span><span class="n">b</span>
+    <span class="k">return</span> <span class="n">a</span><span class="o">*</span><span class="p">(</span><span class="n">voltage_t0</span><span class="p">)</span><span class="o">+</span><span class="n">b</span></div>
 
-</div>
-<div class="viewcode-block" id="reset_voltage_i_v_before"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_i_v_before">[docs]</a><span class="k">def</span> <span class="nf">reset_voltage_i_v_before</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This method is not implemented yet.  It will raise an exception. &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;reset_voltage_IandVbefore not implemented&quot;</span><span class="p">)</span>
-
-</div>
 <div class="viewcode-block" id="reset_voltage_zero"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_zero">[docs]</a><span class="k">def</span> <span class="nf">reset_voltage_zero</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Reset voltage to zero. &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="mf">0.0</span></div>
 
-</div>
-<div class="viewcode-block" id="reset_voltage_fixed"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_fixed">[docs]</a><span class="k">def</span> <span class="nf">reset_voltage_fixed</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">voltage_t0</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Reset voltage to a fixed value.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    value : float</span>
-<span class="sd">        the value to which voltage will be reset.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">value</span>
-</div>
-<div class="viewcode-block" id="reset_threshold_max_v_th"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_max_v_th">[docs]</a><span class="k">def</span> <span class="nf">reset_threshold_max_v_th</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_v1</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Return the maximum of threshold and reset voltage offset by a constant.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    delta : float</span>
-<span class="sd">        value used to offset the return threshold.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1">#This is a bit dangerous as it would change if El was not choosen to be zero. Perhaps could change it to absolute value.</span>
-    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_v1</span><span class="p">)</span> <span class="o">+</span> <span class="n">delta</span>
-
-</div>
-<div class="viewcode-block" id="reset_threshold_th_before"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_th_before">[docs]</a><span class="k">def</span> <span class="nf">reset_threshold_th_before</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_v1</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Return the previous threshold by a constant. This method is not used and will raise an exception if called.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    delta : float</span>
-<span class="sd">        value used to offset the return threshold.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">Exception</span> <span class="p">(</span><span class="s1">&#39;reset_threshold_th_before should not be called&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">threshold_t0</span> <span class="o">+</span> <span class="n">delta</span>
-
-</div>
 <div class="viewcode-block" id="reset_threshold_inf"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_inf">[docs]</a><span class="k">def</span> <span class="nf">reset_threshold_inf</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_v1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Reset the threshold to instantaneous threshold. &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span>
+    <span class="k">return</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span></div>
 
-</div>
-<div class="viewcode-block" id="reset_threshold_fixed"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_fixed">[docs]</a><span class="k">def</span> <span class="nf">reset_threshold_fixed</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_v1</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Reset the threshold to a fixed value. This method is not sued and will raise an exception if called.</span>
+<div class="viewcode-block" id="reset_threshold_three_components"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components">[docs]</a><span class="k">def</span> <span class="nf">reset_threshold_three_components</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_v1</span><span class="p">,</span> <span class="n">a_spike</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;This method calculates the two components of the threshold: a spike (fast)</span>
+<span class="sd">    component and a voltage (slow) component.  The threshold_components vectors are then </span>
+<span class="sd">    updated so that the traces match the voltage, current, and total threshold traces.  The</span>
+<span class="sd">    spike component of the threshold decays via an exponential fit specified by the amplitude</span>
+<span class="sd">    a_spike and the time constant b_spike fit via the multiblip data.  The voltage component </span>
+<span class="sd">    does not change during the duration of the spike.  The </span>
+<span class="sd">    spike component are threshold component are summed along with threshold infinity to </span>
+<span class="sd">    return the total threshold.  Note that in the current implementation a_spike is added to </span>
+<span class="sd">    the last value of the threshold_components which means that a_spike is the amplitude after </span>
+<span class="sd">    spike cutting (if there is any).  </span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    value : float</span>
-<span class="sd">        value to return as the reset threshold</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;reset_threshold_fixed should not be called&#39;</span><span class="p">)</span>
-    <span class="k">return</span>  <span class="n">value</span>
-
-</div>
-<div class="viewcode-block" id="reset_threshold_three_components"><a class="viewcode-back" href="../../../../allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components">[docs]</a><span class="k">def</span> <span class="nf">reset_threshold_three_components</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">threshold_t0</span><span class="p">,</span> <span class="n">voltage_v1</span><span class="p">,</span> <span class="n">a_spike</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;This method resets the two components of the threshold: a spike (fast)</span>
-<span class="sd">    component and a (voltage) component which are summed.</span>
+<span class="sd">    Inputs:  </span>
+<span class="sd">        neuron: class</span>
+<span class="sd">            contains attributes of the neuron</span>
+<span class="sd">        threshold_t0, voltage_t0: float</span>
+<span class="sd">            are not used but are here for consistency with other methods</span>
+<span class="sd">        a_spike: float </span>
+<span class="sd">            amplitude of the exponential decay of spike component of threshold after spike</span>
+<span class="sd">            cutting has been implemented.</span>
+<span class="sd">        b_spike: float</span>
+<span class="sd">            amplitude of the exponential decay of spike component of threshold</span>
+<span class="sd">            </span>
+<span class="sd">    Outputs:</span>
+<span class="sd">        Returns: float</span>
+<span class="sd">            the total threshold which is the sum of the spike component of threshold, the voltage </span>
+<span class="sd">            component of threshold and threshold infinity (with it&#39;s corresponding coefficient)</span>
+<span class="sd">        neuron.threshold_components: dictionary containing</span>
+<span class="sd">            a spike: list</span>
+<span class="sd">                vector of spiking component of threshold that corresponds to the voltage, current, </span>
+<span class="sd">                and total threshold traces</span>
+<span class="sd">            b_spike: list</span>
+<span class="sd">               vector of voltage component of threshold that corresponds to the voltage, current, </span>
+<span class="sd">                and total threshold traces.</span>
+<span class="sd">                </span>
+<span class="sd">    Note that this function can be changed to use a_spike at the time of the spike and then have the </span>
+<span class="sd">    the spike component plus the residual decay thought the spike.  There are benefits and drawbacks to</span>
+<span class="sd">    this.  This potential change would be beneficial as it perhaps makes more biological sense for the </span>
+<span class="sd">    threshold to go up at the time of spike if the traces are ever used.  Also this would mean that a_spike</span>
+<span class="sd">    would not have to be adjusted thought the spike cutting after the multiblip fit.  However the current </span>
+<span class="sd">    implementation makes sense in that it is similar to how afterspike currents are implemented.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">get_threshold_components</span><span class="p">()</span>
-    <span class="n">neuron</span><span class="o">.</span><span class="n">add_threshold_components</span><span class="p">(</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">a_spike</span><span class="p">,</span>  <span class="c1">#adding spiking component of threshold ontop of already existent spike component.</span>
-                                     <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span> <span class="c1">#note these are the same value.</span>
+    <span class="k">if</span> <span class="n">neuron</span><span class="o">.</span><span class="n">threshold_components</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;reset should never happen at the beginning of a trace&#39;</span><span class="p">)</span>             
+        
+    <span class="n">tcs</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">threshold_components</span> <span class="c1">#for ease of updating</span>
+    
+    <span class="c1"># note that these values are at the indicie of the time of the spike which is the index right after the voltage crosses </span>
+    <span class="c1"># threshold since the neuron.threshold_components are updated by the dynamics method which is called before the reset. </span>
+    <span class="n">th_spike</span><span class="o">=</span><span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#this needs to decay through the spike must be very particular about how many indicies to decay</span>
+    <span class="n">th_voltage</span><span class="o">=</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    
+    <span class="c1"># calculate spike component decay though spike from time =1 (not zero because zero is already in neuron.threshold_components</span>
+    <span class="c1"># via the dynamics method) though the end of the spike cutting</span>
+    <span class="n">spike_comp_decay</span><span class="o">=</span><span class="n">spike_component_of_threshold_exact</span><span class="p">(</span><span class="n">th_spike</span><span class="p">,</span> <span class="n">b_spike</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">neuron</span><span class="o">.</span><span class="n">spike_cut_length</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">neuron</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span> <span class="c1">#Note that the plus one is that one needs to know the decay and the inital condition for next starting point </span>
+    
+    <span class="c1">#update neuron.threshold_components via pass by reference.</span>
+    <span class="p">[</span><span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">spike_cut_length</span><span class="p">)</span><span class="o">*</span><span class="n">th_voltage</span><span class="p">]</span> <span class="c1">#note that here I don&#39;t need the plus one because I am starting from zero</span>
+    <span class="p">[</span><span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">spike_comp_decay</span><span class="p">]</span>
+    
+    <span class="c1"># add the amplitude of the spike component decay to last value of vector (reseting)</span>
+    <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">a_spike</span>
+    
+    <span class="k">return</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span></div>
 
-    <span class="k">return</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;spike&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">tcs</span><span class="p">[</span><span class="s1">&#39;voltage&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">neuron</span><span class="o">.</span><span class="n">th_inf</span> <span class="o">*</span> <span class="n">neuron</span><span class="o">.</span><span class="n">coeffs</span><span class="p">[</span><span class="s1">&#39;th_inf&#39;</span><span class="p">]</span>
 
-
-<span class="c1">#: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. &#39;voltage_dynamics_method&#39;).</span>
-<span class="c1">#Those groups assign each method in this file a string name.  This is used by the GlifNeuron when initializing</span>
-<span class="c1">#its dynamics and reset methods.</span></div>
+<span class="c1">#: The METHOD_LIBRARY constant groups dynamics and reset methods by group name (e.g. &#39;voltage_dynamics_method&#39;).  </span>
+<span class="c1">#Those groups assign each method in this file a string name.  This is used by the GlifNeuron when initializing </span>
+<span class="c1">#its dynamics and reset methods.</span>
 <span class="n">METHOD_LIBRARY</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;AScurrent_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s1">&#39;AScurrent_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span> 
         <span class="s1">&#39;exp&#39;</span><span class="p">:</span>    <span class="n">dynamics_AScurrent_exp</span><span class="p">,</span>
-        <span class="s1">&#39;vector&#39;</span><span class="p">:</span> <span class="n">dynamics_AScurrent_vector</span><span class="p">,</span>
         <span class="s1">&#39;none&#39;</span><span class="p">:</span>   <span class="n">dynamics_AScurrent_none</span>
         <span class="p">},</span>
-    <span class="s1">&#39;voltage_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;linear_forward_euler&#39;</span><span class="p">:</span>           <span class="n">dynamics_voltage_linear_forward_euler</span><span class="p">,</span>
-        <span class="s1">&#39;quadratic_forward_euler&#39;</span><span class="p">:</span>        <span class="n">dynamics_voltage_quadratic_forward_euler</span><span class="p">,</span>
-        <span class="s1">&#39;piecewise_linear_forward_euler&#39;</span><span class="p">:</span> <span class="n">dynamics_voltage_piecewise_linear_forward_euler</span><span class="p">,</span>
-        <span class="s1">&#39;linear_exact&#39;</span><span class="p">:</span>                   <span class="n">dynamics_voltage_linear_exact</span><span class="p">,</span>
-        <span class="s1">&#39;piecewise_linear_exact&#39;</span><span class="p">:</span>         <span class="n">dynamics_voltage_piecewise_linear_exact</span><span class="p">,</span>
+    <span class="s1">&#39;voltage_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span> 
+        <span class="s1">&#39;linear_forward_euler&#39;</span><span class="p">:</span> <span class="n">dynamics_voltage_linear_forward_euler</span>
         <span class="p">},</span>
     <span class="s1">&#39;threshold_dynamics_method&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;spike_component&#39;</span><span class="p">:</span>          <span class="n">dynamics_threshold_spike_component</span><span class="p">,</span>
-        <span class="s1">&#39;inf&#39;</span><span class="p">:</span>                      <span class="n">dynamics_threshold_inf</span><span class="p">,</span>
-        <span class="s1">&#39;three_components_forward&#39;</span><span class="p">:</span> <span class="n">dynamics_threshold_three_components_forward</span><span class="p">,</span>
-        <span class="s1">&#39;three_components_exact&#39;</span><span class="p">:</span>   <span class="n">dynamics_threshold_three_components_exact</span>
+        <span class="s1">&#39;spike_component&#39;</span><span class="p">:</span>        <span class="n">dynamics_threshold_spike_component</span><span class="p">,</span> 
+        <span class="s1">&#39;inf&#39;</span><span class="p">:</span>                    <span class="n">dynamics_threshold_inf</span><span class="p">,</span>
+        <span class="s1">&#39;three_components_exact&#39;</span><span class="p">:</span> <span class="n">dynamics_threshold_three_components_exact</span> 
         <span class="p">},</span>
     <span class="s1">&#39;AScurrent_reset_method&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s1">&#39;sum&#39;</span><span class="p">:</span>  <span class="n">reset_AScurrent_sum</span><span class="p">,</span>
         <span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="n">reset_AScurrent_none</span>
-        <span class="p">},</span>
+        <span class="p">},</span> 
     <span class="s1">&#39;voltage_reset_method&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s1">&#39;v_before&#39;</span><span class="p">:</span>   <span class="n">reset_voltage_v_before</span><span class="p">,</span>
-        <span class="s1">&#39;i_v_before&#39;</span><span class="p">:</span> <span class="n">reset_voltage_i_v_before</span><span class="p">,</span>
-        <span class="s1">&#39;zero&#39;</span><span class="p">:</span>       <span class="n">reset_voltage_zero</span><span class="p">,</span>
-        <span class="s1">&#39;fixed&#39;</span><span class="p">:</span>      <span class="n">reset_voltage_fixed</span>
-        <span class="p">},</span>
+        <span class="s1">&#39;zero&#39;</span><span class="p">:</span>       <span class="n">reset_voltage_zero</span>
+        <span class="p">},</span> 
     <span class="s1">&#39;threshold_reset_method&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;max_v_th&#39;</span><span class="p">:</span>         <span class="n">reset_threshold_max_v_th</span><span class="p">,</span>
-        <span class="s1">&#39;th_before&#39;</span><span class="p">:</span>        <span class="n">reset_threshold_th_before</span><span class="p">,</span>
         <span class="s1">&#39;inf&#39;</span><span class="p">:</span>              <span class="n">reset_threshold_inf</span><span class="p">,</span>
-        <span class="s1">&#39;fixed&#39;</span><span class="p">:</span>            <span class="n">reset_threshold_fixed</span><span class="p">,</span>
         <span class="s1">&#39;three_components&#39;</span><span class="p">:</span> <span class="n">reset_threshold_three_components</span>
         <span class="p">}</span>
 <span class="p">}</span>
@@ -1369,7 +572,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../../index.html">Contents</a></h3>
 <ul>
@@ -1380,6 +583,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference_space.html">Reference Space</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -1398,6 +602,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -1413,7 +618,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
 </p>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../../search.html" method="get">
       <input type="text" name="q" />
@@ -1421,9 +626,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1432,9 +634,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     </div>
 
 
-    <div class="footer">
+    <div class="footer" role="contentinfo">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
 
   </body>
 </html>

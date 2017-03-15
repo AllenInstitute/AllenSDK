@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Reference Space &mdash; Allen SDK 0.12.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.12.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.12.5 documentation" href="index.html" />
+    <link rel="up" title="Data Resources" href="data_resources.html" />
+    <link rel="next" title="API Access" href="data_api_client.html" />
+    <link rel="prev" title="Mouse Connectivity" href="connectivity.html" /> 
+  </head>
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  div.document {
+  position:relative !important;;
+  }
+
+  img#portal_logo{
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
+  }
+
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent;
+  }
+
+  #portal_tabs {
+  display:none !important;;
+  }
+
+  #portal_search_input_group {
+  display:none !important;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="reference-space">
+<h1>Reference Space<a class="headerlink" href="#reference-space" title="Permalink to this headline">¶</a></h1>
+<p>Allen Institute atlases and data are registered, when possible, to one of several common reference spaces. Working in such a space allows you to
+easily compare data across subjects and experimental modalities.</p>
+<p>This page documents how to use the Allen SDK to interact with a reference space. For more information and a list of reference spaces, see the
+<a class="reference external" href="http://help.brain-map.org/display/api/Atlas+Drawings+and+Ontologies">API documentation</a>.</p>
+<div class="section" id="structure-tree">
+<h2>Structure Tree<a class="headerlink" href="#structure-tree" title="Permalink to this headline">¶</a></h2>
+<p>Brain structures in our reference spaces are arranged in trees. The leaf nodes of the tree describe the very fine anatomical divisions
+of the space, while nodes closer to the root correspond to gross divisions. The <a class="reference internal" href="allensdk.core.html#allensdk.core.structure_tree.StructureTree" title="allensdk.core.structure_tree.StructureTree"><code class="xref py py-class docutils literal"><span class="pre">StructureTree</span></code></a>
+class provides an interface for interacting with a structure tree.</p>
+<p>To download a structure tree, use the <a class="reference internal" href="allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi" title="allensdk.api.queries.ontologies_api.OntologiesApi"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.ontologies_api.OntologiesApi</span></code></a> class as seen in
+<a class="reference external" href="_static/examples/nb/reference_space.html#Constructing-a-structure-tree">this example</a></p>
+</div>
+<div class="section" id="annotation-volumes">
+<h2>Annotation Volumes<a class="headerlink" href="#annotation-volumes" title="Permalink to this headline">¶</a></h2>
+<p>An annotation volume is a 3d raster image that segments the reference space into structures. Each voxel in the annotation volume is assigned
+an integer value that describes the finest structure to which that point in space definitely belongs.</p>
+<p>To download a nrrd formatted annotation volume at a specified isometric resolution, use the <a class="reference internal" href="allensdk.api.queries.html#module-allensdk.api.queries.mouse_connectivity_api" title="allensdk.api.queries.mouse_connectivity_api"><code class="xref py py-class docutils literal"><span class="pre">allensdk.api.queries.mouse_connectivity_api</span></code></a> class.
+There is <a class="reference external" href="_static/examples/nb/reference_space.html#Downloading-an-annotation-volume">an example</a> in the notebook.</p>
+</div>
+<div class="section" id="referencespace-class">
+<h2>ReferenceSpace Class<a class="headerlink" href="#referencespace-class" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace" title="allensdk.core.reference_space.ReferenceSpace"><code class="xref py py-class docutils literal"><span class="pre">allensdk.core.reference_space.ReferenceSpace</span></code></a> class contains methods for working with our reference spaces. Some use cases might include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference external" href="_static/examples/nb/reference_space.html#makingstructuremasks">Building an indicator mask for one or more structures</a></li>
+<li><a class="reference external" href="_static/exampled/nb/reference_space.html#Viewaslicefromtheannotation">Viewing the annotation</a></li>
+<li><a class="reference external" href="_static/exampled/nb/reference_space.html#UsingaStructureTree">Querying the structure graph</a></li>
+</ul>
+</div></blockquote>
+<p>Please see the <a class="reference external" href="_static/examples/nb/reference_space.html">example notebook</a> for more code samples.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="data_resources.html">Data Resources</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

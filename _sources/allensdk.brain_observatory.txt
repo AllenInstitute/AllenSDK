@@ -20,6 +20,14 @@ allensdk.brain_observatory.brain_observatory_plotting module
     :undoc-members:
     :show-inheritance:
 
+allensdk.brain_observatory.circle_plots module
+----------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.circle_plots
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.brain_observatory.dff module
 -------------------------------------
 
@@ -64,6 +72,14 @@ allensdk.brain_observatory.natural_scenes module
 ------------------------------------------------
 
 .. automodule:: allensdk.brain_observatory.natural_scenes
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.brain_observatory.observatory_plots module
+---------------------------------------------------
+
+.. automodule:: allensdk.brain_observatory.observatory_plots
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.test_utilities.temp_dir &mdash; Allen SDK 0.12.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.12.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.12.5 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  div.document {
+  position:relative !important;;
+  }
+
+  img#portal_logo{
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
+  }
+
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent;
+  }
+
+  #portal_tabs {
+  display:none !important;;
+  }
+
+  #portal_search_input_group {
+  display:none !important;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for allensdk.test_utilities.temp_dir</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">pytest</span>
+
+
+<span class="c1"># This is actually a pytest fixture! See below.</span>
+<div class="viewcode-block" id="temp_dir"><a class="viewcode-back" href="../../../allensdk.test_utilities.html#allensdk.test_utilities.temp_dir.temp_dir">[docs]</a><span class="k">def</span> <span class="nf">temp_dir</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+
+    <span class="n">tmpfs</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;dev&#39;</span><span class="p">,</span> <span class="s1">&#39;shm&#39;</span><span class="p">))</span>
+    <span class="c1"># would like to check mount type, but that requires system calls</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">tmpfs</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">ismount</span><span class="p">(</span><span class="n">tmpfs</span><span class="p">):</span>
+    
+        <span class="n">base_path</span> <span class="o">=</span> <span class="n">tmpfs</span>
+    
+    <span class="k">else</span><span class="p">:</span>
+    
+        <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
+        
+        
+    <span class="n">fls</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">base_path</span><span class="p">)</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">dname</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">dname</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fls</span><span class="p">:</span>
+            <span class="k">break</span>
+            
+    <span class="n">specific_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;allensdk_test_&#39;</span> <span class="o">+</span> <span class="n">dname</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">specific_path</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">fin</span><span class="p">():</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">specific_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">specific_path</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;test dir {0} still exists!&#39;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        
+    <span class="n">request</span><span class="o">.</span><span class="n">addfinalizer</span><span class="p">(</span><span class="n">fin</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">specific_path</span></div>
+    
+<span class="n">fn_temp_dir</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">)(</span><span class="n">temp_dir</span><span class="p">)</span>
+<span class="n">md_temp_dir</span> <span class="o">=</span> <span class="n">pytest</span><span class="o">.</span><span class="n">fixture</span><span class="p">(</span><span class="n">scope</span><span class="o">=</span><span class="s1">&#39;module&#39;</span><span class="p">)(</span><span class="n">temp_dir</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>

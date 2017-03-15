@@ -11761,7 +11761,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">json</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.api</span> <span class="kn">import</span> <span class="n">Api</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.queries.rma_api</span> <span class="kn">import</span> <span class="n">RmaApi</span>
 <span class="kn">from</span> <span class="nn">allensdk.api.queries.mouse_connectivity_api</span> <span class="kn">import</span> <span class="n">MouseConnectivityApi</span>
@@ -11793,7 +11793,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">section_data_set_id</span> <span class="o">=</span> <span class="mi">168095756</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">section_data_set_id</span> <span class="o">=</span> <span class="mi">168095756</span>
 </pre></div>
 
 </div>
@@ -11806,7 +11806,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="c1"># rma version from detail page</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># rma version from detail page</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">get_manual_injection_summary</span><span class="p">(</span><span class="n">section_data_set_id</span><span class="p">)</span>
 
 <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Manual Injection Summary&#39;</span><span class="p">)</span>
@@ -11856,7 +11856,7 @@ Sparse, scattered expression in brain areas including the medulla, pons, and mid
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">projection_results</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">get_structure_unionizes</span><span class="p">([</span><span class="n">section_data_set_id</span><span class="p">],</span> <span class="n">is_injection</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">projection_results</span> <span class="o">=</span> <span class="n">mca</span><span class="o">.</span><span class="n">get_structure_unionizes</span><span class="p">([</span><span class="n">section_data_set_id</span><span class="p">],</span> <span class="n">is_injection</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="n">projection_df</span> <span class="o">=</span> <span class="n">tabular_dataframe</span><span class="p">(</span><span class="n">projection_results</span><span class="p">)</span>
 <span class="n">projection_df</span>
 </pre></div>
@@ -13258,7 +13258,7 @@ Sparse, scattered expression in brain areas including the medulla, pons, and mid
 <div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">allensdk.api.queries.ontologies_api</span> <span class="kn">import</span> <span class="n">OntologiesApi</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">allensdk.api.queries.ontologies_api</span> <span class="kn">import</span> <span class="n">OntologiesApi</span>
 <span class="n">oa</span> <span class="o">=</span> <span class="n">OntologiesApi</span><span class="p">()</span>
 
 <span class="n">atlases</span> <span class="o">=</span> <span class="n">tabular_dataframe</span><span class="p">(</span><span class="n">oa</span><span class="o">.</span><span class="n">get_atlases_table</span><span class="p">(</span><span class="n">brief</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
@@ -13353,7 +13353,7 @@ Sparse, scattered expression in brain areas including the medulla, pons, and mid
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">cutoff</span> <span class="o">=</span> <span class="mf">0.0050</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">cutoff</span> <span class="o">=</span> <span class="mf">0.0050</span>
 <span class="n">data_field</span> <span class="o">=</span> <span class="s1">&#39;projection_volume&#39;</span>
 
 <span class="c1"># projection joined to structures</span>
@@ -13557,7 +13557,7 @@ Sparse, scattered expression in brain areas including the medulla, pons, and mid
 <div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span class="n">display_table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s1">&#39;acronym&#39;</span><span class="p">,</span> <span class="s1">&#39;hemisphere_id&#39;</span><span class="p">,</span> <span class="s1">&#39;projection_volume&#39;</span><span class="p">,</span> <span class="s1">&#39;graph_order&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;graph_order&#39;</span><span class="p">,</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">display_table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s1">&#39;acronym&#39;</span><span class="p">,</span> <span class="s1">&#39;hemisphere_id&#39;</span><span class="p">,</span> <span class="s1">&#39;projection_volume&#39;</span><span class="p">,</span> <span class="s1">&#39;graph_order&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;graph_order&#39;</span><span class="p">,</span>
                                                                                                     <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;hemisphere_id&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]</span>
 
 <span class="n">display_table</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;structure&#39;</span><span class="p">,</span><span class="s1">&#39;L&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">]</span>
@@ -13680,7 +13680,7 @@ Sparse, scattered expression in brain areas including the medulla, pons, and mid
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre> 
+<div class=" highlight hl-ipython2"><pre><span></span> 
 </pre></div>
 
 </div>

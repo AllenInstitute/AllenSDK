@@ -1,7 +1,7 @@
 from allensdk.api.queries.glif_api import GlifApi
 import allensdk.core.json_utilities as json_utilities
 
-neuronal_model_id = 472423251
+neuronal_model_id = 566302806
 
 glif_api = GlifApi()
 glif_api.get_neuronal_model(neuronal_model_id)

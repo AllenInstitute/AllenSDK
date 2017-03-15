@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.swc &mdash; Allen SDK 0.12.3 documentation</title>
+    <title>allensdk.core.swc &mdash; Allen SDK 0.12.5 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.12.3',
+        VERSION:     '0.12.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,604 +23,62 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.3 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.12.5 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
-  <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
-<style>
-
-	/* the icon font-family definition and helper classes */
-	@font-face {
-	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
-	  font-weight: normal;
-	  font-style: normal;
-	}
-	 
-	 [class^="icon-"]:before, [class*=" icon-"]:before {
-	  font-family: "portal_icon_font";
-	  font-style: normal;
-	  font-weight: normal;
-	  speak: none;
-	 
-	  display: inline-block;
-	  text-decoration: inherit;
-	  width: 1em;
-	  margin-right: .2em;
-	  text-align: center;
-	  /* opacity: .8; */
-	 
-	  /* For safety - reset parent styles, that can break glyph codes*/
-	  font-variant: normal;
-	  text-transform: none;
-	     
-	  /* fix buttons height, for twitter bootstrap */
-	  line-height: 1em;
-	 
-	  /* Animation center compensation - margins should be symmetric */
-	  /* remove if not needed */
-	  margin-left: .2em;
-	
-	}
-	 
-	.icon-spin5:before { content: '\e806'; } /* '' */
-	.icon-left-open-1:before { content: '\e81e'; } /* '' */
-	.icon-plus-1:before { content: '\e801'; } /* '' */
-	.icon-facebook:before { content: '\e816'; } /* '' */
-	.icon-gplus:before { content: '\e818'; } /* '' */
-	.icon-linkedin-3:before { content: '\e815'; } /* '' */
-	.icon-twitter:before { content: '\e817'; } /* '' */
-	.icon-youtube-play:before { content: '\e805'; } /* '' */
-	.icon-plus-2:before { content: '\e809'; } /* '' */
-	.icon-record-1:before { content: '\e81c'; } /* '' */
-	.icon-cancel:before { content: '\e80b'; } /* '' */
-	.icon-search:before { content: '\e804'; } /* '' */
-	.icon-cancel-2:before { content: '\e80c'; } /* '' */
-	.icon-plus-4:before { content: '\e80d'; } /* '' */
-	.icon-cancel-3:before { content: '\e80e'; } /* '' */
-	.icon-plus:before { content: '\e808'; } /* '' */
-	.icon-down-open:before { content: '\e800'; } /* '' */
-	.icon-right-open:before { content: '\e802'; } /* '' */
-	.icon-up-open:before { content: '\e803'; } /* '' */
-	.icon-stop:before { content: '\e813'; } /* '' */
-	.icon-cancel-1:before { content: '\e820'; } /* '' */
-	.icon-plus-3:before { content: '\e80a'; } /* '' */
-	/* end icon font helpers */
-
-	/* icon font spin animation */
-	.animate-spin {
-	  -moz-animation: spin 2s infinite linear;
-	  -o-animation: spin 2s infinite linear;
-	  -webkit-animation: spin 2s infinite linear;
-	  animation: spin 2s infinite linear;
-	  display: inline-block;
-	}
-	@-moz-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-webkit-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-o-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-ms-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	/*  end spin animation */	
-
-	@font-face {
-	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
-	    font-weight: normal;
-	    font-style: normal;
-	}
-
-	/* top chrome styles */
-	#top_chrome {
-
-		width:100%;
-		height:28px;
-		background-color:#163E65;
-	}
-
-	.chrome_link_block {
-
-		color:#fff !important;	
-		display:inline-block;
-		height:100%;
-		max-height:28px;
-	}
-
-	.chrome_link_block:hover {
-
-		background-color:#eee;
-		color:#0779BE !important;	
-		cursor:pointer;
-	}
-
-	#top_chrome a {
-
-		color:inherit !important;	
-		text-decoration:none;
-	}
-
-	#top_chrome a:hover {
-
-		color:inherit !important;	
-	}
-
-	#top_chrome_buttons {
-
-		float:right;
-		margin-right:50px;
-	}
-
-	.chrome_button {
-
-		font-family:arial,sans-serif;
-		font-weight:bold;
-		display:inline-block;
-		font-size:9px;
-		text-align:left;
-		text-decoration:none;
-		margin:9px 20px 10px 20px;
-	}
-
-	.chrome_active {
-
-		background-color:#1b7abd;
-		color:#fff;
-	}
-
-
-	/* header element styles*/
-	#header_content {
-
-		font-family: bebas_neueregular, arial, sans-serif;
-		font-size:22px;
-		color:#0779be;		
-		letter-spacing:0.03em;
-
-		position:relative;
-		width:calc(100% - 112px);
-		min-width:800px;
-		height:76px;
-		border-bottom:2px solid #A5A8AB;
-		margin-left:50px;
-		margin-right:50px;
-        z-index:9999; /* IT-9508 */
-	}
-
-	#portal_logo {
-
-		position:absolute;
-		top:20px;
-		left:0px;
-		width:236px;
-	}
-
-	#portal_tabs {
-
-		position: absolute;
-		bottom: 12px;
-		left: 0px;
-		margin-bottom: -12px;
-		display: block;
-	}
-
-	.horizontal_list
-	{
-		margin: 0;
-		padding: 0;
-		list-style-type: none;
-		display: inline; 		
-	}
-
-	.horizontal_list li { 
-
-		display: inline; 	
-	}	
-
-	#portal_tab_menu_container {
-
-		display:none;
-	}
-
-	#portal_search_input_group {
-
-		position:absolute;
-		margin: 0;
-		padding: 0;
-		bottom:12px;
-		right:0px;
-		border:1px solid #DAD9D3;
-		color:#DAD9D3;
-	}
-
-	#portal_search_input_group input {
-
-		margin: 0;
-		padding: 0;
-		border:none;
-		width:110px;
-		color:#DAD9D3;
-		font-family:Helvetica,sans-serif;
-		font-size:12px;
-		height:28px;
-		margin-left:10px;
-
-		outline:none;
-	}
-
-	input::-ms-clear {
-		display: none;
-	}
-
-	#portal_search_input_group i {
-
-		font-size:0.8em;
-		cursor:pointer;
-	}
-
-	#pSiteSearchTextInput:focus {
-
-		color:#000;
-	}
-
-	.icon_menu_down {
-
-		font-size: 12px;
-		margin-left: 4px;
-		vertical-align: text-top;
-		padding-top: 4px;
-		display: inline-block;
-	}
-
-	.portal_tab_item {
-
-		background-color: #fff;
-		padding: 12px;
-		padding-left:20px;
-		padding-right:20px;
-		display: inline-block !important;		
-	}
-
-	.portal_tab_item a:hover {
-
-		color:#fbe300;	
-	}
-
-	.portal_tab_item:hover {
-
-		background-color: #0779be;	
-		color:#fbe300 !important;	
-	}	
-
-
-	.portal_menu_active {
-
-		background-color: #EEEEEE;
-	}	
-
-	.portal_menu_item_active {
-
-		color:#fbe300 !important;	
-	}
-
-	.portal_tab_active {
-
-		color:#a5a8ab !important;
-	}
-
-	#header_content a {		
-
-		color:inherit !important;
-	}
-
-	#header_content a:hover {
-
-		background-color: #0779be;	
-		color:#fbe300 !important;	
-	}
-
-	#header_content ul {
-
-		list-style: none;
-		position: relative;
-		top: 58px;
-		display: inline-table;
-	}
-
-	#header_content ul ul {
-		
-		display:none;
-		opacity:0;
-	}
-
-	/* the fly out menus */
-	#header_content ul li:hover > ul,
-	#header_content ul li.hover > ul {
-
-		position: absolute;
-		top: 48px;
-		z-index:999;
-
-		display: block;
-		width: 152px;
-		padding:0px;
-		padding-top:20px;
-		padding-bottom:10px;
-		font-size: 12px;
-		font-family: Arial,Sans-Serif;
-		font-weight: bold;
-		text-transform: uppercase;
-
-		background-color: rgba(8,122,191,0.98);
-		color: #fff !important;
-		opacity: 1;
-
-		-webkit-animation: fade 0.25s;
-		animation: fade 0.25s;
-	}
-
-	@-webkit-keyframes fade {
-	    from {opacity: 0}
-	    to {opacity: 1}
-	}
-	@keyframes fade {
-	    from {opacity: 0}
-	    to {opacity: 1}
-	}	
-
-	#header_content ul li:hover > ul li {
-
-		padding: 10px;
-		padding-top: 0px;
-		padding-left: 20px;
-		display: block;
-		opacity:1;
-	}
-
-	#header_content ul li:hover > ul a {
-
-		display: block;
-		opacity:1;
-		white-space:nowrap;
-	}
-
-	#portal_menu_start_list {
-
-		left: 81px;
-
-		/* IE sauce */
-		left:85px\9;
-
-		/* Safari sauce */
-		(;left:79px;);
-	}
-
-	#portal_menu_atlases_list {
-
-		left: 290px;
-		width: 210px !important;
-        height: 236px;
-
-		padding-bottom:5px !important;
-
-		/* IE sauce */
-		left: 303px\9;
-        height: 225px\9;
-
-		/* Safari sauce */
-		(;left:279px;);
-	}
-
-	#portal_menu_tools_list {
-
-		left: 500px;
-		width: 172px !important;
-		height: 236px;
-
-		padding-bottom:5px !important;
-
-		/* IE sauce */
-		left: 513px\9;
-		height:225px\9;
-
-		/* Safari sauce */
-		(;left:489px;);
-		(;height:227px;);
-	}
-
-	/* mozilla sauce */
-	@-moz-document url-prefix() {
-
-		#header_content {
-
-			height:107px;
-		}
-
-		#portal_menu_start_list {
-
-			left:85px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 302px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 512px;
-			height:236px;
-		}
-	}
-
-
-	/* make it look OK on iPad also */
-	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
-
-		#portal_menu_start_list {
-
-			left:81px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 291px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 501px;
-			height:236px;
-		}  
-	}
-	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
-
-		#portal_menu_start_list {
-
-			left:81px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 291px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 501px;
-			height:236px;
-		}	  
-	}
-
-	.portal_menu_list_heading {
-
-		color:#9ccae5;
-		border-bottom:1px solid #9ccae5;
-		padding-bottom:5px !important;
-	}
-
-	.portal_menu_list_heading + li {
-
-		padding-top:10px !important;
-	}
-
-	.portal_menu_list_heading li {
-
-		padding-bottom:0px;
-	}	
-
-	#portal_menu_atlases_list li:last-of-type {
-
-		padding-bottom:15px !important;
-	}
-
-	.icon-spin5 {
-
-		color:#000;
-	}
-</style>
-<div id="pHeader">
-<div id="top_chrome">
-	<div id="top_chrome_buttons">
-		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
-		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
-	</div>
-</div>
-
-<div id="header_content">
-
-	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
-	</a>
-</div>
-</div>
-
-<script>
-
-jQuery('#portal_tab_menu').bind('touchstart', function() {
-
-	if(window.console)
-		console.log("touchstart");
-});
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  div.document {
+  position:relative !important;;
+  }
+
+  img#portal_logo{
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
+  }
+
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent;
+  }
+
+  #portal_tabs {
+  display:none !important;;
+  }
+
+  #portal_search_input_group {
+  display:none !important;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -628,7 +86,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <h1>Source code for allensdk.core.swc</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright 2015-2016 Allen Institute for Brain Science</span>
@@ -649,6 +107,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="kn">import</span> <span class="nn">csv</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">six</span>
 
 <span class="c1"># Morphology nodes have the following fields. SWC fields are numeric.</span>
 <span class="n">NODE_ID</span> <span class="o">=</span> <span class="s1">&#39;id&#39;</span>
@@ -722,12 +181,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">err</span> <span class="o">+=</span> <span class="s2">&quot;Content: &#39;</span><span class="si">%s</span><span class="s2">&#39;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">line</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">Morphology</span><span class="p">(</span><span class="n">compartment_list</span><span class="o">=</span><span class="n">compartments</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Morphology</span><span class="p">(</span><span class="n">compartment_list</span><span class="o">=</span><span class="n">compartments</span><span class="p">)</span></div>
 
 
 <span class="c1">########################################################################</span>
 <span class="c1">########################################################################</span>
-</div>
+
 <div class="viewcode-block" id="Compartment"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Compartment">[docs]</a><span class="k">class</span> <span class="nc">Compartment</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A dictionary class storing information about a single morphology node</span>
@@ -754,9 +213,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <div class="viewcode-block" id="Compartment.print_node"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Compartment.print_node">[docs]</a>    <span class="k">def</span> <span class="nf">print_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; print out compartment information with field names &quot;&quot;&quot;</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%.4f</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">_N</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_TYP</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span>
-              <span class="n">_X</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_Y</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_Z</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_R</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_P</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">_C</span><span class="p">]),</span> <span class="bp">self</span><span class="p">[</span><span class="n">_TID</span><span class="p">]))</span>
+              <span class="n">_X</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_Y</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_Z</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_R</span><span class="p">],</span> <span class="bp">self</span><span class="p">[</span><span class="n">_P</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">_C</span><span class="p">]),</span> <span class="bp">self</span><span class="p">[</span><span class="n">_TID</span><span class="p">]))</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="Morphology"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology">[docs]</a><span class="k">class</span> <span class="nc">Morphology</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Keep track of the list of compartments in a morphology and provide</span>
@@ -828,10 +287,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span>
 
     <span class="nd">@compartment_list.setter</span>
-<div class="viewcode-block" id="Morphology.compartment_list"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.compartment_list">[docs]</a>    <span class="k">def</span> <span class="nf">compartment_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_list</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">compartment_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Update the compartment list.  Update the compartment index. &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_compartments</span><span class="p">(</span><span class="n">compartment_list</span><span class="p">)</span>
-</div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">compartment_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the compartment index.  This is a property to ensure that the</span>
@@ -839,23 +298,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_index</span>
 
     <span class="nd">@compartment_index.setter</span>
-<div class="viewcode-block" id="Morphology.compartment_index"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.compartment_index">[docs]</a>    <span class="k">def</span> <span class="nf">compartment_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_index</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">compartment_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Update the compartment index.  Update the compartment list. &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_compartments</span><span class="p">(</span><span class="n">compartment_index</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Morphology.num_trees"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.num_trees">[docs]</a>    <span class="k">def</span> <span class="nf">num_trees</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">num_trees</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the number of trees in the morphology. A tree is</span>
 <span class="sd">        defined as everything following from a single root compartment. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">)</span>
 
-    <span class="c1"># TODO add filter for number of nodes of a particular type</span></div>
+    <span class="c1"># TODO add filter for number of nodes of a particular type</span>
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Morphology.num_nodes"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.num_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">num_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">num_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the number of compartments in the morphology. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">)</span>
 
-    <span class="c1"># internal function</span></div>
+    <span class="c1"># internal function</span>
     <span class="k">def</span> <span class="nf">_set_compartments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        take a list of SWC-like objects and turn those into morphology</span>
@@ -876,19 +335,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Morphology.soma"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.soma">[docs]</a>    <span class="k">def</span> <span class="nf">soma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">soma</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns root node of soma, if present&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span>
-</div>
+
     <span class="nd">@property</span>
-<div class="viewcode-block" id="Morphology.root"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.root">[docs]</a>    <span class="k">def</span> <span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; [deprecated] Returns root node of soma, if present. Use &#39;soma&#39; instead of &#39;root&#39;&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_soma</span>
 
     <span class="c1">####################################################################</span>
     <span class="c1">####################################################################</span>
     <span class="c1"># tree and node access</span>
-</div>
+
 <div class="viewcode-block" id="Morphology.tree"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.tree">[docs]</a>    <span class="k">def</span> <span class="nf">tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a list of all Morphology Nodes within the specified</span>
@@ -907,8 +366,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">None</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
-</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">[</span><span class="n">n</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="Morphology.node"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.node">[docs]</a>    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the morphology node having the specified ID.</span>
@@ -925,8 +384,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># undocumented feature -- if a node is supplied instead of a</span>
         <span class="c1">#   node ID, the node is returned and no error is triggered</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_node_type</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_node_type</span><span class="p">(</span><span class="n">n</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Morphology.parent_of"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.parent_of">[docs]</a>    <span class="k">def</span> <span class="nf">parent_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns parent of the specified node.</span>
 
@@ -947,8 +406,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="c1"># return parent of specified node</span>
         <span class="k">if</span> <span class="n">seg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]]</span>
-        <span class="k">return</span> <span class="bp">None</span>
-</div>
+        <span class="k">return</span> <span class="bp">None</span></div>
+
 <div class="viewcode-block" id="Morphology.children_of"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.children_of">[docs]</a>    <span class="k">def</span> <span class="nf">children_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns a list of the children of the specified node</span>
 
@@ -963,14 +422,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        node is invalid, None is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_node_type</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]]</span></div>
 
     <span class="c1">###################################################################</span>
     <span class="c1">###################################################################</span>
     <span class="c1"># Information querying and data manipulation</span>
 
     <span class="c1"># internal function. takes an integer and returns the node having</span>
-    <span class="c1">#   that ID. IF a node is passed in instead, it is returned</span></div>
+    <span class="c1">#   that ID. IF a node is passed in instead, it is returned</span>
     <span class="k">def</span> <span class="nf">_resolve_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seg</span><span class="p">):</span>
         <span class="c1"># if compartment passed then we don&#39;t need to convert anything</span>
         <span class="c1"># if compartment not passed, try converting value to int</span>
@@ -1010,9 +469,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">old_par</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">])</span>
             <span class="n">old_par</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">])</span>
         <span class="n">parent_seg</span><span class="p">[</span><span class="n">NODE_CHILDREN</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">])</span>
-        <span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span>
+        <span class="n">child_seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_seg</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span></div>
 
-    <span class="c1"># returns a list of nodes located within dist of x,y,z</span></div>
+    <span class="c1"># returns a list of nodes located within dist of x,y,z</span>
 <div class="viewcode-block" id="Morphology.find"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">node_type</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns a list of Morphology Objects located within &#39;dist&#39;</span>
 <span class="sd">        of coordinate (x,y,z). If node_type is specified, the search</span>
@@ -1042,8 +501,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">+</span> <span class="n">dy</span> <span class="o">*</span> <span class="n">dy</span> <span class="o">+</span> <span class="n">dz</span> <span class="o">*</span> <span class="n">dz</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">dist</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">node_type</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">node_type</span><span class="p">:</span>
                     <span class="n">found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">found</span>
-</div>
+        <span class="k">return</span> <span class="n">found</span></div>
+
 <div class="viewcode-block" id="Morphology.compartment_list_by_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.compartment_list_by_type">[docs]</a>    <span class="k">def</span> <span class="nf">compartment_list_by_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return an list of all compartments having the specified</span>
 <span class="sd">        compartment type.</span>
@@ -1057,8 +516,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        -------</span>
 <span class="sd">        A list of of Morphology Objects</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">compartment_type</span><span class="p">]</span>
-</div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">compartment_type</span><span class="p">]</span></div>
+
 <div class="viewcode-block" id="Morphology.compartment_index_by_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.compartment_index_by_type">[docs]</a>    <span class="k">def</span> <span class="nf">compartment_index_by_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compartment_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return an dictionary of compartments indexed by id that all have</span>
 <span class="sd">        a particular compartment type.</span>
@@ -1072,8 +531,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        -------</span>
 <span class="sd">        A dictionary of Morphology Objects, indexed by ID</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">c</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">compartment_type</span><span class="p">}</span>
-</div>
+        <span class="k">return</span> <span class="p">{</span><span class="n">c</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compartment_list</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">compartment_type</span><span class="p">}</span></div>
+
 <div class="viewcode-block" id="Morphology.save"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write this morphology out to an SWC file</span>
 
@@ -1091,12 +550,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_Z</span><span class="p">])</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_R</span><span class="p">])</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">])</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-    <span class="c1"># keep for backward compatibility, but don&#39;t publish in docs</span></div>
+    <span class="c1"># keep for backward compatibility, but don&#39;t publish in docs</span>
 <div class="viewcode-block" id="Morphology.write"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Morphology.sparsify"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.sparsify">[docs]</a>    <span class="k">def</span> <span class="nf">sparsify</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modulo</span><span class="p">,</span> <span class="n">compress_ids</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return a new Morphology object that has a given number of non-leaf,</span>
 <span class="sd">        non-root nodes removed.  IDs can be reassigned so as to be continuous.</span>
@@ -1119,7 +578,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="n">keep</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># figure out which compartments to toss</span>
         <span class="n">ct</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">compartments</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">compartments</span><span class="p">):</span>
             <span class="n">pid</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span>
             <span class="n">cid</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span>
             <span class="n">ctype</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span>
@@ -1132,7 +591,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">ct</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="c1"># hook children up to their new parents</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">compartments</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">compartments</span><span class="p">):</span>
             <span class="n">comp_id</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">keep</span><span class="p">[</span><span class="n">comp_id</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
                 <span class="n">parent_id</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span>
@@ -1143,24 +602,24 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
         <span class="c1"># filter out the orphans</span>
         <span class="n">sparsified_compartments</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span>
-                                   <span class="n">v</span> <span class="ow">in</span> <span class="n">compartments</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()</span> <span class="k">if</span> <span class="n">keep</span><span class="p">[</span><span class="n">k</span><span class="p">]}</span>
+                                   <span class="n">v</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">compartments</span><span class="p">)</span> <span class="k">if</span> <span class="n">keep</span><span class="p">[</span><span class="n">k</span><span class="p">]}</span>
         <span class="k">if</span> <span class="n">compress_ids</span><span class="p">:</span>
             <span class="n">ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sparsified_compartments</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
             <span class="n">id_hash</span> <span class="o">=</span> <span class="p">{</span><span class="n">fid</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">fid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ids</span><span class="p">)}</span>
             <span class="n">id_hash</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="c1"># build the final compartment index</span>
             <span class="n">out_compartments</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">compartment</span> <span class="ow">in</span> <span class="n">sparsified_compartments</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">compartment</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">sparsified_compartments</span><span class="p">):</span>
                 <span class="n">compartment</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">id_hash</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span>
                 <span class="n">compartment</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="n">id_hash</span><span class="p">[</span><span class="n">compartment</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]]</span>
                 <span class="n">out_compartments</span><span class="p">[</span><span class="n">compartment</span><span class="p">[</span><span class="n">NODE_ID</span><span class="p">]]</span> <span class="o">=</span> <span class="n">compartment</span>
             <span class="k">return</span> <span class="n">Morphology</span><span class="p">(</span><span class="n">compartment_index</span><span class="o">=</span><span class="n">out_compartments</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Morphology</span><span class="p">(</span><span class="n">compartment_index</span><span class="o">=</span><span class="n">sparsified_compartments</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Morphology</span><span class="p">(</span><span class="n">compartment_index</span><span class="o">=</span><span class="n">sparsified_compartments</span><span class="p">)</span></div>
 
     <span class="c1">####################################################################</span>
     <span class="c1">####################################################################</span>
-</div>
+
     <span class="k">def</span> <span class="nf">_reconstruct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        internal function that restructures data and establishes</span>
@@ -1251,8 +710,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">seg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="n">remap</span><span class="p">[</span><span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="Morphology.stumpify_axon"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.stumpify_axon">[docs]</a>    <span class="k">def</span> <span class="nf">stumpify_axon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Remove all axon compartments except the first &#39;count&#39;</span>
 <span class="sd">        nodes, as counted from the connected axon root.</span>
@@ -1288,9 +747,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">Morphology</span><span class="o">.</span><span class="n">AXON</span><span class="p">:</span>
                 <span class="k">if</span> <span class="s2">&quot;flag&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seg</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span></div>
 
-    <span class="c1"># strip out everything but the soma and the specified SWC type</span></div>
+    <span class="c1"># strip out everything but the soma and the specified SWC type</span>
 <div class="viewcode-block" id="Morphology.strip_all_other_types"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.strip_all_other_types">[docs]</a>    <span class="k">def</span> <span class="nf">strip_all_other_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">keep_soma</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Strips everything from the morphology except for the</span>
 <span class="sd">        specified type.</span>
@@ -1329,9 +788,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">elif</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="ow">in</span> <span class="n">flagged_for_removal</span><span class="p">:</span>
                 <span class="c1"># parent was eliminated. make this a new root</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span></div>
 
-    <span class="c1"># strip out the specified SWC type</span></div>
+    <span class="c1"># strip out the specified SWC type</span>
 <div class="viewcode-block" id="Morphology.strip_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.strip_type">[docs]</a>    <span class="k">def</span> <span class="nf">strip_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Strips all compartments of the specified type from the</span>
 <span class="sd">        morphology.</span>
@@ -1361,9 +820,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="k">elif</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="ow">in</span> <span class="n">flagged_for_removal</span><span class="p">:</span>
                 <span class="c1"># parent was eliminated. make this a new root</span>
                 <span class="n">seg</span><span class="p">[</span><span class="n">NODE_PN</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span></div>
 
-    <span class="c1"># strip out the specified SWC type</span></div>
+    <span class="c1"># strip out the specified SWC type</span>
 <div class="viewcode-block" id="Morphology.convert_type"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.convert_type">[docs]</a>    <span class="k">def</span> <span class="nf">convert_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_type</span><span class="p">,</span> <span class="n">new_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Converts all compartments from one type to another.</span>
 <span class="sd">        Nodes of the original type are not affected so this</span>
@@ -1383,8 +842,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">==</span> <span class="n">old_type</span><span class="p">:</span>
-                <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_type</span>
-</div>
+                <span class="n">seg</span><span class="p">[</span><span class="n">NODE_TYPE</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_type</span></div>
+
 <div class="viewcode-block" id="Morphology.apply_affine"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Morphology.apply_affine">[docs]</a>    <span class="k">def</span> <span class="nf">apply_affine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">aff</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Apply an affine transform to all compartments in this</span>
 <span class="sd">        morphology. Node radius is adjusted as well.</span>
@@ -1447,8 +906,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
             <span class="n">seg</span><span class="p">[</span><span class="n">NODE_X</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
             <span class="n">seg</span><span class="p">[</span><span class="n">NODE_Y</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
             <span class="n">seg</span><span class="p">[</span><span class="n">NODE_Z</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>
-            <span class="n">seg</span><span class="p">[</span><span class="n">NODE_R</span><span class="p">]</span> <span class="o">*=</span> <span class="n">scale</span>
-</div>
+            <span class="n">seg</span><span class="p">[</span><span class="n">NODE_R</span><span class="p">]</span> <span class="o">*=</span> <span class="n">scale</span></div>
+
     <span class="k">def</span> <span class="nf">_separate_trees</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        construct list of independent trees (each tree has a root of -1)</span>
@@ -1603,18 +1062,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tree_list</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">()</span>
         <span class="c1"># reset node tree_id to correct tree number</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_tree_ids</span><span class="p">()</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_tree_ids</span><span class="p">()</span></div>
+
     <span class="k">def</span> <span class="nf">_print_all_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        debugging function. prints all nodes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compartment_list</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
 
 <span class="c1">########################################################################</span>
 
-</div>
+
 <div class="viewcode-block" id="Marker"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.Marker">[docs]</a><span class="k">class</span> <span class="nc">Marker</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Simple dictionary class for handling reconstruction marker objects. &quot;&quot;&quot;</span>
 
@@ -1630,9 +1089,9 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
         <span class="c1"># pixel</span>
         <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SPACING</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></div>
 
-</div>
+
 <div class="viewcode-block" id="read_marker_file"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.swc.read_marker_file">[docs]</a><span class="k">def</span> <span class="nf">read_marker_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; read in a marker file and return a list of dictionaries &quot;&quot;&quot;</span>
 
@@ -1650,7 +1109,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h3><a href="../../../index.html">Contents</a></h3>
 <ul>
@@ -1661,6 +1120,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_space.html">Reference Space</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -1679,6 +1139,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -1694,7 +1155,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
 </p>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
@@ -1702,9 +1163,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1713,9 +1171,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     </div>
 
 
-    <div class="footer">
+    <div class="footer" role="contentinfo">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
 
   </body>
 </html>

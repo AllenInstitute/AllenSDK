@@ -68,6 +68,30 @@ allensdk.core.ontology module
     :undoc-members:
     :show-inheritance:
 
+allensdk.core.reference_space module
+------------------------------------
+
+.. automodule:: allensdk.core.reference_space
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.core.simple_tree module
+--------------------------------
+
+.. automodule:: allensdk.core.simple_tree
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+allensdk.core.structure_tree module
+-----------------------------------
+
+.. automodule:: allensdk.core.structure_tree
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 allensdk.core.swc module
 ------------------------
 

@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &mdash; Allen SDK 0.12.3 documentation</title>
+    <title>Index &mdash; Allen SDK 0.12.5 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.12.3',
+        VERSION:     '0.12.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,603 +24,61 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.12.3 documentation" href="index.html" /> 
+    <link rel="top" title="Allen SDK 0.12.5 documentation" href="index.html" /> 
   </head>
-  <body>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portal.js"></script>
-<style>
-
-	/* the icon font-family definition and helper classes */
-	@font-face {
-	  font-family: 'portal_icon_font';
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677');
-	  src: url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.eot?39505677#iefix') format('embedded-opentype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.woff?39505677') format('woff'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.ttf?39505677') format('truetype'),
-	       url('/AllenSDK/_static/external_assets/stylesheets/portal_icon_font.svg?39505677#portal_icon_font') format('svg');
-	  font-weight: normal;
-	  font-style: normal;
-	}
-	 
-	 [class^="icon-"]:before, [class*=" icon-"]:before {
-	  font-family: "portal_icon_font";
-	  font-style: normal;
-	  font-weight: normal;
-	  speak: none;
-	 
-	  display: inline-block;
-	  text-decoration: inherit;
-	  width: 1em;
-	  margin-right: .2em;
-	  text-align: center;
-	  /* opacity: .8; */
-	 
-	  /* For safety - reset parent styles, that can break glyph codes*/
-	  font-variant: normal;
-	  text-transform: none;
-	     
-	  /* fix buttons height, for twitter bootstrap */
-	  line-height: 1em;
-	 
-	  /* Animation center compensation - margins should be symmetric */
-	  /* remove if not needed */
-	  margin-left: .2em;
-	
-	}
-	 
-	.icon-spin5:before { content: '\e806'; } /* '' */
-	.icon-left-open-1:before { content: '\e81e'; } /* '' */
-	.icon-plus-1:before { content: '\e801'; } /* '' */
-	.icon-facebook:before { content: '\e816'; } /* '' */
-	.icon-gplus:before { content: '\e818'; } /* '' */
-	.icon-linkedin-3:before { content: '\e815'; } /* '' */
-	.icon-twitter:before { content: '\e817'; } /* '' */
-	.icon-youtube-play:before { content: '\e805'; } /* '' */
-	.icon-plus-2:before { content: '\e809'; } /* '' */
-	.icon-record-1:before { content: '\e81c'; } /* '' */
-	.icon-cancel:before { content: '\e80b'; } /* '' */
-	.icon-search:before { content: '\e804'; } /* '' */
-	.icon-cancel-2:before { content: '\e80c'; } /* '' */
-	.icon-plus-4:before { content: '\e80d'; } /* '' */
-	.icon-cancel-3:before { content: '\e80e'; } /* '' */
-	.icon-plus:before { content: '\e808'; } /* '' */
-	.icon-down-open:before { content: '\e800'; } /* '' */
-	.icon-right-open:before { content: '\e802'; } /* '' */
-	.icon-up-open:before { content: '\e803'; } /* '' */
-	.icon-stop:before { content: '\e813'; } /* '' */
-	.icon-cancel-1:before { content: '\e820'; } /* '' */
-	.icon-plus-3:before { content: '\e80a'; } /* '' */
-	/* end icon font helpers */
-
-	/* icon font spin animation */
-	.animate-spin {
-	  -moz-animation: spin 2s infinite linear;
-	  -o-animation: spin 2s infinite linear;
-	  -webkit-animation: spin 2s infinite linear;
-	  animation: spin 2s infinite linear;
-	  display: inline-block;
-	}
-	@-moz-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-webkit-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-o-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@-ms-keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	@keyframes spin {
-	  0% {
-	    -moz-transform: rotate(0deg);
-	    -o-transform: rotate(0deg);
-	    -webkit-transform: rotate(0deg);
-	    transform: rotate(0deg);
-	  }
-
-	  100% {
-	    -moz-transform: rotate(359deg);
-	    -o-transform: rotate(359deg);
-	    -webkit-transform: rotate(359deg);
-	    transform: rotate(359deg);
-	  }
-	}
-	/*  end spin animation */	
-
-	@font-face {
-	    font-family: 'bebas_neueregular';
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot');
-	    src: url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.eot?#iefix') format('embedded-opentype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.woff') format('woff'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.ttf') format('truetype'),
-	         url('/AllenSDK/_static/external_assets/stylesheets/bebasneue-webfont.svg#bebas_neueregular') format('svg');
-	    font-weight: normal;
-	    font-style: normal;
-	}
-
-	/* top chrome styles */
-	#top_chrome {
-
-		width:100%;
-		height:28px;
-		background-color:#163E65;
-	}
-
-	.chrome_link_block {
-
-		color:#fff !important;	
-		display:inline-block;
-		height:100%;
-		max-height:28px;
-	}
-
-	.chrome_link_block:hover {
-
-		background-color:#eee;
-		color:#0779BE !important;	
-		cursor:pointer;
-	}
-
-	#top_chrome a {
-
-		color:inherit !important;	
-		text-decoration:none;
-	}
-
-	#top_chrome a:hover {
-
-		color:inherit !important;	
-	}
-
-	#top_chrome_buttons {
-
-		float:right;
-		margin-right:50px;
-	}
-
-	.chrome_button {
-
-		font-family:arial,sans-serif;
-		font-weight:bold;
-		display:inline-block;
-		font-size:9px;
-		text-align:left;
-		text-decoration:none;
-		margin:9px 20px 10px 20px;
-	}
-
-	.chrome_active {
-
-		background-color:#1b7abd;
-		color:#fff;
-	}
-
-
-	/* header element styles*/
-	#header_content {
-
-		font-family: bebas_neueregular, arial, sans-serif;
-		font-size:22px;
-		color:#0779be;		
-		letter-spacing:0.03em;
-
-		position:relative;
-		width:calc(100% - 112px);
-		min-width:800px;
-		height:76px;
-		border-bottom:2px solid #A5A8AB;
-		margin-left:50px;
-		margin-right:50px;
-        z-index:9999; /* IT-9508 */
-	}
-
-	#portal_logo {
-
-		position:absolute;
-		top:20px;
-		left:0px;
-		width:236px;
-	}
-
-	#portal_tabs {
-
-		position: absolute;
-		bottom: 12px;
-		left: 0px;
-		margin-bottom: -12px;
-		display: block;
-	}
-
-	.horizontal_list
-	{
-		margin: 0;
-		padding: 0;
-		list-style-type: none;
-		display: inline; 		
-	}
-
-	.horizontal_list li { 
-
-		display: inline; 	
-	}	
-
-	#portal_tab_menu_container {
-
-		display:none;
-	}
-
-	#portal_search_input_group {
-
-		position:absolute;
-		margin: 0;
-		padding: 0;
-		bottom:12px;
-		right:0px;
-		border:1px solid #DAD9D3;
-		color:#DAD9D3;
-	}
-
-	#portal_search_input_group input {
-
-		margin: 0;
-		padding: 0;
-		border:none;
-		width:110px;
-		color:#DAD9D3;
-		font-family:Helvetica,sans-serif;
-		font-size:12px;
-		height:28px;
-		margin-left:10px;
-
-		outline:none;
-	}
-
-	input::-ms-clear {
-		display: none;
-	}
-
-	#portal_search_input_group i {
-
-		font-size:0.8em;
-		cursor:pointer;
-	}
-
-	#pSiteSearchTextInput:focus {
-
-		color:#000;
-	}
-
-	.icon_menu_down {
-
-		font-size: 12px;
-		margin-left: 4px;
-		vertical-align: text-top;
-		padding-top: 4px;
-		display: inline-block;
-	}
-
-	.portal_tab_item {
-
-		background-color: #fff;
-		padding: 12px;
-		padding-left:20px;
-		padding-right:20px;
-		display: inline-block !important;		
-	}
-
-	.portal_tab_item a:hover {
-
-		color:#fbe300;	
-	}
-
-	.portal_tab_item:hover {
-
-		background-color: #0779be;	
-		color:#fbe300 !important;	
-	}	
-
-
-	.portal_menu_active {
-
-		background-color: #EEEEEE;
-	}	
-
-	.portal_menu_item_active {
-
-		color:#fbe300 !important;	
-	}
-
-	.portal_tab_active {
-
-		color:#a5a8ab !important;
-	}
-
-	#header_content a {		
-
-		color:inherit !important;
-	}
-
-	#header_content a:hover {
-
-		background-color: #0779be;	
-		color:#fbe300 !important;	
-	}
-
-	#header_content ul {
-
-		list-style: none;
-		position: relative;
-		top: 58px;
-		display: inline-table;
-	}
-
-	#header_content ul ul {
-		
-		display:none;
-		opacity:0;
-	}
-
-	/* the fly out menus */
-	#header_content ul li:hover > ul,
-	#header_content ul li.hover > ul {
-
-		position: absolute;
-		top: 48px;
-		z-index:999;
-
-		display: block;
-		width: 152px;
-		padding:0px;
-		padding-top:20px;
-		padding-bottom:10px;
-		font-size: 12px;
-		font-family: Arial,Sans-Serif;
-		font-weight: bold;
-		text-transform: uppercase;
-
-		background-color: rgba(8,122,191,0.98);
-		color: #fff !important;
-		opacity: 1;
-
-		-webkit-animation: fade 0.25s;
-		animation: fade 0.25s;
-	}
-
-	@-webkit-keyframes fade {
-	    from {opacity: 0}
-	    to {opacity: 1}
-	}
-	@keyframes fade {
-	    from {opacity: 0}
-	    to {opacity: 1}
-	}	
-
-	#header_content ul li:hover > ul li {
-
-		padding: 10px;
-		padding-top: 0px;
-		padding-left: 20px;
-		display: block;
-		opacity:1;
-	}
-
-	#header_content ul li:hover > ul a {
-
-		display: block;
-		opacity:1;
-		white-space:nowrap;
-	}
-
-	#portal_menu_start_list {
-
-		left: 81px;
-
-		/* IE sauce */
-		left:85px\9;
-
-		/* Safari sauce */
-		(;left:79px;);
-	}
-
-	#portal_menu_atlases_list {
-
-		left: 290px;
-		width: 210px !important;
-        height: 236px;
-
-		padding-bottom:5px !important;
-
-		/* IE sauce */
-		left: 303px\9;
-        height: 225px\9;
-
-		/* Safari sauce */
-		(;left:279px;);
-	}
-
-	#portal_menu_tools_list {
-
-		left: 500px;
-		width: 172px !important;
-		height: 236px;
-
-		padding-bottom:5px !important;
-
-		/* IE sauce */
-		left: 513px\9;
-		height:225px\9;
-
-		/* Safari sauce */
-		(;left:489px;);
-		(;height:227px;);
-	}
-
-	/* mozilla sauce */
-	@-moz-document url-prefix() {
-
-		#header_content {
-
-			height:107px;
-		}
-
-		#portal_menu_start_list {
-
-			left:85px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 302px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 512px;
-			height:236px;
-		}
-	}
-
-
-	/* make it look OK on iPad also */
-	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:portrait) {
-
-		#portal_menu_start_list {
-
-			left:81px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 291px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 501px;
-			height:236px;
-		}  
-	}
-	@media all and (device-width: 768px) and (device-height: 1024px) and (orientation:landscape) {
-
-		#portal_menu_start_list {
-
-			left:81px;
-		}
-
-		#portal_menu_atlases_list {
-
-			left: 291px;		
-		}
-
-		#portal_menu_tools_list {
-
-			left: 501px;
-			height:236px;
-		}	  
-	}
-
-	.portal_menu_list_heading {
-
-		color:#9ccae5;
-		border-bottom:1px solid #9ccae5;
-		padding-bottom:5px !important;
-	}
-
-	.portal_menu_list_heading + li {
-
-		padding-top:10px !important;
-	}
-
-	.portal_menu_list_heading li {
-
-		padding-bottom:0px;
-	}	
-
-	#portal_menu_atlases_list li:last-of-type {
-
-		padding-bottom:15px !important;
-	}
-
-	.icon-spin5 {
-
-		color:#000;
-	}
-</style>
-<div id="pHeader">
-<div id="top_chrome">
-	<div id="top_chrome_buttons">
-		<div class="chrome_link_block"><a href="http://www.alleninstitute.org" target="_blank" class="chrome_button">ALLEN INSTITUTE</a></div>
-		<div class="chrome_link_block chrome_active"><a href="http://www.brain-map.org" class="chrome_button">BRAIN ATLAS</a></div>
-	</div>
-</div>
-
-<div id="header_content">
-
-	<a href="http://AllenInstitute.github.io/AllenSDK">
-		<img id="portal_logo" style="border:0;" src="/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png"/>
-	</a>
-</div>
-</div>
-
-<script>
-
-jQuery('#portal_tab_menu').bind('touchstart', function() {
-
-	if(window.console)
-		console.log("touchstart");
-});
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
 </script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  div.document {
+  position:relative !important;;
+  }
+
+  img#portal_logo{
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
+  }
+
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent;
+  }
+
+  #portal_tabs {
+  display:none !important;;
+  }
+
+  #portal_search_input_group {
+  display:none !important;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -628,7 +86,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
 
 <h1 id="index">Index</h1>
@@ -670,6 +128,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.acquisition_rate">acquisition_rate (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatureExtractor.adaptation_index">adaptation_index() (allensdk.ephys.feature_extractor.EphysFeatureExtractor method)</a>
   </dt>
 
@@ -679,6 +141,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       </dl></dd>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.add_angle_labels">add_angle_labels() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.add_arrow">add_arrow() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
       
   <dt><a href="allensdk.config.html#allensdk.config.manifest.Manifest.add_file">add_file() (allensdk.config.manifest.Manifest method)</a>
   </dt>
@@ -699,10 +169,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.add_section">add_section() (allensdk.config.manifest_builder.ManifestBuilder method)</a>
-  </dt>
-
-      
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.add_threshold_components">add_threshold_components() (allensdk.model.glif.glif_neuron.GlifNeuron method)</a>
   </dt>
 
       
@@ -786,6 +252,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.api.queries.html#module-allensdk.api.queries.rma_pager">allensdk.api.queries.rma_pager (module)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#module-allensdk.api.queries.rma_template">allensdk.api.queries.rma_template (module)</a>
   </dt>
 
@@ -814,6 +284,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#module-allensdk.brain_observatory.circle_plots">allensdk.brain_observatory.circle_plots (module)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.brain_observatory.html#module-allensdk.brain_observatory.dff">allensdk.brain_observatory.dff (module)</a>
   </dt>
 
@@ -835,6 +309,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.brain_observatory.html#module-allensdk.brain_observatory.natural_scenes">allensdk.brain_observatory.natural_scenes (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#module-allensdk.brain_observatory.observatory_plots">allensdk.brain_observatory.observatory_plots (module)</a>
   </dt>
 
       
@@ -905,8 +383,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.json_description_parser">allensdk.config.model.formats.json_description_parser (module)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.config.model.formats.html#module-allensdk.config.model.formats.pycfg_description_parser">allensdk.config.model.formats.pycfg_description_parser (module)</a>
   </dt>
@@ -915,6 +391,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.core.html#module-allensdk.core">allensdk.core (module)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.core.html#module-allensdk.core.brain_observatory_cache">allensdk.core.brain_observatory_cache (module)</a>
   </dt>
@@ -945,6 +423,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.core.html#module-allensdk.core.ontology">allensdk.core.ontology (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#module-allensdk.core.reference_space">allensdk.core.reference_space (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#module-allensdk.core.simple_tree">allensdk.core.simple_tree (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#module-allensdk.core.structure_tree">allensdk.core.structure_tree (module)</a>
   </dt>
 
       
@@ -1040,11 +530,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.test_utilities.html#module-allensdk.test_utilities">allensdk.test_utilities (module)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.test_utilities.html#module-allensdk.test_utilities.temp_dir">allensdk.test_utilities.temp_dir (module)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.alpha_filter">alpha_filter() (in module allensdk.brain_observatory.r_neuropil)</a>
   </dt>
 
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_features.analyze_trough_details">analyze_trough_details() (in module allensdk.ephys.ephys_features)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.ancestor_ids">ancestor_ids() (allensdk.core.simple_tree.SimpleTree method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.ancestors">ancestors() (allensdk.core.simple_tree.SimpleTree method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.angle_lines">angle_lines() (in module allensdk.brain_observatory.circle_plots)</a>
   </dt>
 
       
@@ -1081,6 +591,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.append_metrics_static_grating">append_metrics_static_grating() (allensdk.brain_observatory.session_analysis.SessionAnalysis method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.append_threshold_components">append_threshold_components() (allensdk.model.glif.glif_neuron.GlifNeuron method)</a>
   </dt>
 
       
@@ -1162,6 +676,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_cells_sp">binned_cells_sp (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_cells_vis">binned_cells_vis (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_dx_sp">binned_dx_sp (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.binned_dx_vis">binned_dx_vis (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi">BiophysicalApi (class in allensdk.api.queries.biophysical_api)</a>
   </dt>
 
@@ -1185,6 +715,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet">BrainObservatoryNwbDataSet (class in allensdk.core.brain_observatory_nwb_data_set)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.build_hex_pack">build_hex_pack() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
       
   <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.build_manifest">build_manifest() (allensdk.api.cache.Cache method)</a>
   </dt>
@@ -1203,8 +739,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       </dl></dd>
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi.build_query">build_query() (allensdk.api.queries.svg_api.SvgApi method)</a>
   </dt>
@@ -1248,11 +782,39 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.cache_csv">cache_csv() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.cache_csv_dataframe">cache_csv_dataframe() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.cache_csv_json">cache_csv_json() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.biophysical_api.BiophysicalApi.cache_data">cache_data() (allensdk.api.queries.biophysical_api.BiophysicalApi method)</a>
   </dt>
 
       
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.cache_json">cache_json() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.cache_json_dataframe">cache_json_dataframe() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.cache_stimulus_file">cache_stimulus_file() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.cache.cacheable">cacheable() (in module allensdk.api.cache)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.cacher">cacher() (allensdk.api.cache.Cache static method)</a>
   </dt>
 
       
@@ -1296,11 +858,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.cell_id">cell_id (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.core.html#allensdk.core.brain_observatory_cache.BrainObservatoryCache.CELL_SPECIMENS_KEY">CELL_SPECIMENS_KEY (allensdk.core.brain_observatory_cache.BrainObservatoryCache attribute)</a>
   </dt>
 
       
   <dt><a href="allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.CELLS_KEY">CELLS_KEY (allensdk.core.cell_types_cache.CellTypesCache attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.celltraces">celltraces (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
   </dt>
 
       
@@ -1316,11 +886,29 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.check_and_write">check_and_write() (allensdk.core.reference_space.ReferenceSpace static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.check_coverage">check_coverage() (allensdk.core.reference_space.ReferenceSpace method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.config.html#allensdk.config.manifest.Manifest.check_dir">check_dir() (allensdk.config.manifest.Manifest method)</a>
   </dt>
 
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_features.check_thresholds_and_peaks">check_thresholds_and_peaks() (in module allensdk.ephys.ephys_features)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.child_ids">child_ids() (allensdk.core.simple_tree.SimpleTree method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.children">children() (allensdk.core.simple_tree.SimpleTree method)</a>
   </dt>
 
       
@@ -1332,13 +920,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.html#allensdk.deprecated.class_deprecated">class_deprecated() (in module allensdk.deprecated)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.clean_structures">clean_structures() (allensdk.core.structure_tree.StructureTree static method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.html#allensdk.api.api.Api.cleanup_truncated_file">cleanup_truncated_file() (allensdk.api.api.Api method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.feature_extractor.EphysFeatures.clone">clone() (allensdk.ephys.feature_extractor.EphysFeatures method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.image_download_api.ImageDownloadApi.COLORMAPS">COLORMAPS (allensdk.api.queries.image_download_api.ImageDownloadApi attribute)</a>
   </dt>
 
       
@@ -1387,6 +985,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.convert_type">convert_type() (allensdk.core.swc.Morphology method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.CoronaPlotter">CoronaPlotter (class in allensdk.brain_observatory.circle_plots)</a>
   </dt>
 
       
@@ -1488,6 +1090,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.descendant_ids">descendant_ids() (allensdk.core.simple_tree.SimpleTree method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.descendants">descendants() (allensdk.core.simple_tree.SimpleTree method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.config.model.html#allensdk.config.model.description.Description">Description (class in allensdk.config.model.description)</a>
   </dt>
 
@@ -1516,13 +1126,35 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.dfftraces">dfftraces (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.config.html#allensdk.config.manifest.Manifest.DIR">DIR (allensdk.config.manifest.Manifest attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.PolarPlotter.DIR_CCW">DIR_CCW (allensdk.brain_observatory.circle_plots.PolarPlotter attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.PolarPlotter.DIR_CW">DIR_CW (allensdk.brain_observatory.circle_plots.PolarPlotter attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.direct_voxel_counts">direct_voxel_counts() (allensdk.core.reference_space.ReferenceSpace method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.direct_voxel_map">direct_voxel_map (allensdk.core.reference_space.ReferenceSpace attribute)</a>
   </dt>
 
       
   <dt><a href="allensdk.config.html#allensdk.config.manifest.Manifest.DIRNAME">DIRNAME (allensdk.config.manifest.Manifest attribute)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.api.html#allensdk.api.api.Api.do_query">do_query() (allensdk.api.api.Api method)</a>
   </dt>
@@ -1543,8 +1175,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.download_data_mask">download_data_mask() (allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.grid_data_api.GridDataApi.download_expression_grid_data">download_expression_grid_data() (allensdk.api.queries.grid_data_api.GridDataApi method)</a>
   </dt>
@@ -1598,7 +1228,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.downsample">downsample() (allensdk.core.reference_space.ReferenceSpace method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings">DriftingGratings (class in allensdk.brain_observatory.drifting_gratings)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.dxcm">dxcm (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.dxtime">dxtime (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
   </dt>
 
       
@@ -1614,14 +1256,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_AScurrent_vector">dynamics_AScurrent_vector() (in module allensdk.model.glif.glif_neuron_methods)</a>
-  </dt>
-
-      
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_adapt_standard">dynamics_threshold_adapt_standard() (in module allensdk.model.glif.glif_neuron_methods)</a>
-  </dt>
-
-      
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_inf">dynamics_threshold_inf() (in module allensdk.model.glif.glif_neuron_methods)</a>
   </dt>
 
@@ -1634,27 +1268,11 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_threshold_three_components_forward">dynamics_threshold_three_components_forward() (in module allensdk.model.glif.glif_neuron_methods)</a>
-  </dt>
-
-      
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_exact">dynamics_voltage_linear_exact() (in module allensdk.model.glif.glif_neuron_methods)</a>
   </dt>
 
       
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_linear_forward_euler">dynamics_voltage_linear_forward_euler() (in module allensdk.model.glif.glif_neuron_methods)</a>
-  </dt>
-
-      
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_piecewise_linear_exact">dynamics_voltage_piecewise_linear_exact() (in module allensdk.model.glif.glif_neuron_methods)</a>
-  </dt>
-
-      
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_piecewise_linear_forward_euler">dynamics_voltage_piecewise_linear_forward_euler() (in module allensdk.model.glif.glif_neuron_methods)</a>
-  </dt>
-
-      
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.dynamics_voltage_quadratic_forward_euler">dynamics_voltage_quadratic_forward_euler() (in module allensdk.model.glif.glif_neuron_methods)</a>
   </dt>
 
   </dl></td>
@@ -1723,12 +1341,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.estimate_contamination_ratios">estimate_contamination_ratios() (in module allensdk.brain_observatory.r_neuropil)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.NeuropilSubtract.estimate_error">estimate_error() (allensdk.brain_observatory.r_neuropil.NeuropilSubtract method)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.estimate_sag">estimate_sag() (allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor method)</a>
   </dt>
@@ -1739,6 +1357,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.EXCEPT">EXCEPT (allensdk.api.queries.rma_api.RmaApi attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.EXCPT">EXCPT (allensdk.api.queries.rma_api.RmaApi attribute)</a>
   </dt>
 
       
@@ -1787,6 +1409,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_extractor.extractor_for_nwb_sweeps">extractor_for_nwb_sweeps() (in module allensdk.ephys.ephys_extractor)</a>
   </dt>
 
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.extralength">extralength (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.extralength">(allensdk.brain_observatory.natural_scenes.NaturalScenes attribute)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.extralength">(allensdk.brain_observatory.static_gratings.StaticGratings attribute)</a>
+  </dt>
+
+      </dl></dd>
   </dl></td>
 </tr></table>
 
@@ -1798,7 +1434,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.FanPlotter">FanPlotter (class in allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_features.FeatureError">FeatureError</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.FIELDS">FIELDS (allensdk.core.structure_tree.StructureTree attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.figure_in_px">figure_in_px() (in module allensdk.brain_observatory.observatory_plots)</a>
   </dt>
 
       
@@ -1826,11 +1474,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.filter_dict">filter_dict() (allensdk.core.structure_tree.StructureTree static method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.filter_experiment_containers">filter_experiment_containers() (allensdk.api.queries.brain_observatory_api.BrainObservatoryApi method)</a>
   </dt>
 
       
   <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.filter_experiments">filter_experiments() (allensdk.core.mouse_connectivity_cache.MouseConnectivityCache method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.filter_nodes">filter_nodes() (allensdk.core.simple_tree.SimpleTree method)</a>
   </dt>
 
       
@@ -1850,9 +1506,27 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.PolarPlotter.finalize">finalize() (allensdk.brain_observatory.circle_plots.PolarPlotter method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.finalize_no_axes">finalize_no_axes() (in module allensdk.brain_observatory.observatory_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.finalize_no_labels">finalize_no_labels() (in module allensdk.brain_observatory.observatory_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.finalize_with_axes">finalize_with_axes() (in module allensdk.brain_observatory.observatory_plots)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.find">find() (allensdk.core.swc.Morphology method)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_features.find_downstroke_indexes">find_downstroke_indexes() (in module allensdk.ephys.ephys_features)</a>
   </dt>
@@ -1861,8 +1535,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_features.find_peak_indexes">find_peak_indexes() (in module allensdk.ephys.ephys_features)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_features.find_time_index">find_time_index() (in module allensdk.ephys.ephys_features)</a>
   </dt>
@@ -1911,6 +1583,40 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.connected_services.ConnectedServices.FLOAT">FLOAT (allensdk.api.queries.connected_services.ConnectedServices attribute)</a>
   </dt>
 
+      
+  <dt><a href="allensdk.test_utilities.html#allensdk.test_utilities.temp_dir.fn_temp_dir">fn_temp_dir() (in module allensdk.test_utilities.temp_dir)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.FanPlotter.for_drifting_gratings">for_drifting_gratings() (allensdk.brain_observatory.circle_plots.FanPlotter static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.FanPlotter.for_static_gratings">for_static_gratings() (allensdk.brain_observatory.circle_plots.FanPlotter static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.from_analysis_file">from_analysis_file() (allensdk.brain_observatory.drifting_gratings.DriftingGratings static method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.from_analysis_file">(allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise static method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_movie.NaturalMovie.from_analysis_file">(allensdk.brain_observatory.natural_movie.NaturalMovie static method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.from_analysis_file">(allensdk.brain_observatory.natural_scenes.NaturalScenes static method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.from_analysis_file">(allensdk.brain_observatory.static_gratings.StaticGratings static method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.from_dataframe">from_dataframe() (allensdk.config.manifest_builder.ManifestBuilder method)</a>
   </dt>
@@ -1976,6 +1682,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_ancestor_id_map">get_ancestor_id_map() (allensdk.core.structure_tree.StructureTree method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi.get_annotated_section_data_sets">get_annotated_section_data_sets() (allensdk.api.queries.annotated_section_data_sets_api.AnnotatedSectionDataSetsApi method)</a>
   </dt>
 
@@ -2025,6 +1735,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.core.html#allensdk.core.ontology.Ontology.get_children">get_children() (allensdk.core.ontology.Ontology method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_colormap">get_colormap() (allensdk.core.structure_tree.StructureTree method)</a>
   </dt>
 
       
@@ -2128,6 +1842,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       </dl></dd>
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_fluorescence">get_fluorescence() (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_fluorescence_timestamps">get_fluorescence_timestamps() (allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet method)</a>
   </dt>
 
@@ -2137,6 +1855,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.config.html#allensdk.config.manifest.Manifest.get_format">get_format() (allensdk.config.manifest.Manifest method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_id_acronym_map">get_id_acronym_map() (allensdk.core.structure_tree.StructureTree method)</a>
   </dt>
 
       
@@ -2191,8 +1913,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_max_projection">get_max_projection() (allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_metadata">get_metadata() (allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet method)</a>
   </dt>
@@ -2212,11 +1932,33 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_name_map">get_name_map() (allensdk.core.structure_tree.StructureTree method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_neuron_config">get_neuron_config() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_neuron_configs">get_neuron_configs() (allensdk.api.queries.glif_api.GlifApi method)</a>
   </dt>
 
       
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_neuronal_model">get_neuronal_model() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_neuronal_model_templates">get_neuronal_model_templates() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.get_neuronal_models">get_neuronal_models() (allensdk.api.queries.glif_api.GlifApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.get_neuropil_r">get_neuropil_r() (allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet method)</a>
   </dt>
 
       
@@ -2268,6 +2010,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       </dl></dd>
       
+  <dt><a href="allensdk.core.html#allensdk.core.nwb_data_set.NwbDataSet.get_pipeline_version">get_pipeline_version() (allensdk.core.nwb_data_set.NwbDataSet method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_projection_density">get_projection_density() (allensdk.core.mouse_connectivity_cache.MouseConnectivityCache method)</a>
   </dt>
 
@@ -2297,6 +2043,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi.get_reference_aligned_image_channel_volumes_url">get_reference_aligned_image_channel_volumes_url() (allensdk.api.queries.mouse_connectivity_api.MouseConnectivityApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_reference_space">get_reference_space() (allensdk.core.mouse_connectivity_cache.MouseConnectivityCache method)</a>
   </dt>
 
       
@@ -2346,6 +2096,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.get_slice_image">get_slice_image() (allensdk.core.reference_space.ReferenceSpace method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.get_speed_tuning">get_speed_tuning() (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis method)</a>
   </dt>
 
@@ -2389,8 +2143,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structure_sets">get_structure_sets() (allensdk.api.queries.ontologies_api.OntologiesApi method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structure_sets">(allensdk.core.structure_tree.StructureTree method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.synchronization_api.SynchronizationApi.get_structure_to_image">get_structure_to_image() (allensdk.api.queries.synchronization_api.SynchronizationApi method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_structure_tree">get_structure_tree() (allensdk.core.mouse_connectivity_cache.MouseConnectivityCache method)</a>
   </dt>
 
       
@@ -2413,6 +2177,26 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       </dl></dd>
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structures_by_acronym">get_structures_by_acronym() (allensdk.core.structure_tree.StructureTree method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structures_by_id">get_structures_by_id() (allensdk.core.structure_tree.StructureTree method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structures_by_name">get_structures_by_name() (allensdk.core.structure_tree.StructureTree method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.get_structures_by_set_id">get_structures_by_set_id() (allensdk.core.structure_tree.StructureTree method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.get_structures_with_sets">get_structures_with_sets() (allensdk.api.queries.ontologies_api.OntologiesApi method)</a>
+  </dt>
+
       
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.svg_api.SvgApi.get_svg">get_svg() (allensdk.api.queries.svg_api.SvgApi method)</a>
   </dt>
@@ -2441,10 +2225,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
       </dl></dd>
       
   <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.get_template_volume">get_template_volume() (allensdk.core.mouse_connectivity_cache.MouseConnectivityCache method)</a>
-  </dt>
-
-      
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.get_threshold_components">get_threshold_components() (allensdk.model.glif.glif_neuron.GlifNeuron method)</a>
   </dt>
 
       
@@ -2489,10 +2269,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_features.has_fixed_dt">has_fixed_dt() (in module allensdk.ephys.ephys_features)</a>
   </dt>
 
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.has_overlaps">has_overlaps() (allensdk.core.structure_tree.StructureTree method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.hdf5_util.Hdf5Util">Hdf5Util (class in allensdk.config.model.formats.hdf5_util)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.hdf5_util.Hdf5Util">Hdf5Util (class in allensdk.config.model.formats.hdf5_util)</a>
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.hex_pack">hex_pack() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.hex_to_rgb">hex_to_rgb() (allensdk.core.structure_tree.StructureTree static method)</a>
   </dt>
 
       
@@ -2517,6 +2309,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.core.html#allensdk.core.cell_types_cache.ReporterStatus.INDETERMINATE">INDETERMINATE (allensdk.core.cell_types_cache.ReporterStatus attribute)</a>
   </dt>
 
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.CoronaPlotter.infer_dims">infer_dims() (allensdk.brain_observatory.circle_plots.CoronaPlotter method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.FanPlotter.infer_dims">(allensdk.brain_observatory.circle_plots.FanPlotter method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.roi_masks.NeuropilMask.init_by_mask">init_by_mask() (allensdk.brain_observatory.roi_masks.NeuropilMask method)</a>
   </dt>
@@ -2570,6 +2372,20 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.interlength">interlength (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.interlength">(allensdk.brain_observatory.natural_scenes.NaturalScenes attribute)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.interlength">(allensdk.brain_observatory.static_gratings.StaticGratings attribute)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.interpolate_spike_time">interpolate_spike_time() (in module allensdk.model.glif.glif_neuron)</a>
   </dt>
 
@@ -2607,8 +2423,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.api.html#allensdk.api.api.Api.json_msg_query">json_msg_query() (allensdk.api.api.Api method)</a>
   </dt>
 
+      
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.json_remove_keys">json_remove_keys() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.json_rename_columns">json_rename_columns() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
       
   <dt><a href="allensdk.core.html#allensdk.core.json_utilities.JsonComments">JsonComments (class in allensdk.core.json_utilities)</a>
   </dt>
@@ -2687,12 +2511,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.load_csv">load_csv() (allensdk.api.cache.Cache method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.model.biophysical.html#allensdk.model.biophysical.runner.load_description">load_description() (in module allensdk.model.biophysical.runner)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.load_json">load_json() (allensdk.api.cache.Cache method)</a>
   </dt>
@@ -2742,7 +2566,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN">LSN (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise attribute)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_GREY">LSN_GREY (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.LSN_mask">LSN_mask (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise attribute)</a>
   </dt>
 
       
@@ -2790,9 +2622,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.make_pincushion_plot">make_pincushion_plot() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.make_structure_mask">make_structure_mask() (allensdk.core.mouse_connectivity_cache.MouseConnectivityCache method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.make_structure_mask">(allensdk.core.reference_space.ReferenceSpace method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="allensdk.config.html#allensdk.config.manifest.Manifest">Manifest (class in allensdk.config.manifest)</a>
   </dt>
@@ -2803,6 +2645,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder">ManifestBuilder (class in allensdk.config.manifest_builder)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.many_structure_masks">many_structure_masks() (allensdk.core.reference_space.ReferenceSpace method)</a>
   </dt>
 
       
@@ -2830,25 +2676,37 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.test_utilities.html#allensdk.test_utilities.temp_dir.md_temp_dir">md_temp_dir() (in module allensdk.test_utilities.temp_dir)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.ephys.html#allensdk.ephys.extract_cell_features.mean_features_spike_zero">mean_features_spike_zero() (in module allensdk.ephys.extract_cell_features)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.mean_sweep_response">mean_sweep_response (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
   </dt>
 
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_extractor.membrane_time_constant">membrane_time_constant() (in module allensdk.ephys.ephys_extractor)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.merge_receptive_fields">merge_receptive_fields() (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise static method)</a>
+  </dt>
+
       
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.METHOD_LIBRARY">METHOD_LIBRARY (in module allensdk.model.glif.glif_neuron_methods)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.min_of_line_and_zero">min_of_line_and_zero() (in module allensdk.model.glif.glif_neuron_methods)</a>
   </dt>
 
       
-  <dt><a href="allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.MissingStimulusException">MissingStimulusException</a>
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.brain_observatory_exceptions.MissingStimulusException">MissingStimulusException</a>
   </dt>
 
       
@@ -2942,15 +2800,31 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
-  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.node">node() (allensdk.core.swc.Morphology method)</a>
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.nocache_dataframe">nocache_dataframe() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.nocache_json">nocache_json() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.node">node() (allensdk.core.simple_tree.SimpleTree method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.node">(allensdk.core.swc.Morphology method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.node_ids">node_ids() (allensdk.core.simple_tree.SimpleTree method)</a>
   </dt>
 
       
   <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.NODE_TYPES">NODE_TYPES (allensdk.core.swc.Morphology attribute)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_features.norm_diff">norm_diff() (in module allensdk.ephys.ephys_features)</a>
   </dt>
@@ -2959,6 +2833,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_features.norm_sq_diff">norm_sq_diff() (in module allensdk.ephys.ephys_features)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.normalize_F">normalize_F() (in module allensdk.brain_observatory.r_neuropil)</a>
   </dt>
@@ -2984,12 +2860,46 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.number_ori">number_ori (allensdk.brain_observatory.drifting_gratings.DriftingGratings attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.number_ori">(allensdk.brain_observatory.static_gratings.StaticGratings attribute)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.number_phase">number_phase (allensdk.brain_observatory.static_gratings.StaticGratings attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.number_scenes">number_scenes (allensdk.brain_observatory.natural_scenes.NaturalScenes attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.number_sf">number_sf (allensdk.brain_observatory.static_gratings.StaticGratings attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.number_tf">number_tf (allensdk.brain_observatory.drifting_gratings.DriftingGratings attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.numbercells">numbercells (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.NWB_FILE_TYPE">NWB_FILE_TYPE (allensdk.api.queries.brain_observatory_api.BrainObservatoryApi attribute)</a>
   </dt>
 
       <dd><dl>
         
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.cell_types_api.CellTypesApi.NWB_FILE_TYPE">(allensdk.api.queries.cell_types_api.CellTypesApi attribute)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.NWB_FILE_TYPE">(allensdk.api.queries.glif_api.GlifApi attribute)</a>
   </dt>
 
       </dl></dd>
@@ -3019,8 +2929,28 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.core.html#allensdk.core.ontology.Ontology">Ontology (class in allensdk.core.ontology)</a>
   </dt>
 
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.open_corona_plot">open_corona_plot() (allensdk.brain_observatory.natural_scenes.NaturalScenes method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.open_fan_plot">open_fan_plot() (allensdk.brain_observatory.static_gratings.StaticGratings method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.open_pincushion_plot">open_pincushion_plot() (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise method)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.open_star_plot">open_star_plot() (allensdk.brain_observatory.drifting_gratings.DriftingGratings method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_movie.NaturalMovie.open_track_plot">open_track_plot() (allensdk.brain_observatory.natural_movie.NaturalMovie method)</a>
+  </dt>
+
       
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.OPTIONS">OPTIONS (allensdk.api.queries.rma_api.RmaApi attribute)</a>
   </dt>
@@ -3037,12 +2967,38 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.order_clause">order_clause() (allensdk.api.queries.rma_api.RmaApi method)</a>
   </dt>
 
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.orivals">orivals (allensdk.brain_observatory.drifting_gratings.DriftingGratings attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.orivals">(allensdk.brain_observatory.static_gratings.StaticGratings attribute)</a>
+  </dt>
+
+      </dl></dd>
   </dl></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_pager.pageable">pageable() (in module allensdk.api.queries.rma_pager)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_pager.RmaPager.pager">pager() (allensdk.api.queries.rma_pager.RmaPager static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.parent">parent() (allensdk.core.simple_tree.SimpleTree method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.parent_id">parent_id() (allensdk.core.simple_tree.SimpleTree method)</a>
+  </dt>
+
       
   <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.parent_of">parent_of() (allensdk.core.swc.Morphology method)</a>
   </dt>
@@ -3060,7 +3016,27 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.pathfinder">pathfinder() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.pause_metrics">pause_metrics() (allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak">peak (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak_row_from_csid">peak_row_from_csid() (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.peak_run">peak_run (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.phasevals">phasevals (allensdk.brain_observatory.static_gratings.StaticGratings attribute)</a>
   </dt>
 
       
@@ -3073,6 +3049,32 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet.PIPELINE_DATASET">PIPELINE_DATASET (allensdk.core.brain_observatory_nwb_data_set.BrainObservatoryNwbDataSet attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.CoronaPlotter.plot">plot() (allensdk.brain_observatory.circle_plots.CoronaPlotter method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.FanPlotter.plot">(allensdk.brain_observatory.circle_plots.FanPlotter method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.TrackPlotter.plot">(allensdk.brain_observatory.circle_plots.TrackPlotter method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_combined_speed">plot_combined_speed() (in module allensdk.brain_observatory.observatory_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_condition_histogram">plot_condition_histogram() (in module allensdk.brain_observatory.observatory_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_direction_selectivity">plot_direction_selectivity() (allensdk.brain_observatory.drifting_gratings.DriftingGratings method)</a>
   </dt>
 
       
@@ -3092,7 +3094,53 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_orientation_selectivity">plot_orientation_selectivity() (allensdk.brain_observatory.drifting_gratings.DriftingGratings method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.plot_orientation_selectivity">(allensdk.brain_observatory.static_gratings.StaticGratings method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_preferred_direction">plot_preferred_direction() (allensdk.brain_observatory.drifting_gratings.DriftingGratings method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.plot_preferred_orientation">plot_preferred_orientation() (allensdk.brain_observatory.static_gratings.StaticGratings method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.plot_preferred_spatial_frequency">plot_preferred_spatial_frequency() (allensdk.brain_observatory.static_gratings.StaticGratings method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.plot_preferred_temporal_frequency">plot_preferred_temporal_frequency() (allensdk.brain_observatory.drifting_gratings.DriftingGratings method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_radial_histogram">plot_radial_histogram() (in module allensdk.brain_observatory.observatory_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.plot_receptive_field">plot_receptive_field() (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_receptive_field">(in module allensdk.brain_observatory.observatory_plots)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.brain_observatory_plotting.plot_running_a">plot_running_a() (in module allensdk.brain_observatory.brain_observatory_plotting)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_selectivity_cumulative_histogram">plot_selectivity_cumulative_histogram() (in module allensdk.brain_observatory.observatory_plots)</a>
   </dt>
 
       
@@ -3100,11 +3148,73 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_speed">plot_speed() (in module allensdk.brain_observatory.observatory_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.plot_speed_tuning">plot_speed_tuning() (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.plot_time_to_peak">plot_time_to_peak() (allensdk.brain_observatory.natural_scenes.NaturalScenes method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.plot_time_to_peak">(allensdk.brain_observatory.static_gratings.StaticGratings method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.observatory_plots.plot_time_to_peak">(in module allensdk.brain_observatory.observatory_plots)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.polar_line_circles">polar_line_circles() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.polar_linspace">polar_linspace() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.polar_to_xy">polar_to_xy() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.PolarPlotter">PolarPlotter (class in allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.populate_stimulus_table">populate_stimulus_table() (allensdk.brain_observatory.drifting_gratings.DriftingGratings method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.populate_stimulus_table">(allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_movie.NaturalMovie.populate_stimulus_table">(allensdk.brain_observatory.natural_movie.NaturalMovie method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.populate_stimulus_table">(allensdk.brain_observatory.natural_scenes.NaturalScenes method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.populate_stimulus_table">(allensdk.brain_observatory.static_gratings.StaticGratings method)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.populate_stimulus_table">(allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis method)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="allensdk.core.html#allensdk.core.cell_types_cache.ReporterStatus.POSITIVE">POSITIVE (allensdk.core.cell_types_cache.ReporterStatus attribute)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.model.biophysical.html#allensdk.model.biophysical.runner.prepare_nwb_output">prepare_nwb_output() (in module allensdk.model.biophysical.runner)</a>
   </dt>
@@ -3168,6 +3278,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.pval">pval (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.config.model.formats.html#allensdk.config.model.formats.pycfg_description_parser.PycfgDescriptionParser">PycfgDescriptionParser (class in allensdk.config.model.formats.pycfg_description_parser)</a>
   </dt>
 
@@ -3187,6 +3301,14 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.radial_arcs">radial_arcs() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.radial_circles">radial_circles() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.ramps_features">ramps_features() (allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor method)</a>
   </dt>
@@ -3272,11 +3394,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.receptive_field">receptive_field (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise attribute)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.core.html#allensdk.core.cell_types_cache.CellTypesCache.RECONSTRUCTION_KEY">RECONSTRUCTION_KEY (allensdk.core.cell_types_cache.CellTypesCache attribute)</a>
   </dt>
 
       
   <dt><a href="allensdk.model.biophysical.html#allensdk.model.biophysical.utils.Utils.record_values">record_values() (allensdk.model.biophysical.utils.Utils method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace">ReferenceSpace (class in allensdk.core.reference_space)</a>
   </dt>
 
       
@@ -3288,17 +3418,27 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.remove_keys">remove_keys() (allensdk.api.cache.Cache static method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.core.html#allensdk.core.json_utilities.JsonComments.remove_multiline_comments">remove_multiline_comments() (allensdk.core.json_utilities.JsonComments class method)</a>
   </dt>
 
       
-  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.rename_columns">rename_columns() (allensdk.api.cache.Cache method)</a>
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.remove_unassigned">remove_unassigned() (allensdk.core.reference_space.ReferenceSpace method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.api.html#allensdk.api.cache.Cache.rename_columns">rename_columns() (allensdk.api.cache.Cache static method)</a>
   </dt>
 
       
   <dt><a href="allensdk.core.html#allensdk.core.cell_types_cache.ReporterStatus">ReporterStatus (class in allensdk.core.cell_types_cache)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.reset">reset() (allensdk.model.glif.glif_neuron.GlifNeuron method)</a>
   </dt>
@@ -3311,14 +3451,8 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_AScurrent_sum">reset_AScurrent_sum() (in module allensdk.model.glif.glif_neuron_methods)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron.GlifNeuron.reset_threshold_components">reset_threshold_components() (allensdk.model.glif.glif_neuron.GlifNeuron method)</a>
-  </dt>
-
-      
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_fixed">reset_threshold_fixed() (in module allensdk.model.glif.glif_neuron_methods)</a>
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.reset_hex_pack">reset_hex_pack() (in module allensdk.brain_observatory.circle_plots)</a>
   </dt>
 
       
@@ -3326,23 +3460,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_max_v_th">reset_threshold_max_v_th() (in module allensdk.model.glif.glif_neuron_methods)</a>
-  </dt>
-
-      
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_th_before">reset_threshold_th_before() (in module allensdk.model.glif.glif_neuron_methods)</a>
-  </dt>
-
-      
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_threshold_three_components">reset_threshold_three_components() (in module allensdk.model.glif.glif_neuron_methods)</a>
-  </dt>
-
-      
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_fixed">reset_voltage_fixed() (in module allensdk.model.glif.glif_neuron_methods)</a>
-  </dt>
-
-      
-  <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.reset_voltage_i_v_before">reset_voltage_i_v_before() (in module allensdk.model.glif.glif_neuron_methods)</a>
   </dt>
 
       
@@ -3358,6 +3476,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.response">response (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.html#allensdk.api.api.Api.retrieve_file_over_http">retrieve_file_over_http() (allensdk.api.api.Api method)</a>
   </dt>
 
@@ -3370,10 +3492,22 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.return_mask_cb">return_mask_cb() (allensdk.core.reference_space.ReferenceSpace static method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.rings_in_hex_pack">rings_in_hex_pack() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.brain_observatory_api.BrainObservatoryApi.rma_templates">rma_templates (allensdk.api.queries.brain_observatory_api.BrainObservatoryApi attribute)</a>
   </dt>
 
       <dd><dl>
+        
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.glif_api.GlifApi.rma_templates">(allensdk.api.queries.glif_api.GlifApi attribute)</a>
+  </dt>
+
         
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.ontologies_api.OntologiesApi.rma_templates">(allensdk.api.queries.ontologies_api.OntologiesApi attribute)</a>
   </dt>
@@ -3384,7 +3518,15 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_pager.RmaPager">RmaPager (class in allensdk.api.queries.rma_pager)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_template.RmaTemplate">RmaTemplate (class in allensdk.api.queries.rma_template)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.roi_id">roi_id (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
   </dt>
 
       
@@ -3480,6 +3622,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.save_session_c2">save_session_c2() (allensdk.brain_observatory.session_analysis.SessionAnalysis method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.core.html#allensdk.core.dat_utilities.DatUtilities.save_voltage">save_voltage() (allensdk.core.dat_utilities.DatUtilities class method)</a>
   </dt>
 
@@ -3516,6 +3662,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis.session_c2">session_c2() (allensdk.brain_observatory.session_analysis.SessionAnalysis method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.session_analysis.SessionAnalysis">SessionAnalysis (class in allensdk.brain_observatory.session_analysis)</a>
   </dt>
 
@@ -3531,6 +3681,16 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.api.html#allensdk.api.api.Api.set_default_working_directory">set_default_working_directory() (allensdk.api.api.Api method)</a>
   </dt>
 
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.CoronaPlotter.set_dims">set_dims() (allensdk.brain_observatory.circle_plots.CoronaPlotter method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.FanPlotter.set_dims">(allensdk.brain_observatory.circle_plots.FanPlotter method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.NeuropilSubtract.set_F">set_F() (allensdk.brain_observatory.r_neuropil.NeuropilSubtract method)</a>
   </dt>
@@ -3552,7 +3712,41 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.sfvals">sfvals (allensdk.brain_observatory.static_gratings.StaticGratings attribute)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor.short_squares_features">short_squares_features() (allensdk.ephys.ephys_extractor.EphysCellFeatureExtractor method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.FanPlotter.show_angle_labels">show_angle_labels() (allensdk.brain_observatory.circle_plots.FanPlotter method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.CoronaPlotter.show_arrow">show_arrow() (allensdk.brain_observatory.circle_plots.CoronaPlotter method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.TrackPlotter.show_arrow">(allensdk.brain_observatory.circle_plots.TrackPlotter method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.FanPlotter.show_axes">show_axes() (allensdk.brain_observatory.circle_plots.FanPlotter method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.FanPlotter.show_group_labels">show_group_labels() (allensdk.brain_observatory.circle_plots.FanPlotter method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.FanPlotter.show_r_labels">show_r_labels() (allensdk.brain_observatory.circle_plots.FanPlotter method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree">SimpleTree (class in allensdk.core.simple_tree)</a>
   </dt>
 
       
@@ -3571,14 +3765,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.simulate_neuron.simulate_sweep_from_file">simulate_sweep_from_file() (in module allensdk.model.glif.simulate_neuron)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.SOMA">SOMA (allensdk.core.swc.Morphology attribute)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.core.html#allensdk.core.swc.Morphology.soma">soma (allensdk.core.swc.Morphology attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.sort_trials">sort_trials() (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise method)</a>
   </dt>
 
       
@@ -3618,11 +3816,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.spiral_trials">spiral_trials() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.spiral_trials_polar">spiral_trials_polar() (in module allensdk.brain_observatory.circle_plots)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_api.RmaApi.START_ROW">START_ROW (allensdk.api.queries.rma_api.RmaApi attribute)</a>
   </dt>
 
       
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings">StaticGratings (class in allensdk.brain_observatory.static_gratings)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.stim_table">stim_table (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
   </dt>
 
       
@@ -3661,8 +3871,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.core.html#allensdk.core.ontology.Ontology.structure_descends_from">structure_descends_from() (allensdk.core.ontology.Ontology method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree.structure_descends_from">(allensdk.core.structure_tree.StructureTree method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURE_MASK_KEY">STRUCTURE_MASK_KEY (allensdk.core.mouse_connectivity_cache.MouseConnectivityCache attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURE_TREE_KEY">STRUCTURE_TREE_KEY (allensdk.core.mouse_connectivity_cache.MouseConnectivityCache attribute)</a>
   </dt>
 
       
@@ -3671,6 +3891,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 
       
   <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.STRUCTURES_KEY">STRUCTURES_KEY (allensdk.core.mouse_connectivity_cache.MouseConnectivityCache attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.structure_tree.StructureTree">StructureTree (class in allensdk.core.structure_tree)</a>
   </dt>
 
       
@@ -3714,6 +3938,34 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_movie.NaturalMovie.sweep_response">sweep_response (allensdk.brain_observatory.natural_movie.NaturalMovie attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.sweep_response">(allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise.sweeplength">sweeplength (allensdk.brain_observatory.locally_sparse_noise.LocallySparseNoise attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_movie.NaturalMovie.sweeplength">(allensdk.brain_observatory.natural_movie.NaturalMovie attribute)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.natural_scenes.NaturalScenes.sweeplength">(allensdk.brain_observatory.natural_scenes.NaturalScenes attribute)</a>
+  </dt>
+
+        
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.static_gratings.StaticGratings.sweeplength">(allensdk.brain_observatory.static_gratings.StaticGratings attribute)</a>
+  </dt>
+
+      </dl></dd>
+      
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor.sweeps">sweeps() (allensdk.ephys.ephys_extractor.EphysSweepSetFeatureExtractor method)</a>
   </dt>
 
@@ -3740,11 +3992,23 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       
+  <dt><a href="allensdk.test_utilities.html#allensdk.test_utilities.temp_dir.temp_dir">temp_dir() (in module allensdk.test_utilities.temp_dir)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.core.html#allensdk.core.mouse_connectivity_cache.MouseConnectivityCache.TEMPLATE_KEY">TEMPLATE_KEY (allensdk.core.mouse_connectivity_cache.MouseConnectivityCache attribute)</a>
   </dt>
 
       
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_template.RmaTemplate.template_query">template_query() (allensdk.api.queries.rma_template.RmaTemplate method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.drifting_gratings.DriftingGratings.tfvals">tfvals (allensdk.brain_observatory.drifting_gratings.DriftingGratings attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis.timestamps">timestamps (allensdk.brain_observatory.stimulus_analysis.StimulusAnalysis attribute)</a>
   </dt>
 
       
@@ -3765,6 +4029,18 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.api.queries.html#allensdk.api.queries.rma_template.RmaTemplate.to_filter_rhs">to_filter_rhs() (allensdk.api.queries.rma_template.RmaTemplate method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.total_voxel_counts">total_voxel_counts() (allensdk.core.reference_space.ReferenceSpace method)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.total_voxel_map">total_voxel_map (allensdk.core.reference_space.ReferenceSpace attribute)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.TrackPlotter">TrackPlotter (class in allensdk.brain_observatory.circle_plots)</a>
   </dt>
 
       
@@ -3822,11 +4098,19 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.validate_structures">validate_structures() (allensdk.core.reference_space.ReferenceSpace method)</a>
+  </dt>
+
+      
   <dt><a href="allensdk.morphology.html#allensdk.morphology.validate_swc.validate_swc">validate_swc() (in module allensdk.morphology.validate_swc)</a>
   </dt>
 
       
   <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.r_neuropil.validate_with_synthetic_F">validate_with_synthetic_F() (in module allensdk.brain_observatory.r_neuropil)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.core.html#allensdk.core.simple_tree.SimpleTree.value_map">value_map() (allensdk.core.simple_tree.SimpleTree method)</a>
   </dt>
 
       
@@ -3837,12 +4121,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.voltage_component_of_threshold_exact">voltage_component_of_threshold_exact() (in module allensdk.model.glif.glif_neuron_methods)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.model.glif.html#allensdk.model.glif.glif_neuron_methods.voltage_component_of_threshold_forward_euler">voltage_component_of_threshold_forward_euler() (in module allensdk.model.glif.glif_neuron_methods)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.ephys.html#allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor.voltage_deflection">voltage_deflection() (allensdk.ephys.ephys_extractor.EphysSweepFeatureExtractor method)</a>
   </dt>
@@ -3871,6 +4155,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.core.html#allensdk.core.brain_observatory_nwb_data_set.warp_stimulus_coords">warp_stimulus_coords() (in module allensdk.core.brain_observatory_nwb_data_set)</a>
+  </dt>
+
+      
+  <dt><a href="allensdk.brain_observatory.html#allensdk.brain_observatory.circle_plots.wedge_ring">wedge_ring() (in module allensdk.brain_observatory.circle_plots)</a>
   </dt>
 
       
@@ -3903,12 +4191,12 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   </dt>
 
       </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.write_json_file">write_json_file() (allensdk.config.manifest_builder.ManifestBuilder method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="allensdk.config.html#allensdk.config.manifest_builder.ManifestBuilder.write_json_string">write_json_string() (allensdk.config.manifest_builder.ManifestBuilder method)</a>
   </dt>
@@ -3939,7 +4227,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h3><a href="index.html">Contents</a></h3>
 <ul>
@@ -3950,6 +4238,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="brain_observatory.html">Brain Observatory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cell_types.html">Cell Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference_space.html">Reference Space</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_api_client.html">API Access</a></li>
 </ul>
 </li>
@@ -3968,6 +4257,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
 <li class="toctree-l2"><a class="reference internal" href="allensdk.ephys.html">allensdk.ephys package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.model.html">allensdk.model package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
@@ -3983,7 +4273,7 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
   If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
 </p>
 
-<div id="searchbox" style="display: none">
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
@@ -3991,9 +4281,6 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -4002,9 +4289,10 @@ jQuery('#portal_tab_menu').bind('touchstart', function() {
     </div>
 
 
-    <div class="footer">
+    <div class="footer" role="contentinfo">
     </div>
-<script type="text/javascript" src="/AllenSDK/_static/external_assets/javascript/portalFooter.js"></script>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
 
   </body>
 </html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>allensdk.core.reference_space &mdash; Allen SDK 0.12.5 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.12.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="Allen SDK 0.12.5 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+<link href="http://www.brain-map.org/assets/stylesheets/portal.css" media="screen" rel="stylesheet" type="text/css" />
+<script src="http://www.brain-map.org/assets/javascripts/portal.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var _pSupressBrowserFlashWarning = true;
+    var _pTabId = "pHome";
+    var _pMoreProjectsId = "pMoreProjects";
+    var _pImagePath = "http://www.brain-map.org/assets/images/";
+</script>
+<script type="text/javascript">
+    function initialize() {
+        /*** do your stuff, then initialize the portal plugin ***/
+        _pPortalOnLoad();
+    }
+</script>
+<style>
+  div.document {
+  position:relative !important;;
+  }
+
+  img#portal_logo{
+  display:none;
+  }
+  
+  #header_content{
+  height:75px !important;
+  }
+
+  #header_content > a {
+  display: inline-block;
+  width: 250px;
+  height: 75px;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-size: 235px 37px;
+  background-position: 0px 20px;
+  background-repeat: no-repeat;
+  }
+
+  #header_content > a:hover {
+  background-color: transparent;
+  }
+
+  #portal_tabs {
+  display:none !important;;
+  }
+
+  #portal_search_input_group {
+  display:none !important;
+  }
+</style>
+
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA-259/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
+
+
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for allensdk.core.reference_space</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2017 Allen Institute for Brain Science</span>
+<span class="c1"># This file is part of Allen SDK.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, version 3 of the License.</span>
+<span class="c1">#</span>
+<span class="c1"># Allen SDK is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># Merchantability Or Fitness FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with Allen SDK.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">operator</span> <span class="kn">as</span> <span class="nn">op</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">scipy.misc</span> <span class="kn">import</span> <span class="n">imresize</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage.interpolation</span> <span class="kn">import</span> <span class="n">zoom</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nrrd</span>
+
+<span class="kn">from</span> <span class="nn">allensdk.core.structure_tree</span> <span class="kn">import</span> <span class="n">StructureTree</span>
+
+
+<div class="viewcode-block" id="ReferenceSpace"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace">[docs]</a><span class="k">class</span> <span class="nc">ReferenceSpace</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">direct_voxel_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_direct_voxel_map&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">direct_voxel_counts</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direct_voxel_map</span> 
+        
+    <span class="nd">@direct_voxel_map.setter</span>
+    <span class="k">def</span> <span class="nf">direct_voxel_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_direct_voxel_map</span> <span class="o">=</span> <span class="n">data</span>
+    
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">total_voxel_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_total_voxel_map&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">total_voxel_counts</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_voxel_map</span>
+        
+    <span class="nd">@total_voxel_map.setter</span>
+    <span class="k">def</span> <span class="nf">total_voxel_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_voxel_map</span> <span class="o">=</span> <span class="n">data</span>
+        
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_tree</span><span class="p">,</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">resolution</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Handles brain structures in a 3d reference space</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_tree : StructureTree</span>
+<span class="sd">            Defines the heirarchy and properties of the brain structures.</span>
+<span class="sd">        annotation : numpy ndarray</span>
+<span class="sd">            3d volume whose elements are structure ids.</span>
+<span class="sd">        resolution : length-3 tuple of numeric</span>
+<span class="sd">            Resolution of annotation voxels along each dimension.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span> <span class="o">=</span> <span class="n">structure_tree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="ReferenceSpace.direct_voxel_counts"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.direct_voxel_counts">[docs]</a>    <span class="k">def</span> <span class="nf">direct_voxel_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Determines the number of voxels directly assigned to one or more </span>
+<span class="sd">        structures.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict : </span>
+<span class="sd">            Keys are structure ids, values are the number of voxels directly </span>
+<span class="sd">            assigned to those structures.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">uniques</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">uniques</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_direct_voxel_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">found</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">found</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> 
+                                  <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="o">.</span><span class="n">node_ids</span><span class="p">()}</span></div>
+          
+<div class="viewcode-block" id="ReferenceSpace.total_voxel_counts"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.total_voxel_counts">[docs]</a>    <span class="k">def</span> <span class="nf">total_voxel_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Determines the number of voxels assigned to a structure or its </span>
+<span class="sd">        descendants</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict : </span>
+<span class="sd">            Keys are structure ids, values are the number of voxels assigned </span>
+<span class="sd">            to structures&#39; descendants.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_voxel_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">stid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="o">.</span><span class="n">node_ids</span><span class="p">():</span>
+
+            <span class="n">desc_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="o">.</span><span class="n">descendant_ids</span><span class="p">([</span><span class="n">stid</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_total_voxel_map</span><span class="p">[</span><span class="n">stid</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">direct_voxel_map</span><span class="p">[</span><span class="n">dscid</span><span class="p">]</span> 
+                                               <span class="k">for</span> <span class="n">dscid</span> <span class="ow">in</span> <span class="n">desc_ids</span><span class="p">])</span></div>
+    
+<div class="viewcode-block" id="ReferenceSpace.remove_unassigned"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.remove_unassigned">[docs]</a>    <span class="k">def</span> <span class="nf">remove_unassigned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update_self</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Obtains a structure tree consisting only of structures that have </span>
+<span class="sd">        at least one voxel in the annotation.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        update_self : bool, optional</span>
+<span class="sd">            If True, the contained structure tree will be replaced,</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of dict : </span>
+<span class="sd">            elements are filtered structures</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="n">structures</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="o">.</span><span class="n">filter_nodes</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_voxel_map</span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">update_self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span> <span class="o">=</span> <span class="n">StructureTree</span><span class="p">(</span><span class="n">structures</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">structures</span></div>
+    
+<div class="viewcode-block" id="ReferenceSpace.make_structure_mask"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.make_structure_mask">[docs]</a>    <span class="k">def</span> <span class="nf">make_structure_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">direct_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Return an indicator array for one or more structures</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_ids : list of int</span>
+<span class="sd">            Make a mask that indicates the union of these structures&#39; voxels</span>
+<span class="sd">        direct_only : bool, optional</span>
+<span class="sd">            If True, only include voxels directly assigned to a structure in </span>
+<span class="sd">            the mask. Otherwise include voxels assigned to descendants.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy ndarray :</span>
+<span class="sd">            Same shape as annotation. 1 inside mask, 0 outside.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">if</span> <span class="n">direct_only</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">stid</span> <span class="ow">in</span> <span class="n">structure_ids</span><span class="p">:</span>
+                
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direct_voxel_map</span><span class="p">[</span><span class="n">stid</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                    
+                <span class="n">mask</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="o">==</span> <span class="n">stid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+                
+            <span class="k">return</span> <span class="n">mask</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">structure_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="o">.</span><span class="n">descendant_ids</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)</span>
+            <span class="n">structure_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">reduce</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_structure_mask</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">,</span> <span class="n">direct_only</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></div>
+                        
+<div class="viewcode-block" id="ReferenceSpace.many_structure_masks"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.many_structure_masks">[docs]</a>    <span class="k">def</span> <span class="nf">many_structure_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">output_cb</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                             <span class="n">direct_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Build one or more structure masks and do something with them</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_ids : list of int</span>
+<span class="sd">            Specify structures to be masked</span>
+<span class="sd">        output_cb : function, optional</span>
+<span class="sd">            Must have the following signature: output_cb(structure_id, fn). </span>
+<span class="sd">            On each requested id, fn will be curried to make a mask for that </span>
+<span class="sd">            id. Defaults to returning the structure id and mask.</span>
+<span class="sd">        direct_only : bool, optional</span>
+<span class="sd">            If True, only include voxels directly assigned to a structure in </span>
+<span class="sd">            the mask. Otherwise include voxels assigned to descendants.</span>
+<span class="sd">            </span>
+<span class="sd">        Yields</span>
+<span class="sd">        -------</span>
+<span class="sd">        Return values of output_cb called on each structure_id, structure_mask </span>
+<span class="sd">        pair.</span>
+<span class="sd">        </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        output_cb is called on every yield, so any side-effects (such as </span>
+<span class="sd">        writing to a file) will be carried out regardless of what you do with </span>
+<span class="sd">        the return values. You do actually have to iterate through the output, </span>
+<span class="sd">        though.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">if</span> <span class="n">output_cb</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">output_cb</span> <span class="o">=</span> <span class="n">ReferenceSpace</span><span class="o">.</span><span class="n">return_mask_cb</span>
+                                              
+        <span class="k">for</span> <span class="n">stid</span> <span class="ow">in</span> <span class="n">structure_ids</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">output_cb</span><span class="p">(</span><span class="n">stid</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">make_structure_mask</span><span class="p">,</span> 
+                                                    <span class="p">[</span><span class="n">stid</span><span class="p">],</span> <span class="n">direct_only</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ReferenceSpace.check_coverage"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.check_coverage">[docs]</a>    <span class="k">def</span> <span class="nf">check_coverage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">domain_mask</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Determines whether a spatial domain is completely covered by </span>
+<span class="sd">        structures in a set.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_ids : list of int </span>
+<span class="sd">            Specifies the set of structures to check.</span>
+<span class="sd">        domain_mask : numpy ndarray</span>
+<span class="sd">            Same shape as annotation. 1 inside the mask, 0 out. Specifies </span>
+<span class="sd">            spatial domain.</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy ndarray : </span>
+<span class="sd">            1 where voxels are missing from the candidate, 0 where the </span>
+<span class="sd">            candidate exceeds the domain</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="n">candidate_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_structure_mask</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">domain_mask</span> <span class="o">-</span> <span class="n">candidate_mask</span></div>
+        
+<div class="viewcode-block" id="ReferenceSpace.validate_structures"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.validate_structures">[docs]</a>    <span class="k">def</span> <span class="nf">validate_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">,</span> <span class="n">domain_mask</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Determines whether a set of structures produces an exact and </span>
+<span class="sd">        nonoverlapping tiling of a spatial domain</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_ids : list of int </span>
+<span class="sd">            Specifies the set of structures to check.</span>
+<span class="sd">        domain_mask : numpy ndarray</span>
+<span class="sd">           Same shape as annotation. 1 inside the mask, 0 out. Specifies </span>
+<span class="sd">           spatial domain.</span>
+<span class="sd">           </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        set : </span>
+<span class="sd">            Ids of structures that are the ancestors of other structures in </span>
+<span class="sd">            the supplied set.</span>
+<span class="sd">        numpy ndarray : </span>
+<span class="sd">            Indicator for missing voxels.</span>
+<span class="sd">            </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="o">.</span><span class="n">has_overlaps</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">),</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">check_coverage</span><span class="p">(</span><span class="n">structure_ids</span><span class="p">,</span> <span class="n">domain_mask</span><span class="p">)]</span></div>
+        
+        
+<div class="viewcode-block" id="ReferenceSpace.downsample"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.downsample">[docs]</a>    <span class="k">def</span> <span class="nf">downsample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_resolution</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Obtain a smaller reference space by downsampling</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_resolution : tuple of numeric</span>
+<span class="sd">            Resolution in microns of the output space.</span>
+<span class="sd">        interpolator : string</span>
+<span class="sd">            Method used to interpolate the volume. Currently only &#39;nearest&#39; </span>
+<span class="sd">            is supported</span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ReferenceSpace : </span>
+<span class="sd">            A new ReferenceSpace with the same structure tree and a </span>
+<span class="sd">            downsampled annotation.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="n">factors</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">float</span><span class="p">(</span><span class="n">ii</span> <span class="o">/</span> <span class="n">jj</span><span class="p">)</span> <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> 
+                                                     <span class="n">target_resolution</span><span class="p">)]</span>
+                                                     
+        <span class="n">target</span> <span class="o">=</span> <span class="n">zoom</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span> <span class="n">factors</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">ReferenceSpace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">target_resolution</span><span class="p">)</span></div>
+        
+        
+<div class="viewcode-block" id="ReferenceSpace.get_slice_image"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.get_slice_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_slice_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Produce a AxBx3 RGB image from a slice in the annotation</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        axis : int</span>
+<span class="sd">            Along which to slice the annotation volume. 0 is coronal, 1 is </span>
+<span class="sd">            horizontal, and 2 is sagittal.</span>
+<span class="sd">        position : int </span>
+<span class="sd">            In microns. Take the slice from this far along the specified axis.</span>
+<span class="sd">        cmap : dict, optional</span>
+<span class="sd">            Keys are structure ids, values are rgb triplets. Defaults to </span>
+<span class="sd">            structure color_hex_triplets. </span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray : </span>
+<span class="sd">            RGB image array. </span>
+<span class="sd">            </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If you assign a custom colormap, make sure that you take care of the </span>
+<span class="sd">        background in addition to the structures.</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        
+        <span class="k">if</span> <span class="n">cmap</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">cmap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure_tree</span><span class="o">.</span><span class="n">get_colormap</span><span class="p">()</span>
+            <span class="n">cmap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        
+        <span class="n">position</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">around</span><span class="p">(</span><span class="n">position</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">[</span><span class="n">axis</span><span class="p">]))</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">take</span><span class="p">([</span><span class="n">position</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">))</span>
+            
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">cmap</span><span class="p">[</span><span class="n">point</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">image</span><span class="o">.</span><span class="n">flat</span><span class="p">],</span> 
+                      <span class="nb">list</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span></div>
+            
+            
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ReferenceSpace.return_mask_cb"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.return_mask_cb">[docs]</a>    <span class="k">def</span> <span class="nf">return_mask_cb</span><span class="p">(</span><span class="n">structure_id</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;A basic callback for many_structure_masks</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="k">return</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">fn</span><span class="p">()</span></div>
+        
+        
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="ReferenceSpace.check_and_write"><a class="viewcode-back" href="../../../allensdk.core.html#allensdk.core.reference_space.ReferenceSpace.check_and_write">[docs]</a>    <span class="k">def</span> <span class="nf">check_and_write</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;A many_structure_masks callback that writes the mask to a nrrd file </span>
+<span class="sd">        if the file does not already exist.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    
+        <span class="n">mask_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_dir</span><span class="p">,</span> 
+                                 <span class="s1">&#39;structure_{0}.nrrd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">structure_id</span><span class="p">))</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">mask_path</span><span class="p">):</span>
+            <span class="n">nrrd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mask_path</span><span class="p">,</span> <span class="n">fn</span><span class="p">())</span>
+            
+        <span class="k">return</span> <span class="n">structure_id</span></div></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Install Guide</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_resources.html">Data Resources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../brain_observatory.html">Brain Observatory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../cell_types.html">Cell Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../connectivity.html">Mouse Connectivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../reference_space.html">Reference Space</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../data_api_client.html">API Access</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../glif_models.html">Generalized LIF</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../biophysical_models.html">Biophysical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../allensdk.html">Source Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.api.html">allensdk.api package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.brain_observatory.html">allensdk.brain_observatory package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.config.html">allensdk.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.core.html">allensdk.core package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.ephys.html">allensdk.ephys package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.model.html">allensdk.model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.morphology.html">allensdk.morphology package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../allensdk.test_utilities.html">allensdk.test_utilities package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/AllenInstitute/AllenSDK">Github Profile</a></li>
+</ul>
+
+<h3> Questions </h3>
+<p class="questions">
+  Send any questions using the <a href="http://alleninstitute.org/contact_us/index.html">Send Us a Message</a> link below, 
+  or submit your question to <a href="http://stackoverflow.com/">StackOverflow</a> using with the 'allensdk' tag.
+</p>
+
+<p class="questions">
+  If you encounter any problems using the AllenSDK, please create an issue on <a href="http://github.com/alleninstitute/allensdk/issues/">Github's issue tracker</a>.
+</p>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+    <div class="footer" role="contentinfo">
+    </div>
+<script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalFooter.js"></script>
+
+
+  </body>
+</html>
