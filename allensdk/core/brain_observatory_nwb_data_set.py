@@ -25,9 +25,7 @@ import dateutil
 import re
 import os
 from pkg_resources import parse_version
-
-class MissingStimulusException(Exception):
-    pass
+from allensdk.brain_observatory.brain_observatory_exceptions import MissingStimulusException
 
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
@@ -54,7 +52,9 @@ class BrainObservatoryNwbDataSet(object):
     STIMULUS_TABLE_TYPES = {
         'abstract_feature_series': [si.DRIFTING_GRATINGS, si.STATIC_GRATINGS],
         'indexed_time_series': [si.NATURAL_MOVIE_ONE, si.NATURAL_MOVIE_TWO, si.NATURAL_MOVIE_THREE,
-                                si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE]
+                                si.NATURAL_SCENES, si.LOCALLY_SPARSE_NOISE, 
+                                si.LOCALLY_SPARSE_NOISE_4DEG, si.LOCALLY_SPARSE_NOISE_8DEG]
+
     }
 
     MOTION_CORRECTION_DATASETS = [ "MotionCorrection/2p_image_series/xy_translations", 
@@ -144,6 +144,34 @@ class BrainObservatoryNwbDataSet(object):
 
         return timestamps, np_traces
 
+
+    def get_neuropil_r(self, cell_specimen_ids=None):
+        ''' Returns a scalar value of r for neuropil correction of flourescence traces
+
+        Parameters
+        ----------
+        cell_specimen_ids: list or array (optional)
+            List of cell IDs to return traces for. If this is None (default)
+            then results for all are returned
+
+        Returns
+        -------
+        r: 1D numpy array, len(r)=len(cell_specimen_ids)
+            Scalar for neuropil subtraction for each cell
+        '''
+
+        with h5py.File(self.nwb_file, 'r') as f:
+            r_ds = f['processing'][self.PIPELINE_DATASET][
+                'Fluorescence']['imaging_plane_1']['r']
+
+            if cell_specimen_ids is None:
+                r = r_ds.value
+            else:
+                inds = self.get_cell_specimen_indices(cell_specimen_ids)
+                r = r_ds[inds]
+
+        return r
+
     def get_corrected_fluorescence_traces(self, cell_specimen_ids=None):
         ''' Returns an array of neuropil-corrected fluorescence traces
         for all ROIs and the timestamps for each datapoint
@@ -165,23 +193,17 @@ class BrainObservatoryNwbDataSet(object):
         
         timestamps, cell_traces = self.get_fluorescence_traces(cell_specimen_ids)
 
+        r = self.get_neuropil_r(cell_specimen_ids)
+
         _, neuropil_traces = self.get_neuropil_traces(cell_specimen_ids)
 
-        with h5py.File(self.nwb_file, 'r') as f:
-            r_ds = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['r']
 
-            if cell_specimen_ids is None:
-                r = r_ds.value
-            else:
-                inds = self.get_cell_specimen_indices(cell_specimen_ids)
-                r = r_ds[inds]
 
         fc = cell_traces - neuropil_traces * r[:, np.newaxis]
 
         return timestamps, fc
 
-    def get_cell_specimen_indices(self, cell_specimen_ids):
+    def get_cell_specimen_indices(self, cell_specimen_ids=None):
         ''' Given a list of cell specimen ids, return their index based on their order in this file.
 
         Parameters
@@ -298,7 +320,10 @@ class BrainObservatoryNwbDataSet(object):
         if stimulus_name in self.STIMULUS_TABLE_TYPES['abstract_feature_series']:
             return _get_abstract_feature_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
         elif stimulus_name in self.STIMULUS_TABLE_TYPES['indexed_time_series']:
-            return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
+            try:
+                return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name + "_stimulus")
+            except:
+                return _get_indexed_time_series_stimulus_table(self.nwb_file, stimulus_name)
         elif stimulus_name == 'spontaneous':
             return self.get_spontaneous_activity_stimulus_table()
         else:
@@ -348,11 +373,19 @@ class BrainObservatoryNwbDataSet(object):
             image_stack = f['stimulus']['templates'][stim_name]['data'].value
         return image_stack
 
-    def get_locally_sparse_noise_stimulus_template(self, mask_off_screen=True):
+    def get_locally_sparse_noise_stimulus_template(self, 
+                                                   stimulus, 
+                                                   mask_off_screen=True):
         ''' Return an array of the stimulus template for the specified stimulus.
 
         Parameters
         ----------
+        stimulus: string
+           Which locally sparse noise stimulus to retrieve.  Must be one of: 
+               stimulus_info.LOCALLY_SPARSE_NOISE
+               stimulus_info.LOCALLY_SPARSE_NOISE_4DEG
+               stimulus_info.LOCALLY_SPARSE_NOISE_8DEG
+
         mask_off_screen: boolean
            Set off-screen regions of the stimulus to LocallySparseNoise.LSN_OFF_SCREEN.
 
@@ -361,10 +394,15 @@ class BrainObservatoryNwbDataSet(object):
         tuple: (template, off-screen mask)
         '''
 
-        template = self.get_stimulus_template("locally_sparse_noise")
+        if stimulus not in si.LOCALLY_SPARSE_NOISE_DIMENSIONS:
+            raise KeyError("%s is not a known locally sparse noise stimulus" % stimulus)
+
+        template = self.get_stimulus_template(stimulus)
 
         # build mapping from template coordinates to display coordinates
-        template_shape = (28, 16)
+        template_shape = si.LOCALLY_SPARSE_NOISE_DIMENSIONS[stimulus]
+        template_shape = [ template_shape[1], template_shape[0] ]
+
         template_display_shape = (1260, 720)
         display_shape = (1920, 1200)
 
@@ -419,8 +457,8 @@ class BrainObservatoryNwbDataSet(object):
         roi_arr = np.zeros((len(roi_list), roi_list[0].shape[
                            0], roi_list[0].shape[1]), dtype=np.uint8)
 
-        for i, roi in enumerate(roi_list):
-            roi_arr[i, :, :] = roi
+        for i, an_roi in enumerate(roi_list):
+            roi_arr[i, :, :] = an_roi
 
         return roi_arr
 
@@ -490,38 +528,36 @@ class BrainObservatoryNwbDataSet(object):
                 except KeyError as e:
                     logging.warning("could not find key %s", disk_key)
 
-        if 'genotye' in meta:
-            meta['cre_line'] = meta['genotype'].split(';')[0]
+        # extract cre line from genotype string
+        genotype = meta.get('genotype')
+        meta['cre_line'] = meta['genotype'].split(';')[0] if genotype else None
 
-        if 'imaging_depth' in meta:
-            meta['imaging_depth_um'] = int(meta['imaging_depth'].split()[0])
-            del meta['imaging_depth']
-            
-        if 'ophys_experiment_id' in meta:
-            meta['ophys_experiment_id'] = int(meta['ophys_experiment_id'])
+        imaging_depth = meta.pop('imaging_depth', None)
+        meta['imaging_depth_um'] = int(imaging_depth.split()[0]) if imaging_depth else None
+        
+        ophys_experiment_id = meta.get('ophys_experiment_id')
+        meta['ophys_experiment_id'] = int(ophys_experiment_id) if ophys_experiment_id else None
 
-        if 'experiment_container_id' in meta:
-            meta['experiment_container_id'] = \
-                int(meta['experiment_container_id'])
+        experiment_container_id = meta.get('experiment_container_id')
+        meta['experiment_container_id'] = int(experiment_container_id) if experiment_container_id else None
 
-        if 'session_start_time' in meta:
-            meta['session_start_time'] = \
-                dateutil.parser.parse(meta['session_start_time'])
+        # convert start time to a date object
+        session_start_time = meta.get('session_start_time')
+        meta['session_start_time'] = dateutil.parser.parse(session_start_time) if session_start_time else None
 
-        if 'age' in meta:
+        age = meta.pop('age', None)
+        if age:
             # parse the age in days
-            m = re.match("(.*?) days", meta['age'])
+            m = re.match("(.*?) days", age)
             if m:
                 meta['age_days'] = int(m.groups()[0])
-                del meta['age']
             else:
                 raise IOError("Could not parse age.")
+            
 
         # parse the device string (ugly, sorry)
-        if 'device_string' in meta:
-            device_string = meta['device_string']
-            del meta['device_string']
-
+        device_string = meta.pop('device_string', None)
+        if device_string:
             m = re.match("(.*?)\.\s(.*?)\sPlease*", device_string)
             if m:
                 device, device_name = m.groups()
@@ -531,14 +567,9 @@ class BrainObservatoryNwbDataSet(object):
                 raise IOError("Could not parse device string.")
 
         # file version
-        if 'generated_by' in meta:
-            generated_by = meta.get("generated_by", None)
-            if generated_by is not None:
-                del meta["generated_by"]
-                version = generated_by[-1]
-            else:
-                version = "0.9"
-            meta["pipeline_version"] = version
+        generated_by = meta.pop('generated_by', None)
+        version = generated_by[-1] if generated_by else "0.9"
+        meta["pipeline_version"] = version
 
         return meta
 
@@ -832,3 +863,4 @@ def _get_indexed_time_series_stimulus_table(nwb_file, stimulus_name):
     stimulus_table.loc[:, 'end'] = frame_dur[:, 1].astype(int)
 
     return stimulus_table
+

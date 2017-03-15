@@ -441,6 +441,75 @@ def test_api_doc_url_download_image_full_resolution(image_api):
     image_api.retrieve_file_over_http.assert_called_once_with(expected, path)
 
 
+def test_colormap_filter(image_api):
+    '''
+    '''
+    path = '70636013.jpg'
+
+    section_image_id = 70636013
+    image_api.download_section_image(section_image_id,
+                                     downsample=4,
+                                     view='expression',
+                                     colormap=(0.9,"expression"))
+
+    image_api.retrieve_file_over_http.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/section_image_download/70636013"
+        "?downsample=4&colormap=0.5,0.9,0,256,4&view=expression",
+        path)
+
+
+def test_colormap_filter_string(image_api):
+    '''
+    '''
+    path = '70636013.jpg'
+
+    section_image_id = 70636013
+    image_api.download_section_image(section_image_id,
+                                     downsample=4,
+                                     view='expression',
+                                     colormap="expression")
+
+    image_api.retrieve_file_over_http.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/section_image_download/70636013"
+        "?downsample=4&colormap=expression&view=expression",
+        path)
+
+
+
+def test_rgb_filter(image_api):
+    '''
+    '''
+    path = '70636013.jpg'
+
+    section_image_id = 70636013
+    image_api.download_section_image(section_image_id,
+                                     downsample=4,
+                                     view='expression',
+                                     rgb=[0.25,0.5,1])
+
+    image_api.retrieve_file_over_http.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/section_image_download/70636013"
+        "?downsample=4&rgb=0.25,0.5,1&view=expression",
+        path)
+
+
+def test_contrast_filter(image_api):
+    '''
+    '''
+    path = '70636013.jpg'
+
+    section_image_id = 70636013
+    image_api.download_section_image(section_image_id,
+                                     downsample=4,
+                                     view='expression',
+                                     contrast=[0.5,1])
+
+    image_api.retrieve_file_over_http.assert_called_once_with(
+        "http://api.brain-map.org/api/v2/section_image_download/70636013"
+        "?downsample=4&contrast=0.5,1&view=expression",
+        path)
+
+
 def test_atlas_image_query(image_api):
     expected = "http://api.brain-map.org/api/v2/data/query.json?q=" + \
                "model::Atlas,rma::criteria,[id$eq1]," + \

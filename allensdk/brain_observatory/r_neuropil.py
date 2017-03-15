@@ -55,7 +55,7 @@ def ab_from_diagonals(mat_dict):
     -------
     ab: value for scipy.linalg.solve_banded
     '''
-    offsets = mat_dict.keys()
+    offsets = list(mat_dict.keys())
     l = -np.min(offsets)
     u = np.max(offsets)
 

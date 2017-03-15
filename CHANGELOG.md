@@ -1,11 +1,28 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.12.5] - 2017-03-16
+
+### Added
+
+- ReferenceSpace is a new class for relating structure graphs and annotation volumes.
+- Standardized caching and paging decorators
+
+### Changed
+
+- Ontology has been deprecated in favor of StructureTree. 
+- MouseConnectivityCache uses StructureTree internally (ontology-based methods are deprecated)
+- CellTypesCache and MouseConnectivityCache use cacher decorator
+
+### Fixed
+
+- Github issue #35 - MouseConnectivityCache's manifest now uses CCF-version- and resolution-specific file names for masks.  The masks now live inside the CCF version directory.
+
 ## [0.12.4] - 2016-10-28
 
 ### Fixed
 
-- Gitub issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
+- Github issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
 - Github issue #26 - better documentation for structure unionize records.
 - Github issue #25 - documentation errors in brain observatory analysis.
 
