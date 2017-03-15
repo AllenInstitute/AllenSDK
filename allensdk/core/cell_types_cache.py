@@ -63,10 +63,11 @@ class CellTypesCache(Cache):
     EPHYS_SWEEPS_KEY = 'EPHYS_SWEEPS'
     RECONSTRUCTION_KEY = 'RECONSTRUCTION'
     MARKER_KEY = 'MARKER'
+    MANIFEST_VERSION = None
 
     def __init__(self, cache=True, manifest_file='cell_types_manifest.json', base_uri=None):
         super(CellTypesCache, self).__init__(
-            manifest=manifest_file, cache=cache)
+            manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
         self.api = CellTypesApi(base_uri=base_uri)
 
     def get_cells(self, file_name=None,
@@ -357,7 +358,7 @@ class CellTypesCache(Cache):
         """
 
         mb = ManifestBuilder()
-
+        mb.set_version(self.MANIFEST_VERSION)
         mb.add_path('BASEDIR', '.')
         mb.add_path(self.CELLS_KEY, 'cells.json',
                     typename='file', parent_key='BASEDIR')

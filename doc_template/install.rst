@@ -60,7 +60,7 @@ example Dockerfiles are available.
  
      Anaconda::
      
-         docker build --tag alleninstitute/allensdk:anaconda https://github.com/AllenInstitute/AllenSDK.git#v0.12.4:docker/anaconda
+         docker build --tag alleninstitute/allensdk:anaconda https://github.com/AllenInstitute/AllenSDK.git#v0.13.0:docker/anaconda
  
      Other docker configurations are also available under docker directory in the source repository.
  

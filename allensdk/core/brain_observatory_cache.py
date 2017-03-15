@@ -55,10 +55,11 @@ class BrainObservatoryCache(Cache):
     CELL_SPECIMENS_KEY = 'CELL_SPECIMENS'
     EXPERIMENT_DATA_KEY = 'EXPERIMENT_DATA'
     STIMULUS_MAPPINGS_KEY = 'STIMULUS_MAPPINGS'
+    MANIFEST_VERSION=None
 
     def __init__(self, cache=True, manifest_file='brain_observatory_manifest.json', base_uri=None):
         super(BrainObservatoryCache, self).__init__(
-            manifest=manifest_file, cache=cache)
+            manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
         self.api = BrainObservatoryApi(base_uri=base_uri)
 
     def get_all_targeted_structures(self):
@@ -400,7 +401,7 @@ class BrainObservatoryCache(Cache):
         """
 
         mb = ManifestBuilder()
-
+        mb.set_version(self.MANIFEST_VERSION)
         mb.add_path('BASEDIR', '.')
         mb.add_path(self.EXPERIMENT_CONTAINERS_KEY,
                     'experiment_containers.json', typename='file', parent_key='BASEDIR')
