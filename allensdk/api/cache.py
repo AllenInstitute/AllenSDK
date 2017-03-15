@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from allensdk.config.manifest import Manifest
+from allensdk.config.manifest import Manifest, ManifestVersionError
 import allensdk.core.json_utilities as ju
 import pandas as pd
 import pandas.io.json as pj
@@ -21,13 +21,13 @@ import functools
 import os
 from allensdk.deprecated import deprecated
 
-
 class Cache(object):
     def __init__(self,
                  manifest=None,
-                 cache=True):
+                 cache=True,
+                 version=None):
         self.cache = cache
-        self.load_manifest(manifest)
+        self.load_manifest(manifest, version)
 
     def get_cache_path(self, file_name, manifest_key, *args):
         '''Helper method for accessing path specs from manifest keys.
@@ -51,7 +51,7 @@ class Cache(object):
 
         return None
 
-    def load_manifest(self, file_name):
+    def load_manifest(self, file_name, version=None):
         '''Read a keyed collection of path specifications.
 
         Parameters
@@ -73,8 +73,19 @@ class Cache(object):
 
                 self.build_manifest(file_name)
 
-            self.manifest = Manifest(
-                ju.read(file_name)['manifest'], os.path.dirname(file_name))
+            try:
+                self.manifest = Manifest(
+                    ju.read(file_name)['manifest'], 
+                    os.path.dirname(file_name), 
+                    version=version)
+            except ManifestVersionError as e:
+                raise ManifestVersionError(("Your manifest file (%s) is out of date" +
+                                            " (version '%s' vs '%s').  Please remove this file" +
+                                            " and it will be regenerated for you the next"
+                                            " time you instantiate this class.") % (file_name, e.found_version, e.version),
+                                           e.version, e.found_version)
+
+
         else:
             self.manifest = None
 

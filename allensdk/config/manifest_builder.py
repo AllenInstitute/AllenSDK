@@ -28,6 +28,9 @@ class ManifestBuilder(object):
         self.path_info = []
         self.sections = {}
 
+    def set_version(self, value):
+        self.path_info.append({'type': Manifest.VERSION, 'value': value})
+
     def add_path(self, key, spec,
                  typename='dir',
                  parent_key=None,
