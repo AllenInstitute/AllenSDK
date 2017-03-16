@@ -96,6 +96,7 @@ This release also addresses issues from the Github issue tracker:
 
     * issue #35: structure masks at different resolutions were overwriting each other
     * issue #37: updating cell types notebook to use new feature extractor
+    * issue #34: deprecated stateful methods in :py:class:`~allensdk.api.queries.glif_api.GlifApi` in favor of stateless versions.
 
 Note that because of the change to the structure mask paths, users will need to regenerate their MouseConnectivityCache manifests.  Also, if you don't want to regenerate all of your masks, please move them from here: 
 
