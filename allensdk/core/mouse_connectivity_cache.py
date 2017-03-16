@@ -130,7 +130,8 @@ class MouseConnectivityCache(Cache):
         annotation, info = self.api.download_annotation_volume(
             self.ccf_version,
             self.resolution,
-            file_name)
+            file_name, 
+            strategy='lazy')
 
         return annotation, info
 
@@ -152,7 +153,8 @@ class MouseConnectivityCache(Cache):
             file_name, self.TEMPLATE_KEY, self.resolution)
 
         template, info = self.api.download_template_volume(self.resolution, 
-                                                             file_name)
+                                                           file_name, 
+                                                           strategy='lazy')
 
         return template, info
 
@@ -182,7 +184,7 @@ class MouseConnectivityCache(Cache):
                                         self.resolution)
                                         
         self.api.download_projection_density(
-            file_name, experiment_id, self.resolution)
+            file_name, experiment_id, self.resolution, strategy='lazy')
 
         return nrrd.read(file_name)
 
@@ -212,7 +214,7 @@ class MouseConnectivityCache(Cache):
                                         experiment_id,
                                         self.resolution)
         self.api.download_injection_density(
-            file_name, experiment_id, self.resolution)
+            file_name, experiment_id, self.resolution, strategy='lazy')
 
         return nrrd.read(file_name)
 
@@ -241,7 +243,7 @@ class MouseConnectivityCache(Cache):
                                         experiment_id,
                                         self.resolution)
         self.api.download_injection_fraction(
-            file_name, experiment_id, self.resolution)
+            file_name, experiment_id, self.resolution, strategy='lazy')
 
         return nrrd.read(file_name)
 
@@ -270,7 +272,7 @@ class MouseConnectivityCache(Cache):
                                         experiment_id,
                                         self.resolution)
         self.api.download_data_mask(
-            file_name, experiment_id, self.resolution)
+            file_name, experiment_id, self.resolution, strategy='lazy')
 
         return nrrd.read(file_name)
 
