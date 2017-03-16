@@ -130,13 +130,10 @@ class CellTypesCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.EPHYS_SWEEPS_KEY, specimen_id)
 
-        if os.path.exists(file_name):
-            sweeps = json_utilities.read(file_name)
-        else:
-            sweeps = self.api.get_ephys_sweeps(specimen_id)
-
-            if self.cache:
-                json_utilities.write(file_name, sweeps)
+        sweeps = self.api.get_ephys_sweeps(specimen_id, 
+                                           strategy='lazy', 
+                                           path=file_name, 
+                                           **Cache.cache_json())
 
         return sweeps
 
@@ -269,7 +266,7 @@ class CellTypesCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.EPHYS_DATA_KEY, specimen_id)
 
-        self.api.save_ephys_data(specimen_id, file_name)
+        self.api.save_ephys_data(specimen_id, file_name, strategy='lazy')
 
         return NwbDataSet(file_name)
 

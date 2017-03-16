@@ -510,7 +510,7 @@ def test_get_morphology_features(cache_fixture,
 @pytest.mark.parametrize('path_exists',
                          (False, True))
 def test_get_ephys_sweeps(cache_fixture,
-                             path_exists):
+                          path_exists):
     ctc = cache_fixture
 
     cell_id = 464212183
@@ -544,16 +544,18 @@ def test_get_ephys_sweeps_with_api(cache_fixture,
                MagicMock(name='model query',
                          return_value=return_dicts)) as query_mock:
         with patch('os.path.exists', MagicMock(return_value=path_exists)) as ope:
-            with patch('allensdk.core.json_utilities.read',
-                       return_value=['mock_data']) as ju_read:
-                with patch('allensdk.core.json_utilities.write') as ju_write:
-                    _ = ctc.get_ephys_sweeps(cell_id)
+            with patch('allensdk.config.manifest.Manifest.safe_make_parent_dirs'):
+                with patch('allensdk.core.json_utilities.read',
+                           return_value=['mock_data']) as ju_read:
+                    with patch('allensdk.core.json_utilities.write') as ju_write:
+                        _ = ctc.get_ephys_sweeps(cell_id)
+
+    # read will be called regardless
+    assert ju_read.called_once_with(_MOCK_PATH)
 
     if path_exists:
-        assert ju_read.called_once_with(_MOCK_PATH)
         assert not query_mock.called
     else:
-        assert not ju_read.called
         assert query_mock.called
 
 
