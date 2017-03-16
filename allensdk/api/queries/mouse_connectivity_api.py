@@ -45,7 +45,7 @@ class MouseConnectivityApi(RmaApi):
     VOXEL_RESOLUTION_50_MICRONS = 50
     VOXEL_RESOLUTION_100_MICRONS = 100
 
-    @cacheable(strategy='create',
+    @cacheable(strategy='lazy',
                reader=nrrd.read,
                pathfinder=Cache.pathfinder(file_name_position=3))
     def download_annotation_volume(self,
@@ -77,7 +77,7 @@ class MouseConnectivityApi(RmaApi):
                                       file_name,
                                       reader=None)
 
-    @cacheable(strategy='create',
+    @cacheable(strategy='lazy',
                reader=nrrd.read,
                pathfinder=Cache.pathfinder(file_name_position=2))
     def download_template_volume(self, resolution, file_name):
@@ -261,7 +261,7 @@ class MouseConnectivityApi(RmaApi):
         return url
 
     # TODO: check if this was 'read_by_default'
-    @cacheable(strategy='create',
+    @cacheable(strategy='lazy',
                reader=nrrd.read,
                pathfinder=Cache.pathfinder(file_name_position=4,
                                            secondary_file_name_position=2))
