@@ -67,6 +67,10 @@ class GlifApi(RmaTemplate):
         return self.template_query('glif_queries',
                                    'neuronal_models', ephys_experiment_ids=ephys_experiment_ids)
 
+    def get_neuronal_models_by_id(self, neuronal_model_ids=None):
+        return self.template_query('glif_queries',
+                                   'neuron_config', neuronal_model_ids=neuronal_model_ids)
+
     def get_neuron_configs(self, neuronal_model_ids=None):
 
         data = self.template_query('glif_queries',
