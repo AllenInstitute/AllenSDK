@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Ontology has been deprecated in favor of StructureTree. 
 - MouseConnectivityCache uses StructureTree internally (ontology-based methods are deprecated)
 - CellTypesCache and MouseConnectivityCache use cacher decorator
+- GlifApi has stateless methods now.  Old methods are deprecated.  
 
 ### Fixed
 
