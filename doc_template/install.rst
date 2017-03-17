@@ -68,7 +68,7 @@ example Dockerfiles are available.
  
      docker run -i -t -p 8888:8888 -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
      cd allensdk
-     make pytest_lax
+     make test
  
  #. Start a Jupyter Notebook::
  

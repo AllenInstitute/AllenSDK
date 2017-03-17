@@ -21,3 +21,4 @@ RUN  pip install -r requirements.txt; \
 
 ENV PYTHONPATH /usr/local/nrn/lib/python
 ENV PATH /usr/local/nrn/x86_64/bin:$PATH
+ENV TEST_API_ENDPOINT http://api.brain-map.org

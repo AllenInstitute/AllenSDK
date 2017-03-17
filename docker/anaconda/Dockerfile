@@ -16,3 +16,7 @@ RUN /bin/bash -c "\
   cd allensdk && \
   pip install . && \
   pip install -r test_requirements.txt"
+  
+ENV TEST_API_ENDPOINT http://api.brain-map.org
+ENV TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA=skip
+ENV TEST_NWB_FILES=skip
