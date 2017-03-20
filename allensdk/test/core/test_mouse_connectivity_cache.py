@@ -371,11 +371,17 @@ def test_get_structure_mask(mcc, fn_temp_dir):
         warnings.simplefilter('always')
     
         mask, _ = mcc.get_structure_mask(12)
-        
+
+        # also make sure we can do this for pd.Series input for backwards compatibility
+        mask, _ = mcc.get_structure_mask(pd.Series([12]))
         
     assert( mask.sum() == 1 )
     #assert( len(c) == 2 )
     assert( os.path.exists(path) )
+
+    with pytest.raises(ValueError):
+        mask, _ = mcc.get_structure_mask("fish")
+
     
     
 def test_make_structure_mask(mcc):
@@ -391,3 +397,4 @@ def test_make_structure_mask(mcc):
     #assert(len(c) == 1)
     assert( mask.sum() == 5 )
     
+
