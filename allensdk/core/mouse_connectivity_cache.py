@@ -689,6 +689,10 @@ class MouseConnectivityCache(Cache):
             it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
         """
+        try:
+            structure_id = int(structure_id)
+        except ValueError as e:
+            raise ValueError("Invalid structure_id (%s): could not convert to integer." % str(structure_id))
         
         file_name = self.get_cache_path(
             file_name, self.STRUCTURE_MASK_KEY, self.ccf_version, 

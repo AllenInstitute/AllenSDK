@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.13.1] - 2017-03-20
+
+### Fixed
+
+- issue #42: Caching behavior in MouseConnectivityCache for CCF volumes fixed
+- GLIF examples, documentation fixed
+
 ## [0.13.0] - 2017-03-16
 
 ### Added
