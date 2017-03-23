@@ -87,7 +87,7 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.13.1 (March 20th, 2017)
+What's New - Release 0.13.1 (March 23rd, 2017)
 ----------------------------------------------
 
 The 0.13.1 release features a new set of classes for manipulating structure ontologies (:py:class:`~allensdk.core.structure_tree.StructureTree`) and annotated reference spaces like the CCF (:py:class:`~allensdk.core.reference_space.ReferenceSpace`).  These were designed based on feedback from the community that more regular, specifically named functions would be valuable.  The :py:class:`~allensdk.core.ontology.Ontology` class is now deprecated in favor of :py:class:`~allensdk.core.structure_tree.StructureTree`.  Take a look at the `Reference Space documentation page <reference_space.html>`_.  
