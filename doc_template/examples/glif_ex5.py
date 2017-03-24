@@ -28,7 +28,7 @@ plt.subplot(3,1,2)
 plt.plot(time,  voltage, label='voltage')
 plt.plot(time,  threshold, label='threshold')
 
-if grid_spike_indices:
+if grid_spike_indices is not None:
     plt.plot(interpolated_spike_times, interpolated_spike_voltages, 'x', 
              label='interpolated spike')
 

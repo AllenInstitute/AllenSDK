@@ -59,16 +59,16 @@ example Dockerfiles are available.
  #. Use Docker to build one of the images.
  
      Anaconda::
-     
-         docker build --tag alleninstitute/allensdk:anaconda https://github.com/AllenInstitute/AllenSDK.git#v0.13.0:docker/anaconda
+
+         docker pull alleninsitute/allensdk
  
      Other docker configurations are also available under docker directory in the source repository.
  
  #. Run the docker image::
  
-     docker run -i -t -p 8888:8888 -v /data:/data alleninstitute/allensdk:anaconda /bin/bash
+     docker run -i -t -p 8888:8888 -v /data:/data alleninstitute/allensdk /bin/bash
      cd allensdk
-     make pytest_lax
+     make test
  
  #. Start a Jupyter Notebook::
  

@@ -79,7 +79,7 @@ def test_get_neuron_configs(glif_api, specimen_id):
 
     np.testing.assert_almost_equal(glif_api.get_neuron_configs([neuronal_model_id])[neuronal_model_id]['th_inf'], 0.024561992461740227)
 
-
+@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
 def test_deprecated(glif_api, neuronal_model_id):
 
     # Exercising deprecated functionality

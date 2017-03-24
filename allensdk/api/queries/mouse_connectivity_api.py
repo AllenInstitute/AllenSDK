@@ -72,10 +72,8 @@ class MouseConnectivityApi(RmaApi):
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
 
         self.download_volumetric_data(ccf_version,
-                                      'annotation_%d.nrrd' % resolution,
-                                      None,
-                                      file_name,
-                                      reader=None)
+                                      'annotation_%d.nrrd' % resolution, 
+                                      save_file_path=file_name)
 
     @cacheable(strategy='create',
                reader=nrrd.read,
@@ -94,9 +92,8 @@ class MouseConnectivityApi(RmaApi):
             Where to save the registration template volume.
         '''
         self.download_volumetric_data(MouseConnectivityApi.AVERAGE_TEMPLATE,
-                                      'average_template_%d.nrrd' % resolution,
-                                      save_file_path=file_name, 
-                                      reader=None)
+                                      'average_template_%d.nrrd' % resolution, 
+                                      save_file_path=file_name)
 
 
     @cacheable()
@@ -260,11 +257,7 @@ class MouseConnectivityApi(RmaApi):
 
         return url
 
-    # TODO: check if this was 'read_by_default'
-    @cacheable(strategy='create',
-               reader=nrrd.read,
-               pathfinder=Cache.pathfinder(file_name_position=4,
-                                           secondary_file_name_position=2))
+
     def download_volumetric_data(self,
                                  data_path,
                                  file_name,
@@ -561,25 +554,25 @@ class MouseConnectivityApi(RmaApi):
             debug=debug,
             count=False)
 
-    @cacheable(strategy='lazy', 
+    @cacheable(strategy='create', 
                pathfinder=Cache.pathfinder(file_name_position=1))
     def download_injection_density(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_DENSITY], resolution, path)
 
-    @cacheable(strategy='lazy', 
+    @cacheable(strategy='create', 
                pathfinder=Cache.pathfinder(file_name_position=1))
     def download_projection_density(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.PROJECTION_DENSITY], resolution, path)
 
-    @cacheable(strategy='lazy', 
+    @cacheable(strategy='create', 
                pathfinder=Cache.pathfinder(file_name_position=1))
     def download_injection_fraction(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
             experiment_id, [GridDataApi.INJECTION_FRACTION], resolution, path)
 
-    @cacheable(strategy='lazy', 
+    @cacheable(strategy='create', 
                pathfinder=Cache.pathfinder(file_name_position=1))
     def download_data_mask(self, path, experiment_id, resolution):
         GridDataApi(base_uri=self.api_url).download_projection_grid_data(
