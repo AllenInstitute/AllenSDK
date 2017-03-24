@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Install Guide &mdash; Allen SDK 0.13.0 documentation</title>
+    <title>Install Guide &mdash; Allen SDK 0.13.1 documentation</title>
     
     <link rel="stylesheet" href="_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.13.0',
+        VERSION:     '0.13.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.0 documentation" href="index.html" />
+    <link rel="top" title="Allen SDK 0.13.1 documentation" href="index.html" />
     <link rel="next" title="Data Resources" href="data_resources.html" />
     <link rel="prev" title="Welcome to the Allen SDK" href="index.html" /> 
   </head>
@@ -46,43 +46,19 @@
     }
 </script>
 <style>
-  div.document {
-  position:relative !important;;
-  }
-
-  img#portal_logo{
-  display:none;
-  }
-  
-  #header_content{
-  height:75px !important;
-  }
-
   #header_content > a {
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA13-9/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
   }
-
-  #header_content > a:hover {
-  background-color: transparent !important;
-  }
-
-  #portal_tabs {
-  display:none !important;;
-  }
-
-  #portal_search_input_group {
-  display:none !important;
-  }
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA13-9/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -153,16 +129,16 @@ example Dockerfiles are available.</p>
 <li><p class="first">Use Docker to build one of the images.</p>
 <blockquote>
 <div><p>Anaconda:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">build</span> <span class="o">--</span><span class="n">tag</span> <span class="n">alleninstitute</span><span class="o">/</span><span class="n">allensdk</span><span class="p">:</span><span class="n">anaconda</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">AllenInstitute</span><span class="o">/</span><span class="n">AllenSDK</span><span class="o">.</span><span class="n">git</span><span class="c1">#v0.13.0:docker/anaconda</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">pull</span> <span class="n">alleninsitute</span><span class="o">/</span><span class="n">allensdk</span>
 </pre></div>
 </div>
 <p>Other docker configurations are also available under docker directory in the source repository.</p>
 </div></blockquote>
 </li>
 <li><p class="first">Run the docker image:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">p</span> <span class="mi">8888</span><span class="p">:</span><span class="mi">8888</span> <span class="o">-</span><span class="n">v</span> <span class="o">/</span><span class="n">data</span><span class="p">:</span><span class="o">/</span><span class="n">data</span> <span class="n">alleninstitute</span><span class="o">/</span><span class="n">allensdk</span><span class="p">:</span><span class="n">anaconda</span> <span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">bash</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">-</span><span class="n">i</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">p</span> <span class="mi">8888</span><span class="p">:</span><span class="mi">8888</span> <span class="o">-</span><span class="n">v</span> <span class="o">/</span><span class="n">data</span><span class="p">:</span><span class="o">/</span><span class="n">data</span> <span class="n">alleninstitute</span><span class="o">/</span><span class="n">allensdk</span> <span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">bash</span>
 <span class="n">cd</span> <span class="n">allensdk</span>
-<span class="n">make</span> <span class="n">pytest_lax</span>
+<span class="n">make</span> <span class="n">test</span>
 </pre></div>
 </div>
 </li>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>allensdk.core.mouse_connectivity_cache &mdash; Allen SDK 0.13.0 documentation</title>
+    <title>allensdk.core.mouse_connectivity_cache &mdash; Allen SDK 0.13.1 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/aibs_sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.13.0',
+        VERSION:     '0.13.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="Allen SDK 0.13.0 documentation" href="../../../index.html" />
+    <link rel="top" title="Allen SDK 0.13.1 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -45,43 +45,19 @@
     }
 </script>
 <style>
-  div.document {
-  position:relative !important;;
-  }
-
-  img#portal_logo{
-  display:none;
-  }
-  
-  #header_content{
-  height:75px !important;
-  }
-
   #header_content > a {
   display: inline-block;
   width: 250px;
   height: 75px;
-  background-image:url("/AllenSDK/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
+  background-image:url("http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA13-9/artifact/JOB1/doc/_static/external_assets/images/Brain_Atlas_Logotype_SDK.png") !important;
   background-size: 235px 37px;
   background-position: 0px 20px;
   background-repeat: no-repeat;
   }
-
-  #header_content > a:hover {
-  background-color: transparent !important;
-  }
-
-  #portal_tabs {
-  display:none !important;;
-  }
-
-  #portal_search_input_group {
-  display:none !important;
-  }
 </style>
 
 <script type="text/javascript" src="http://www.brain-map.org/external_assets/javascripts/portalHeader.js"></script>
-<link rel="stylesheet" type="text/css" href="/AllenSDK/_static/external_assets/stylesheets/common_layout.css" />
+<link rel="stylesheet" type="text/css" href="http://bamboo.corp.alleninstitute.org/browse/IFR-SDKDKRANA13-9/artifact/JOB1/doc/_static/external_assets/stylesheets/common_layout.css" />
 
 
   
@@ -224,7 +200,8 @@
         <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_annotation_volume</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ccf_version</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span>
-            <span class="n">file_name</span><span class="p">)</span>
+            <span class="n">file_name</span><span class="p">,</span> 
+            <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">annotation</span><span class="p">,</span> <span class="n">info</span></div>
 
@@ -246,7 +223,8 @@
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">TEMPLATE_KEY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
 
         <span class="n">template</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_template_volume</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> 
-                                                             <span class="n">file_name</span><span class="p">)</span>
+                                                           <span class="n">file_name</span><span class="p">,</span> 
+                                                           <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">template</span><span class="p">,</span> <span class="n">info</span></div>
 
@@ -276,7 +254,7 @@
                                         <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
                                         
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_projection_density</span><span class="p">(</span>
-            <span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
 
@@ -306,7 +284,7 @@
                                         <span class="n">experiment_id</span><span class="p">,</span>
                                         <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_injection_density</span><span class="p">(</span>
-            <span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
 
@@ -335,7 +313,7 @@
                                         <span class="n">experiment_id</span><span class="p">,</span>
                                         <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_injection_fraction</span><span class="p">(</span>
-            <span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
 
@@ -364,7 +342,7 @@
                                         <span class="n">experiment_id</span><span class="p">,</span>
                                         <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">download_data_mask</span><span class="p">(</span>
-            <span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">)</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span> <span class="n">strategy</span><span class="o">=</span><span class="s1">&#39;lazy&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">nrrd</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
 
@@ -781,6 +759,10 @@
 <span class="sd">            it will be read from this file.  If file_name is None, the</span>
 <span class="sd">            file_name will be pulled out of the manifest.  Default is None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">structure_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">structure_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid structure_id (</span><span class="si">%s</span><span class="s2">): could not convert to integer.&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">structure_id</span><span class="p">))</span>
         
         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cache_path</span><span class="p">(</span>
             <span class="n">file_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">STRUCTURE_MASK_KEY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ccf_version</span><span class="p">,</span> 
