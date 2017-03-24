@@ -238,7 +238,7 @@ class Cache(object):
         Object or None
             data type depends on fn, reader and/or post methods.
         '''
-        path = kwargs.pop('path', 'data.csv')
+        path = kwargs.pop('path', None)
         strategy = kwargs.pop('strategy', None)
         pre = kwargs.pop('pre', lambda d: d)
         post = kwargs.pop('post', None)

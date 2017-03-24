@@ -108,15 +108,9 @@ def test_download_volumetric_data(nrrd_read,
     nrrd_read.reset_mock()
     connectivity.retrieve_file_over_http.reset_mock()
 
-    a, b = connectivity.download_volumetric_data(
-        data_path,
-        cache_filename,
-        resolution)
-
-    assert a
-    assert b
-    
-    nrrd_read.assert_called_once_with(cache_filename)
+    connectivity.download_volumetric_data(data_path,
+                                          cache_filename,
+                                          resolution)
 
     connectivity.retrieve_file_over_http.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"
@@ -175,6 +169,8 @@ def test_download_annotation_volume_default(os_makedirs,
     
     assert a
     assert b
+
+    print(connectivity.retrieve_file_over_http.call_args_list)
 
     connectivity.retrieve_file_over_http.assert_called_once_with(
         "http://download.alleninstitute.org/informatics-archive/"

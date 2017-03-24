@@ -100,6 +100,10 @@ def test_get_annotation_volume(mcc, fn_temp_dir):
     mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
     obtained, _ = mcc.get_annotation_volume()
     
+    mcc.api.retrieve_file_over_http = mock.MagicMock()
+    mcc.get_annotation_volume()
+    
+    mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) ) 
     assert( os.path.exists(path) )
     
@@ -112,6 +116,10 @@ def test_get_template_volume(mcc, fn_temp_dir):
     mcc.api.retrieve_file_over_http = lambda a, b: nrrd.write(b, eye)
     obtained, _ = mcc.get_template_volume()
     
+    mcc.api.retrieve_file_over_http = mock.MagicMock()
+    mcc.get_template_volume()
+    
+    mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) )            
     assert( os.path.exists(path) )
     
@@ -128,6 +136,10 @@ def test_get_projection_density(mcc, fn_temp_dir):
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_projection_density(eid)
     
+    mcc.api.retrieve_file_over_http = mock.MagicMock()
+    mcc.get_projection_density(eid)
+    
+    mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) )            
     assert( os.path.exists(path) )
     
@@ -144,6 +156,10 @@ def test_get_injection_density(mcc, fn_temp_dir):
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_injection_density(eid)
     
+    mcc.api.retrieve_file_over_http = mock.MagicMock()
+    mcc.get_injection_density(eid)
+    
+    mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) )            
     assert( os.path.exists(path) )
     
@@ -160,6 +176,10 @@ def test_get_injection_fraction(mcc, fn_temp_dir):
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_injection_fraction(eid)
     
+    mcc.api.retrieve_file_over_http = mock.MagicMock()
+    mcc.get_injection_fraction(eid)
+    
+    mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) )            
     assert( os.path.exists(path) )
     
@@ -176,6 +196,10 @@ def test_get_data_mask(mcc, fn_temp_dir):
                     new=lambda a, b, c: nrrd.write(c, eye)):
         obtained, _ = mcc.get_data_mask(eid)
     
+    mcc.api.retrieve_file_over_http = mock.MagicMock()
+    mcc.get_data_mask(eid)
+    
+    mcc.api.retrieve_file_over_http.assert_not_called()
     assert( np.allclose(obtained, eye) )            
     assert( os.path.exists(path) )
     
@@ -186,9 +210,12 @@ def test_get_structure_tree(mcc, fn_temp_dir, new_nodes):
     
     with mock.patch('allensdk.api.queries.ontologies_api.'
                     'OntologiesApi.model_query', 
-                    return_value=new_nodes):
+                    return_value=new_nodes) as p:
                     
         obtained = mcc.get_structure_tree()
+        
+        mcc.get_structure_tree()
+        p.assert_called_once()
         
     assert(obtained.node_ids()[0] == 0)
     assert( os.path.exists(path) )
@@ -201,11 +228,13 @@ def test_get_ontology(mcc, fn_temp_dir, old_nodes):
 
         with mock.patch('allensdk.api.queries.ontologies_api.'
                         'OntologiesApi.model_query', 
-                        return_value=old_nodes):
+                        return_value=old_nodes) as p:
                 
             mcc.get_ontology()
-    
-            assert(len(c) == 3)
+            mcc.get_ontology()
+            
+            p.assert_called_once()
+            assert(len(c) == 6)
             
             
 def test_get_structures(mcc, fn_temp_dir, old_nodes):
@@ -216,12 +245,14 @@ def test_get_structures(mcc, fn_temp_dir, old_nodes):
 
         with mock.patch('allensdk.api.queries.ontologies_api.'
                         'OntologiesApi.model_query', 
-                        return_value=old_nodes):
+                        return_value=old_nodes) as p:
                 
             obtained = mcc.get_structures()
+            mcc.get_structures()
     
+            p.assert_called_once()
             assert( obtained.loc[0, 'acronym'] == old_nodes[0]['acronym'] )
-            assert(len(c) == 1)
+            assert(len(c) == 2)
             
             
 def test_get_experiments(mcc, fn_temp_dir, experiments):
@@ -231,6 +262,10 @@ def test_get_experiments(mcc, fn_temp_dir, experiments):
     mcc.api.service_query = lambda a, parameters: experiments    
     obtained = mcc.get_experiments()
     
+    mcc.api.service_query = mock.MagicMock()
+    mcc.get_experiments()
+    
+    mcc.api.service_query.assert_not_called()
     assert( os.path.exists(file_path) )
     assert( 'num_voxels' not in obtained[0] )
     assert( obtained[0]['transgenic-line'] == 'most_creish' ) 
@@ -254,6 +289,10 @@ def test_get_experiment_structure_unionizes(mcc, fn_temp_dir, unionizes):
     mcc.api.model_query = lambda *args, **kwargs: unionizes
     obtained = mcc.get_experiment_structure_unionizes(eid)
         
+    mcc.api.model_query = mock.MagicMock()
+    mcc.get_experiment_structure_unionizes(eid)
+    
+    mcc.api.model_query.assert_not_called()
     assert( obtained.loc[0, 'projection_intensity'] == 263.231 )
     assert( os.path.exists(path) )
 
@@ -332,11 +371,17 @@ def test_get_structure_mask(mcc, fn_temp_dir):
         warnings.simplefilter('always')
     
         mask, _ = mcc.get_structure_mask(12)
-        
+
+        # also make sure we can do this for pd.Series input for backwards compatibility
+        mask, _ = mcc.get_structure_mask(pd.Series([12]))
         
     assert( mask.sum() == 1 )
     #assert( len(c) == 2 )
     assert( os.path.exists(path) )
+
+    with pytest.raises(ValueError):
+        mask, _ = mcc.get_structure_mask("fish")
+
     
     
 def test_make_structure_mask(mcc):
@@ -352,3 +397,4 @@ def test_make_structure_mask(mcc):
     #assert(len(c) == 1)
     assert( mask.sum() == 5 )
     
+

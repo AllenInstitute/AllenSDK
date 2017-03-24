@@ -18,8 +18,12 @@ if 'TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA' in os.environ:
 else:
     data_file = resource_filename(__name__, 'test_observatory_plots_data.json')
 
-EXPERIMENT_CONTAINER = ju.read(data_file)
-TEST_DATA_DIR = EXPERIMENT_CONTAINER['image_directory']
+if data_file == 'skip':
+    EXPERIMENT_CONTAINER=None
+    TEST_DATA_DIR=None
+else:
+    EXPERIMENT_CONTAINER = ju.read(data_file)
+    TEST_DATA_DIR = EXPERIMENT_CONTAINER['image_directory']
 
 class AnalysisSingleton(object):
     def __init__(self, klass, session, *args):
@@ -50,7 +54,12 @@ NATURAL_MOVIE_ONE_C = AnalysisSingleton(NaturalMovie, stiminfo.THREE_SESSION_C, 
 NATURAL_MOVIE_TWO = AnalysisSingleton(NaturalMovie, stiminfo.THREE_SESSION_C, stiminfo.NATURAL_MOVIE_TWO)
 NATURAL_MOVIE_THREE = AnalysisSingleton(NaturalMovie, stiminfo.THREE_SESSION_A, stiminfo.NATURAL_MOVIE_THREE)
 LOCALLY_SPARSE_NOISE = AnalysisSingleton(LocallySparseNoise, stiminfo.THREE_SESSION_C, stiminfo.LOCALLY_SPARSE_NOISE)
-CELL_SPECIMEN_ID = EXPERIMENT_CONTAINER['cells'][0]
+
+if EXPERIMENT_CONTAINER:
+    CELL_SPECIMEN_ID = EXPERIMENT_CONTAINER['cells'][0]
+else:
+    CELL_SPECIMEN_ID = None
+
 
 def assert_images_match(new_file, test_file, shape):
     assert os.path.exists(new_file)
@@ -66,6 +75,8 @@ def assert_images_match(new_file, test_file, shape):
     
     os.remove(new_file)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,static_gratings", 
                          [ [ 'static_gratings_ttp.png', STATIC_GRATINGS ] ])
 def test_ttp_static_gratings(new_file, static_gratings, shape=[500,500]):
@@ -74,6 +85,8 @@ def test_ttp_static_gratings(new_file, static_gratings, shape=[500,500]):
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,static_gratings", 
                          [ [ 'static_gratings_pref_ori.png', STATIC_GRATINGS ] ])
 def test_pref_ori_static_gratings(new_file, static_gratings, shape=[250,500]):
@@ -82,6 +95,8 @@ def test_pref_ori_static_gratings(new_file, static_gratings, shape=[250,500]):
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,static_gratings", 
                          [ [ 'static_gratings_ori.png', STATIC_GRATINGS ] ])
 def test_osi_static_gratings(new_file, static_gratings, shape=[500,500]):
@@ -90,6 +105,8 @@ def test_osi_static_gratings(new_file, static_gratings, shape=[500,500]):
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,static_gratings", 
                          [ [ 'static_gratings_pref_sf.png', STATIC_GRATINGS ] ])
 def test_pref_sf(new_file, static_gratings, shape=[500,500]):
@@ -98,6 +115,8 @@ def test_pref_sf(new_file, static_gratings, shape=[500,500]):
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,drifting_gratings", 
                          [ [ 'drifting_gratings_pref_dir.png', DRIFTING_GRATINGS ] ])
 def test_pref_dir_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
@@ -106,6 +125,8 @@ def test_pref_dir_drifting_gratings(new_file, drifting_gratings, shape=[500,500]
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,drifting_gratings", 
                          [ [ 'drifting_gratings_pref_tf.png', DRIFTING_GRATINGS ] ])
 def test_pref_tf_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
@@ -114,6 +135,8 @@ def test_pref_tf_drifting_gratings(new_file, drifting_gratings, shape=[500,500])
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,drifting_gratings", 
                          [ [ 'drifting_gratings_dsi.png', DRIFTING_GRATINGS ] ])
 def test_dsi_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
@@ -122,6 +145,8 @@ def test_dsi_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,drifting_gratings", 
                          [ [ 'drifting_gratings_osi.png', DRIFTING_GRATINGS ] ])
 def test_osi_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
@@ -130,6 +155,8 @@ def test_osi_drifting_gratings(new_file, drifting_gratings, shape=[500,500]):
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,natural_scenes", 
                          [ [ 'natural_scenes_ttp.png', NATURAL_SCENES ] ])
 def test_ttp_natural_scenes(new_file, natural_scenes, shape=[500,500]):
@@ -138,6 +165,8 @@ def test_ttp_natural_scenes(new_file, natural_scenes, shape=[500,500]):
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,static_gratings,cell_specimen_id",
                          [ [ 'static_gratings_fan_plot.png', STATIC_GRATINGS, CELL_SPECIMEN_ID ] ])
 def test_fan_plot(new_file, static_gratings, cell_specimen_id, shape=[250,500]):
@@ -146,6 +175,8 @@ def test_fan_plot(new_file, static_gratings, cell_specimen_id, shape=[250,500]):
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,natural_scenes,cell_specimen_id", 
                          [ [ 'natural_scenes_fan_plot.png', NATURAL_SCENES, CELL_SPECIMEN_ID ] ])
 def test_corona_plot(new_file, natural_scenes, cell_specimen_id, shape=[500,500]):
@@ -154,6 +185,8 @@ def test_corona_plot(new_file, natural_scenes, cell_specimen_id, shape=[500,500]
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,natural_movie,cell_specimen_id", 
                          [ ("natural_movie_one_a_track_plot.png", NATURAL_MOVIE_ONE_A, CELL_SPECIMEN_ID),
                            ("natural_movie_one_b_track_plot.png", NATURAL_MOVIE_ONE_B, CELL_SPECIMEN_ID),
@@ -166,6 +199,8 @@ def test_track_plot(new_file, natural_movie, cell_specimen_id, shape=[500,500]):
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,drifting_gratings,cell_specimen_id", 
                          [ [ 'drifting_gratings_star_plot.png', DRIFTING_GRATINGS, CELL_SPECIMEN_ID ] ])
 def test_star_plot(new_file, drifting_gratings, cell_specimen_id, shape=[500,500]):
@@ -174,6 +209,8 @@ def test_star_plot(new_file, drifting_gratings, cell_specimen_id, shape=[500,500
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,analysis,cell_specimen_id", 
                          [ ("3sa_speed_tuning_plot.png", DRIFTING_GRATINGS, CELL_SPECIMEN_ID),
                            ("3sb_speed_tuning_plot.png", STATIC_GRATINGS, CELL_SPECIMEN_ID),
@@ -184,6 +221,8 @@ def test_speed_tuning_plot(new_file, analysis, cell_specimen_id, shape=[500,500]
         oplots.finalize_with_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
 
+
+@pytest.mark.skipif(data_file == 'skip', reason='NWB Data files not configured')
 @pytest.mark.parametrize("new_file,locally_sparse_noise,on,cell_specimen_id", 
                          [ ('locally_sparse_noise_on.png', LOCALLY_SPARSE_NOISE, True, CELL_SPECIMEN_ID),
                            ('locally_sparse_noise_off.png', LOCALLY_SPARSE_NOISE, False, CELL_SPECIMEN_ID) ])
@@ -192,10 +231,3 @@ def test_pincushion_plot(new_file, locally_sparse_noise, on, cell_specimen_id, s
         locally_sparse_noise().open_pincushion_plot(cell_specimen_id, on=on)
         oplots.finalize_no_axes()
     assert_images_match(new_file, os.path.join(TEST_DATA_DIR, new_file), shape)
-
-
-
-    
-
-
-                           

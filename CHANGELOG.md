@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [0.13.1] - 2017-03-20
+
+### Fixed
+
+- issue #42: Caching behavior in MouseConnectivityCache for CCF volumes fixed
+- GLIF examples, documentation fixed
+
 ## [0.13.0] - 2017-03-16
 
 ### Added
@@ -13,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - Ontology has been deprecated in favor of StructureTree. 
 - MouseConnectivityCache uses StructureTree internally (ontology-based methods are deprecated)
 - CellTypesCache and MouseConnectivityCache use cacher decorator
+- GlifApi has stateless methods now.  Old methods are deprecated.  
 
 ### Fixed
 
