@@ -16,14 +16,14 @@
 
 import pytest
 from mock import patch, mock_open, Mock
+from simplejson.scanner import JSONDecodeError
+import allensdk.core.json_utilities as ju
 from allensdk.core.json_utilities import JsonComments
 import logging
 try:
     import __builtin__ as builtins  # @UnresolvedImport
-    from __builtin__ import ValueError
 except:
     import builtins  # @UnresolvedImport
-    from builtins import ValueError
 
 
 @pytest.fixture
@@ -75,7 +75,7 @@ def two_multi_line_json():
 @pytest.fixture
 def corrupted_json():
     return ("{\n"
-            "    \"colors\": [\"blue\",\n"
+            "    \"colors\": \"blue\",\n"
             "    /* comment these out\n"
             "    \"red\",\n"
             "    \"yel")
@@ -89,16 +89,16 @@ def ju_logger():
     return log
 
 
-def testSingleLineCommentValueError(corrupted_json,
+def testSingleLineCommentJSONDecodeError(corrupted_json,
                                     ju_logger):
-    with pytest.raises(ValueError) as e_info:
+    with pytest.raises(JSONDecodeError) as e_info:
         with patch(builtins.__name__ + ".open",
                    mock_open(read_data=corrupted_json)):
             JsonComments.read_file("corrupted.json")
 
     ju_logger.error.assert_called_once_with(
         'Could not load json object from file: corrupted.json')
-    assert e_info.typename == 'ValueError'
+    assert e_info.typename == 'JSONDecodeError'
 
 
 def testSingleLineComment(commented_json):
@@ -179,3 +179,12 @@ def testTwoMultiLineFile(two_multi_line_json):
     assert('orange' in parsed_json['colors'])
     assert('purple' in parsed_json['colors'])
     assert('violet' in parsed_json['colors'])
+
+
+def test_write_nan():
+    with patch(builtins.__name__ + ".open",
+               mock_open(),
+               create=True) as mo:
+        ju.write('/some/file/test.json', { "thing": float('nan')})
+    
+    assert 'null' in str(mo().write.call_args_list[0])

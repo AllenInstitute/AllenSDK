@@ -1,7 +1,7 @@
 import logging
 
 import numpy as np
-import json 
+import simplejson as json 
 import allensdk.core.json_utilities as ju
 import copy
 
