@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-import json
+import simplejson as json
 import logging
 from ...deprecated import deprecated
 from .rma_template import RmaTemplate
