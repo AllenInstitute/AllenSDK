@@ -498,15 +498,7 @@ class BrainObservatoryNwbDataSet(object):
         if len(roi_masks) == 0:
             raise IOError("no masks found for given cell specimen ids")
 
-        roi_list = []
-        for m in roi_masks:
-            roi_list.append(m.get_mask_plane())
-
-        roi_arr = np.zeros((len(roi_list), roi_list[0].shape[
-                           0], roi_list[0].shape[1]), dtype=np.uint8)
-
-        for i, an_roi in enumerate(roi_list):
-            roi_arr[i, :, :] = an_roi
+        roi_arr = roi.create_roi_mask_array(roi_masks)
 
         return roi_arr
 
