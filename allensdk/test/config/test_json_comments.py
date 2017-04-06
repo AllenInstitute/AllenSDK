@@ -89,7 +89,9 @@ def ju_logger():
     return log
 
 
-def testSingleLineCommentValueError(corrupted_json,
+# ABS-24 disabling this until a better corrupt json can be created
+#   that creates a fault under simplejson
+def do_not_testSingleLineCommentValueError(corrupted_json,
                                     ju_logger):
     with pytest.raises(ValueError) as e_info:
         with patch(builtins.__name__ + ".open",
