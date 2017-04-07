@@ -14,13 +14,21 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
+
+import pandas as pd
+import pandas.io.json as pj
+
 import pytest
 from mock import MagicMock
+
 from allensdk.api.cache import Cache
 from allensdk.api.queries.rma_api import RmaApi
 import allensdk.core.json_utilities as ju
-import pandas as pd
-import pandas.io.json as pj
+from allensdk.config.manifest import ManifestVersionError
+from allensdk.config.manifest_builder import ManifestBuilder
+
+from allensdk.test_utilities.temp_dir import fn_temp_dir
 
 
 @pytest.fixture
@@ -31,6 +39,26 @@ def cache():
 @pytest.fixture
 def rma():
     return RmaApi()
+
+
+def test_version_update(fn_temp_dir):
+
+    class DummyCache(Cache):
+        
+        VERSION = None
+    
+        def build_manifest(self, file_name):
+            manifest_builder = ManifestBuilder()
+            manifest_builder.set_version(DummyCache.VERSION)
+            manifest_builder.write_json_file(file_name)
+
+    mpath = os.path.join(fn_temp_dir, 'manifest.json')
+    dc = DummyCache(manifest=mpath)
+    
+    same_dc = DummyCache(manifest=mpath)
+    
+    with pytest.raises(ManifestVersionError):
+        new_dc = DummyCache(manifest=mpath, version=1.0)
 
 
 def test_wrap_json(rma, cache):

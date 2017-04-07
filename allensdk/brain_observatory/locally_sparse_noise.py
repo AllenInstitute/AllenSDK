@@ -19,8 +19,8 @@ import pandas as pd
 from .stimulus_analysis import StimulusAnalysis
 import allensdk.brain_observatory.stimulus_info as stimulus_info
 import scipy.ndimage 
-import observatory_plots as oplots
-import circle_plots as cplots
+from . import observatory_plots as oplots
+from . import circle_plots as cplots
 from .brain_observatory_exceptions import MissingStimulusException
 
 class LocallySparseNoise(StimulusAnalysis):
@@ -213,7 +213,7 @@ class LocallySparseNoise(StimulusAnalysis):
             with h5py.File(analysis_file, "r") as f:
                 lsn._receptive_field = f["analysis/receptive_field_lsn"].value
         except Exception as e:
-            raise MissingStimulusException(e.message)
+            raise MissingStimulusException(e.args)
 
         return lsn
 

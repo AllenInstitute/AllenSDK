@@ -15,15 +15,38 @@
 
 
 import pytest
-from mock import MagicMock, patch
-from allensdk.api.cache import Cache
-from allensdk.config.manifest import file_download, Manifest
-from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
+from mock import Mock, patch
+from allensdk.api.cache import cacheable, Cache
+from allensdk.config.manifest import Manifest
 import allensdk.core.json_utilities as ju
 import pandas.io.json as pj
 import pandas as pd
-import StringIO
-import nrrd
+
+try:
+    import StringIO
+except:
+    import io as StringIO
+
+try:
+    reload
+except NameError:
+    try:
+        from importlib import reload
+    except ImportError:
+        from imp import reload
+
+
+@pytest.fixture(scope='module', autouse=True)
+def mock_imports():
+    with patch('nrrd.read',
+               Mock(name='nrrd_read_file_mcm',
+                    return_value=('mock_annotation_data',
+                                  'mock_annotation_image'))) as nrrd_read:
+        import allensdk.api.queries.mouse_connectivity_api
+        reload(allensdk.api.queries.mouse_connectivity_api)
+        from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi as MCA
+
+    return nrrd_read, MCA
 
 
 @pytest.fixture
@@ -38,46 +61,50 @@ _csv_msg = pd.read_csv(StringIO.StringIO(""",whatever
 """))
 
 @pytest.fixture
-def mca():
+def mca(mock_imports):
+    _, MCA = mock_imports
+    
     ju.read_url_get = \
-        MagicMock(name='read_url_get',
-                  return_value={'msg': _msg})
+        Mock(name='read_url_get',
+             return_value={'msg': _msg})
     ju.write = \
-        MagicMock(name='write')
+        Mock(name='write')
 
     ju.read = \
-        MagicMock(name='read',
-                  return_value=_pd_msg)
+        Mock(name='read',
+             return_value=_pd_msg)
 
     pj.read_json = \
-        MagicMock(name='read_json',
-                  return_value=_pd_msg)
+        Mock(name='read_json',
+             return_value=_pd_msg)
 
     pd.DataFrame.to_csv = \
-        MagicMock(name='to_csv')
+        Mock(name='to_csv')
 
     pd.DataFrame.read_csv = \
-        MagicMock(name='read_csv',
-                  return_value=_csv_msg)
+        Mock(name='read_csv',
+             return_value=_csv_msg)
 
-    Manifest.safe_mkdir = MagicMock(name='safe_mkdir')
-    
-    nrrd.read = MagicMock(name='nrrd.read',
-                          return_value=('nrrd_file_a',
-                                        'nrrd_file_b'))
+    Manifest.safe_mkdir = Mock(name='safe_mkdir')
 
-    mca = MouseConnectivityApi()
-    mca.retrieve_file_over_http = MagicMock(name='retrieve_file_over_http')
+    mca = MCA()
+    mca.retrieve_file_over_http = Mock(name='retrieve_file_over_http')
     
     return mca
 
+
 @pytest.mark.parametrize("file_exists",
                          (True, False))
-def test_file_download_lazy(mca, cache,
+def test_file_download_lazy(mock_imports,
+                            mca, 
+                            cache,
                             file_exists):
-    @file_download(reader='nrrd',
-                   file_name_position=3,
-                   secondary_file_name_position=1)
+    nrrd_read, MCA = mock_imports
+
+    @cacheable(strategy='lazy',
+               reader=nrrd_read,
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           secondary_file_name_position=1))
     def download_volumetric_data(data_path,
                                  file_name,
                                  voxel_resolution=None,
@@ -92,14 +119,16 @@ def test_file_download_lazy(mca, cache,
 
         mca.retrieve_file_over_http(url, save_file_path)
 
-    with patch('os.path.exists', MagicMock(name="os.path.exists",
-                                           return_value=file_exists)) as mkdir:
-        download_volumetric_data(MouseConnectivityApi.AVERAGE_TEMPLATE,
+    with patch('os.path.exists',
+               Mock(name="os.path.exists",
+                    return_value=file_exists)) as mkdir:
+        nrrd_read.reset_mock()
+        download_volumetric_data(MCA.AVERAGE_TEMPLATE,
                                  'annotation_10.nrrd',
-                                 MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS,
+                                 MCA.VOXEL_RESOLUTION_10_MICRONS,
                                  'volumetric.nrrd',
-                                 MouseConnectivityApi.CCF_2016,
-                                 query_strategy='lazy')
+                                 MCA.CCF_2016,
+                                 strategy='lazy')
 
     if file_exists:
         assert not mca.retrieve_file_over_http.called, 'server call not needed when file exists'
@@ -108,16 +137,20 @@ def test_file_download_lazy(mca, cache,
             'http://download.alleninstitute.org/informatics-archive/annotation/ccf_2016/mouse_ccf/average_template/annotation_10.nrrd',
             'volumetric.nrrd')
     assert not Manifest.safe_mkdir.called, 'safe_mkdir should not have been called.'
-    nrrd.read.assert_called_once_with('volumetric.nrrd')
+    nrrd_read.assert_called_once_with('volumetric.nrrd')
 
 
 @pytest.mark.parametrize("file_exists",
                          (True, False))
-def test_file_download_server(mca, cache,
+def test_file_download_server(mock_imports,
+                              mca,
+                              cache,
                              file_exists):
-    @file_download(reader='nrrd',
-                   file_name_position=3,
-                   secondary_file_name_position=1)
+    nrrd_read, MCA = mock_imports
+
+    @cacheable(reader=nrrd_read,
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           secondary_file_name_position=1))
     def download_volumetric_data(data_path,
                                  file_name,
                                  voxel_resolution=None,
@@ -132,29 +165,36 @@ def test_file_download_server(mca, cache,
 
         mca.retrieve_file_over_http(url, save_file_path)
 
-    with patch('os.path.exists', MagicMock(name="os.path.exists",
-                                           return_value=file_exists)) as mkdir:
-        download_volumetric_data(MouseConnectivityApi.AVERAGE_TEMPLATE,
+    with patch('os.path.exists',
+               Mock(name="os.path.exists",
+                    return_value=file_exists)) as mkdir:
+        nrrd_read.reset_mock()
+        
+        download_volumetric_data(MCA.AVERAGE_TEMPLATE,
                                  'annotation_10.nrrd',
-                                 MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS,
+                                 MCA.VOXEL_RESOLUTION_10_MICRONS,
                                  'volumetric.nrrd',
-                                 MouseConnectivityApi.CCF_2016,
-                                 query_strategy='server')
+                                 MCA.CCF_2016,
+                                 strategy='create')
 
     mca.retrieve_file_over_http.assert_called_once_with(
         'http://download.alleninstitute.org/informatics-archive/annotation/ccf_2016/mouse_ccf/average_template/annotation_10.nrrd',
         'volumetric.nrrd')
     assert not Manifest.safe_mkdir.called, 'safe_mkdir should not have been called.'
-    nrrd.read.assert_called_once_with('volumetric.nrrd')
+    nrrd_read.assert_called_once_with('volumetric.nrrd')
 
 
 @pytest.mark.parametrize("file_exists",
                          (True, False))
-def test_file_download_cached_file(mca, cache,
+def test_file_download_cached_file(mock_imports,
+                                   mca,
+                                   cache,
                                    file_exists):
-    @file_download(reader='nrrd',
-                   file_name_position=3,
-                   secondary_file_name_position=1)
+    nrrd_read, MCA = mock_imports
+
+    @cacheable(reader=nrrd_read,
+               pathfinder=Cache.pathfinder(file_name_position=3,
+                                           secondary_file_name_position=1))
     def download_volumetric_data(data_path,
                                  file_name,
                                  voxel_resolution=None,
@@ -169,15 +209,25 @@ def test_file_download_cached_file(mca, cache,
 
         mca.retrieve_file_over_http(url, save_file_path)
 
-    with patch('os.path.exists', MagicMock(name="os.path.exists",
-                                           return_value=file_exists)) as mkdir:
-        download_volumetric_data(MouseConnectivityApi.AVERAGE_TEMPLATE,
+    with patch('os.path.exists',
+               Mock(name="os.path.exists",
+                    return_value=file_exists)) as mkdir:
+        nrrd_read.reset_mock()
+
+        download_volumetric_data(MCA.AVERAGE_TEMPLATE,
                                  'annotation_10.nrrd',
-                                 MouseConnectivityApi.VOXEL_RESOLUTION_10_MICRONS,
+                                 MCA.VOXEL_RESOLUTION_10_MICRONS,
                                  'volumetric.nrrd',
-                                 MouseConnectivityApi.CCF_2016,
-                                 query_strategy='file')
+                                 MCA.CCF_2016,
+                                 strategy='file')
 
     assert not mca.retrieve_file_over_http.called, 'server should not have been called'
     assert not Manifest.safe_mkdir.called, 'safe_mkdir should not have been called.'
-    nrrd.read.assert_called_once_with('volumetric.nrrd')
+    nrrd_read.assert_called_once_with('volumetric.nrrd')
+
+@pytest.mark.run('last')
+def test_cleanup():
+    import allensdk.api.queries.mouse_connectivity_api
+    reload(allensdk.api.queries.mouse_connectivity_api)
+    import allensdk.core.mouse_connectivity_cache
+    reload(allensdk.core.mouse_connectivity_cache)

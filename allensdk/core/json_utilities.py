@@ -14,7 +14,8 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-import json
+import simplejson as json
+import math
 import re
 import logging
 
@@ -50,7 +51,10 @@ def write(file_name, obj):
 
 def write_string(obj):
     """ Shortcut for writing JSON to a string.  This also takes care of serializing numpy and data types. """
-    return json.dumps(obj, indent=2, default=json_handler)
+    return json.dumps(obj,
+                      indent=2,
+                      ignore_nan=True,
+                      default=json_handler)
 
 
 def read_url(url, method='POST'):

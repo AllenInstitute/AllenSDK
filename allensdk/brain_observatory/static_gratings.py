@@ -21,8 +21,8 @@ from math import sqrt
 import logging
 from .stimulus_analysis import StimulusAnalysis
 from .brain_observatory_exceptions import BrainObservatoryAnalysisException, MissingStimulusException
-import observatory_plots as oplots
-import circle_plots as cplots
+from . import observatory_plots as oplots
+from . import circle_plots as cplots
 import h5py
 import matplotlib.pyplot as plt
 
@@ -388,6 +388,6 @@ class StaticGratings(StimulusAnalysis):
                 sg._binned_dx_vis = f["analysis/binned_dx_vis"].value
                 sg._binned_cells_vis = f["analysis/binned_cells_vis"].value
         except Exception as e:
-            raise MissingStimulusException(e.message)
+            raise MissingStimulusException(e.args)
 
         return sg

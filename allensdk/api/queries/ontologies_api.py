@@ -16,6 +16,8 @@
 from .rma_template import RmaTemplate
 from ..cache import cacheable
 
+from allensdk.core.structure_tree import StructureTree
+
 
 class OntologiesApi(RmaTemplate):
     '''
@@ -96,6 +98,24 @@ class OntologiesApi(RmaTemplate):
              'num_rows': 'all',
              'count': False,
              'criteria_params': ['atlas_ids']
+             }, 
+             {'name': 'structures_with_sets', 
+             'description': 'see name',
+             'model': 'Structure',
+             'include': 'structure_sets', 
+             'criteria': '[graph_id$in{{ graph_ids }}]',
+             'order': ['structures.graph_order'], 
+             'num_rows': 'all', 
+             'count': False, 
+             'criteria_params': ['graph_ids']
+             },
+             {'name': 'structure_sets_by_id', 
+              'description': 'see name', 
+              'model': 'StructureSet',
+              'criteria': '[id$in{{ set_ids }}]', 
+              'num_rows': 'all',
+              'count': False, 
+              'criteria_params': ['set_ids']
              }
         ]}
 
@@ -103,7 +123,7 @@ class OntologiesApi(RmaTemplate):
         super(OntologiesApi, self).__init__(base_uri,
                                             query_manifest=OntologiesApi.rma_templates)
 
-    @cacheable
+    @cacheable()
     def get_structures(self,
                        structure_graph_ids=None,
                        structure_graph_names=None,
@@ -111,7 +131,8 @@ class OntologiesApi(RmaTemplate):
                        structure_set_names=None,
                        order=['structures.graph_order'],
                        num_rows='all',
-                       count=False):
+                       count=False,
+                       **kwargs):
         '''Retrieve data about anatomical structures.
 
         Parameters
@@ -167,7 +188,35 @@ class OntologiesApi(RmaTemplate):
                                        num_rows=num_rows,
                                        count=count)
 
-        return data
+        return data 
+        
+        
+    @cacheable()
+    def get_structures_with_sets(self, structure_graph_ids, order=['structures.graph_order'], 
+                                 num_rows='all', count=False, **kwargs):
+        '''Download structures along with the sets to which they belong.
+
+        Parameters
+        ----------
+        structure_graph_ids : int or list of int
+            Only fetch structure records from these graphs.
+        order : list of strings
+            list of RMA order clauses for sorting
+        num_rows : int
+            how many records to retrieve
+ 
+        Returns
+        -------
+        dict
+            the parsed json response containing data from the API
+
+        '''
+    
+        return self.template_query('ontology_queries', 'structures_with_sets', 
+                                   graph_ids=structure_graph_ids, 
+                                   order=order, num_rows=num_rows, 
+                                   count=count)
+    
 
     def unpack_structure_set_ancestors(self, structure_dataframe):
         '''Convert a slash-separated structure_id_path field to a list.
@@ -189,7 +238,7 @@ class OntologiesApi(RmaTemplate):
         ]
         structure_dataframe['structure_set_ancestor'] = structure_ancestors
 
-    @cacheable
+    @cacheable()
     def get_atlases_table(self, atlas_ids=None, brief=True):
         '''List Atlases available through the API
         with associated ontologies and structure graphs.
@@ -223,17 +272,23 @@ class OntologiesApi(RmaTemplate):
 
         return data
 
-    @cacheable
+    @cacheable()
     def get_atlases(self):
         return self.template_query('ontology_queries',
                                    'atlases_list')
 
-    @cacheable
+    @cacheable()
     def get_structure_graphs(self):
         return self.template_query('ontology_queries',
                                    'structure_graphs_list')
 
-    @cacheable
-    def get_structure_sets(self):
-        return self.template_query('ontology_queries',
-                                   'structure_sets_list')
+    @cacheable()
+    def get_structure_sets(self, structure_set_ids=None):
+
+        if structure_set_ids is None:
+            return self.template_query('ontology_queries',
+                                       'structure_sets_list')
+        else:
+            return self.template_query('ontology_queries', 
+                                       'structure_sets_by_id', 
+                                       set_ids=list(structure_set_ids))

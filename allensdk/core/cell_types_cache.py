@@ -14,11 +14,10 @@
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import pandas as pd
 from six import string_types
 
 from allensdk.config.manifest_builder import ManifestBuilder
-from allensdk.api.cache import Cache, cacheable
+from allensdk.api.cache import Cache
 from allensdk.api.queries.cell_types_api import CellTypesApi
 
 from . import json_utilities as json_utilities
@@ -27,6 +26,7 @@ from . import  swc
 
 import logging
 import warnings
+import pandas as pd
 
 
 class CellTypesCache(Cache):
@@ -63,13 +63,17 @@ class CellTypesCache(Cache):
     EPHYS_SWEEPS_KEY = 'EPHYS_SWEEPS'
     RECONSTRUCTION_KEY = 'RECONSTRUCTION'
     MARKER_KEY = 'MARKER'
+    MANIFEST_VERSION = None
 
     def __init__(self, cache=True, manifest_file='cell_types_manifest.json', base_uri=None):
         super(CellTypesCache, self).__init__(
-            manifest=manifest_file, cache=cache)
+            manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
         self.api = CellTypesApi(base_uri=base_uri)
 
-    def get_cells(self, file_name=None, require_morphology=False, require_reconstruction=False, reporter_status=None):
+    def get_cells(self, file_name=None,
+                  require_morphology=False,
+                  require_reconstruction=False,
+                  reporter_status=None):
         """
         Download metadata for all cells in the database and optionally return a
         subset filtered by whether or not they have a morphology or reconstruction.
@@ -106,7 +110,11 @@ class CellTypesCache(Cache):
             reporter_status = [reporter_status]
 
         # filter the cells on the way out
-        return self.api.filter_cells(cells, require_morphology, require_reconstruction, reporter_status)
+        return self.api.filter_cells(cells,
+                                     require_morphology,
+                                     require_reconstruction,
+                                     reporter_status)
+        
 
     def get_ephys_sweeps(self, specimen_id, file_name=None):
         """
@@ -122,13 +130,10 @@ class CellTypesCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.EPHYS_SWEEPS_KEY, specimen_id)
 
-        if os.path.exists(file_name):
-            sweeps = json_utilities.read(file_name)
-        else:
-            sweeps = self.api.get_ephys_sweeps(specimen_id)
-
-            if self.cache:
-                json_utilities.write(file_name, sweeps)
+        sweeps = self.api.get_ephys_sweeps(specimen_id, 
+                                           strategy='lazy', 
+                                           path=file_name, 
+                                           **Cache.cache_json())
 
         return sweeps
 
@@ -149,22 +154,23 @@ class CellTypesCache(Cache):
             Return the output as a Pandas DataFrame.  If False, return
             a list of dictionaries.
         """
-
         file_name = self.get_cache_path(file_name, self.EPHYS_FEATURES_KEY)
 
-        if os.path.exists(file_name):
-            features_df = pd.DataFrame.from_csv(file_name)
+        if self.cache:
+            if dataframe:
+                warnings.warn("dataframe argument is deprecated.")
+                args = Cache.cache_csv_dataframe()
+            else:
+                args = Cache.cache_csv_json()
+            args['strategy'] = 'lazy'
         else:
-            features_df = self.api.get_ephys_features(dataframe=True)
+            args = Cache.nocache_json()
 
-            if self.cache:
-                features_df.to_csv(file_name)
+        features_df = self.api.get_ephys_features(path=file_name,
+                                                  **args)
 
-        if dataframe:
-            warnings.warn("dataframe argument is deprecated.")
-            return features_df
-        else:
-            return features_df.to_dict('records')
+        return features_df
+
 
     def get_morphology_features(self, dataframe=False, file_name=None):
         """
@@ -187,19 +193,20 @@ class CellTypesCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.MORPHOLOGY_FEATURES_KEY)
 
-        if os.path.exists(file_name):
-            features_df = pd.DataFrame.from_csv(file_name)
+        if self.cache:
+            if dataframe:
+                warnings.warn("dataframe argument is deprecated.")
+                args = Cache.cache_csv_dataframe()
+            else:
+                args = Cache.cache_csv_json()
         else:
-            features_df = self.api.get_morphology_features(dataframe=True)
+            args = Cache.nocache_json()
 
-            if self.cache:
-                features_df.to_csv(file_name)
+        args['strategy'] = 'lazy'
+        args['path'] = file_name
 
-        if dataframe:
-            warnings.warn("dataframe argument is deprecated.")
-            return features_df
-        else:
-            return features_df.to_dict('records')
+        return self.api.get_morphology_features(**args)
+
 
     def get_all_features(self, dataframe=False, require_reconstruction=True):
         """
@@ -217,9 +224,9 @@ class CellTypesCache(Cache):
             Only return ephys and morphology features for cells that have
             reconstructions. Default True.
         """
-
-        ephys_features = self.get_ephys_features(dataframe=True)
-        morphology_features = self.get_morphology_features(dataframe=True)
+        
+        ephys_features = pd.DataFrame(self.get_ephys_features())
+        morphology_features = pd.DataFrame(self.get_morphology_features())
 
         how = 'inner' if require_reconstruction else 'outer'
 
@@ -259,8 +266,7 @@ class CellTypesCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.EPHYS_DATA_KEY, specimen_id)
 
-        if not os.path.exists(file_name):
-            self.api.save_ephys_data(specimen_id, file_name)
+        self.api.save_ephys_data(specimen_id, file_name, strategy='lazy')
 
         return NwbDataSet(file_name)
 
@@ -349,7 +355,7 @@ class CellTypesCache(Cache):
         """
 
         mb = ManifestBuilder()
-
+        mb.set_version(self.MANIFEST_VERSION)
         mb.add_path('BASEDIR', '.')
         mb.add_path(self.CELLS_KEY, 'cells.json',
                     typename='file', parent_key='BASEDIR')

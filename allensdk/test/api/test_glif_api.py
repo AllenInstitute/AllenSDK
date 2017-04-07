@@ -17,6 +17,13 @@ import numpy as np
 import pytest
 import os
 
+@pytest.fixture
+def neuronal_model_id():
+    return 566283950
+
+@pytest.fixture
+def specimen_id():
+    return 325464516
 
 @pytest.fixture
 def glif_api():
@@ -55,41 +62,36 @@ def test_get_neuronal_model_templates(glif_api):
 
 
 @pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
-def test_get_neuronal_models(glif_api):
+def test_get_neuronal_models(glif_api, specimen_id):
 
-    model = glif_api.get_neuronal_models([325464516])
+    model = glif_api.get_neuronal_models([specimen_id])
 
     assert len(model) == 1
     assert len(model[0]['neuronal_models']) == 2
 
 
 @pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
-def test_get_neuron_configs(glif_api):
-    model = glif_api.get_neuronal_models([325464516])
+def test_get_neuron_configs(glif_api, specimen_id):
+    model = glif_api.get_neuronal_models([specimen_id])
 
     neuronal_model_id = model[0]['neuronal_models'][0]['id']
-    assert neuronal_model_id == 473465606
+    assert neuronal_model_id == 566283950
 
-    np.testing.assert_almost_equal(glif_api.get_neuron_configs([neuronal_model_id])[neuronal_model_id]['th_inf'], 0.0236421993869)
+    np.testing.assert_almost_equal(glif_api.get_neuron_configs([neuronal_model_id])[neuronal_model_id]['th_inf'], 0.024561992461740227)
 
-
-def test_deprecated():
+@pytest.mark.skipif(glif_api() is None, reason='No TEST_API_ENDPOINT set.')
+def test_deprecated(glif_api, neuronal_model_id):
 
     # Exercising deprecated functionality
-    tmp = GlifApi()
-    len(tmp.list_neuronal_models())
+    len(glif_api.list_neuronal_models())
 
-    tmp = GlifApi()
-    tmp.get_neuronal_model(473465606)
+    glif_api.get_neuronal_model(neuronal_model_id)
 
-    tmp = GlifApi()
-    tmp.get_neuronal_model(473465606)
-    print tmp.get_ephys_sweeps()
+    glif_api.get_neuronal_model(neuronal_model_id)
+    print(glif_api.get_ephys_sweeps())
 
-    tmp = GlifApi()
-    tmp.get_neuronal_model(473465606)
-    x = tmp.get_neuron_config()
+    glif_api.get_neuronal_model(neuronal_model_id)
+    x = glif_api.get_neuron_config()
 
-    tmp = GlifApi()
-    tmp.get_neuronal_model(473465606)
-    tmp.cache_stimulus_file('tmp.nwb')
+    glif_api.get_neuronal_model(neuronal_model_id)
+    glif_api.cache_stimulus_file('tmp.nwb')

@@ -7,10 +7,16 @@ FROM alleninstitute/allensdk:anaconda_neuron_1370
 
 MAINTAINER Tim Fliss <timf@alleninstitute.org>
 
-RUN mkdir allensdk; \
-    cd allensdk; \
-    wget -O allensdk.zip http://stash.corp.alleninstitute.org/plugins/servlet/archive/projects/INF/repos/allensdk?at=refs%2Fheads%2Fdev; \
-    unzip allensdk.zip; \
-    rm allensdk.zip; \
-    pip install .; \
-    pip install -r test_requirements.txt
+COPY env.sh git_clone.sh ./
+
+RUN /bin/bash -c "\
+  chmod +x git_clone.sh && \
+  source env.sh && \
+  ./git_clone.sh && \
+  cd allensdk && \
+  pip install . && \
+  pip install -r test_requirements.txt"
+  
+ENV TEST_API_ENDPOINT http://api.brain-map.org
+ENV TEST_OBSERVATORY_EXPERIMENT_PLOTS_DATA=skip
+ENV TEST_NWB_FILES=skip

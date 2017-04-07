@@ -234,7 +234,7 @@ class BrainObservatoryApi(RmaTemplate):
 
         return data
 
-    @cacheable
+    @cacheable()
     def get_cell_metrics(self, cell_specimen_ids=None):
         ''' Get cell metrics by id
 

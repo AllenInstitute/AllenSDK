@@ -18,8 +18,13 @@ import re
 import logging
 import errno
 import pandas as pd
-import nrrd
 
+class ManifestVersionError(Exception): 
+    def __init__(self, message, version, found_version):
+        super(ManifestVersionError, self).__init__(message)
+        self.found_version = found_version
+        self.version = version
+        
 
 class Manifest(object):
     """Manages the location of external files
@@ -28,16 +33,18 @@ class Manifest(object):
     DIR = 'dir'
     FILE = 'file'
     DIRNAME = 'dir_name'
+    VERSION = 'manifest_version'
+
     log = logging.getLogger(__name__)
 
-    def __init__(self, config=None, relative_base_dir='.'):
+    def __init__(self, config=None, relative_base_dir='.', version=None):
         self.path_info = {}
         self.relative_base_dir = relative_base_dir
 
         if config is not None:
-            self.load_config(config)
+            self.load_config(config, version=version)
 
-    def load_config(self, config):
+    def load_config(self, config, version=None):
         ''' Load paths into the manifest from an Allen SDK config section.
 
         Parameters
@@ -45,6 +52,7 @@ class Manifest(object):
         config : Config
             Manifest section of an Allen SDK config.
         '''
+        found_version = None
         for path_info in config:
             path_type = path_info['type']
             path_format = None
@@ -77,9 +85,17 @@ class Manifest(object):
                               absolute,
                               path_format,
                               parent_key)
+
+            elif path_type == self.VERSION:
+                found_version = path_info['value']
             else:
                 Manifest.log.warning("Unknown path type in manifest: %s" %
                                      (path_type))
+
+
+        if found_version != version:
+            raise ManifestVersionError("", version, found_version)
+        self.version = version
 
     def add_path(self, key, path, path_type=DIR,
                  absolute=True, path_format=None, parent_key=None):
@@ -328,61 +344,3 @@ class Manifest(object):
     def as_dataframe(self):
         return pd.DataFrame.from_dict(self.path_info,
                                       orient='index')
-
-
-def file_download(reader=None,
-                  file_name_position=1,
-                  secondary_file_name_position=None,
-                  require_file_name=False,
-                  read_by_default=False,
-                  default_query_strategy='server'):
-    def decor(func):
-        def w(*args,
-              **kwargs):
-            query_strategy = kwargs.pop('query_strategy',
-                                        default_query_strategy)
-            file_name = None
-
-            if file_name_position < len(args):
-                file_name = args[file_name_position]
-
-            if (file_name is None and
-                secondary_file_name_position and 
-                secondary_file_name_position < len(args)):
-                file_name = args[secondary_file_name_position]
-
-            if require_file_name and file_name is None:
-                raise Exception("No file name to save volume.")
-
-            if 'lazy' == query_strategy:
-                if os.path.exists(file_name):
-                    query_strategy = 'file'
-                else:
-                    query_strategy = 'server'
-
-            if file_name:
-                if ('file' == query_strategy or
-                    (os.path.exists(file_name)
-                     and reader
-                     and 'server' != query_strategy)):
-                        if reader == 'nrrd':
-                            result = nrrd.read(file_name)
-                            return result
-                else:
-                    Manifest.safe_make_parent_dirs(file_name)
-                    func(*args, **kwargs)
-
-                    if (read_by_default or 
-                        (reader and
-                         query_strategy is not None)):
-                        if reader == 'nrrd':
-                            result = nrrd.read(file_name)
-                            return result
-                        else:
-                            raise ValueError('unknown reader')
-            else:
-                func(*args, **kwargs)
-                
-            return
-        return w
-    return decor

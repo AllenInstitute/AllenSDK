@@ -388,3 +388,27 @@ def calculate_traces(stack, mask_list):
                 print(mask)
             raise
     return traces
+
+
+def create_roi_mask_array(rois):
+    '''Create full image mask array from list of RoiMasks.
+
+    Parameters
+    ----------
+    rois: list<RoiMask>
+        List of roi masks.
+
+    Returns
+    -------
+    np.ndarray: NxWxH array
+        Boolean array of of len(rois) image masks.
+    '''
+    if rois:
+        height = rois[0].img_rows
+        width = rois[0].img_cols
+        masks = np.zeros((len(rois), height, width), dtype=np.uint8)
+        for i, roi in enumerate(rois):
+            masks[i, :, :] = roi.get_mask_plane()
+    else:
+        masks = None
+    return masks

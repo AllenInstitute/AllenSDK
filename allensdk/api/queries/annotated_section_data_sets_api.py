@@ -82,7 +82,7 @@ class AnnotatedSectionDataSetsApi(RmaApi):
 
         return self.json_msg_query(url)
 
-    @cacheable
+    @cacheable()
     def get_annotated_section_data_sets_via_rma(self,
                                                 structures,
                                                 intensity_values=None,

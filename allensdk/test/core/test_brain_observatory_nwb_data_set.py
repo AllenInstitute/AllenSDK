@@ -13,20 +13,27 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
+
 import numpy as np
 from pkg_resources import resource_filename  # @UnresolvedImport
 from allensdk.core.brain_observatory_nwb_data_set import BrainObservatoryNwbDataSet
 import pytest
 import os
 
+
 NWB_FLAVORS = []
+
 
 if 'TEST_NWB_FILES' in os.environ:
     nwb_list_file = os.environ['TEST_NWB_FILES']
 else:
     nwb_list_file = resource_filename(__name__, 'nwb_files.txt')
-with open(nwb_list_file, 'r') as f:
-    NWB_FLAVORS = [l.strip() for l in f]
+
+if nwb_list_file == 'skip':
+    NWB_FLAVORS = []
+else:
+    with open(nwb_list_file, 'r') as f:
+        NWB_FLAVORS = [l.strip() for l in f]
 
 
 @pytest.fixture(params=NWB_FLAVORS)

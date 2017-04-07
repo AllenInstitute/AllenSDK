@@ -13,15 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Allen SDK.  If not, see <http://www.gnu.org/licenses/>.
 
-from stimulus_analysis import StimulusAnalysis
+from .stimulus_analysis import StimulusAnalysis
 import scipy.stats as st
 import pandas as pd
 import numpy as np
 import h5py
 from math import sqrt
 import logging
-import observatory_plots as oplots
-import circle_plots as cplots
+from . import observatory_plots as oplots
+from . import circle_plots as cplots
 from .brain_observatory_exceptions import MissingStimulusException
 import matplotlib.pyplot as plt
 
@@ -314,7 +314,7 @@ class DriftingGratings(StimulusAnalysis):
                 dg._binned_dx_vis = f["analysis/binned_dx_vis"].value
                 dg._binned_cells_vis = f["analysis/binned_cells_vis"].value
         except Exception as e:
-            raise MissingStimulusException(e.message)
+            raise MissingStimulusException(e.args)
 
         return dg
 

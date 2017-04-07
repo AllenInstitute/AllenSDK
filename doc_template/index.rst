@@ -87,16 +87,25 @@ The Allen SDK provides Python code for accessing experimental metadata along wit
 
 See the `mouse connectivity section <connectivity.html>`_ for more details.
 
-What's New - Release 0.12.4 (October 28th, 2016)
-------------------------------------------------
+What's New - Release 0.13.1 (March 23rd, 2017)
+----------------------------------------------
 
-The 0.12.4 release features a new 2016 version of the Allen Mouse Common Coordinate Framework.  This primarily affects Mouse Connectivity Atlas `structure unionize records <unionizes.html>`_ and structure masks.  All structure unionize records downloaded via the MouseConnectivityCache or API now correspond to the new CCF.  More details on CCF construction can be found in the `CCF technical whitepaper <http://help.brain-map.org/download/attachments/2818171/Mouse_Common_Coordinate_Framework.pdf?version=2&modificationDate=1477414987120>`_.  Users can download the old `unionize records here <http://download.alleninstitute.org/informatics-archive/june-2016/mouse_projection/>`_.
+The 0.13.1 release features a new set of classes for manipulating structure ontologies (:py:class:`~allensdk.core.structure_tree.StructureTree`) and annotated reference spaces like the CCF (:py:class:`~allensdk.core.reference_space.ReferenceSpace`).  These were designed based on feedback from the community that more regular, specifically named functions would be valuable.  The :py:class:`~allensdk.core.ontology.Ontology` class is now deprecated in favor of :py:class:`~allensdk.core.structure_tree.StructureTree`.  Take a look at the `Reference Space documentation page <reference_space.html>`_.  
 
-This release also addresses issues from the Github issue tracker:
-  
-    * issues #23, #28 - added a new dependency "requests_toolbelt" and upgraded API database for more reliable large file downloads.
-    * issue #27 - MouseConnectivityCache.get_structure_unionizes returns only requested structures, not all descendants.  Added a separate argument for descendant inclusion.
-    * issue #26 - documentation for structure unionize records `here <unionizes.html>`_.
-    * issue #25 - documentation errors in brain observatory analysis.
+This release also addresses several issues:
+
+    * issue #35: structure masks at different resolutions were overwriting each other
+    * issue #37: updating cell types notebook to use new feature extractor
+    * issue #34: deprecated stateful methods in :py:class:`~allensdk.api.queries.glif_api.GlifApi` in favor of stateless versions.
+    * issue #42: broken caching behavior in MouseConnectivityCache
+    * broken GLIF documentation/examples
+
+Note that because of the change to the structure mask paths, users will need to regenerate their MouseConnectivityCache manifests.  Also, if you don't want to regenerate all of your masks, please move them from here: 
+
+    * `manifest_dir/structure_masks/`
+
+To here (with the appropriate CCF/resolution strings):
+
+    * `manifest_dir/annotation/ccf_2016/resolution_25/structure_masks/`
 
 To find out more, take a look at our `CHANGELOG <http://github.com/AllenInstitute/AllenSDK/blob/master/CHANGELOG.md>`_. 

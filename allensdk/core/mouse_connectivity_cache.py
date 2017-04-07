@@ -17,9 +17,12 @@ from allensdk.config.manifest_builder import ManifestBuilder
 from allensdk.api.cache import Cache
 from allensdk.api.queries.mouse_connectivity_api import MouseConnectivityApi
 from allensdk.api.queries.ontologies_api import OntologiesApi
+from allensdk.deprecated import deprecated
 
 from . import json_utilities
 from .ontology import Ontology
+from .structure_tree import StructureTree
+from .reference_space import ReferenceSpace
 
 import nrrd
 import os
@@ -27,6 +30,8 @@ import pandas as pd
 import numpy as np
 from allensdk.config.manifest import Manifest
 import warnings
+import operator as op
+import functools
 
 
 class MouseConnectivityCache(Cache):
@@ -82,8 +87,9 @@ class MouseConnectivityCache(Cache):
     STRUCTURE_UNIONIZES_KEY = 'STRUCTURE_UNIONIZES'
     EXPERIMENTS_KEY = 'EXPERIMENTS'
     STRUCTURES_KEY = 'STRUCTURES'
+    STRUCTURE_TREE_KEY = 'STRUCTURE_TREE'
     STRUCTURE_MASK_KEY = 'STRUCTURE_MASK'
-
+    MANIFEST_VERSION = 1.0
 
     def __init__(self,
                  resolution=None,
@@ -92,7 +98,7 @@ class MouseConnectivityCache(Cache):
                  ccf_version=None,
                  base_uri=None):
         super(MouseConnectivityCache, self).__init__(
-            manifest=manifest_file, cache=cache)
+            manifest=manifest_file, cache=cache, version=self.MANIFEST_VERSION)
 
         if resolution is None:
             self.resolution = MouseConnectivityApi.VOXEL_RESOLUTION_25_MICRONS
@@ -103,7 +109,7 @@ class MouseConnectivityCache(Cache):
         if ccf_version is None:
             ccf_version = MouseConnectivityApi.CCF_VERSION_DEFAULT
         self.ccf_version = ccf_version
-
+        
     def get_annotation_volume(self, file_name=None):
         """
         Read the annotation volume.  Download it first if it doesn't exist.
@@ -124,7 +130,8 @@ class MouseConnectivityCache(Cache):
         annotation, info = self.api.download_annotation_volume(
             self.ccf_version,
             self.resolution,
-            file_name)
+            file_name, 
+            strategy='lazy')
 
         return annotation, info
 
@@ -145,18 +152,11 @@ class MouseConnectivityCache(Cache):
         file_name = self.get_cache_path(
             file_name, self.TEMPLATE_KEY, self.resolution)
 
-        if file_name is None:
-            raise Exception("No save file provided for annotation volume.")
+        template, info = self.api.download_template_volume(self.resolution, 
+                                                           file_name, 
+                                                           strategy='lazy')
 
-        if os.path.exists(file_name):
-            annotation, info = nrrd.read(file_name)
-        else:
-            Manifest.safe_make_parent_dirs(file_name)
-
-            annotation, info = self.api.download_template_volume(
-                self.resolution, file_name)
-
-        return annotation, info
+        return template, info
 
     def get_projection_density(self, experiment_id, file_name=None):
         """
@@ -177,12 +177,14 @@ class MouseConnectivityCache(Cache):
             file_name will be pulled out of the manifest.  Default is None.
 
         """
+        
         file_name = self.get_cache_path(file_name,
                                         self.PROJECTION_DENSITY_KEY,
                                         experiment_id,
                                         self.resolution)
+                                        
         self.api.download_projection_density(
-            file_name, experiment_id, self.resolution)
+            file_name, experiment_id, self.resolution, strategy='lazy')
 
         return nrrd.read(file_name)
 
@@ -206,18 +208,13 @@ class MouseConnectivityCache(Cache):
             file_name will be pulled out of the manifest.  Default is None.
 
         """
-
-        file_name = self.get_cache_path(
-            file_name, self.INJECTION_DENSITY_KEY, experiment_id, self.resolution)
-
-        if file_name is None:
-            raise Exception("No file name to save volume.")
-
-        if not os.path.exists(file_name):
-            Manifest.safe_make_parent_dirs(file_name)
-
-            self.api.download_injection_density(
-                file_name, experiment_id, self.resolution)
+        
+        file_name = self.get_cache_path(file_name,
+                                        self.INJECTION_DENSITY_KEY,
+                                        experiment_id,
+                                        self.resolution)
+        self.api.download_injection_density(
+            file_name, experiment_id, self.resolution, strategy='lazy')
 
         return nrrd.read(file_name)
 
@@ -241,17 +238,12 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.INJECTION_FRACTION_KEY, experiment_id, self.resolution)
-
-        if file_name is None:
-            raise Exception("No file name to save volume.")
-
-        if not os.path.exists(file_name):
-            Manifest.safe_make_parent_dirs(file_name)
-
-            self.api.download_injection_fraction(
-                file_name, experiment_id, self.resolution)
+        file_name = self.get_cache_path(file_name,
+                                        self.INJECTION_FRACTION_KEY,
+                                        experiment_id,
+                                        self.resolution)
+        self.api.download_injection_fraction(
+            file_name, experiment_id, self.resolution, strategy='lazy')
 
         return nrrd.read(file_name)
 
@@ -275,20 +267,40 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.DATA_MASK_KEY, experiment_id, self.resolution)
-
-        if file_name is None:
-            raise Exception("No file name to save volume.")
-
-        if not os.path.exists(file_name):
-            Manifest.safe_make_parent_dirs(file_name)
-
-            self.api.download_data_mask(
-                file_name, experiment_id, self.resolution)
+        file_name = self.get_cache_path(file_name,
+                                        self.DATA_MASK_KEY,
+                                        experiment_id,
+                                        self.resolution)
+        self.api.download_data_mask(
+            file_name, experiment_id, self.resolution, strategy='lazy')
 
         return nrrd.read(file_name)
 
+    def get_structure_tree(self, file_name=None):
+        """
+        Read the list of adult mouse structures and return an StructureTree 
+        instance.
+
+        Parameters
+        ----------
+
+        file_name: string
+            File name to save/read the structures table.  If file_name is None,
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+        """
+        
+        file_name = self.get_cache_path(file_name, self.STRUCTURE_TREE_KEY)
+
+        return OntologiesApi(self.api.api_url).get_structures_with_sets(
+            strategy='lazy',
+            path=file_name,
+            pre=StructureTree.clean_structures, 
+            post=StructureTree, 
+            structure_graph_ids=1,
+            **Cache.cache_json())
+
+    @deprecated('Use get_structure_tree instead.')
     def get_ontology(self, file_name=None):
         """
         Read the list of adult mouse structures and return an Ontology instance.
@@ -304,6 +316,7 @@ class MouseConnectivityCache(Cache):
 
         return Ontology(self.get_structures(file_name))
 
+    @deprecated('Use get_structure_tree instead.')
     def get_structures(self, file_name=None):
         """
         Read the list of adult mouse structures and return a Pandas DataFrame.
@@ -320,10 +333,9 @@ class MouseConnectivityCache(Cache):
 
         return OntologiesApi(base_uri=self.api.api_url).get_structures(
             1,
-            query_strategy='lazy',
+            strategy='lazy',
             path=file_name,
-            file_type='csv',
-            dataframe=True)
+            **Cache.cache_csv_dataframe())
 
 
     def get_experiments(self, dataframe=False, file_name=None, cre=None, injection_structure_ids=None):
@@ -411,9 +423,10 @@ class MouseConnectivityCache(Cache):
                 'transgenic-line'] in cre]
 
         if injection_structure_ids is not None:
-            descendant_ids = self.get_ontology().get_descendant_ids(injection_structure_ids)
-            experiments = [e for e in experiments if e[
-                'structure-id'] in descendant_ids]
+            descendant_ids = reduce(op.add, self.get_structure_tree()\
+                                    .descendant_ids(injection_structure_ids))
+            experiments = [e for e in experiments 
+                           if e['structure-id'] in descendant_ids]
 
         return experiments
 
@@ -457,30 +470,25 @@ class MouseConnectivityCache(Cache):
 
         """
 
-        file_name = self.get_cache_path(
-            file_name, self.STRUCTURE_UNIONIZES_KEY, experiment_id)
-
-        if os.path.exists(file_name):
-            unionizes = pd.DataFrame.from_csv(file_name)
-        else:
-            unionizes = self.api.get_structure_unionizes([experiment_id])
-            unionizes = pd.DataFrame(unionizes)
-
-            # rename section_data_set_id column to experiment_id
-            unionizes.columns = ['experiment_id'
-                                 if c == 'section_data_set_id' else c
-                                 for c in unionizes.columns]
-
-            if self.cache:
-                Manifest.safe_make_parent_dirs(file_name)
-
-                unionizes.to_csv(file_name)
-
-        return self.filter_structure_unionizes(unionizes, 
-                                               is_injection, 
-                                               structure_ids,
-                                               include_descendants,
-                                               hemisphere_ids)
+        file_name = self.get_cache_path(file_name, 
+                                        self.STRUCTURE_UNIONIZES_KEY, 
+                                        experiment_id)
+                   
+        filter_fn = functools.partial(self.filter_structure_unionizes, 
+                                      is_injection=is_injection, 
+                                      structure_ids=structure_ids, 
+                                      include_descendants=include_descendants, 
+                                      hemisphere_ids=hemisphere_ids)
+                                      
+        col_rn = lambda x: pd.DataFrame(x).rename(columns={
+            'section_data_set_id': 'experiment_id'})
+                                      
+        return self.api.get_structure_unionizes([experiment_id], 
+                                                path=file_name,
+                                                strategy='lazy',  
+                                                pre=col_rn, 
+                                                post=filter_fn, 
+                                                **Cache.cache_csv_dataframe())
 
     def filter_structure_unionizes(self, unionizes, 
                                    is_injection=None, 
@@ -515,7 +523,7 @@ class MouseConnectivityCache(Cache):
 
         if structure_ids is not None:
             if include_descendants:
-                structure_ids = self.get_ontology().get_descendant_ids(structure_ids)
+                structure_ids = reduce(op.add, self.get_structure_tree().descendant_ids(structure_ids))
             else:
                 structure_ids = set(structure_ids)
 
@@ -600,12 +608,13 @@ class MouseConnectivityCache(Cache):
         cidx = 0
         hlabel = {1: '-L', 2: '-R', 3: ''}
 
-        o = self.get_ontology()
+        acronym_map = self.get_structure_tree().value_map(lambda x: x['id'], 
+                                                          lambda x: x['acronym'])
 
         for hid in hemisphere_ids:
             for sid in projection_structure_ids:
                 column_lookup[(hid, sid)] = cidx
-                label = o[sid].iloc[0]['acronym'] + hlabel[hid]
+                label = acronym_map[sid] + hlabel[hid]
                 columns.append(
                     {'hemisphere_id': hid, 'structure_id': sid, 'label': label})
                 cidx += 1
@@ -628,11 +637,42 @@ class MouseConnectivityCache(Cache):
         else:
             return {'matrix': matrix, 'rows': experiment_ids, 'columns': columns}
 
+    def get_reference_space(self, structure_file_name=None, 
+                            annotation_file_name=None):
+        """
+        Build a ReferenceSpace from this cache's annotation volume and 
+        structure tree. The ReferenceSpace does operations that relate brain 
+        structures to spatial domains.
+        
+        Parameters
+        ----------
+        
+        structure_file_name: string
+            File name to save/read the structures table.  If file_name is None,
+            the file_name will be pulled out of the manifest.  If caching
+            is disabled, no file will be saved. Default is None.
+            
+        annotation_file_name: string
+            File name to store the annotation volume.  If it already exists,
+            it will be read from this file.  If file_name is None, the
+            file_name will be pulled out of the manifest.  Default is None.
+        
+        """
+        
+        return ReferenceSpace(self.get_structure_tree(structure_file_name), 
+                              self.get_annotation_volume(annotation_file_name)[0], 
+                              [self.resolution] * 3)
+
     def get_structure_mask(self, structure_id, file_name=None, annotation_file_name=None):
         """
         Read a 3D numpy array shaped like the annotation volume that has non-zero values where
         voxels belong to a particular structure.  This will take care of identifying substructures.
 
+        Notes
+        -----
+        If you are making large numbers of masks, there is a faster structure mask generator in 
+        ReferenceSpace.many_structure_masks.  We will be migrating this function in a future release.
+        
         Parameters
         ----------
 
@@ -649,6 +689,10 @@ class MouseConnectivityCache(Cache):
             it will be read from this file.  If file_name is None, the
             file_name will be pulled out of the manifest.  Default is None.
         """
+        try:
+            structure_id = int(structure_id)
+        except ValueError as e:
+            raise ValueError("Invalid structure_id (%s): could not convert to integer." % str(structure_id))
         
         file_name = self.get_cache_path(
             file_name, self.STRUCTURE_MASK_KEY, self.ccf_version, 
@@ -657,8 +701,8 @@ class MouseConnectivityCache(Cache):
         if os.path.exists(file_name):
             return nrrd.read(file_name)
         else:
-            ont = self.get_ontology()
-            structure_ids = ont.get_descendant_ids([structure_id])
+            st = self.get_structure_tree()
+            structure_ids = st.descendant_ids([structure_id])[0]
             annotation, _ = self.get_annotation_volume(annotation_file_name)
             mask = self.make_structure_mask(structure_ids, annotation)
 
@@ -704,6 +748,7 @@ class MouseConnectivityCache(Cache):
         """
 
         manifest_builder = ManifestBuilder()
+        manifest_builder.set_version(self.MANIFEST_VERSION)
         manifest_builder.add_path('BASEDIR', '.')
 
         manifest_builder.add_path(self.EXPERIMENTS_KEY,
@@ -713,6 +758,11 @@ class MouseConnectivityCache(Cache):
 
         manifest_builder.add_path(self.STRUCTURES_KEY,
                                   'structures.csv',
+                                  parent_key='BASEDIR',
+                                  typename='file')
+                                  
+        manifest_builder.add_path(self.STRUCTURE_TREE_KEY,
+                                  'structures.json',
                                   parent_key='BASEDIR',
                                   typename='file')
 
@@ -762,3 +812,4 @@ class MouseConnectivityCache(Cache):
                                   typename='file')
 
         manifest_builder.write_json_file(file_name)
+        

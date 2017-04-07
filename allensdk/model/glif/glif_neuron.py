@@ -1,11 +1,14 @@
 import logging
 
 import numpy as np
-import json 
+import simplejson as json 
 import allensdk.core.json_utilities as ju
 import copy
 
-from glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
+try:
+    from glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
+except:
+    from .glif_neuron_methods import GlifNeuronMethod, METHOD_LIBRARY
 
 class GlifBadResetException( Exception ):
     """ Exception raised when voltage is still above threshold after a reset rule is applied. """
@@ -216,7 +219,6 @@ class GlifNeuron( object ):
         GlifNeuronMethod
             a GlifNeuronMethod instance
         """
-        print "method type", method_type
         method_options = METHOD_LIBRARY.get(method_type, None)
 
         assert method_options is not None, Exception("Unknown method type (%s)" % method_type)

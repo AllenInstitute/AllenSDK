@@ -29,7 +29,7 @@ from allensdk.brain_observatory.brain_observatory_exceptions import MissingStimu
 
 class BrainObservatoryNwbDataSet(object):
     PIPELINE_DATASET = 'brain_observatory_pipeline'
-    SUPPORTED_PIPELINE_VERSION = "1.0"
+    SUPPORTED_PIPELINE_VERSION = "2.0"
 
     FILE_METADATA_MAPPING = {
         'age': 'general/subject/age',
@@ -57,21 +57,26 @@ class BrainObservatoryNwbDataSet(object):
 
     }
 
+    # this array was moved before file versioning was in place
     MOTION_CORRECTION_DATASETS = [ "MotionCorrection/2p_image_series/xy_translations", 
                                    "MotionCorrection/2p_image_series/xy_translation" ]
 
     def __init__(self, nwb_file):
 
         self.nwb_file = nwb_file
+        self.pipeline_version = None
         
         if os.path.exists(self.nwb_file):
             meta = self.get_metadata()
             if meta and 'pipeline_version' in meta:
-                pipeline_version = meta['pipeline_version']
-        
-                if parse_version(pipeline_version) > parse_version(self.SUPPORTED_PIPELINE_VERSION):
+                pipeline_version_str = meta['pipeline_version']
+                self.pipeline_version = parse_version(pipeline_version_str)
+
+                if self.pipeline_version > parse_version(self.SUPPORTED_PIPELINE_VERSION):
                     logging.warning("File %s has a pipeline version newer than the version supported by this class (%s vs %s)."
-                                    " Please update your AllenSDK." % (nwb_file, pipeline_version, self.SUPPORTED_PIPELINE_VERSION))
+                                    " Please update your AllenSDK." % (nwb_file, pipeline_version_str, self.SUPPORTED_PIPELINE_VERSION))
+
+
 
     def get_fluorescence_traces(self, cell_specimen_ids=None):
         ''' Returns an array of fluorescence traces for all ROI and
@@ -113,7 +118,7 @@ class BrainObservatoryNwbDataSet(object):
         return timestamps
 
     def get_neuropil_traces(self, cell_specimen_ids=None):
-        ''' Returns an array of fluorescence traces for all ROIs
+        ''' Returns an array of neuropil fluorescence traces for all ROIs
         and the timestamps for each datapoint
 
         Parameters
@@ -134,8 +139,13 @@ class BrainObservatoryNwbDataSet(object):
         timestamps = self.get_fluorescence_timestamps()
 
         with h5py.File(self.nwb_file, 'r') as f:
-            ds = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['neuropil_traces']
+            if self.pipeline_version >= parse_version("2.0"):
+                ds = f['processing'][self.PIPELINE_DATASET][
+                    'Fluorescence']['imaging_plane_1_neuropil_response']['data']
+            else:
+                ds = f['processing'][self.PIPELINE_DATASET][
+                    'Fluorescence']['imaging_plane_1']['neuropil_traces']
+
             if cell_specimen_ids is None:
                 np_traces = ds.value
             else:
@@ -161,8 +171,12 @@ class BrainObservatoryNwbDataSet(object):
         '''
 
         with h5py.File(self.nwb_file, 'r') as f:
-            r_ds = f['processing'][self.PIPELINE_DATASET][
-                'Fluorescence']['imaging_plane_1']['r']
+            if self.pipeline_version >= parse_version("2.0"):
+                r_ds = f['processing'][self.PIPELINE_DATASET][
+                    'Fluorescence']['imaging_plane_1_neuropil_response']['r']
+            else:
+                r_ds = f['processing'][self.PIPELINE_DATASET][
+                    'Fluorescence']['imaging_plane_1']['r']
 
             if cell_specimen_ids is None:
                 r = r_ds.value
@@ -172,8 +186,40 @@ class BrainObservatoryNwbDataSet(object):
 
         return r
 
+    def get_demixed_traces(self, cell_specimen_ids=None):
+        ''' Returns an array of demixed fluorescence traces for all ROIs
+        and the timestamps for each datapoint
+
+        Parameters
+        ----------
+        cell_specimen_ids: list or array (optional)
+            List of cell IDs to return traces for. If this is None (default)
+            then all are returned
+
+        Returns
+        -------
+        timestamps: 2D numpy array
+            Timestamp for each fluorescence sample
+
+        traces: 2D numpy array
+            Demixed fluorescence traces for each cell
+        '''
+
+        timestamps = self.get_fluorescence_timestamps()
+
+        with h5py.File(self.nwb_file, 'r') as f:
+            ds = f['processing'][self.PIPELINE_DATASET][
+                'Fluorescence']['imaging_plane_1_demixed_signal']['data']
+            if cell_specimen_ids is None:
+                np_traces = ds.value
+            else:
+                inds = self.get_cell_specimen_indices(cell_specimen_ids)
+                traces = ds[inds, :]
+
+        return timestamps, traces
+
     def get_corrected_fluorescence_traces(self, cell_specimen_ids=None):
-        ''' Returns an array of neuropil-corrected fluorescence traces
+        ''' Returns an array of demixed and neuropil-corrected fluorescence traces
         for all ROIs and the timestamps for each datapoint
 
         Parameters
@@ -190,14 +236,16 @@ class BrainObservatoryNwbDataSet(object):
         traces: 2D numpy array
             Corrected fluorescence traces for each cell
         '''
-        
-        timestamps, cell_traces = self.get_fluorescence_traces(cell_specimen_ids)
+
+        # starting in version 2.0, neuropil correction follows trace demixing
+        if self.pipeline_version >= parse_version("2.0"):
+            timestamps, cell_traces = self.get_demixed_traces(cell_specimen_ids)
+        else:
+            timestamps, cell_traces = self.get_fluorescence_traces(cell_specimen_ids)
 
         r = self.get_neuropil_r(cell_specimen_ids)
 
         _, neuropil_traces = self.get_neuropil_traces(cell_specimen_ids)
-
-
 
         fc = cell_traces - neuropil_traces * r[:, np.newaxis]
 
@@ -450,15 +498,7 @@ class BrainObservatoryNwbDataSet(object):
         if len(roi_masks) == 0:
             raise IOError("no masks found for given cell specimen ids")
 
-        roi_list = []
-        for m in roi_masks:
-            roi_list.append(m.get_mask_plane())
-
-        roi_arr = np.zeros((len(roi_list), roi_list[0].shape[
-                           0], roi_list[0].shape[1]), dtype=np.uint8)
-
-        for i, roi in enumerate(roi_list):
-            roi_arr[i, :, :] = roi
+        roi_arr = roi.create_roi_mask_array(roi_masks)
 
         return roi_arr
 
