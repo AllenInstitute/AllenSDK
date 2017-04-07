@@ -406,7 +406,7 @@ def create_roi_mask_array(rois):
     if rois:
         height = rois[0].img_rows
         width = rois[0].img_cols
-        masks = np.zeros((len(rois), height, width), dtype=bool)
+        masks = np.zeros((len(rois), height, width), dtype=np.uint8)
         for i, roi in enumerate(rois):
             masks[i, :, :] = roi.get_mask_plane()
     else:
